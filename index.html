@@ -9,8 +9,10 @@
 <meta name="referrer" content="no-referrer">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<!-- Leaflet 1.9.4 ships dist/leaflet.js (no leaflet.min.js). Official unpkg build, SRI-pinned;
+     deferred so a slow CDN never blocks first paint. ensureLeaflet() falls back to jsDelivr. -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
 <style>
 :root{
   --bg:#070c0e; --card:#0d1518; --border:#1b2a2f; --hover:#162529;
@@ -32,7 +34,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .brand-shield{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;
   background:rgba(16,185,129,.12);border:1px solid rgba(52,211,153,.45);box-shadow:0 0 18px rgba(16,185,129,.25)}
 .brand-word b{color:var(--mint2);font-weight:900}
-.brand-word sup{font-size:.55em;color:var(--mint2);margin-left:1px}
+.brand-logo sup,.hero h1 sup{line-height:0;vertical-align:super;margin-left:1px}
 .brand-logo:focus-visible{outline:2px solid var(--mint2);outline-offset:3px;border-radius:10px}
 .brand-sub{font-size:.64rem;color:var(--muted);letter-spacing:.6px;text-transform:uppercase;border-left:1px solid var(--border);padding-left:10px}
 
@@ -78,7 +80,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 
 .privacy-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(16,185,129,.08);
   border:1px solid var(--border);color:var(--mint2);border-radius:20px;padding:10px 18px;
-  font-size:.78rem;font-weight:700;cursor:pointer;align-self:flex-start;transition:border-color .15s}
+  font-size:.78rem;font-weight:700;cursor:pointer;align-self:center;justify-content:center;text-align:center;transition:border-color .15s}
 .privacy-pill:hover{border-color:var(--mint2)}
 
 .hud-left{display:flex;flex-direction:column;gap:16px}
@@ -153,10 +155,10 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   .sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border);max-height:none}
   .mapwrap{height:420px}
   .hud-grid{grid-template-columns:1fr}
-  .privacy-pill{align-self:center;text-align:center;justify-content:center}
   header.topbar{padding:10px 14px}
   .grid-select{min-width:160px}
 }
+.map-offline{display:flex;align-items:center;justify-content:center;height:100%;padding:16px;text-align:center;font-size:.76rem;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -167,7 +169,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
         <span class="brand-shield" aria-hidden="true">
           <svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="var(--mint)" stroke="var(--mint2)" stroke-width="1.5" stroke-linejoin="round"/><path d="m8.5 12 2.5 2.5 4.5-5" fill="none" stroke="#051311" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </span>
-        <span class="brand-word">CITIXEN <b>UX</b><sup>™</sup></span>
+        <span class="brand-word">CITIXEN <b>UX</b><sup style="font-weight: 300; font-size: 0.5em; opacity: 0.75;">™</sup></span>
       </a>
       <div class="brand-sub">Civic Intelligence Platform</div>
     </div>
@@ -195,7 +197,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   </header>
 
   <section class="hero">
-    <h1>CITIXEN UX™</h1>
+    <h1>CITIXEN UX<sup style="font-weight: 300; font-size: 0.5em; opacity: 0.75;">™</sup></h1>
     <h2>Civic Intelligence & Anonymous Dispatch Gateway</h2>
   </section>
 
@@ -285,8 +287,8 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
       <div class="card" style="flex:1;">
         <div class="label"><span>Live dispatch feed</span><span class="small" id="feedCount">3 shown</span></div>
         <div class="audit-tabs">
-          <button class="audit-tab active" data-view="live">Civic Tools</button>
-          <button class="audit-tab" data-view="audit">Your Reports</button>
+          <button class="audit-tab active" data-view="live">Active Incidents</button>
+          <button class="audit-tab" data-view="audit">Community Log</button>
         </div>
         <div class="filter-tabs">
           <button class="filter-tab active" data-filter="All">All</button>
@@ -352,9 +354,37 @@ function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&l
 function statusColor(status){ return status==='Critical' ? '#ef4444' : status==='Warning' ? '#f59e0b' : '#10b981'; }
 function statusPill(status){ return status==='Critical' ? 'pill-crit' : status==='Warning' ? 'pill-warn' : 'pill-ok'; }
 
+/* ===== LEAFLET LOADER =====
+   The <head> script is deferred, so window.L is normally set before DOMContentLoaded.
+   If the primary CDN is blocked or fails, load the same SRI-pinned build from jsDelivr;
+   if that fails too, the map degrades to a notice instead of throwing. */
+const LEAFLET_FALLBACK='https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/';
+let leafletReady=null;
+function ensureLeaflet(){
+  if(window.L) return Promise.resolve(window.L);
+  if(leafletReady) return leafletReady;
+  leafletReady=new Promise((resolve,reject)=>{
+    const css=document.createElement('link');
+    css.rel='stylesheet'; css.href=LEAFLET_FALLBACK+'leaflet.css';
+    css.integrity='sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY='; css.crossOrigin='';
+    document.head.appendChild(css);
+    const s=document.createElement('script');
+    s.src=LEAFLET_FALLBACK+'leaflet.js';
+    s.integrity='sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo='; s.crossOrigin='';
+    s.onload=()=>window.L ? resolve(window.L) : reject(new Error('Leaflet unavailable'));
+    s.onerror=()=>reject(new Error('Leaflet unavailable'));
+    document.head.appendChild(s);
+  }).catch(err=>{ leafletReady=null; throw err; });
+  return leafletReady;
+}
+function mapUnavailable(){
+  const el=document.getElementById('map');
+  if(el) el.innerHTML='<div class="map-offline">Map tiles are unavailable right now. The live feed still works.</div>';
+}
 /* ===== MAP ===== */
 let map, markers={};
-function initMap(){
+async function initMap(){
+  try{ await ensureLeaflet(); }catch(e){ mapUnavailable(); return; }
   map=L.map('map',{attributionControl:false}).setView([cities.lacrosse.lat,cities.lacrosse.lng],cities.lacrosse.zoom);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
     maxZoom:19, subdomains:'abcd', crossOrigin:true

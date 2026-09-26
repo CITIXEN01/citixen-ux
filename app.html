@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>CITIXEN UX // Civic Intelligence Platform</title>
+<title>CITIXEN UX™ // Civic Intelligence Platform</title>
 <meta name="theme-color" content="#10b981">
 <meta name="referrer" content="no-referrer">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -11,8 +11,10 @@
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%23070c0e%22/><text x=%2250%22 y=%2268%22 font-size=%2258%22 text-anchor=%22middle%22>🏛️</text></svg>">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<!-- Leaflet 1.9.4 ships dist/leaflet.js (no leaflet.min.js). Official unpkg build, SRI-pinned;
+     deferred so a slow CDN never blocks first paint. ensureLeaflet() falls back to jsDelivr. -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
 <style>
 :root{
   --bg:#070c0e; --card:#0d1518; --border:#1b2a2f; --hover:#162529;
@@ -116,6 +118,8 @@ textarea.input{resize:none;line-height:1.4}
 #photoPreview{display:block;width:100%;max-height:220px;object-fit:cover;border-radius:10px;border:1px solid var(--mint2)}
 /* OSM tiles → dark mode */
 .leaflet-tile-container{filter:invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)}
+.brand-logo sup{line-height:0;vertical-align:super;margin-left:1px}
+.map-offline{display:flex;align-items:center;justify-content:center;height:100%;padding:16px;text-align:center;font-size:.76rem;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -125,7 +129,7 @@ textarea.input{resize:none;line-height:1.4}
     <div class="brand">
       <div class="brand-logo">
         <svg viewBox="0 0 24 24" width="21" height="21" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        CITIXEN UX
+        <span>CITIXEN UX<sup style="font-weight: 300; font-size: 0.5em; opacity: 0.75;">™</sup></span>
       </div>
       <div class="badge"><span class="badge-dot"></span> WARD 4 ACTIVE</div>
     </div>
@@ -316,9 +320,8 @@ function switchTab(id,btn){
   document.querySelectorAll('.navtab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   if(id==='tab-map'){
-    if(!mapInit) initMap();
     // Force Leaflet to recalculate container dimensions once unhidden
-    setTimeout(()=>{ if(map) map.invalidateSize(); },200);
+    initMap().then(m=>{ if(m) setTimeout(()=>m.invalidateSize(),200); });
   }
 }
 
@@ -328,7 +331,41 @@ function selectCat(el){
   cat=el.dataset.cat;
 }
 
+/* ===== LEAFLET LOADER =====
+   The <head> script is deferred, so window.L is normally set before DOMContentLoaded.
+   If the primary CDN is blocked or fails, load the same SRI-pinned build from jsDelivr;
+   if that fails too, the map degrades to a notice instead of throwing. */
+const LEAFLET_FALLBACK='https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/';
+let leafletReady=null;
+function ensureLeaflet(){
+  if(window.L) return Promise.resolve(window.L);
+  if(leafletReady) return leafletReady;
+  leafletReady=new Promise((resolve,reject)=>{
+    const css=document.createElement('link');
+    css.rel='stylesheet'; css.href=LEAFLET_FALLBACK+'leaflet.css';
+    css.integrity='sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY='; css.crossOrigin='';
+    document.head.appendChild(css);
+    const s=document.createElement('script');
+    s.src=LEAFLET_FALLBACK+'leaflet.js';
+    s.integrity='sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo='; s.crossOrigin='';
+    s.onload=()=>window.L ? resolve(window.L) : reject(new Error('Leaflet unavailable'));
+    s.onerror=()=>reject(new Error('Leaflet unavailable'));
+    document.head.appendChild(s);
+  }).catch(err=>{ leafletReady=null; throw err; });
+  return leafletReady;
+}
+function mapUnavailable(){
+  const el=document.getElementById('map');
+  if(el) el.innerHTML='<div class="map-offline">Map tiles are unavailable right now. The live feed still works.</div>';
+}
+let mapLoading=null;
 function initMap(){
+  if(!mapLoading){
+    mapLoading=ensureLeaflet().then(buildMap).catch(()=>{ mapLoading=null; mapUnavailable(); return null; });
+  }
+  return mapLoading;
+}
+function buildMap(){
   map=L.map('map',{attributionControl:true}).setView([43.8138,-91.2519],14);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
     maxZoom:19,
@@ -338,6 +375,7 @@ function initMap(){
   }).addTo(map);
   cases.forEach(plotMarker);
   mapInit=true;
+  return map;
 }
 
 function statusColor(status){
@@ -365,9 +403,11 @@ function renderFeed(){
       <div class="small" style="margin:4px 0">${esc(item.desc)}</div>
       <div class="row small"><span>${esc(item.loc)}</span><span>${esc(item.time)}</span></div>`;
     el.addEventListener('click',()=>{
-      if(!mapInit) initMap();
-      map.flyTo([item.lat,item.lng],16);
-      markers[item.id] && markers[item.id].openPopup();
+      initMap().then(m=>{
+        if(!m) return;
+        m.flyTo([item.lat,item.lng],16);
+        markers[item.id] && markers[item.id].openPopup();
+      });
     });
     c.appendChild(el);
   });
