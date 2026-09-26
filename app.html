@@ -10,7 +10,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%23070c0e%22/><text x=%2250%22 y=%2268%22 font-size=%2258%22 text-anchor=%22middle%22>🏛️</text></svg>">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
 <!-- Leaflet is not loaded here: ensureLeaflet() fetches it on first use of the Map tab,
      so the report form and splash never wait on the map CDN. -->
 <style>
@@ -82,8 +83,17 @@ textarea.input{resize:none;line-height:1.4}
 .navtab.active{color:var(--mint2)}
 .navtab svg{width:19px;height:19px}
 
-#map{height:220px;width:100%;border-radius:12px;border:1px solid var(--border);background:#0d1518}
-.leaflet-container{background:#0d1518}
+#map{height:220px;width:100%;border-radius:12px;border:1px solid var(--border);background:#0D1117}
+/* ===== MAP THEME (CARTO Dark Matter) — scoped under #map to beat leaflet.css, which loads later ===== */
+#map.leaflet-container{background:#0D1117}
+#map .leaflet-bar{border:1px solid #00FF66 !important;border-radius:8px;overflow:hidden;box-shadow:0 0 10px rgba(0,255,102,.12) !important}
+#map .leaflet-bar a,#map .leaflet-bar a:hover{background:#161B22;color:#e6edf3;border-bottom:1px solid rgba(0,255,102,.25)}
+#map .leaflet-bar a:last-child{border-bottom:none}
+#map .leaflet-bar a:hover{color:#00FF66;background:#1c232c}
+#map .leaflet-bar a.leaflet-disabled{background:#161B22;color:#4b5563}
+#map .leaflet-control-attribution.leaflet-control{background:rgba(13,17,23,.8);color:#8b949e}
+#map .leaflet-control-attribution a{color:#8b949e}
+#map .leaflet-div-icon{background:none;border:none}
 .feed-item{background:rgba(7,12,14,.6);border:1px solid var(--border);border-radius:10px;padding:12px;
   margin-bottom:8px;cursor:pointer}
 .feed-item:hover{border-color:var(--mint2)}
@@ -116,8 +126,6 @@ textarea.input{resize:none;line-height:1.4}
 .cam-round:disabled{opacity:.35;cursor:default}
 .cam-round:focus-visible,.btn-submit:focus-visible{outline:2px solid var(--mint2);outline-offset:2px}
 #photoPreview{display:block;width:100%;max-height:220px;object-fit:cover;border-radius:10px;border:1px solid var(--mint2)}
-/* OSM tiles → dark mode */
-.leaflet-tile-container{filter:invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)}
 .brand-logo sup{line-height:0;vertical-align:super;margin-left:1px}
 /* ===== LOADING / SPLASH GRID ===== */
 .loading-grid{isolation:isolate}
@@ -406,11 +414,9 @@ function initMap(){
 function buildMap(){
   document.getElementById('map').textContent=''; // drop any earlier 'unavailable' notice on retry
   map=L.map('map',{attributionControl:true}).setView([43.8138,-91.2519],14);
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    maxZoom:19,
-    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    // Page is no-referrer; OSM's tile policy needs a Referer, so send origin only (no path).
-    referrerPolicy:'strict-origin-when-cross-origin'
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+    maxZoom:19, subdomains:'abcd',
+    attribution:'&copy; OpenStreetMap contributors &copy; CARTO'
   }).addTo(map);
   cases.forEach(plotMarker);
   mapInit=true;

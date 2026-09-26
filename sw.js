@@ -1,0 +1,67 @@
+/* CITIXEN UX service worker
+   - Precaches the app shell so the reporter opens offline / on flaky networks.
+   - Pages: network-first (always fresh when online), cached copy as fallback.
+   - Same-origin static files: stale-while-revalidate.
+   - Cross-origin requests (map tiles, Leaflet CDN, QR images) pass straight through:
+     they are not cached here, so no third-party responses are stored on the device.
+   Bump VERSION to roll out a new shell; old caches are deleted on activate. */
+const VERSION = 'citixen-v1';
+const SHELL = [
+  '/app',
+  '/',
+  '/manifest.json',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png',
+  '/icons/apple-touch-icon.png'
+];
+
+self.addEventListener('install', event => {
+  event.waitUntil((async () => {
+    const cache = await caches.open(VERSION);
+    // Cache entries one by one so a single missing file can't abort the install.
+    await Promise.all(SHELL.map(url => cache.add(new Request(url, { cache: 'reload' })).catch(() => {})));
+    await self.skipWaiting();
+  })());
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(k => k !== VERSION).map(k => caches.delete(k)));
+    await self.clients.claim();
+  })());
+});
+
+self.addEventListener('fetch', event => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;   // tiles, CDNs, QR: network only
+  if (url.pathname.startsWith('/admin')) return;     // staff console is never cached on device
+
+  if (req.mode === 'navigate') {
+    event.respondWith((async () => {
+      const cache = await caches.open(VERSION);
+      try {
+        const fresh = await fetch(req);
+        if (fresh.ok) cache.put(req, fresh.clone());
+        return fresh;
+      } catch (err) {
+        return (await cache.match(req, { ignoreSearch: true }))
+            || (await cache.match('/app'))
+            || Response.error();
+      }
+    })());
+    return;
+  }
+
+  event.respondWith((async () => {
+    const cache = await caches.open(VERSION);
+    const cached = await cache.match(req);
+    const network = fetch(req).then(res => {
+      if (res.ok) cache.put(req, res.clone());
+      return res;
+    }).catch(() => cached);
+    return cached || network;
+  })());
+});

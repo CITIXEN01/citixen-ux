@@ -1,0 +1,18 @@
+{
+  "id": "/app",
+  "name": "CITIXEN UX™ Mobile Reporter",
+  "short_name": "CITIXEN",
+  "description": "Zero-account, anonymous civic hazard reporting and live ward dispatch tracking.",
+  "start_url": "/app?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#070c0e",
+  "theme_color": "#10b981",
+  "categories": ["utilities", "government", "navigation"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

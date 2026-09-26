@@ -8,6 +8,8 @@
 <meta name="theme-color" content="#10b981">
 <meta name="referrer" content="no-referrer">
 <link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
 <!-- Leaflet 1.9.4 ships dist/leaflet.js (no leaflet.min.js). Official unpkg build, SRI-pinned;
      deferred so a slow CDN never blocks first paint. ensureLeaflet() falls back to jsDelivr. -->
@@ -140,8 +142,17 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .pill-warn{background:rgba(245,158,11,.2);color:#fde68a}
 .pill-ok{background:rgba(16,185,129,.2);color:#a7f3d0}
 .mapwrap{flex:1;position:relative}
-#map{position:absolute;inset:0;background:#0d1518}
-.leaflet-container{background:#0d1518}
+#map{position:absolute;inset:0;background:#0D1117}
+/* ===== MAP THEME (CARTO Dark Matter) — scoped under #map to beat leaflet.css, which loads later ===== */
+#map.leaflet-container{background:#0D1117}
+#map .leaflet-bar{border:1px solid #00FF66 !important;border-radius:8px;overflow:hidden;box-shadow:0 0 10px rgba(0,255,102,.12) !important}
+#map .leaflet-bar a,#map .leaflet-bar a:hover{background:#161B22;color:#e6edf3;border-bottom:1px solid rgba(0,255,102,.25)}
+#map .leaflet-bar a:last-child{border-bottom:none}
+#map .leaflet-bar a:hover{color:#00FF66;background:#1c232c}
+#map .leaflet-bar a.leaflet-disabled{background:#161B22;color:#4b5563}
+#map .leaflet-control-attribution.leaflet-control{background:rgba(13,17,23,.8);color:#8b949e}
+#map .leaflet-control-attribution a{color:#8b949e}
+#map .leaflet-div-icon{background:none;border:none}
 
 /* ===== MODAL ===== */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:3000;display:none;
@@ -422,9 +433,10 @@ async function initMap(){
   el.classList.add('loading-grid');
   try{ await ensureLeaflet(); }catch(e){ mapUnavailable(); return; }
   finally{ el.classList.remove('loading-grid'); }
-  map=L.map('map',{attributionControl:false}).setView([cities.lacrosse.lat,cities.lacrosse.lng],cities.lacrosse.zoom);
+  map=L.map('map',{attributionControl:true}).setView([cities.lacrosse.lat,cities.lacrosse.lng],cities.lacrosse.zoom);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
-    maxZoom:19, subdomains:'abcd', crossOrigin:true
+    maxZoom:19, subdomains:'abcd',
+    attribution:'&copy; OpenStreetMap contributors &copy; CARTO'
   }).addTo(map);
   cases.forEach(plotMarker);
   setTimeout(()=>map.invalidateSize(),150);
@@ -634,6 +646,9 @@ document.getElementById('installBtnCard').addEventListener('click', async ()=>{
   deferredPrompt=null;
   installStatus.textContent='Install prompt shown.';
 });
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
+}
 window.addEventListener('appinstalled',()=>{
   installStatus.textContent='✓ Installed to this device.';
 });
