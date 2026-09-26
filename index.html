@@ -197,12 +197,12 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
         <div class="label">Install Mobile Reporter</div>
         <div class="qr-row">
           <img id="qrImg" width="120" height="120" alt="Scan to launch the CITIXEN UX mobile reporter"
-            src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=https://citixenux.com/app.html&color=10b981&bgcolor=0d1518"
+            src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=https%3A%2F%2Fcitixenux.com%2Fapp&color=10b981&bgcolor=0d1518"
             style="border-radius:8px;flex-shrink:0;display:block"
             onerror="this.style.display='none';document.getElementById('qrFallback').style.display='flex';">
           <div id="qrFallback" style="display:none;width:120px;height:120px;background:#0d1518;border:1px solid var(--border);
             border-radius:8px;align-items:center;justify-content:center;text-align:center;padding:8px;flex-shrink:0;">
-            <span class="small">QR image unavailable in this preview — <a href="/app.html" style="color:var(--mint2)">open /app.html</a> directly</span>
+            <span class="small">QR image unavailable in this preview — <a href="https://citixenux.com/app" style="color:var(--mint2)">open citixenux.com/app</a> directly</span>
           </div>
           <div class="qr-copy">
             <div class="small">Scan with your phone to launch the Mobile PWA, or install directly on this device.</div>
@@ -468,7 +468,7 @@ const modalData={
   sla:{
     title:'SLA Legal Guarantees',
     body:[
-      ['Response Commitment','Every submitted report receives an acknowledged routing decision within the ward\\'s published SLA window.'],
+      ['Response Commitment','Every submitted report receives an acknowledged routing decision within the ward’s published SLA window.'],
       ['Escalation Path','Reports left unresolved past their SLA window are automatically flagged for department escalation.'],
       ['Transparency','Ward-level SLA performance (shown in the header ticker and health index) is calculated from the same data dispatchers see — not a marketing figure.']
     ]
@@ -477,7 +477,7 @@ const modalData={
     title:'Anonymity Whitepaper',
     body:[
       ['No Accounts, Ever','There is no login, no user ID, and no device fingerprinting anywhere in this system.'],
-      ['On-Device Scrubbing','EXIF metadata — including GPS coordinates and device serial/model identifiers — is stripped before a photo leaves the reporter\\'s device.'],
+      ['On-Device Scrubbing','EXIF metadata — including GPS coordinates and device serial/model identifiers — is stripped before a photo leaves the reporter’s device.'],
       ['No-Referrer by Default','Every page sets referrer-policy to no-referrer, so third-party sites (including map tile providers) cannot see what page linked to them.']
     ]
   },
@@ -486,16 +486,16 @@ const modalData={
     body:[
       ['Upcoming Ward Cleanup','Sat, Oct 4 — Pine St Alley cleanup, 9:00 AM, Public Works staging lot.'],
       ['Volunteer Dispatch','Tue, Oct 7 — Ward 4 Council session, streetlight budget review, 6:30 PM. Volunteer slots open for setup crew.'],
-      ['Citizen Priority Voting','Residents may rank which open hazard categories (Roads / Lighting / Sanitation) should receive next quarter\\'s discretionary repair budget.']
+      ['Citizen Priority Voting','Residents may rank which open hazard categories (Roads / Lighting / Sanitation) should receive next quarter’s discretionary repair budget.']
     ]
   },
   ledger:{
     title:'Public Ledger Architecture',
     body:[
-      ['Aggregated, Not Individual','The ledger publishes category totals and counts per ward — never a single citizen\\'s report tied back to them, their device, or their location history.'],
+      ['Aggregated, Not Individual','The ledger publishes category totals and counts per ward — never a single citizen’s report tied back to them, their device, or their location history.'],
       ['No IP or Identity Collection','Nothing about who filed a report — IP address, account, or device ID — is captured in the first place, so there is nothing to include or exclude from the public record.'],
       ['Auditable by Design','Each resolved entry in the Immutable Audit Stream carries a timestamp and a verification hash, so the sequence of resolutions can be checked for tampering without exposing reporter identity.'],
-      ['Open Data, Estimated Costs','Expenditure figures are AI-clustered estimates derived from resolved-case categories, published for transparency — not a substitute for the city\\'s official finance office records.']
+      ['Open Data, Estimated Costs','Expenditure figures are AI-clustered estimates derived from resolved-case categories, published for transparency — not a substitute for the city’s official finance office records.']
     ]
   }
 };
@@ -536,9 +536,20 @@ window.addEventListener('appinstalled',()=>{
   document.getElementById('installStatus').textContent='✓ Installed to this device.';
 });
 
+/* CITIXEN-FIXPACK:qr — dynamic QR, always encodes the canonical mobile URL */
+const MOBILE_APP_URL='https://citixenux.com/app';
+function renderQR(){
+  const img=document.getElementById('qrImg'); if(!img) return;
+  const size=Math.round(140*Math.min(window.devicePixelRatio||1,3));
+  img.src='https://api.qrserver.com/v1/create-qr-code/?size='+size+'x'+size+
+    '&margin=0&color=10b981&bgcolor=0d1518&data='+encodeURIComponent(MOBILE_APP_URL);
+  img.title=MOBILE_APP_URL;
+}
+
 window.addEventListener('DOMContentLoaded',()=>{
   renderFeed();
   initMap();
+  renderQR();
 });
 </script>
 </body>
