@@ -18,6 +18,8 @@
   --bg:#070c0e; --card:#0d1518; --border:#1b2a2f; --hover:#162529;
   --mint:#10b981; --mint2:#34d399; --text:#f8fafc; --muted:#8e9fa8;
   --danger:#ef4444; --warn:#f59e0b;
+  /* Commercial neon green: primary glow */
+  --brand-glow-green:#00FF66; --brand-glow-rgba:rgba(0, 255, 102, 0.4);
 }
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
 html,body{height:100%}
@@ -32,7 +34,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .brand-logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.02rem;letter-spacing:.4px;color:var(--text);text-decoration:none}
 .brand-shield{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;
-  background:rgba(16,185,129,.12);border:1px solid rgba(52,211,153,.45);box-shadow:0 0 18px rgba(16,185,129,.25)}
+  background:rgba(16,185,129,.12);border:1px solid rgba(52,211,153,.45);box-shadow:0 0 18px var(--brand-glow-rgba)}
 .brand-word b{color:var(--mint2);font-weight:900}
 .brand-logo sup,.hero h1 sup{line-height:0;vertical-align:super;margin-left:1px}
 .brand-logo:focus-visible{outline:2px solid var(--mint2);outline-offset:3px;border-radius:10px}
@@ -158,6 +160,17 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   header.topbar{padding:10px 14px}
   .grid-select{min-width:160px}
 }
+/* ===== LOADING / SPLASH GRID ===== */
+.loading-grid{isolation:isolate}
+.loading-grid::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background-image:linear-gradient(var(--brand-glow-rgba) 1px,transparent 1px),
+    linear-gradient(90deg,var(--brand-glow-rgba) 1px,transparent 1px);
+  background-size:28px 28px;background-position:center;
+  -webkit-mask-image:radial-gradient(ellipse at center,#000 20%,transparent 75%);
+  mask-image:radial-gradient(ellipse at center,#000 20%,transparent 75%);
+  opacity:.18;animation:gridPulse 2.4s ease-in-out infinite}
+@keyframes gridPulse{0%,100%{opacity:.14}50%{opacity:.42}}
+@media (prefers-reduced-motion:reduce){.loading-grid::before{animation:none;opacity:.28}}
 .map-offline{display:flex;align-items:center;justify-content:center;height:100%;padding:16px;text-align:center;font-size:.76rem;color:var(--muted)}
 </style>
 </head>
@@ -384,7 +397,10 @@ function mapUnavailable(){
 /* ===== MAP ===== */
 let map, markers={};
 async function initMap(){
+  const el=document.getElementById('map');
+  el.classList.add('loading-grid');
   try{ await ensureLeaflet(); }catch(e){ mapUnavailable(); return; }
+  finally{ el.classList.remove('loading-grid'); }
   map=L.map('map',{attributionControl:false}).setView([cities.lacrosse.lat,cities.lacrosse.lng],cities.lacrosse.zoom);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
     maxZoom:19, subdomains:'abcd', crossOrigin:true
