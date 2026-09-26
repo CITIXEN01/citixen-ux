@@ -49,6 +49,8 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .dropdown-btn{background:transparent;border:1px solid var(--border);color:var(--text);padding:9px 14px;
   border-radius:8px;font-size:.78rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px}
 .dropdown-btn:hover{border-color:var(--mint2);color:var(--mint2)}
+.dropdown-btn.primary{border-color:rgba(52,211,153,.55);color:var(--mint2);background:rgba(16,185,129,.08)}
+.dropdown-btn.primary:hover{background:rgba(16,185,129,.16)}
 .dropdown-menu{display:none;position:absolute;top:calc(100% + 6px);right:0;background:var(--card);
   border:1px solid var(--border);border-radius:10px;min-width:220px;overflow:hidden;z-index:1500;
   box-shadow:0 12px 30px rgba(0,0,0,.5)}
@@ -171,6 +173,18 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   opacity:.18;animation:gridPulse 2.4s ease-in-out infinite}
 @keyframes gridPulse{0%,100%{opacity:.14}50%{opacity:.42}}
 @media (prefers-reduced-motion:reduce){.loading-grid::before{animation:none;opacity:.28}}
+/* ===== FOOTER ===== */
+.site-footer{border-top:1px solid var(--border);padding:18px 22px calc(18px + env(safe-area-inset-bottom,0px));display:flex;
+  justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:.72rem;color:var(--muted)}
+.footer-links{display:flex;gap:16px}
+.footer-links a{color:var(--muted);text-decoration:none}
+.footer-links a:hover,.footer-links a:focus-visible{color:var(--mint2)}
+.footer-staff{opacity:.8}
+/* ===== iOS INSTALL STEPS ===== */
+.install-steps{margin:10px 0 0 18px;font-size:.74rem;color:var(--text);line-height:1.6}
+.install-steps li::marker{color:var(--mint2);font-weight:800}
+.install-steps a{color:var(--mint2)}
+.install-steps svg{vertical-align:-3px;margin:0 2px}
 .map-offline{display:flex;align-items:center;justify-content:center;height:100%;padding:16px;text-align:center;font-size:.76rem;color:var(--muted)}
 </style>
 </head>
@@ -196,7 +210,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 
     <div class="nav-right">
       <div class="dropdown">
-        <button class="dropdown-btn" id="civicToolsBtn">Civic Tools <span style="font-size:.6rem;">▾</span></button>
+        <button class="dropdown-btn primary" id="civicToolsBtn" aria-haspopup="true">Civic Tools <span style="font-size:.6rem;">▾</span></button>
         <div class="dropdown-menu" id="civicToolsMenu">
           <button data-modal="constitution">Founding Constitution</button>
           <button data-modal="sla">SLA Legal Guarantees</button>
@@ -205,7 +219,6 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
           <button data-modal="ledger">Public Ledger Architecture</button>
         </div>
       </div>
-      <a class="btn btn-outline" href="/admin.html">Staff Console</a>
     </div>
   </header>
 
@@ -316,6 +329,14 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 
     <div class="mapwrap"><div id="map"></div></div>
   </section>
+
+  <footer class="site-footer">
+    <div>CITIXEN UX<sup style="font-weight: 300; font-size: 0.5em; opacity: 0.75;">™</sup> · Anonymous civic reporting for every ward</div>
+    <nav class="footer-links" aria-label="Footer">
+      <a href="/app">Mobile Reporter</a>
+      <a href="/admin" class="footer-staff">Staff Console</a>
+    </nav>
+  </footer>
 
   <!-- MODAL OVERLAY -->
   <div class="modal-overlay" id="modalOverlay">
@@ -570,25 +591,51 @@ document.getElementById('modalOverlay').addEventListener('click',(e)=>{
   if(e.target.id==='modalOverlay') e.currentTarget.classList.remove('open');
 });
 
-/* ===== PWA INSTALL ===== */
+/* ===== PWA INSTALL =====
+   Chromium browsers fire beforeinstallprompt, so the button can open the native prompt.
+   iOS never fires it (every iOS browser is WebKit), so iOS gets step-by-step Share-sheet guidance. */
 let deferredPrompt=null;
+const installStatus=document.getElementById('installStatus');
+const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+  ((navigator.platform==='MacIntel' || /Macintosh/.test(navigator.userAgent)) && navigator.maxTouchPoints>1); // iPadOS reports as Mac
+const isStandalone=window.matchMedia('(display-mode: standalone)').matches || navigator.standalone===true;
+const SHARE_ICON='<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-label="Share icon"><path d="M12 3v12"/><path d="m8 7 4-4 4 4"/><path d="M5 11v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9"/></svg>';
+
+function showIOSSteps(){
+  // Add to Home Screen saves the page that is open, so send people to /app first.
+  const onApp=/^\/app(\.html)?$/.test(location.pathname);
+  installStatus.innerHTML='<strong style="color:var(--mint2)">Install on iPhone / iPad:</strong>'+
+    '<ol class="install-steps">'+
+    (onApp ? '' : '<li>Open the <a href="/app">Mobile Reporter</a>.</li>')+
+    '<li>Tap the Share icon '+SHARE_ICON+' in the browser toolbar.</li>'+
+    '<li>Scroll down and tap <b>Add to Home Screen</b>.</li>'+
+    '<li>Tap <b>Add</b>.</li></ol>';
+}
+
+if(isStandalone){
+  installStatus.textContent='✓ Running as an installed app.';
+}else if(isIOS){
+  installStatus.textContent='On iPhone/iPad: tap "Add to Home Screen" above for step-by-step instructions.';
+}
 window.addEventListener('beforeinstallprompt',(e)=>{
   e.preventDefault();
   deferredPrompt=e;
-  document.getElementById('installStatus').textContent='Ready to install — tap "Add to Home Screen".';
+  installStatus.textContent='Ready to install — tap "Add to Home Screen".';
 });
 document.getElementById('installBtnCard').addEventListener('click', async ()=>{
+  if(isStandalone){ installStatus.textContent='✓ Already installed on this device.'; return; }
+  if(isIOS){ showIOSSteps(); return; }
   if(!deferredPrompt){
-    document.getElementById('installStatus').textContent="Install isn't available in this browser yet — try Chrome/Edge on Android or desktop, or scan the QR code above.";
+    installStatus.textContent='Use your browser menu (⋮) → "Install app" or "Add to Home screen", or scan the QR code with your phone.';
     return;
   }
   deferredPrompt.prompt();
   await deferredPrompt.userChoice;
   deferredPrompt=null;
-  document.getElementById('installStatus').textContent='Install prompt shown.';
+  installStatus.textContent='Install prompt shown.';
 });
 window.addEventListener('appinstalled',()=>{
-  document.getElementById('installStatus').textContent='✓ Installed to this device.';
+  installStatus.textContent='✓ Installed to this device.';
 });
 
 /* CITIXEN-FIXPACK:qr — dynamic QR, always encodes the canonical mobile URL */
