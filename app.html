@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CITIXEN UX // Civic Intelligence Platform</title>
+<meta name="theme-color" content="#10b981">
+<meta name="referrer" content="no-referrer">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%23070c0e%22/><text x=%2250%22 y=%2268%22 font-size=%2258%22 text-anchor=%22middle%22>🏛️</text></svg>">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+:root{
+  --bg:#070c0e; --card:#0d1518; --border:#1b2a2f; --hover:#162529;
+  --mint:#10b981; --mint2:#34d399; --text:#f8fafc; --muted:#8e9fa8;
+  --danger:#ef4444; --warn:#f59e0b;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);display:flex;justify-content:center;min-height:100vh}
+.shell{width:100%;max-width:520px;min-height:100vh;display:flex;flex-direction:column;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(80px + env(safe-area-inset-bottom,0px))}
+
+.topnav{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.95);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);padding:14px 16px}
+.brand{display:flex;justify-content:space-between;align-items:center}
+.brand-logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.05rem;letter-spacing:.8px;color:var(--mint2)}
+.badge{font-size:.62rem;background:rgba(16,185,129,.12);color:var(--mint2);border:1px solid rgba(16,185,129,.4);
+  padding:4px 10px;border-radius:20px;font-weight:700;letter-spacing:.4px;display:flex;align-items:center;gap:6px}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--mint2)}
+
+.main{padding:14px;display:flex;flex-direction:column;gap:12px;flex:1}
+.tabpane{display:none;flex-direction:column;gap:12px}
+.tabpane.active{display:flex}
+
+.notice-banner{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);color:#fca5a5;border-radius:12px;
+  padding:10px 14px;font-size:.76rem;font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.notice-banner .left-txt{display:flex;align-items:center;gap:8px}
+.btn-911{background:var(--danger);color:#fff;text-decoration:none;font-weight:800;font-size:.76rem;padding:6px 12px;
+  border-radius:8px;display:inline-flex;align-items:center;gap:5px;flex-shrink:0}
+
+.privacy-note{display:flex;align-items:center;gap:8px;font-size:.7rem;color:var(--muted);
+  background:rgba(16,185,129,.05);border:1px solid var(--border);border-radius:10px;padding:8px 12px}
+.privacy-note svg{color:var(--mint2);flex-shrink:0}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px}
+.label{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);
+  margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+
+.chip-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+.chip{background:rgba(7,12,14,.6);border:1px solid var(--border);color:var(--text);padding:13px 12px;
+  border-radius:12px;font-size:.76rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:9px;
+  transition:border-color .15s,background .15s}
+.chip.active{border-color:var(--mint2);background:rgba(16,185,129,.12);color:var(--mint2)}
+.chip svg{width:17px;height:17px;flex-shrink:0}
+
+.btn-camera{width:100%;background:rgba(16,185,129,.04);border:1px dashed var(--mint2);color:var(--text);padding:13px;
+  border-radius:12px;font-weight:800;font-size:.8rem;letter-spacing:.3px;cursor:pointer;display:flex;
+  align-items:center;justify-content:center;gap:8px;margin-bottom:12px}
+.btn-camera svg{color:var(--mint2)}
+
+.input{width:100%;padding:11px 13px;background:rgba(7,12,14,.8);border:1px solid var(--border);color:var(--text);
+  border-radius:10px;font-size:.8rem;margin-bottom:10px;outline:none;transition:border-color .15s}
+.input:focus{border-color:var(--mint2)}
+textarea.input{resize:none;line-height:1.4}
+
+.btn-submit{width:100%;background:var(--mint);color:#051311;border:none;padding:14px;border-radius:12px;
+  font-weight:900;font-size:.85rem;letter-spacing:.4px;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;gap:9px}
+
+.bottomnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;
+  background:rgba(11,18,21,.96);backdrop-filter:blur(16px);border-top:1px solid var(--border);
+  display:grid;grid-template-columns:repeat(3,1fr);padding:8px 4px;z-index:1000;
+  padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))}
+.navtab{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;
+  color:var(--muted);font-size:.62rem;font-weight:700;cursor:pointer;padding:6px 0}
+.navtab.active{color:var(--mint2)}
+.navtab svg{width:19px;height:19px}
+
+#map{height:220px;width:100%;border-radius:12px;border:1px solid var(--border);background:#0d1518}
+.leaflet-container{background:#0d1518}
+.feed-item{background:rgba(7,12,14,.6);border:1px solid var(--border);border-radius:10px;padding:12px;
+  margin-bottom:8px;cursor:pointer}
+.feed-item:hover{border-color:var(--mint2)}
+.row{display:flex;justify-content:space-between;align-items:center;font-size:.78rem;gap:8px}
+.small{font-size:.72rem;color:var(--muted)}
+.pill{padding:2px 7px;border-radius:5px;font-size:.62rem;font-weight:700;text-transform:uppercase;flex-shrink:0}
+.pill-crit{background:rgba(239,68,68,.2);color:#fca5a5}
+.pill-warn{background:rgba(245,158,11,.2);color:#fde68a}
+.pill-ok{background:rgba(16,185,129,.2);color:#a7f3d0}
+.stat-big{font-size:2.2rem;font-weight:900;color:var(--mint2)}
+.bar{height:6px;background:rgba(255,255,255,.08);border-radius:10px;overflow:hidden;margin-top:4px}
+.bar>span{display:block;height:100%;background:var(--mint2)}
+
+.drawer{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:2000;display:none;flex-direction:column;padding:18px}
+.drawer.open{display:flex}
+.icon-btn{background:none;border:none;color:#fff;cursor:pointer;display:flex;padding:4px}
+.toast{display:none;background:rgba(16,185,129,.2);border:1px solid var(--mint2);color:var(--mint2);
+  padding:10px 14px;border-radius:10px;font-size:.76rem;font-weight:700;text-align:center;margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <header class="topnav">
+    <div class="brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24" width="21" height="21" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        CITIXEN UX
+      </div>
+      <div class="badge"><span class="badge-dot"></span> WARD 4 ACTIVE</div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div id="toast" class="toast"></div>
+
+    <div class="notice-banner">
+      <div class="left-txt">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Non-emergency reporting only. Life-safety emergency?
+      </div>
+      <a href="tel:911" class="btn-911">
+        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        911
+      </a>
+    </div>
+
+    <div class="privacy-note">
+      <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+      No account required. No personal data retained. Photos are stripped of device ID and GPS EXIF tags before submission.
+    </div>
+
+    <section id="tab-report" class="tabpane active">
+      <div class="card">
+        <div class="label">1. Category</div>
+        <div class="chip-grid">
+          <button class="chip active" data-cat="Pothole / Road">
+            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Pothole / Road
+          </button>
+          <button class="chip" data-cat="Power / Lighting">
+            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Power / Lighting
+          </button>
+          <button class="chip" data-cat="Waste / Litter">
+            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            Waste / Litter
+          </button>
+          <button class="chip" data-cat="Sidewalk / ADA">
+            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.5" r="1.6" fill="currentColor" stroke="none"/><path d="M9 8l3 1.2 3-1.2M12 9.2v4M9 21l3-7.8 3 7.8M8.5 13h4.5"/></svg>
+            Sidewalk / ADA
+          </button>
+        </div>
+
+        <div class="label">2. Capture proof</div>
+        <button class="btn-camera" id="btnCamera">
+          <svg viewBox="0 0 24 24" width="17" height="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          Launch camera
+        </button>
+        <div id="photoBox" style="display:none;margin-bottom:12px;text-align:center;">
+          <div style="background:rgba(16,185,129,.06);border:1px solid var(--mint2);border-radius:10px;padding:22px;">
+            <svg viewBox="0 0 24 24" width="34" height="34" stroke="var(--mint2)" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </div>
+          <div class="small" style="color:var(--mint2);margin-top:6px;">✓ Captured — device ID and GPS tags scrubbed from EXIF before upload</div>
+        </div>
+
+        <div class="label">3. Location & details</div>
+        <input class="input" id="repLoc" value="La Crosse, WI (Current GPS)">
+        <textarea class="input" id="repDesc" rows="3" placeholder="Describe the hazard, cross street, or specific risk..."></textarea>
+
+        <button class="btn-submit" id="btnSubmit">
+          <svg viewBox="0 0 24 24" width="17" height="17" stroke="#051311" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Publish report
+        </button>
+      </div>
+    </section>
+
+    <section id="tab-map" class="tabpane">
+      <div class="card">
+        <div class="label"><span>Civic dispatch map</span><span id="mCount" style="color:var(--mint2)">3 active</span></div>
+        <div id="map"></div>
+      </div>
+      <div class="card">
+        <div class="label">Live dispatch feed</div>
+        <div id="feed"></div>
+      </div>
+    </section>
+
+    <section id="tab-analytics" class="tabpane">
+      <div class="card">
+        <div class="label">Ward 4 civic health index</div>
+        <div style="text-align:center;padding:12px 0;">
+          <div class="stat-big">88 <span style="font-size:1rem;color:var(--muted)">/ 100</span></div>
+          <div class="small">Dispatch response SLA: 91% on-time</div>
+        </div>
+        <div style="margin-top:8px;">
+          <div class="row"><span>Road infrastructure</span><span style="color:var(--mint2)">82%</span></div>
+          <div class="bar"><span style="width:82%"></span></div>
+        </div>
+        <div style="margin-top:10px;">
+          <div class="row"><span>Lighting & safety</span><span style="color:var(--warn)">64%</span></div>
+          <div class="bar"><span style="width:64%;background:var(--warn)"></span></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:10px;text-align:center;">
+        <div class="label" style="justify-content:center;">City-Wide Analytics</div>
+        <p style="font-size:.78rem;color:var(--muted);margin-bottom:12px;">
+          Access real-time GIS mapping, ward heatmaps, and municipal SLAs on the desktop portal.
+        </p>
+        <a href="https://citixenux.com" target="_blank" rel="noopener noreferrer" class="btn-submit" style="text-decoration:none;">
+          Open Web Dashboard ↗
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottomnav">
+    <button class="navtab active" data-target="tab-report">
+      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      <span>Report</span>
+    </button>
+    <button class="navtab" data-target="tab-map">
+      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
+      <span>Map & feed</span>
+    </button>
+    <button class="navtab" data-target="tab-analytics">
+      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="20" x2="5" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="19" y1="20" x2="19" y2="15"/></svg>
+      <span>Analytics</span>
+    </button>
+  </nav>
+
+  <div id="camModal" class="drawer">
+    <div class="row"><strong style="color:var(--mint2)">CITIXEN Camera</strong>
+      <button class="icon-btn" id="btnCloseCam">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+      </button>
+    </div>
+    <div class="small" style="margin-top:6px;color:var(--muted)">Nothing leaves this device until you capture and submit. Location and device identifiers are stripped automatically.</div>
+    <div style="flex:1;border:2px dashed var(--mint2);border-radius:14px;margin:14px 0;display:flex;align-items:center;justify-content:center;background:#000;">
+      <span class="small">Camera viewfinder simulation</span>
+    </div>
+    <button class="btn-submit" id="btnCapture">
+      <svg viewBox="0 0 24 24" width="17" height="17" stroke="#051311" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.2"/></svg>
+      Capture proof
+    </button>
+  </div>
+
+</div>
+
+<script>
+'use strict';
+let map, mapInit=false, markers={}, cat='Pothole / Road';
+
+const cases=[
+  {id:'c1',title:'Deep Pothole - Right Lane',loc:'Main St & 4th Ave',lat:43.8138,lng:-91.2519,status:'Critical',time:'12m ago',desc:'Severe pavement gap.'},
+  {id:'c2',title:'Streetlight Outage',loc:'Grand Ave & 7th St',lat:43.8180,lng:-91.2480,status:'Warning',time:'45m ago',desc:'Dark corner, visibility issue.'},
+  {id:'c3',title:'Overfilled Trash Bin',loc:'Pine St Alley',lat:43.8100,lng:-91.2550,status:'Resolved',time:'2h ago',desc:'Debris blocking access.'}
+];
+
+// Escape any user-supplied text before it is ever placed into innerHTML, to prevent stored-XSS
+// from a hazard description or location field containing HTML/script content.
+function esc(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// Local-only, non-PII classification of free text into a routing department.
+// Runs entirely client-side; nothing is sent anywhere for this step.
+function parseDepartment(text){
+  const t = text.toLowerCase();
+  if (t.includes('sidewalk') || t.includes('ada') || t.includes('ramp')) return 'Public Works / ADA';
+  if (t.includes('wire') || t.includes('dark') || t.includes('power') || t.includes('light')) return 'Utilities & Electrical';
+  if (t.includes('trash') || t.includes('dump') || t.includes('litter') || t.includes('waste')) return 'Sanitation';
+  return 'Public Works';
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.display='block';
+  setTimeout(()=>{ t.style.display='none'; },3200);
+}
+
+function switchTab(id,btn){
+  document.querySelectorAll('.tabpane').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.navtab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(id==='tab-map'){
+    if(!mapInit) initMap();
+    // Force Leaflet to recalculate container dimensions once unhidden
+    setTimeout(()=>{ if(map) map.invalidateSize(); },200);
+  }
+}
+
+function selectCat(el){
+  document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+  cat=el.dataset.cat;
+}
+
+function initMap(){
+  map=L.map('map',{attributionControl:false}).setView([43.8138,-91.2519],14);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+    maxZoom:19, subdomains:'abcd', crossOrigin:true
+  }).addTo(map);
+  cases.forEach(plotMarker);
+  mapInit=true;
+}
+
+function statusColor(status){
+  return status==='Critical' ? '#ef4444' : status==='Warning' ? '#f59e0b' : '#10b981';
+}
+function statusPill(status){
+  return status==='Critical' ? 'pill-crit' : status==='Warning' ? 'pill-warn' : 'pill-ok';
+}
+
+function plotMarker(item){
+  const col=statusColor(item.status);
+  const icon=L.divIcon({html:`<div style="background:${col};width:14px;height:14px;border-radius:50%;border:2px solid #fff"></div>`,iconSize:[14,14]});
+  const m=L.marker([item.lat,item.lng],{icon}).addTo(map);
+  m.bindPopup(`<strong>${esc(item.title)}</strong><br><span style="font-size:.7rem">${esc(item.loc)} • ${esc(item.time)}</span>`);
+  markers[item.id]=m;
+}
+
+function renderFeed(){
+  const c=document.getElementById('feed'); c.innerHTML='';
+  cases.forEach(item=>{
+    const pill=statusPill(item.status);
+    const el=document.createElement('div');
+    el.className='feed-item';
+    el.innerHTML=`<div class="row"><strong>${esc(item.title)}</strong><span class="pill ${pill}">${esc(item.status)}</span></div>
+      <div class="small" style="margin:4px 0">${esc(item.desc)}</div>
+      <div class="row small"><span>${esc(item.loc)}</span><span>${esc(item.time)}</span></div>`;
+    el.addEventListener('click',()=>{
+      if(!mapInit) initMap();
+      map.flyTo([item.lat,item.lng],16);
+      markers[item.id] && markers[item.id].openPopup();
+    });
+    c.appendChild(el);
+  });
+}
+
+function openCamera(){ document.getElementById('camModal').classList.add('open'); }
+function closeCamera(){ document.getElementById('camModal').classList.remove('open'); }
+function capturePhoto(){
+  closeCamera();
+  // No network request is made to simulate the photo — this stays entirely on-device.
+  document.getElementById('photoBox').style.display='block';
+}
+
+function submitReport(){
+  const rawDesc=document.getElementById('repDesc').value.trim() || 'Hazard reported.';
+  const rawLoc=document.getElementById('repLoc').value.trim() || 'La Crosse, WI';
+  const dept=parseDepartment(rawDesc);
+  const nc={
+    id:'c'+Date.now(), title:cat, loc:rawLoc,
+    lat:43.8150+(Math.random()-.5)*.01, lng:-91.2500+(Math.random()-.5)*.01,
+    status:'Critical', time:'Just now',
+    desc: rawDesc + ' → Routed to ' + dept
+  };
+  cases.unshift(nc);
+  renderFeed();
+  document.getElementById('mCount').textContent=cases.length+' active';
+  if(mapInit) plotMarker(nc);
+  toast('✓ Published — routed to ' + dept);
+  document.getElementById('repDesc').value='';
+  document.getElementById('photoBox').style.display='none';
+  switchTab('tab-map', document.querySelectorAll('.navtab')[1]);
+}
+
+function registerSW(){
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  }
+}
+
+// All interaction wiring happens here (no inline onclick attributes anywhere in the markup),
+// which keeps this page compatible with a strict script-src CSP with no 'unsafe-inline'.
+window.addEventListener('DOMContentLoaded',()=>{
+  renderFeed();
+  registerSW();
+
+  document.querySelectorAll('.chip').forEach(chip=>{
+    chip.addEventListener('click',()=>selectCat(chip));
+  });
+  document.querySelectorAll('.navtab').forEach(btn=>{
+    btn.addEventListener('click',()=>switchTab(btn.dataset.target,btn));
+  });
+  document.getElementById('btnCamera').addEventListener('click',openCamera);
+  document.getElementById('btnCloseCam').addEventListener('click',closeCamera);
+  document.getElementById('btnCapture').addEventListener('click',capturePhoto);
+  document.getElementById('btnSubmit').addEventListener('click',submitReport);
+});
+</script>
+</body>
+</html>
