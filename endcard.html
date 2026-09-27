@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  :root{
+    --brand-mint:#00ff88;
+    --bg-obsidian:#080c0a;
+    --text:#f8fafc;
+    --muted:#8e9fa8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1080px;height:1920px;background:var(--bg-obsidian);overflow:hidden}
+  body{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  }
+  .shield{
+    width:180px;height:180px;
+    opacity:0;
+    animation:shieldIn 900ms ease-out forwards;
+  }
+  .shield svg{width:100%;height:100%;filter:drop-shadow(0 0 24px rgba(0,255,136,0.55));}
+  .wordmark{
+    display:flex;align-items:baseline;gap:14px;
+    opacity:0;
+    animation:wordIn 900ms ease-out 500ms forwards;
+  }
+  .wordmark .citixen{font-size:64px;font-weight:800;color:var(--text);letter-spacing:0.5px;}
+  .wordmark .ux{font-size:64px;font-weight:800;color:var(--brand-mint);letter-spacing:0.5px;}
+  .wordmark .tm{font-size:22px;font-weight:800;color:var(--brand-mint);opacity:0.55;align-self:flex-start;margin-top:8px;}
+  .tagline{
+    font-size:30px;font-weight:600;color:var(--text);text-align:center;max-width:820px;line-height:1.4;
+    opacity:0;
+    animation:fadeUp 900ms ease-out 1300ms forwards;
+  }
+  .url{
+    font-family:'SF Mono','Courier New',ui-monospace,monospace;
+    font-size:26px;font-weight:700;letter-spacing:0.08em;color:var(--brand-mint);
+    padding:14px 30px;border:1px solid rgba(0,255,136,0.35);border-radius:999px;
+    background:rgba(0,255,136,0.08);
+    opacity:0;
+    animation:fadeUp 900ms ease-out 1900ms forwards;
+  }
+  @keyframes shieldIn{
+    from{opacity:0;transform:scale(0.85);}
+    to{opacity:1;transform:scale(1);}
+  }
+  @keyframes wordIn{
+    from{opacity:0;transform:translateY(10px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+  @keyframes fadeUp{
+    from{opacity:0;transform:translateY(16px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+</style>
+</head>
+<body>
+  <div class="shield">
+    <svg viewBox="0 0 48 56" xmlns="http://www.w3.org/2000/svg">
+      <path d="M22 44s16-8 16-20V10L22 4 6 10v14c0 12 16 20 16 20z"
+            fill="none" stroke="#00ff88" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <div class="wordmark">
+    <span class="citixen">CITIXEN</span><span class="ux">UX</span><span class="tm">™</span>
+  </div>
+  <div class="tagline">Civic infrastructure, finally accountable.</div>
+  <div class="url">citixenux.com</div>
+</body>
+</html>
