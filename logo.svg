@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 64" width="340" height="64" role="img" aria-label="CITIXEN UX">
+  <!-- CITIXEN UX™ vector lockup — Electric Lime shield + wordmark, transparent background.
+       Matches the unified logo markup used across index.html / app.html / admin.html. -->
+  <title>CITIXEN UX</title>
+  <g transform="translate(2,10)">
+    <path d="M22 44s16-8 16-20V10L22 4 6 10v14c0 12 16 20 16 20z"
+          fill="none" stroke="#00ff88" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="58" y="40" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif"
+        font-size="30" font-weight="800" letter-spacing="0.3" fill="#ffffff">CITIXEN</text>
+  <text x="204" y="40" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif"
+        font-size="30" font-weight="800" letter-spacing="0.3" fill="#00ff88">UX</text>
+  <text x="256" y="22" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif"
+        font-size="13" font-weight="800" fill="#00ff88" opacity="0.55">™</text>
+</svg>

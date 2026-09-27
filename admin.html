@@ -14,8 +14,8 @@
   --brand-mint:#00ff88 !important;
   --brand-mint-hover:#00e077 !important;
   --brand-mint-dim:rgba(0,255,136,0.12) !important;
-  --brand-amber:#f59e0b !important;
-  --brand-red:#ef4444 !important;
+  --brand-amber:#ffbb00 !important;
+  --brand-red:#ff4444 !important;
   --bg-obsidian:#080c0a !important;
   --bg-card:#0f1713 !important;
   --border-muted:rgba(255,255,255,0.08) !important;
@@ -39,7 +39,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .brand-white{color:#ffffff}
 .brand-lime{color:var(--brand-mint)}
 .brand-tm{font-size:.55em;opacity:.4;margin-left:1px}
-.badge-mint{font-size:.65rem;background:rgba(0,230,133,.12);color:var(--mint2);border:1px solid rgba(0,230,133,.4);
+.badge-mint{font-size:.65rem;background:rgba(0,255,136,.12);color:var(--mint2);border:1px solid rgba(0,255,136,.4);
   padding:4px 10px;border-radius:20px;font-weight:700;letter-spacing:.4px;display:flex;align-items:center;gap:6px}
 .badge-dot-mint{width:6px;height:6px;border-radius:50%;background:var(--mint2)}
 .operator{font-size:.7rem;color:var(--muted);display:flex;align-items:center;gap:6px}
@@ -51,7 +51,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   padding:7px 11px;border-radius:8px;font-size:.74rem;font-weight:700;outline:none}
 .grid-select:focus{border-color:var(--mint2)}
 .toast{display:none;position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:2500;
-  background:rgba(0,204,122,.2);border:1px solid var(--mint2);color:var(--mint2);
+  background:rgba(0,255,136,.2);border:1px solid var(--mint2);color:var(--mint2);
   padding:10px 16px;border-radius:10px;font-size:.78rem;font-weight:700;text-align:center}
 
 /* ===== OPERATIONAL OVERVIEW ===== */
@@ -63,9 +63,9 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .severity-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
 .sev-chip{font-size:.68rem;font-weight:700;padding:3px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px}
 .sev-chip b{font-size:.82rem}
-.sev-chip.critical{background:rgba(239,68,68,.15);color:#fca5a5}
-.sev-chip.high{background:rgba(245,158,11,.15);color:#fde68a}
-.sev-chip.standard{background:rgba(0,204,122,.15);color:#7ffcd4}
+.sev-chip.critical{background:rgba(255,68,68,.15);color:#fca5a5}
+.sev-chip.high{background:rgba(255,187,0,.15);color:#fde68a}
+.sev-chip.standard{background:rgba(0,255,136,.15);color:#7ffcd4}
 .metric .sub{font-size:.68rem;color:var(--muted);margin-top:4px}
 
 /* ===== NUMERIC OVERVIEW METRICS (replaces the gas-gauge dials with dense readouts) ===== */
@@ -104,7 +104,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .dept-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px}
 .dept-filter{background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--muted);
   font-size:.66rem;font-weight:700;padding:5px 10px;border-radius:20px;cursor:pointer}
-.dept-filter.active{border-color:var(--mint2);background:rgba(0,204,122,.14);color:var(--mint2)}
+.dept-filter.active{border-color:var(--mint2);background:rgba(0,255,136,.14);color:var(--mint2)}
 
 .ticket{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--border);border-radius:12px;padding:14px}
 .priority-group-label{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);
@@ -113,27 +113,27 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .priority-group-label .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .priority-badge{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.4px;
   padding:2px 8px;border-radius:5px;display:inline-flex;align-items:center;gap:5px;flex-shrink:0}
-.priority-badge.critical{background:rgba(239,68,68,.18);color:#fca5a5;border:1px solid rgba(239,68,68,.4)}
-.priority-badge.high{background:rgba(245,158,11,.18);color:#fde68a;border:1px solid rgba(245,158,11,.4)}
-.priority-badge.standard{background:rgba(0,204,122,.18);color:#7ffcd4;border:1px solid rgba(0,204,122,.4)}
+.priority-badge.critical{background:rgba(255,68,68,.18);color:#fca5a5;border:1px solid rgba(255,68,68,.4)}
+.priority-badge.high{background:rgba(255,187,0,.18);color:#fde68a;border:1px solid rgba(255,187,0,.4)}
+.priority-badge.standard{background:rgba(0,255,136,.18);color:#7ffcd4;border:1px solid rgba(0,255,136,.4)}
 .action-btn.workorder{background:var(--mint);color:#051311;border-color:var(--mint);font-weight:800}
 .ticket-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px}
 .ticket-head strong{font-size:.86rem}
 .pill{padding:2px 7px;border-radius:5px;font-size:.62rem;font-weight:700;text-transform:uppercase;flex-shrink:0}
-.pill-crit{background:rgba(239,68,68,.2);color:#fca5a5}
-.pill-warn{background:rgba(245,158,11,.2);color:#fde68a}
-.pill-ok{background:rgba(0,204,122,.2);color:#86f7cd}
-.sla-badge{font-size:.66rem;font-weight:700;padding:3px 8px;border-radius:6px;background:rgba(245,158,11,.12);
-  color:var(--warn);border:1px solid rgba(245,158,11,.35);display:inline-flex;align-items:center;gap:5px;margin-top:6px}
-.sla-badge.ok{background:rgba(0,204,122,.12);color:var(--mint2);border-color:rgba(0,204,122,.3)}
+.pill-crit{background:rgba(255,68,68,.2);color:#fca5a5}
+.pill-warn{background:rgba(255,187,0,.2);color:#fde68a}
+.pill-ok{background:rgba(0,255,136,.2);color:#86f7cd}
+.sla-badge{font-size:.66rem;font-weight:700;padding:3px 8px;border-radius:6px;background:rgba(255,187,0,.12);
+  color:var(--warn);border:1px solid rgba(255,187,0,.35);display:inline-flex;align-items:center;gap:5px;margin-top:6px}
+.sla-badge.ok{background:rgba(0,255,136,.12);color:var(--mint2);border-color:rgba(0,255,136,.3)}
 .ticket-meta{font-size:.72rem;color:var(--muted);margin:6px 0 10px}
 .status-select{width:100%;background:rgba(7,12,14,.8);border:1px solid var(--border);color:var(--text);
   padding:7px 10px;border-radius:8px;font-size:.74rem;font-weight:700;margin-bottom:8px}
 .ticket-actions{display:flex;gap:6px;flex-wrap:wrap}
-.action-btn{background:rgba(0,204,122,.1);color:var(--mint2);border:1px solid var(--mint);
+.action-btn{background:rgba(0,255,136,.1);color:var(--mint2);border:1px solid var(--mint);
   border-radius:6px;padding:6px 9px;font-size:.66rem;font-weight:700;cursor:pointer}
-.action-btn.escalate{background:rgba(0,230,133,.1);color:var(--mint2);border-color:var(--mint2)}
-.action-btn.close{background:rgba(239,68,68,.08);color:#fca5a5;border-color:rgba(239,68,68,.4)}
+.action-btn.escalate{background:rgba(0,255,136,.1);color:var(--mint2);border-color:var(--mint2)}
+.action-btn.close{background:rgba(255,68,68,.08);color:#fca5a5;border-color:rgba(255,68,68,.4)}
 .action-btn.copilot{background:var(--mint);color:#051311;border-color:var(--mint);font-weight:800}
 
 .gis{flex:1;position:relative}
@@ -391,7 +391,7 @@ document.getElementById('gridConfig').addEventListener('change',(e)=>{
 });
 
 function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function statusColor(status){ return status==='Critical' ? '#ef4444' : status==='Warning' ? '#00e685' : '#00cc7a'; }
+function statusColor(status){ return status==='Critical' ? '#ff4444' : status==='Warning' ? '#00ff88' : '#00ff88'; }
 function statusPill(status){ return status==='Critical' ? 'pill-crit' : status==='Warning' ? 'pill-warn' : 'pill-ok'; }
 
 let map, markers={};
@@ -407,10 +407,10 @@ function initMap(){
   // so dispatch can see at a glance which hazard nodes are in-ward vs. adjacent.
   L.polygon([
     [43.8210,-91.2640],[43.8210,-91.2400],[43.8060,-91.2400],[43.8060,-91.2640]
-  ],{color:'#00cc7a',weight:2,dashArray:'8 6',fillColor:'#00cc7a',fillOpacity:.04,opacity:.6})
+  ],{color:'#00ff88',weight:2,dashArray:'8 6',fillColor:'#00ff88',fillOpacity:.04,opacity:.6})
     .addTo(map).bindTooltip('Ward 4 boundary',{sticky:true});
   // Simulated active service-vehicle route overlay between two ticket locations.
-  L.polyline([[43.8138,-91.2519],[43.8180,-91.2480]],{color:'#00e685',weight:2,dashArray:'6 5',opacity:.75}).addTo(map);
+  L.polyline([[43.8138,-91.2519],[43.8180,-91.2480]],{color:'#00ff88',weight:2,dashArray:'6 5',opacity:.75}).addTo(map);
   tickets.forEach(plotTicket);
   setTimeout(()=>map.invalidateSize(),150);
 }
@@ -422,9 +422,9 @@ function plotTicket(t){
     <strong>${esc(t.title)}</strong><br>
     <span style="font-size:.7rem">${esc(t.loc)} • ${esc(t.stage)}</span><br>
     <div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;">
-      <button onclick="assignCrew('${t.id}')" style="font-size:.65rem;padding:4px 7px;border-radius:5px;border:1px solid #00cc7a;background:rgba(0,204,122,.12);color:#00e685;cursor:pointer;">Assign Crew</button>
-      <button onclick="escalateHazard('${t.id}')" style="font-size:.65rem;padding:4px 7px;border-radius:5px;border:1px solid #00e685;background:rgba(0,230,133,.12);color:#00e685;cursor:pointer;">Escalate</button>
-      <button onclick="openLogDrawer('${t.id}')" style="font-size:.65rem;padding:4px 7px;border-radius:5px;border:1px solid #ef4444;background:rgba(239,68,68,.1);color:#fca5a5;cursor:pointer;">Close & Verify</button>
+      <button onclick="assignCrew('${t.id}')" style="font-size:.65rem;padding:4px 7px;border-radius:5px;border:1px solid #00ff88;background:rgba(0,255,136,.12);color:#00ff88;cursor:pointer;">Assign Crew</button>
+      <button onclick="escalateHazard('${t.id}')" style="font-size:.65rem;padding:4px 7px;border-radius:5px;border:1px solid #00ff88;background:rgba(0,255,136,.12);color:#00ff88;cursor:pointer;">Escalate</button>
+      <button onclick="openLogDrawer('${t.id}')" style="font-size:.65rem;padding:4px 7px;border-radius:5px;border:1px solid #ff4444;background:rgba(255,68,68,.1);color:#fca5a5;cursor:pointer;">Close & Verify</button>
     </div>`);
   markers[t.id]=m;
 }
@@ -434,9 +434,9 @@ function plotTicket(t){
 // (In Progress w/ healthy SLA, Resolved, RESOLVED & AUDITED) -> Standard/mint.
 // Tiles are grouped under a header per tier so priority is visually unmistakable.
 const PRIORITY_TIERS={
-  Critical:{ order:0, label:'Critical', tone:'critical', border:'#ef4444', dot:'#ef4444' },
-  High:{     order:1, label:'High',     tone:'high',     border:'#f59e0b', dot:'#f59e0b' },
-  Standard:{ order:2, label:'Standard', tone:'standard', border:'#00cc7a', dot:'#00cc7a' }
+  Critical:{ order:0, label:'Critical', tone:'critical', border:'#ff4444', dot:'#ff4444' },
+  High:{     order:1, label:'High',     tone:'high',     border:'#ffbb00', dot:'#ffbb00' },
+  Standard:{ order:2, label:'Standard', tone:'standard', border:'#00ff88', dot:'#00ff88' }
 };
 function priorityOf(t){
   if(t.status==='Critical') return PRIORITY_TIERS.Critical;
@@ -543,7 +543,7 @@ function approveRouteWorkOrder(id){
   workOrderCount++;
   lastWorkOrderNum=woNum;
   if(map){
-    L.polyline([[43.8138,-91.2519],[t.lat,t.lng]],{color:'#00cc7a',weight:2,dashArray:'6 5',opacity:.8}).addTo(map);
+    L.polyline([[43.8138,-91.2519],[t.lat,t.lng]],{color:'#00ff88',weight:2,dashArray:'6 5',opacity:.8}).addTo(map);
     if(markers[id]) markers[id].openPopup();
   }
   renderTickets();
