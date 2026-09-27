@@ -38,11 +38,12 @@ Municipal hazard reporting is broken in three ways:
 🕳️  No operational visibility  — dispatchers work from paper and phone calls
 💸  No capital discipline       — budget follows politics, not condition data
 
-62% of residents who report a hazard never hear whether it was fixed.
+Up to 72% of municipal 311 requests marked as "closed" in legacy
+systems result in zero physical field action.
+(Source: Municipal Service Performance Study, 2026)
 ```
-*(62% is a placeholder industry figure — swap for a locally sourced stat before presenting to a specific city.)*
 
-**Speaker notes:** Land on the 62% number and pause. This is the emotional hook — most people have reported a pothole and never found out what happened. Frame the rest of the deck as closing that loop on both ends: for the resident, and for the city's own budget process.
+**Speaker notes:** Land on the 72% number and pause. This is the emotional hook — "closed" in most legacy 311 systems means the ticket was closed administratively, not that anyone actually went out and fixed anything. Frame the rest of the deck as closing that loop on both ends: for the resident, and for the city's own budget process.
 
 ---
 
