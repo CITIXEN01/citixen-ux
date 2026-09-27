@@ -3,30 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>CITIXEN UX // Municipal Dispatch Console</title>
-<meta name="theme-color" content="#f59e0b">
+<title>CITIXEN UX — Master Production Municipal Dashboard</title>
+<meta name="theme-color" content="#00ff88">
 <meta name="referrer" content="no-referrer">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
 :root{
-  --bg:#070c0e; --card:#0d1518; --border:#1b2a2f; --hover:#162529;
-  --mint:#10b981; --mint2:#34d399; --text:#f8fafc; --muted:#8e9fa8;
-  --danger:#ef4444; --warn:#f59e0b;
+  --brand-mint:#00ff88 !important;
+  --brand-mint-hover:#00e077 !important;
+  --brand-mint-dim:rgba(0,255,136,0.12) !important;
+  --brand-amber:#f59e0b !important;
+  --brand-red:#ef4444 !important;
+  --bg-obsidian:#080c0a !important;
+  --bg-card:#0f1713 !important;
+  --border-muted:rgba(255,255,255,0.08) !important;
+  /* legacy aliases — every existing var(--mint)/var(--card)/etc. usage below inherits
+     the brand tokens above unchanged, so there is one source of truth for color. */
+  --bg:var(--bg-obsidian); --card:var(--bg-card); --border:var(--border-muted); --hover:#162529;
+  --mint:var(--brand-mint); --mint2:var(--brand-mint-hover); --text:#f8fafc; --muted:#8e9fa8;
+  --danger:var(--brand-red); --warn:var(--brand-amber); --amber:var(--brand-amber);
 }
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
 html,body{height:100%}
 body{background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
 
-/* ===== HEADER (same visual identity, amber console badge) ===== */
+/* ===== HEADER (same visual identity, mint console badge) ===== */
 header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);backdrop-filter:blur(12px);
   border-bottom:1px solid var(--border);padding:14px 24px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.brand-logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:1.1rem;letter-spacing:.6px;color:var(--mint2)}
-.badge-amber{font-size:.65rem;background:rgba(245,158,11,.12);color:var(--warn);border:1px solid rgba(245,158,11,.4);
+.brand-logo{display:flex;align-items:center;gap:10px}
+/* ===== UNIFIED LOGO LOCKUP (identical markup/classes across index.html, admin.html, app.html) ===== */
+.brand-wordmark{font-weight:800;font-size:1.05rem;letter-spacing:.3px}
+.brand-white{color:#ffffff}
+.brand-lime{color:var(--brand-mint)}
+.brand-tm{font-size:.55em;opacity:.4;margin-left:1px}
+.badge-mint{font-size:.65rem;background:rgba(0,230,133,.12);color:var(--mint2);border:1px solid rgba(0,230,133,.4);
   padding:4px 10px;border-radius:20px;font-weight:700;letter-spacing:.4px;display:flex;align-items:center;gap:6px}
-.badge-dot-amber{width:6px;height:6px;border-radius:50%;background:var(--warn)}
+.badge-dot-mint{width:6px;height:6px;border-radius:50%;background:var(--mint2)}
 .operator{font-size:.7rem;color:var(--muted);display:flex;align-items:center;gap:6px}
 .operator-dot{width:7px;height:7px;border-radius:50%;background:var(--mint2);box-shadow:0 0 6px var(--mint2)}
 .staff-link{font-size:.78rem;color:var(--muted);text-decoration:none;border-bottom:1px dashed var(--border);
@@ -36,16 +51,51 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   padding:7px 11px;border-radius:8px;font-size:.74rem;font-weight:700;outline:none}
 .grid-select:focus{border-color:var(--mint2)}
 .toast{display:none;position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:2500;
-  background:rgba(16,185,129,.2);border:1px solid var(--mint2);color:var(--mint2);
+  background:rgba(0,204,122,.2);border:1px solid var(--mint2);color:var(--mint2);
   padding:10px 16px;border-radius:10px;font-size:.78rem;font-weight:700;text-align:center}
 
 /* ===== OPERATIONAL OVERVIEW ===== */
-.overview{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-bottom:1px solid var(--border)}
+.overview{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-bottom:1px solid var(--border)}
 .metric{background:var(--bg);padding:16px 18px}
 .metric .label{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:8px}
 .metric .value{font-size:1.7rem;font-weight:900;color:var(--mint2)}
 .metric.warn .value{color:var(--warn)}
+.severity-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+.sev-chip{font-size:.68rem;font-weight:700;padding:3px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px}
+.sev-chip b{font-size:.82rem}
+.sev-chip.critical{background:rgba(239,68,68,.15);color:#fca5a5}
+.sev-chip.high{background:rgba(245,158,11,.15);color:#fde68a}
+.sev-chip.standard{background:rgba(0,204,122,.15);color:#7ffcd4}
 .metric .sub{font-size:.68rem;color:var(--muted);margin-top:4px}
+
+/* ===== NUMERIC OVERVIEW METRICS (replaces the gas-gauge dials with dense readouts) ===== */
+.metric .sub-lg{font-size:.72rem;color:var(--muted);margin-top:4px}
+
+/* ===== PRINTABLE WARD REPORT (built from live DOM values, isolated via @media print) ===== */
+#printReportArea{display:none}
+#printReportArea table{width:100%;border-collapse:collapse;margin:10px 0 18px;font-size:12px}
+#printReportArea th,#printReportArea td{border:1px solid #999;padding:5px 9px;text-align:left}
+#printReportArea h2{margin:0 0 2px;font-size:1.3rem}
+#printReportArea h3{margin:16px 0 4px;font-size:.95rem}
+#printReportArea .meta{font-size:.8rem;color:#444}
+@media print{
+  body *{visibility:hidden}
+  #printReportArea, #printReportArea *{visibility:visible}
+  #printReportArea{display:block;position:absolute;top:0;left:0;width:100%;padding:28px;color:#000;background:#fff}
+}
+
+/* ===== DENSE OPERATIONS ANALYTICS STRIP (tight industrial layout, below the metrics) ===== */
+.analytics-dense{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-bottom:1px solid var(--border)}
+.dense-cell{background:var(--bg);padding:10px 14px}
+.dense-cell .dense-label{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);
+  margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.dense-cell .dense-label::before{content:'▸';color:var(--brand-mint);font-size:.68rem;line-height:1}
+.dense-cell .value{font-size:1.25rem}
+.dense-cell .sub{margin-top:3px}
+.ops-table{width:100%;border-collapse:collapse;font-size:.72rem;margin:2px 0 6px}
+.ops-table td{padding:3px 0;border-bottom:1px solid var(--border)}
+.ops-table td:first-child{color:var(--muted);font-weight:700}
+.ops-table td:last-child{text-align:right;font-weight:800;color:var(--mint2)}
 
 /* ===== WORKSPACE ===== */
 .workspace{flex:1;display:flex;min-height:600px}
@@ -54,31 +104,42 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .dept-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px}
 .dept-filter{background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--muted);
   font-size:.66rem;font-weight:700;padding:5px 10px;border-radius:20px;cursor:pointer}
-.dept-filter.active{border-color:var(--mint2);background:rgba(16,185,129,.14);color:var(--mint2)}
+.dept-filter.active{border-color:var(--mint2);background:rgba(0,204,122,.14);color:var(--mint2)}
 
-.ticket{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}
+.ticket{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--border);border-radius:12px;padding:14px}
+.priority-group-label{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);
+  margin:14px 0 6px;display:flex;align-items:center;gap:6px}
+.priority-group-label:first-child{margin-top:0}
+.priority-group-label .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.priority-badge{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.4px;
+  padding:2px 8px;border-radius:5px;display:inline-flex;align-items:center;gap:5px;flex-shrink:0}
+.priority-badge.critical{background:rgba(239,68,68,.18);color:#fca5a5;border:1px solid rgba(239,68,68,.4)}
+.priority-badge.high{background:rgba(245,158,11,.18);color:#fde68a;border:1px solid rgba(245,158,11,.4)}
+.priority-badge.standard{background:rgba(0,204,122,.18);color:#7ffcd4;border:1px solid rgba(0,204,122,.4)}
+.action-btn.workorder{background:var(--mint);color:#051311;border-color:var(--mint);font-weight:800}
 .ticket-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px}
 .ticket-head strong{font-size:.86rem}
 .pill{padding:2px 7px;border-radius:5px;font-size:.62rem;font-weight:700;text-transform:uppercase;flex-shrink:0}
 .pill-crit{background:rgba(239,68,68,.2);color:#fca5a5}
 .pill-warn{background:rgba(245,158,11,.2);color:#fde68a}
-.pill-ok{background:rgba(16,185,129,.2);color:#a7f3d0}
+.pill-ok{background:rgba(0,204,122,.2);color:#86f7cd}
 .sla-badge{font-size:.66rem;font-weight:700;padding:3px 8px;border-radius:6px;background:rgba(245,158,11,.12);
-  color:var(--warn);border:1px solid rgba(245,158,11,.3);display:inline-flex;align-items:center;gap:5px;margin-top:6px}
-.sla-badge.ok{background:rgba(16,185,129,.12);color:var(--mint2);border-color:rgba(16,185,129,.3)}
+  color:var(--warn);border:1px solid rgba(245,158,11,.35);display:inline-flex;align-items:center;gap:5px;margin-top:6px}
+.sla-badge.ok{background:rgba(0,204,122,.12);color:var(--mint2);border-color:rgba(0,204,122,.3)}
 .ticket-meta{font-size:.72rem;color:var(--muted);margin:6px 0 10px}
 .status-select{width:100%;background:rgba(7,12,14,.8);border:1px solid var(--border);color:var(--text);
   padding:7px 10px;border-radius:8px;font-size:.74rem;font-weight:700;margin-bottom:8px}
 .ticket-actions{display:flex;gap:6px;flex-wrap:wrap}
-.action-btn{background:rgba(16,185,129,.1);color:var(--mint2);border:1px solid var(--mint);
+.action-btn{background:rgba(0,204,122,.1);color:var(--mint2);border:1px solid var(--mint);
   border-radius:6px;padding:6px 9px;font-size:.66rem;font-weight:700;cursor:pointer}
-.action-btn.escalate{background:rgba(245,158,11,.1);color:var(--warn);border-color:var(--warn)}
+.action-btn.escalate{background:rgba(0,230,133,.1);color:var(--mint2);border-color:var(--mint2)}
 .action-btn.close{background:rgba(239,68,68,.08);color:#fca5a5;border-color:rgba(239,68,68,.4)}
 .action-btn.copilot{background:var(--mint);color:#051311;border-color:var(--mint);font-weight:800}
 
 .gis{flex:1;position:relative}
 #map{position:absolute;inset:0;background:#0d1518}
 .leaflet-container{background:#0d1518}
+.leaflet-tile-pane{filter:invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);}
 .route-line{stroke:var(--mint2);stroke-width:2;stroke-dasharray:6 5;opacity:.75}
 
 /* ===== LOGGING DRAWER ===== */
@@ -98,23 +159,32 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   .workspace{flex-direction:column}
   .triage{width:100%;border-right:none;border-bottom:1px solid var(--border);max-height:none}
   .gis{height:420px}
-  .overview{grid-template-columns:repeat(2,1fr)}
+  .overview{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:768px){
+  .overview{grid-template-columns:1fr}
+  .metric{padding:12px 10px;min-width:0}
+  .metric .label{font-size:.6rem;letter-spacing:.3px;white-space:normal;overflow-wrap:break-word;margin-bottom:6px}
+  .metric .value{font-size:1.3rem;line-height:1.15;overflow-wrap:break-word}
+  .metric .sub{font-size:.62rem}
+  .analytics-dense{grid-template-columns:1fr}
+  .dense-cell{padding:10px}
 }
 /* CITIXEN-FIXPACK:gate */
 html.locked body>*:not(#accessGate){visibility:hidden}
 #accessGate{position:fixed;inset:0;z-index:5000;background:rgba(3,6,7,.96);display:flex;align-items:center;justify-content:center;padding:20px}
 html:not(.locked) #accessGate{display:none}
 .gate-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:26px;width:100%;max-width:380px}
-.gate-box h2{font-size:1.05rem;color:var(--warn);margin-bottom:6px}
+.gate-box h2{font-size:1.05rem;color:var(--mint2);margin-bottom:6px}
 .gate-box p{font-size:.76rem;color:var(--muted);line-height:1.5;margin-bottom:16px}
 .gate-box input{width:100%;padding:11px 13px;background:rgba(7,12,14,.8);border:1px solid var(--border);color:var(--text);
   border-radius:10px;font-size:.9rem;letter-spacing:.08em;outline:none;margin-bottom:10px}
-.gate-box input:focus{border-color:var(--warn)}
-.gate-box button{width:100%;background:var(--warn);color:#1a1203;border:none;padding:12px;border-radius:10px;font-weight:800;cursor:pointer}
+.gate-box input:focus{border-color:var(--mint2)}
+.gate-box button{width:100%;background:var(--mint);color:#051311;border:none;padding:12px;border-radius:10px;font-weight:800;cursor:pointer}
 #gateErr{font-size:.72rem;color:#fca5a5;min-height:1.1em;margin-top:8px}
 /* Alderman briefing */
 .briefing{border-bottom:1px solid var(--border);padding:12px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:10px}
-.briefing h3{font-size:.8rem;color:var(--warn);margin-right:6px}
+.briefing h3{font-size:.8rem;color:var(--mint2);margin-right:6px}
 .briefing label{font-size:.68rem;color:var(--muted);display:flex;align-items:center;gap:6px}
 .briefing .grid-select{padding:6px 9px}
 #briefSummary{flex-basis:100%;font-size:.74rem;color:var(--text);line-height:1.55}
@@ -161,10 +231,10 @@ function renderBriefing(list){
   <header class="topbar">
     <div class="brand">
       <div class="brand-logo">
-        <svg viewBox="0 0 24 24" width="21" height="21" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        CITIXEN UX
+        <svg viewBox="0 0 24 24" width="21" height="21" stroke="var(--brand-mint)" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span class="brand-wordmark"><span class="brand-white">CITIXEN</span> <span class="brand-lime">UX</span><sup class="brand-tm">™</sup></span>
       </div>
-      <div class="badge-amber"><span class="badge-dot-amber"></span> MUNICIPAL DISPATCH CONSOLE</div>
+      <div class="badge-mint"><span class="badge-dot-mint"></span> MUNICIPAL DISPATCH CONSOLE</div>
       <div class="operator"><span class="operator-dot"></span> Operator: J. Kowalski — Public Works, on duty</div>
       <select class="grid-select" id="gridConfig" aria-label="Municipal grid taxonomy">
         <option value="standard">Standard Public Works</option>
@@ -186,30 +256,47 @@ function renderBriefing(list){
     <label>Stage
       <select class="grid-select" id="fStage"><option>All</option><option>Critical</option><option>Assigned to Public Works</option><option>In Progress</option><option>Resolved</option><option>RESOLVED &amp; AUDITED</option></select></label>
     <label><input type="checkbox" id="fSlaRisk"> SLA at risk only</label>
-    <button class="btn btn-ghost" id="briefCopy" type="button">Copy briefing</button>
+    <button class="btn btn-ghost" id="printWardReport" type="button">Print My Ward Report</button>
     <div id="briefSummary"></div>
   </section>
 
   <div class="overview">
     <div class="metric">
-      <div class="label">Active Incidents</div>
-      <div class="value" id="mActive">3</div>
-      <div class="sub">Ward 4, last 24h</div>
-    </div>
-    <div class="metric warn">
-      <div class="label">Avg Response SLA</div>
-      <div class="value">18m</div>
-      <div class="sub">Target: 30m</div>
+      <div class="label">Ward Health Index</div>
+      <div class="value" id="wardHealthValue">88%</div>
+      <div class="sub" id="wardHealthSub">Ward 4 — Stable</div>
     </div>
     <div class="metric">
-      <div class="label">Unassigned Tasks</div>
-      <div class="value" id="mUnassigned">2</div>
-      <div class="sub">Awaiting crew</div>
+      <div class="label">Active Dispatch Capacity</div>
+      <div class="value" id="capValue">0%</div>
+      <div class="sub" id="capSub">0 of 8 crew slots committed</div>
     </div>
     <div class="metric">
-      <div class="label" style="color:var(--mint2)">Ward 4 Crew Status</div>
-      <div class="value" style="font-size:1.2rem;">ON-DUTY</div>
-      <div class="sub">2 vehicles active</div>
+      <div class="label" style="color:var(--mint2)">Weekly Resolve Rate</div>
+      <div class="value" id="resolveFraction" style="font-size:1.9rem;">84<span style="color:var(--muted);font-size:1.1rem;">/91</span></div>
+      <div class="sub">Resolved this week, Ward 4</div>
+    </div>
+  </div>
+
+  <div class="analytics-dense" aria-label="Dense operations analytics">
+    <div class="dense-cell">
+      <div class="dense-label">Dispatch Severity Queues</div>
+      <table class="ops-table">
+        <tr><td>Critical</td><td id="sevCritical">0</td></tr>
+        <tr><td>High</td><td id="sevHigh">0</td></tr>
+        <tr><td>Standard</td><td id="sevStandard">0</td></tr>
+      </table>
+      <div class="sub" id="sevTotal">0 tickets in queue</div>
+    </div>
+    <div class="dense-cell">
+      <div class="dense-label">CapEx Scoping Ledger — Track 2</div>
+      <div class="value" id="capexTotal">$482,600</div>
+      <div class="sub">Scoped capital spend — current cycle</div>
+    </div>
+    <div class="dense-cell">
+      <div class="dense-label" style="color:var(--mint2)">Crew / Vendor Routing</div>
+      <div class="value" id="woActive">0 <span style="font-size:.8rem;color:var(--muted);">active</span></div>
+      <div class="sub" id="woSub">No routes approved this session</div>
     </div>
   </div>
 
@@ -239,6 +326,8 @@ function renderBriefing(list){
       </div>
     </div>
   </div>
+
+  <div id="printReportArea" aria-hidden="true"></div>
 
   <!-- COPILOT QUICK-RESOLVE DRAWER -->
   <div id="copilotDrawer" class="drawer">
@@ -302,17 +391,26 @@ document.getElementById('gridConfig').addEventListener('change',(e)=>{
 });
 
 function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function statusColor(status){ return status==='Critical' ? '#ef4444' : status==='Warning' ? '#f59e0b' : '#10b981'; }
+function statusColor(status){ return status==='Critical' ? '#ef4444' : status==='Warning' ? '#00e685' : '#00cc7a'; }
 function statusPill(status){ return status==='Critical' ? 'pill-crit' : status==='Warning' ? 'pill-warn' : 'pill-ok'; }
 
 let map, markers={};
+// Standard OpenStreetMap tiles, no API key required. Only the tile PANE is filtered
+// dark (see .leaflet-tile-pane) so markers, the Ward 4 boundary and routes stay true
+// mint/red — inverting the whole map would wash those colors out too.
 function initMap(){
   map=L.map('map',{attributionControl:false}).setView([43.8138,-91.2519],14);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
-    maxZoom:19, subdomains:'abcd', crossOrigin:true
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    maxZoom:19, subdomains:'abc', crossOrigin:true
   }).addTo(map);
+  // Ward 4 boundary — approximate polygon around the pilot ward, mint dashed outline
+  // so dispatch can see at a glance which hazard nodes are in-ward vs. adjacent.
+  L.polygon([
+    [43.8210,-91.2640],[43.8210,-91.2400],[43.8060,-91.2400],[43.8060,-91.2640]
+  ],{color:'#00cc7a',weight:2,dashArray:'8 6',fillColor:'#00cc7a',fillOpacity:.04,opacity:.6})
+    .addTo(map).bindTooltip('Ward 4 boundary',{sticky:true});
   // Simulated active service-vehicle route overlay between two ticket locations.
-  L.polyline([[43.8138,-91.2519],[43.8180,-91.2480]],{color:'#34d399',weight:2,dashArray:'6 5',opacity:.75}).addTo(map);
+  L.polyline([[43.8138,-91.2519],[43.8180,-91.2480]],{color:'#00e685',weight:2,dashArray:'6 5',opacity:.75}).addTo(map);
   tickets.forEach(plotTicket);
   setTimeout(()=>map.invalidateSize(),150);
 }
@@ -324,23 +422,56 @@ function plotTicket(t){
     <strong>${esc(t.title)}</strong><br>
     <span style="font-size:.7rem">${esc(t.loc)} • ${esc(t.stage)}</span><br>
     <div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;">
-      <button onclick="assignCrew('${t.id}')" style="font-size:.65rem;padding:4px 7px;border-radius:5px;border:1px solid #10b981;background:rgba(16,185,129,.12);color:#34d399;cursor:pointer;">Assign Crew</button>
-      <button onclick="escalateHazard('${t.id}')" style="font-size:.65rem;padding:4px 7px;border-radius:5px;border:1px solid #f59e0b;background:rgba(245,158,11,.12);color:#f59e0b;cursor:pointer;">Escalate</button>
+      <button onclick="assignCrew('${t.id}')" style="font-size:.65rem;padding:4px 7px;border-radius:5px;border:1px solid #00cc7a;background:rgba(0,204,122,.12);color:#00e685;cursor:pointer;">Assign Crew</button>
+      <button onclick="escalateHazard('${t.id}')" style="font-size:.65rem;padding:4px 7px;border-radius:5px;border:1px solid #00e685;background:rgba(0,230,133,.12);color:#00e685;cursor:pointer;">Escalate</button>
       <button onclick="openLogDrawer('${t.id}')" style="font-size:.65rem;padding:4px 7px;border-radius:5px;border:1px solid #ef4444;background:rgba(239,68,68,.1);color:#fca5a5;cursor:pointer;">Close & Verify</button>
     </div>`);
   markers[t.id]=m;
+}
+
+// ===== SLA PRIORITY TIERS =====
+// Critical status -> Critical/red. Warning status -> High/amber. Everything else
+// (In Progress w/ healthy SLA, Resolved, RESOLVED & AUDITED) -> Standard/mint.
+// Tiles are grouped under a header per tier so priority is visually unmistakable.
+const PRIORITY_TIERS={
+  Critical:{ order:0, label:'Critical', tone:'critical', border:'#ef4444', dot:'#ef4444' },
+  High:{     order:1, label:'High',     tone:'high',     border:'#f59e0b', dot:'#f59e0b' },
+  Standard:{ order:2, label:'Standard', tone:'standard', border:'#00cc7a', dot:'#00cc7a' }
+};
+function priorityOf(t){
+  if(t.status==='Critical') return PRIORITY_TIERS.Critical;
+  if(t.status==='Warning') return PRIORITY_TIERS.High;
+  return PRIORITY_TIERS.Standard;
 }
 
 function renderTickets(){
   const list=document.getElementById('ticketList'); list.innerHTML='';
   const visible = briefingFilter(activeDept==='All' ? tickets : tickets.filter(t=>deptLabel(t.category)===activeDept));
   renderBriefing(visible);
-  visible.forEach(t=>{
+  updateOverviewWidgets();
+  const sorted=[...visible].sort((a,b)=>priorityOf(a).order-priorityOf(b).order);
+  let lastTier=null;
+  sorted.forEach(t=>{
+    const pr=priorityOf(t);
+    if(pr.label!==lastTier){
+      lastTier=pr.label;
+      const count=sorted.filter(x=>priorityOf(x).label===pr.label).length;
+      const head=document.createElement('div');
+      head.className='priority-group-label';
+      head.innerHTML=`<span class="dot" style="background:${pr.dot}"></span>${esc(pr.label)} SLA priority (${count})`;
+      list.appendChild(head);
+    }
     const el=document.createElement('div');
     el.className='ticket';
+    el.style.borderLeftColor=pr.border;
     const resolvedAudited = t.stage==='RESOLVED & AUDITED';
     el.innerHTML=`
-      <div class="ticket-head"><strong>${esc(t.title)}</strong><span class="pill ${statusPill(t.status)}">${esc(resolvedAudited?'Resolved':t.status)}</span></div>
+      <div class="ticket-head"><strong>${esc(t.title)}</strong>
+        <span style="display:flex;gap:5px;flex-shrink:0;">
+          <span class="priority-badge ${pr.tone}">${esc(pr.label)}</span>
+          <span class="pill ${statusPill(t.status)}">${esc(resolvedAudited?'Resolved':t.status)}</span>
+        </span>
+      </div>
       <div class="ticket-meta">${esc(t.loc)} — ${esc(deptLabel(t.category))}</div>
       <select class="status-select" data-id="${t.id}">
         <option ${t.stage==='Critical'?'selected':''}>Critical</option>
@@ -355,6 +486,7 @@ function renderTickets(){
         <button class="action-btn escalate" data-action="escalate" data-id="${t.id}">Escalate Hazard</button>
         <button class="action-btn close" data-action="close" data-id="${t.id}">Close & Verify EXIF</button>
         <button class="action-btn copilot" data-action="copilot" data-id="${t.id}">⚡ Copilot Quick-Resolve</button>
+        <button class="action-btn workorder" data-action="workorder" data-id="${t.id}">✓ Approve Route / Create Work Order</button>
       </div>`;
     el.querySelector('.status-select').addEventListener('change',(e)=>{
       const t2=tickets.find(x=>x.id===t.id); t2.stage=e.target.value;
@@ -365,11 +497,57 @@ function renderTickets(){
         if(action==='assign') assignCrew(id);
         else if(action==='escalate') escalateHazard(id);
         else if(action==='copilot') openCopilotDrawer(id);
+        else if(action==='workorder') approveRouteWorkOrder(id);
         else openLogDrawer(id);
       });
     });
     list.appendChild(el);
   });
+}
+
+// ===== OVERVIEW WIDGETS =====
+// Active Dispatch Queue by Severity is computed live from the same priority tiers
+// used to group the ticket list, so the two are always in sync.
+let workOrderCount=0, lastWorkOrderNum=null;
+const WARD_HEALTH_PCT=88;      // Ward 4 health score — kept consistent with index.html/app.html
+const CREW_CAPACITY_SLOTS=8;   // assumed max concurrent tickets the on-duty crew can carry
+
+function updateOverviewWidgets(){
+  const counts={ Critical:0, High:0, Standard:0 };
+  tickets.forEach(t=>{ counts[priorityOf(t).label]++; });
+  const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
+  set('sevCritical', counts.Critical);
+  set('sevHigh', counts.High);
+  set('sevStandard', counts.Standard);
+  set('sevTotal', tickets.length+' ticket'+(tickets.length===1?'':'s')+' in queue');
+  set('woActive', workOrderCount+' active');
+  set('woSub', workOrderCount===0 ? 'No routes approved this session' : `Last: ${lastWorkOrderNum}`);
+
+  set('wardHealthValue', WARD_HEALTH_PCT+'%');
+  set('wardHealthSub', 'Ward 4 — '+(WARD_HEALTH_PCT>=90?'Nominal':WARD_HEALTH_PCT>=75?'Stable':'Degraded'));
+
+  const activeCount=tickets.filter(t=>t.stage!=='Resolved' && t.stage!=='RESOLVED & AUDITED').length;
+  const capPct=Math.round((activeCount/CREW_CAPACITY_SLOTS)*100);
+  set('capValue', capPct+'%');
+  set('capSub', `${activeCount} of ${CREW_CAPACITY_SLOTS} crew slots committed`);
+}
+
+// Converts a dispatch packet into an assigned crew route: sets the ticket in motion,
+// draws a mint dashed route from the depot to the hazard on the map, and stamps a
+// work-order number the crew can reference in the field.
+function approveRouteWorkOrder(id){
+  const t=tickets.find(x=>x.id===id);
+  if(!t) return;
+  t.stage='Assigned to Public Works';
+  const woNum='WO-'+Math.floor(10000+Math.random()*89999);
+  workOrderCount++;
+  lastWorkOrderNum=woNum;
+  if(map){
+    L.polyline([[43.8138,-91.2519],[t.lat,t.lng]],{color:'#00cc7a',weight:2,dashArray:'6 5',opacity:.8}).addTo(map);
+    if(markers[id]) markers[id].openPopup();
+  }
+  renderTickets();
+  toast(`✓ Route approved — ${woNum} created for "${t.title}"`);
 }
 
 function assignCrew(id){
@@ -508,10 +686,46 @@ document.getElementById('gateForm').addEventListener('submit',async e=>{
 });
 
 ['fWard','fStatus','fStage','fSlaRisk'].forEach(id=>document.getElementById(id).addEventListener('change',()=>renderTickets()));
-document.getElementById('briefCopy').addEventListener('click',async()=>{
-  const txt=document.getElementById('briefSummary').textContent;
-  try{ await navigator.clipboard.writeText(txt); toast('Briefing copied'); }catch(e){ toast('Copy failed — select the text manually'); }
-});
+
+// Builds a clean printable Ward Report from the live DOM readouts (so the printed
+// numbers always match what's on screen) and hands it to the browser's print stream.
+function buildAndPrintWardReport(){
+  const ward=document.getElementById('fWard').value;
+  const list=briefingFilter(activeDept==='All' ? tickets : tickets.filter(t=>deptLabel(t.category)===activeDept));
+  const get=(id)=>{ const el=document.getElementById(id); return el ? el.textContent : ''; };
+  const rows=list.map(t=>`<tr><td>${esc(t.title)}</td><td>${esc(t.status)}</td><td>${esc(t.stage||'')}</td><td>${esc(t.sla||'')}</td></tr>`).join('')
+    || '<tr><td colspan="4">No tickets match the current filters.</td></tr>';
+  const area=document.getElementById('printReportArea');
+  area.innerHTML=`
+    <h2>CITIXEN UX — Ward Report</h2>
+    <div class="meta">${esc(ward==='All'?'All wards':ward)} · Generated ${esc(new Date().toLocaleString())}</div>
+    <h3>Dispatch Summary</h3>
+    <div>${esc(document.getElementById('briefSummary').textContent || briefingText(list))}</div>
+    <h3>SLA &amp; Operational Metrics</h3>
+    <table>
+      <tr><th>Metric</th><th>Value</th></tr>
+      <tr><td>Ward Health Index</td><td>${esc(get('wardHealthValue'))} — ${esc(get('wardHealthSub'))}</td></tr>
+      <tr><td>Active Dispatch Capacity</td><td>${esc(get('capValue'))} — ${esc(get('capSub'))}</td></tr>
+      <tr><td>Weekly Resolve Rate</td><td>${esc(get('resolveFraction'))}</td></tr>
+      <tr><td>CapEx Scoping Ledger</td><td>${esc(get('capexTotal'))}</td></tr>
+      <tr><td>Crew / Vendor Routing</td><td>${esc(get('woActive'))} — ${esc(get('woSub'))}</td></tr>
+    </table>
+    <h3>Dispatch Severity Queues</h3>
+    <table>
+      <tr><th>Severity</th><th>Count</th></tr>
+      <tr><td>Critical</td><td>${esc(get('sevCritical'))}</td></tr>
+      <tr><td>High</td><td>${esc(get('sevHigh'))}</td></tr>
+      <tr><td>Standard</td><td>${esc(get('sevStandard'))}</td></tr>
+    </table>
+    <h3>Active Dispatch Queue</h3>
+    <table>
+      <tr><th>Issue</th><th>Status</th><th>Stage</th><th>SLA</th></tr>
+      ${rows}
+    </table>
+  `;
+  window.print();
+}
+document.getElementById('printWardReport').addEventListener('click',buildAndPrintWardReport);
 </script>
 </body>
 </html>
