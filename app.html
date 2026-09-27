@@ -9,8 +9,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="/manifest.json">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%23070c0e%22/><text x=%2250%22 y=%2268%22 font-size=%2258%22 text-anchor=%22middle%22>🏛️</text></svg>">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
@@ -18,8 +18,8 @@
   --brand-mint:#00ff88 !important;
   --brand-mint-hover:#00e077 !important;
   --brand-mint-dim:rgba(0,255,136,0.12) !important;
-  --brand-amber:#f59e0b !important;
-  --brand-red:#ef4444 !important;
+  --brand-amber:#ffbb00 !important;
+  --brand-red:#ff4444 !important;
   --bg-obsidian:#080c0a !important;
   --bg-card:#0f1713 !important;
   --border-muted:rgba(255,255,255,0.08) !important;
@@ -339,7 +339,7 @@ function initMap(){
 }
 
 function statusColor(status){
-  return status==='Critical' ? '#ef4444' : status==='Warning' ? '#f59e0b' : '#10b981';
+  return status==='Critical' ? '#ff4444' : status==='Warning' ? '#ffbb00' : '#00ff88';
 }
 function statusPill(status){
   return status==='Critical' ? 'pill-crit' : status==='Warning' ? 'pill-warn' : 'pill-ok';
@@ -447,7 +447,7 @@ function submitReport(){
 
 function registerSW(){
   if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('/sw.js').catch(()=>{});
+    navigator.serviceWorker.register('/sw.js', { scope:'/' }).catch(()=>{});
   }
 }
 

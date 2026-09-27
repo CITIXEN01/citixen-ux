@@ -7,10 +7,11 @@
 <meta name="description" content="Zero-account civic hazard reporting and real-time ward health tracking for CITIXEN UX.">
 <meta name="theme-color" content="#00ff88">
 <meta name="referrer" content="no-referrer">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="/manifest.json">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2222%22%20fill%3D%22%230c1412%22/%3E%3Cpath%20d%3D%22M50%2082c0%200%2028-13%2028-34V22l-28-11-28%2011v26c0%2021%2028%2034%2028%2034z%22%20fill%3D%22none%22%20stroke%3D%22%2300cc7a%22%20stroke-width%3D%226%22%20stroke-linejoin%3D%22round%22%20stroke-linecap%3D%22round%22/%3E%3C/svg%3E">
-<link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAFPElEQVR4nO3dS1LbQBRG4RbFkBHForKULClLyaJcHnlOBpSDJSS5H7df/z3fLEkVtKyj65btwBIG8Pbx/tl7DSh3u1yX3mvosgAC9qFH4M2+IRH71iruqt+EiLGnZtxVvjAhI0aNsF+svyAxI1aNVsyuEEJGCatpbTKhiRmlrBoquioIGTWUTOvsCU3MqKWkraygiRm15TaWHDQxo5Wc1pKCJma0ltpcdNDEjF5S2osKmpjRW2yDT4MmZowipkXzt76Bnk6DZjpjNM+aPAyamDGqszbZckDKbtBMZ4zuqNEfQRMzZrHX6muPhXhy+/t79ee3X386rcSH1YRmOtvaxnz0d8i3bXY5+0fkiwmXaW3j8fPTBG2oZPoSd77doIk5j/UWgrDz3KMm6Ayt9sHEHY+gM/S8oSPuc6ugifnYiK9KEPe+2+W6EPSOESPeQ9hrBP1gloiPELfzoFsG/BgbN5T13C7XZfEW80hBtViLt7DdBD1yPCOvbTbyQdeOxTqU2dY7GtmgFcKoeQyqYcsFrRpBreNSC1smaC8n3Mtx5po+6BoneJaT6/nYj0wdNJ90+8Lj8G3aoC1P4swn8BGPifP/UzjrSTtyP57Z38Yv4TJotZC3PIftKmj1kLc8hu0iaG8hb3kKWzpo7yFveQibn20HKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKQQNKdJBK//GVOyTDho/qV/k0wbN7/GuZ+bHdtqggT3yQas/xWJNPmj4MnXQM+/1UMfUQSONh+0XQWNl9mc9F0F7mEz44iJo+DF90LM/RcLW9EEDj9wE7X0f7eX43QSN5xS2bxJBK5wI2JAIGrhzFbSXfeSWp+OWCZptRxmVx08m6BDiToqnaRVC3PGqxByCWNBY83bxhiAYNFM6jdJ0DkEwaHzxetFKBs2UjqM2nUMQDTqWatTebgQfyQatesKeUb1IY8kGHctjAMoXu3TQyiduj+etxp100CH4uUFUOAYL8kHjm/p0DsFJ0OpTeua1W3MRNHxM5xAcBa06pbkRXHvtvYDR3AMZPYIZL74W3EzoENIiHTmYlLWNfmFaY0KfGG1aj3yRjcLVhA4hL84RQspZwygXYkvL28f7Z+9F9JAbaY9IiDme26BDGD/q0dc3ItdB340YDlM5j7s99J7cEGrtrYk5HxN6o2dMhFyOoHf02IIQsw2CPtEishH37zMj6CdqBsdUtkfQkazjI+Y6CDqBxbQm5Lp42S5B6ct7xFwfEzpTi893EHM6gi5QK2pCzkfQBizDJuYy7KENWEVIzOWY0Ma48euLCW0sNU5itsWEruhsWhNyHUzoio6iJeZ6mNCQwoSGFIKGlJfb5br0XgRg4Xa5LkxoSCFoSCFoSHkJ4Wvv0XshQIl7w0xoSCFoSPkfNNsOzOqxXSY0pBA0pKyCZtuB2WybZUJDyo+gmdKYxV6ruxOaqDG6o0bZckDKYdBMaYzqrM3TCU3UGM2zJtlyQMrToJnSGEVMi1ETmqjRW2yD0VsOokYvKe0l7aGJGq2lNpd8U0jUaCWntaxXOYgateU2lv2yHVGjlpK2TKLk5+PBgsWQNHljhWmNUlYNmYfItEYK62Fo/tY30xqxarRSNT6mNfbUHHrNpilx+9bqmbvL9oC4feix/Rxiv0vgGka4f/oH0qEgTzVDnwMAAAAASUVORK5CYII=">
-<link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAA3UlEQVR4nO2XMQ7DIAxFDerIVPVQOUqPlKP0UFEm9nZy1Vou2B9COvCXSA7kfRNkQyBF6XZ9avFW5W0PMvYVOApcMhJHwyUrtsLz495kItYGWuCoCSKigGavQdOyHmvgEyphpXewASRL75xL8WtG6K+xlr3RtAl7aBqYBqaB/zbARQVpNjynVsTMK+Ax4RlbNYB0OM9c1x6wZOb9XeZ2LD+sZYe0ZPeBRINYzHUzoAERMAuqA2lZ3zD59Ao+E/bS+ZVQuy6NUt72cP4KsJPRYGZGGRgJJxK3Y9bI6/kL0JtmLnQOa8kAAAAASUVORK5CYII=">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
@@ -18,8 +19,8 @@
   --brand-mint:#00ff88 !important;
   --brand-mint-hover:#00e077 !important;
   --brand-mint-dim:rgba(0,255,136,0.12) !important;
-  --brand-amber:#f59e0b !important;
-  --brand-red:#ef4444 !important;
+  --brand-amber:#ffbb00 !important;
+  --brand-red:#ff4444 !important;
   --bg-obsidian:#080c0a !important;
   --bg-card:#0f1713 !important;
   --border-muted:rgba(255,255,255,0.08) !important;
@@ -64,7 +65,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .dropdown-menu.open{display:block}
 .dropdown-menu button{display:block;width:100%;text-align:left;background:none;border:none;color:var(--text);
   padding:10px 14px;font-size:.78rem;font-weight:600;cursor:pointer}
-.dropdown-menu button:hover{background:rgba(0,204,122,.1);color:var(--mint2)}
+.dropdown-menu button:hover{background:rgba(0,255,136,.1);color:var(--mint2)}
 .dropdown-menu button+button{border-top:1px solid var(--border)}
 .dropdown-group-label{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;
   color:var(--muted);padding:10px 14px 5px;background:rgba(255,255,255,.02)}
@@ -80,7 +81,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 /* ===== FOOTER ===== */
 .site-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
   padding:16px 22px max(16px, env(safe-area-inset-bottom));border-top:1px solid var(--border);
-  font-size:.7rem;color:var(--muted)}
+  font-size:.7rem;color:var(--muted);position:relative;z-index:1;background:var(--bg)}
 .footer-staff-link{color:var(--muted);text-decoration:none;border-bottom:1px dashed var(--border);padding-bottom:1px}
 .footer-staff-link:hover{color:var(--mint2);border-color:var(--mint2)}
 
@@ -122,7 +123,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   font-weight:800;font-size:.76rem;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
 #installStatus{font-size:.66rem;color:var(--muted);margin-top:8px}
 
-.privacy-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(0,204,122,.08);
+.privacy-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(0,255,136,.08);
   border:1px solid var(--border);color:var(--mint2);border-radius:20px;padding:10px 18px;
   font-size:.78rem;font-weight:700;cursor:pointer;align-self:center;margin-top:18px;transition:border-color .15s}
 .privacy-pill:hover{border-color:var(--mint2)}
@@ -134,9 +135,9 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .mobile-media{display:flex;justify-content:center;padding:8px 24px 36px}
 
 /* ===== BENTO DECK ===== */
-#dashboard{display:flex;border-top:1px solid var(--border);min-height:560px}
-.sidebar{width:380px;flex-shrink:0;padding:20px;display:flex;flex-direction:column;gap:16px;
-  border-right:1px solid var(--border);overflow-y:auto;max-height:calc(100vh - 64px)}
+#dashboard{display:flex;border-top:1px solid var(--border);min-height:560px;position:relative;isolation:isolate}
+.sidebar{width:380px;flex-shrink:0;min-height:0;padding:20px;display:flex;flex-direction:column;gap:16px;
+  border-right:1px solid var(--border);overflow-y:auto;max-height:calc(100vh - 64px);position:relative;z-index:1}
 .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
 .label{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);
   margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
@@ -149,14 +150,14 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .row{display:flex;justify-content:space-between;align-items:center;font-size:.78rem;gap:8px}
 .small{font-size:.72rem;color:var(--muted)}
 .bar-row{cursor:pointer;border-radius:8px;padding:6px;margin:0 -6px;transition:background .15s}
-.bar-row:hover,.bar-row.active{background:rgba(0,204,122,.08)}
+.bar-row:hover,.bar-row.active{background:rgba(0,255,136,.08)}
 .bar{height:6px;background:rgba(255,255,255,.08);border-radius:10px;overflow:hidden;margin-top:4px}
 .bar>span{display:block;height:100%;background:var(--mint2)}
 
 .filter-tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
 
 /* ===== LEDGER CARD ===== */
-.ledger-card{border-color:rgba(0,204,122,.35)}
+.ledger-card{border-color:rgba(0,255,136,.35)}
 .ledger-tag{font-size:.62rem;color:var(--muted);letter-spacing:.4px;margin-bottom:12px}
 .ledger-row{margin-bottom:12px}
 .ledger-row:last-child{margin-bottom:0}
@@ -168,7 +169,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .audit-tabs{display:flex;gap:6px;margin-bottom:10px}
 .audit-tab{flex:1;background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--muted);
   font-size:.66rem;font-weight:700;padding:7px 6px;border-radius:8px;cursor:pointer;text-align:center}
-.audit-tab.active{border-color:var(--mint2);background:rgba(0,204,122,.14);color:var(--mint2)}
+.audit-tab.active{border-color:var(--mint2);background:rgba(0,255,136,.14);color:var(--mint2)}
 .audit-entry{background:rgba(7,12,14,.6);border:1px solid var(--border);border-radius:10px;padding:11px;margin-bottom:8px}
 .audit-entry .row strong{font-size:.78rem}
 .audit-hash{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.6rem;color:var(--muted);
@@ -182,7 +183,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .filter-tab[data-filter="Critical"] .dot{background:var(--danger)}
 .filter-tab[data-filter="Warning"] .dot{background:var(--warn)}
 .filter-tab[data-filter="Resolved"] .dot{background:var(--mint2)}
-.filter-tab.active{border-color:var(--mint2);background:rgba(0,204,122,.14);color:var(--mint2)}
+.filter-tab.active{border-color:var(--mint2);background:rgba(0,255,136,.14);color:var(--mint2)}
 .filter-tab.active[data-filter="Critical"]{border-color:var(--danger);color:#fca5a5;background:rgba(239,68,68,.12)}
 .filter-tab.active[data-filter="Warning"]{border-color:var(--warn);color:#fde68a;background:rgba(245,158,11,.12)}
 
@@ -190,7 +191,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .ledger-filters{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
 .ledger-filter{background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--muted);
   font-size:.6rem;font-weight:700;padding:4px 9px;border-radius:20px;cursor:pointer;font-family:var(--mono)}
-.ledger-filter.active{border-color:var(--mint2);background:rgba(0,204,122,.14);color:var(--mint2)}
+.ledger-filter.active{border-color:var(--mint2);background:rgba(0,255,136,.14);color:var(--mint2)}
 .ledger-row{transition:opacity .15s}
 .ledger-row.dimmed{opacity:.28}
 
@@ -203,7 +204,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .pill{padding:2px 7px;border-radius:5px;font-size:.62rem;font-weight:700;text-transform:uppercase;flex-shrink:0}
 .pill-crit{background:rgba(239,68,68,.2);color:#fca5a5}
 .pill-warn{background:rgba(245,158,11,.2);color:#fde68a}
-.pill-ok{background:rgba(0,204,122,.2);color:#a7f3d0}
+.pill-ok{background:rgba(0,255,136,.2);color:#a7f3d0}
 .mapwrap{flex:1;position:relative}
 #map{position:absolute;inset:0;background:#0d1518}
 .leaflet-container{background:#0d1518}
@@ -266,7 +267,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   <section class="hero">
     <h1>CITIXEN UX<sup style="font-size:.5em;opacity:.4;">™</sup></h1>
     <h2>Civic Intelligence Platform</h2>
-    <div class="hero-badge">Anonymous Dispatch Gateway</div>
+    <div class="hero-badge">CITIXEN Mobile Gateway</div>
 
     <div class="gateway-telemetry" aria-label="Gateway telemetry">
       <div class="gauge-dial">
@@ -309,12 +310,12 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
       <div class="label">Install Mobile Reporter</div>
       <div class="qr-row">
         <img id="qrImg" width="120" height="120" alt="Scan to launch the CITIXEN UX mobile reporter"
-          src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=https://citixenux.com/app&color=00cc7a&bgcolor=0c1412"
+          src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=https://citixenux.com/app&color=00ff88&bgcolor=0c1412"
           style="border-radius:8px;flex-shrink:0;display:block"
           onerror="this.style.display='none';document.getElementById('qrFallback').style.display='flex';">
         <div id="qrFallback" style="display:none;width:120px;height:120px;background:#0d1518;border:1px solid var(--border);
           border-radius:8px;align-items:center;justify-content:center;text-align:center;padding:8px;flex-shrink:0;">
-          <span class="small">QR image unavailable in this preview — <a href="/app.html" style="color:var(--mint2)">open /app.html</a> directly</span>
+          <span class="small">Can't scan? <a class="footer-staff-link" href="/app.html">Open the mobile reporter</a> directly.</span>
         </div>
         <div class="qr-copy">
           <div class="small">Scan with your phone to launch the Mobile PWA, or install directly on this device.</div>
@@ -506,7 +507,7 @@ const cases=[
 let statusFilter='All', categoryFilter=null;
 
 function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function statusColor(status){ return status==='Critical' ? '#ef4444' : status==='Warning' ? '#f59e0b' : '#00cc7a'; }
+function statusColor(status){ return status==='Critical' ? '#ff4444' : status==='Warning' ? '#ffbb00' : '#00ff88'; }
 function statusPill(status){ return status==='Critical' ? 'pill-crit' : status==='Warning' ? 'pill-warn' : 'pill-ok'; }
 
 // ===== PUBLIC LEDGER LOCATION FUZZYING =====
@@ -753,6 +754,11 @@ document.getElementById('installBtnCard').addEventListener('click', async ()=>{
 window.addEventListener('appinstalled',()=>{
   document.getElementById('installStatus').textContent='✓ Installed to this device.';
 });
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('/sw.js', { scope:'/' }).catch(()=>{});
+  });
+}
 
 window.addEventListener('DOMContentLoaded',()=>{
   renderFeed();
