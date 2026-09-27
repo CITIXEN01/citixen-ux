@@ -269,3 +269,27 @@ Contact: partners@citixenux.com   |   citixenux.com/pilot
 ```
 
 **Distribution note:** This memo is designed to be handed out at a council meeting or left with a city manager after a pitch — it deliberately mirrors the plain, tabular style of the platform's own "Print My Ward Report" output, so the leadership audience sees the same design language they'd get from the product itself.
+
+---
+
+## Part 4 — IP Portfolio Reference
+
+CITIXEN UX is positioned as backed by a proprietary, multi-layer IP strategy —
+one filing covering the platform's dispatch/routing mechanics, one covering
+its anonymity-preserving telemetry pipeline. Both `deck.html` (Slide 4) and any
+future collateral referencing patent status should pull from this table rather
+than restating numbers independently, so a correction only has to happen once.
+
+| | Patent 1 | Patent 2 |
+|---|---|---|
+| **Title** | Spatial Stream Processing Engine | Zero-Knowledge Civic Telemetry Engine |
+| **Covers** | Geolocating, clustering, and routing incoming reports against live crew position and ward boundary data in real time | Aggregating and routing report telemetry (ward health, SLA, dispatch load) without retaining device, location-EXIF, or account identity |
+| **Filing** | U.S. Provisional Patent Application No. **63/163,426** | **Application number not yet provided — do not publish a number for this filing until legal confirms it** |
+| **Status** | Provisional — confirm current standing with counsel before external distribution | Provisional (title only, per founder direction) — confirm filing has actually been made, and get the real application number, before this patent is named publicly |
+
+**Why Patent 2 has no number here:** an application number is a specific legal
+fact, not marketing copy — publishing a wrong or placeholder-looking one is a
+false-marking risk, not just an inaccurate stat. This table intentionally
+leaves it blank rather than inventing something plausible. Fill it in from
+counsel, then update this table, `deck.html`, and any deck built after it in
+one pass.
