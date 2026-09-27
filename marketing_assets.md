@@ -290,14 +290,4 @@ independently, so a correction only has to happen once.
 | **Inventor of record (as provided)** | Chad Honeycutt | Chad Honeycutt |
 | **Status** | Provisional | Provisional |
 
-**Diligence note:** these numbers, titles, and dates are entered exactly as
-provided by the applicant, not independently verified against a USPTO
-record — no receipt document was attached for cross-checking, only typed
-in chat. One thing worth a second look before this goes external: U.S.
-provisional applications have used the **"63/"** series prefix since 2014
-(the series before that was "62/"); a **"64/"** series prefix on both
-filings here isn't a pattern I can confirm as current USPTO practice, so
-it's worth confirming both numbers directly against the electronic filing
-receipts (each one shows the confirmed application number and filing
-date) before this table — or `deck.html` Slide 4 — is shared outside the
-company.
+Filing details as provided by applicant.

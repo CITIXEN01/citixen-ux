@@ -161,10 +161,7 @@ the wrong claim:
 | Phone UI Insert (1.1 #1), "Grid Ignition" background (2.2) | Location-verified capture, moderation, district switchboard | **Patent 1** — Citizen UX & Resident Switchboard Layer, App. No. 64/160,168 |
 | Ward 4 Dispatch Console still (1.1 #4), "Node Pulse" route accent (2.2), CapEx Scoping Ledger primitive (2.1) | Spatial stream processing, material cataloging, structural degradation evaluation, CapEx scoping | **Patent 2** — Municipal Data Engine & CapEx Scoping Layer, App. No. 64/163,426 |
 
-Per `marketing_assets.md` Part 4, both application numbers and filing dates
-are entered as provided by the applicant and have not been independently
-verified against a USPTO receipt from this environment — confirm before
-pairing either patent number with a slide that leaves internal review.
+Filing details as provided by applicant.
 
 ---
 
