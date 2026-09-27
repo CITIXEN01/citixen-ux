@@ -16,17 +16,25 @@ flagged because the source footage does not actually support it.
 
 ## Part 1 — Honest Video Breakdown
 
-### 1.1 The Four Core Setups
+### 1.1 The Five Core Setups
 
-The video is not ten unique scenes — it is **four distinct physical setups**,
-intercut with one recurring transition motif (see 1.2) used at least three times,
-and it ends mid-motif with no logo card or CTA slate.
+**Correction (2026-09-27):** the original version of this table was built from
+a 2-second-resolution frame sample, which skipped two real cuts and mistimed a
+third. A full 1fps contact-sheet pass across the whole 59.35s, plus targeted
+re-scans, found: an aerial title card the earlier pass missed entirely, a
+second phone-UI insert cut later in the edit, and the utility-truck shot at a
+different timestamp than originally logged. Corrected rows are marked below.
+
+The video is **five distinct physical setups**, intercut with one recurring
+transition motif (see 1.2) used at least three times, and it ends mid-motif
+with no logo card or CTA slate.
 
 | # | Setup | Timestamp(s) | What's Actually Shown | Usable As |
 |---|---|---|---|---|
-| 1 | **Phone UI Insert** | 0:00–0:02 | Close-up of a hand holding a phone on the CITIZEN report form — "Lighting & Utilities" category selected, a ticket card, a "Publish Report" button, bottom nav (Report/Map/Analytics) | Product-in-hand B-roll for a slide needing a human holding the app. The only shot in the video with real, on-brand UI. |
+| 0 | **Aerial Title Card** *(added)* | ~0:07–0:10 | Full aerial dusk shot of the city: a mint wireframe grid overlaid on real intersections, citizen-report pin markers (person-icon chips) blooming across the whole grid, and the tagline **"CITIXEN UX — UPGRADE YOUR CIVIC EXPERIENCE"** fully legible, uncut | The strongest "network/connection" shot in the video — it visualizes many citizens reporting into one system. Best candidate for a cold open and/or a closing bookend shot. |
+| 1 | **Phone UI Insert** | 0:00–0:02, and recut ~0:16–0:17 *(second instance added)* | Close-up of a hand holding a phone on the CITIZEN report form — "Lighting & Utilities" category selected, a ticket card, a "Publish Report" button, bottom nav (Report/Map/Analytics). The ~0:16–0:17 recut shows the same UI with a red "emergency notice" banner visible. | Product-in-hand B-roll for a slide needing a human holding the app. The only shot in the video with real, on-brand UI. |
 | 2 | **Alley Walk / Photograph** | 0:06–0:16, repeated 0:18–0:59 | A man alone on a rainy night street: standing under a streetlamp, raising his phone to photograph something off-camera, walking away from camera | The emotional "citizen notices a hazard" beat. Reused 3+ times in the source edit — do not assume it represents 3 different moments; it's the same setup recut. |
-| 3 | **Utility Truck Field Response** | ~0:14 | A municipal bucket truck at night, crew working on a streetlamp | The only genuine "field crew physically responding" shot. Pairs directly with the "Field Response" side of the +34%/−18% capital-shift story in `marketing_assets.md`. |
+| 3 | **Utility Truck Field Response** | ~0:05–0:06 *(corrected from ~0:14)* | A municipal bucket truck at night, crew working on a streetlamp | The only genuine "field crew physically responding" shot. Pairs directly with the "Field Response" side of the +34%/−18% capital-shift story in `marketing_assets.md`. |
 | 4 | **Ward 4 Dispatch Console** | 0:42–0:52 | A dark PostGIS-style desktop map UI: zigzag teal route lines labeled "Ward 4" (×2), a hand interacting near a pulsing radius marker labeled "New Route Request" (×2), a bottom stats strip including "Route Optimized" | The only other shot with legible, real-sounding copy. Good B-roll for an ops/dispatch-focused slide, but the surrounding numeric stats are not reliably legible and should not be quoted as data. |
 
 **What the footage does NOT show**, despite being implied by earlier extraction
@@ -70,7 +78,7 @@ illegible at any resolution actually needed for a slide.
 | ✅ **Genuine, usable** | "Ward 4" | Dispatch console (appears twice) |
 | ✅ **Genuine, usable** | "New Route Request" | Dispatch console (appears twice) |
 | ✅ **Genuine, usable** | "Route Optimized" | Dispatch console stats strip |
-| ⚠️ **Incomplete, unverifiable** | "UPGRADE YOUR CIVIC..." | Aerial title card — cut off at frame edge, rest of the line unknown |
+| ✅ **Genuine, usable** *(was "incomplete" — corrected 2026-09-27)* | "CITIXEN UX — UPGRADE YOUR CIVIC EXPERIENCE" | Aerial title card, ~0:09–0:10 — a later re-scan found the full line legible and uncut, not cut off at the frame edge as previously logged |
 | 🚫 **AI-generation noise — do not use** | "Leedin Yeaser Freafity," "Uporo-Stary Frajfsdary," "Frezet Route," ticket IDs, secondary dashboard labels | Phone UI insert, dispatch console margins | 
 
 **Rule for this repo going forward:** only the ✅ rows above may be quoted as
