@@ -155,8 +155,16 @@ p.slide-lede{font-size:clamp(.9rem,1.4vw,1.1rem);color:var(--muted);max-width:68
             <stop offset="0%" stop-color="#00ff88" stop-opacity="0.5"/>
             <stop offset="100%" stop-color="#00ff88" stop-opacity="0"/>
           </linearGradient>
+          <filter id="gridGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="2.2" result="blur"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
         </defs>
-        <g stroke="url(#fade1)" stroke-width="1">
+        <rect x="0" y="0" width="400" height="800" fill="#071619"/>
+        <g stroke="url(#fade1)" stroke-width="1" filter="url(#gridGlow)">
           <path d="M0 800 L400 800"/>
           <path d="M0 700 L400 700"/>
           <path d="M0 600 L400 600"/>
@@ -236,7 +244,7 @@ p.slide-lede{font-size:clamp(.9rem,1.4vw,1.1rem);color:var(--muted);max-width:68
           <h3 style="margin-bottom:4px">Resident Switchboard Layer</h3>
           <p class="hud-sub" style="line-height:1.5;margin-bottom:10px">"System and Method for Location-Verified Civic Intelligence Capture, Moderation, and Real-Time District Management Ledger"</p>
           <svg class="route-svg" viewBox="0 0 200 90" style="margin:6px 0 10px">
-            <rect x="0" y="0" width="200" height="90" rx="10" fill="#0b120f"/>
+            <rect x="0" y="0" width="200" height="90" rx="10" fill="#071619"/>
             <g stroke="#00ff88" stroke-width="1.6" opacity=".7">
               <circle cx="100" cy="42" r="12" fill="none"/>
               <circle cx="100" cy="42" r="26" fill="none"/>
@@ -254,7 +262,7 @@ p.slide-lede{font-size:clamp(.9rem,1.4vw,1.1rem);color:var(--muted);max-width:68
           <h3 style="margin-bottom:4px">Municipal Data Engine &amp; CapEx Scoping</h3>
           <p class="hud-sub" style="line-height:1.5;margin-bottom:10px">"Hardware-Agnostic Spatial Stream Processing Engine for Automated Material Cataloging, Structural Degradation Evaluation, and Dynamic Cost-Linked Infrastructure Scoping"</p>
           <svg class="route-svg" viewBox="0 0 200 90" style="margin:6px 0 10px">
-            <rect x="0" y="0" width="200" height="90" rx="10" fill="#0b120f"/>
+            <rect x="0" y="0" width="200" height="90" rx="10" fill="#071619"/>
             <g stroke="#00ff88" stroke-width="2" fill="none" opacity=".85">
               <path d="M20 68 L60 44 L100 56 L140 24 L180 34"/>
             </g>
