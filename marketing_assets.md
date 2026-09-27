@@ -38,15 +38,17 @@ Municipal hazard reporting is broken in three ways:
 🕳️  No operational visibility  — dispatchers work from paper and phone calls
 💸  No capital discipline       — budget follows politics, not condition data
 
-According to ICMA and municipal performance audits, over 60% of
-non-emergency resident requests in legacy 311 systems are closed
-administratively without verified field maintenance or resolution.
+Legacy 311 and municipal ERP systems suffer from a high
+"Administrative Closure Gap" — where service tickets are marked
+"Closed" or "Resolved" in back-office software upon administrative
+intake, despite zero physical dispatch or field verification
+taking place.
 
-— Source: ICMA (International City/County Management Association)
-  Municipal Service Benchmarks & Pew Charitable Trusts Civic Data Report.
+KEY TAKEAWAY: Legacy systems prioritize administrative throughput
+over physical field execution.
 ```
 
-**Speaker notes:** Land on the 60%+ figure and pause. This is the emotional hook — "closed" in most legacy 311 systems means the ticket was closed administratively, not that anyone actually went out and verified the fix. Cite ICMA and Pew by name if asked where the number comes from — both are credible enough that most council members and city managers will recognize them without pushback. Frame the rest of the deck as closing that loop on both ends: for the resident, and for the city's own budget process.
+**Speaker notes:** Point out to the council/city manager that closing a ticket in software without spatial field verification is why residents feel ignored — CITIXEN UX™ bridges software closure to actual physical completion. Frame the rest of the deck as closing that loop on both ends: for the resident, and for the city's own budget process.
 
 ---
 
