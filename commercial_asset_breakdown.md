@@ -149,6 +149,23 @@ video assets slot into that existing package.
    "Print My Ward Report" button, since that's the console feature staff
    actually touch after a route is approved
 
+### 2.4 Cross-Reference: Visual Assets vs. Patent-Covered Functionality
+
+The two motifs this document treats as reusable design assets happen to map
+directly onto the two provisional patents recorded in `marketing_assets.md`
+Part 4 — worth knowing so a future deck doesn't pair the wrong visual with
+the wrong claim:
+
+| Visual asset (this document) | Maps to | Patent |
+|---|---|---|
+| Phone UI Insert (1.1 #1), "Grid Ignition" background (2.2) | Location-verified capture, moderation, district switchboard | **Patent 1** — Citizen UX & Resident Switchboard Layer, App. No. 64/160,168 |
+| Ward 4 Dispatch Console still (1.1 #4), "Node Pulse" route accent (2.2), CapEx Scoping Ledger primitive (2.1) | Spatial stream processing, material cataloging, structural degradation evaluation, CapEx scoping | **Patent 2** — Municipal Data Engine & CapEx Scoping Layer, App. No. 64/163,426 |
+
+Per `marketing_assets.md` Part 4, both application numbers and filing dates
+are entered as provided by the applicant and have not been independently
+verified against a USPTO receipt from this environment — confirm before
+pairing either patent number with a slide that leaves internal review.
+
 ---
 
 ## Notes for Future Extraction Work

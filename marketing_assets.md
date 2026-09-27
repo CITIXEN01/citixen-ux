@@ -274,22 +274,30 @@ Contact: partners@citixenux.com   |   citixenux.com/pilot
 
 ## Part 4 — IP Portfolio Reference
 
-CITIXEN UX is positioned as backed by a proprietary, multi-layer IP strategy —
-one filing covering the platform's dispatch/routing mechanics, one covering
-its anonymity-preserving telemetry pipeline. Both `deck.html` (Slide 4) and any
-future collateral referencing patent status should pull from this table rather
-than restating numbers independently, so a correction only has to happen once.
+CITIXEN UX is positioned as backed by a proprietary, dual-engine IP
+architecture — one filing covering the citizen-facing capture/moderation
+layer, one covering the back-end spatial data and capital-scoping engine.
+Both `deck.html` (Slide 4) and any future collateral referencing patent
+status should pull from this table rather than restating numbers
+independently, so a correction only has to happen once.
 
-| | Patent 1 | Patent 2 |
+| | Patent 1 — Citizen UX & Resident Switchboard Layer | Patent 2 — Municipal Data Engine & CapEx Scoping Layer |
 |---|---|---|
-| **Title** | Spatial Stream Processing Engine | Zero-Knowledge Civic Telemetry Engine |
-| **Covers** | Geolocating, clustering, and routing incoming reports against live crew position and ward boundary data in real time | Aggregating and routing report telemetry (ward health, SLA, dispatch load) without retaining device, location-EXIF, or account identity |
-| **Filing** | U.S. Provisional Patent Application No. **63/163,426** | **Application number not yet provided — do not publish a number for this filing until legal confirms it** |
-| **Status** | Provisional — confirm current standing with counsel before external distribution | Provisional (title only, per founder direction) — confirm filing has actually been made, and get the real application number, before this patent is named publicly |
+| **Official title** | "System and Method for Location-Verified Civic Intelligence Capture, Moderation, and Real-Time District Management Ledger" | "Hardware-Agnostic Spatial Stream Processing Engine for Automated Material Cataloging, Structural Degradation Evaluation, and Dynamic Cost-Linked Infrastructure Scoping" |
+| **Functional scope** | Powers the front-end Citizen UX: location verification, moderation, and the real-time district management switchboard | Powers back-end data stripping, material cataloging, structural degradation evaluation, and automated CapEx scoping |
+| **Filing** | U.S. Provisional Patent Application No. **64/160,168** | U.S. Provisional Patent Application No. **64/163,426** |
+| **Filed** | September 22, 2026 | September 27, 2026 |
+| **Inventor of record (as provided)** | Chad Honeycutt | Chad Honeycutt |
+| **Status** | Provisional | Provisional |
 
-**Why Patent 2 has no number here:** an application number is a specific legal
-fact, not marketing copy — publishing a wrong or placeholder-looking one is a
-false-marking risk, not just an inaccurate stat. This table intentionally
-leaves it blank rather than inventing something plausible. Fill it in from
-counsel, then update this table, `deck.html`, and any deck built after it in
-one pass.
+**Diligence note:** these numbers, titles, and dates are entered exactly as
+provided by the applicant, not independently verified against a USPTO
+record — no receipt document was attached for cross-checking, only typed
+in chat. One thing worth a second look before this goes external: U.S.
+provisional applications have used the **"63/"** series prefix since 2014
+(the series before that was "62/"); a **"64/"** series prefix on both
+filings here isn't a pattern I can confirm as current USPTO practice, so
+it's worth confirming both numbers directly against the electronic filing
+receipts (each one shows the confirmed application number and filing
+date) before this table — or `deck.html` Slide 4 — is shared outside the
+company.
