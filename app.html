@@ -113,6 +113,33 @@ textarea.input{resize:none;line-height:1.4}
 .bar{height:6px;background:rgba(255,255,255,.08);border-radius:10px;overflow:hidden;margin-top:4px}
 .bar>span{display:block;height:100%;background:var(--mint2)}
 
+/* ===== ANALYTICS SCOPE TOGGLE (My Impact / Ward 4 Local / National Network) ===== */
+.scope-toggle{position:relative;display:grid;grid-template-columns:repeat(3,1fr);background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:4px;margin-bottom:14px}
+.scope-thumb{position:absolute;top:4px;bottom:4px;left:4px;background:var(--mint);border-radius:10px;z-index:1;
+  box-shadow:0 0 14px rgba(0,255,136,.5);transition:transform .32s cubic-bezier(.4,0,.2,1),width .32s cubic-bezier(.4,0,.2,1)}
+.scope-btn{position:relative;z-index:2;background:none;border:none;color:rgba(255,255,255,.6);font-size:.66rem;
+  font-weight:800;letter-spacing:.01em;padding:11px 2px;border-radius:10px;cursor:pointer;text-align:center;
+  white-space:nowrap;transition:color .3s ease}
+.scope-btn.active{color:#051311}
+
+.scope-view-wrap{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows .35s cubic-bezier(.4,0,.2,1),opacity .25s ease}
+.scope-view-wrap.active{grid-template-rows:1fr;opacity:1;transition:grid-template-rows .35s cubic-bezier(.4,0,.2,1),opacity .3s ease .05s}
+.scope-view-inner{overflow:hidden;min-height:0;display:flex;flex-direction:column;gap:10px}
+
+.receipt-item{background:rgba(7,12,14,.6);border:1px solid var(--border);border-radius:10px;padding:11px 12px;
+  margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.receipt-item .ri-cat{font-size:.78rem;font-weight:800}
+.receipt-item .ri-meta{font-size:.66rem;color:var(--muted);margin-top:2px}
+.receipt-item .ri-amt{font-size:.85rem;font-weight:900;color:var(--mint2);white-space:nowrap;flex-shrink:0}
+
+.impact-split{display:flex;padding:10px 0 4px}
+.impact-split>div{flex:1;text-align:center}
+.impact-split>div+div{border-left:1px solid var(--border)}
+
+.nat-tile{padding:14px 0;border-top:1px solid var(--border);text-align:center}
+.nat-tile:first-child{padding-top:4px;border-top:none}
+
 .coverage-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px;flex-wrap:wrap;gap:8px}
 .coverage-ticker{font-size:1.6rem;font-weight:900;color:var(--mint2)}
 .coverage-sub{font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
@@ -236,57 +263,123 @@ textarea.input{resize:none;line-height:1.4}
     </section>
 
     <section id="tab-analytics" class="tabpane">
-      <div class="card">
-        <div class="label">Ward 4 civic health index</div>
-        <div style="text-align:center;padding:12px 0;">
-          <div class="stat-big">88 <span style="font-size:1rem;color:var(--muted)">/ 100</span></div>
-          <div class="small">Dispatch response SLA: 91% on-time</div>
-        </div>
-        <div style="margin-top:8px;">
-          <div class="row"><span>Road infrastructure</span><span style="color:var(--mint2)">82%</span></div>
-          <div class="bar"><span style="width:82%"></span></div>
-        </div>
-        <div style="margin-top:10px;">
-          <div class="row"><span>Lighting & safety</span><span style="color:var(--warn)">64%</span></div>
-          <div class="bar"><span style="width:64%;background:var(--warn)"></span></div>
+
+      <div class="scope-toggle" id="scopeToggle" role="tablist" aria-label="Analytics scope">
+        <div class="scope-thumb" id="scopeThumb"></div>
+        <button class="scope-btn active" data-scope="mine" role="tab" aria-selected="true">My Impact</button>
+        <button class="scope-btn" data-scope="ward" role="tab" aria-selected="false">Ward 4 Local</button>
+        <button class="scope-btn" data-scope="national" role="tab" aria-selected="false">National Network</button>
+      </div>
+
+      <!-- MY IMPACT -->
+      <div class="scope-view-wrap active" data-scope-view="mine">
+        <div class="scope-view-inner">
+          <div class="card">
+            <div class="label">Your civic impact</div>
+            <div class="impact-split">
+              <div>
+                <div class="stat-big" style="font-size:1.7rem" id="myBlocksCount">0</div>
+                <div class="small">Blocks claimed</div>
+              </div>
+              <div>
+                <div class="stat-big" style="font-size:1.7rem;color:#fff" id="myDollarValue">$0</div>
+                <div class="small">Civic repairs triggered</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="label">Your receipts</div>
+            <div id="myReceipts"></div>
+            <p class="small" id="myReceiptsEmpty" style="display:none;text-align:center;padding:10px 0">
+              No reports yet — switch to Ward 4 Local and tap a dark block to file your first one.
+            </p>
+          </div>
         </div>
       </div>
 
-      <div class="card" style="margin-top:10px;">
-        <div class="coverage-head">
-          <div>
-            <div class="label" style="margin-bottom:2px">Citywide asset coverage</div>
-            <div class="coverage-ticker" id="covTicker">0.0%</div>
+      <!-- WARD 4 LOCAL -->
+      <div class="scope-view-wrap" data-scope-view="ward">
+        <div class="scope-view-inner">
+          <div class="card">
+            <div class="label">Ward 4 civic health index</div>
+            <div style="text-align:center;padding:12px 0;">
+              <div class="stat-big">88 <span style="font-size:1rem;color:var(--muted)">/ 100</span></div>
+              <div class="small">Dispatch response SLA: 91% on-time</div>
+            </div>
+            <div style="margin-top:8px;">
+              <div class="row"><span>Road infrastructure</span><span style="color:var(--mint2)">82%</span></div>
+              <div class="bar"><span style="width:82%"></span></div>
+            </div>
+            <div style="margin-top:10px;">
+              <div class="row"><span>Lighting & safety</span><span style="color:var(--warn)">64%</span></div>
+              <div class="bar"><span style="width:64%;background:var(--warn)"></span></div>
+            </div>
           </div>
-          <div style="text-align:right">
-            <div class="coverage-sub">Ward 4 blocks surveyed</div>
-            <div style="font-size:.8rem;font-weight:800" id="covFraction">0 / 0</div>
+
+          <div class="card">
+            <div class="coverage-head">
+              <div>
+                <div class="label" style="margin-bottom:2px">Citywide asset coverage</div>
+                <div class="coverage-ticker" id="covTicker">0.0%</div>
+              </div>
+              <div style="text-align:right">
+                <div class="coverage-sub">Ward 4 blocks surveyed</div>
+                <div style="font-size:.8rem;font-weight:800" id="covFraction">0 / 0</div>
+              </div>
+            </div>
+            <div class="cov-legend">
+              <span><span class="dot" style="background:var(--mint2)"></span>Verified</span>
+              <span><span class="dot" style="background:rgba(255,255,255,.15)"></span>Not yet surveyed</span>
+            </div>
+            <div class="cov-grid" id="covGrid"></div>
+            <div class="cov-toast" id="covToast">
+              <span id="covToastText"></span>
+              <button class="ct-cta" id="covToastCta">Report it</button>
+            </div>
+            <div class="your-impact">
+              <div class="num" id="covYouCount">0</div>
+              <div class="lbl">blocks you've helped verify — tap any dark block to report it and light it up for everyone.</div>
+            </div>
           </div>
-        </div>
-        <div class="cov-legend">
-          <span><span class="dot" style="background:var(--mint2)"></span>Verified</span>
-          <span><span class="dot" style="background:rgba(255,255,255,.15)"></span>Not yet surveyed</span>
-        </div>
-        <div class="cov-grid" id="covGrid"></div>
-        <div class="cov-toast" id="covToast">
-          <span id="covToastText"></span>
-          <button class="ct-cta" id="covToastCta">Report it</button>
-        </div>
-        <div class="your-impact">
-          <div class="num" id="covYouCount">0</div>
-          <div class="lbl">blocks you've helped verify — tap any dark block to report it and light it up for everyone.</div>
+
+          <div class="card">
+            <div class="label">Local resolution feed</div>
+            <div id="localFeed"></div>
+          </div>
         </div>
       </div>
 
-      <div class="card" style="margin-top:10px;text-align:center;">
-        <div class="label" style="justify-content:center;">City-Wide Analytics</div>
-        <p style="font-size:.78rem;color:var(--muted);margin-bottom:12px;">
-          Access real-time GIS mapping, ward heatmaps, and municipal SLAs on the desktop portal.
-        </p>
-        <a href="https://citixenux.com" target="_blank" rel="noopener noreferrer" class="btn-submit" style="text-decoration:none;">
-          Open Web Dashboard ↗
-        </a>
+      <!-- NATIONAL NETWORK -->
+      <div class="scope-view-wrap" data-scope-view="national">
+        <div class="scope-view-inner">
+          <div class="card">
+            <div class="label" style="justify-content:center">National network — live</div>
+            <div class="nat-tile">
+              <div class="stat-big">14</div>
+              <div class="small">Wards digitized</div>
+            </div>
+            <div class="nat-tile">
+              <div class="stat-big">182,400</div>
+              <div class="small">Blocks mapped</div>
+            </div>
+            <div class="nat-tile">
+              <div class="stat-big" style="color:#fff">$12.8M</div>
+              <div class="small">CapEx scoped</div>
+            </div>
+          </div>
+
+          <div class="card" style="text-align:center;">
+            <div class="label" style="justify-content:center;">City-Wide Analytics</div>
+            <p style="font-size:.78rem;color:var(--muted);margin-bottom:12px;">
+              Access real-time GIS mapping, ward heatmaps, and municipal SLAs on the desktop portal.
+            </p>
+            <a href="https://citixenux.com" target="_blank" rel="noopener noreferrer" class="btn-submit" style="text-decoration:none;">
+              Open Web Dashboard ↗
+            </a>
+          </div>
+        </div>
       </div>
+
     </section>
   </main>
 
@@ -368,8 +461,110 @@ function switchTab(id,btn){
     setTimeout(()=>{ if(map) map.invalidateSize(); },200);
   }
   if(id==='tab-analytics'){
-    animateCoverage();
+    initAnalytics();
+    positionScopeThumb();
   }
+}
+
+/* =====================================================================
+   ANALYTICS SCOPE TOGGLE — My Impact / Ward 4 Local / National Network
+   ===================================================================== */
+function positionScopeThumb(){
+  const activeBtn = document.querySelector('.scope-btn.active');
+  const thumb = document.getElementById('scopeThumb');
+  if (!activeBtn || !thumb) return;
+  thumb.style.width = activeBtn.offsetWidth + 'px';
+  thumb.style.transform = 'translateX(' + activeBtn.offsetLeft + 'px)';
+}
+
+function switchScope(scope, btn){
+  document.querySelectorAll('.scope-btn').forEach(b => {
+    b.classList.remove('active');
+    b.setAttribute('aria-selected', 'false');
+  });
+  btn.classList.add('active');
+  btn.setAttribute('aria-selected', 'true');
+  positionScopeThumb();
+
+  document.querySelectorAll('.scope-view-wrap').forEach(v => {
+    v.classList.toggle('active', v.dataset.scopeView === scope);
+  });
+}
+
+let analyticsInitialized = false;
+
+async function initAnalytics(){
+  if (analyticsInitialized) return;
+  analyticsInitialized = true;
+  await animateCoverage(); // fetches covCells + builds/animates the grid
+  renderMyImpact();
+  renderLocalFeed();
+}
+
+const CATEGORY_VALUES = { Pothole: 1200, Streetlight: 850, Signage: 420, Sidewalk: 2100, Drainage: 3400 };
+
+function renderMyImpact(){
+  const mine = covCells.filter(c => c.reportedByYou);
+  const totalValue = mine.reduce((sum, c) => sum + (CATEGORY_VALUES[c.category] || 0), 0);
+
+  document.getElementById('myBlocksCount').textContent = mine.length;
+  document.getElementById('myDollarValue').textContent = '$' + totalValue.toLocaleString('en-US');
+
+  const listEl = document.getElementById('myReceipts');
+  const emptyEl = document.getElementById('myReceiptsEmpty');
+  listEl.innerHTML = '';
+  if (!mine.length) { emptyEl.style.display = 'block'; return; }
+  emptyEl.style.display = 'none';
+
+  mine.slice().reverse().forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'receipt-item';
+
+    const left = document.createElement('div');
+    const catLine = document.createElement('div');
+    catLine.className = 'ri-cat';
+    catLine.textContent = c.category;
+    const metaLine = document.createElement('div');
+    metaLine.className = 'ri-meta';
+    metaLine.textContent = 'Ward 4 · Block #' + c.id + ' · ' + c.verifiedDate;
+    left.appendChild(catLine);
+    left.appendChild(metaLine);
+
+    const amtEl = document.createElement('div');
+    amtEl.className = 'ri-amt';
+    amtEl.textContent = '$' + (CATEGORY_VALUES[c.category] || 0).toLocaleString('en-US');
+
+    div.appendChild(left);
+    div.appendChild(amtEl);
+    listEl.appendChild(div);
+  });
+}
+
+function renderLocalFeed(){
+  const feedEl = document.getElementById('localFeed');
+  if (!feedEl) return;
+  const covered = covCells.filter(c => c.covered).slice(-8).reverse();
+  feedEl.innerHTML = '';
+  covered.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'feed-item';
+    const row = document.createElement('div');
+    row.className = 'row';
+    const catSpan = document.createElement('span');
+    catSpan.textContent = c.category;
+    const pill = document.createElement('span');
+    pill.className = 'pill pill-ok';
+    pill.textContent = 'Verified';
+    row.appendChild(catSpan);
+    row.appendChild(pill);
+    const meta = document.createElement('div');
+    meta.className = 'small';
+    meta.style.marginTop = '4px';
+    meta.textContent = 'Ward 4 · Block #' + c.id + ' · ' + c.verifiedDate + (c.reportedByYou ? ' · by you' : '');
+    div.appendChild(row);
+    div.appendChild(meta);
+    feedEl.appendChild(div);
+  });
 }
 
 /* =====================================================================
@@ -528,6 +723,8 @@ async function verifyReportedCell(cellId, category){
   const fromPct = computeCoveragePctBefore(cellId);
   refreshCoverageStats();
   animateTicker(fromPct, computeCoveragePct(), 600);
+  renderMyImpact();
+  renderLocalFeed();
 }
 
 function computeCoveragePctBefore(justUpdatedId){
@@ -723,6 +920,12 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('btnCloseCam').addEventListener('click',closeCamera);
   document.getElementById('btnCapture').addEventListener('click',capturePhoto);
   document.getElementById('btnSubmit').addEventListener('click',submitReport);
+
+  document.querySelectorAll('.scope-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>switchScope(btn.dataset.scope,btn));
+  });
+  positionScopeThumb();
+  window.addEventListener('resize',positionScopeThumb);
 });
 </script>
 </body>
