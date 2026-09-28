@@ -266,39 +266,13 @@ textarea.input{resize:none;line-height:1.4}
 
       <div class="scope-toggle" id="scopeToggle" role="tablist" aria-label="Analytics scope">
         <div class="scope-thumb" id="scopeThumb"></div>
-        <button class="scope-btn active" data-scope="mine" role="tab" aria-selected="true">My Impact</button>
-        <button class="scope-btn" data-scope="ward" role="tab" aria-selected="false">Ward 4 Local</button>
+        <button class="scope-btn active" data-scope="ward" role="tab" aria-selected="true">Ward 4 Local</button>
+        <button class="scope-btn" data-scope="mine" role="tab" aria-selected="false">My Impact</button>
         <button class="scope-btn" data-scope="national" role="tab" aria-selected="false">National Network</button>
       </div>
 
-      <!-- MY IMPACT -->
-      <div class="scope-view-wrap active" data-scope-view="mine">
-        <div class="scope-view-inner">
-          <div class="card">
-            <div class="label">Your civic impact</div>
-            <div class="impact-split">
-              <div>
-                <div class="stat-big" style="font-size:1.7rem" id="myBlocksCount">0</div>
-                <div class="small">Blocks claimed</div>
-              </div>
-              <div>
-                <div class="stat-big" style="font-size:1.7rem;color:#fff" id="myDollarValue">$0</div>
-                <div class="small">Civic repairs triggered</div>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="label">Your receipts</div>
-            <div id="myReceipts"></div>
-            <p class="small" id="myReceiptsEmpty" style="display:none;text-align:center;padding:10px 0">
-              No reports yet — switch to Ward 4 Local and tap a dark block to file your first one.
-            </p>
-          </div>
-        </div>
-      </div>
-
       <!-- WARD 4 LOCAL -->
-      <div class="scope-view-wrap" data-scope-view="ward">
+      <div class="scope-view-wrap active" data-scope-view="ward">
         <div class="scope-view-inner">
           <div class="card">
             <div class="label">Ward 4 civic health index</div>
@@ -345,6 +319,32 @@ textarea.input{resize:none;line-height:1.4}
           <div class="card">
             <div class="label">Local resolution feed</div>
             <div id="localFeed"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MY IMPACT -->
+      <div class="scope-view-wrap" data-scope-view="mine">
+        <div class="scope-view-inner">
+          <div class="card">
+            <div class="label">Your civic impact</div>
+            <div class="impact-split">
+              <div>
+                <div class="stat-big" style="font-size:1.7rem" id="myBlocksCount">0</div>
+                <div class="small">Blocks claimed</div>
+              </div>
+              <div>
+                <div class="stat-big" style="font-size:1.7rem;color:#fff" id="myDollarValue">$0</div>
+                <div class="small">Civic repairs triggered</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="label">Your receipts</div>
+            <div id="myReceipts"></div>
+            <p class="small" id="myReceiptsEmpty" style="display:none;text-align:center;padding:10px 0">
+              No reports yet — switch to Ward 4 Local and tap a dark block to file your first one.
+            </p>
           </div>
         </div>
       </div>
