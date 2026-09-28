@@ -1,5 +1,14 @@
 // Shared in-memory data store for the coverage API.
 //
+// PRIVACY NOTE: cells here carry only anonymous, public facts — covered,
+// category, verifiedDate. There is deliberately no "who reported this"
+// field anywhere in this store. That matches the product's own promise
+// ("no account required, no personal data retained") and it's also just
+// correct modeling: "reported by me" is relative to whoever is looking,
+// so it can never be a property of a shared/public record — it has to be
+// computed on each citizen's own device from their own local history.
+// See app.html's localStorage-backed "My Impact" ledger for that half.
+//
 // NOTE ON WHAT THIS IS AND ISN'T:
 // Vercel serverless functions are stateless between cold starts — this
 // module-level object only survives across requests that happen to land on
@@ -14,14 +23,12 @@ const CATEGORIES = ['Pothole', 'Streetlight', 'Signage', 'Sidewalk', 'Drainage']
 
 function buildWard4Cells() {
   const covered = [1, 2, 3, 4, 10, 11, 12, 13, 14, 20, 21, 22, 30, 31, 32, 33, 40, 41, 42, 43, 44, 50, 51, 52, 60, 61, 62, 63, 70, 71, 72, 73, 74, 75];
-  const youReported = [3, 13, 32, 52, 63, 74];
   const cells = [];
   for (let i = 0; i < 80; i++) {
     const isCovered = covered.includes(i);
     cells.push({
       id: i,
       covered: isCovered,
-      reportedByYou: isCovered && youReported.includes(i),
       category: isCovered ? CATEGORIES[i % CATEGORIES.length] : null,
       verifiedDate: isCovered ? ('Sep ' + (10 + (i % 18)) + ', 2026') : null
     });

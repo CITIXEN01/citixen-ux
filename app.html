@@ -504,8 +504,10 @@ async function initAnalytics(){
 const CATEGORY_VALUES = { Pothole: 1200, Streetlight: 850, Signage: 420, Sidewalk: 2100, Drainage: 3400 };
 
 function renderMyImpact(){
-  const mine = covCells.filter(c => c.reportedByYou);
-  const totalValue = mine.reduce((sum, c) => sum + (CATEGORY_VALUES[c.category] || 0), 0);
+  // Sourced entirely from this device's local ledger — never from the
+  // shared covCells data, which carries no submitter identity at all.
+  const mine = getMyReports();
+  const totalValue = mine.reduce((sum, r) => sum + (CATEGORY_VALUES[r.category] || 0), 0);
 
   document.getElementById('myBlocksCount').textContent = mine.length;
   document.getElementById('myDollarValue').textContent = '$' + totalValue.toLocaleString('en-US');
@@ -516,23 +518,23 @@ function renderMyImpact(){
   if (!mine.length) { emptyEl.style.display = 'block'; return; }
   emptyEl.style.display = 'none';
 
-  mine.slice().reverse().forEach(c => {
+  mine.slice().reverse().forEach(r => {
     const div = document.createElement('div');
     div.className = 'receipt-item';
 
     const left = document.createElement('div');
     const catLine = document.createElement('div');
     catLine.className = 'ri-cat';
-    catLine.textContent = c.category;
+    catLine.textContent = r.category;
     const metaLine = document.createElement('div');
     metaLine.className = 'ri-meta';
-    metaLine.textContent = 'Ward 4 · Block #' + c.id + ' · ' + c.verifiedDate;
+    metaLine.textContent = 'Ward 4 · Block #' + r.cellId + ' · ' + r.verifiedDate;
     left.appendChild(catLine);
     left.appendChild(metaLine);
 
     const amtEl = document.createElement('div');
     amtEl.className = 'ri-amt';
-    amtEl.textContent = '$' + (CATEGORY_VALUES[c.category] || 0).toLocaleString('en-US');
+    amtEl.textContent = '$' + (CATEGORY_VALUES[r.category] || 0).toLocaleString('en-US');
 
     div.appendChild(left);
     div.appendChild(amtEl);
@@ -541,8 +543,12 @@ function renderMyImpact(){
 }
 
 function renderLocalFeed(){
+  // Public feed of shared/anonymous data — the "· by you" tag added below
+  // is computed by joining against this device's own local ledger, purely
+  // client-side. It never comes from (or goes to) the server.
   const feedEl = document.getElementById('localFeed');
   if (!feedEl) return;
+  const mine = getMyReportedCellIds();
   const covered = covCells.filter(c => c.covered).slice(-8).reverse();
   feedEl.innerHTML = '';
   covered.forEach(c => {
@@ -560,7 +566,7 @@ function renderLocalFeed(){
     const meta = document.createElement('div');
     meta.className = 'small';
     meta.style.marginTop = '4px';
-    meta.textContent = 'Ward 4 · Block #' + c.id + ' · ' + c.verifiedDate + (c.reportedByYou ? ' · by you' : '');
+    meta.textContent = 'Ward 4 · Block #' + c.id + ' · ' + c.verifiedDate + (mine.has(c.id) ? ' · by you' : '');
     div.appendChild(row);
     div.appendChild(meta);
     feedEl.appendChild(div);
@@ -582,8 +588,8 @@ const COVERAGE_ENDPOINT = '/api/coverage/wi/la-crosse/ward-4';
 
 function mockCoverageCells(){
   // Same shape as the real endpoint — used only when the API can't be reached.
+  // No "reportedByYou" here: that's never public/shared data (see note below).
   const covered = [1,2,3,4,10,11,12,13,14,20,21,22,30,31,32,33,40,41,42,43,44,50,51,52,60,61,62,63,70,71,72,73,74,75];
-  const youReported = [3,13,32,52,63,74];
   const categories = ['Pothole','Streetlight','Signage','Sidewalk','Drainage'];
   const cells = [];
   for (let i = 0; i < 80; i++) {
@@ -591,12 +597,48 @@ function mockCoverageCells(){
     cells.push({
       id: i,
       covered: isCovered,
-      reportedByYou: isCovered && youReported.includes(i),
       category: isCovered ? categories[i % categories.length] : null,
       verifiedDate: isCovered ? ('Sep ' + (10 + (i % 18))) : null
     });
   }
   return cells;
+}
+
+/* =====================================================================
+   MY IMPACT — local-only receipt ledger
+   -----------------------------------------------------------------
+   The coverage API is deliberately anonymous: no cell record anywhere on
+   the server says who reported it, because "reported by me" only means
+   something relative to one citizen — it can't be a property of shared,
+   public data without breaking the "no account required, no personal
+   data retained" promise for everyone else who loads the same page.
+   So "mine" lives only here, in this browser's own localStorage. Nothing
+   in this ledger is ever sent to the server as an identity — it's a
+   private note-to-self that happens to be checkable against public data.
+   ===================================================================== */
+const MY_REPORTS_KEY = 'citixen_my_reports_v1';
+
+function getMyReports(){
+  try {
+    return JSON.parse(localStorage.getItem(MY_REPORTS_KEY) || '[]');
+  } catch (e) {
+    return []; // private browsing / storage blocked — impact tracking just stays empty
+  }
+}
+
+function getMyReportedCellIds(){
+  return new Set(getMyReports().map(r => r.cellId));
+}
+
+function addMyReport(record){
+  try {
+    const list = getMyReports();
+    list.push(record);
+    localStorage.setItem(MY_REPORTS_KEY, JSON.stringify(list));
+  } catch (e) {
+    // Storage unavailable — reporting itself still works, only the local
+    // "My Impact" receipt for this one report is lost.
+  }
 }
 
 let coverageIsLive = false;
@@ -619,13 +661,17 @@ let pendingReportCellId = null;
 
 function renderCoverageGrid(){
   const gridEl = document.getElementById('covGrid');
+  const mine = getMyReportedCellIds();
   gridEl.innerHTML = '';
   covCells.forEach(c => {
     const b = document.createElement('button');
     b.className = 'cov-cell';
     b.dataset.id = c.id;
     b.type = 'button';
-    b.setAttribute('aria-label', c.covered ? (c.category + ' — verified ' + c.verifiedDate) : 'Unsurveyed block — tap to report');
+    const isMine = mine.has(c.id);
+    b.setAttribute('aria-label', c.covered
+      ? (c.category + ' — verified ' + c.verifiedDate + (isMine ? ', reported by you' : ''))
+      : 'Unsurveyed block — tap to report');
     b.addEventListener('click', () => onCoverageCellTap(c.id));
     gridEl.appendChild(b);
   });
@@ -645,6 +691,7 @@ async function animateCoverage(){
 
   const gridEl = document.getElementById('covGrid');
   const cellEls = Array.from(gridEl.children);
+  const mine = getMyReportedCellIds();
   const DURATION = 1200;
 
   cellEls.forEach(el => el.classList.remove('covered', 'you'));
@@ -653,7 +700,7 @@ async function animateCoverage(){
   order.forEach((idx, seq) => {
     setTimeout(() => {
       cellEls[idx].classList.add('covered');
-      if (covCells[idx].reportedByYou) cellEls[idx].classList.add('you');
+      if (mine.has(covCells[idx].id)) cellEls[idx].classList.add('you');
     }, (seq / order.length) * DURATION);
   });
 
@@ -670,7 +717,7 @@ function refreshCoverageStats(){
   const total = covCells.length;
   const coveredCount = covCells.filter(c => c.covered).length;
   document.getElementById('covFraction').textContent = coveredCount + ' / ' + total;
-  document.getElementById('covYouCount').textContent = covCells.filter(c => c.reportedByYou).length;
+  document.getElementById('covYouCount').textContent = getMyReportedCellIds().size;
 }
 
 function animateTicker(fromPct, toPct, duration){
@@ -693,6 +740,7 @@ function animateTicker(fromPct, toPct, duration){
 // lights up just that one cell and re-ticks the percentage, so a citizen
 // watches their own report change the number in front of them.
 async function verifyReportedCell(cellId, category){
+  let verifiedCell = null;
   try {
     const res = await fetch(COVERAGE_ENDPOINT + '/verify', {
       method: 'POST',
@@ -702,17 +750,24 @@ async function verifyReportedCell(cellId, category){
     if (!res.ok) throw new Error('verify failed: ' + res.status);
     const data = await res.json();
     const cell = covCells.find(c => c.id === cellId);
-    if (cell) Object.assign(cell, data.cell);
+    if (cell) { Object.assign(cell, data.cell); verifiedCell = cell; }
   } catch (err) {
     // API unreachable (e.g. static local server) — update local state only,
     // so the demo loop still visibly works even without live functions.
     const cell = covCells.find(c => c.id === cellId);
     if (cell) {
       cell.covered = true;
-      cell.reportedByYou = true;
       cell.category = category || cell.category || 'Pothole';
       cell.verifiedDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      verifiedCell = cell;
     }
+  }
+
+  // This is the only place "mine" gets written, and it's written to THIS
+  // device only — the server response above never carried a submitter
+  // identity, and never will.
+  if (verifiedCell) {
+    addMyReport({ cellId: verifiedCell.id, category: verifiedCell.category, verifiedDate: verifiedCell.verifiedDate });
   }
 
   const cellEl = document.querySelector('.cov-grid .cov-cell[data-id="' + cellId + '"]');
@@ -751,7 +806,8 @@ function onCoverageCellTap(id){
   const ctaEl = document.getElementById('covToastCta');
 
   if (cell.covered) {
-    textEl.textContent = cell.category + ' — verified ' + cell.verifiedDate + (cell.reportedByYou ? ' · reported by you' : '');
+    const isMine = getMyReportedCellIds().has(cell.id);
+    textEl.textContent = cell.category + ' — verified ' + cell.verifiedDate + (isMine ? ' · reported by you' : '');
     ctaEl.style.display = 'none';
   } else {
     textEl.textContent = 'Not yet surveyed — be the first to report this block.';

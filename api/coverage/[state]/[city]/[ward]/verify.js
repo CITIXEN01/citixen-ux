@@ -8,6 +8,11 @@
 // the client-side call here stands in for that event so the demo's
 // "tap a dark block -> report it -> watch it light up" loop is real,
 // not simulated with a local array mutation.
+//
+// Deliberately does NOT record who reported this cell — this store is
+// public/shared data, and "reported by me" only means something relative
+// to one citizen. That half lives entirely on the reporting citizen's own
+// device (see app.html's local "My Impact" ledger), never here.
 const { getWard, summarize, CATEGORIES } = require('../../../../_lib/store');
 
 module.exports = (req, res) => {
@@ -36,7 +41,6 @@ module.exports = (req, res) => {
   }
 
   cell.covered = true;
-  cell.reportedByYou = true;
   cell.category = CATEGORIES.includes(body.category) ? body.category : CATEGORIES[cellId % CATEGORIES.length];
   cell.verifiedDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
