@@ -156,14 +156,14 @@ p.slide-lede{font-size:clamp(.9rem,1.4vw,1.1rem);color:var(--muted);max-width:68
 .mini-list{margin:0 0 10px 18px;padding:0;font-size:.78rem;color:var(--muted);line-height:1.6}
 .mini-list li{margin-bottom:2px}
 
-/* ===== RED/LIME STATUS TAGS (slide 6) ===== */
+/* ===== RED/LIME STATUS TAGS (slide 5) ===== */
 .status-tag{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.6rem;font-weight:800;
   letter-spacing:.04em;border-radius:20px;padding:6px 12px;margin-bottom:12px;line-height:1.3}
 .status-tag.red{color:var(--brand-red);border:1px solid rgba(255,68,68,.45);background:rgba(255,68,68,.1)}
 .status-tag.lime{color:var(--brand-mint);border:1px solid rgba(0,255,136,.45);background:rgba(0,255,136,.1)}
 .status-tag .sd{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
 
-/* ===== CAPEX LINE-ITEM TABLE (slide 7) ===== */
+/* ===== CAPEX LINE-ITEM TABLE (unused) ===== */
 .capex-table{margin-top:16px;width:100%;max-width:420px;margin-left:auto;margin-right:auto;text-align:left}
 .capex-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border-muted)}
 .capex-row:last-child{border-bottom:none}
@@ -172,7 +172,7 @@ p.slide-lede{font-size:clamp(.9rem,1.4vw,1.1rem);color:var(--muted);max-width:68
 .capex-row .cx-bar-fill{height:100%;background:var(--brand-mint);border-radius:6px}
 .capex-row .cx-amt{flex:0 0 62px;text-align:right;font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--text)}
 
-/* ===== STACKED COMPARISON BARS (slide 8) ===== */
+/* ===== STACKED COMPARISON BARS (unused) ===== */
 .stack-compare{display:flex;flex-direction:column;gap:16px;margin-top:22px}
 .stack-row .sr-label{font-family:var(--mono);font-size:.64rem;letter-spacing:.08em;color:var(--muted);margin-bottom:6px;text-transform:uppercase}
 .stack-row .sr-bar{display:flex;height:40px;border-radius:10px;overflow:hidden;border:1px solid var(--border-muted)}
@@ -181,7 +181,7 @@ p.slide-lede{font-size:clamp(.9rem,1.4vw,1.1rem);color:var(--muted);max-width:68
 .stack-row .sr-admin-dark{background:#050807;color:var(--muted);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.68rem}
 .stack-row .sr-field-lime{background:var(--brand-mint);color:#051311;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.85rem}
 
-/* ===== API MIDDLEWARE DIAGRAM (slide 9) ===== */
+/* ===== API MIDDLEWARE DIAGRAM (slide 8) ===== */
 .api-diagram{display:flex;align-items:center;justify-content:center;gap:0;margin:6px 0 20px}
 .api-node{background:rgba(15,23,19,.6);border:1px solid var(--border-muted);border-radius:14px;padding:14px 16px;text-align:center;flex:1}
 .api-node.mid{border-color:rgba(0,255,136,.4);background:rgba(0,255,136,.06)}
@@ -202,7 +202,7 @@ p.slide-lede{font-size:clamp(.9rem,1.4vw,1.1rem);color:var(--muted);max-width:68
 .roadmap-node.done .rn-dot{background:var(--brand-mint);color:#051311}
 .roadmap-node .rn-label{font-size:.62rem;color:var(--muted);text-align:center;max-width:96px;line-height:1.3}
 
-/* ===== COVERAGE GRID WIDGET (slide 5) ===== */
+/* ===== COVERAGE GRID WIDGET (slide 6) ===== */
 .cux-grid{display:grid;grid-template-columns:repeat(20,1fr);grid-auto-rows:9px;gap:3px}
 .cux-cell{background:#1a241f;border-radius:2px;transition:background .5s ease,box-shadow .5s ease}
 .cux-cell.lit{background:var(--brand-mint);box-shadow:0 0 6px rgba(0,255,136,.85)}
@@ -267,7 +267,8 @@ p.slide-lede{font-size:clamp(.9rem,1.4vw,1.1rem);color:var(--muted);max-width:68
       <svg viewBox="0 0 24 24" width="54" height="54" class="shield shield-glow" style="margin:0 auto 22px;display:block"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       <div class="hud-label" style="justify-content:center;display:flex;margin-bottom:10px">CIVIC INTELLIGENCE PLATFORM</div>
       <h1 class="slide-title" style="font-size:clamp(2rem,6vw,3.4rem)">CITIXEN UX<sup class="tm-mark">™</sup></h1>
-      <p class="slide-lede" style="margin:0 auto 14px;text-align:center;font-weight:700;font-size:1.15em;color:var(--text)">Upgrade Your Civic Experience</p>
+      <p class="slide-lede" style="margin:0 auto 8px;text-align:center;font-weight:700;font-size:1.15em;color:var(--text)">Upgrade Your Civic Experience</p>
+      <div class="hud-label" style="justify-content:center;display:flex;margin:0 auto 14px;color:var(--brand-mint)">ANONYMOUS · REAL-TIME RESOLUTION</div>
       <p class="slide-lede" style="margin:0 auto 20px">Turning citizen reports into resolved infrastructure anonymously in real time — and with capital planning data to prove it.</p>
       <div class="hud-label" style="display:inline-flex;padding:10px 22px;border:1px solid var(--brand-mint-dim);border-radius:999px;background:rgba(0,255,136,0.08);letter-spacing:.08em">citixenux.com</div>
       <div class="cta-row" style="justify-content:center;margin-top:22px">
@@ -301,25 +302,25 @@ p.slide-lede{font-size:clamp(.9rem,1.4vw,1.1rem);color:var(--muted);max-width:68
   <section class="slide" data-index="2">
     <div class="slide-inner">
       <div class="slide-eyebrow"><span class="hud-label">THE PLATFORM</span><span class="n">03 / 10</span></div>
-      <h1 class="slide-title">One Workspace. <span class="lime">Three Modules.</span></h1>
-      <p class="slide-lede">The citizen PWA is one workspace with three tabs — know your rights, report what's broken, and see the receipts — with no account and no manual handoff between them.</p>
+      <h1 class="slide-title">One Pipeline. <span class="lime">Three Modules.</span></h1>
+      <p class="slide-lede">One ticket, three purpose-built surfaces — a public dashboard, a zero-account reporting PWA, and a staff dispatch console — with no manual handoff between them.</p>
       <div class="pipeline">
         <div class="glass module-card pipeline-node">
-          <div class="tag">TAB 1 · KNOW YOUR RIGHTS</div>
-          <h3>Citizen 101</h3>
-          <p>The 4-tier legal stack — Federal, State, Municipal, District/Ward — auto-populated by jurisdiction, in Full Text, Cliff Notes, Video, and Audio.</p>
+          <div class="tag">MODULE 1 · PUBLIC DASHBOARD</div>
+          <h3>Gateway</h3>
+          <p>The public civic web dashboard — jurisdiction auto-detection, live ward-health telemetry, the immutable public ledger, a QR install card for the reporter PWA, and the Civic Tools drawer. No login required.</p>
         </div>
         <div class="pipeline-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"/></svg></div>
         <div class="glass module-card pipeline-node">
-          <div class="tag">TAB 2 · FOG-OF-WAR GRID</div>
-          <h3>Local Reports</h3>
-          <p>1–5 mile spatial grid with one-tap hazard hotkeys, automatic EXIF/GPS stripping, and Open311-compatible dispatch routing.</p>
+          <div class="tag">MODULE 2 · REPORTER PWA</div>
+          <h3>PWA Reporter</h3>
+          <p>The zero-account mobile hazard-reporting app — the 4-tier legal stack, fog-of-war spatial grid, live map, and feed. EXIF and GPS are stripped from every photo before it leaves the device.</p>
         </div>
         <div class="pipeline-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"/></svg></div>
         <div class="glass module-card pipeline-node">
-          <div class="tag">TAB 3 · OPEN DATA</div>
-          <h3>Public Ledger</h3>
-          <p>Whole-system ROI at $1 per resident — population covered, staff hours saved, grid coverage, SLA velocity — with one-click CSV and graph exports.</p>
+          <div class="tag">MODULE 3 · STAFF CONSOLE</div>
+          <h3>Municipal Console</h3>
+          <p>The staff-facing dispatch console — severity-tiered ticket queues, a live GIS dispatch map, SLA tracking, the CapEx scoping ledger, AI-assisted quick-resolve, and one-click printable Ward Reports for council packets.</p>
         </div>
       </div>
     </div>
@@ -385,36 +386,48 @@ p.slide-lede{font-size:clamp(.9rem,1.4vw,1.1rem);color:var(--muted);max-width:68
     </div>
   </section>
 
-  <!-- SLIDE 5 — REAL-TIME WARD HEALTH TELEMETRY -->
+  <!-- SLIDE 5 — FIELD VERIFICATION & EXIF PROOF -->
   <section class="slide" data-index="4">
     <div class="slide-inner">
-      <div class="slide-eyebrow"><span class="hud-label">LIVE TELEMETRY</span><span class="n">05 / 10</span></div>
-      <h1 class="slide-title">Real-Time <span class="lime">Ward Health Telemetry</span></h1>
+      <div class="slide-eyebrow"><span class="hud-label">ACCOUNTABILITY</span><span class="n">05 / 10</span></div>
+      <h1 class="slide-title">Field Verification, <span class="lime">Not Ghost Closures</span></h1>
+      <p class="slide-lede">A ticket cannot close on paperwork alone. Every resolution requires a timestamped, EXIF-verified proof photo from the crew on site — pushed automatically to the public feed.</p>
+      <div class="grid-2">
+        <div class="glass">
+          <div class="status-tag red"><span class="sd"></span>GHOST CLOSURE DETECTED — DESK TRIAGE / NO PHOTO</div>
+          <div class="hud-label" style="margin-bottom:8px">BEFORE</div>
+          <p style="font-size:.85rem;color:var(--muted);line-height:1.6">Dispatcher marks a ticket "Resolved" from a desk. No photo, no timestamp, no way to confirm a crew was ever on site.</p>
+        </div>
+        <div class="glass lime-edge">
+          <div class="status-tag lime"><span class="sd"></span>EXIF/GPS VERIFIED — FIELD CREW PHOTO TIMESTAMPED</div>
+          <div class="hud-label" style="margin-bottom:8px">WITH CITIXEN UX</div>
+          <p style="font-size:.85rem;color:var(--text);line-height:1.6">Closure requires a proof photo. EXIF timestamp + location are verified server-side, then the resolution posts to the resident's public feed automatically.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 6 — CAPITAL PLANNING: THE IMMUTABLE PUBLIC LEDGER -->
+  <section class="slide" data-index="5">
+    <div class="slide-inner">
+      <div class="slide-eyebrow"><span class="hud-label">CAPITAL PLANNING</span><span class="n">06 / 10</span></div>
+      <h1 class="slide-title">The <span class="lime">Immutable Public Ledger</span></h1>
+      <p class="slide-lede">Every field-verified report feeds a live CapEx-scoping ledger — converting report density and condition data into concrete dollar figures the city can plan a capital budget around.</p>
       <div class="grid-3">
-        <div class="glass" style="display:flex;justify-content:center">
-          <div class="gauge-wrap">
-            <div class="gauge-label">Ward Health Index</div>
-            <svg viewBox="0 0 120 66" width="120" height="66" aria-hidden="true">
-              <path class="gd-track" d="M10,60 A50,50 0 0 1 110,60" fill="none" stroke-width="9"/>
-              <path class="gd-fill" data-pct="88" d="M10,60 A50,50 0 0 1 110,60" fill="none" stroke-width="9"/>
-              <g class="gd-needle-group" data-pct="88">
-                <line x1="60" y1="60" x2="60" y2="18" class="gd-needle"/>
-                <circle cx="60" cy="60" r="4" class="gd-hub"/>
-              </g>
-            </svg>
-            <div class="gauge-value">88%</div>
-            <div class="gauge-sub">Ward 4 — Stable</div>
-          </div>
+        <div class="metric-card" style="border-color:rgba(0,255,136,.4)">
+          <div class="m-label">Scoped Capital Spend</div>
+          <div class="m-value" style="font-size:1.5rem">$482,600</div>
+          <div class="m-sub">CapEx Scoping Ledger · Track 2, current cycle</div>
         </div>
-        <div class="metric-card" style="align-self:center">
-          <div class="m-label">Avg Resolution SLA</div>
-          <div class="m-value">18<span>hrs</span></div>
-          <div class="m-sub">From report to crew close-out</div>
+        <div class="metric-card">
+          <div class="m-label">Grid Coverage</div>
+          <div class="m-value">55<span>%</span></div>
+          <div class="m-sub">Blocks field-verified across active wards</div>
         </div>
-        <div class="metric-card" style="align-self:center">
-          <div class="m-label">Weekly Resolve Rate</div>
-          <div class="m-value">84<span>/91</span></div>
-          <div class="m-sub">Tickets resolved this week</div>
+        <div class="metric-card">
+          <div class="m-label">Population Covered</div>
+          <div class="m-value">52<span>k</span></div>
+          <div class="m-sub">Residents represented in live ledger inputs</div>
         </div>
       </div>
       <div class="glass lime-edge" style="margin-top:16px;padding:16px">
@@ -436,96 +449,35 @@ p.slide-lede{font-size:clamp(.9rem,1.4vw,1.1rem);color:var(--muted);max-width:68
         </div>
         <div class="cux-grid" id="coverageGrid"></div>
       </div>
+      <p class="footnote" style="margin-top:14px">Priced as one flat $1.00 / resident / year municipal contract — no per-ticket fee, no seat licenses, no dispatch surcharge.</p>
     </div>
   </section>
 
-  <!-- SLIDE 6 — FIELD VERIFICATION & EXIF PROOF -->
-  <section class="slide" data-index="5">
-    <div class="slide-inner">
-      <div class="slide-eyebrow"><span class="hud-label">ACCOUNTABILITY</span><span class="n">06 / 10</span></div>
-      <h1 class="slide-title">Field Verification, <span class="lime">Not Ghost Closures</span></h1>
-      <p class="slide-lede">A ticket cannot close on paperwork alone. Every resolution requires a timestamped, EXIF-verified proof photo from the crew on site — pushed automatically to the public feed.</p>
-      <div class="grid-2">
-        <div class="glass">
-          <div class="status-tag red"><span class="sd"></span>GHOST CLOSURE DETECTED — DESK TRIAGE / NO PHOTO</div>
-          <div class="hud-label" style="margin-bottom:8px">BEFORE</div>
-          <p style="font-size:.85rem;color:var(--muted);line-height:1.6">Dispatcher marks a ticket "Resolved" from a desk. No photo, no timestamp, no way to confirm a crew was ever on site.</p>
-        </div>
-        <div class="glass lime-edge">
-          <div class="status-tag lime"><span class="sd"></span>EXIF/GPS VERIFIED — FIELD CREW PHOTO TIMESTAMPED</div>
-          <div class="hud-label" style="margin-bottom:8px">WITH CITIXEN UX</div>
-          <p style="font-size:.85rem;color:var(--text);line-height:1.6">Closure requires a proof photo. EXIF timestamp + location are verified server-side, then the resolution posts to the resident's public feed automatically.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SLIDE 7 — PUBLIC LEDGER / $1-PER-RESIDENT ROI -->
+  <!-- SLIDE 7 — ROI: SAME BUDGET, DIFFERENT SPLIT -->
   <section class="slide" data-index="6">
     <div class="slide-inner">
-      <div class="slide-eyebrow"><span class="hud-label">CONTRACT MODEL</span><span class="n">07 / 10</span></div>
-      <h1 class="slide-title">$1 Per Resident. <span class="lime">Whole-System ROI.</span></h1>
-      <p class="slide-lede">CITIXEN prices as one flat municipal contract — $1.00 per resident, per year — and the Public Ledger tab proves the value back with four numbers any council member can check themselves.</p>
-      <div class="glass" style="max-width:460px;margin:0 auto;text-align:center">
-        <div class="m-label" style="font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px">MUNICIPAL CONTRACT VALUE</div>
-        <div style="font-size:2.4rem;font-weight:900;color:var(--brand-mint)">$1.00 <span style="font-size:1rem;color:var(--muted);font-weight:800">/ resident / year</span></div>
-        <div class="m-sub" style="margin-top:8px">Flat-rate — no per-ticket fee, no seat licenses, no dispatch surcharge</div>
-        <div class="metric-grid-2x2" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px">
-          <div class="metric-card">
-            <div class="m-label">Population Covered</div>
-            <div class="m-value">52<span>k</span></div>
-            <div class="m-sub">Residents in live jurisdictions</div>
-          </div>
-          <div class="metric-card">
-            <div class="m-label">Staff Hours Saved</div>
-            <div class="m-value">1,240<span>hrs</span></div>
-            <div class="m-sub">Triage/routing time reclaimed per cycle</div>
-          </div>
-          <div class="metric-card">
-            <div class="m-label">Grid Coverage</div>
-            <div class="m-value">55<span>%</span></div>
-            <div class="m-sub">Blocks field-verified across active wards</div>
-          </div>
-          <div class="metric-card">
-            <div class="m-label">SLA Response Velocity</div>
-            <div class="m-value">88<span>%</span></div>
-            <div class="m-sub">On-time dispatch response, network-wide</div>
-          </div>
+      <div class="slide-eyebrow"><span class="hud-label">ROI</span><span class="n">07 / 10</span></div>
+      <h1 class="slide-title">Same Budget. <span class="lime">Different Split.</span></h1>
+      <p class="slide-lede">Same headcount, same dollars — reallocated once triage, routing, and reporting stop consuming staff hours. These are independent before/after deltas measured against the same budget cycle, not a fixed-sum split.</p>
+      <div class="grid-2" style="max-width:640px;margin:0 auto">
+        <div class="metric-card" style="padding:30px 16px">
+          <div class="m-label">Field Execution Capacity</div>
+          <div class="m-value" style="font-size:2.6rem">+34<span>%</span></div>
+          <div class="m-sub">Capital reallocated to field repair crews</div>
+        </div>
+        <div class="metric-card" style="padding:30px 16px">
+          <div class="m-label">Administrative Overhead</div>
+          <div class="m-value" style="font-size:2.6rem">−18<span>%</span></div>
+          <div class="m-sub">Reduction in desk triage &amp; routing burden</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- SLIDE 8 — ROI IMPACT -->
+  <!-- SLIDE 8 — LEGISTAR & MUNICIPAL ERP INTEGRATION LAYER -->
   <section class="slide" data-index="7">
     <div class="slide-inner">
-      <div class="slide-eyebrow"><span class="hud-label">ROI</span><span class="n">08 / 10</span></div>
-      <h1 class="slide-title">Same Budget. <span class="lime">Different Split.</span></h1>
-      <p class="slide-lede">When triage, routing, and reporting stop consuming staff hours, the same headcount and the same dollars shift from paperwork toward repair capacity.</p>
-      <div class="stack-compare">
-        <div class="stack-row">
-          <div class="sr-label">Legacy 311</div>
-          <div class="sr-bar">
-            <div class="sr-admin-gray" style="flex:0.6">60% ADMIN OVERHEAD</div>
-            <div class="sr-field-muted" style="flex:0.4">40% FIELD REPAIR</div>
-          </div>
-        </div>
-        <div class="stack-row">
-          <div class="sr-label" style="color:var(--brand-mint)">CITIXEN UX</div>
-          <div class="sr-bar">
-            <div class="sr-admin-dark" style="flex:0.18">18% ADMIN</div>
-            <div class="sr-field-lime" style="flex:0.82">82% FIELD REPAIR</div>
-          </div>
-        </div>
-      </div>
-      <div class="split-legend" style="margin-top:14px"><span class="lime">■ FIELD REPAIR CAPITAL</span><span>■ ADMINISTRATIVE OVERHEAD</span></div>
-    </div>
-  </section>
-
-  <!-- SLIDE 9 — LEGISTAR & MUNICIPAL ERP INTEGRATION LAYER -->
-  <section class="slide" data-index="8">
-    <div class="slide-inner">
-      <div class="slide-eyebrow"><span class="hud-label">INTEGRATION</span><span class="n">09 / 10</span></div>
+      <div class="slide-eyebrow"><span class="hud-label">INTEGRATION</span><span class="n">08 / 10</span></div>
       <h1 class="slide-title">Built to Plug Into <span class="lime">What You Already Run</span></h1>
       <p class="slide-lede">CITIXEN UX is designed as an integration layer, not a replacement — council-facing records and back-office systems stay where they are.</p>
       <div class="api-diagram">
@@ -563,12 +515,42 @@ p.slide-lede{font-size:clamp(.9rem,1.4vw,1.1rem);color:var(--muted);max-width:68
     </div>
   </section>
 
-  <!-- SLIDE 10 — EXECUTIVE CTA -->
+  <!-- SLIDE 9 — GOVERNANCE: DATA SOVEREIGNTY & 2-TIER RETENTION -->
+  <section class="slide" data-index="8">
+    <div class="slide-inner">
+      <div class="slide-eyebrow"><span class="hud-label">GOVERNANCE</span><span class="n">09 / 10</span></div>
+      <h1 class="slide-title">Data Sovereignty &amp; <span class="lime">2-Tier Retention</span></h1>
+      <p class="slide-lede">The city owns its own tenant data outright. CITIXEN retains only anonymized, network-wide benchmarks — never a name, a device ID, or a precise location.</p>
+      <div class="grid-2">
+        <div class="glass lime-edge">
+          <div class="tag" style="margin-bottom:10px">TIER 1 · MUNICIPAL TENANT DATA</div>
+          <h3 style="margin-bottom:8px">Sovereign City Data</h3>
+          <ul class="mini-list">
+            <li>Raw ticket, location, and dispatch records stay inside that city's own instance</li>
+            <li>Never sold or shared outside the municipal services agreement</li>
+            <li>No resident accounts, logins, or device fingerprinting to begin with</li>
+          </ul>
+        </div>
+        <div class="glass">
+          <div class="tag" style="margin-bottom:10px">TIER 2 · ANONYMIZED MACRO BENCHMARKS</div>
+          <h3 style="margin-bottom:8px">Cross-City Benchmarking</h3>
+          <ul class="mini-list">
+            <li>Only aggregate, de-identified network-wide stats — resolution SLA, grid coverage, capital-split ratios</li>
+            <li>Public ledger pins are coordinate-fuzzed to ~110m before anything is ever displayed</li>
+            <li>EXIF/GPS and device identifiers are stripped from every photo before it leaves the reporter's device</li>
+          </ul>
+        </div>
+      </div>
+      <p class="footnote">Specific data-processing terms, retention windows, and sub-processor disclosures are governed by the municipal services agreement — this slide summarizes the platform's default architecture, not a substitute for that agreement.</p>
+    </div>
+  </section>
+
+  <!-- SLIDE 10 — NEXT STEP: THE 30-DAY WARD PILOT -->
   <section class="slide" data-index="9">
     <div class="slide-inner" style="text-align:center">
-      <div class="hud-label" style="justify-content:center;display:flex;margin-bottom:14px">NEXT STEP</div>
-      <h1 class="slide-title">Let's Put One Ward <span class="lime">on the Platform.</span></h1>
-      <p class="slide-lede" style="margin:0 auto">A 30-day pilot. No procurement cycle required to start the conversation — setup takes under two weeks.</p>
+      <div class="slide-eyebrow" style="justify-content:center"><span class="hud-label">NEXT STEP</span><span class="n">10 / 10</span></div>
+      <h1 class="slide-title">The <span class="lime">30-Day Ward Pilot</span></h1>
+      <p class="slide-lede" style="margin:0 auto">No procurement cycle required to start the conversation — setup takes under two weeks, one ward at a time.</p>
       <div class="roadmap">
         <div class="roadmap-node done"><div class="rn-dot">01</div><div class="rn-label">IP &amp; Engine</div></div>
         <div class="roadmap-node done"><div class="rn-dot">02</div><div class="rn-label">Pitch / Media</div></div>
@@ -624,7 +606,7 @@ function activateGauges(slideEl){
   });
 }
 
-/* ===== COVERAGE GRID + TICKER (slide 5) ===== */
+/* ===== COVERAGE GRID + TICKER (slide 6) ===== */
 function initCoverageGrid(){
   const gridEl = document.getElementById('coverageGrid');
   if (!gridEl || gridEl.dataset.built) return;

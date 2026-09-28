@@ -107,20 +107,24 @@ function tagPill(slide, x, y, text) {
     { x: 0, y: 2.45, w: W, h: 0.9, align: "center", fontFace: FONT, fontSize: 44, bold: true, isTextBox: true, margin: 0 }
   );
   s.addText("Upgrade Your Civic Experience", {
-    x: 0, y: 3.4, w: W, h: 0.5, align: "center",
+    x: 0, y: 3.35, w: W, h: 0.45, align: "center",
     fontFace: FONT, fontSize: 18, bold: true, color: TEXT, isTextBox: true, margin: 0,
+  });
+  s.addText("ANONYMOUS · REAL-TIME RESOLUTION", {
+    x: 0, y: 3.78, w: W, h: 0.3, align: "center",
+    fontFace: "Courier New", fontSize: 10, bold: true, color: MINT, charSpacing: 1.5, isTextBox: true, margin: 0,
   });
   s.addText(
     "Turning citizen reports into resolved infrastructure — anonymously, in real time, and with the capital-planning data to prove it.",
-    { x: W / 2 - 4.5, y: 3.95, w: 9, h: 0.7, align: "center", fontFace: FONT, fontSize: 13, color: MUTED, isTextBox: true, margin: 0, lineSpacingMultiple: 1.3 }
+    { x: W / 2 - 4.5, y: 4.15, w: 9, h: 0.6, align: "center", fontFace: FONT, fontSize: 13, color: MUTED, isTextBox: true, margin: 0, lineSpacingMultiple: 1.3 }
   );
   const pillW = 1.9;
   s.addShape(pres.ShapeType.roundRect, {
-    x: W / 2 - pillW / 2, y: 4.85, w: pillW, h: 0.42, rectRadius: 0.21,
+    x: W / 2 - pillW / 2, y: 4.95, w: pillW, h: 0.42, rectRadius: 0.21,
     fill: { color: MINT_BG }, line: { color: MINT, width: 1, transparency: 40 },
   });
   s.addText("citixenux.com", {
-    x: W / 2 - pillW / 2, y: 4.85, w: pillW, h: 0.42, align: "center", valign: "middle",
+    x: W / 2 - pillW / 2, y: 4.95, w: pillW, h: 0.42, align: "center", valign: "middle",
     fontFace: "Courier New", fontSize: 11, bold: true, color: MINT, isTextBox: true, margin: 0,
   });
 }
@@ -158,9 +162,9 @@ function tagPill(slide, x, y, text) {
   eyebrowAndNumber(s, "THE PLATFORM", "03 / 10");
   title(s, [{ text: "One Pipeline. " }, { text: "Three Modules.", color: MINT }]);
   const mods = [
-    { tag: "GATEWAY", h: "Public Gateway", p: "Live, public ward-health dashboard — resolution SLA, dispatch capacity, and resolve rate, visible without a login." },
-    { tag: "PWA", h: "Citizen Reporter", p: "Zero-account mobile reporting. Category, photo, description — EXIF and GPS stripped before upload, submitted in under 60 seconds." },
-    { tag: "CONSOLE", h: "Municipal Console", p: "Real-time dispatch, SLA and severity queues, capital ledger, and one-click printable ward reporting for council packets." },
+    { tag: "MODULE 1 · GATEWAY", h: "Gateway", p: "The public civic web dashboard — jurisdiction auto-detection, live ward-health telemetry, the immutable public ledger, a QR install card, and the Civic Tools drawer. No login required." },
+    { tag: "MODULE 2 · PWA REPORTER", h: "PWA Reporter", p: "The zero-account mobile hazard-reporting app — the 4-tier legal stack, fog-of-war spatial grid, live map, and feed. EXIF and GPS are stripped from every photo before it leaves the device." },
+    { tag: "MODULE 3 · CONSOLE", h: "Municipal Console", p: "The staff-facing dispatch console — severity-tiered ticket queues, a live GIS dispatch map, SLA tracking, the CapEx scoping ledger, AI-assisted quick-resolve, and printable Ward Reports for council packets." },
   ];
   const colW = (W - 1.2 - 0.4) / 3;
   mods.forEach((m, i) => {
@@ -213,52 +217,10 @@ function tagPill(slide, x, y, text) {
   s.addText("Filing details as provided by applicant.", { x: 0.6, y: 7.1, w: W - 1.2, h: 0.3, fontFace: "Courier New", fontSize: 8, color: MUTED, isTextBox: true, margin: 0 });
 }
 
-// ================= SLIDE 5 — REAL-TIME WARD HEALTH TELEMETRY =================
+// ================= SLIDE 5 — FIELD VERIFICATION =================
 {
   const s = newSlide();
-  eyebrowAndNumber(s, "LIVE TELEMETRY", "05 / 10");
-  title(s, [{ text: "Real-Time " }, { text: "Ward Health Telemetry", color: MINT }]);
-  const colW = (W - 1.2 - 0.4) / 3;
-
-  // Gauge card (native doughnut chart, 88%)
-  let x = 0.6;
-  card(s, x, 2.2, colW, 3.4);
-  s.addText("WARD HEALTH INDEX", { x: x + 0.2, y: 2.4, w: colW - 0.4, h: 0.3, align: "center", fontFace: "Courier New", fontSize: 9, color: MUTED, isTextBox: true, margin: 0, charSpacing: 1 });
-  s.addChart(pres.ChartType.doughnut, [
-    { name: "Ward Health", labels: ["Healthy", "Remaining"], values: [88, 12] },
-  ], {
-    x: x + colW / 2 - 1.0, y: 2.75, w: 2.0, h: 2.0,
-    chartColors: [MINT, "1A211D"],
-    showLegend: false, showValue: false, showPercent: false,
-    dataBorder: { pt: 0, color: CARD },
-    holeSize: 70,
-  });
-  s.addText("88%", { x: x + colW / 2 - 1.0, y: 3.45, w: 2.0, h: 0.6, align: "center", fontFace: FONT, fontSize: 24, bold: true, color: TEXT, isTextBox: true, margin: 0 });
-  s.addText("Ward 4 — Stable", { x: x + 0.2, y: 5.0, w: colW - 0.4, h: 0.3, align: "center", fontFace: FONT, fontSize: 11, color: MUTED, isTextBox: true, margin: 0 });
-
-  // Metric card 2
-  x = 0.6 + colW + 0.2;
-  card(s, x, 2.2, colW, 3.4);
-  s.addText("AVG RESOLUTION SLA", { x: x + 0.2, y: 2.55, w: colW - 0.4, h: 0.3, align: "center", fontFace: "Courier New", fontSize: 9, color: MUTED, isTextBox: true, margin: 0, charSpacing: 1 });
-  s.addText([{ text: "18", options: { color: MINT } }, { text: "hrs", options: { color: MUTED, fontSize: 16 } }], {
-    x: x + 0.2, y: 3.1, w: colW - 0.4, h: 0.8, align: "center", fontFace: FONT, fontSize: 34, bold: true, isTextBox: true, margin: 0,
-  });
-  s.addText("From report to crew close-out", { x: x + 0.2, y: 4.05, w: colW - 0.4, h: 0.5, align: "center", fontFace: FONT, fontSize: 10.5, color: MUTED, isTextBox: true, margin: 0 });
-
-  // Metric card 3
-  x = 0.6 + (colW + 0.2) * 2;
-  card(s, x, 2.2, colW, 3.4);
-  s.addText("WEEKLY RESOLVE RATE", { x: x + 0.2, y: 2.55, w: colW - 0.4, h: 0.3, align: "center", fontFace: "Courier New", fontSize: 9, color: MUTED, isTextBox: true, margin: 0, charSpacing: 1 });
-  s.addText([{ text: "84", options: { color: MINT } }, { text: "/91", options: { color: MUTED, fontSize: 16 } }], {
-    x: x + 0.2, y: 3.1, w: colW - 0.4, h: 0.8, align: "center", fontFace: FONT, fontSize: 34, bold: true, isTextBox: true, margin: 0,
-  });
-  s.addText("Tickets resolved this week", { x: x + 0.2, y: 4.05, w: colW - 0.4, h: 0.5, align: "center", fontFace: FONT, fontSize: 10.5, color: MUTED, isTextBox: true, margin: 0 });
-}
-
-// ================= SLIDE 6 — FIELD VERIFICATION =================
-{
-  const s = newSlide();
-  eyebrowAndNumber(s, "ACCOUNTABILITY", "06 / 10");
+  eyebrowAndNumber(s, "ACCOUNTABILITY", "05 / 10");
   title(s, [{ text: "Field Verification, " }, { text: "Not Ghost Closures", color: MINT }], 0.85, 26);
   lede(s, "A ticket cannot close on paperwork alone. Every resolution requires a timestamped, EXIF-verified proof photo from the crew on site — pushed automatically to the public feed.", 1.85, W - 1.2);
   const colW = (W - 1.2 - 0.3) / 2;
@@ -276,66 +238,56 @@ function tagPill(slide, x, y, text) {
   });
 }
 
-// ================= SLIDE 7 — CAPEX SCOPING LEDGER =================
+// ================= SLIDE 6 — CAPITAL PLANNING: THE IMMUTABLE PUBLIC LEDGER =================
 {
   const s = newSlide();
-  eyebrowAndNumber(s, "CAPITAL PLANNING", "07 / 10");
-  title(s, [{ text: "CapEx Scoping " }, { text: "Ledger", color: MINT }]);
-  lede(s, 'Every ticket contributes condition data to a live capital-scoping ledger — turning "we think Main Street needs repaving" into a dollar figure backed by real reports.', 1.85, W - 1.2);
-  const cw = 5.2;
-  card(s, W / 2 - cw / 2, 3.0, cw, 2.5, { lineColor: MINT, lineWidth: 1.25 });
-  s.addText("CAPEX SCOPING LEDGER — TRACK 2", {
-    x: W / 2 - cw / 2, y: 3.25, w: cw, h: 0.3, align: "center", fontFace: "Courier New", fontSize: 9, color: MUTED, isTextBox: true, margin: 0, charSpacing: 1,
+  eyebrowAndNumber(s, "CAPITAL PLANNING", "06 / 10");
+  title(s, [{ text: "The " }, { text: "Immutable Public Ledger", color: MINT }], 0.85, 26);
+  lede(s, "Every field-verified report feeds a live CapEx-scoping ledger — converting report density and condition data into concrete dollar figures the city can plan a capital budget around.", 1.85, W - 1.2);
+  const colW = (W - 1.2 - 0.4) / 3;
+  const rows = [
+    { label: "SCOPED CAPITAL SPEND", value: "$482,600", sub: "CapEx Scoping Ledger · Track 2, current cycle", accent: true },
+    { label: "GRID COVERAGE", value: "55%", sub: "Blocks field-verified across active wards" },
+    { label: "POPULATION COVERED", value: "52k", sub: "Residents represented in live ledger inputs" },
+  ];
+  rows.forEach((r, i) => {
+    const x = 0.6 + i * (colW + 0.2);
+    card(s, x, 2.6, colW, 2.1, r.accent ? { lineColor: MINT, lineWidth: 1.25 } : {});
+    s.addText(r.label, { x: x + 0.2, y: 2.85, w: colW - 0.4, h: 0.3, align: "center", fontFace: "Courier New", fontSize: 8.5, color: MUTED, isTextBox: true, margin: 0, charSpacing: 1 });
+    s.addText(r.value, { x: x + 0.2, y: 3.2, w: colW - 0.4, h: 0.6, align: "center", fontFace: FONT, fontSize: r.value.length > 5 ? 24 : 30, bold: true, color: MINT, isTextBox: true, margin: 0 });
+    s.addText(r.sub, { x: x + 0.2, y: 3.95, w: colW - 0.4, h: 0.6, align: "center", fontFace: FONT, fontSize: 10, color: MUTED, isTextBox: true, margin: 0, lineSpacingMultiple: 1.3 });
   });
-  s.addText("$482,600", {
-    x: W / 2 - cw / 2, y: 3.65, w: cw, h: 0.9, align: "center", fontFace: FONT, fontSize: 40, bold: true, color: MINT, isTextBox: true, margin: 0,
-  });
-  s.addText("Scoped capital spend — current cycle, Ward 4", {
-    x: W / 2 - cw / 2, y: 4.6, w: cw, h: 0.4, align: "center", fontFace: FONT, fontSize: 12, color: MUTED, isTextBox: true, margin: 0,
+  s.addText("Priced as one flat $1.00 / resident / year municipal contract — no per-ticket fee, no seat licenses, no dispatch surcharge.", {
+    x: 0.6, y: 5.1, w: W - 1.2, h: 0.4, align: "center", fontFace: "Courier New", fontSize: 9, color: MUTED, isTextBox: true, margin: 0,
   });
 }
 
-// ================= SLIDE 8 — ROI IMPACT =================
+// ================= SLIDE 7 — ROI IMPACT =================
 {
   const s = newSlide();
-  eyebrowAndNumber(s, "ROI", "08 / 10");
+  eyebrowAndNumber(s, "ROI", "07 / 10");
   title(s, [{ text: "Same Budget. " }, { text: "Different Split.", color: MINT }]);
-  lede(s, "When triage, routing, and reporting stop consuming staff hours, the same headcount and the same dollars shift from paperwork toward repair capacity.", 1.85, W - 1.2);
-  const barY = 3.3, barH = 0.85, barW = W - 1.2;
-  const fieldW = barW * (1.34 / (1.34 + 0.82));
-  const adminW = barW - fieldW;
-  s.addShape(pres.ShapeType.roundRect, {
-    x: 0.6, y: barY, w: fieldW, h: barH, rectRadius: 0.06,
-    fill: { color: MINT }, line: { type: "none" },
-  });
-  s.addText("+34% FIELD EXECUTION", {
-    x: 0.6, y: barY, w: fieldW, h: barH, align: "center", valign: "middle",
-    fontFace: FONT, fontSize: 13, bold: true, color: "051311", isTextBox: true, margin: 0,
-  });
-  s.addShape(pres.ShapeType.roundRect, {
-    x: 0.6 + fieldW, y: barY, w: adminW, h: barH, rectRadius: 0.06,
-    fill: { color: "17201B" }, line: { color: BORDER, width: 1 },
-  });
-  s.addText("−18% ADMIN OVERHEAD", {
-    x: 0.6 + fieldW, y: barY, w: adminW, h: barH, align: "center", valign: "middle",
-    fontFace: FONT, fontSize: 11, bold: true, color: MUTED, isTextBox: true, margin: 0,
-  });
-  s.addText(
-    [
-      { text: "■ FIELD REPAIR CAPITAL", options: { color: MINT } },
-    ],
-    { x: 0.6, y: barY + barH + 0.25, w: 4, h: 0.3, fontFace: "Courier New", fontSize: 10, isTextBox: true, margin: 0 }
-  );
-  s.addText(
-    [{ text: "■ ADMINISTRATIVE OVERHEAD", options: { color: MUTED } }],
-    { x: W - 4.6, y: barY + barH + 0.25, w: 4, h: 0.3, align: "right", fontFace: "Courier New", fontSize: 10, isTextBox: true, margin: 0 }
-  );
+  lede(s, "Same headcount, same dollars — reallocated once triage, routing, and reporting stop consuming staff hours. These are independent before/after deltas measured against the same budget cycle, not a fixed-sum split.", 1.85, W - 1.2);
+  // Two independent stat callouts (not a 100%-stacked bar): these are separate
+  // before/after deltas, not complementary shares of a fixed total.
+  const colW = 4.6, cardY = 3.1, cardH = 2.4, gap = 0.5;
+  const totalW = colW * 2 + gap;
+  let x = W / 2 - totalW / 2;
+  card(s, x, cardY, colW, cardH, { lineColor: MINT, lineWidth: 1.25 });
+  s.addText("FIELD EXECUTION CAPACITY", { x: x + 0.2, y: cardY + 0.3, w: colW - 0.4, h: 0.3, align: "center", fontFace: "Courier New", fontSize: 9.5, color: MUTED, isTextBox: true, margin: 0, charSpacing: 1 });
+  s.addText("+34%", { x: x + 0.2, y: cardY + 0.75, w: colW - 0.4, h: 1.0, align: "center", fontFace: FONT, fontSize: 46, bold: true, color: MINT, isTextBox: true, margin: 0 });
+  s.addText("Capital reallocated to field repair crews", { x: x + 0.3, y: cardY + 1.75, w: colW - 0.6, h: 0.5, align: "center", fontFace: FONT, fontSize: 11, color: MUTED, isTextBox: true, margin: 0, lineSpacingMultiple: 1.3 });
+  x += colW + gap;
+  card(s, x, cardY, colW, cardH);
+  s.addText("ADMINISTRATIVE OVERHEAD", { x: x + 0.2, y: cardY + 0.3, w: colW - 0.4, h: 0.3, align: "center", fontFace: "Courier New", fontSize: 9.5, color: MUTED, isTextBox: true, margin: 0, charSpacing: 1 });
+  s.addText("−18%", { x: x + 0.2, y: cardY + 0.75, w: colW - 0.4, h: 1.0, align: "center", fontFace: FONT, fontSize: 46, bold: true, color: MINT, isTextBox: true, margin: 0 });
+  s.addText("Reduction in desk triage & routing burden", { x: x + 0.3, y: cardY + 1.75, w: colW - 0.6, h: 0.5, align: "center", fontFace: FONT, fontSize: 11, color: MUTED, isTextBox: true, margin: 0, lineSpacingMultiple: 1.3 });
 }
 
-// ================= SLIDE 9 — INTEGRATION =================
+// ================= SLIDE 8 — INTEGRATION =================
 {
   const s = newSlide();
-  eyebrowAndNumber(s, "INTEGRATION", "09 / 10");
+  eyebrowAndNumber(s, "INTEGRATION", "08 / 10");
   title(s, [{ text: "Built to Plug Into " }, { text: "What You Already Run", color: MINT }], 0.85, 26);
   lede(s, "CITIXEN UX is designed as an integration layer, not a replacement — council-facing records and back-office systems stay where they are.", 1.85, W - 1.2);
   const colW = (W - 1.2 - 0.3) / 2;
@@ -358,18 +310,57 @@ function tagPill(slide, x, y, text) {
   });
 }
 
-// ================= SLIDE 10 — EXECUTIVE CTA =================
+// ================= SLIDE 9 — GOVERNANCE: DATA SOVEREIGNTY & 2-TIER RETENTION =================
+{
+  const s = newSlide();
+  eyebrowAndNumber(s, "GOVERNANCE", "09 / 10");
+  title(s, [{ text: "Data Sovereignty & " }, { text: "2-Tier Retention", color: MINT }], 0.85, 26);
+  lede(s, "The city owns its own tenant data outright. CITIXEN retains only anonymized, network-wide benchmarks — never a name, a device ID, or a precise location.", 1.85, W - 1.2);
+  const colW = (W - 1.2 - 0.3) / 2;
+  let x = 0.6;
+  card(s, x, 2.75, colW, 2.9, { lineColor: MINT, lineWidth: 1.25 });
+  tagPill(s, x + 0.3, 3.0, "TIER 1 · MUNICIPAL TENANT DATA");
+  s.addText("Sovereign City Data", { x: x + 0.3, y: 3.4, w: colW - 0.6, h: 0.45, fontFace: FONT, fontSize: 15, bold: true, color: TEXT, isTextBox: true, margin: 0 });
+  s.addText(
+    [
+      { text: "Raw ticket, location, and dispatch records stay inside that city's own instance", options: { bullet: true, breakLine: true } },
+      { text: "Never sold or shared outside the municipal services agreement", options: { bullet: true, breakLine: true } },
+      { text: "No resident accounts, logins, or device fingerprinting to begin with", options: { bullet: true } },
+    ],
+    { x: x + 0.3, y: 3.9, w: colW - 0.6, h: 1.6, fontFace: FONT, fontSize: 11.5, color: MUTED, isTextBox: true, margin: 0, paraSpaceAfter: 6 }
+  );
+  x = 0.6 + colW + 0.3;
+  card(s, x, 2.75, colW, 2.9);
+  tagPill(s, x + 0.3, 3.0, "TIER 2 · ANON. MACRO BENCHMARKS");
+  s.addText("Cross-City Benchmarking", { x: x + 0.3, y: 3.4, w: colW - 0.6, h: 0.45, fontFace: FONT, fontSize: 15, bold: true, color: TEXT, isTextBox: true, margin: 0 });
+  s.addText(
+    [
+      { text: "Only aggregate, de-identified network-wide stats — resolution SLA, grid coverage, capital-split ratios", options: { bullet: true, breakLine: true } },
+      { text: "Public ledger pins are coordinate-fuzzed to ~110m before anything is ever displayed", options: { bullet: true, breakLine: true } },
+      { text: "EXIF/GPS and device identifiers are stripped from every photo before it leaves the reporter's device", options: { bullet: true } },
+    ],
+    { x: x + 0.3, y: 3.9, w: colW - 0.6, h: 1.6, fontFace: FONT, fontSize: 11.5, color: MUTED, isTextBox: true, margin: 0, paraSpaceAfter: 6 }
+  );
+  s.addText("Specific data-processing terms, retention windows, and sub-processor disclosures are governed by the municipal services agreement — this slide summarizes the platform's default architecture, not a substitute for that agreement.", {
+    x: 0.6, y: 5.85, w: W - 1.2, h: 0.5, fontFace: "Courier New", fontSize: 9, color: MUTED, isTextBox: true, margin: 0, lineSpacingMultiple: 1.3,
+  });
+}
+
+// ================= SLIDE 10 — NEXT STEP: THE 30-DAY WARD PILOT =================
 {
   const s = newSlide();
   s.addText("NEXT STEP", {
-    x: 0, y: 1.5, w: W, h: 0.35, align: "center", fontFace: "Courier New", fontSize: 11, bold: true, color: MINT, isTextBox: true, margin: 0, charSpacing: 2,
+    x: 0, y: 1.35, w: W, h: 0.3, align: "center", fontFace: "Courier New", fontSize: 11, bold: true, color: MINT, isTextBox: true, margin: 0, charSpacing: 2,
+  });
+  s.addText("10 / 10", {
+    x: 0, y: 1.35, w: W - 0.6, h: 0.3, align: "right", fontFace: "Courier New", fontSize: 10, color: MUTED, isTextBox: true, margin: 0,
   });
   s.addText(
-    [{ text: "Let's Put One Ward ", options: { color: TEXT } }, { text: "on the Platform.", options: { color: MINT } }],
-    { x: 0.6, y: 1.95, w: W - 1.2, h: 0.9, align: "center", fontFace: FONT, fontSize: 30, bold: true, isTextBox: true, margin: 0 }
+    [{ text: "The ", options: { color: TEXT } }, { text: "30-Day Ward Pilot", options: { color: MINT } }],
+    { x: 0.6, y: 1.8, w: W - 1.2, h: 0.9, align: "center", fontFace: FONT, fontSize: 30, bold: true, isTextBox: true, margin: 0 }
   );
-  s.addText("A 30-day pilot. No procurement cycle required to start the conversation — setup takes under two weeks.", {
-    x: W / 2 - 4.5, y: 2.85, w: 9, h: 0.6, align: "center", fontFace: FONT, fontSize: 14, color: MUTED, isTextBox: true, margin: 0, lineSpacingMultiple: 1.3,
+  s.addText("No procurement cycle required to start the conversation — setup takes under two weeks, one ward at a time.", {
+    x: W / 2 - 4.5, y: 2.7, w: 9, h: 0.6, align: "center", fontFace: FONT, fontSize: 14, color: MUTED, isTextBox: true, margin: 0, lineSpacingMultiple: 1.3,
   });
   // CTA buttons
   const btn1W = 3.2, btn2W = 3.4, gap = 0.3;
