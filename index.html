@@ -211,6 +211,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .mapwrap{flex:1;position:relative}
 #map{position:absolute;inset:0;background:#0d1518}
 .leaflet-container{background:#0d1518}
+.leaflet-tile-pane{filter:invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);}
 .leaflet-div-icon{background:transparent;border:none}
 
 /* ===== MAP BEACONS (CartoDB Dark Matter basemap) ===== */
@@ -425,15 +426,15 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     <div class="hub-row" role="navigation" aria-label="Dashboard shortcuts">
       <button class="hub-card" id="hubCoverageBtn" type="button">
         <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-        <span>Asset Coverage &amp; Survey Grid</span>
+        <span>Analytics and Reporting</span>
       </button>
       <button class="hub-card" id="hubSlaBtn" type="button">
         <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19a8 8 0 0 1 16 0"/><line x1="12" y1="19" x2="16.5" y2="10.5"/><circle cx="12" cy="19" r="1.4"/></svg>
-        <span>District SLA &amp; Expenditure Gauge</span>
+        <span>Expenditures and Projects</span>
       </button>
       <button class="hub-card" id="hubStackBtn" type="button">
         <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 21 8 12 13 3 8 12 3"/><polyline points="3 13 12 18 21 13"/><polyline points="3 18 12 23 21 18"/></svg>
-        <span>Geotagged Civic Stack</span>
+        <span>Civic Stack</span>
       </button>
     </div>
   </section>
@@ -628,15 +629,21 @@ function statusPill(status){ return status==='Critical' ? 'pill-crit' : status==
 function fuzzCoord(n){ return Math.round(n*1000)/1000; }
 
 /* ===== MAP ===== */
-// CartoDB Dark Matter basemap — genuinely dark tiles, so no CSS invert/hue-rotate
-// filter hack is needed (that filter is removed from .leaflet-tile-pane above).
+// Plain OpenStreetMap raster tiles — no API key, no account, no rate-limit
+// watermark on any domain. CartoDB's basemap service and Stadia Maps' hosted
+// styles were both tried here and each requires a registered API key on a
+// real production domain (keyless access only works on localhost/low
+// volume), which showed as an on-tile "API key required" watermark once
+// deployed. The tile PANE (not the whole map — markers/popups stay true
+// color) gets a CSS filter (see .leaflet-tile-pane) that inverts +
+// hue-rotates OSM's tiles into a dark, obsidian-matched basemap instead.
 let map, markers={}, userMarker=null;
 function addBaseLayer(m){
   const srcTag=document.getElementById('mapSrcTag');
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
-    maxZoom:20, subdomains:'abcd', crossOrigin:true
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    maxZoom:19, subdomains:'abc', crossOrigin:true
   }).addTo(m);
-  if(srcTag) srcTag.textContent='TILE SRC: CARTODB DARK MATTER';
+  if(srcTag) srcTag.textContent='TILE SRC: OPENSTREETMAP (DARK FILTER)';
 }
 function initMap(){
   if (typeof L === 'undefined') return; // Leaflet CDN unreachable — degrade gracefully rather than aborting the caller

@@ -101,6 +101,7 @@ textarea.input{resize:none;line-height:1.4}
 .navtab svg{width:19px;height:19px}
 
 #map{height:220px;width:100%;border-radius:12px;border:1px solid var(--border);background:#0d1518;overflow:hidden}
+.dark-tiles{filter:invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);}
 .leaflet-container{background:#0d1518}
 .leaflet-div-icon{background:transparent;border:none}
 
@@ -1184,12 +1185,16 @@ function initMap(){
   }
   try {
     map=L.map('map',{attributionControl:false}).setView([43.8138,-91.2519],14);
-    // CartoDB Dark Matter — a genuinely dark basemap, so no CSS invert/hue-rotate
-    // hack is needed (unlike the old OSM-tiles-forced-dark approach elsewhere
-    // in this codebase). Subdomains a-d per CARTO's basemap docs; no API key
-    // required for basemap tiles.
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
-      maxZoom:20, subdomains:'abcd'
+    // Plain OpenStreetMap raster tiles — no API key, no account, no rate-limit
+    // watermark on any domain. Both CartoDB's basemap service and Stadia Maps'
+    // hosted styles were tried here and each requires a registered API key on
+    // a real production domain (they only work keyless on localhost/low
+    // volume), which showed as an on-tile "API key required" watermark once
+    // deployed. The tile PANE (not the whole map — markers/popups stay true
+    // color) gets a CSS filter (see .dark-tiles) that inverts + hue-rotates
+    // OSM's tiles into a dark, obsidian-matched basemap instead.
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+      maxZoom:19, className:'dark-tiles'
     }).addTo(map);
     cases.forEach(plotMarker);
     if (window.CITIXEN_RESOLVED_LOCATION && typeof window.CITIXEN_RESOLVED_LOCATION.lat === 'number') {
