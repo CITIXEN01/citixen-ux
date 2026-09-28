@@ -406,7 +406,7 @@ textarea.input{resize:none;line-height:1.4}
         <p style="font-size:.78rem;color:var(--muted);margin-bottom:12px;">
           Access real-time GIS mapping, district heatmaps, and municipal SLAs on the desktop portal.
         </p>
-        <a href="https://citixenux.com/analytics" target="_blank" rel="noopener noreferrer" class="btn-submit" style="text-decoration:none;">
+        <a href="https://citixenux.com/" target="_blank" rel="noopener noreferrer" class="btn-submit" style="text-decoration:none;">
           Open Web Dashboard ↗
         </a>
       </div>
@@ -1227,8 +1227,11 @@ function renderFeed(){
     const slaTag = bucket === 'open'
       ? `<span class="feed-sla" style="color:${slaAgeColor(item.ageMin || 0)}">SLA age: ${esc(item.time)}</span>`
       : '';
+    // No dedicated per-project route exists on the deployed site (there is
+    // no /projects/:id page) — link to the dashboard root rather than a
+    // path that would 404, while still surfacing the project id as text.
     const projectLink = item.projectId
-      ? `<a class="feed-project-link" href="https://citixenux.com/projects/${esc(item.projectId)}" target="_blank" rel="noopener noreferrer">View Project (${esc(item.projectId)}) →</a>`
+      ? `<a class="feed-project-link" href="https://citixenux.com/" target="_blank" rel="noopener noreferrer">View Project (${esc(item.projectId)}) →</a>`
       : '';
     el.innerHTML=`<div class="row"><strong>${esc(item.title)}</strong><span class="pill ${pill}">${esc(item.status)}</span></div>
       <div class="small" style="margin:4px 0">${esc(item.desc)}</div>
