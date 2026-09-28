@@ -1,0 +1,19 @@
+{
+  "appId": "com.citixenux.app",
+  "appName": "CITIXEN UX",
+  "webDir": ".",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  },
+  "ios": {
+    "contentInset": "always",
+    "infoPlist": {
+      "NSCameraUsageDescription": "CITIXEN UX uses your camera to document infrastructure issues anonymously. Photos are stripped of EXIF data.",
+      "NSLocationWhenInUseUsageDescription": "CITIXEN UX uses your precise GPS location to identify ward jurisdiction and map report coordinates."
+    }
+  },
+  "android": {
+    "allowMixedContent": false
+  }
+}

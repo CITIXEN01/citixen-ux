@@ -23,6 +23,7 @@
   --bg-obsidian:#080c0a !important;
   --bg-card:#0f1713 !important;
   --border-muted:rgba(255,255,255,0.08) !important;
+  --fow-amber:#FFB800 !important;
   /* legacy aliases — every existing var(--mint)/var(--card)/etc. usage below inherits
      the brand tokens above unchanged, so there is one source of truth for color. */
   --bg:var(--bg-obsidian); --card:var(--bg-card); --border:var(--border-muted); --hover:#162529;
@@ -160,6 +161,9 @@ textarea.input{resize:none;line-height:1.4}
 .muni-card:hover,.muni-card:focus{border-color:var(--mint2)}
 .muni-card .bar{margin:6px 0}
 
+.radius-tag{display:inline-flex;align-items:center;gap:5px;font-size:.6rem;font-weight:800;letter-spacing:.4px;
+  text-transform:uppercase;color:var(--mint2);background:rgba(0,255,136,.08);border:1px solid var(--border);
+  border-radius:20px;padding:4px 10px;margin-bottom:10px}
 .coverage-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px;flex-wrap:wrap;gap:8px}
 .coverage-ticker{font-size:1.6rem;font-weight:900;color:var(--mint2)}
 .coverage-sub{font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
@@ -167,9 +171,10 @@ textarea.input{resize:none;line-height:1.4}
 .cov-cell{aspect-ratio:1;border-radius:3px;background:rgba(255,255,255,.06);cursor:pointer;border:none;padding:0;
   transition:transform .12s ease,box-shadow .3s ease,background .3s ease}
 .cov-cell.covered{background:var(--mint2);box-shadow:0 0 6px rgba(0,255,136,.7)}
+.cov-cell.pending{background:var(--fow-amber);box-shadow:0 0 6px rgba(255,184,0,.6)}
 .cov-cell.you{box-shadow:0 0 0 1.5px #fff,0 0 6px rgba(0,255,136,.7)}
 .cov-cell:active{transform:scale(.82)}
-.cov-legend{display:flex;justify-content:space-between;font-size:.62rem;color:var(--muted);margin-bottom:4px}
+.cov-legend{display:flex;justify-content:space-between;font-size:.62rem;color:var(--muted);margin-bottom:4px;flex-wrap:wrap;gap:6px 12px}
 .cov-legend .dot{width:7px;height:7px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:middle}
 .cov-toast{display:none;background:rgba(0,255,136,.08);border:1px solid var(--border);border-radius:10px;
   padding:10px 12px;font-size:.74rem;margin-top:4px;align-items:center;justify-content:space-between;gap:8px;color:var(--text)}
@@ -272,6 +277,36 @@ textarea.input{resize:none;line-height:1.4}
     </section>
 
     <section id="tab-map" class="tabpane">
+      <div class="card">
+        <div class="radius-tag">
+          <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+          1–5 MILE FOG-OF-WAR GRID
+        </div>
+        <div class="coverage-head">
+          <div>
+            <div class="label" style="margin-bottom:2px">Citywide asset coverage</div>
+            <div class="coverage-ticker" id="mapFowTicker">0.0%</div>
+          </div>
+          <div style="text-align:right">
+            <div class="coverage-sub" id="mapFowSub">Ward 4 blocks surveyed</div>
+            <div style="font-size:.8rem;font-weight:800" id="mapFowFraction">0 / 0</div>
+          </div>
+        </div>
+        <div class="cov-legend">
+          <span><span class="dot" style="background:var(--mint2)"></span>Audited</span>
+          <span><span class="dot" style="background:var(--fow-amber)"></span>Pending</span>
+          <span><span class="dot" style="background:rgba(255,255,255,.15)"></span>Uncharted</span>
+        </div>
+        <div class="cov-grid" id="mapFowGrid"></div>
+        <div class="cov-toast" id="mapFowToast">
+          <span id="mapFowToastText"></span>
+          <button class="ct-cta" id="mapFowToastCta">Report it</button>
+        </div>
+        <div class="your-impact">
+          <div class="num" id="mapFowYouCount">0</div>
+          <div class="lbl">blocks you've helped verify — tap any dark block to report it and light it up for everyone.</div>
+        </div>
+      </div>
       <div class="card">
         <div class="label"><span>Civic dispatch map</span><span id="mCount" style="color:var(--mint2)">3 active</span></div>
         <div id="map"></div>
@@ -504,13 +539,19 @@ function toast(msg){
 
 function switchTab(id,btn){
   document.querySelectorAll('.tabpane').forEach(t=>t.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  const pane = document.getElementById(id);
+  if (pane) pane.classList.add('active');
   document.querySelectorAll('.navtab').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+  if (btn) btn.classList.add('active');
   if(id==='tab-map'){
     if(!mapInit) initMap();
     // Force Leaflet to recalculate container dimensions once unhidden
     setTimeout(()=>{ if(map) map.invalidateSize(); },200);
+    // Fog-of-War grid: loads/animates once (shared covCells with Analytics'
+    // grid via the coverageLoaded guard in animateCoverage), so opening
+    // Map & feed first still shows live coverage without visiting Analytics.
+    resolveCoverageEndpointFromStorage();
+    animateCoverage();
   }
   if(id==='tab-analytics'){
     initAnalytics();
@@ -975,6 +1016,23 @@ function jumpToMunicipality(m){
    ===================================================================== */
 let COVERAGE_ENDPOINT = '/api/coverage/wi/la-crosse/ward-4';
 
+// If the Map & feed tab's Fog-of-War grid loads before the Analytics tab
+// has ever been opened (which is what normally resolves currentWardMeta
+// from the live directory), fall back to whatever jurisdiction was already
+// confirmed elsewhere (citixenux.com's location intake modal) so the grid
+// doesn't silently show the wrong ward's blocks. No-op once currentWardMeta
+// is set for real.
+function resolveCoverageEndpointFromStorage(){
+  if (currentWardMeta) return;
+  const stored = getStoredJurisdiction();
+  if (stored && stored.state && stored.city && stored.ward) {
+    COVERAGE_ENDPOINT = '/api/coverage/' + stored.state + '/' + stored.city + '/' + stored.ward;
+    const label = (stored.wardName || 'Ward') + ' blocks surveyed';
+    setTextIfExists('mapFowSub', label);
+    setTextIfExists('covSub', label);
+  }
+}
+
 function mockCoverageCells(){
   // Same shape as the real endpoint — used only when the API can't be reached.
   // No "reportedByYou" here: that's never public/shared data (see note below).
@@ -1077,23 +1135,47 @@ async function fetchCoverageGrid(){
 let covCells = [];
 let pendingReportCellId = null;
 
+// The Analytics tab's Ward 4 Local grid (#covGrid) and the Map & feed tab's
+// Fog-of-War grid (#mapFowGrid) render the SAME covCells data into two
+// separate DOM targets, so both stay in sync from one fetch — tapping a
+// block or verifying a report updates whichever grid(s) are on the page.
+// Every lookup here is null-guarded: a grid id not present on this build of
+// the page (or an id that gets renamed later) is skipped rather than thrown.
+const COVERAGE_GRID_IDS = ['covGrid', 'mapFowGrid'];
+function coverageGridEls(){
+  return COVERAGE_GRID_IDS.map(id => document.getElementById(id)).filter(Boolean);
+}
+
+// The coverage API has no live "pending dispatch" signal yet — this
+// deterministic subset of unsurveyed blocks (~1 in 5) is shown as Pending
+// (amber) purely to demonstrate the intended three-state Fog-of-War grid
+// (Audited / Pending / Uncharted). Swap for a real in-flight-report flag
+// once the API exposes one; nothing here is presented as live dispatch data.
+function markPendingCells(cells){
+  cells.forEach(c => { if (!c.covered) c.pending = (c.id % 5 === 0); });
+  return cells;
+}
+
 function renderCoverageGrid(){
-  const gridEl = document.getElementById('covGrid');
+  const grids = coverageGridEls();
+  if (!grids.length) return;
   const mine = getMyReportedCellIds();
-  gridEl.innerHTML = '';
-  covCells.forEach(c => {
-    const b = document.createElement('button');
-    b.className = 'cov-cell';
-    b.dataset.id = c.id;
-    b.type = 'button';
-    const isMine = mine.has(c.id);
-    b.setAttribute('aria-label', c.covered
-      ? (c.category + ' — verified ' + c.verifiedDate + (isMine ? ', reported by you' : ''))
-      : 'Unsurveyed block — tap to report');
-    b.addEventListener('click', () => onCoverageCellTap(c.id));
-    gridEl.appendChild(b);
+  grids.forEach(gridEl => {
+    gridEl.innerHTML = '';
+    covCells.forEach(c => {
+      const b = document.createElement('button');
+      b.className = 'cov-cell' + (c.pending ? ' pending' : '');
+      b.dataset.id = c.id;
+      b.type = 'button';
+      const isMine = mine.has(c.id);
+      b.setAttribute('aria-label', c.covered
+        ? (c.category + ' — verified ' + c.verifiedDate + (isMine ? ', reported by you' : ''))
+        : (c.pending ? 'Pending dispatch review' : 'Unsurveyed block — tap to report'));
+      b.addEventListener('click', () => onCoverageCellTap(c.id, gridEl.id));
+      gridEl.appendChild(b);
+    });
+    gridEl.dataset.built = '1';
   });
-  gridEl.dataset.built = '1';
 }
 
 let coverageLoaded = false;
@@ -1102,24 +1184,29 @@ async function animateCoverage(){
   if (coverageLoaded) return; // this widget loads and animates in once per page load
   coverageLoaded = true;
 
-  covCells = await fetchCoverageGrid();
+  covCells = markPendingCells(await fetchCoverageGrid());
   renderCoverageGrid();
   refreshCoverageStats();
   if (!covCells.length) return;
 
-  const gridEl = document.getElementById('covGrid');
-  const cellEls = Array.from(gridEl.children);
+  const grids = coverageGridEls();
+  if (!grids.length) return;
   const mine = getMyReportedCellIds();
   const DURATION = 1200;
-
-  cellEls.forEach(el => el.classList.remove('covered', 'you'));
   const coveredIdx = covCells.map((c, i) => i).filter(i => covCells[i].covered);
   const order = shuffleArray(coveredIdx);
-  order.forEach((idx, seq) => {
-    setTimeout(() => {
-      cellEls[idx].classList.add('covered');
-      if (mine.has(covCells[idx].id)) cellEls[idx].classList.add('you');
-    }, (seq / order.length) * DURATION);
+
+  grids.forEach(gridEl => {
+    const cellEls = Array.from(gridEl.children);
+    cellEls.forEach(el => el.classList.remove('covered', 'you'));
+    order.forEach((idx, seq) => {
+      setTimeout(() => {
+        const el = cellEls[idx];
+        if (!el) return;
+        el.classList.add('covered');
+        if (mine.has(covCells[idx].id)) el.classList.add('you');
+      }, (seq / order.length) * DURATION);
+    });
   });
 
   animateTicker(0, computeCoveragePct(), DURATION);
@@ -1131,11 +1218,23 @@ function computeCoveragePct(){
   return total ? (coveredCount / total) * 100 : 0;
 }
 
+// Stat ids come in Analytics-tab / Map-tab pairs; each is set only if that
+// element exists on the page, so either tab can be present, absent, or
+// (as today) both at once without a missing id ever throwing.
+const COVERAGE_FRACTION_IDS = ['covFraction', 'mapFowFraction'];
+const COVERAGE_YOU_COUNT_IDS = ['covYouCount', 'mapFowYouCount'];
+const COVERAGE_TICKER_IDS = ['covTicker', 'mapFowTicker'];
+
+function setTextIfExists(id, text){
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
+}
+
 function refreshCoverageStats(){
   const total = covCells.length;
   const coveredCount = covCells.filter(c => c.covered).length;
-  document.getElementById('covFraction').textContent = coveredCount + ' / ' + total;
-  document.getElementById('covYouCount').textContent = getMyReportedCellIds().size;
+  COVERAGE_FRACTION_IDS.forEach(id => setTextIfExists(id, coveredCount + ' / ' + total));
+  COVERAGE_YOU_COUNT_IDS.forEach(id => setTextIfExists(id, getMyReportedCellIds().size));
 }
 
 function animateTicker(fromPct, toPct, duration){
@@ -1145,9 +1244,9 @@ function animateTicker(fromPct, toPct, duration){
     const progress = Math.min((ts - start) / duration, 1);
     const eased = 1 - Math.pow(1 - progress, 3);
     const val = fromPct + (toPct - fromPct) * eased;
-    document.getElementById('covTicker').textContent = val.toFixed(1) + '%';
+    COVERAGE_TICKER_IDS.forEach(id => setTextIfExists(id, val.toFixed(1) + '%'));
     if (progress < 1) requestAnimationFrame(step);
-    else document.getElementById('covTicker').textContent = toPct.toFixed(1) + '%';
+    else COVERAGE_TICKER_IDS.forEach(id => setTextIfExists(id, toPct.toFixed(1) + '%'));
   }
   requestAnimationFrame(step);
 }
@@ -1197,11 +1296,11 @@ async function verifyReportedCell(cellId, category){
     });
   }
 
-  const cellEl = document.querySelector('.cov-grid .cov-cell[data-id="' + cellId + '"]');
-  if (cellEl) {
+  document.querySelectorAll('.cov-grid .cov-cell[data-id="' + cellId + '"]').forEach(cellEl => {
+    cellEl.classList.remove('pending');
     cellEl.classList.add('covered', 'you');
     cellEl.setAttribute('aria-label', 'Verified — reported by you');
-  }
+  });
   const fromPct = computeCoveragePctBefore(cellId);
   refreshCoverageStats();
   animateTicker(fromPct, computeCoveragePct(), 600);
@@ -1226,15 +1325,25 @@ function shuffleArray(arr){
   return copy;
 }
 
-function onCoverageCellTap(id){
+// gridId names WHICH grid was tapped (covGrid in Analytics, mapFowGrid in
+// Map & feed) so the toast shows in that same card rather than one that may
+// be off-screen in another tab; each lookup is null-guarded so a grid
+// without its own toast markup simply skips showing one instead of throwing.
+function onCoverageCellTap(id, gridId){
   const cell = covCells.find(c => c.id === id);
-  const toastEl = document.getElementById('covToast');
-  const textEl = document.getElementById('covToastText');
-  const ctaEl = document.getElementById('covToastCta');
+  if (!cell) return;
+  const suffix = gridId === 'mapFowGrid' ? 'mapFow' : 'cov';
+  const toastEl = document.getElementById(suffix + 'Toast');
+  const textEl = document.getElementById(suffix + 'ToastText');
+  const ctaEl = document.getElementById(suffix + 'ToastCta');
+  if (!toastEl || !textEl || !ctaEl) return;
 
   if (cell.covered) {
     const isMine = getMyReportedCellIds().has(cell.id);
     textEl.textContent = cell.category + ' — verified ' + cell.verifiedDate + (isMine ? ' · reported by you' : '');
+    ctaEl.style.display = 'none';
+  } else if (cell.pending) {
+    textEl.textContent = 'Pending dispatch review — a report for this block is already in the queue.';
     ctaEl.style.display = 'none';
   } else {
     textEl.textContent = 'Not yet surveyed — be the first to report this block.';
@@ -1257,12 +1366,25 @@ function selectCat(el){
 }
 
 function initMap(){
-  map=L.map('map',{attributionControl:false}).setView([43.8138,-91.2519],14);
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    maxZoom:19, className:'dark-tiles'
-  }).addTo(map);
-  cases.forEach(plotMarker);
-  mapInit=true;
+  // Leaflet loads from a CDN (see <head>); a blocked network, offline
+  // device, or ad-blocker can leave `L` undefined. Guarding this means a
+  // failed map load degrades to "no map" instead of throwing and aborting
+  // the rest of switchTab() — including the Fog-of-War grid init that runs
+  // right after this call.
+  if (typeof L === 'undefined') {
+    console.warn('Leaflet failed to load — the dispatch map is unavailable, but the rest of the page (Fog-of-War grid, feed, reporting) still works.');
+    return;
+  }
+  try {
+    map=L.map('map',{attributionControl:false}).setView([43.8138,-91.2519],14);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+      maxZoom:19, className:'dark-tiles'
+    }).addTo(map);
+    cases.forEach(plotMarker);
+    mapInit=true;
+  } catch (err) {
+    console.warn('Map initialization failed — continuing without the live map.', err);
+  }
 }
 
 function statusColor(status){
@@ -1291,6 +1413,7 @@ function renderFeed(){
       <div class="row small"><span>${esc(item.loc)}</span><span>${esc(item.time)}</span></div>`;
     el.addEventListener('click',()=>{
       if(!mapInit) initMap();
+      if(!map) return; // Leaflet unavailable — feed item just doesn't fly the (absent) map
       map.flyTo([item.lat,item.lng],16);
       markers[item.id] && markers[item.id].openPopup();
     });

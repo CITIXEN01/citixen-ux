@@ -58,7 +58,19 @@ const FEDERAL_LAYER = [
   }
 ];
 
+// Strict null checks for every caller-supplied name: state/city/ward lookups
+// ultimately trace back to a URL param or a store.js record, either of which
+// can be missing or malformed. Falling back to a plain, honest placeholder
+// string here (rather than letting `undefined` flow into the fullText/
+// cliffNotes concatenations below, or letting a caller who passes null
+// mid-expression throw) keeps Ward 4/municipal lookups rendering cleanly —
+// with no console error — even when a name can't be resolved.
+function safeName(value, fallback){
+  return (typeof value === 'string' && value.trim()) ? value.trim() : fallback;
+}
+
 function stateLayer(stateName){
+  stateName = safeName(stateName, 'this state');
   return [{
     id: 'state-constitution',
     title: stateName + ' State Constitution',
@@ -78,6 +90,7 @@ function stateLayer(stateName){
 }
 
 function municipalLayer(cityName){
+  cityName = safeName(cityName, 'this municipality');
   return [
     {
       id: 'municipal-code',
@@ -174,6 +187,9 @@ function municipalLayer(cityName){
 }
 
 function wardLayer(wardName, alderman, cityName){
+  wardName = safeName(wardName, 'this ward');
+  alderman = safeName(alderman, 'The elected representative for this ward');
+  cityName = safeName(cityName, 'this municipality');
   return [
     {
       id: 'ward-directives',
@@ -228,6 +244,10 @@ function wardLayer(wardName, alderman, cityName){
 // this module has no dependency on store.js so the two can evolve
 // independently, but they're always looked up together in practice.
 function getJurisdictionStack(stateName, cityName, wardName, alderman){
+  // Every downstream lookup (stateLayer/municipalLayer/wardLayer) already
+  // guards its own arguments via safeName(), so this never throws even if
+  // called with undefined/null across the board — it just returns the
+  // stack with honest "this state/municipality/ward" placeholders.
   return {
     federal: FEDERAL_LAYER,
     state: stateLayer(stateName),

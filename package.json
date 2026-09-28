@@ -1,0 +1,20 @@
+{
+  "name": "citixen-ux",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CITIXEN UX — Civic Intelligence Platform (web PWA + native Capacitor wrapper)",
+  "scripts": {
+    "cap:init": "node scripts/capacitor-init.js",
+    "cap:add:ios": "npx cap add ios && node scripts/patch-ios-permissions.js",
+    "cap:add:android": "npx cap add android && node scripts/patch-android-permissions.js",
+    "cap:sync": "npx cap sync",
+    "cap:open:ios": "npx cap open ios",
+    "cap:open:android": "npx cap open android"
+  },
+  "devDependencies": {
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/ios": "^6.0.0",
+    "@capacitor/android": "^6.0.0"
+  }
+}
