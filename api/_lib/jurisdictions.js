@@ -109,6 +109,66 @@ function municipalLayer(cityName){
       ],
       videoAvailable: false,
       audioAvailable: false
+    },
+    {
+      id: 'zoning-ordinance',
+      title: cityName + ' Zoning Ordinance',
+      kind: 'Municipal',
+      source: 'Representative summary — not sourced live',
+      fullText:
+        'Representative summary — pending integration with ' + cityName + '\'s official zoning map and ordinance text. ' +
+        'A production deployment reads current zoning districts and use tables live from the city planning department\'s published records.',
+      cliffNotes: [
+        'Defines what can be built where (residential, commercial, mixed-use) and sets setback, height, and lot-coverage rules.',
+        'Governs the permit and variance process a resident or landlord must follow to change a property\'s use.'
+      ],
+      videoAvailable: false,
+      audioAvailable: false
+    },
+    {
+      id: 'tenant-ordinance',
+      title: cityName + ' Tenant & Landlord Ordinance',
+      kind: 'Municipal',
+      source: 'Representative summary — not sourced live',
+      fullText:
+        'Representative summary — pending integration with ' + cityName + '\'s official tenant-protection and rental-licensing code. ' +
+        'A production deployment reads current habitability standards and notice requirements live from the city\'s published ordinance.',
+      cliffNotes: [
+        'Sets minimum habitability standards (heat, water, pest control) a landlord must maintain.',
+        'Defines notice periods for entry, rent increases, and non-renewal, and where to file a habitability complaint.'
+      ],
+      videoAvailable: false,
+      audioAvailable: false
+    },
+    {
+      id: 'parking-ordinance',
+      title: cityName + ' Parking Ordinance',
+      kind: 'Municipal',
+      source: 'Representative summary — not sourced live',
+      fullText:
+        'Representative summary — pending integration with ' + cityName + '\'s official parking and traffic code. ' +
+        'A production deployment reads current permit-zone maps, time limits, and snow-emergency rules live from the city\'s published ordinance.',
+      cliffNotes: [
+        'Defines residential permit zones, metered time limits, and street-sweeping/snow-emergency parking bans.',
+        'The legal basis for the "Parking" hotkey in Local Reports — routes to Traffic/Parking Enforcement.'
+      ],
+      videoAvailable: false,
+      audioAvailable: false
+    },
+    {
+      id: 'noise-ordinance',
+      title: cityName + ' Noise Ordinance',
+      kind: 'Municipal',
+      source: 'Representative summary — not sourced live',
+      fullText:
+        'Representative summary — pending integration with ' + cityName + '\'s official noise-control code. ' +
+        'A production deployment reads current decibel limits and quiet-hours windows live from the city\'s published ordinance.',
+      cliffNotes: [
+        'Sets quiet hours and maximum decibel levels for residential and commercial zones.',
+        'The legal basis for the "Noise" hotkey in Local Reports — routes to Code Enforcement or Police non-emergency.'
+      ],
+      videoAvailable: false,
+      audioAvailable: false
     }
   ];
 }
@@ -141,6 +201,21 @@ function wardLayer(wardName, alderman, cityName){
       cliffNotes: [
         alderman + ' is the elected council member/alderman for ' + wardName + '.',
         'Residents may contact their alderman directly regarding unresolved reports or next quarter\'s budget priorities for the ward.'
+      ],
+      videoAvailable: false,
+      audioAvailable: false
+    },
+    {
+      id: 'council-meeting-schedule',
+      title: wardName + ' Council Meeting Schedule',
+      kind: 'District/Ward',
+      source: 'Representative summary — not sourced live',
+      fullText:
+        'Representative summary — pending integration with ' + cityName + '\'s official council/committee calendar for ' + wardName + '. ' +
+        'A production deployment reads the current meeting calendar, agendas, and remote-attendance links live from the city clerk\'s published schedule.',
+      cliffNotes: [
+        'Regular council session cadence and how to find the agenda ahead of a meeting.',
+        'How a resident signs up for public comment, in person or remotely.'
       ],
       videoAvailable: false,
       audioAvailable: false
