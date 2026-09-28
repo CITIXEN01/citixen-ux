@@ -10,7 +10,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
 :root{
   --brand-mint:#00ff88 !important;
@@ -63,6 +65,12 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
 .label{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);
   margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
 
+.chip-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+.chip{background:rgba(7,12,14,.6);border:1px solid var(--border);color:var(--text);padding:13px 12px;
+  border-radius:12px;font-size:.76rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:9px;
+  transition:border-color .15s,background .15s}
+.chip.active{border-color:var(--mint2);background:rgba(0,255,136,.12);color:var(--mint2)}
+.chip svg{width:17px;height:17px;flex-shrink:0}
 .chip-other-row{display:flex;justify-content:center;margin-bottom:14px}
 .chip-other{min-width:150px;justify-content:center}
 
@@ -89,6 +97,9 @@ textarea.input{resize:none;line-height:1.4}
 .navtab.active{color:var(--mint2)}
 .navtab svg{width:19px;height:19px}
 
+#map{height:220px;width:100%;border-radius:12px;border:1px solid var(--border);background:#0d1518;overflow:hidden}
+.dark-tiles{filter:invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);}
+.leaflet-container{background:#0d1518}
 .feed-item{background:rgba(7,12,14,.6);border:1px solid var(--border);border-radius:10px;padding:12px;
   margin-bottom:8px;cursor:pointer}
 .feed-item:hover{border-color:var(--mint2)}
@@ -101,6 +112,20 @@ textarea.input{resize:none;line-height:1.4}
 .stat-big{font-size:2.2rem;font-weight:900;color:var(--mint2)}
 .bar{height:6px;background:rgba(255,255,255,.08);border-radius:10px;overflow:hidden;margin-top:4px}
 .bar>span{display:block;height:100%;background:var(--mint2)}
+
+/* ===== ANALYTICS SCOPE TOGGLE (My Impact / Ward 4 Local / National Network) ===== */
+.scope-toggle{position:relative;display:grid;grid-template-columns:repeat(3,1fr);background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:4px;margin-bottom:14px}
+.scope-thumb{position:absolute;top:4px;bottom:4px;left:4px;background:var(--mint);border-radius:10px;z-index:1;
+  box-shadow:0 0 14px rgba(0,255,136,.5);transition:transform .32s cubic-bezier(.4,0,.2,1),width .32s cubic-bezier(.4,0,.2,1)}
+.scope-btn{position:relative;z-index:2;background:none;border:none;color:rgba(255,255,255,.6);font-size:.66rem;
+  font-weight:800;letter-spacing:.01em;padding:11px 2px;border-radius:10px;cursor:pointer;text-align:center;
+  white-space:nowrap;transition:color .3s ease}
+.scope-btn.active{color:#051311}
+
+.scope-view-wrap{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows .35s cubic-bezier(.4,0,.2,1),opacity .25s ease}
+.scope-view-wrap.active{grid-template-rows:1fr;opacity:1;transition:grid-template-rows .35s cubic-bezier(.4,0,.2,1),opacity .3s ease .05s}
+.scope-view-inner{overflow:hidden;min-height:0;display:flex;flex-direction:column;gap:10px}
 
 .receipt-item{background:rgba(7,12,14,.6);border:1px solid var(--border);border-radius:10px;padding:11px 12px;
   margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:10px}
@@ -160,102 +185,6 @@ textarea.input{resize:none;line-height:1.4}
 .icon-btn{background:none;border:none;color:#fff;cursor:pointer;display:flex;padding:4px}
 .toast{display:none;background:rgba(0,255,136,.2);border:1px solid var(--mint2);color:var(--mint2);
   padding:10px 14px;border-radius:10px;font-size:.76rem;font-weight:700;text-align:center;margin-bottom:10px}
-
-/* ===== HEADER: JURISDICTION SELECTOR + CIVIC TOOLS + CONTACT ===== */
-.header-actions{display:flex;align-items:center;gap:6px}
-.icon-link{background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:6px;
-  display:flex;cursor:pointer;text-decoration:none}
-.icon-link:hover{border-color:var(--mint2);color:var(--mint2)}
-.header-jurisdiction{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-top:10px}
-.header-jurisdiction select{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--text);
-  border-radius:8px;padding:7px 3px;font-size:.62rem;font-weight:700;text-align:center;appearance:none}
-.header-jurisdiction select:focus{outline:2px solid var(--mint2)}
-
-/* ===== CIVIC TOOLS DRAWER ===== */
-.civic-drawer-body{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px;margin-top:14px}
-.civic-tools-link{display:flex;justify-content:space-between;align-items:center;background:rgba(7,12,14,.6);
-  border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);text-decoration:none;
-  font-size:.78rem;font-weight:700}
-.civic-tools-link:hover{border-color:var(--mint2);color:var(--mint2)}
-
-/* ===== HOTKEYS (Local Reports category picker) ===== */
-.hotkey-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
-.hotkey{background:rgba(7,12,14,.6);border:1px solid var(--border);color:var(--text);padding:12px 6px;
-  border-radius:12px;font-size:.68rem;font-weight:700;cursor:pointer;display:flex;flex-direction:column;
-  align-items:center;gap:6px;transition:border-color .15s,background .15s}
-.hotkey.active{border-color:var(--mint2);background:rgba(0,255,136,.12);color:var(--mint2)}
-.hotkey svg{width:18px;height:18px}
-
-/* ===== FOG-OF-WAR GRID (renamed coverage grid) ===== */
-.radius-tag{display:inline-flex;align-items:center;gap:5px;font-size:.6rem;font-weight:800;letter-spacing:.4px;
-  text-transform:uppercase;color:var(--mint2);background:rgba(0,255,136,.08);border:1px solid var(--border);
-  border-radius:20px;padding:4px 10px;margin-bottom:10px}
-
-/* ===== OPEN311 MACHINE PAYLOAD ===== */
-.payload-toggle{background:none;border:1px dashed var(--border);color:var(--muted);border-radius:8px;
-  padding:8px 10px;font-size:.66rem;font-weight:700;cursor:pointer;width:100%;text-align:left;
-  display:flex;justify-content:space-between;align-items:center;margin-top:8px}
-.payload-toggle:hover{border-color:var(--mint2);color:var(--mint2)}
-.payload-pre{display:none;background:#050a0b;border:1px solid var(--border);border-radius:8px;padding:10px;
-  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.62rem;color:var(--mint2);
-  overflow-x:auto;white-space:pre;margin-top:6px}
-.payload-pre.show{display:block}
-
-/* ===== SUBMITTED-REPORT PROGRESS TRACKER ===== */
-.report-card{background:rgba(7,12,14,.6);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px}
-.tracker{display:flex;align-items:center;margin-top:10px}
-.tracker-step{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;position:relative}
-.tracker-step .dot{width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,.1);
-  border:2px solid rgba(255,255,255,.18);z-index:2;transition:background .3s,border-color .3s}
-.tracker-step.done .dot{background:var(--mint2);border-color:var(--mint2);box-shadow:0 0 8px rgba(0,255,136,.6)}
-.tracker-step .tl{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;font-weight:700;text-align:center}
-.tracker-step.done .tl{color:var(--mint2)}
-.tracker-step:not(:last-child)::after{content:'';position:absolute;top:7px;left:50%;width:100%;height:2px;
-  background:rgba(255,255,255,.12);z-index:1}
-.tracker-step.done:not(:last-child)::after{background:var(--mint2)}
-
-/* ===== PUBLIC LEDGER: ROI TILES, EXPORTS, GRAPH ===== */
-.roi-hero{max-width:100%;text-align:center}
-.roi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-.export-row{display:flex;gap:8px;margin-top:4px}
-.btn-export{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text);
-  padding:11px 8px;border-radius:10px;font-weight:800;font-size:.7rem;cursor:pointer;display:flex;
-  align-items:center;justify-content:center;gap:6px}
-.btn-export:hover{border-color:var(--mint2);color:var(--mint2)}
-.ledger-graph-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:.72rem}
-.ledger-graph-row .lg-label{flex:0 0 74px;color:var(--muted)}
-.ledger-graph-row .lg-bar-track{flex:1;height:10px;border-radius:6px;background:rgba(255,255,255,.06);overflow:hidden}
-.ledger-graph-row .lg-bar-fill{height:100%;background:var(--mint2);border-radius:6px}
-.ledger-graph-row .lg-count{flex:0 0 22px;text-align:right;font-weight:800;color:var(--text)}
-
-/* ===== CITIZEN 101: 4-TIER LEGAL STACK ===== */
-.c101-layer{border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px}
-.c101-layer-head{background:rgba(255,255,255,.03);padding:9px 12px;font-size:.62rem;font-weight:800;
-  text-transform:uppercase;letter-spacing:.5px;color:var(--muted);display:flex;justify-content:space-between}
-.c101-doc-item{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;background:none;
-  border:none;border-top:1px solid var(--border);color:var(--text);padding:11px 12px;font-size:.76rem;
-  font-weight:600;text-align:left;cursor:pointer}
-.c101-doc-item:hover{background:rgba(0,255,136,.08);color:var(--mint2)}
-.c101-doc-item .chev{color:var(--muted);flex-shrink:0}
-.c101-doc-detail{display:none;flex-direction:column;gap:10px}
-.c101-doc-detail.open{display:flex}
-.c101-back-btn{align-self:flex-start;background:none;border:none;color:var(--muted);font-size:.74rem;
-  font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px}
-.c101-back-btn:hover{color:var(--mint2)}
-.c101-media-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:rgba(255,255,255,.04);
-  border-radius:10px;padding:3px}
-.c101-media-tab{background:none;border:none;color:var(--muted);font-size:.6rem;font-weight:800;padding:8px 2px;
-  border-radius:8px;cursor:pointer;text-align:center}
-.c101-media-tab.active{background:var(--mint);color:#051311}
-.c101-media-pane{display:none;font-size:.78rem;line-height:1.6;color:var(--text)}
-.c101-media-pane.active{display:block}
-.c101-media-pane p{white-space:pre-line;color:var(--muted);font-size:.76rem;line-height:1.6}
-.c101-media-pane ul{padding-left:18px}
-.c101-media-pane li{margin-bottom:8px;color:var(--text);font-size:.76rem}
-.c101-source-tag{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
-.c101-placeholder-media{border:1.5px dashed var(--border);border-radius:12px;padding:22px 12px;text-align:center;
-  color:var(--muted);font-size:.74rem}
-.c101-placeholder-media svg{margin-bottom:8px}
 </style>
 </head>
 <body>
@@ -267,40 +196,9 @@ textarea.input{resize:none;line-height:1.4}
         <svg viewBox="0 0 24 24" width="21" height="21" stroke="var(--brand-mint)" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         <span class="brand-wordmark"><span class="brand-white">CITIXEN</span> <span class="brand-lime">UX</span><sup class="brand-tm">™</sup></span>
       </div>
-      <div class="header-actions">
-        <div class="badge"><span class="badge-dot"></span> <span id="headerWardLabel">WARD 4 ACTIVE</span></div>
-        <button class="icon-link" id="civicToolsBtn" aria-label="Civic Tools" title="Civic Tools">
-          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
-        </button>
-        <a class="icon-link" href="mailto:contact@citixenux.com" aria-label="Email CITIXEN" title="contact@citixenux.com">
-          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="m22 6-10 7L2 6"/></svg>
-        </a>
-      </div>
-    </div>
-    <div class="header-jurisdiction">
-      <select id="locState" aria-label="State"></select>
-      <select id="locCity" aria-label="City"></select>
-      <select id="locWard" aria-label="Ward"></select>
+      <div class="badge"><span class="badge-dot"></span> <span id="headerWardLabel">WARD 4 ACTIVE</span></div>
     </div>
   </header>
-
-  <!-- ===== CIVIC TOOLS DRAWER ===== -->
-  <div id="civicDrawer" class="drawer">
-    <div class="row"><strong style="color:var(--mint2)">Civic Tools</strong>
-      <button class="icon-btn" id="btnCloseCivic">
-        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
-      </button>
-    </div>
-    <div class="small" style="margin-top:4px" id="civicDrawerWard">La Crosse, WI — Ward 4</div>
-    <div class="civic-drawer-body">
-      <button class="civic-tools-link" id="civicOpenCitizen101">Quick rights lookup — Citizen 101 <span>›</span></button>
-      <div class="card">
-        <div class="label" style="margin-bottom:8px">Representative directory</div>
-        <div id="civicAldermanLine" class="small">Ald. Rebecca Voss represents Ward 4.</div>
-      </div>
-      <a class="civic-tools-link" href="mailto:contact@citixenux.com">Email CITIXEN UX — contact@citixenux.com <span>›</span></a>
-    </div>
-  </div>
 
   <main class="main">
     <div id="toast" class="toast"></div>
@@ -321,123 +219,35 @@ textarea.input{resize:none;line-height:1.4}
       No account required. No personal data retained. Photos are stripped of device ID and GPS EXIF tags before submission.
     </div>
 
-    <!-- ===================================================================
-         TAB 1 — CITIZEN 101 (Know Your Paperwork)
-         =================================================================== -->
-    <section id="tab-citizen101" class="tabpane active">
+    <section id="tab-report" class="tabpane active">
       <div class="card">
-        <div class="label" style="margin-bottom:2px">4-tier legal stack</div>
-        <div class="small" id="c101JurisdictionLine">La Crosse, WI — Ward 4</div>
-      </div>
-
-      <div id="c101StackView">
-        <div class="small" style="text-align:center;padding:20px 0">Loading jurisdictional stack…</div>
-      </div>
-
-      <div class="c101-doc-detail" id="c101DocDetail">
-        <button class="c101-back-btn" id="c101BackBtn">← Back to jurisdictional stack</button>
-        <div class="card">
-          <div class="c101-source-tag" id="c101DocKind">Federal</div>
-          <h3 style="font-size:.92rem" id="c101DocTitle">Document title</h3>
-          <div class="c101-media-tabs" style="margin-top:10px">
-            <button class="c101-media-tab active" data-pane="fulltext">Full Text</button>
-            <button class="c101-media-tab" data-pane="cliffnotes">Cliff Notes</button>
-            <button class="c101-media-tab" data-pane="video">5-Min Video</button>
-            <button class="c101-media-tab" data-pane="audio">5-Min Audio</button>
-          </div>
-          <div class="c101-media-pane active" data-pane="fulltext" style="margin-top:10px"><p id="c101FullText"></p></div>
-          <div class="c101-media-pane" data-pane="cliffnotes" style="margin-top:10px"><ul id="c101CliffNotes"></ul></div>
-          <div class="c101-media-pane" data-pane="video" style="margin-top:10px">
-            <div class="c101-placeholder-media" id="c101VideoPane">
-              <svg viewBox="0 0 24 24" width="26" height="26" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-              <div>5-minute video breakdown — production placeholder, not yet recorded for this document.</div>
-            </div>
-          </div>
-          <div class="c101-media-pane" data-pane="audio" style="margin-top:10px">
-            <div class="c101-placeholder-media" id="c101AudioPane">
-              <svg viewBox="0 0 24 24" width="26" height="26" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-              <div>5-minute audio breakdown — production placeholder, not yet recorded for this document.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===================================================================
-         TAB 2 — LOCAL REPORTS (Fog-of-War Grid & Municipal Dispatch)
-         =================================================================== -->
-    <section id="tab-local" class="tabpane">
-      <div class="card">
-        <div class="label" style="margin-bottom:2px">Local reports</div>
-        <div class="small" id="localJurisdictionLine">La Crosse, WI — Ward 4 · Local</div>
-      </div>
-
-      <div class="card">
-        <div class="radius-tag">
-          <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-          1–5 MILE FOG-OF-WAR GRID
-        </div>
-        <div class="coverage-head">
-          <div>
-            <div class="label" style="margin-bottom:2px">Citywide asset coverage</div>
-            <div class="coverage-ticker" id="covTicker">0.0%</div>
-          </div>
-          <div style="text-align:right">
-            <div class="coverage-sub" id="covSub">Ward 4 blocks surveyed</div>
-            <div style="font-size:.8rem;font-weight:800" id="covFraction">0 / 0</div>
-          </div>
-        </div>
-        <div class="cov-legend">
-          <span><span class="dot" style="background:var(--mint2)"></span>Verified</span>
-          <span><span class="dot" style="background:rgba(255,255,255,.15)"></span>Uncharted (fog)</span>
-        </div>
-        <div class="cov-grid" id="covGrid"></div>
-        <div class="cov-toast" id="covToast">
-          <span id="covToastText"></span>
-          <button class="ct-cta" id="covToastCta">Report it</button>
-        </div>
-        <div class="your-impact">
-          <div class="num" id="covYouCount">0</div>
-          <div class="lbl">blocks you've helped verify — tap any dark block to report it and light it up for everyone.</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="label">1. What's the issue?</div>
-        <div class="hotkey-grid" id="hotkeyGrid">
-          <button class="hotkey active" data-cat="Parking">
-            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></svg>
-            Parking
-          </button>
-          <button class="hotkey" data-cat="Noise">
-            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>
-            Noise
-          </button>
-          <button class="hotkey" data-cat="Vandalism">
-            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            Vandalism
-          </button>
-          <button class="hotkey" data-cat="Potholes">
+        <div class="label">1. Category</div>
+        <div class="chip-grid">
+          <button class="chip active" data-cat="Pothole / Road">
             <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            Potholes
+            Pothole / Road
           </button>
-          <button class="hotkey" data-cat="Trash">
+          <button class="chip" data-cat="Power / Lighting">
+            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Power / Lighting
+          </button>
+          <button class="chip" data-cat="Waste / Litter">
             <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-            Trash
+            Waste / Litter
           </button>
-          <button class="hotkey" data-cat="Transit">
-            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="12" rx="2"/><path d="M4 12h16"/><circle cx="8" cy="20" r="1.4" fill="currentColor" stroke="none"/><circle cx="16" cy="20" r="1.4" fill="currentColor" stroke="none"/></svg>
-            Transit
+          <button class="chip" data-cat="Sidewalk / ADA">
+            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.5" r="1.6" fill="currentColor" stroke="none"/><path d="M9 8l3 1.2 3-1.2M12 9.2v4M9 21l3-7.8 3 7.8M8.5 13h4.5"/></svg>
+            Sidewalk / ADA
           </button>
         </div>
         <div class="chip-other-row">
-          <button class="hotkey chip-other" data-cat="Other" style="min-width:150px">
+          <button class="chip chip-other" data-cat="Other">
             <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg>
             Other
           </button>
         </div>
 
-        <div class="label" style="margin-top:14px">2. Capture proof</div>
+        <div class="label">2. Capture proof</div>
         <button class="btn-camera" id="btnCamera">
           <svg viewBox="0 0 24 24" width="17" height="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
           Launch camera
@@ -458,147 +268,185 @@ textarea.input{resize:none;line-height:1.4}
           <svg viewBox="0 0 24 24" width="17" height="17" stroke="#051311" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           Publish report
         </button>
-        <button class="payload-toggle" id="payloadToggleBtn">
-          <span>View machine-readable payload (Open311)</span><span id="payloadToggleChev">▾</span>
-        </button>
-        <pre class="payload-pre" id="payloadPre"></pre>
-      </div>
-
-      <div class="card" id="reportsTrackerCard" style="display:none">
-        <div class="label">Your submitted reports</div>
-        <div id="reportsTrackerList"></div>
-      </div>
-
-      <div class="card">
-        <div class="label">Local resolution feed</div>
-        <div id="localFeed"></div>
       </div>
     </section>
 
-    <!-- ===================================================================
-         TAB 3 — PUBLIC LEDGER ($1/Resident Whole-System ROI + Exports)
-         =================================================================== -->
-    <section id="tab-ledger" class="tabpane">
-      <div class="card roi-hero">
-        <div class="label" style="justify-content:center">Municipal contract value</div>
-        <div class="stat-big">$1.00 <span style="font-size:.85rem;color:var(--muted);font-weight:800">/ resident / year</span></div>
-        <div class="small" style="margin-top:4px">Flat-rate — no per-ticket fee, no seat licenses, no dispatch surcharge</div>
-        <div class="roi-grid">
-          <div class="nat-tile" style="border-top:none">
-            <div class="stat-big" id="roiPopulation" style="font-size:1.35rem">0</div>
-            <div class="small">Population covered</div>
-          </div>
-          <div class="nat-tile" style="border-top:none">
-            <div class="stat-big" id="roiStaffHours" style="font-size:1.35rem">0</div>
-            <div class="small">Staff hours saved</div>
-          </div>
-          <div class="nat-tile" style="border-top:none">
-            <div class="stat-big" id="roiGridCoverage" style="font-size:1.35rem">0%</div>
-            <div class="small">Grid coverage</div>
-          </div>
-          <div class="nat-tile" style="border-top:none">
-            <div class="stat-big" id="roiSlaVelocity" style="font-size:1.35rem">0%</div>
-            <div class="small">SLA response velocity</div>
-          </div>
-        </div>
-      </div>
-
+    <section id="tab-map" class="tabpane">
       <div class="card">
-        <div class="label">Ward ledger breakdown</div>
-        <div id="ledgerGraph"></div>
-        <div class="export-row">
-          <button class="btn-export" id="exportWardCsvBtn">⬇ Ward Ledger CSV</button>
-          <button class="btn-export" id="exportMyCsvBtn">⬇ My Receipts CSV</button>
-        </div>
+        <div class="label"><span>Civic dispatch map</span><span id="mCount" style="color:var(--mint2)">3 active</span></div>
+        <div id="map"></div>
       </div>
-
       <div class="card">
-        <div class="label">Your civic impact</div>
-        <div class="impact-split">
-          <div>
-            <div class="stat-big" style="font-size:1.7rem" id="myBlocksCount">0</div>
-            <div class="small">Blocks claimed</div>
-          </div>
-          <div>
-            <div class="stat-big" style="font-size:1.7rem;color:#fff" id="myDollarValue">0 hrs</div>
-            <div class="small">Est. staff hours saved</div>
-          </div>
-        </div>
+        <div class="label">Live dispatch feed</div>
+        <div id="feed"></div>
+      </div>
+    </section>
+
+    <section id="tab-analytics" class="tabpane">
+
+      <div class="scope-toggle" id="scopeToggle" role="tablist" aria-label="Analytics scope">
+        <div class="scope-thumb" id="scopeThumb"></div>
+        <button class="scope-btn active" data-scope="ward" role="tab" aria-selected="true">Ward 4 Local</button>
+        <button class="scope-btn" data-scope="mine" role="tab" aria-selected="false">My Impact</button>
+        <button class="scope-btn" data-scope="national" role="tab" aria-selected="false">National Network</button>
       </div>
 
-      <div class="card zero-pii-note">
-        <div class="row">
-          <svg viewBox="0 0 24 24" width="18" height="18" stroke="var(--mint2)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-          <div>
-            <div style="font-weight:800;font-size:.8rem;margin-bottom:4px;">100% device-local tracking — Zero-PII</div>
-            <div class="small">
-              These numbers are computed entirely on this device, from an anonymous local ledger keyed to this browser's device token (<code id="deviceTokenDisplay">…</code>) — never from an account or server-side profile. CITIXEN's servers store only anonymous, public block facts; they never learn who reported what.
+      <!-- WARD 4 LOCAL -->
+      <div class="scope-view-wrap active" data-scope-view="ward">
+        <div class="scope-view-inner">
+          <div class="card">
+            <div class="label" style="margin-bottom:8px">Municipality & district</div>
+            <div class="ward-select-row">
+              <select id="locState" aria-label="State"></select>
+              <select id="locCity" aria-label="City"></select>
+              <select id="locWard" aria-label="Ward"></select>
+            </div>
+            <div class="ward-meta-line" id="wardAldermanLine">Ald. Rebecca Voss · La Crosse, Wisconsin</div>
+          </div>
+
+          <div class="card">
+            <div class="label" id="wardHealthLabel">Ward 4 civic health index</div>
+            <div style="text-align:center;padding:12px 0;">
+              <div class="stat-big" id="healthIndexVal">88 <span style="font-size:1rem;color:var(--muted)">/ 100</span></div>
+              <div class="small" id="healthSlaVal">Dispatch response SLA: 91% on-time</div>
+            </div>
+            <div style="margin-top:8px;">
+              <div class="row"><span>Road infrastructure</span><span style="color:var(--mint2)" id="healthRoadPct">82%</span></div>
+              <div class="bar"><span style="width:82%" id="healthRoadBar"></span></div>
+            </div>
+            <div style="margin-top:10px;">
+              <div class="row"><span>Lighting & safety</span><span style="color:var(--warn)" id="healthLightPct">64%</span></div>
+              <div class="bar"><span style="width:64%;background:var(--warn)" id="healthLightBar"></span></div>
             </div>
           </div>
+
+          <div class="card">
+            <div class="coverage-head">
+              <div>
+                <div class="label" style="margin-bottom:2px">Citywide asset coverage</div>
+                <div class="coverage-ticker" id="covTicker">0.0%</div>
+              </div>
+              <div style="text-align:right">
+                <div class="coverage-sub" id="covSub">Ward 4 blocks surveyed</div>
+                <div style="font-size:.8rem;font-weight:800" id="covFraction">0 / 0</div>
+              </div>
+            </div>
+            <div class="cov-legend">
+              <span><span class="dot" style="background:var(--mint2)"></span>Verified</span>
+              <span><span class="dot" style="background:rgba(255,255,255,.15)"></span>Not yet surveyed</span>
+            </div>
+            <div class="cov-grid" id="covGrid"></div>
+            <div class="cov-toast" id="covToast">
+              <span id="covToastText"></span>
+              <button class="ct-cta" id="covToastCta">Report it</button>
+            </div>
+            <div class="your-impact">
+              <div class="num" id="covYouCount">0</div>
+              <div class="lbl">blocks you've helped verify — tap any dark block to report it and light it up for everyone.</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="label">Local resolution feed</div>
+            <div id="localFeed"></div>
+          </div>
         </div>
       </div>
 
-      <div class="card">
-        <div class="label">Your receipts</div>
-        <div id="myReceipts"></div>
-        <p class="small" id="myReceiptsEmpty" style="display:none;text-align:center;padding:10px 0">
-          No reports yet — switch to Local Reports and tap a dark block to file your first one.
-        </p>
+      <!-- MY IMPACT -->
+      <div class="scope-view-wrap" data-scope-view="mine">
+        <div class="scope-view-inner">
+          <div class="card">
+            <div class="label">Your civic impact</div>
+            <div class="impact-split">
+              <div>
+                <div class="stat-big" style="font-size:1.7rem" id="myBlocksCount">0</div>
+                <div class="small">Blocks claimed</div>
+              </div>
+              <div>
+                <div class="stat-big" style="font-size:1.7rem;color:#fff" id="myDollarValue">$0</div>
+                <div class="small">Civic repairs triggered</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card zero-pii-note">
+            <div class="row">
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="var(--mint2)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+              <div>
+                <div style="font-weight:800;font-size:.8rem;margin-bottom:4px;">100% device-local tracking — Zero-PII</div>
+                <div class="small">
+                  These numbers are computed entirely on this device, from an anonymous local ledger keyed to this browser's device token (<code id="deviceTokenDisplay">…</code>) — never from an account or server-side profile. CITIXEN's servers store only anonymous, public block facts; they never learn who reported what.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="label">Your receipts</div>
+            <div id="myReceipts"></div>
+            <p class="small" id="myReceiptsEmpty" style="display:none;text-align:center;padding:10px 0">
+              No reports yet — switch to Ward 4 Local and tap a dark block to file your first one.
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div class="card">
-        <div class="label" style="justify-content:center">National network — live</div>
-        <div class="nat-tile">
-          <div class="stat-big" id="natActiveMunis">0</div>
-          <div class="small">Active municipalities</div>
-        </div>
-        <div class="nat-tile">
-          <div class="stat-big" id="natDistricts">0</div>
-          <div class="small">Districts mapped</div>
-        </div>
-        <div class="nat-tile">
-          <div class="stat-big" id="natTiles">0</div>
-          <div class="small">National grid tiles digitized</div>
-        </div>
-        <div class="nat-tile">
-          <div class="stat-big" style="color:#fff" id="natCapex">0 hrs</div>
-          <div class="small">Est. staff hours saved nationwide</div>
+      <!-- NATIONAL NETWORK -->
+      <div class="scope-view-wrap" data-scope-view="national">
+        <div class="scope-view-inner">
+          <div class="card">
+            <div class="label" style="justify-content:center">National network — live</div>
+            <div class="nat-tile">
+              <div class="stat-big" id="natActiveMunis">0</div>
+              <div class="small">Active municipalities</div>
+            </div>
+            <div class="nat-tile">
+              <div class="stat-big" id="natDistricts">0</div>
+              <div class="small">Districts mapped</div>
+            </div>
+            <div class="nat-tile">
+              <div class="stat-big" id="natTiles">0</div>
+              <div class="small">National grid tiles digitized</div>
+            </div>
+            <div class="nat-tile">
+              <div class="stat-big" style="color:#fff" id="natCapex">$0</div>
+              <div class="small">Total CapEx scoped nationwide</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="label">National coverage directory</div>
+            <div class="muni-grid" id="natMuniGrid"></div>
+          </div>
+
+          <div class="card" style="text-align:center;">
+            <div class="label" style="justify-content:center;">City-Wide Analytics</div>
+            <p style="font-size:.78rem;color:var(--muted);margin-bottom:12px;">
+              Access real-time GIS mapping, ward heatmaps, and municipal SLAs on the desktop portal.
+            </p>
+            <a href="https://citixenux.com" target="_blank" rel="noopener noreferrer" class="btn-submit" style="text-decoration:none;">
+              Open Web Dashboard ↗
+            </a>
+          </div>
         </div>
       </div>
 
-      <div class="card">
-        <div class="label">National coverage directory</div>
-        <div class="muni-grid" id="natMuniGrid"></div>
-      </div>
-
-      <div class="card" style="text-align:center;">
-        <div class="label" style="justify-content:center;">City-Wide Analytics</div>
-        <p style="font-size:.78rem;color:var(--muted);margin-bottom:12px;">
-          Access real-time GIS mapping, ward heatmaps, and municipal SLAs on the desktop portal.
-        </p>
-        <a href="https://citixenux.com" target="_blank" rel="noopener noreferrer" class="btn-submit" style="text-decoration:none;">
-          Open Web Dashboard ↗
-        </a>
-      </div>
     </section>
   </main>
 
-  <footer style="text-align:center;padding:6px 0 2px;font-size:.66rem;color:var(--muted)">
-    Questions? <a href="mailto:contact@citixenux.com" style="color:var(--mint2)">contact@citixenux.com</a>
-  </footer>
-
   <nav class="bottomnav">
-    <button class="navtab active" data-target="tab-citizen101">
-      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
-      <span>Citizen 101</span>
+    <button class="navtab active" data-target="tab-report">
+      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      <span>Report</span>
     </button>
-    <button class="navtab" data-target="tab-local">
+    <button class="navtab" data-target="tab-map">
       <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
-      <span>Local Reports</span>
+      <span>Map & feed</span>
     </button>
-    <button class="navtab" data-target="tab-ledger">
+    <button class="navtab" data-target="tab-analytics">
       <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="20" x2="5" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="19" y1="20" x2="19" y2="15"/></svg>
-      <span>Public Ledger</span>
+      <span>Analytics</span>
     </button>
   </nav>
 
@@ -624,10 +472,13 @@ textarea.input{resize:none;line-height:1.4}
 
 <script>
 'use strict';
+let map, mapInit=false, markers={}, cat='Pothole / Road';
 
-/* =====================================================================
-   SMALL SHARED HELPERS
-   ===================================================================== */
+const cases=[
+  {id:'c1',title:'Deep Pothole - Right Lane',loc:'Main St & 4th Ave',lat:43.8138,lng:-91.2519,status:'Critical',time:'12m ago',desc:'Severe pavement gap.'},
+  {id:'c2',title:'Streetlight Outage',loc:'Grand Ave & 7th St',lat:43.8180,lng:-91.2480,status:'Warning',time:'45m ago',desc:'Dark corner, visibility issue.'},
+  {id:'c3',title:'Overfilled Trash Bin',loc:'Pine St Alley',lat:43.8100,lng:-91.2550,status:'Resolved',time:'2h ago',desc:'Debris blocking access.'}
+];
 
 // Escape any user-supplied text before it is ever placed into innerHTML, to prevent stored-XSS
 // from a hazard description or location field containing HTML/script content.
@@ -635,60 +486,152 @@ function esc(s){
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-// Defensive DOM helpers — every write to the DOM in this file goes through
-// one of these instead of touching .innerHTML/.textContent directly, so a
-// renamed or removed element id can never throw "Cannot set properties of
-// null" and take down the rest of a DOMContentLoaded/init chain with it.
-function $(id){ return document.getElementById(id); }
-function setHTML(id, html){ const el = $(id); if (el) el.innerHTML = html; return el; }
-function setText(id, text){ const el = $(id); if (el) el.textContent = text; return el; }
-function on(id, evt, fn){ const el = $(id); if (el) el.addEventListener(evt, fn); return el; }
-
 // Local-only, non-PII classification of free text into a routing department.
 // Runs entirely client-side; nothing is sent anywhere for this step.
-function parseDepartment(text, category){
-  const t = (text || '').toLowerCase();
-  if (category === 'Parking') return 'Traffic / Parking Enforcement';
-  if (category === 'Noise') return 'Code Enforcement';
-  if (category === 'Vandalism') return 'Code Enforcement';
-  if (category === 'Trash') return 'Sanitation';
-  if (category === 'Transit') return 'Transit Authority';
+function parseDepartment(text){
+  const t = text.toLowerCase();
   if (t.includes('sidewalk') || t.includes('ada') || t.includes('ramp')) return 'Public Works / ADA';
   if (t.includes('wire') || t.includes('dark') || t.includes('power') || t.includes('light')) return 'Utilities & Electrical';
+  if (t.includes('trash') || t.includes('dump') || t.includes('litter') || t.includes('waste')) return 'Sanitation';
   return 'Public Works';
 }
 
-// Service codes follow the Open311/GeoReport v2 convention of short,
-// stable machine identifiers distinct from the human-readable category label.
-const SERVICE_CODES = {
-  Parking: 'PARK-01', Noise: 'NOISE-01', Vandalism: 'VAND-01',
-  Potholes: 'ROAD-01', Trash: 'SANIT-01', Transit: 'TRAN-01', Other: 'MISC-01'
-};
-
 function toast(msg){
-  const t = $('toast');
-  if (!t) return;
-  t.textContent = msg; t.style.display = 'block';
-  setTimeout(() => { t.style.display = 'none'; }, 3200);
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.display='block';
+  setTimeout(()=>{ t.style.display='none'; },3200);
+}
+
+function switchTab(id,btn){
+  document.querySelectorAll('.tabpane').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.navtab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(id==='tab-map'){
+    if(!mapInit) initMap();
+    // Force Leaflet to recalculate container dimensions once unhidden
+    setTimeout(()=>{ if(map) map.invalidateSize(); },200);
+  }
+  if(id==='tab-analytics'){
+    initAnalytics();
+    positionScopeThumb();
+  }
 }
 
 /* =====================================================================
-   TAB SWITCHING — Citizen 101 / Local Reports / Public Ledger
+   ANALYTICS SCOPE TOGGLE — My Impact / Ward 4 Local / National Network
    ===================================================================== */
-function switchTab(id, btn){
-  document.querySelectorAll('.tabpane').forEach(t => t.classList.remove('active'));
-  const pane = $(id);
-  if (pane) pane.classList.add('active');
-  document.querySelectorAll('.navtab').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
+function positionScopeThumb(){
+  const activeBtn = document.querySelector('.scope-btn.active');
+  const thumb = document.getElementById('scopeThumb');
+  if (!activeBtn || !thumb) return;
+  thumb.style.width = activeBtn.offsetWidth + 'px';
+  thumb.style.transform = 'translateX(' + activeBtn.offsetLeft + 'px)';
+}
 
-  if (id === 'tab-local') {
-    animateCoverage();
-  }
-  if (id === 'tab-ledger') {
-    renderLedgerTab();
-    loadNationalTab();
-  }
+function switchScope(scope, btn){
+  document.querySelectorAll('.scope-btn').forEach(b => {
+    b.classList.remove('active');
+    b.setAttribute('aria-selected', 'false');
+  });
+  btn.classList.add('active');
+  btn.setAttribute('aria-selected', 'true');
+  positionScopeThumb();
+
+  document.querySelectorAll('.scope-view-wrap').forEach(v => {
+    v.classList.toggle('active', v.dataset.scopeView === scope);
+  });
+
+  if (scope === 'national') loadNationalTab();
+  if (scope === 'mine') renderDeviceToken();
+}
+
+let analyticsInitialized = false;
+
+async function initAnalytics(){
+  if (analyticsInitialized) return;
+  analyticsInitialized = true;
+  coverageDirectory = await fetchDirectory();
+  populateLocationSelectors();       // builds State/City/Ward <select>s, defaults to La Crosse WI Ward 4
+  updateWardLabels();                // syncs every "Ward 4"-style label to the selected ward
+  wireLocationSelectors();
+  renderDeviceToken();
+  await refreshWardSummary();
+  await animateCoverage();           // fetches covCells + builds/animates the grid
+  renderMyImpact();
+  renderLocalFeed();
+}
+
+const CATEGORY_VALUES = { Pothole: 1200, Streetlight: 850, Signage: 420, Sidewalk: 2100, Drainage: 3400 };
+
+function renderMyImpact(){
+  // Sourced entirely from this device's local ledger — never from the
+  // shared covCells data, which carries no submitter identity at all.
+  const mine = getMyReports();
+  const totalValue = mine.reduce((sum, r) => sum + (CATEGORY_VALUES[r.category] || 0), 0);
+
+  document.getElementById('myBlocksCount').textContent = mine.length;
+  document.getElementById('myDollarValue').textContent = '$' + totalValue.toLocaleString('en-US');
+
+  const listEl = document.getElementById('myReceipts');
+  const emptyEl = document.getElementById('myReceiptsEmpty');
+  listEl.innerHTML = '';
+  if (!mine.length) { emptyEl.style.display = 'block'; return; }
+  emptyEl.style.display = 'none';
+
+  mine.slice().reverse().forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'receipt-item';
+
+    const left = document.createElement('div');
+    const catLine = document.createElement('div');
+    catLine.className = 'ri-cat';
+    catLine.textContent = r.category;
+    const metaLine = document.createElement('div');
+    metaLine.className = 'ri-meta';
+    metaLine.textContent = (r.wardName || 'Ward') + ' · Block #' + r.cellId + ' · ' + r.verifiedDate;
+    left.appendChild(catLine);
+    left.appendChild(metaLine);
+
+    const amtEl = document.createElement('div');
+    amtEl.className = 'ri-amt';
+    amtEl.textContent = '$' + (CATEGORY_VALUES[r.category] || 0).toLocaleString('en-US');
+
+    div.appendChild(left);
+    div.appendChild(amtEl);
+    listEl.appendChild(div);
+  });
+}
+
+function renderLocalFeed(){
+  // Public feed of shared/anonymous data — the "· by you" tag added below
+  // is computed by joining against this device's own local ledger, purely
+  // client-side. It never comes from (or goes to) the server.
+  const feedEl = document.getElementById('localFeed');
+  if (!feedEl) return;
+  const mine = getMyReportedCellIds();
+  const covered = covCells.filter(c => c.covered).slice(-8).reverse();
+  feedEl.innerHTML = '';
+  covered.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'feed-item';
+    const row = document.createElement('div');
+    row.className = 'row';
+    const catSpan = document.createElement('span');
+    catSpan.textContent = c.category;
+    const pill = document.createElement('span');
+    pill.className = 'pill pill-ok';
+    pill.textContent = 'Verified';
+    row.appendChild(catSpan);
+    row.appendChild(pill);
+    const meta = document.createElement('div');
+    meta.className = 'small';
+    meta.style.marginTop = '4px';
+    meta.textContent = (currentWardMeta ? currentWardMeta.wardName : 'Ward') + ' · Block #' + c.id + ' · ' + c.verifiedDate + (mine.has(c.id) ? ' · by you' : '');
+    div.appendChild(row);
+    div.appendChild(meta);
+    feedEl.appendChild(div);
+  });
 }
 
 /* =====================================================================
@@ -697,12 +640,8 @@ function switchTab(id, btn){
    State -> City -> Ward -> Grid Blocks. A ward is an official council
    district led by a named Alderman/Council Member. Nothing below hardcodes
    "Ward 4" — every ward-scoped label on the page is driven by whichever
-   ward is selected in the header's State/City/Ward picker, sourced live
-   from /api/coverage/directory (see api/_lib/store.js for the seeded
-   dataset). jurisdictions.js's getJurisdictionStack() is looked up with
-   the SAME state/city/ward/alderman values resolved here, so the
-   Aldermanic Directory doc in Citizen 101, the Civic Tools drawer's
-   representative line, and the header badge always agree with each other.
+   ward is selected in the State/City/Ward picker, sourced live from
+   /api/coverage/directory (see api/_lib/store.js for the seeded dataset).
    ===================================================================== */
 let coverageDirectory = null;   // { states: [{ slug, name, cities: [{ slug, name, wards: [...] }] }] }
 let currentWardMeta = null;     // { state, stateName, city, cityName, ward, wardName, alderman }
@@ -729,19 +668,15 @@ function fallbackDirectory(){
   ] };
 }
 
-// Ward-level health/ROI metadata isn't part of the grid — it's governance
-// metadata a real deployment would read from the municipality's own
-// reporting. Mirrors the seed data in api/_lib/store.js, used only when the
-// live /summary endpoint can't be reached. `population` and
-// `staffHoursBaseline` are illustrative, clearly-labeled estimates (see the
-// Public Ledger tab's ROI tiles) — this file has no live census or payroll
-// integration, consistent with the honesty convention used throughout the
-// rest of this codebase (see jurisdictions.js's header comment).
+// Ward-level health metadata (healthIndex/slaPct/roadPct/lightingPct) isn't
+// part of the grid — it's governance metadata a real deployment would read
+// from the municipality's own reporting. Mirrors the seed data in
+// api/_lib/store.js, used only when the live /summary endpoint can't be reached.
 const WARD_HEALTH_FALLBACK = {
-  'wi/la-crosse/ward-4': { healthIndex: 82, slaPct: 91, roadPct: 78, lightingPct: 88, population: 4200, staffHoursBaseline: 640 },
-  'wi/la-crosse/ward-7': { healthIndex: 74, slaPct: 85, roadPct: 70, lightingPct: 80, population: 3600, staffHoursBaseline: 520 },
-  'wi/milwaukee/ward-12': { healthIndex: 79, slaPct: 88, roadPct: 75, lightingPct: 84, population: 6100, staffHoursBaseline: 910 },
-  'il/chicago/ward-3': { healthIndex: 76, slaPct: 86, roadPct: 72, lightingPct: 81, population: 5400, staffHoursBaseline: 780 }
+  'wi/la-crosse/ward-4': { healthIndex: 82, slaPct: 91, roadPct: 78, lightingPct: 88 },
+  'wi/la-crosse/ward-7': { healthIndex: 74, slaPct: 85, roadPct: 70, lightingPct: 80 },
+  'wi/milwaukee/ward-12': { healthIndex: 79, slaPct: 88, roadPct: 75, lightingPct: 84 },
+  'il/chicago/ward-3': { healthIndex: 76, slaPct: 86, roadPct: 72, lightingPct: 81 }
 };
 
 async function fetchDirectory(){
@@ -778,8 +713,7 @@ function storeJurisdiction(j){
 }
 
 function populateLocationSelectors(){
-  const stateSel = $('locState');
-  if (!stateSel) return;
+  const stateSel = document.getElementById('locState');
   stateSel.innerHTML = '';
   coverageDirectory.states.forEach(s => {
     const opt = document.createElement('option');
@@ -797,8 +731,8 @@ function populateLocationSelectors(){
 }
 
 function populateCitySelector(){
-  const stateSel = $('locState'), citySel = $('locCity');
-  if (!stateSel || !citySel) return;
+  const stateSel = document.getElementById('locState');
+  const citySel = document.getElementById('locCity');
   const s = coverageDirectory.states.find(s => s.slug === stateSel.value);
   citySel.innerHTML = '';
   (s ? s.cities : []).forEach(c => {
@@ -816,8 +750,9 @@ function populateCitySelector(){
 }
 
 function populateWardSelector(){
-  const stateSel = $('locState'), citySel = $('locCity'), wardSel = $('locWard');
-  if (!stateSel || !citySel || !wardSel) return;
+  const stateSel = document.getElementById('locState');
+  const citySel = document.getElementById('locCity');
+  const wardSel = document.getElementById('locWard');
   const s = coverageDirectory.states.find(s => s.slug === stateSel.value);
   const c = s && s.cities.find(c => c.slug === citySel.value);
   wardSel.innerHTML = '';
@@ -835,21 +770,18 @@ function populateWardSelector(){
 }
 
 function wireLocationSelectors(){
-  on('locState', 'change', () => { populateCitySelector(); switchWard(); });
-  on('locCity', 'change', () => { populateWardSelector(); switchWard(); });
-  on('locWard', 'change', switchWard);
+  document.getElementById('locState').addEventListener('change', () => { populateCitySelector(); switchWard(); });
+  document.getElementById('locCity').addEventListener('change', () => { populateWardSelector(); switchWard(); });
+  document.getElementById('locWard').addEventListener('change', switchWard);
 }
 
-// Rewrites every ward-scoped label on the page to match whichever
+// Rewrites every "Ward 4"-style label on the page to match whichever
 // State/City/Ward is currently selected, and repoints COVERAGE_ENDPOINT —
-// this is what makes the rest of the widget location-agnostic. Also
-// re-resolves jurisdictions.js's 4-tier legal stack and the Civic Tools
-// drawer's representative line, so the alderman shown always matches
-// whichever ward is actually selected (rather than a value hardcoded once
-// at build time).
+// this is what makes the rest of the widget location-agnostic.
 function updateWardLabels(){
-  const stateSel = $('locState'), citySel = $('locCity'), wardSel = $('locWard');
-  if (!stateSel || !citySel || !wardSel) return;
+  const stateSel = document.getElementById('locState');
+  const citySel = document.getElementById('locCity');
+  const wardSel = document.getElementById('locWard');
   const meta = findWardMeta(coverageDirectory, stateSel.value, citySel.value, wardSel.value);
   if (!meta) return;
 
@@ -866,23 +798,14 @@ function updateWardLabels(){
     ward: currentWardMeta.ward, wardName: currentWardMeta.wardName
   });
 
-  const jurisdictionLine = currentWardMeta.cityName + ', ' + currentWardMeta.stateName.replace(/^./, m => m) + ' — ' + currentWardMeta.wardName;
-  const shortJurisdictionLine = currentWardMeta.cityName + ', ' + currentWardMeta.stateName + ' — ' + currentWardMeta.wardName;
-
-  setText('headerWardLabel', currentWardMeta.wardName.toUpperCase() + ' ACTIVE');
-  setText('c101JurisdictionLine', shortJurisdictionLine);
-  setText('localJurisdictionLine', shortJurisdictionLine + ' · Local');
-  setText('civicDrawerWard', shortJurisdictionLine);
-  setText('civicAldermanLine', currentWardMeta.alderman + ' represents ' + currentWardMeta.wardName + '.');
-  setText('covSub', currentWardMeta.wardName + ' blocks surveyed');
-
-  const emptyHint = $('myReceiptsEmpty');
-  if (emptyHint) emptyHint.textContent = 'No reports yet — switch to Local Reports and tap a dark block to file your first one.';
-  const repLoc = $('repLoc');
+  document.getElementById('headerWardLabel').textContent = currentWardMeta.wardName.toUpperCase() + ' ACTIVE';
+  document.getElementById('wardHealthLabel').textContent = currentWardMeta.wardName + ' civic health index';
+  document.getElementById('covSub').textContent = currentWardMeta.wardName + ' blocks surveyed';
+  document.getElementById('wardAldermanLine').textContent = currentWardMeta.alderman + ' · ' + currentWardMeta.cityName + ', ' + currentWardMeta.stateName;
+  const emptyHint = document.getElementById('myReceiptsEmpty');
+  if (emptyHint) emptyHint.textContent = 'No reports yet — switch to ' + currentWardMeta.wardName + ' Local and tap a dark block to file your first one.';
+  const repLoc = document.getElementById('repLoc');
   if (repLoc) repLoc.value = currentWardMeta.cityName + ', ' + currentWardMeta.state.toUpperCase() + ' (Current GPS)';
-
-  renderCitizen101Stack();
-  updatePayloadPreview();
 }
 
 async function refreshWardSummary(){
@@ -892,22 +815,18 @@ async function refreshWardSummary(){
     if (!res.ok) throw new Error('summary returned ' + res.status);
     s = await res.json();
   } catch (err) {
-    s = null;
+    if (currentWardMeta) {
+      const key = currentWardMeta.state + '/' + currentWardMeta.city + '/' + currentWardMeta.ward;
+      s = WARD_HEALTH_FALLBACK[key] || { healthIndex: 0, slaPct: 0, roadPct: 0, lightingPct: 0 };
+    }
   }
-  // The live /summary endpoint (api/_lib/store.js) carries healthIndex/
-  // slaPct/roadPct/lightingPct but not population or a staff-hours
-  // baseline, so those two ROI fields are always filled in from the same
-  // illustrative, labeled WARD_HEALTH_FALLBACK constants used elsewhere in
-  // this file — whether or not the live call itself succeeded.
-  const fallback = currentWardMeta
-    ? (WARD_HEALTH_FALLBACK[currentWardMeta.state + '/' + currentWardMeta.city + '/' + currentWardMeta.ward]
-       || { healthIndex: 0, slaPct: 0, roadPct: 0, lightingPct: 0, population: 0, staffHoursBaseline: 0 })
-    : { healthIndex: 0, slaPct: 0, roadPct: 0, lightingPct: 0, population: 0, staffHoursBaseline: 0 };
-  currentWardSummary = Object.assign({}, fallback, s || {}, {
-    population: fallback.population,
-    staffHoursBaseline: fallback.staffHoursBaseline
-  });
-  renderRoiTiles();
+  if (!s) return;
+  document.getElementById('healthIndexVal').innerHTML = s.healthIndex + ' <span style="font-size:1rem;color:var(--muted)">/ 100</span>';
+  document.getElementById('healthSlaVal').textContent = 'Dispatch response SLA: ' + s.slaPct + '% on-time';
+  document.getElementById('healthRoadPct').textContent = s.roadPct + '%';
+  document.getElementById('healthRoadBar').style.width = s.roadPct + '%';
+  document.getElementById('healthLightPct').textContent = s.lightingPct + '%';
+  document.getElementById('healthLightBar').style.width = s.lightingPct + '%';
 }
 
 // Switching ward/city/state: re-point the endpoint, re-fetch and re-animate
@@ -920,744 +839,20 @@ async function switchWard(){
   await animateCoverage();
   renderMyImpact();
   renderLocalFeed();
-  renderLedgerTab();
-}
-
-/* =====================================================================
-   CITIZEN 101 — dynamic 4-tier legal stack
-   -----------------------------------------------------------------
-   Backed by /api/coverage/:state/:city/:ward/jurisdiction (see
-   api/coverage/[state]/[city]/[ward]/jurisdiction.js), which calls
-   api/_lib/jurisdictions.js's getJurisdictionStack() with the SAME
-   state/city/ward/alderman resolved by the header's location selector.
-   Falls back to calling the same jurisdictions.js shape locally is not
-   possible from a browser (it's a Node module), so if the API can't be
-   reached this view shows an honest "stack unavailable" state rather than
-   silently inventing legal text.
-   ===================================================================== */
-let jurisdictionStack = null; // { federal, state, municipal, ward }
-let activeC101Doc = null;
-
-async function fetchJurisdictionStack(){
-  if (!currentWardMeta) return null;
-  try {
-    const res = await fetch(COVERAGE_ENDPOINT + '/jurisdiction');
-    if (!res.ok) throw new Error('jurisdiction returned ' + res.status);
-    const data = await res.json();
-    return data.stack;
-  } catch (err) {
-    return null;
-  }
-}
-
-function c101LayerBlock(label, docs){
-  if (!docs || !docs.length) return '';
-  const items = docs.map(d =>
-    '<button class="c101-doc-item" data-doc-id="' + esc(d.id) + '" type="button">' +
-      '<span>' + esc(d.title) + '</span>' +
-      '<span class="chev">›</span>' +
-    '</button>'
-  ).join('');
-  return '<div class="c101-layer">' +
-    '<div class="c101-layer-head"><span>' + esc(label) + '</span></div>' +
-    items +
-  '</div>';
-}
-
-async function renderCitizen101Stack(){
-  const stackEl = $('c101StackView');
-  if (!stackEl) return;
-  stackEl.innerHTML = '<div class="small" style="text-align:center;padding:20px 0">Loading jurisdictional stack…</div>';
-
-  jurisdictionStack = await fetchJurisdictionStack();
-  if (!jurisdictionStack) {
-    stackEl.innerHTML = '<div class="small" style="text-align:center;padding:20px 0">' +
-      'Jurisdictional stack unavailable — the coverage API could not be reached from this page. ' +
-      'Federal, State, Municipal, and District/Ward documents will appear here once it is.</div>';
-    return;
-  }
-
-  const html =
-    c101LayerBlock('Layer 1 · Federal', jurisdictionStack.federal) +
-    c101LayerBlock('Layer 2 · State', jurisdictionStack.state) +
-    c101LayerBlock('Layer 3 · Municipal', jurisdictionStack.municipal) +
-    c101LayerBlock('Layer 4 · District / Ward', jurisdictionStack.ward);
-  stackEl.innerHTML = html || '<div class="small" style="text-align:center;padding:20px 0">No documents available for this jurisdiction yet.</div>';
-
-  stackEl.querySelectorAll('.c101-doc-item').forEach(btn => {
-    btn.addEventListener('click', () => openC101Doc(btn.dataset.docId));
-  });
-}
-
-function findC101Doc(id){
-  if (!jurisdictionStack) return null;
-  const all = [].concat(jurisdictionStack.federal, jurisdictionStack.state, jurisdictionStack.municipal, jurisdictionStack.ward);
-  return all.find(d => d.id === id) || null;
-}
-
-function openC101Doc(id){
-  const doc = findC101Doc(id);
-  if (!doc) return;
-  activeC101Doc = doc;
-
-  setText('c101DocKind', doc.kind);
-  setText('c101DocTitle', doc.title);
-  setText('c101FullText', doc.fullText);
-
-  const notesEl = $('c101CliffNotes');
-  if (notesEl) {
-    notesEl.innerHTML = '';
-    (doc.cliffNotes || []).forEach(note => {
-      const li = document.createElement('li');
-      li.textContent = note;
-      notesEl.appendChild(li);
-    });
-  }
-
-  document.querySelectorAll('.c101-media-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.c101-media-pane').forEach(p => p.classList.remove('active'));
-  const firstTab = document.querySelector('.c101-media-tab[data-pane="fulltext"]');
-  const firstPane = document.querySelector('.c101-media-pane[data-pane="fulltext"]');
-  if (firstTab) firstTab.classList.add('active');
-  if (firstPane) firstPane.classList.add('active');
-
-  const stackView = $('c101StackView');
-  const detail = $('c101DocDetail');
-  if (stackView) stackView.style.display = 'none';
-  if (detail) detail.classList.add('open');
-}
-
-function closeC101Doc(){
-  const stackView = $('c101StackView');
-  const detail = $('c101DocDetail');
-  if (detail) detail.classList.remove('open');
-  if (stackView) stackView.style.display = '';
-  activeC101Doc = null;
-}
-
-function wireCitizen101(){
-  on('c101BackBtn', 'click', closeC101Doc);
-  document.querySelectorAll('.c101-media-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.c101-media-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.c101-media-pane').forEach(p => p.classList.remove('active'));
-      tab.classList.add('active');
-      const pane = document.querySelector('.c101-media-pane[data-pane="' + tab.dataset.pane + '"]');
-      if (pane) pane.classList.add('active');
-    });
-  });
-}
-
-/* =====================================================================
-   CIVIC TOOLS DRAWER
-   ===================================================================== */
-function wireCivicDrawer(){
-  on('civicToolsBtn', 'click', () => { const d = $('civicDrawer'); if (d) d.classList.add('open'); });
-  on('btnCloseCivic', 'click', () => { const d = $('civicDrawer'); if (d) d.classList.remove('open'); });
-  on('civicOpenCitizen101', 'click', () => {
-    const d = $('civicDrawer'); if (d) d.classList.remove('open');
-    switchTab('tab-citizen101', document.querySelectorAll('.navtab')[0]);
-  });
-}
-
-/* =====================================================================
-   LOCAL REPORTS — hotkey category picker
-   ===================================================================== */
-let cat = 'Parking';
-
-function selectCat(el){
-  document.querySelectorAll('.hotkey').forEach(x => x.classList.remove('active'));
-  el.classList.add('active');
-  cat = el.dataset.cat;
-  updatePayloadPreview();
-}
-
-function wireHotkeys(){
-  document.querySelectorAll('.hotkey').forEach(hk => {
-    hk.addEventListener('click', () => selectCat(hk));
-  });
-}
-
-/* =====================================================================
-   OPEN311 MACHINE-READABLE PAYLOAD PREVIEW
-   -----------------------------------------------------------------
-   Formats the current report form as a standardized, Open311/GeoReport v2-
-   compatible JSON payload — the same shape a real dispatch integration
-   would POST to a municipality's service-request endpoint. This preview
-   updates live as the citizen fills in the form, purely client-side.
-   ===================================================================== */
-function buildOpen311Payload(){
-  const desc = ($('repDesc') && $('repDesc').value.trim()) || 'Hazard reported.';
-  const loc = ($('repLoc') && $('repLoc').value.trim()) || 'La Crosse, WI';
-  const dept = parseDepartment(desc, cat);
-  return {
-    service_code: SERVICE_CODES[cat] || 'MISC-01',
-    service_name: cat,
-    description: desc,
-    address_string: loc,
-    lat: currentWardMeta ? 43.8150 : null,
-    long: currentWardMeta ? -91.2500 : null,
-    media_url: null,
-    agency_responsible: dept,
-    requested_datetime: new Date().toISOString(),
-    status: 'open',
-    jurisdiction_id: currentWardMeta ? (currentWardMeta.state + '.' + currentWardMeta.city + '.' + currentWardMeta.ward) : null
-  };
-}
-
-function updatePayloadPreview(){
-  const pre = $('payloadPre');
-  if (!pre) return;
-  pre.textContent = JSON.stringify(buildOpen311Payload(), null, 2);
-}
-
-function wirePayloadToggle(){
-  on('payloadToggleBtn', 'click', () => {
-    const pre = $('payloadPre');
-    const chev = $('payloadToggleChev');
-    if (!pre) return;
-    const showing = pre.classList.toggle('show');
-    if (chev) chev.textContent = showing ? '▴' : '▾';
-    if (showing) updatePayloadPreview();
-  });
-  ['repDesc', 'repLoc'].forEach(id => on(id, 'input', updatePayloadPreview));
-}
-
-/* =====================================================================
-   SUBMITTED-REPORT PROGRESS TRACKER
-   -----------------------------------------------------------------
-   Submitted -> Routed -> Dispatched -> Resolved. Only a report that came
-   from tapping a dark Fog-of-War block and was field-verified through
-   verifyReportedCell() (the real /verify API call) ever reaches
-   "Resolved" — a freeform hotkey report with no grid-linked block
-   simulates progression only as far as "Dispatched", since nothing has
-   actually confirmed it on the ground. Session-only (not persisted):
-   this is a live status view of the current visit, not a permanent record.
-   ===================================================================== */
-const TRACKER_STAGES = ['submitted', 'routed', 'dispatched', 'resolved'];
-let sessionReports = [];
-let sessionReportSeq = 0;
-
-function trackerStepsHTML(stage){
-  const idx = TRACKER_STAGES.indexOf(stage);
-  const labels = ['Submitted', 'Routed', 'Dispatched', 'Resolved'];
-  return '<div class="tracker">' + labels.map((label, i) =>
-    '<div class="tracker-step' + (i <= idx ? ' done' : '') + '"><div class="dot"></div><div class="tl">' + label + '</div></div>'
-  ).join('') + '</div>';
-}
-
-function renderTracker(){
-  const card = $('reportsTrackerCard');
-  const list = $('reportsTrackerList');
-  if (!card || !list) return;
-  if (!sessionReports.length) { card.style.display = 'none'; return; }
-  card.style.display = 'block';
-  list.innerHTML = '';
-  sessionReports.slice().reverse().forEach(r => {
-    const div = document.createElement('div');
-    div.className = 'report-card';
-    const head = document.createElement('div');
-    head.className = 'row';
-    const cat = document.createElement('strong');
-    cat.textContent = r.category;
-    const dept = document.createElement('span');
-    dept.className = 'small';
-    dept.textContent = r.department;
-    head.appendChild(cat); head.appendChild(dept);
-    div.appendChild(head);
-    div.insertAdjacentHTML('beforeend', trackerStepsHTML(r.stage));
-    list.appendChild(div);
-  });
-}
-
-function advanceTracker(reportId, stage){
-  const r = sessionReports.find(r => r.id === reportId);
-  if (!r) return;
-  r.stage = stage;
-  renderTracker();
-}
-
-function trackReportProgress(report){
-  // Demo-paced progression: Submitted is immediate; Routed/Dispatched follow
-  // shortly after so the tracker visibly moves without a real dispatch
-  // integration behind it. "Resolved" is reached only via verifyReportedCell()
-  // for a grid-linked report, never simulated here.
-  setTimeout(() => advanceTracker(report.id, 'routed'), 1500);
-  setTimeout(() => advanceTracker(report.id, 'dispatched'), 3200);
-}
-
-/* =====================================================================
-   FOG-OF-WAR GRID — live per-ward block coverage
-   ===================================================================== */
-let COVERAGE_ENDPOINT = '/api/coverage/wi/la-crosse/ward-4';
-const HOTKEY_CATEGORIES = ['Parking', 'Noise', 'Vandalism', 'Potholes', 'Trash', 'Transit'];
-
-function mockCoverageCells(){
-  // Same shape as the real endpoint — used only when the API can't be reached.
-  const covered = [1,2,3,4,10,11,12,13,14,20,21,22,30,31,32,33,40,41,42,43,44,50,51,52,60,61,62,63,70,71,72,73,74,75];
-  const cells = [];
-  for (let i = 0; i < 80; i++) {
-    const isCovered = covered.includes(i);
-    cells.push({
-      id: i,
-      covered: isCovered,
-      category: isCovered ? HOTKEY_CATEGORIES[i % HOTKEY_CATEGORIES.length] : null,
-      verifiedDate: isCovered ? ('Sep ' + (10 + (i % 18))) : null
-    });
-  }
-  return cells;
-}
-
-/* =====================================================================
-   MY IMPACT — local-only receipt ledger
-   -----------------------------------------------------------------
-   The coverage API is deliberately anonymous: no cell record anywhere on
-   the server says who reported it. So "mine" lives only here, in this
-   browser's own localStorage — never sent to the server as an identity.
-   CATEGORY_HOURS is an illustrative, honestly-labeled estimate of staff
-   time saved per verified category (not a live payroll/dispatch figure),
-   used only to give the ROI framing something concrete to show.
-   ===================================================================== */
-const MY_REPORTS_KEY = 'citixen_my_reports_v1';
-// Covers both the Local Reports hotkey categories AND the coverage API's
-// own seeded category taxonomy (api/_lib/store.js's CATEGORIES: Pothole,
-// Streetlight, Signage, Sidewalk, Drainage) — a block verified through the
-// live API carries whichever category store.js already assigned it, which
-// predates the hotkey redesign, so both sets need an entry or a live-API
-// report would silently show "0 hrs" for its real, valid category.
-const CATEGORY_HOURS = {
-  Parking: 0.5, Noise: 1, Vandalism: 2, Potholes: 3, Trash: 0.75, Transit: 1.5, Other: 1,
-  Pothole: 3, Streetlight: 1.5, Signage: 0.75, Sidewalk: 2, Drainage: 2.5
-};
-
-function getMyReports(){
-  try {
-    return JSON.parse(localStorage.getItem(MY_REPORTS_KEY) || '[]');
-  } catch (e) {
-    return []; // private browsing / storage blocked — impact tracking just stays empty
-  }
-}
-
-function getMyReportedCellIds(){
-  return new Set(getMyReports().map(r => r.cellId));
-}
-
-function addMyReport(record){
-  try {
-    const list = getMyReports();
-    list.push(record);
-    localStorage.setItem(MY_REPORTS_KEY, JSON.stringify(list));
-  } catch (e) {
-    // Storage unavailable — reporting itself still works, only the local
-    // "My Impact" receipt for this one report is lost.
-  }
-}
-
-// Anonymous, per-device identifier used ONLY to key this browser's own
-// localStorage ledger. Generated locally, never sent to the server.
-const DEVICE_TOKEN_KEY = 'citixen_device_token_v1';
-
-function getDeviceToken(){
-  try {
-    let token = localStorage.getItem(DEVICE_TOKEN_KEY);
-    if (!token) {
-      token = (window.crypto && crypto.randomUUID)
-        ? crypto.randomUUID()
-        : 'anon-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
-      localStorage.setItem(DEVICE_TOKEN_KEY, token);
-    }
-    return token;
-  } catch (e) {
-    return null; // private browsing / storage blocked — impact tracking just stays session-only
-  }
-}
-
-function renderDeviceToken(){
-  const token = getDeviceToken();
-  setText('deviceTokenDisplay', token ? token.slice(0, 8) + '…' : 'unsaved — storage blocked');
-}
-
-function renderMyImpact(){
-  const mine = getMyReports();
-  const totalHours = mine.reduce((sum, r) => sum + (CATEGORY_HOURS[r.category] || 0), 0);
-
-  setText('myBlocksCount', mine.length);
-  setText('myDollarValue', (Math.round(totalHours * 10) / 10) + ' hrs');
-
-  const listEl = $('myReceipts');
-  const emptyEl = $('myReceiptsEmpty');
-  if (!listEl) return;
-  listEl.innerHTML = '';
-  if (!mine.length) { if (emptyEl) emptyEl.style.display = 'block'; return; }
-  if (emptyEl) emptyEl.style.display = 'none';
-
-  mine.slice().reverse().forEach(r => {
-    const div = document.createElement('div');
-    div.className = 'receipt-item';
-
-    const left = document.createElement('div');
-    const catLine = document.createElement('div');
-    catLine.className = 'ri-cat';
-    catLine.textContent = r.category;
-    const metaLine = document.createElement('div');
-    metaLine.className = 'ri-meta';
-    metaLine.textContent = (r.wardName || 'Ward') + ' · Block #' + r.cellId + ' · ' + r.verifiedDate;
-    left.appendChild(catLine);
-    left.appendChild(metaLine);
-
-    const amtEl = document.createElement('div');
-    amtEl.className = 'ri-amt';
-    amtEl.textContent = (CATEGORY_HOURS[r.category] || 0) + ' hrs';
-
-    div.appendChild(left);
-    div.appendChild(amtEl);
-    listEl.appendChild(div);
-  });
-}
-
-function renderLocalFeed(){
-  // Public feed of shared/anonymous data — the "· by you" tag is computed
-  // by joining against this device's own local ledger, purely client-side.
-  const feedEl = $('localFeed');
-  if (!feedEl) return;
-  const mine = getMyReportedCellIds();
-  const covered = covCells.filter(c => c.covered).slice(-8).reverse();
-  feedEl.innerHTML = '';
-  covered.forEach(c => {
-    const div = document.createElement('div');
-    div.className = 'feed-item';
-    const row = document.createElement('div');
-    row.className = 'row';
-    const catSpan = document.createElement('span');
-    catSpan.textContent = c.category;
-    const pill = document.createElement('span');
-    pill.className = 'pill pill-ok';
-    pill.textContent = 'Verified';
-    row.appendChild(catSpan);
-    row.appendChild(pill);
-    const meta = document.createElement('div');
-    meta.className = 'small';
-    meta.style.marginTop = '4px';
-    meta.textContent = (currentWardMeta ? currentWardMeta.wardName : 'Ward') + ' · Block #' + c.id + ' · ' + c.verifiedDate + (mine.has(c.id) ? ' · by you' : '');
-    div.appendChild(row);
-    div.appendChild(meta);
-    feedEl.appendChild(div);
-  });
-}
-
-let coverageIsLive = false;
-
-async function fetchCoverageGrid(){
-  try {
-    const res = await fetch(COVERAGE_ENDPOINT + '/grid');
-    if (!res.ok) throw new Error('coverage API returned ' + res.status);
-    const data = await res.json();
-    coverageIsLive = true;
-    return data.cells;
-  } catch (err) {
-    coverageIsLive = false;
-    return mockCoverageCells();
-  }
-}
-
-let covCells = [];
-let pendingReportCellId = null;
-
-function renderCoverageGrid(){
-  const gridEl = $('covGrid');
-  if (!gridEl) return;
-  const mine = getMyReportedCellIds();
-  gridEl.innerHTML = '';
-  covCells.forEach(c => {
-    const b = document.createElement('button');
-    b.className = 'cov-cell';
-    b.dataset.id = c.id;
-    b.type = 'button';
-    const isMine = mine.has(c.id);
-    b.setAttribute('aria-label', c.covered
-      ? (c.category + ' — verified ' + c.verifiedDate + (isMine ? ', reported by you' : ''))
-      : 'Unsurveyed block — tap to report');
-    b.addEventListener('click', () => onCoverageCellTap(c.id));
-    gridEl.appendChild(b);
-  });
-  gridEl.dataset.built = '1';
-}
-
-let coverageLoaded = false;
-
-async function animateCoverage(){
-  if (coverageLoaded) return; // this widget loads and animates in once per page/ward load
-  coverageLoaded = true;
-
-  covCells = await fetchCoverageGrid();
-  renderCoverageGrid();
-  refreshCoverageStats();
-  if (!covCells.length) return;
-
-  const gridEl = $('covGrid');
-  if (!gridEl) return;
-  const cellEls = Array.from(gridEl.children);
-  const mine = getMyReportedCellIds();
-  const DURATION = 1200;
-
-  cellEls.forEach(el => el.classList.remove('covered', 'you'));
-  const coveredIdx = covCells.map((c, i) => i).filter(i => covCells[i].covered);
-  const order = shuffleArray(coveredIdx);
-  order.forEach((idx, seq) => {
-    setTimeout(() => {
-      if (cellEls[idx]) {
-        cellEls[idx].classList.add('covered');
-        if (mine.has(covCells[idx].id)) cellEls[idx].classList.add('you');
-      }
-    }, (seq / order.length) * DURATION);
-  });
-
-  animateTicker(0, computeCoveragePct(), DURATION);
-}
-
-function computeCoveragePct(){
-  const total = covCells.length;
-  const coveredCount = covCells.filter(c => c.covered).length;
-  return total ? (coveredCount / total) * 100 : 0;
-}
-
-function refreshCoverageStats(){
-  const total = covCells.length;
-  const coveredCount = covCells.filter(c => c.covered).length;
-  setText('covFraction', coveredCount + ' / ' + total);
-  setText('covYouCount', getMyReportedCellIds().size);
-  renderRoiTiles();
-}
-
-function animateTicker(fromPct, toPct, duration){
-  let start = null;
-  function step(ts){
-    if (!start) start = ts;
-    const progress = Math.min((ts - start) / duration, 1);
-    const eased = 1 - Math.pow(1 - progress, 3);
-    const val = fromPct + (toPct - fromPct) * eased;
-    setText('covTicker', val.toFixed(1) + '%');
-    if (progress < 1) requestAnimationFrame(step);
-    else setText('covTicker', toPct.toFixed(1) + '%');
-  }
-  requestAnimationFrame(step);
-}
-
-// Called after a citizen submits a report that started from tapping a dark
-// grid block (see submitReport()). Calls the real /verify endpoint, then
-// lights up just that one cell and re-ticks the percentage, and is the ONLY
-// path that advances a tracked report all the way to "Resolved".
-async function verifyReportedCell(cellId, category, trackedReportId){
-  let verifiedCell = null;
-  try {
-    const res = await fetch(COVERAGE_ENDPOINT + '/verify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cellId, category })
-    });
-    if (!res.ok) throw new Error('verify failed: ' + res.status);
-    const data = await res.json();
-    const cell = covCells.find(c => c.id === cellId);
-    if (cell) { Object.assign(cell, data.cell); verifiedCell = cell; }
-  } catch (err) {
-    // API unreachable (e.g. static local server) — update local state only,
-    // so the demo loop still visibly works even without live functions.
-    const cell = covCells.find(c => c.id === cellId);
-    if (cell) {
-      cell.covered = true;
-      cell.category = category || cell.category || 'Parking';
-      cell.verifiedDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-      verifiedCell = cell;
-    }
-  }
-
-  if (verifiedCell) {
-    addMyReport({
-      cellId: verifiedCell.id,
-      category: verifiedCell.category,
-      verifiedDate: verifiedCell.verifiedDate,
-      state: currentWardMeta && currentWardMeta.state,
-      city: currentWardMeta && currentWardMeta.city,
-      ward: currentWardMeta && currentWardMeta.ward,
-      wardName: currentWardMeta ? currentWardMeta.wardName : 'Ward',
-      cityName: currentWardMeta && currentWardMeta.cityName
-    });
-  }
-
-  const cellEl = document.querySelector('.cov-grid .cov-cell[data-id="' + cellId + '"]');
-  if (cellEl) {
-    cellEl.classList.add('covered', 'you');
-    cellEl.setAttribute('aria-label', 'Verified — reported by you');
-  }
-  const fromPct = computeCoveragePctBefore(cellId);
-  refreshCoverageStats();
-  animateTicker(fromPct, computeCoveragePct(), 600);
-  renderMyImpact();
-  renderLocalFeed();
-  renderLedgerTab();
-  if (trackedReportId) advanceTracker(trackedReportId, 'resolved');
-}
-
-function computeCoveragePctBefore(justUpdatedId){
-  const total = covCells.length;
-  const coveredCount = covCells.filter(c => c.covered && c.id !== justUpdatedId).length;
-  return total ? (coveredCount / total) * 100 : 0;
-}
-
-function shuffleArray(arr){
-  const copy = arr.slice();
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
-  }
-  return copy;
-}
-
-function onCoverageCellTap(id){
-  const cell = covCells.find(c => c.id === id);
-  if (!cell) return;
-  const toastEl = $('covToast');
-  const textEl = $('covToastText');
-  const ctaEl = $('covToastCta');
-  if (!toastEl || !textEl || !ctaEl) return;
-
-  if (cell.covered) {
-    const isMine = getMyReportedCellIds().has(cell.id);
-    textEl.textContent = cell.category + ' — verified ' + cell.verifiedDate + (isMine ? ' · reported by you' : '');
-    ctaEl.style.display = 'none';
-  } else {
-    textEl.textContent = 'Not yet surveyed — be the first to report this block.';
-    ctaEl.style.display = 'inline-block';
-    ctaEl.onclick = () => {
-      pendingReportCellId = id;
-      toastEl.classList.remove('show');
-      const hotkeyBtn = document.querySelector('.hotkey[data-cat="' + (cell.category || 'Parking') + '"]');
-      if (hotkeyBtn) selectCat(hotkeyBtn);
-      const repDesc = $('repDesc');
-      if (repDesc) repDesc.focus();
-    };
-  }
-  toastEl.classList.add('show');
-  clearTimeout(toastEl._hideTimer);
-  toastEl._hideTimer = setTimeout(() => toastEl.classList.remove('show'), 4000);
-}
-
-/* =====================================================================
-   PUBLIC LEDGER — Whole-System ROI tiles, ward breakdown graph, exports
-   -----------------------------------------------------------------
-   Every number here is derived from data already live elsewhere on the
-   page (the ward summary endpoint, the Fog-of-War grid, and this device's
-   own local ledger) — nothing is a separately hand-typed figure. Where a
-   figure has no live backing yet (ward population, a staff-hours
-   baseline), it is drawn from the same clearly-labeled illustrative
-   constants used by the rest of the app (WARD_HEALTH_FALLBACK), consistent
-   with this codebase's honesty convention.
-   ===================================================================== */
-let currentWardSummary = null;
-
-function renderRoiTiles(){
-  const pop = currentWardSummary ? currentWardSummary.population : 0;
-  const baseline = currentWardSummary ? currentWardSummary.staffHoursBaseline : 0;
-  const mine = getMyReports();
-  const myHours = mine.reduce((sum, r) => sum + (CATEGORY_HOURS[r.category] || 0), 0);
-  const totalHours = Math.round((baseline || 0) + myHours);
-  const slaPct = currentWardSummary ? currentWardSummary.slaPct : 0;
-
-  setText('roiPopulation', (pop || 0).toLocaleString('en-US'));
-  setText('roiStaffHours', totalHours.toLocaleString('en-US'));
-  setText('roiGridCoverage', computeCoveragePct().toFixed(0) + '%');
-  setText('roiSlaVelocity', (slaPct || 0) + '%');
-}
-
-// Maps the coverage API's legacy seeded categories (api/_lib/store.js's
-// CATEGORIES: Pothole, Streetlight, Signage, Sidewalk, Drainage — out of
-// this task's file scope, so left as-is there) onto the nearest Local
-// Reports hotkey category, so a block verified through the live API still
-// shows up under a real bucket in the ward breakdown graph instead of
-// being silently dropped.
-const LEGACY_CATEGORY_MAP = {
-  Pothole: 'Potholes', Streetlight: 'Other', Signage: 'Other', Sidewalk: 'Other', Drainage: 'Other'
-};
-function normalizeCategory(category){
-  return HOTKEY_CATEGORIES.includes(category) ? category : (LEGACY_CATEGORY_MAP[category] || 'Other');
-}
-
-function renderLedgerGraph(){
-  const graphEl = $('ledgerGraph');
-  if (!graphEl) return;
-  const tally = {};
-  HOTKEY_CATEGORIES.forEach(c => tally[c] = 0);
-  covCells.filter(c => c.covered).forEach(c => {
-    const bucket = normalizeCategory(c.category);
-    tally[bucket] = (tally[bucket] || 0) + 1;
-  });
-  const max = Math.max(1, ...Object.values(tally));
-  graphEl.innerHTML = '';
-  HOTKEY_CATEGORIES.forEach(category => {
-    const count = tally[category] || 0;
-    const row = document.createElement('div');
-    row.className = 'ledger-graph-row';
-    const label = document.createElement('div');
-    label.className = 'lg-label';
-    label.textContent = category;
-    const track = document.createElement('div');
-    track.className = 'lg-bar-track';
-    const fill = document.createElement('div');
-    fill.className = 'lg-bar-fill';
-    fill.style.width = ((count / max) * 100) + '%';
-    track.appendChild(fill);
-    const countEl = document.createElement('div');
-    countEl.className = 'lg-count';
-    countEl.textContent = count;
-    row.appendChild(label); row.appendChild(track); row.appendChild(countEl);
-    graphEl.appendChild(row);
-  });
-}
-
-function renderLedgerTab(){
-  renderRoiTiles();
-  renderLedgerGraph();
-}
-
-function downloadCsv(filename, rows){
-  const csv = rows.map(row => row.map(cell => {
-    const s = String(cell == null ? '' : cell);
-    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
-  }).join(',')).join('\n');
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = filename;
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-function exportWardCsv(){
-  const rows = [['block_id', 'category', 'covered', 'verified_date']];
-  covCells.forEach(c => rows.push([c.id, c.category || '', c.covered, c.verifiedDate || '']));
-  const wardSlug = currentWardMeta ? (currentWardMeta.city + '-' + currentWardMeta.ward) : 'ward';
-  downloadCsv('citixen-' + wardSlug + '-ledger.csv', rows);
-}
-
-function exportMyCsv(){
-  const mine = getMyReports();
-  const rows = [['block_id', 'category', 'verified_date', 'ward', 'city']];
-  mine.forEach(r => rows.push([r.cellId, r.category, r.verifiedDate, r.wardName || '', r.cityName || '']));
-  downloadCsv('citixen-my-receipts.csv', rows);
-}
-
-function wireExports(){
-  on('exportWardCsvBtn', 'click', exportWardCsv);
-  on('exportMyCsvBtn', 'click', exportMyCsv);
 }
 
 /* =====================================================================
    NATIONAL MACRO-TELEMETRY — scale ticker + coverage directory
+   -----------------------------------------------------------------
+   Backed by /api/coverage/national, which sums every seeded ward for real
+   (see api/_lib/store.js's allWards()) — nothing here is a hand-typed
+   placeholder number. See rollup-sync.js for mirroring these same
+   aggregates into the pitch deck.
    ===================================================================== */
 function fallbackNational(){
   const dir = fallbackDirectory();
   const municipalities = [];
-  let districtsMapped = 0, nationalGridTilesDigitized = 0, totalStaffHoursSavedNationwide = 0;
+  let districtsMapped = 0, nationalGridTilesDigitized = 0, totalCapExScopedNationwide = 0;
   const citiesSeen = new Set();
   dir.states.forEach(s => {
     s.cities.forEach(c => {
@@ -1665,18 +860,24 @@ function fallbackNational(){
       c.wards.forEach(w => {
         districtsMapped++;
         nationalGridTilesDigitized += w.coveredCount;
-        const key = s.slug + '/' + c.slug + '/' + w.slug;
-        totalStaffHoursSavedNationwide += (WARD_HEALTH_FALLBACK[key] && WARD_HEALTH_FALLBACK[key].staffHoursBaseline) || 0;
+        totalCapExScopedNationwide += w.capExScopedUSD;
         municipalities.push({
           state: s.slug, stateName: s.name, city: c.slug, cityName: c.name,
           ward: w.slug, wardName: w.name, alderman: w.alderman,
-          coveragePct: w.coveragePct, coveredCount: w.coveredCount, totalCells: w.totalCells
+          coveragePct: w.coveragePct, coveredCount: w.coveredCount, totalCells: w.totalCells,
+          capExScopedUSD: w.capExScopedUSD
         });
       });
     });
   });
-  municipalities.sort((a, b) => b.coveragePct - a.coveragePct);
-  return { activeMunicipalities: citiesSeen.size, districtsMapped, nationalGridTilesDigitized, totalStaffHoursSavedNationwide, municipalities };
+  municipalities.sort((a, b) => b.capExScopedUSD - a.capExScopedUSD);
+  return { activeMunicipalities: citiesSeen.size, districtsMapped, nationalGridTilesDigitized, totalCapExScopedNationwide, municipalities };
+}
+
+function formatUSDCompact(n){
+  if (n >= 1e6) return '$' + (n / 1e6).toFixed(2) + 'M';
+  if (n >= 1e3) return '$' + (n / 1e3).toFixed(0) + 'K';
+  return '$' + n.toLocaleString('en-US');
 }
 
 let nationalLoaded = false;
@@ -1694,24 +895,12 @@ async function loadNationalTab(){
     data = fallbackNational();
   }
 
-  // The live /api/coverage/national endpoint (api/_lib/store.js) doesn't yet
-  // carry a staff-hours figure, so it's always estimated here client-side
-  // from the same illustrative, labeled WARD_HEALTH_FALLBACK baseline used
-  // throughout this file — whether the rest of the payload came from the
-  // live API or the local fallback.
-  const totalStaffHoursSavedNationwide = (data.municipalities || []).reduce((sum, m) => {
-    const key = m.state + '/' + m.city + '/' + m.ward;
-    const baseline = WARD_HEALTH_FALLBACK[key] ? WARD_HEALTH_FALLBACK[key].staffHoursBaseline : 700;
-    return sum + baseline;
-  }, 0);
+  document.getElementById('natActiveMunis').textContent = data.activeMunicipalities;
+  document.getElementById('natDistricts').textContent = data.districtsMapped;
+  document.getElementById('natTiles').textContent = data.nationalGridTilesDigitized.toLocaleString('en-US');
+  document.getElementById('natCapex').textContent = formatUSDCompact(data.totalCapExScopedNationwide);
 
-  setText('natActiveMunis', data.activeMunicipalities);
-  setText('natDistricts', data.districtsMapped);
-  setText('natTiles', data.nationalGridTilesDigitized.toLocaleString('en-US'));
-  setText('natCapex', Math.round(totalStaffHoursSavedNationwide).toLocaleString('en-US') + ' hrs');
-
-  const gridEl = $('natMuniGrid');
-  if (!gridEl) return;
+  const gridEl = document.getElementById('natMuniGrid');
   gridEl.innerHTML = '';
   data.municipalities.forEach(m => {
     const card = document.createElement('button');
@@ -1743,7 +932,11 @@ async function loadNationalTab(){
     bottom.className = 'row small';
     const tiles = document.createElement('span');
     tiles.textContent = m.coveredCount.toLocaleString('en-US') + ' / ' + m.totalCells.toLocaleString('en-US') + ' blocks';
-    bottom.appendChild(tiles);
+    const capex = document.createElement('span');
+    capex.style.color = '#fff';
+    capex.style.fontWeight = '800';
+    capex.textContent = formatUSDCompact(m.capExScopedUSD);
+    bottom.appendChild(tiles); bottom.appendChild(capex);
 
     card.appendChild(top);
     card.appendChild(sub);
@@ -1754,142 +947,452 @@ async function loadNationalTab(){
   });
 }
 
-// Lets a citizen tap a municipality card in the National directory and land
-// directly on that ward's live Local Reports view.
+// Lets a citizen tap a municipality card in the National tab and land
+// directly on that ward's live Local view — the same end state a manual
+// State/City/Ward pick would produce.
 function jumpToMunicipality(m){
-  const stateSel = $('locState'), citySel = $('locCity'), wardSel = $('locWard');
-  if (!stateSel || !citySel || !wardSel) return;
-  stateSel.value = m.state;
+  document.getElementById('locState').value = m.state;
   populateCitySelector();
-  citySel.value = m.city;
+  document.getElementById('locCity').value = m.city;
   populateWardSelector();
-  wardSel.value = m.ward;
+  document.getElementById('locWard').value = m.ward;
   switchWard();
-  switchTab('tab-local', document.querySelectorAll('.navtab')[1]);
+  const wardBtn = document.querySelector('.scope-btn[data-scope="ward"]');
+  if (wardBtn) switchScope('ward', wardBtn);
 }
 
 /* =====================================================================
-   CAMERA CAPTURE (EXIF/GPS is never attached in the first place — this
-   flow draws the live frame to an in-memory canvas, so no device or
-   location metadata is ever produced for a captured photo)
+   CITYWIDE ASSET COVERAGE — live per-ward block grid
+   -----------------------------------------------------------------
+   Backed by the real API contract under /api/coverage/... (see that
+   folder). fetchCoverageGrid() calls it; if it's unreachable — e.g. this
+   page is opened from a plain static file server with no serverless
+   functions running, as during local dev — it falls back to a local mock
+   with the identical shape, so the widget never breaks, it just stops
+   being live. render/animate/tap logic is written against that one shape
+   either way. COVERAGE_ENDPOINT is intentionally `let`, not `const` — it's
+   repointed by updateWardLabels() whenever the ward selector changes.
    ===================================================================== */
-let cameraStream = null;
+let COVERAGE_ENDPOINT = '/api/coverage/wi/la-crosse/ward-4';
 
+function mockCoverageCells(){
+  // Same shape as the real endpoint — used only when the API can't be reached.
+  // No "reportedByYou" here: that's never public/shared data (see note below).
+  const covered = [1,2,3,4,10,11,12,13,14,20,21,22,30,31,32,33,40,41,42,43,44,50,51,52,60,61,62,63,70,71,72,73,74,75];
+  const categories = ['Pothole','Streetlight','Signage','Sidewalk','Drainage'];
+  const cells = [];
+  for (let i = 0; i < 80; i++) {
+    const isCovered = covered.includes(i);
+    cells.push({
+      id: i,
+      covered: isCovered,
+      category: isCovered ? categories[i % categories.length] : null,
+      verifiedDate: isCovered ? ('Sep ' + (10 + (i % 18))) : null
+    });
+  }
+  return cells;
+}
+
+/* =====================================================================
+   MY IMPACT — local-only receipt ledger
+   -----------------------------------------------------------------
+   The coverage API is deliberately anonymous: no cell record anywhere on
+   the server says who reported it, because "reported by me" only means
+   something relative to one citizen — it can't be a property of shared,
+   public data without breaking the "no account required, no personal
+   data retained" promise for everyone else who loads the same page.
+   So "mine" lives only here, in this browser's own localStorage. Nothing
+   in this ledger is ever sent to the server as an identity — it's a
+   private note-to-self that happens to be checkable against public data.
+   ===================================================================== */
+const MY_REPORTS_KEY = 'citixen_my_reports_v1';
+
+function getMyReports(){
+  try {
+    return JSON.parse(localStorage.getItem(MY_REPORTS_KEY) || '[]');
+  } catch (e) {
+    return []; // private browsing / storage blocked — impact tracking just stays empty
+  }
+}
+
+function getMyReportedCellIds(){
+  return new Set(getMyReports().map(r => r.cellId));
+}
+
+function addMyReport(record){
+  try {
+    const list = getMyReports();
+    list.push(record);
+    localStorage.setItem(MY_REPORTS_KEY, JSON.stringify(list));
+  } catch (e) {
+    // Storage unavailable — reporting itself still works, only the local
+    // "My Impact" receipt for this one report is lost.
+  }
+}
+
+// Anonymous, per-device identifier used ONLY to key this browser's own
+// localStorage ledger (so the UI has something concrete to show under
+// "Zero-PII" other than an abstract promise). It is generated locally,
+// never sent to the server, and carries no identity — a fresh browser
+// profile or cleared site data simply gets a new one.
+const DEVICE_TOKEN_KEY = 'citixen_device_token_v1';
+
+function getDeviceToken(){
+  try {
+    let token = localStorage.getItem(DEVICE_TOKEN_KEY);
+    if (!token) {
+      token = (window.crypto && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : 'anon-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+      localStorage.setItem(DEVICE_TOKEN_KEY, token);
+    }
+    return token;
+  } catch (e) {
+    return null; // private browsing / storage blocked — impact tracking just stays session-only
+  }
+}
+
+function renderDeviceToken(){
+  const el = document.getElementById('deviceTokenDisplay');
+  if (!el) return;
+  const token = getDeviceToken();
+  el.textContent = token ? token.slice(0, 8) + '…' : 'unsaved — storage blocked';
+}
+
+let coverageIsLive = false;
+
+async function fetchCoverageGrid(){
+  try {
+    const res = await fetch(COVERAGE_ENDPOINT + '/grid');
+    if (!res.ok) throw new Error('coverage API returned ' + res.status);
+    const data = await res.json();
+    coverageIsLive = true;
+    return data.cells;
+  } catch (err) {
+    coverageIsLive = false;
+    return mockCoverageCells();
+  }
+}
+
+let covCells = [];
+let pendingReportCellId = null;
+
+function renderCoverageGrid(){
+  const gridEl = document.getElementById('covGrid');
+  const mine = getMyReportedCellIds();
+  gridEl.innerHTML = '';
+  covCells.forEach(c => {
+    const b = document.createElement('button');
+    b.className = 'cov-cell';
+    b.dataset.id = c.id;
+    b.type = 'button';
+    const isMine = mine.has(c.id);
+    b.setAttribute('aria-label', c.covered
+      ? (c.category + ' — verified ' + c.verifiedDate + (isMine ? ', reported by you' : ''))
+      : 'Unsurveyed block — tap to report');
+    b.addEventListener('click', () => onCoverageCellTap(c.id));
+    gridEl.appendChild(b);
+  });
+  gridEl.dataset.built = '1';
+}
+
+let coverageLoaded = false;
+
+async function animateCoverage(){
+  if (coverageLoaded) return; // this widget loads and animates in once per page load
+  coverageLoaded = true;
+
+  covCells = await fetchCoverageGrid();
+  renderCoverageGrid();
+  refreshCoverageStats();
+  if (!covCells.length) return;
+
+  const gridEl = document.getElementById('covGrid');
+  const cellEls = Array.from(gridEl.children);
+  const mine = getMyReportedCellIds();
+  const DURATION = 1200;
+
+  cellEls.forEach(el => el.classList.remove('covered', 'you'));
+  const coveredIdx = covCells.map((c, i) => i).filter(i => covCells[i].covered);
+  const order = shuffleArray(coveredIdx);
+  order.forEach((idx, seq) => {
+    setTimeout(() => {
+      cellEls[idx].classList.add('covered');
+      if (mine.has(covCells[idx].id)) cellEls[idx].classList.add('you');
+    }, (seq / order.length) * DURATION);
+  });
+
+  animateTicker(0, computeCoveragePct(), DURATION);
+}
+
+function computeCoveragePct(){
+  const total = covCells.length;
+  const coveredCount = covCells.filter(c => c.covered).length;
+  return total ? (coveredCount / total) * 100 : 0;
+}
+
+function refreshCoverageStats(){
+  const total = covCells.length;
+  const coveredCount = covCells.filter(c => c.covered).length;
+  document.getElementById('covFraction').textContent = coveredCount + ' / ' + total;
+  document.getElementById('covYouCount').textContent = getMyReportedCellIds().size;
+}
+
+function animateTicker(fromPct, toPct, duration){
+  let start = null;
+  function step(ts){
+    if (!start) start = ts;
+    const progress = Math.min((ts - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const val = fromPct + (toPct - fromPct) * eased;
+    document.getElementById('covTicker').textContent = val.toFixed(1) + '%';
+    if (progress < 1) requestAnimationFrame(step);
+    else document.getElementById('covTicker').textContent = toPct.toFixed(1) + '%';
+  }
+  requestAnimationFrame(step);
+}
+
+// Called after a citizen submits a report that started from tapping a dark
+// grid block (see submitReport()). Calls the real /verify endpoint — the
+// same call the ticket-resolution pipeline would make in production — then
+// lights up just that one cell and re-ticks the percentage, so a citizen
+// watches their own report change the number in front of them.
+async function verifyReportedCell(cellId, category){
+  let verifiedCell = null;
+  try {
+    const res = await fetch(COVERAGE_ENDPOINT + '/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cellId, category })
+    });
+    if (!res.ok) throw new Error('verify failed: ' + res.status);
+    const data = await res.json();
+    const cell = covCells.find(c => c.id === cellId);
+    if (cell) { Object.assign(cell, data.cell); verifiedCell = cell; }
+  } catch (err) {
+    // API unreachable (e.g. static local server) — update local state only,
+    // so the demo loop still visibly works even without live functions.
+    const cell = covCells.find(c => c.id === cellId);
+    if (cell) {
+      cell.covered = true;
+      cell.category = category || cell.category || 'Pothole';
+      cell.verifiedDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      verifiedCell = cell;
+    }
+  }
+
+  // This is the only place "mine" gets written, and it's written to THIS
+  // device only — the server response above never carried a submitter
+  // identity, and never will.
+  if (verifiedCell) {
+    addMyReport({
+      cellId: verifiedCell.id,
+      category: verifiedCell.category,
+      verifiedDate: verifiedCell.verifiedDate,
+      state: currentWardMeta && currentWardMeta.state,
+      city: currentWardMeta && currentWardMeta.city,
+      ward: currentWardMeta && currentWardMeta.ward,
+      wardName: currentWardMeta ? currentWardMeta.wardName : 'Ward',
+      cityName: currentWardMeta && currentWardMeta.cityName
+    });
+  }
+
+  const cellEl = document.querySelector('.cov-grid .cov-cell[data-id="' + cellId + '"]');
+  if (cellEl) {
+    cellEl.classList.add('covered', 'you');
+    cellEl.setAttribute('aria-label', 'Verified — reported by you');
+  }
+  const fromPct = computeCoveragePctBefore(cellId);
+  refreshCoverageStats();
+  animateTicker(fromPct, computeCoveragePct(), 600);
+  renderMyImpact();
+  renderLocalFeed();
+}
+
+function computeCoveragePctBefore(justUpdatedId){
+  // The percentage immediately before this one cell flipped, for a smooth
+  // tick-up rather than a jump.
+  const total = covCells.length;
+  const coveredCount = covCells.filter(c => c.covered && c.id !== justUpdatedId).length;
+  return total ? (coveredCount / total) * 100 : 0;
+}
+
+function shuffleArray(arr){
+  const copy = arr.slice();
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function onCoverageCellTap(id){
+  const cell = covCells.find(c => c.id === id);
+  const toastEl = document.getElementById('covToast');
+  const textEl = document.getElementById('covToastText');
+  const ctaEl = document.getElementById('covToastCta');
+
+  if (cell.covered) {
+    const isMine = getMyReportedCellIds().has(cell.id);
+    textEl.textContent = cell.category + ' — verified ' + cell.verifiedDate + (isMine ? ' · reported by you' : '');
+    ctaEl.style.display = 'none';
+  } else {
+    textEl.textContent = 'Not yet surveyed — be the first to report this block.';
+    ctaEl.style.display = 'inline-block';
+    ctaEl.onclick = () => {
+      pendingReportCellId = id;
+      toastEl.classList.remove('show');
+      switchTab('tab-report', document.querySelectorAll('.navtab')[0]);
+    };
+  }
+  toastEl.classList.add('show');
+  clearTimeout(toastEl._hideTimer);
+  toastEl._hideTimer = setTimeout(() => toastEl.classList.remove('show'), 4000);
+}
+
+function selectCat(el){
+  document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+  cat=el.dataset.cat;
+}
+
+function initMap(){
+  map=L.map('map',{attributionControl:false}).setView([43.8138,-91.2519],14);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    maxZoom:19, className:'dark-tiles'
+  }).addTo(map);
+  cases.forEach(plotMarker);
+  mapInit=true;
+}
+
+function statusColor(status){
+  return status==='Critical' ? '#ff4444' : status==='Warning' ? '#ffbb00' : '#00ff88';
+}
+function statusPill(status){
+  return status==='Critical' ? 'pill-crit' : status==='Warning' ? 'pill-warn' : 'pill-ok';
+}
+
+function plotMarker(item){
+  const col=statusColor(item.status);
+  const icon=L.divIcon({html:`<div style="background:${col};width:14px;height:14px;border-radius:50%;border:2px solid #fff"></div>`,iconSize:[14,14]});
+  const m=L.marker([item.lat,item.lng],{icon}).addTo(map);
+  m.bindPopup(`<strong>${esc(item.title)}</strong><br><span style="font-size:.7rem">${esc(item.loc)} • ${esc(item.time)}</span>`);
+  markers[item.id]=m;
+}
+
+function renderFeed(){
+  const c=document.getElementById('feed'); c.innerHTML='';
+  cases.forEach(item=>{
+    const pill=statusPill(item.status);
+    const el=document.createElement('div');
+    el.className='feed-item';
+    el.innerHTML=`<div class="row"><strong>${esc(item.title)}</strong><span class="pill ${pill}">${esc(item.status)}</span></div>
+      <div class="small" style="margin:4px 0">${esc(item.desc)}</div>
+      <div class="row small"><span>${esc(item.loc)}</span><span>${esc(item.time)}</span></div>`;
+    el.addEventListener('click',()=>{
+      if(!mapInit) initMap();
+      map.flyTo([item.lat,item.lng],16);
+      markers[item.id] && markers[item.id].openPopup();
+    });
+    c.appendChild(el);
+  });
+}
+
+let cameraStream=null;
 async function openCamera(){
-  const modal = $('camModal');
-  if (modal) modal.classList.add('open');
-  const video = $('cameraVideo');
-  const fallback = $('cameraFallbackMsg');
-  if (video) video.style.display = 'none';
-  if (fallback) { fallback.style.display = 'block'; fallback.textContent = 'Requesting camera access…'; }
+  document.getElementById('camModal').classList.add('open');
+  const video=document.getElementById('cameraVideo');
+  const fallback=document.getElementById('cameraFallbackMsg');
+  video.style.display='none';
+  fallback.style.display='block';
+  fallback.textContent='Requesting camera access…';
 
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    if (fallback) fallback.textContent = 'Camera API unavailable on this device — using capture mock instead.';
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    fallback.textContent='Camera API unavailable on this device — using capture mock instead.';
     return;
   }
-  try {
-    cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
-    if (video) { video.srcObject = cameraStream; video.style.display = 'block'; }
-    if (fallback) fallback.style.display = 'none';
-  } catch (err) {
-    if (fallback) fallback.textContent = 'Camera access denied or unavailable — using capture mock instead.';
+  try{
+    cameraStream=await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment' }, audio:false });
+    video.srcObject=cameraStream;
+    video.style.display='block';
+    fallback.style.display='none';
+  }catch(err){
+    // NotAllowedError, NotFoundError, or any other getUserMedia failure — fall back to the mock capture flow.
+    fallback.textContent='Camera access denied or unavailable — using capture mock instead.';
   }
 }
 function stopCameraStream(){
-  if (cameraStream) {
-    cameraStream.getTracks().forEach(track => track.stop());
-    cameraStream = null;
+  if(cameraStream){
+    cameraStream.getTracks().forEach(track=>track.stop());
+    cameraStream=null;
   }
 }
 function closeCamera(){
-  const modal = $('camModal');
-  if (modal) modal.classList.remove('open');
+  document.getElementById('camModal').classList.remove('open');
   stopCameraStream();
 }
 function capturePhoto(){
-  const video = $('cameraVideo');
-  const photoImg = $('photoImg');
-  if (!photoImg) { closeCamera(); return; }
-  if (cameraStream && video && video.videoWidth) {
-    const canvas = $('captureCanvas');
-    if (canvas) {
-      canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-      photoImg.src = canvas.toDataURL('image/jpeg', 0.85);
-      photoImg.style.display = 'block';
-      const fallbackIcon = $('photoIconFallback');
-      if (fallbackIcon) fallbackIcon.style.display = 'none';
-    }
+  const video=document.getElementById('cameraVideo');
+  const photoImg=document.getElementById('photoImg');
+  if(cameraStream && video.videoWidth){
+    // Draw the live frame to an in-memory canvas and keep it as a local data URL —
+    // no network request, the captured frame never leaves this device at this step.
+    const canvas=document.getElementById('captureCanvas');
+    canvas.width=video.videoWidth; canvas.height=video.videoHeight;
+    canvas.getContext('2d').drawImage(video,0,0,canvas.width,canvas.height);
+    photoImg.src=canvas.toDataURL('image/jpeg',0.85);
+    photoImg.style.display='block';
+    document.getElementById('photoIconFallback').style.display='none';
   } else {
-    photoImg.style.display = 'none';
-    const fallbackIcon = $('photoIconFallback');
-    if (fallbackIcon) fallbackIcon.style.display = 'flex';
+    // No live camera available — fall back to the icon mock so the flow still completes.
+    photoImg.style.display='none';
+    document.getElementById('photoIconFallback').style.display='flex';
   }
   closeCamera();
-  const photoBox = $('photoBox');
-  if (photoBox) photoBox.style.display = 'block';
+  document.getElementById('photoBox').style.display='block';
 }
 
-/* =====================================================================
-   SUBMIT REPORT — publishes to the local session tracker and, when the
-   report started from a Fog-of-War grid tap, closes the loop for real
-   through verifyReportedCell().
-   ===================================================================== */
 function submitReport(){
-  const rawDesc = ($('repDesc') && $('repDesc').value.trim()) || 'Hazard reported.';
-  const rawLoc = ($('repLoc') && $('repLoc').value.trim()) || 'La Crosse, WI';
-  const dept = parseDepartment(rawDesc, cat);
-  const wasGridLinked = pendingReportCellId !== null;
-
-  const report = {
-    id: 'r' + (++sessionReportSeq) + '-' + Date.now(),
-    category: cat,
-    location: rawLoc,
-    description: rawDesc,
-    department: dept,
-    stage: 'submitted',
-    gridLinked: wasGridLinked
+  const rawDesc=document.getElementById('repDesc').value.trim() || 'Hazard reported.';
+  const rawLoc=document.getElementById('repLoc').value.trim() || 'La Crosse, WI';
+  const dept=parseDepartment(rawDesc);
+  const nc={
+    id:'c'+Date.now(), title:cat, loc:rawLoc,
+    lat:43.8150+(Math.random()-.5)*.01, lng:-91.2500+(Math.random()-.5)*.01,
+    status:'Critical', time:'Just now',
+    desc: rawDesc + ' → Routed to ' + dept
   };
-  sessionReports.push(report);
-  renderTracker();
-  trackReportProgress(report);
-
+  cases.unshift(nc);
+  renderFeed();
+  document.getElementById('mCount').textContent=cases.length+' active';
+  if(mapInit) plotMarker(nc);
   toast('✓ Published — routed to ' + dept);
-  const repDesc = $('repDesc');
-  if (repDesc) repDesc.value = '';
-  const photoBox = $('photoBox');
-  if (photoBox) photoBox.style.display = 'none';
-  updatePayloadPreview();
+  document.getElementById('repDesc').value='';
+  document.getElementById('photoBox').style.display='none';
 
   // If this report started from tapping a dark block on the coverage grid,
   // close the loop for real: tell the coverage API this block is now
-  // verified, light it up, and let this report's tracker reach "Resolved".
-  if (wasGridLinked) {
-    const cellId = pendingReportCellId;
+  // verified, and light it up on the grid the citizen just came from.
+  if (pendingReportCellId !== null) {
+    verifyReportedCell(pendingReportCellId, cat);
     pendingReportCellId = null;
-    verifyReportedCell(cellId, cat, report.id);
   }
+
+  switchTab('tab-map', document.querySelectorAll('.navtab')[1]);
 }
 
-/* =====================================================================
-   SERVICE WORKER
-   ===================================================================== */
 function registerSW(){
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {});
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('/sw.js', { scope:'/' }).catch(()=>{});
   }
 }
 
-/* =====================================================================
-   BOOTSTRAP
-   -----------------------------------------------------------------
-   All interaction wiring happens here (no inline onclick attributes
-   anywhere in the markup), which keeps this page compatible with a strict
-   script-src CSP with no 'unsafe-inline'. A deep link from citixenux.com's
-   Citizen Paperwork File ("Free Citizen Report" CTA) carries
-   ?state=&city=&ward= — honor it by pre-seeding the shared jurisdiction so
-   the page opens on that ward the first time it's visited.
-   ===================================================================== */
+// All interaction wiring happens here (no inline onclick attributes anywhere in the markup),
+// which keeps this page compatible with a strict script-src CSP with no 'unsafe-inline'.
+// A deep link from citixenux.com's Citizen Paperwork File ("Free Citizen
+// Report" CTA) carries ?state=&city=&ward= — honor it by pre-seeding the
+// shared jurisdiction so the Analytics tab opens on that ward the first
+// time it's visited, without waiting on a round trip through the selector.
 function applyJurisdictionFromQueryString(){
   const params = new URLSearchParams(window.location.search);
   const state = params.get('state'), city = params.get('city'), ward = params.get('ward');
@@ -1898,45 +1401,27 @@ function applyJurisdictionFromQueryString(){
   }
 }
 
-let appInitialized = false;
-
-async function initApp(){
-  if (appInitialized) return;
-  appInitialized = true;
-
+window.addEventListener('DOMContentLoaded',()=>{
   applyJurisdictionFromQueryString();
+  renderFeed();
   registerSW();
 
-  coverageDirectory = await fetchDirectory();
-  populateLocationSelectors();
-  wireLocationSelectors();
-  updateWardLabels();
-  renderDeviceToken();
-
-  await refreshWardSummary();
-  await animateCoverage();
-  renderMyImpact();
-  renderLocalFeed();
-  renderLedgerTab();
-
-  wireCitizen101();
-  wireCivicDrawer();
-  wireHotkeys();
-  wirePayloadToggle();
-  wireExports();
-  updatePayloadPreview();
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.navtab').forEach(btn => {
-    btn.addEventListener('click', () => switchTab(btn.dataset.target, btn));
+  document.querySelectorAll('.chip').forEach(chip=>{
+    chip.addEventListener('click',()=>selectCat(chip));
   });
-  on('btnCamera', 'click', openCamera);
-  on('btnCloseCam', 'click', closeCamera);
-  on('btnCapture', 'click', capturePhoto);
-  on('btnSubmit', 'click', submitReport);
+  document.querySelectorAll('.navtab').forEach(btn=>{
+    btn.addEventListener('click',()=>switchTab(btn.dataset.target,btn));
+  });
+  document.getElementById('btnCamera').addEventListener('click',openCamera);
+  document.getElementById('btnCloseCam').addEventListener('click',closeCamera);
+  document.getElementById('btnCapture').addEventListener('click',capturePhoto);
+  document.getElementById('btnSubmit').addEventListener('click',submitReport);
 
-  initApp();
+  document.querySelectorAll('.scope-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>switchScope(btn.dataset.scope,btn));
+  });
+  positionScopeThumb();
+  window.addEventListener('resize',positionScopeThumb);
 });
 </script>
 </body>
