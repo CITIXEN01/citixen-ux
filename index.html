@@ -45,6 +45,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .brand-logo{display:flex;align-items:center;gap:10px}
+.brand-logo svg{filter:drop-shadow(0 0 6px rgba(0,255,136,.55))}
 /* ===== UNIFIED LOGO LOCKUP (identical markup/classes across index.html, admin.html, app.html) ===== */
 .brand-wordmark{font-weight:800;font-size:1.05rem;letter-spacing:.3px}
 .brand-white{color:#ffffff}
@@ -101,6 +102,18 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .hero h2{font-size:1rem;font-weight:700;color:var(--mint2);margin-bottom:14px}
 .hero-badge{display:inline-flex;align-items:center;background:var(--brand-mint-dim);border:1px solid rgba(0,255,136,.35);
   color:var(--mint2);border-radius:20px;padding:6px 16px;font-size:.72rem;font-weight:700;letter-spacing:.3px;margin-bottom:22px}
+
+/* ===== LATERAL BRIDGE HUB CARDS ===== */
+.hub-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:920px;margin:0 auto 26px;padding:0 24px}
+.hub-card{display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--card);
+  border:1px solid var(--border);border-radius:14px;padding:16px 12px;cursor:pointer;color:var(--text);
+  text-align:center;transition:border-color .15s,transform .15s;font-family:inherit}
+.hub-card:hover{border-color:var(--mint2);transform:translateY(-2px)}
+.hub-card svg{stroke:var(--brand-mint);flex-shrink:0}
+.hub-card span{font-size:.74rem;font-weight:700;line-height:1.3}
+@media (max-width:768px){
+  .hub-row{grid-template-columns:1fr}
+}
 
 /* ===== GATEWAY LANDING TELEMETRY (semi-circle gas gauges + resolve readout) ===== */
 .gateway-telemetry{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;gap:22px;margin:0 auto 26px;max-width:640px}
@@ -409,11 +422,25 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   <section class="hero">
     <h1>CITIXEN UX<sup style="font-size:.5em;opacity:.4;">™</sup></h1>
     <h2>Civic Intelligence Platform</h2>
-    <div class="hero-badge">CITIXEN Mobile Gateway</div>
+
+    <div class="hub-row" role="navigation" aria-label="Dashboard shortcuts">
+      <button class="hub-card" id="hubCoverageBtn" type="button">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span>Asset Coverage &amp; Survey Grid</span>
+      </button>
+      <button class="hub-card" id="hubSlaBtn" type="button">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19a8 8 0 0 1 16 0"/><line x1="12" y1="19" x2="16.5" y2="10.5"/><circle cx="12" cy="19" r="1.4"/></svg>
+        <span>District SLA &amp; Expenditure Gauge</span>
+      </button>
+      <button class="hub-card" id="hubStackBtn" type="button">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 21 8 12 13 3 8 12 3"/><polyline points="3 13 12 18 21 13"/><polyline points="3 18 12 23 21 18"/></svg>
+        <span>Geotagged Civic Stack</span>
+      </button>
+    </div>
 
     <div class="gateway-telemetry" aria-label="Gateway telemetry">
       <div class="gauge-dial">
-        <div class="gd-label">Ward Health Index</div>
+        <div class="gd-label">Citywide Health Index</div>
         <svg viewBox="0 0 120 66" width="120" height="66" aria-hidden="true">
           <path class="gd-track" d="M10,60 A50,50 0 0 1 110,60" fill="none" stroke-width="9"/>
           <path id="gwWardArc" class="gd-fill" d="M10,60 A50,50 0 0 1 110,60" fill="none" stroke-width="9" stroke-dasharray="157.08" stroke-dashoffset="157.08"/>
@@ -447,7 +474,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   </section>
 
   <div class="hero-stack">
-    <a class="btn btn-primary btn-hero" href="/app.html" target="_blank" rel="noopener noreferrer">Civic Mobile Gateway</a>
+    <a class="btn btn-primary btn-hero" href="/app" target="_blank" rel="noopener noreferrer">Launch Mobile Reporter ↗</a>
     <div class="hud-card" style="max-width:420px;width:100%;">
       <div class="label">Install Mobile Reporter</div>
       <div class="qr-row">
@@ -485,10 +512,10 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 
   <section id="dashboard">
     <aside class="sidebar">
-      <div class="card">
-        <div class="label"><span>Ward Health Index</span><span id="healthCity" style="color:var(--mint2)">Locating…</span></div>
+      <div class="card" id="coverageGridCard">
+        <div class="label"><span>Citywide Health Index</span><span id="healthCity" style="color:var(--mint2)">Locating…</span></div>
         <select class="grid-select" id="gridSelect" aria-label="Select municipal grid" style="width:100%;min-width:0;margin-bottom:10px;">
-          <option value="lacrosse">La Crosse, WI (Ward 4 Active)</option>
+          <option value="lacrosse">La Crosse, WI</option>
           <option value="austin">Austin, TX (Ward 2)</option>
           <option value="chicago">Chicago, IL (District 7)</option>
           <option value="add">Add Your City +</option>
@@ -522,7 +549,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         <div class="small" style="margin-top:10px;">Tap a category to filter the feed below.</div>
       </div>
 
-      <div class="card ledger-card">
+      <div class="card ledger-card" id="ledgerCard">
         <div class="label"><span id="ledgerTitle">CITYWIDE MUNICIPAL EXPENDITURE & ALLOCATION</span></div>
         <div class="ledger-tag">AI Categorization Engine // Real-Time Capital Tracking</div>
 
@@ -590,7 +617,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 'use strict';
 
 const cities={
-  lacrosse:{ name:'La Crosse', region:'Ward 4', label:'La Crosse, WI (Ward 4 Active)', lat:43.8138, lng:-91.2519, zoom:14, health:88, sla:91, roads:82, lighting:64, sanitation:74,
+  lacrosse:{ name:'La Crosse', region:'Citywide', label:'La Crosse, WI', lat:43.8138, lng:-91.2519, zoom:14, health:88, sla:91, roads:82, lighting:64, sanitation:74,
     slaHours:18, resolvedWeek:84, totalWeek:91, dispatchCapacity:72,
     ledger:{ roads:[124500,42], lighting:[82900,28], sanitation:[53300,18], ada:[35500,12] } },
   austin:{ name:'Austin', region:'Ward 2', label:'Austin, TX (Ward 2)', lat:30.2672, lng:-97.7431, zoom:12, health:79, sla:88, roads:70, lighting:66, sanitation:81,
@@ -827,7 +854,7 @@ const modalData={
     body:[
       ['Response Commitment','Every submitted report receives an acknowledged routing decision within the ward\'s published SLA window.'],
       ['Escalation Path','Reports left unresolved past their SLA window are automatically flagged for department escalation.'],
-      ['Transparency','Ward-level SLA performance (shown in the Ward Health Index) is calculated from the same data dispatchers see — not a marketing figure.']
+      ['Transparency','Ward-level SLA performance (shown in the Citywide Health Index) is calculated from the same data dispatchers see — not a marketing figure.']
     ]
   },
   anonymity:{
@@ -842,7 +869,7 @@ const modalData={
     title:'Community Action Logs',
     body:[
       ['Upcoming Ward Cleanup','Sat, Oct 4 — Pine St Alley cleanup, 9:00 AM, Public Works staging lot.'],
-      ['Volunteer Dispatch','Tue, Oct 7 — Ward 4 Council session, streetlight budget review, 6:30 PM. Volunteer slots open for setup crew.'],
+      ['Volunteer Dispatch','Tue, Oct 7 — Local Council session, streetlight budget review, 6:30 PM. Volunteer slots open for setup crew. Check your district\'s calendar for exact ward/session details.'],
       ['Citizen Priority Voting','Residents may rank which open hazard categories (Roads / Lighting / Sanitation) should receive next quarter\'s discretionary repair budget.']
     ]
   },
@@ -876,6 +903,16 @@ document.querySelectorAll('#civicToolsMenu button, #civicToolsMenu a').forEach(b
       openModal(btn.dataset.modal);
     }
   });
+});
+/* ===== LATERAL BRIDGE HUB CARDS — scroll/reveal wiring (CSP-safe, no inline onclick) ===== */
+document.getElementById('hubCoverageBtn').addEventListener('click',()=>{
+  document.getElementById('coverageGridCard').scrollIntoView({ behavior:'smooth', block:'center' });
+});
+document.getElementById('hubSlaBtn').addEventListener('click',()=>{
+  document.getElementById('ledgerCard').scrollIntoView({ behavior:'smooth', block:'center' });
+});
+document.getElementById('hubStackBtn').addEventListener('click',()=>{
+  openPaperworkFile();
 });
 document.getElementById('privacyPillBtn').addEventListener('click',()=> openModal('anonymity'));
 document.getElementById('modalClose').addEventListener('click',()=> document.getElementById('modalOverlay').classList.remove('open'));
