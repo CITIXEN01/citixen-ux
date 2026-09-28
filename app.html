@@ -278,36 +278,6 @@ textarea.input{resize:none;line-height:1.4}
 
     <section id="tab-map" class="tabpane">
       <div class="card">
-        <div class="radius-tag">
-          <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-          1–5 MILE FOG-OF-WAR GRID
-        </div>
-        <div class="coverage-head">
-          <div>
-            <div class="label" style="margin-bottom:2px">Citywide asset coverage</div>
-            <div class="coverage-ticker" id="mapFowTicker">0.0%</div>
-          </div>
-          <div style="text-align:right">
-            <div class="coverage-sub" id="mapFowSub">Ward 4 blocks surveyed</div>
-            <div style="font-size:.8rem;font-weight:800" id="mapFowFraction">0 / 0</div>
-          </div>
-        </div>
-        <div class="cov-legend">
-          <span><span class="dot" style="background:var(--mint2)"></span>Audited</span>
-          <span><span class="dot" style="background:var(--fow-amber)"></span>Pending</span>
-          <span><span class="dot" style="background:rgba(255,255,255,.15)"></span>Uncharted</span>
-        </div>
-        <div class="cov-grid" id="mapFowGrid"></div>
-        <div class="cov-toast" id="mapFowToast">
-          <span id="mapFowToastText"></span>
-          <button class="ct-cta" id="mapFowToastCta">Report it</button>
-        </div>
-        <div class="your-impact">
-          <div class="num" id="mapFowYouCount">0</div>
-          <div class="lbl">blocks you've helped verify — tap any dark block to report it and light it up for everyone.</div>
-        </div>
-      </div>
-      <div class="card">
         <div class="label"><span>Civic dispatch map</span><span id="mCount" style="color:var(--mint2)">3 active</span></div>
         <div id="map"></div>
       </div>
@@ -318,6 +288,37 @@ textarea.input{resize:none;line-height:1.4}
     </section>
 
     <section id="tab-analytics" class="tabpane">
+
+      <div class="card">
+        <div class="radius-tag">
+          <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+          1–5 MILE FOG-OF-WAR GRID
+        </div>
+        <div class="coverage-head">
+          <div>
+            <div class="label" style="margin-bottom:2px">Citywide asset coverage</div>
+            <div class="coverage-ticker" id="covTicker">0.0%</div>
+          </div>
+          <div style="text-align:right">
+            <div class="coverage-sub" id="covSub">Ward 4 blocks surveyed</div>
+            <div style="font-size:.8rem;font-weight:800" id="covFraction">0 / 0</div>
+          </div>
+        </div>
+        <div class="cov-legend">
+          <span><span class="dot" style="background:var(--mint2)"></span>Audited</span>
+          <span><span class="dot" style="background:var(--fow-amber)"></span>Pending</span>
+          <span><span class="dot" style="background:rgba(255,255,255,.15)"></span>Uncharted</span>
+        </div>
+        <div class="cov-grid" id="covGrid"></div>
+        <div class="cov-toast" id="covToast">
+          <span id="covToastText"></span>
+          <button class="ct-cta" id="covToastCta">Report it</button>
+        </div>
+        <div class="your-impact">
+          <div class="num" id="covYouCount">0</div>
+          <div class="lbl">blocks you've helped verify — tap any dark block to report it and light it up for everyone.</div>
+        </div>
+      </div>
 
       <div class="scope-toggle" id="scopeToggle" role="tablist" aria-label="Analytics scope">
         <div class="scope-thumb" id="scopeThumb"></div>
@@ -352,32 +353,6 @@ textarea.input{resize:none;line-height:1.4}
             <div style="margin-top:10px;">
               <div class="row"><span>Lighting & safety</span><span style="color:var(--warn)" id="healthLightPct">64%</span></div>
               <div class="bar"><span style="width:64%;background:var(--warn)" id="healthLightBar"></span></div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="coverage-head">
-              <div>
-                <div class="label" style="margin-bottom:2px">Citywide asset coverage</div>
-                <div class="coverage-ticker" id="covTicker">0.0%</div>
-              </div>
-              <div style="text-align:right">
-                <div class="coverage-sub" id="covSub">Ward 4 blocks surveyed</div>
-                <div style="font-size:.8rem;font-weight:800" id="covFraction">0 / 0</div>
-              </div>
-            </div>
-            <div class="cov-legend">
-              <span><span class="dot" style="background:var(--mint2)"></span>Verified</span>
-              <span><span class="dot" style="background:rgba(255,255,255,.15)"></span>Not yet surveyed</span>
-            </div>
-            <div class="cov-grid" id="covGrid"></div>
-            <div class="cov-toast" id="covToast">
-              <span id="covToastText"></span>
-              <button class="ct-cta" id="covToastCta">Report it</button>
-            </div>
-            <div class="your-impact">
-              <div class="num" id="covYouCount">0</div>
-              <div class="lbl">blocks you've helped verify — tap any dark block to report it and light it up for everyone.</div>
             </div>
           </div>
 
@@ -547,11 +522,6 @@ function switchTab(id,btn){
     if(!mapInit) initMap();
     // Force Leaflet to recalculate container dimensions once unhidden
     setTimeout(()=>{ if(map) map.invalidateSize(); },200);
-    // Fog-of-War grid: loads/animates once (shared covCells with Analytics'
-    // grid via the coverageLoaded guard in animateCoverage), so opening
-    // Map & feed first still shows live coverage without visiting Analytics.
-    resolveCoverageEndpointFromStorage();
-    animateCoverage();
   }
   if(id==='tab-analytics'){
     initAnalytics();
@@ -1016,23 +986,6 @@ function jumpToMunicipality(m){
    ===================================================================== */
 let COVERAGE_ENDPOINT = '/api/coverage/wi/la-crosse/ward-4';
 
-// If the Map & feed tab's Fog-of-War grid loads before the Analytics tab
-// has ever been opened (which is what normally resolves currentWardMeta
-// from the live directory), fall back to whatever jurisdiction was already
-// confirmed elsewhere (citixenux.com's location intake modal) so the grid
-// doesn't silently show the wrong ward's blocks. No-op once currentWardMeta
-// is set for real.
-function resolveCoverageEndpointFromStorage(){
-  if (currentWardMeta) return;
-  const stored = getStoredJurisdiction();
-  if (stored && stored.state && stored.city && stored.ward) {
-    COVERAGE_ENDPOINT = '/api/coverage/' + stored.state + '/' + stored.city + '/' + stored.ward;
-    const label = (stored.wardName || 'Ward') + ' blocks surveyed';
-    setTextIfExists('mapFowSub', label);
-    setTextIfExists('covSub', label);
-  }
-}
-
 function mockCoverageCells(){
   // Same shape as the real endpoint — used only when the API can't be reached.
   // No "reportedByYou" here: that's never public/shared data (see note below).
@@ -1135,13 +1088,12 @@ async function fetchCoverageGrid(){
 let covCells = [];
 let pendingReportCellId = null;
 
-// The Analytics tab's Ward 4 Local grid (#covGrid) and the Map & feed tab's
-// Fog-of-War grid (#mapFowGrid) render the SAME covCells data into two
-// separate DOM targets, so both stay in sync from one fetch — tapping a
-// block or verifying a report updates whichever grid(s) are on the page.
-// Every lookup here is null-guarded: a grid id not present on this build of
-// the page (or an id that gets renamed later) is skipped rather than thrown.
-const COVERAGE_GRID_IDS = ['covGrid', 'mapFowGrid'];
+// The Fog-of-War grid lives only in the Analytics tab's Ward 4 Local view
+// (#covGrid) — Map & feed shows just the live dispatch map and feed.
+// coverageGridEls() stays list-based and null-guarded (an id not present on
+// this build of the page is skipped rather than thrown) so the grid can be
+// relocated or duplicated again later without touching this logic.
+const COVERAGE_GRID_IDS = ['covGrid'];
 function coverageGridEls(){
   return COVERAGE_GRID_IDS.map(id => document.getElementById(id)).filter(Boolean);
 }
@@ -1218,12 +1170,11 @@ function computeCoveragePct(){
   return total ? (coveredCount / total) * 100 : 0;
 }
 
-// Stat ids come in Analytics-tab / Map-tab pairs; each is set only if that
-// element exists on the page, so either tab can be present, absent, or
-// (as today) both at once without a missing id ever throwing.
-const COVERAGE_FRACTION_IDS = ['covFraction', 'mapFowFraction'];
-const COVERAGE_YOU_COUNT_IDS = ['covYouCount', 'mapFowYouCount'];
-const COVERAGE_TICKER_IDS = ['covTicker', 'mapFowTicker'];
+// Each stat id is set only if that element exists on the page, so a
+// renamed or removed id is skipped rather than thrown.
+const COVERAGE_FRACTION_IDS = ['covFraction'];
+const COVERAGE_YOU_COUNT_IDS = ['covYouCount'];
+const COVERAGE_TICKER_IDS = ['covTicker'];
 
 function setTextIfExists(id, text){
   const el = document.getElementById(id);
@@ -1325,14 +1276,14 @@ function shuffleArray(arr){
   return copy;
 }
 
-// gridId names WHICH grid was tapped (covGrid in Analytics, mapFowGrid in
-// Map & feed) so the toast shows in that same card rather than one that may
-// be off-screen in another tab; each lookup is null-guarded so a grid
-// without its own toast markup simply skips showing one instead of throwing.
+// gridId names which grid was tapped, kept for forward-compatibility if the
+// grid is ever shown in more than one place again; every lookup here is
+// null-guarded so a grid without its own toast markup simply skips showing
+// one instead of throwing.
 function onCoverageCellTap(id, gridId){
   const cell = covCells.find(c => c.id === id);
   if (!cell) return;
-  const suffix = gridId === 'mapFowGrid' ? 'mapFow' : 'cov';
+  const suffix = 'cov';
   const toastEl = document.getElementById(suffix + 'Toast');
   const textEl = document.getElementById(suffix + 'ToastText');
   const ctaEl = document.getElementById(suffix + 'ToastCta');
