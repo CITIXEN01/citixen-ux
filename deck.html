@@ -127,10 +127,88 @@ p.slide-lede{font-size:clamp(.9rem,1.4vw,1.1rem);color:var(--muted);max-width:68
 /* ===== LOGO SHIELD ===== */
 .shield{stroke:var(--brand-mint);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 
+/* ===== TOP-RIGHT PATENT BADGE (slide 1) ===== */
+.patent-badge{position:absolute;top:64px;right:28px;z-index:3;display:flex;flex-direction:column;align-items:flex-end;gap:4px;
+  padding:10px 16px;border:1px solid rgba(0,255,136,.4);border-radius:12px;background:rgba(0,255,136,.08);backdrop-filter:blur(6px)}
+.patent-badge .pb-top{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.6rem;font-weight:800;letter-spacing:.08em;color:var(--brand-mint)}
+.patent-badge .pb-sub{font-family:var(--mono);font-size:.56rem;color:var(--muted);letter-spacing:.04em}
+.dot-live{width:6px;height:6px;border-radius:50%;background:var(--brand-mint);box-shadow:0 0 6px var(--brand-mint);flex-shrink:0;animation:pulseDot 1.8s ease-in-out infinite}
+@keyframes pulseDot{0%,100%{opacity:1}50%{opacity:.35}}
+@media(max-width:640px){.patent-badge{position:static;align-items:center;margin:0 auto 16px}}
+
+/* ===== PIPELINE (slide 3) ===== */
+.pipeline{display:flex;align-items:stretch;gap:0}
+.pipeline-node{flex:1;background:rgba(15,23,19,.6);border:1px solid var(--border-muted);border-radius:16px;padding:20px;
+  backdrop-filter:blur(6px);display:flex;flex-direction:column}
+.pipeline-arrow{display:flex;align-items:center;justify-content:center;width:40px;flex-shrink:0;color:var(--brand-mint);opacity:.85}
+.pipeline-arrow svg{width:20px;height:20px}
+@media(max-width:760px){
+  .pipeline{flex-direction:column;gap:0}
+  .pipeline-arrow{width:100%;height:32px}
+  .pipeline-arrow svg{transform:rotate(90deg)}
+}
+
+/* ===== MINI BULLET LIST ===== */
+.mini-list{margin:0 0 10px 18px;padding:0;font-size:.78rem;color:var(--muted);line-height:1.6}
+.mini-list li{margin-bottom:2px}
+
+/* ===== RED/LIME STATUS TAGS (slide 6) ===== */
+.status-tag{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.6rem;font-weight:800;
+  letter-spacing:.04em;border-radius:20px;padding:6px 12px;margin-bottom:12px;line-height:1.3}
+.status-tag.red{color:var(--brand-red);border:1px solid rgba(255,68,68,.45);background:rgba(255,68,68,.1)}
+.status-tag.lime{color:var(--brand-mint);border:1px solid rgba(0,255,136,.45);background:rgba(0,255,136,.1)}
+.status-tag .sd{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+
+/* ===== CAPEX LINE-ITEM TABLE (slide 7) ===== */
+.capex-table{margin-top:16px;width:100%;max-width:420px;margin-left:auto;margin-right:auto;text-align:left}
+.capex-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border-muted)}
+.capex-row:last-child{border-bottom:none}
+.capex-row .cx-label{flex:0 0 96px;font-size:.72rem;color:var(--muted)}
+.capex-row .cx-bar-track{flex:1;height:8px;border-radius:6px;background:rgba(255,255,255,.06);overflow:hidden}
+.capex-row .cx-bar-fill{height:100%;background:var(--brand-mint);border-radius:6px}
+.capex-row .cx-amt{flex:0 0 62px;text-align:right;font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--text)}
+
+/* ===== STACKED COMPARISON BARS (slide 8) ===== */
+.stack-compare{display:flex;flex-direction:column;gap:16px;margin-top:22px}
+.stack-row .sr-label{font-family:var(--mono);font-size:.64rem;letter-spacing:.08em;color:var(--muted);margin-bottom:6px;text-transform:uppercase}
+.stack-row .sr-bar{display:flex;height:40px;border-radius:10px;overflow:hidden;border:1px solid var(--border-muted)}
+.stack-row .sr-admin-gray{background:rgba(255,255,255,.14);color:var(--text);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.76rem}
+.stack-row .sr-field-muted{background:rgba(255,255,255,.05);color:var(--muted);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.76rem}
+.stack-row .sr-admin-dark{background:#050807;color:var(--muted);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.68rem}
+.stack-row .sr-field-lime{background:var(--brand-mint);color:#051311;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.85rem}
+
+/* ===== API MIDDLEWARE DIAGRAM (slide 9) ===== */
+.api-diagram{display:flex;align-items:center;justify-content:center;gap:0;margin:6px 0 20px}
+.api-node{background:rgba(15,23,19,.6);border:1px solid var(--border-muted);border-radius:14px;padding:14px 16px;text-align:center;flex:1}
+.api-node.mid{border-color:rgba(0,255,136,.4);background:rgba(0,255,136,.06)}
+.api-node .an-label{font-family:var(--mono);font-size:.56rem;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+.api-node .an-title{font-size:.82rem;font-weight:800;color:var(--text)}
+.api-node.mid .an-title{color:var(--brand-mint)}
+.api-node .an-sub{font-size:.64rem;color:var(--muted);margin-top:4px;line-height:1.4}
+.api-arrow{width:32px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--brand-mint);opacity:.75}
+.api-arrow svg{width:18px;height:18px}
+@media(max-width:760px){.api-diagram{flex-direction:column}.api-arrow svg{transform:rotate(90deg)}.api-arrow{width:100%;height:26px}}
+
+/* ===== ROADMAP (slide 10) ===== */
+.roadmap{display:flex;align-items:flex-start;justify-content:space-between;max-width:760px;margin:24px auto 0;position:relative}
+.roadmap::before{content:'';position:absolute;top:15px;left:6%;right:6%;height:1px;background:var(--border-muted);z-index:0}
+.roadmap-node{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:8px;flex:1}
+.roadmap-node .rn-dot{width:30px;height:30px;border-radius:50%;background:var(--bg-obsidian);border:1px solid var(--brand-mint);
+  display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.66rem;font-weight:800;color:var(--brand-mint)}
+.roadmap-node.done .rn-dot{background:var(--brand-mint);color:#051311}
+.roadmap-node .rn-label{font-size:.62rem;color:var(--muted);text-align:center;max-width:96px;line-height:1.3}
+
+/* ===== COVERAGE GRID WIDGET (slide 5) ===== */
+.cux-grid{display:grid;grid-template-columns:repeat(20,1fr);grid-auto-rows:9px;gap:3px}
+.cux-cell{background:#1a241f;border-radius:2px;transition:background .5s ease,box-shadow .5s ease}
+.cux-cell.lit{background:var(--brand-mint);box-shadow:0 0 6px rgba(0,255,136,.85)}
+
 @media(max-width:640px){
-  .slide{padding:80px 6vw 80px}
+  .slide{padding:80px 6vw 80px;align-items:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch}
   .grid-3, .grid-2{gap:10px}
   .metric-card{padding:12px}
+  .roadmap-node .rn-label{max-width:60px;font-size:.56rem}
+  .route-svg{display:none}
 }
 </style>
 </head>
@@ -177,6 +255,10 @@ p.slide-lede{font-size:clamp(.9rem,1.4vw,1.1rem);color:var(--muted);max-width:68
         </g>
       </svg>
     </div>
+    <div class="patent-badge">
+      <span class="pb-top"><span class="dot-live"></span>PROVISIONAL PATENT PROTECTED</span>
+      <span class="pb-sub">US App #64/160,168 &amp; #64/163,426</span>
+    </div>
     <div class="slide-inner" style="text-align:center">
       <svg viewBox="0 0 24 24" width="54" height="54" class="shield" style="margin:0 auto 22px;display:block"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       <div class="hud-label" style="justify-content:center;display:flex;margin-bottom:10px">CIVIC INTELLIGENCE PLATFORM</div>
@@ -184,6 +266,9 @@ p.slide-lede{font-size:clamp(.9rem,1.4vw,1.1rem);color:var(--muted);max-width:68
       <p class="slide-lede" style="margin:0 auto 14px;text-align:center;font-weight:700;font-size:1.15em;color:var(--text)">Upgrade Your Civic Experience</p>
       <p class="slide-lede" style="margin:0 auto 20px">Turning citizen reports into resolved infrastructure — anonymously, in real time, and with the capital-planning data to prove it.</p>
       <div class="hud-label" style="display:inline-flex;padding:10px 22px;border:1px solid var(--brand-mint-dim);border-radius:999px;background:rgba(0,255,136,0.08);letter-spacing:.08em">citixenux.com</div>
+      <div class="cta-row" style="justify-content:center;margin-top:22px">
+        <a class="btn btn-primary" href="https://citixen-ux.vercel.app" target="_blank" rel="noopener noreferrer">▶ Live PWA Demo</a>
+      </div>
     </div>
   </section>
 
@@ -213,21 +298,24 @@ p.slide-lede{font-size:clamp(.9rem,1.4vw,1.1rem);color:var(--muted);max-width:68
     <div class="slide-inner">
       <div class="slide-eyebrow"><span class="hud-label">THE PLATFORM</span><span class="n">03 / 10</span></div>
       <h1 class="slide-title">One Pipeline. <span class="lime">Three Modules.</span></h1>
-      <div class="grid-3">
-        <div class="glass module-card">
-          <div class="tag">GATEWAY</div>
-          <h3>Public Gateway</h3>
-          <p>Live, public ward-health dashboard — resolution SLA, dispatch capacity, and resolve rate, visible without a login.</p>
-        </div>
-        <div class="glass module-card">
-          <div class="tag">PWA</div>
-          <h3>Citizen Reporter</h3>
+      <p class="slide-lede">A single report flows straight through — citizen capture, municipal dispatch, and public proof — with no manual handoff between stages.</p>
+      <div class="pipeline">
+        <div class="glass module-card pipeline-node">
+          <div class="tag">PWA · ZERO-ACCOUNT</div>
+          <h3>Citizen PWA</h3>
           <p>Zero-account mobile reporting. Category, photo, description — EXIF and GPS stripped before upload, submitted in under 60 seconds.</p>
         </div>
-        <div class="glass module-card">
-          <div class="tag">CONSOLE</div>
+        <div class="pipeline-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"/></svg></div>
+        <div class="glass module-card pipeline-node">
+          <div class="tag">CONSOLE · DISPATCH/SLA</div>
           <h3>Municipal Console</h3>
           <p>Real-time dispatch, SLA and severity queues, capital ledger, and one-click printable ward reporting for council packets.</p>
+        </div>
+        <div class="pipeline-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"/></svg></div>
+        <div class="glass module-card pipeline-node">
+          <div class="tag">GATEWAY · PROOF LEDGER</div>
+          <h3>Public Gateway</h3>
+          <p>Live, public ward-health dashboard — resolution SLA, dispatch capacity, and resolve rate, visible without a login.</p>
         </div>
       </div>
     </div>
@@ -241,26 +329,8 @@ p.slide-lede{font-size:clamp(.9rem,1.4vw,1.1rem);color:var(--muted);max-width:68
       <p class="slide-lede">Two provisional filings cover the platform end to end — one governing the citizen-facing capture and moderation layer, one governing the back-end spatial data and capital-scoping engine.</p>
       <div class="grid-2">
         <div class="glass lime-edge">
-          <div class="tag" style="margin-bottom:10px">CITIZEN UX LAYER</div>
-          <h3 style="margin-bottom:4px">Resident Switchboard Layer</h3>
-          <p class="hud-sub" style="line-height:1.5;margin-bottom:10px">"System and Method for Location-Verified Civic Intelligence Capture, Moderation, and Real-Time District Management Ledger"</p>
-          <svg class="route-svg" viewBox="0 0 200 90" style="margin:6px 0 10px">
-            <rect x="0" y="0" width="200" height="90" rx="10" fill="#071619"/>
-            <g stroke="#00ff88" stroke-width="1.6" opacity=".7">
-              <circle cx="100" cy="42" r="12" fill="none"/>
-              <circle cx="100" cy="42" r="26" fill="none"/>
-              <circle cx="100" cy="42" r="40" fill="none" stroke-dasharray="3 4"/>
-            </g>
-            <circle cx="100" cy="42" r="4" fill="#00ff88"/>
-            <text x="100" y="76" text-anchor="middle" fill="#8e9fa8" font-family="monospace" font-size="8" letter-spacing="1">LOCATION-VERIFIED CAPTURE</text>
-          </svg>
-          <p style="font-size:.78rem;color:var(--muted);line-height:1.5;margin-bottom:10px">Powers the front-end Citizen UX: location verification, moderation, and the real-time district management switchboard.</p>
-          <p style="font-size:.8rem;color:var(--text)">U.S. Provisional Patent Application No. <strong>64/160,168</strong></p>
-          <p class="footnote" style="margin-top:4px">Filed September 22, 2026</p>
-        </div>
-        <div class="glass lime-edge">
-          <div class="tag" style="margin-bottom:10px">MUNICIPAL SPATIAL TELEMETRY LAYER</div>
-          <h3 style="margin-bottom:4px">Municipal Data Engine &amp; CapEx Scoping</h3>
+          <div class="tag" style="margin-bottom:10px">PATHWAY 1 · MECHANICAL ENGINE</div>
+          <h3 style="margin-bottom:4px">Mechanical Engine — USPTO #64/163,426</h3>
           <p class="hud-sub" style="line-height:1.5;margin-bottom:10px">"Hardware-Agnostic Spatial Stream Processing Engine for Automated Material Cataloging, Structural Degradation Evaluation, and Dynamic Cost-Linked Infrastructure Scoping"</p>
           <svg class="route-svg" viewBox="0 0 200 90" style="margin:6px 0 10px">
             <rect x="0" y="0" width="200" height="90" rx="10" fill="#071619"/>
@@ -276,9 +346,35 @@ p.slide-lede{font-size:clamp(.9rem,1.4vw,1.1rem);color:var(--muted);max-width:68
             </g>
             <text x="100" y="82" text-anchor="middle" fill="#8e9fa8" font-family="monospace" font-size="8" letter-spacing="1">CAPEX SCOPING · WARD 4</text>
           </svg>
-          <p style="font-size:.78rem;color:var(--muted);line-height:1.5;margin-bottom:10px">Powers back-end data stripping, material cataloging, structural degradation evaluation, and automated CapEx scoping.</p>
+          <ul class="mini-list">
+            <li>Material cataloging</li>
+            <li>Structural degradation scoring</li>
+            <li>CapEx scoping</li>
+          </ul>
           <p style="font-size:.8rem;color:var(--text)">U.S. Provisional Patent Application No. <strong>64/163,426</strong></p>
           <p class="footnote" style="margin-top:4px">Filed September 27, 2026</p>
+        </div>
+        <div class="glass lime-edge">
+          <div class="tag" style="margin-bottom:10px">PATHWAY 2 · STAFFING ENGINE</div>
+          <h3 style="margin-bottom:4px">Staffing Engine — USPTO #64/160,168</h3>
+          <p class="hud-sub" style="line-height:1.5;margin-bottom:10px">"System and Method for Location-Verified Civic Intelligence Capture, Moderation, and Real-Time District Management Ledger"</p>
+          <svg class="route-svg" viewBox="0 0 200 90" style="margin:6px 0 10px">
+            <rect x="0" y="0" width="200" height="90" rx="10" fill="#071619"/>
+            <g stroke="#00ff88" stroke-width="1.6" opacity=".7">
+              <circle cx="100" cy="42" r="12" fill="none"/>
+              <circle cx="100" cy="42" r="26" fill="none"/>
+              <circle cx="100" cy="42" r="40" fill="none" stroke-dasharray="3 4"/>
+            </g>
+            <circle cx="100" cy="42" r="4" fill="#00ff88"/>
+            <text x="100" y="76" text-anchor="middle" fill="#8e9fa8" font-family="monospace" font-size="8" letter-spacing="1">LOCATION-VERIFIED CAPTURE</text>
+          </svg>
+          <ul class="mini-list">
+            <li>District switchboard</li>
+            <li>Automated ward routing</li>
+            <li>SLA tracking</li>
+          </ul>
+          <p style="font-size:.8rem;color:var(--text)">U.S. Provisional Patent Application No. <strong>64/160,168</strong></p>
+          <p class="footnote" style="margin-top:4px">Filed September 22, 2026</p>
         </div>
       </div>
       <p class="footnote" style="margin-top:16px">Filing details as provided by applicant.</p>
@@ -317,6 +413,25 @@ p.slide-lede{font-size:clamp(.9rem,1.4vw,1.1rem);color:var(--muted);max-width:68
           <div class="m-sub">Tickets resolved this week</div>
         </div>
       </div>
+      <div class="glass lime-edge" style="margin-top:16px;padding:16px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;margin-bottom:12px">
+          <div>
+            <div class="hud-label" style="margin-bottom:4px">CITYWIDE ASSET COVERAGE</div>
+            <div style="font-family:var(--mono);font-size:1.7rem;font-weight:900;color:var(--brand-mint)" id="coverageTicker">0.0%</div>
+          </div>
+          <div style="display:flex;gap:20px;text-align:right">
+            <div>
+              <div class="hud-sub">WARD 4 ROADS</div>
+              <div style="font-size:.8rem;font-weight:800;margin-top:2px">88.1% Cataloged</div>
+            </div>
+            <div>
+              <div class="hud-sub" style="color:var(--brand-amber)">UNMAPPED RISK GAP</div>
+              <div style="font-size:.8rem;font-weight:800;color:var(--brand-amber);margin-top:2px">11.9%</div>
+            </div>
+          </div>
+        </div>
+        <div class="cux-grid" id="coverageGrid"></div>
+      </div>
     </div>
   </section>
 
@@ -328,10 +443,12 @@ p.slide-lede{font-size:clamp(.9rem,1.4vw,1.1rem);color:var(--muted);max-width:68
       <p class="slide-lede">A ticket cannot close on paperwork alone. Every resolution requires a timestamped, EXIF-verified proof photo from the crew on site — pushed automatically to the public feed.</p>
       <div class="grid-2">
         <div class="glass">
+          <div class="status-tag red"><span class="sd"></span>GHOST CLOSURE DETECTED — DESK TRIAGE / NO PHOTO</div>
           <div class="hud-label" style="margin-bottom:8px">BEFORE</div>
           <p style="font-size:.85rem;color:var(--muted);line-height:1.6">Dispatcher marks a ticket "Resolved" from a desk. No photo, no timestamp, no way to confirm a crew was ever on site.</p>
         </div>
         <div class="glass lime-edge">
+          <div class="status-tag lime"><span class="sd"></span>EXIF/GPS VERIFIED — FIELD CREW PHOTO TIMESTAMPED</div>
           <div class="hud-label" style="margin-bottom:8px">WITH CITIXEN UX</div>
           <p style="font-size:.85rem;color:var(--text);line-height:1.6">Closure requires a proof photo. EXIF timestamp + location are verified server-side, then the resolution posts to the resident's public feed automatically.</p>
         </div>
@@ -349,6 +466,23 @@ p.slide-lede{font-size:clamp(.9rem,1.4vw,1.1rem);color:var(--muted);max-width:68
         <div class="m-label" style="font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px">CAPEX SCOPING LEDGER — TRACK 2</div>
         <div style="font-size:2.4rem;font-weight:900;color:var(--brand-mint)">$482,600</div>
         <div class="m-sub" style="margin-top:8px">Scoped capital spend — current cycle, Ward 4</div>
+        <div class="capex-table">
+          <div class="capex-row">
+            <div class="cx-label">Asphalt</div>
+            <div class="cx-bar-track"><div class="cx-bar-fill" style="width:38%"></div></div>
+            <div class="cx-amt">$184.2k</div>
+          </div>
+          <div class="capex-row">
+            <div class="cx-label">Street Lights</div>
+            <div class="cx-bar-track"><div class="cx-bar-fill" style="width:23%"></div></div>
+            <div class="cx-amt">$112.4k</div>
+          </div>
+          <div class="capex-row">
+            <div class="cx-label">Drainage</div>
+            <div class="cx-bar-track"><div class="cx-bar-fill" style="width:39%"></div></div>
+            <div class="cx-amt">$186.0k</div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -359,11 +493,23 @@ p.slide-lede{font-size:clamp(.9rem,1.4vw,1.1rem);color:var(--muted);max-width:68
       <div class="slide-eyebrow"><span class="hud-label">ROI</span><span class="n">08 / 10</span></div>
       <h1 class="slide-title">Same Budget. <span class="lime">Different Split.</span></h1>
       <p class="slide-lede">When triage, routing, and reporting stop consuming staff hours, the same headcount and the same dollars shift from paperwork toward repair capacity.</p>
-      <div class="split-bar">
-        <div class="field" style="flex:1.34">+34% FIELD EXECUTION</div>
-        <div class="admin" style="flex:0.82">−18% ADMIN OVERHEAD</div>
+      <div class="stack-compare">
+        <div class="stack-row">
+          <div class="sr-label">Legacy 311</div>
+          <div class="sr-bar">
+            <div class="sr-admin-gray" style="flex:0.6">60% ADMIN OVERHEAD</div>
+            <div class="sr-field-muted" style="flex:0.4">40% FIELD REPAIR</div>
+          </div>
+        </div>
+        <div class="stack-row">
+          <div class="sr-label" style="color:var(--brand-mint)">CITIXEN UX</div>
+          <div class="sr-bar">
+            <div class="sr-admin-dark" style="flex:0.18">18% ADMIN</div>
+            <div class="sr-field-lime" style="flex:0.82">82% FIELD REPAIR</div>
+          </div>
+        </div>
       </div>
-      <div class="split-legend"><span class="lime">■ FIELD REPAIR CAPITAL</span><span>■ ADMINISTRATIVE OVERHEAD</span></div>
+      <div class="split-legend" style="margin-top:14px"><span class="lime">■ FIELD REPAIR CAPITAL</span><span>■ ADMINISTRATIVE OVERHEAD</span></div>
     </div>
   </section>
 
@@ -373,6 +519,25 @@ p.slide-lede{font-size:clamp(.9rem,1.4vw,1.1rem);color:var(--muted);max-width:68
       <div class="slide-eyebrow"><span class="hud-label">INTEGRATION</span><span class="n">09 / 10</span></div>
       <h1 class="slide-title">Built to Plug Into <span class="lime">What You Already Run</span></h1>
       <p class="slide-lede">CITIXEN UX is designed as an integration layer, not a replacement — council-facing records and back-office systems stay where they are.</p>
+      <div class="api-diagram">
+        <div class="api-node">
+          <div class="an-label">CLIENT</div>
+          <div class="an-title">Mobile Citizens</div>
+          <div class="an-sub">PWA reports, zero-account</div>
+        </div>
+        <div class="api-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"/></svg></div>
+        <div class="api-node mid">
+          <div class="an-label">SYNC LAYER</div>
+          <div class="an-title">CITIXEN UX Middleware</div>
+          <div class="an-sub">API sync · work orders · capital data</div>
+        </div>
+        <div class="api-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"/></svg></div>
+        <div class="api-node">
+          <div class="an-label">BACK OFFICE</div>
+          <div class="an-title">Municipal ERPs</div>
+          <div class="an-sub">Tyler Tech · SAP · Legistar</div>
+        </div>
+      </div>
       <div class="grid-2">
         <div class="glass module-card">
           <div class="tag">AGENDA / RECORDS</div>
@@ -395,7 +560,14 @@ p.slide-lede{font-size:clamp(.9rem,1.4vw,1.1rem);color:var(--muted);max-width:68
       <div class="hud-label" style="justify-content:center;display:flex;margin-bottom:14px">NEXT STEP</div>
       <h1 class="slide-title">Let's Put One Ward <span class="lime">on the Platform.</span></h1>
       <p class="slide-lede" style="margin:0 auto">A 30-day pilot. No procurement cycle required to start the conversation — setup takes under two weeks.</p>
-      <div class="cta-row" style="justify-content:center">
+      <div class="roadmap">
+        <div class="roadmap-node done"><div class="rn-dot">01</div><div class="rn-label">IP &amp; Engine</div></div>
+        <div class="roadmap-node done"><div class="rn-dot">02</div><div class="rn-label">Pitch / Media</div></div>
+        <div class="roadmap-node"><div class="rn-dot">03</div><div class="rn-label">Native Wrapper</div></div>
+        <div class="roadmap-node"><div class="rn-dot">04</div><div class="rn-label">Ward 4 Pilot</div></div>
+        <div class="roadmap-node"><div class="rn-dot">05</div><div class="rn-label">Scale</div></div>
+      </div>
+      <div class="cta-row" style="justify-content:center;margin-top:26px">
         <a class="btn btn-primary" href="mailto:partners@citixenux.com">partners@citixenux.com</a>
         <a class="btn btn-outline" href="https://citixenux.com/pilot" target="_blank" rel="noopener noreferrer">citixenux.com/pilot ↗</a>
       </div>
@@ -443,6 +615,47 @@ function activateGauges(slideEl){
   });
 }
 
+/* ===== COVERAGE GRID + TICKER (slide 5) ===== */
+function initCoverageGrid(){
+  const gridEl = document.getElementById('coverageGrid');
+  if (!gridEl || gridEl.dataset.built) return;
+  for (let i = 0; i < 80; i++) {
+    const c = document.createElement('div');
+    c.className = 'cux-cell';
+    gridEl.appendChild(c);
+  }
+  gridEl.dataset.built = '1';
+}
+
+function activateCoverage(slideEl){
+  const gridEl = slideEl.querySelector('#coverageGrid');
+  const tickerEl = slideEl.querySelector('#coverageTicker');
+  if (!gridEl || !tickerEl) return;
+
+  const TARGET = 42.8;
+  const DURATION = 1500;
+  const cells = Array.from(gridEl.children);
+  cells.forEach(c => c.classList.remove('lit'));
+
+  const litCount = Math.round(cells.length * (TARGET / 100));
+  const order = cells.map((_, i) => i).sort(() => Math.random() - 0.5).slice(0, litCount);
+  order.forEach((idx, seq) => {
+    setTimeout(() => cells[idx].classList.add('lit'), (seq / litCount) * DURATION);
+  });
+
+  let start = null;
+  function step(ts){
+    if (!start) start = ts;
+    const progress = Math.min((ts - start) / DURATION, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    tickerEl.textContent = (TARGET * eased).toFixed(1) + '%';
+    if (progress < 1) requestAnimationFrame(step);
+    else tickerEl.textContent = TARGET.toFixed(1) + '%';
+  }
+  requestAnimationFrame(step);
+}
+initCoverageGrid();
+
 function render(){
   slides.forEach((s, i) => {
     s.classList.toggle('active', i === current);
@@ -453,6 +666,7 @@ function render(){
   prevBtn.disabled = current === 0;
   nextBtn.disabled = current === slides.length - 1;
   activateGauges(slides[current]);
+  activateCoverage(slides[current]);
 }
 
 function goTo(i){
