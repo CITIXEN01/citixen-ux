@@ -375,15 +375,18 @@ function switchTab(id,btn){
 /* =====================================================================
    CITYWIDE ASSET COVERAGE — Ward 4 block grid
    -----------------------------------------------------------------
-   fetchCoverageGrid() below is a stand-in for a real network call.
-   In production this becomes:
-     GET /api/coverage/wi/la-crosse/ward-4/grid
-     → { cells: [{ id, h3Index, covered, category, verifiedDate, reportedByYou }, ...] }
-   Swapping the mock for that fetch is the only change this widget needs —
-   render/animate/tap logic below is written against the same shape either way.
+   Backed by the real API contract under /api/coverage/... (see that
+   folder). fetchCoverageGrid() calls it; if it's unreachable — e.g. this
+   page is opened from a plain static file server with no serverless
+   functions running, as during local dev — it falls back to a local mock
+   with the identical shape, so the widget never breaks, it just stops
+   being live. render/animate/tap logic is written against that one shape
+   either way.
    ===================================================================== */
-function fetchCoverageGrid(){
-  // Deterministic mock "API response" — same shape the real endpoint will return.
+const COVERAGE_ENDPOINT = '/api/coverage/wi/la-crosse/ward-4';
+
+function mockCoverageCells(){
+  // Same shape as the real endpoint — used only when the API can't be reached.
   const covered = [1,2,3,4,10,11,12,13,14,20,21,22,30,31,32,33,40,41,42,43,44,50,51,52,60,61,62,63,70,71,72,73,74,75];
   const youReported = [3,13,32,52,63,74];
   const categories = ['Pothole','Streetlight','Signage','Sidewalk','Drainage'];
@@ -401,12 +404,27 @@ function fetchCoverageGrid(){
   return cells;
 }
 
+let coverageIsLive = false;
+
+async function fetchCoverageGrid(){
+  try {
+    const res = await fetch(COVERAGE_ENDPOINT + '/grid');
+    if (!res.ok) throw new Error('coverage API returned ' + res.status);
+    const data = await res.json();
+    coverageIsLive = true;
+    return data.cells;
+  } catch (err) {
+    coverageIsLive = false;
+    return mockCoverageCells();
+  }
+}
+
 let covCells = [];
+let pendingReportCellId = null;
 
 function renderCoverageGrid(){
   const gridEl = document.getElementById('covGrid');
-  if (!gridEl || gridEl.dataset.built) return;
-  covCells = fetchCoverageGrid();
+  gridEl.innerHTML = '';
   covCells.forEach(c => {
     const b = document.createElement('button');
     b.className = 'cov-cell';
@@ -419,21 +437,20 @@ function renderCoverageGrid(){
   gridEl.dataset.built = '1';
 }
 
-let coverageAnimated = false;
+let coverageLoaded = false;
 
-function animateCoverage(){
+async function animateCoverage(){
+  if (coverageLoaded) return; // this widget loads and animates in once per page load
+  coverageLoaded = true;
+
+  covCells = await fetchCoverageGrid();
   renderCoverageGrid();
+  refreshCoverageStats();
   if (!covCells.length) return;
 
   const gridEl = document.getElementById('covGrid');
   const cellEls = Array.from(gridEl.children);
-  const total = covCells.length;
-  const coveredCount = covCells.filter(c => c.covered).length;
-  const pct = (coveredCount / total) * 100;
   const DURATION = 1200;
-
-  document.getElementById('covFraction').textContent = coveredCount + ' / ' + total;
-  document.getElementById('covYouCount').textContent = covCells.filter(c => c.reportedByYou).length;
 
   cellEls.forEach(el => el.classList.remove('covered', 'you'));
   const coveredIdx = covCells.map((c, i) => i).filter(i => covCells[i].covered);
@@ -445,16 +462,80 @@ function animateCoverage(){
     }, (seq / order.length) * DURATION);
   });
 
+  animateTicker(0, computeCoveragePct(), DURATION);
+}
+
+function computeCoveragePct(){
+  const total = covCells.length;
+  const coveredCount = covCells.filter(c => c.covered).length;
+  return total ? (coveredCount / total) * 100 : 0;
+}
+
+function refreshCoverageStats(){
+  const total = covCells.length;
+  const coveredCount = covCells.filter(c => c.covered).length;
+  document.getElementById('covFraction').textContent = coveredCount + ' / ' + total;
+  document.getElementById('covYouCount').textContent = covCells.filter(c => c.reportedByYou).length;
+}
+
+function animateTicker(fromPct, toPct, duration){
   let start = null;
   function step(ts){
     if (!start) start = ts;
-    const progress = Math.min((ts - start) / DURATION, 1);
+    const progress = Math.min((ts - start) / duration, 1);
     const eased = 1 - Math.pow(1 - progress, 3);
-    document.getElementById('covTicker').textContent = (pct * eased).toFixed(1) + '%';
+    const val = fromPct + (toPct - fromPct) * eased;
+    document.getElementById('covTicker').textContent = val.toFixed(1) + '%';
     if (progress < 1) requestAnimationFrame(step);
-    else document.getElementById('covTicker').textContent = pct.toFixed(1) + '%';
+    else document.getElementById('covTicker').textContent = toPct.toFixed(1) + '%';
   }
   requestAnimationFrame(step);
+}
+
+// Called after a citizen submits a report that started from tapping a dark
+// grid block (see submitReport()). Calls the real /verify endpoint — the
+// same call the ticket-resolution pipeline would make in production — then
+// lights up just that one cell and re-ticks the percentage, so a citizen
+// watches their own report change the number in front of them.
+async function verifyReportedCell(cellId, category){
+  try {
+    const res = await fetch(COVERAGE_ENDPOINT + '/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cellId, category })
+    });
+    if (!res.ok) throw new Error('verify failed: ' + res.status);
+    const data = await res.json();
+    const cell = covCells.find(c => c.id === cellId);
+    if (cell) Object.assign(cell, data.cell);
+  } catch (err) {
+    // API unreachable (e.g. static local server) — update local state only,
+    // so the demo loop still visibly works even without live functions.
+    const cell = covCells.find(c => c.id === cellId);
+    if (cell) {
+      cell.covered = true;
+      cell.reportedByYou = true;
+      cell.category = category || cell.category || 'Pothole';
+      cell.verifiedDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+  }
+
+  const cellEl = document.querySelector('.cov-grid .cov-cell[data-id="' + cellId + '"]');
+  if (cellEl) {
+    cellEl.classList.add('covered', 'you');
+    cellEl.setAttribute('aria-label', 'Verified — reported by you');
+  }
+  const fromPct = computeCoveragePctBefore(cellId);
+  refreshCoverageStats();
+  animateTicker(fromPct, computeCoveragePct(), 600);
+}
+
+function computeCoveragePctBefore(justUpdatedId){
+  // The percentage immediately before this one cell flipped, for a smooth
+  // tick-up rather than a jump.
+  const total = covCells.length;
+  const coveredCount = covCells.filter(c => c.covered && c.id !== justUpdatedId).length;
+  return total ? (coveredCount / total) * 100 : 0;
 }
 
 function shuffleArray(arr){
@@ -479,6 +560,7 @@ function onCoverageCellTap(id){
     textEl.textContent = 'Not yet surveyed — be the first to report this block.';
     ctaEl.style.display = 'inline-block';
     ctaEl.onclick = () => {
+      pendingReportCellId = id;
       toastEl.classList.remove('show');
       switchTab('tab-report', document.querySelectorAll('.navtab')[0]);
     };
@@ -607,6 +689,15 @@ function submitReport(){
   toast('✓ Published — routed to ' + dept);
   document.getElementById('repDesc').value='';
   document.getElementById('photoBox').style.display='none';
+
+  // If this report started from tapping a dark block on the coverage grid,
+  // close the loop for real: tell the coverage API this block is now
+  // verified, and light it up on the grid the citizen just came from.
+  if (pendingReportCellId !== null) {
+    verifyReportedCell(pendingReportCellId, cat);
+    pendingReportCellId = null;
+  }
+
   switchTab('tab-map', document.querySelectorAll('.navtab')[1]);
 }
 
