@@ -115,26 +115,6 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   .hub-row{grid-template-columns:1fr}
 }
 
-/* ===== GATEWAY LANDING TELEMETRY (semi-circle gas gauges + resolve readout) ===== */
-.gateway-telemetry{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;gap:22px;margin:0 auto 26px;max-width:640px}
-.gateway-telemetry .gauge-dial{display:flex;flex-direction:column;align-items:center;gap:0}
-.gateway-telemetry .gauge-dial svg{display:block;width:128px;height:auto}
-.gateway-telemetry .gd-track{stroke:rgba(255,255,255,.08)}
-.gateway-telemetry .gd-fill{stroke:var(--brand-mint);stroke-linecap:round;transition:stroke-dashoffset .8s ease}
-.gateway-telemetry .gd-needle-group{transform-origin:60px 60px;transition:transform .8s ease}
-.gateway-telemetry .gd-needle{stroke:var(--brand-mint);stroke-width:2.5;stroke-linecap:round}
-.gateway-telemetry .gd-hub{fill:var(--brand-mint)}
-.gateway-telemetry .gd-value{font-size:1.1rem;font-weight:900;color:var(--text);margin-top:-8px}
-.gateway-telemetry .gd-label{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:2px}
-.gateway-telemetry .gd-sub{font-size:.64rem;color:var(--muted);margin-top:4px;text-align:center}
-.gateway-telemetry .gt-fraction{display:flex;flex-direction:column;align-items:center;min-width:110px;padding-bottom:8px}
-.gateway-telemetry .gt-fraction-value{font-size:1.9rem;font-weight:900;color:var(--mint2)}
-.gateway-telemetry .gt-fraction-value span{font-size:1.1rem;color:var(--muted);font-weight:800}
-@media(max-width:640px){
-  .gateway-telemetry{gap:14px}
-  .gateway-telemetry .gauge-dial svg{width:104px}
-}
-
 .hud-grid{display:grid;grid-template-columns:0.8fr 1.2fr;gap:16px;max-width:980px;margin:0 auto 40px;padding:0 24px}
 .hud-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;text-align:left}
 .hud-card .label{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:14px}
@@ -332,7 +312,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
           <button data-scroll="dashboard">Asset Coverage Grid</button>
           <button data-scroll="dashboard">Expenditure Allocations</button>
           <div class="dropdown-group-label">Governance & Legal Stack</div>
-          <button id="openPaperworkBtn">Open Citizen Paperwork File ↗</button>
+          <button id="openPaperworkBtn">Open CITIXEN Paperwork File ↗</button>
           <button data-loc-change="1">Change My Location</button>
         </div>
       </div>
@@ -371,14 +351,14 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   <div class="pw-overlay" id="pwOverlay">
     <div class="pw-panel">
       <div class="pw-head">
-        <h3>Citizen Paperwork File</h3>
+        <h3>CITIXEN Paperwork File</h3>
         <button class="modal-close" id="pwCloseBtn">✕</button>
       </div>
       <div class="pw-jurisdiction-line" id="pwJurisdictionLine">Locating jurisdiction…</div>
 
       <a class="pw-report-cta" href="/app.html" id="pwReportCta">
         <svg viewBox="0 0 24 24" width="16" height="16" stroke="#051311" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-        Free Citizen Report — no account needed
+        Free CITIXEN Report — no account needed
       </a>
 
       <div class="pw-stack-view" id="pwStackView">
@@ -437,40 +417,6 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         <span>Geotagged Civic Stack</span>
       </button>
     </div>
-
-    <div class="gateway-telemetry" aria-label="Gateway telemetry">
-      <div class="gauge-dial">
-        <div class="gd-label">Citywide Health Index</div>
-        <svg viewBox="0 0 120 66" width="120" height="66" aria-hidden="true">
-          <path class="gd-track" d="M10,60 A50,50 0 0 1 110,60" fill="none" stroke-width="9"/>
-          <path id="gwWardArc" class="gd-fill" d="M10,60 A50,50 0 0 1 110,60" fill="none" stroke-width="9" stroke-dasharray="157.08" stroke-dashoffset="157.08"/>
-          <g id="gwWardNeedle" class="gd-needle-group">
-            <line x1="60" y1="60" x2="60" y2="18" class="gd-needle"/>
-            <circle cx="60" cy="60" r="4" class="gd-hub"/>
-          </g>
-        </svg>
-        <div class="gd-value" id="gwWardValue">0%</div>
-        <div class="gd-sub" id="gwWardSub">Locating…</div>
-      </div>
-      <div class="gt-fraction">
-        <div class="gd-label">Weekly Resolve Rate</div>
-        <div class="gt-fraction-value" id="gwResolveFraction">84<span>/91</span></div>
-        <div class="gd-sub">Cleared this week</div>
-      </div>
-      <div class="gauge-dial">
-        <div class="gd-label">Active Dispatch Capacity</div>
-        <svg viewBox="0 0 120 66" width="120" height="66" aria-hidden="true">
-          <path class="gd-track" d="M10,60 A50,50 0 0 1 110,60" fill="none" stroke-width="9"/>
-          <path id="gwCapArc" class="gd-fill" d="M10,60 A50,50 0 0 1 110,60" fill="none" stroke-width="9" stroke-dasharray="157.08" stroke-dashoffset="157.08"/>
-          <g id="gwCapNeedle" class="gd-needle-group">
-            <line x1="60" y1="60" x2="60" y2="18" class="gd-needle"/>
-            <circle cx="60" cy="60" r="4" class="gd-hub"/>
-          </g>
-        </svg>
-        <div class="gd-value" id="gwCapValue">0%</div>
-        <div class="gd-sub" id="gwCapSub">Crew capacity</div>
-      </div>
-    </div>
   </section>
 
   <div class="hero-stack">
@@ -495,6 +441,37 @@ audio.pw-audio-el{width:100%;margin-top:4px}
           <div id="installStatus">Waiting for install availability on this browser…</div>
         </div>
       </div>
+    </div>
+
+    <div class="card ledger-card" id="ledgerCard" style="max-width:640px;width:100%;">
+      <div class="label"><span id="ledgerTitle">CITYWIDE MUNICIPAL EXPENDITURE & ALLOCATION</span></div>
+      <div class="ledger-tag">AI Categorization Engine // Real-Time Capital Tracking</div>
+
+      <div class="ledger-filters" id="ledgerFilters">
+        <button class="ledger-filter active" data-lfilter="All">All</button>
+        <button class="ledger-filter" data-lfilter="Roads">Roads</button>
+        <button class="ledger-filter" data-lfilter="Lighting">Lighting</button>
+        <button class="ledger-filter" data-lfilter="Sanitation">Sanitation</button>
+        <button class="ledger-filter" data-lfilter="Ada">ADA</button>
+      </div>
+
+      <div class="ledger-row" data-lcat="Roads">
+        <div class="ledger-head"><b>Roads & Pavement</b><span class="ledger-amt" id="ledgerRoadsAmt">$124,500 (42%)</span></div>
+        <div class="bar"><span id="ledgerRoadsBar" style="width:42%"></span></div>
+      </div>
+      <div class="ledger-row" data-lcat="Lighting">
+        <div class="ledger-head"><b>Safety & Lighting Grid</b><span class="ledger-amt" id="ledgerLightingAmt">$82,900 (28%)</span></div>
+        <div class="bar"><span id="ledgerLightingBar" style="width:28%;background:var(--warn)"></span></div>
+      </div>
+      <div class="ledger-row" data-lcat="Sanitation">
+        <div class="ledger-head"><b>Sanitation & Waste</b><span class="ledger-amt" id="ledgerSanitationAmt">$53,300 (18%)</span></div>
+        <div class="bar"><span id="ledgerSanitationBar" style="width:18%"></span></div>
+      </div>
+      <div class="ledger-row" data-lcat="Ada">
+        <div class="ledger-head"><b>ADA & Sidewalk Access</b><span class="ledger-amt" id="ledgerAdaAmt">$35,500 (12%)</span></div>
+        <div class="bar"><span id="ledgerAdaBar" style="width:12%"></span></div>
+      </div>
+      <div class="small" style="margin-top:10px;">Illustrative estimates clustered from resolved reports — not an official finance record.</div>
     </div>
 
     <button class="privacy-pill" id="privacyPillBtn">
@@ -548,38 +525,6 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         </div>
         <div class="small" style="margin-top:10px;">Tap a category to filter the feed below.</div>
       </div>
-
-      <div class="card ledger-card" id="ledgerCard">
-        <div class="label"><span id="ledgerTitle">CITYWIDE MUNICIPAL EXPENDITURE & ALLOCATION</span></div>
-        <div class="ledger-tag">AI Categorization Engine // Real-Time Capital Tracking</div>
-
-        <div class="ledger-filters" id="ledgerFilters">
-          <button class="ledger-filter active" data-lfilter="All">All</button>
-          <button class="ledger-filter" data-lfilter="Roads">Roads</button>
-          <button class="ledger-filter" data-lfilter="Lighting">Lighting</button>
-          <button class="ledger-filter" data-lfilter="Sanitation">Sanitation</button>
-          <button class="ledger-filter" data-lfilter="Ada">ADA</button>
-        </div>
-
-        <div class="ledger-row" data-lcat="Roads">
-          <div class="ledger-head"><b>Roads & Pavement</b><span class="ledger-amt" id="ledgerRoadsAmt">$124,500 (42%)</span></div>
-          <div class="bar"><span id="ledgerRoadsBar" style="width:42%"></span></div>
-        </div>
-        <div class="ledger-row" data-lcat="Lighting">
-          <div class="ledger-head"><b>Safety & Lighting Grid</b><span class="ledger-amt" id="ledgerLightingAmt">$82,900 (28%)</span></div>
-          <div class="bar"><span id="ledgerLightingBar" style="width:28%;background:var(--warn)"></span></div>
-        </div>
-        <div class="ledger-row" data-lcat="Sanitation">
-          <div class="ledger-head"><b>Sanitation & Waste</b><span class="ledger-amt" id="ledgerSanitationAmt">$53,300 (18%)</span></div>
-          <div class="bar"><span id="ledgerSanitationBar" style="width:18%"></span></div>
-        </div>
-        <div class="ledger-row" data-lcat="Ada">
-          <div class="ledger-head"><b>ADA & Sidewalk Access</b><span class="ledger-amt" id="ledgerAdaAmt">$35,500 (12%)</span></div>
-          <div class="bar"><span id="ledgerAdaBar" style="width:12%"></span></div>
-        </div>
-        <div class="small" style="margin-top:10px;">Illustrative estimates clustered from resolved reports — not an official finance record.</div>
-      </div>
-
       <div class="card" style="flex:1;">
         <div class="label"><span>Live dispatch feed</span><span class="small" id="feedCount">3 shown</span></div>
         <div class="audit-tabs">
@@ -627,28 +572,6 @@ const cities={
     slaHours:26, resolvedWeek:112, totalWeek:138, dispatchCapacity:58,
     ledger:{ roads:[410000,35], lighting:[340000,29], sanitation:[260000,22], ada:[170000,14] } }
 };
-// Ward Health Index status word from the numeric health score.
-function healthStatusWord(h){ return h>=90 ? 'Nominal' : h>=75 ? 'Stable' : 'Degraded'; }
-// Drives one semi-circular gas-gauge dial on the Gateway landing screen: sweeps the
-// needle from -90deg (0%, left) to +90deg (100%, right) and fills the arc to match.
-const GATEWAY_GAUGE_SEMI_CIRC=157.08; // arc length of the r=50 semicircle track (pi * r)
-function setGatewayGauge(prefix, pct){
-  pct=Math.max(0,Math.min(100,pct));
-  const arc=document.getElementById('gw'+prefix+'Arc');
-  const needle=document.getElementById('gw'+prefix+'Needle');
-  const valueEl=document.getElementById('gw'+prefix+'Value');
-  if(arc) arc.style.strokeDashoffset = GATEWAY_GAUGE_SEMI_CIRC*(1-pct/100);
-  if(needle) needle.style.transform = `rotate(${(pct/100)*180-90}deg)`;
-  if(valueEl) valueEl.textContent = Math.round(pct)+'%';
-}
-function updateGatewayTelemetry(c){
-  setGatewayGauge('Ward', c.health);
-  const wardSub=document.getElementById('gwWardSub'); if(wardSub) wardSub.textContent=c.region+' — '+healthStatusWord(c.health);
-  setGatewayGauge('Cap', c.dispatchCapacity);
-  const capSub=document.getElementById('gwCapSub'); if(capSub) capSub.textContent=c.dispatchCapacity+'% crew capacity committed';
-  const frac=document.getElementById('gwResolveFraction'); if(frac) frac.innerHTML=`${c.resolvedWeek}<span>/${c.totalWeek}</span>`;
-}
-
 const auditEntries=[
   {id:'a1',title:'Overfilled Trash Bin — Pine St Alley',resolved:'2025-09-22 14:12 UTC',cost:'$410 est.',sla:'Resolved in 3h 40m (SLA: 4h)',hash:'0x9f2a7c...e14b3d'},
   {id:'a2',title:'Pothole — 6th & Cass',resolved:'2025-09-19 09:47 UTC',cost:'$2,150 est.',sla:'Resolved in 1d 2h (SLA: 3d)',hash:'0x4b81ee...02fa9c'},
@@ -731,7 +654,6 @@ document.getElementById('gridSelect').addEventListener('change',(e)=>{
   setBar('Roads',c.roads); setBar('Lighting',c.lighting); setBar('Sanitation',c.sanitation);
   setLedger(c);
   updateTelemetry(c);
-  updateGatewayTelemetry(c);
   if(map) map.flyTo([c.lat,c.lng], c.zoom, { duration:1.3 });
 });
 function setBar(cat,pct){
@@ -870,7 +792,7 @@ const modalData={
     body:[
       ['Upcoming Ward Cleanup','Sat, Oct 4 — Pine St Alley cleanup, 9:00 AM, Public Works staging lot.'],
       ['Volunteer Dispatch','Tue, Oct 7 — Local Council session, streetlight budget review, 6:30 PM. Volunteer slots open for setup crew. Check your district\'s calendar for exact ward/session details.'],
-      ['Citizen Priority Voting','Residents may rank which open hazard categories (Roads / Lighting / Sanitation) should receive next quarter\'s discretionary repair budget.']
+      ['CITIXEN Priority Voting','Residents may rank which open hazard categories (Roads / Lighting / Sanitation) should receive next quarter\'s discretionary repair budget.']
     ]
   },
   ledger:{
@@ -1062,8 +984,14 @@ async function initLocationIntake(){
   }
 
   const guess = await detectJurisdictionGuess(jurisdictionDirectory);
-  document.getElementById('locDetectedLine').textContent = jurisdictionLabel(guess);
-  document.getElementById('locDetectedSource').textContent = 'Detected via ' + guess.source + ' — not stored until you confirm.';
+  // guess.source === 'default' means GPS and IP detection both failed —
+  // show that honestly (CITYWIDE, no location asserted) rather than naming
+  // the internal fallback jurisdiction as if it had actually been detected.
+  const wasDetected = guess.source !== 'default';
+  document.getElementById('locDetectedLine').textContent = wasDetected ? jurisdictionLabel(guess) : 'CITYWIDE (location not detected)';
+  document.getElementById('locDetectedSource').textContent = wasDetected
+    ? 'Detected via ' + guess.source + ' — not stored until you confirm.'
+    : 'Location could not be detected — pick your jurisdiction below, or confirm to use the citywide default.';
   document.getElementById('locModalOverlay').classList.add('open');
 
   document.getElementById('locConfirmBtn').onclick = () => {
@@ -1177,13 +1105,10 @@ function syncDashboardToJurisdiction(j){
     setBar('Roads', c.roads); setBar('Lighting', c.lighting); setBar('Sanitation', c.sanitation);
     setLedger(c);
     updateTelemetry(c);
-    updateGatewayTelemetry(c);
     if (map) map.flyTo([c.lat, c.lng], c.zoom, { duration: 1.3 });
   } else {
     document.getElementById('healthCity').textContent = j.cityName || 'Citywide';
     document.getElementById('ledgerTitle').textContent = 'CITYWIDE MUNICIPAL EXPENDITURE & ALLOCATION';
-    const wardSub = document.getElementById('gwWardSub');
-    if (wardSub) wardSub.textContent = 'Citywide Health Index';
   }
 }
 
@@ -1209,14 +1134,21 @@ let pwStackCache = null;
 function fallbackJurisdictionStack(j){
   // Mirrors api/_lib/jurisdictions.js's shape for offline/local preview.
   const note = (name) => 'Representative summary — pending integration with ' + name + '\'s official published records.';
+  // When the jurisdiction on file is the unresolved/undetected default (GPS
+  // and IP both failed and nothing was confirmed against a real place), the
+  // document titles read as generic placeholders rather than asserting a
+  // specific city/ward name as if it had actually been detected.
+  const isUnresolved = j.source === 'default';
+  const cityForTitle = isUnresolved ? '' : j.cityName + ' ';
+  const wardForTitle = isUnresolved ? 'Local' : j.wardName;
   return { stack: {
     federal: [
       { id:'us-constitution', title:'U.S. Constitution — Preamble & Bill of Rights', kind:'Federal', source:'Public domain', fullText:'We the People of the United States... (see api/_lib/jurisdictions.js for the full excerpt).', cliffNotes:['First Amendment protects speech, press, assembly, and petitioning government.'], videoAvailable:false, audioAvailable:false },
       { id:'declaration-of-independence', title:'Declaration of Independence', kind:'Federal', source:'Public domain', fullText:'We hold these truths to be self-evident... (see api/_lib/jurisdictions.js for the full excerpt).', cliffNotes:['Government exists to secure the people\'s rights and derives authority from their consent.'], videoAvailable:false, audioAvailable:false }
     ],
     state: [ { id:'state-constitution', title: j.stateName + ' State Constitution', kind:'State', source:'Representative summary', fullText: note(j.stateName), cliffNotes:['Defines state government powers and home-rule authority for municipalities.'], videoAvailable:false, audioAvailable:false } ],
-    municipal: [ { id:'municipal-code', title: j.cityName + ' Municipal Code', kind:'Municipal', source:'Representative summary', fullText: note(j.cityName), cliffNotes:['Sets property, right-of-way and nuisance standards behind most hazard categories.'], videoAvailable:false, audioAvailable:false } ],
-    ward: [ { id:'aldermanic-directory', title: j.wardName + ' Aldermanic Directory', kind:'District/Ward', source:'Representative summary', fullText: j.wardName + ' representative contact details are published by the city clerk\'s office.', cliffNotes:['Residents may contact their alderman regarding unresolved reports.'], videoAvailable:false, audioAvailable:false } ]
+    municipal: [ { id:'municipal-code', title: cityForTitle + 'Municipal Code', kind:'Municipal', source:'Representative summary', fullText: note(j.cityName), cliffNotes:['Sets property, right-of-way and nuisance standards behind most hazard categories.'], videoAvailable:false, audioAvailable:false } ],
+    ward: [ { id:'aldermanic-directory', title: wardForTitle + ' Aldermanic Directory', kind:'District/Ward', source:'Representative summary', fullText: j.wardName + ' representative contact details are published by the city clerk\'s office.', cliffNotes:['Residents may contact their alderman regarding unresolved reports.'], videoAvailable:false, audioAvailable:false } ]
   }};
 }
 
@@ -1361,7 +1293,6 @@ window.addEventListener('DOMContentLoaded',()=>{
   renderFeed();
   initMap();
   updateTelemetry(cities.lacrosse);
-  updateGatewayTelemetry(cities.lacrosse);
 });
 </script>
 </body>
