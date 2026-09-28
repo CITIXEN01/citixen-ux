@@ -9,9 +9,11 @@
 <meta name="referrer" content="no-referrer">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="/manifest.json">
-<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
-<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="manifest" href="/manifest.json?v=4">
+<link rel="icon" type="image/x-icon" href="/favicon.ico?v=4">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png?v=4">
+<link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png?v=4">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=4">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
@@ -664,10 +666,13 @@ function addBaseLayer(m){
   if(srcTag) srcTag.textContent='TILE SRC: OPENSTREETMAP (DARK FILTER)';
 }
 function initMap(){
-  map=L.map('map',{attributionControl:false}).setView([cities.lacrosse.lat,cities.lacrosse.lng],cities.lacrosse.zoom);
-  addBaseLayer(map);
-  cases.forEach(plotMarker);
-  setTimeout(()=>map.invalidateSize(),150);
+  if (typeof L === 'undefined') return; // Leaflet CDN unreachable — degrade gracefully rather than aborting the caller
+  try {
+    map=L.map('map',{attributionControl:false}).setView([cities.lacrosse.lat,cities.lacrosse.lng],cities.lacrosse.zoom);
+    addBaseLayer(map);
+    cases.forEach(plotMarker);
+    setTimeout(()=>map.invalidateSize(),150);
+  } catch (err) { /* map unavailable — rest of the page still functions */ }
 }
 function plotMarker(item){
   const col=statusColor(item.status);
@@ -1245,9 +1250,19 @@ window.addEventListener('beforeinstallprompt',(e)=>{
   deferredPrompt=e;
   document.getElementById('installStatus').textContent='Ready to install — tap "Add to Home Screen".';
 });
+function isIosSafari(){
+  const ua = navigator.userAgent || '';
+  const isIos = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isSafari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
+  return isIos && isSafari;
+}
 document.getElementById('installBtnCard').addEventListener('click', async ()=>{
   if(!deferredPrompt){
-    document.getElementById('installStatus').textContent="Install isn't available in this browser yet — try Chrome/Edge on Android or desktop, or scan the QR code above.";
+    if (isIosSafari()) {
+      document.getElementById('installStatus').textContent = "On iPhone: Tap the Share button (⬆) in Safari and select \"Add to Home Screen\".";
+    } else {
+      document.getElementById('installStatus').textContent="Install isn't available in this browser yet — try Chrome/Edge on Android or desktop, or scan the QR code above.";
+    }
     return;
   }
   deferredPrompt.prompt();
@@ -1258,6 +1273,9 @@ document.getElementById('installBtnCard').addEventListener('click', async ()=>{
 window.addEventListener('appinstalled',()=>{
   document.getElementById('installStatus').textContent='✓ Installed to this device.';
 });
+if (isIosSafari() && !window.navigator.standalone) {
+  document.getElementById('installStatus').textContent = "On iPhone: Tap the Share button (⬆) in Safari and select \"Add to Home Screen\".";
+}
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
     navigator.serviceWorker.register('/sw.js', { scope:'/' }).catch(()=>{});
