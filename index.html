@@ -63,6 +63,14 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   border:1px solid var(--border);border-radius:10px;min-width:260px;overflow:hidden;z-index:1500;
   box-shadow:0 12px 30px rgba(0,0,0,.5)}
 .dropdown-menu.open{display:block}
+@media (max-width:640px){
+  /* Anchored to the right edge (right:0), a min-width:260px menu on a
+     narrow phone pushes past the left viewport edge and gets clipped by
+     the page's own overflow. Below 640px, anchor it to the left edge of
+     the nav instead and cap its width to the viewport so it always stays
+     fully on-screen regardless of where the trigger button sits. */
+  .dropdown-menu{left:0;right:auto;max-width:calc(100vw - 32px)}
+}
 .dropdown-menu button{display:block;width:100%;text-align:left;background:none;border:none;color:var(--text);
   padding:10px 14px;font-size:.78rem;font-weight:600;cursor:pointer}
 .dropdown-menu button:hover{background:rgba(0,255,136,.1);color:var(--mint2)}
@@ -221,6 +229,57 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .modal-box p{font-size:.78rem;color:var(--muted);line-height:1.55}
 .modal-close{float:right;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem}
 
+/* ===== LOCATION INTAKE MODAL ===== */
+.loc-modal-box{max-width:420px;text-align:center}
+.loc-modal-box h3{color:var(--mint2)}
+.loc-modal-box .loc-detected{font-size:1.05rem;font-weight:800;margin:10px 0 4px}
+.loc-modal-box p{margin-bottom:6px}
+.loc-modal-actions{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.loc-select-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:14px 0}
+.loc-select-row select{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;padding:9px 4px;font-size:.7rem;font-weight:700;text-align:center}
+
+/* ===== CITIZEN PAPERWORK FILE DRAWER ===== */
+.pw-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:3200;display:none}
+.pw-overlay.open{display:flex;justify-content:flex-end}
+.pw-panel{width:min(480px,100vw);height:100%;background:var(--card);border-left:1px solid var(--border);
+  overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+.pw-head{display:flex;justify-content:space-between;align-items:center}
+.pw-head h3{color:var(--mint2);font-size:1.05rem}
+.pw-jurisdiction-line{font-size:.72rem;color:var(--muted);margin-top:-8px}
+.pw-report-cta{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--mint);color:#051311;
+  border:none;border-radius:10px;padding:13px 16px;font-weight:800;font-size:.82rem;cursor:pointer;text-decoration:none}
+.pw-layer{border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.pw-layer-head{background:rgba(255,255,255,.03);padding:10px 14px;font-size:.66rem;font-weight:800;
+  text-transform:uppercase;letter-spacing:.6px;color:var(--muted);display:flex;justify-content:space-between}
+.pw-doc-item{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;background:none;
+  border:none;border-top:1px solid var(--border);color:var(--text);padding:12px 14px;font-size:.78rem;
+  font-weight:600;text-align:left;cursor:pointer}
+.pw-doc-item:hover{background:rgba(0,255,136,.08);color:var(--mint2)}
+.pw-doc-item .chev{color:var(--muted);flex-shrink:0}
+.pw-doc-detail{display:none;flex-direction:column;gap:12px}
+.pw-doc-detail.open{display:flex}
+.pw-stack-view{display:flex;flex-direction:column;gap:14px}
+.pw-back-btn{align-self:flex-start;background:none;border:none;color:var(--muted);font-size:.74rem;
+  font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px}
+.pw-back-btn:hover{color:var(--mint2)}
+.pw-media-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:rgba(255,255,255,.04);
+  border-radius:10px;padding:3px}
+.pw-media-tab{background:none;border:none;color:var(--muted);font-size:.62rem;font-weight:800;padding:8px 2px;
+  border-radius:8px;cursor:pointer;text-align:center}
+.pw-media-tab.active{background:var(--mint);color:#051311}
+.pw-media-pane{display:none;font-size:.78rem;line-height:1.6;color:var(--text)}
+.pw-media-pane.active{display:block}
+.pw-media-pane p{white-space:pre-line;color:var(--muted);font-size:.76rem;line-height:1.65}
+.pw-media-pane ul{padding-left:18px}
+.pw-media-pane li{margin-bottom:8px;color:var(--text);font-size:.78rem}
+.pw-source-tag{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+.pw-placeholder-media{border:1.5px dashed var(--border);border-radius:12px;padding:26px 14px;text-align:center;
+  color:var(--muted);font-size:.76rem}
+.pw-placeholder-media svg{margin-bottom:8px}
+audio.pw-audio-el{width:100%;margin-top:4px}
+
+
 @media (max-width:1000px){
   #dashboard{flex-direction:column;min-height:0}
   .sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border);max-height:none}
@@ -250,19 +309,95 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
         <button class="dropdown-btn" id="civicToolsBtn">Civic Tools <span style="font-size:.6rem;">▾</span></button>
         <div class="dropdown-menu" id="civicToolsMenu">
           <div class="dropdown-group-label">Ward Intelligence</div>
-          <button data-scroll="ward-metrics">Ward Map Overview</button>
-          <button data-scroll="ward-metrics">SLA Resolution Tracker</button>
-          <div class="dropdown-group-label">Guarantees &amp; Transparency</div>
-          <button data-modal="ledger">Public Ledger Architecture</button>
-          <button data-modal="sla">SLA Legal Guarantees</button>
-          <button data-modal="actionlogs">Community Action Logs</button>
-          <div class="dropdown-group-label">Privacy &amp; Rights</div>
-          <button data-modal="constitution">Founding Constitution</button>
-          <button data-modal="anonymity">Privacy & Anonymity Engine Whitepaper</button>
+          <button data-scroll="dashboard">Ward Map Overview</button>
+          <button data-scroll="dashboard">SLA Resolution Tracker</button>
+          <div class="dropdown-group-label">Citizen Paperwork File</div>
+          <button id="openPaperworkBtn">Open Citizen Paperwork File ↗</button>
+          <button data-loc-change="1">Change My Location</button>
         </div>
       </div>
     </div>
   </header>
+
+  <!-- ===== LOCATION INTAKE MODAL ===== -->
+  <div class="modal-overlay" id="locModalOverlay">
+    <div class="modal-box loc-modal-box" id="locConfirmBox">
+      <button class="modal-close" id="locModalClose">✕</button>
+      <h3>Confirm your jurisdiction</h3>
+      <p class="small">CITIXEN routes your reports and shows Ward Health data for one municipal jurisdiction at a time.</p>
+      <div class="loc-detected" id="locDetectedLine">Locating…</div>
+      <p class="small" id="locDetectedSource"></p>
+      <div class="loc-modal-actions">
+        <button class="btn btn-primary btn-hero" id="locConfirmBtn" style="margin:0">Confirm — use this jurisdiction</button>
+        <button class="btn btn-outline btn-hero" id="locChangeBtn" style="margin:0">Change location</button>
+      </div>
+    </div>
+    <div class="modal-box loc-modal-box" id="locPickerBox" style="display:none">
+      <button class="modal-close" id="locPickerClose">✕</button>
+      <h3>Choose your jurisdiction</h3>
+      <p class="small">Select the State, City and Ward you want CITIXEN to use.</p>
+      <div class="loc-select-row">
+        <select id="locPickState" aria-label="State"></select>
+        <select id="locPickCity" aria-label="City"></select>
+        <select id="locPickWard" aria-label="Ward"></select>
+      </div>
+      <div class="loc-modal-actions">
+        <button class="btn btn-primary btn-hero" id="locPickConfirmBtn" style="margin:0">Use this jurisdiction</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CITIZEN PAPERWORK FILE DRAWER ===== -->
+  <div class="pw-overlay" id="pwOverlay">
+    <div class="pw-panel">
+      <div class="pw-head">
+        <h3>Citizen Paperwork File</h3>
+        <button class="modal-close" id="pwCloseBtn">✕</button>
+      </div>
+      <div class="pw-jurisdiction-line" id="pwJurisdictionLine">La Crosse, WI — Ward 4</div>
+
+      <a class="pw-report-cta" href="/app.html" id="pwReportCta">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="#051311" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        Free Citizen Report — no account needed
+      </a>
+
+      <div class="pw-stack-view" id="pwStackView">
+        <div class="small" style="text-align:center">Loading jurisdictional stack…</div>
+      </div>
+
+      <div class="pw-doc-detail" id="pwDocDetail">
+        <button class="pw-back-btn" id="pwBackBtn">← Back to jurisdictional stack</button>
+        <div>
+          <div class="pw-source-tag" id="pwDocKind">Federal</div>
+          <h3 id="pwDocTitle" style="font-size:.95rem;color:var(--text)">Document title</h3>
+        </div>
+        <div class="pw-media-tabs">
+          <button class="pw-media-tab active" data-pane="fulltext">Full Text</button>
+          <button class="pw-media-tab" data-pane="cliffnotes">Cliff Notes</button>
+          <button class="pw-media-tab" data-pane="video">5-Min Video</button>
+          <button class="pw-media-tab" data-pane="audio">5-Min Audio</button>
+        </div>
+        <div class="pw-media-pane active" data-pane="fulltext">
+          <p id="pwFullText"></p>
+        </div>
+        <div class="pw-media-pane" data-pane="cliffnotes">
+          <ul id="pwCliffNotes"></ul>
+        </div>
+        <div class="pw-media-pane" data-pane="video">
+          <div class="pw-placeholder-media" id="pwVideoPane">
+            <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+            <div>5-minute video breakdown — production placeholder, not yet recorded for this document.</div>
+          </div>
+        </div>
+        <div class="pw-media-pane" data-pane="audio">
+          <div class="pw-placeholder-media" id="pwAudioPane">
+            <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            <div>5-minute audio breakdown — production placeholder, not yet recorded for this document.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <section class="hero">
     <h1>CITIXEN UX<sup style="font-size:.5em;opacity:.4;">™</sup></h1>
@@ -720,10 +855,14 @@ function openModal(key){
 }
 document.querySelectorAll('#civicToolsMenu button').forEach(btn=>{
   btn.addEventListener('click',()=>{
+    civicMenu.classList.remove('open');
     if(btn.dataset.scroll){
       document.getElementById(btn.dataset.scroll).scrollIntoView({ behavior:'smooth' });
-      civicMenu.classList.remove('open');
-    } else {
+    } else if(btn.id==='openPaperworkBtn'){
+      openPaperworkFile();
+    } else if(btn.dataset.locChange){
+      openLocationPicker();
+    } else if(btn.dataset.modal){
       openModal(btn.dataset.modal);
     }
   });
@@ -732,6 +871,371 @@ document.getElementById('privacyPillBtn').addEventListener('click',()=> openModa
 document.getElementById('modalClose').addEventListener('click',()=> document.getElementById('modalOverlay').classList.remove('open'));
 document.getElementById('modalOverlay').addEventListener('click',(e)=>{
   if(e.target.id==='modalOverlay') e.currentTarget.classList.remove('open');
+});
+
+/* =====================================================================
+   GEOGRAPHIC LOCATION INTAKE — jurisdiction detection & persistence
+   -----------------------------------------------------------------
+   On first load, this tries the browser Geolocation API and matches the
+   coordinates against CITIXEN's seeded municipalities (nearest by
+   straight-line distance — the only "reverse geocoding" this demo can back
+   with real data); if geolocation is denied/unavailable, it falls back to
+   a free IP-geolocation lookup (ipapi.co, no key required) for a city/
+   region guess, matched the same way. Either way the result is only ever
+   a *suggestion* — the citizen confirms or picks a different jurisdiction
+   explicitly, and nothing is sent anywhere as part of this: the match
+   happens entirely in the browser against the public /directory payload.
+   ===================================================================== */
+const JURISDICTION_KEY = 'CITIXEN_JURISDICTION';
+const DEFAULT_JURISDICTION = { state:'wi', city:'la-crosse', ward:'ward-4' };
+
+// Approximate seat-of-government coordinates for each seeded city — used
+// only for nearest-match against a detected lat/lng, not for anything
+// submitted with a report.
+const CITY_COORDS = {
+  'wi/la-crosse': { lat: 43.8014, lng: -91.2396 },
+  'wi/milwaukee': { lat: 43.0389, lng: -87.9065 },
+  'il/chicago':   { lat: 41.8781, lng: -87.6298 }
+};
+
+function getStoredJurisdiction(){
+  try {
+    const raw = localStorage.getItem(JURISDICTION_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+
+function storeJurisdiction(j){
+  try { localStorage.setItem(JURISDICTION_KEY, JSON.stringify(j)); } catch (e) { /* storage blocked — session-only */ }
+}
+
+function haversineKm(lat1, lng1, lat2, lng2){
+  const R = 6371, toRad = d => d * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1), dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function nearestCityKey(lat, lng){
+  let best = null, bestDist = Infinity;
+  Object.entries(CITY_COORDS).forEach(([key, c]) => {
+    const d = haversineKm(lat, lng, c.lat, c.lng);
+    if (d < bestDist) { bestDist = d; best = key; }
+  });
+  return best;
+}
+
+async function detectJurisdictionGuess(dir){
+  // 1) Browser geolocation, matched to the nearest seeded city.
+  const fromCoords = (lat, lng) => {
+    const key = nearestCityKey(lat, lng);
+    const [state, city] = key.split('/');
+    const s = dir.states.find(s => s.slug === state);
+    const c = s && s.cities.find(c => c.slug === city);
+    const w = c && c.wards[0];
+    if (!s || !c || !w) return null;
+    return { state: s.slug, stateName: s.name, city: c.slug, cityName: c.name, ward: w.slug, wardName: w.name, source: 'device location' };
+  };
+
+  // A browser permission prompt the person never answers can leave
+  // getCurrentPosition's own `timeout` option from ever counting down (it
+  // only starts once a permission decision has been made), so this is
+  // raced against an independent timer rather than trusting that option
+  // alone — otherwise an ignored prompt would leave the intake modal
+  // stuck on "Locating…" indefinitely instead of falling through to IP/default.
+  const geoWithHardTimeout = new Promise(resolve => {
+    if (!navigator.geolocation) return resolve(null);
+    navigator.geolocation.getCurrentPosition(
+      pos => resolve(fromCoords(pos.coords.latitude, pos.coords.longitude)),
+      () => resolve(null),
+      { timeout: 6000, maximumAge: 300000 }
+    );
+  });
+  const hardTimeout = new Promise(resolve => setTimeout(() => resolve(null), 6500));
+  const geo = await Promise.race([geoWithHardTimeout, hardTimeout]);
+  if (geo) return geo;
+
+  // 2) IP-based fallback (no key required); best-effort, may fail silently
+  //    (offline, blocked by an extension, or the free quota is exhausted).
+  //    Bounded by its own abort timeout for the same reason as above — a
+  //    hung request must not leave the intake modal stuck.
+  try {
+    const controller = new AbortController();
+    const abortTimer = setTimeout(() => controller.abort(), 4000);
+    const res = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+    clearTimeout(abortTimer);
+    if (res.ok) {
+      const data = await res.json();
+      if (typeof data.latitude === 'number' && typeof data.longitude === 'number') {
+        const guess = fromCoords(data.latitude, data.longitude);
+        if (guess) { guess.source = 'IP address (approximate)'; return guess; }
+      }
+    }
+  } catch (e) { /* offline or blocked — fall through to default */ }
+
+  // 3) Default seed jurisdiction.
+  const s = dir.states.find(s => s.slug === DEFAULT_JURISDICTION.state);
+  const c = s && s.cities.find(c => c.slug === DEFAULT_JURISDICTION.city);
+  const w = c && c.wards.find(w => w.slug === DEFAULT_JURISDICTION.ward);
+  return { state: s.slug, stateName: s.name, city: c.slug, cityName: c.name, ward: w.slug, wardName: w.name, source: 'default' };
+}
+
+let jurisdictionDirectory = null;
+
+async function fetchJurisdictionDirectory(){
+  try {
+    const res = await fetch('/api/coverage/directory');
+    if (!res.ok) throw new Error('directory ' + res.status);
+    return await res.json();
+  } catch (e) {
+    // Static/local preview with no serverless functions running.
+    return { states: [
+      { slug:'wi', name:'Wisconsin', cities: [
+        { slug:'la-crosse', name:'La Crosse', wards: [ { slug:'ward-4', name:'Ward 4' }, { slug:'ward-7', name:'Ward 7' } ] },
+        { slug:'milwaukee', name:'Milwaukee', wards: [ { slug:'ward-12', name:'Ward 12' } ] }
+      ]},
+      { slug:'il', name:'Illinois', cities: [
+        { slug:'chicago', name:'Chicago', wards: [ { slug:'ward-3', name:'Ward 3' } ] }
+      ]}
+    ]};
+  }
+}
+
+function jurisdictionLabel(j){
+  return j.cityName + ', ' + j.state.toUpperCase() + ' — ' + j.wardName;
+}
+
+async function initLocationIntake(){
+  jurisdictionDirectory = await fetchJurisdictionDirectory();
+
+  const stored = getStoredJurisdiction();
+  if (stored && stored.state && stored.city && stored.ward) {
+    applyJurisdiction(stored, { silent: true });
+    return; // already confirmed in a previous visit — no need to prompt again
+  }
+
+  const guess = await detectJurisdictionGuess(jurisdictionDirectory);
+  document.getElementById('locDetectedLine').textContent = jurisdictionLabel(guess);
+  document.getElementById('locDetectedSource').textContent = 'Detected via ' + guess.source + ' — not stored until you confirm.';
+  document.getElementById('locModalOverlay').classList.add('open');
+
+  document.getElementById('locConfirmBtn').onclick = () => {
+    applyJurisdiction(guess);
+    document.getElementById('locModalOverlay').classList.remove('open');
+  };
+  document.getElementById('locChangeBtn').onclick = () => showLocationPicker(guess);
+}
+
+function populateLocPickSelectors(preselect){
+  const stateSel = document.getElementById('locPickState');
+  const citySel = document.getElementById('locPickCity');
+  const wardSel = document.getElementById('locPickWard');
+
+  stateSel.innerHTML = '';
+  jurisdictionDirectory.states.forEach(s => {
+    const opt = document.createElement('option'); opt.value = s.slug; opt.textContent = s.name;
+    stateSel.appendChild(opt);
+  });
+  if (preselect) stateSel.value = preselect.state;
+
+  const fillCities = () => {
+    const s = jurisdictionDirectory.states.find(s => s.slug === stateSel.value);
+    citySel.innerHTML = '';
+    (s ? s.cities : []).forEach(c => {
+      const opt = document.createElement('option'); opt.value = c.slug; opt.textContent = c.name;
+      citySel.appendChild(opt);
+    });
+    if (preselect && s && s.cities.some(c => c.slug === preselect.city)) citySel.value = preselect.city;
+    fillWards();
+  };
+  const fillWards = () => {
+    const s = jurisdictionDirectory.states.find(s => s.slug === stateSel.value);
+    const c = s && s.cities.find(c => c.slug === citySel.value);
+    wardSel.innerHTML = '';
+    (c ? c.wards : []).forEach(w => {
+      const opt = document.createElement('option'); opt.value = w.slug; opt.textContent = w.name;
+      wardSel.appendChild(opt);
+    });
+    if (preselect && c && c.wards.some(w => w.slug === preselect.ward)) wardSel.value = preselect.ward;
+  };
+
+  stateSel.onchange = fillCities;
+  citySel.onchange = fillWards;
+  fillCities();
+}
+
+function showLocationPicker(preselect){
+  document.getElementById('locConfirmBox').style.display = 'none';
+  document.getElementById('locPickerBox').style.display = 'block';
+  document.getElementById('locModalOverlay').classList.add('open');
+  populateLocPickSelectors(preselect);
+
+  document.getElementById('locPickConfirmBtn').onclick = () => {
+    const stateSel = document.getElementById('locPickState');
+    const citySel = document.getElementById('locPickCity');
+    const wardSel = document.getElementById('locPickWard');
+    const s = jurisdictionDirectory.states.find(s => s.slug === stateSel.value);
+    const c = s.cities.find(c => c.slug === citySel.value);
+    const w = c.wards.find(w => w.slug === wardSel.value);
+    applyJurisdiction({ state: s.slug, stateName: s.name, city: c.slug, cityName: c.name, ward: w.slug, wardName: w.name });
+    document.getElementById('locModalOverlay').classList.remove('open');
+    document.getElementById('locConfirmBox').style.display = 'block';
+    document.getElementById('locPickerBox').style.display = 'none';
+  };
+}
+
+// Re-opens the picker directly (from the Civic Tools menu's "Change My
+// Location"), without going through the detect/confirm step first.
+async function openLocationPicker(){
+  if (!jurisdictionDirectory) jurisdictionDirectory = await fetchJurisdictionDirectory();
+  showLocationPicker(getStoredJurisdiction() || currentJurisdiction);
+}
+
+let currentJurisdiction = null;
+
+function applyJurisdiction(j, opts){
+  currentJurisdiction = j;
+  storeJurisdiction(j);
+  const line = document.getElementById('pwJurisdictionLine');
+  if (line) line.textContent = jurisdictionLabel(j);
+  const cta = document.getElementById('pwReportCta');
+  if (cta) cta.href = '/app.html?state=' + j.state + '&city=' + j.city + '&ward=' + j.ward;
+  if (!(opts && opts.silent)) {
+    // A citizen just actively confirmed/changed jurisdiction — refresh the
+    // paperwork stack in place if the drawer happens to be open already.
+    if (document.getElementById('pwOverlay').classList.contains('open')) loadPaperworkStack();
+  }
+}
+
+document.getElementById('locModalClose').addEventListener('click', () => document.getElementById('locModalOverlay').classList.remove('open'));
+document.getElementById('locPickerClose').addEventListener('click', () => document.getElementById('locModalOverlay').classList.remove('open'));
+document.getElementById('locModalOverlay').addEventListener('click', (e) => {
+  if (e.target.id === 'locModalOverlay') e.currentTarget.classList.remove('open');
+});
+
+initLocationIntake();
+
+/* =====================================================================
+   CITIZEN PAPERWORK FILE — jurisdictional stack drawer
+   -----------------------------------------------------------------
+   Fetches the 4-layer stack (Federal / State / Municipal / District-Ward)
+   for the currently confirmed jurisdiction from
+   /api/coverage/:state/:city/:ward/jurisdiction and renders it as a
+   browsable list; tapping a document opens its 4-tab media view.
+   ===================================================================== */
+const LAYER_LABELS = { federal: 'Federal', state: 'State', municipal: 'Municipal', ward: 'District / Ward' };
+let pwStackCache = null;
+
+function fallbackJurisdictionStack(j){
+  // Mirrors api/_lib/jurisdictions.js's shape for offline/local preview.
+  const note = (name) => 'Representative summary — pending integration with ' + name + '\'s official published records.';
+  return { stack: {
+    federal: [
+      { id:'us-constitution', title:'U.S. Constitution — Preamble & Bill of Rights', kind:'Federal', source:'Public domain', fullText:'We the People of the United States... (see api/_lib/jurisdictions.js for the full excerpt).', cliffNotes:['First Amendment protects speech, press, assembly, and petitioning government.'], videoAvailable:false, audioAvailable:false },
+      { id:'declaration-of-independence', title:'Declaration of Independence', kind:'Federal', source:'Public domain', fullText:'We hold these truths to be self-evident... (see api/_lib/jurisdictions.js for the full excerpt).', cliffNotes:['Government exists to secure the people\'s rights and derives authority from their consent.'], videoAvailable:false, audioAvailable:false }
+    ],
+    state: [ { id:'state-constitution', title: j.stateName + ' State Constitution', kind:'State', source:'Representative summary', fullText: note(j.stateName), cliffNotes:['Defines state government powers and home-rule authority for municipalities.'], videoAvailable:false, audioAvailable:false } ],
+    municipal: [ { id:'municipal-code', title: j.cityName + ' Municipal Code', kind:'Municipal', source:'Representative summary', fullText: note(j.cityName), cliffNotes:['Sets property, right-of-way and nuisance standards behind most hazard categories.'], videoAvailable:false, audioAvailable:false } ],
+    ward: [ { id:'aldermanic-directory', title: j.wardName + ' Aldermanic Directory', kind:'District/Ward', source:'Representative summary', fullText: j.wardName + ' representative contact details are published by the city clerk\'s office.', cliffNotes:['Residents may contact their alderman regarding unresolved reports.'], videoAvailable:false, audioAvailable:false } ]
+  }};
+}
+
+function openPaperworkFile(){
+  document.getElementById('pwOverlay').classList.add('open');
+  document.getElementById('pwDocDetail').classList.remove('open');
+  document.getElementById('pwStackView').style.display = 'flex';
+  loadPaperworkStack();
+}
+
+async function loadPaperworkStack(){
+  const j = currentJurisdiction || getStoredJurisdiction();
+  if (!j) return;
+  document.getElementById('pwJurisdictionLine').textContent = jurisdictionLabel(j);
+  document.getElementById('pwReportCta').href = '/app.html?state=' + j.state + '&city=' + j.city + '&ward=' + j.ward;
+
+  let data;
+  try {
+    const res = await fetch('/api/coverage/' + j.state + '/' + j.city + '/' + j.ward + '/jurisdiction');
+    if (!res.ok) throw new Error('jurisdiction ' + res.status);
+    data = await res.json();
+  } catch (e) {
+    data = fallbackJurisdictionStack(j);
+  }
+  pwStackCache = data.stack;
+  renderPaperworkStack(data.stack);
+}
+
+function renderPaperworkStack(stack){
+  const view = document.getElementById('pwStackView');
+  view.innerHTML = '';
+  ['federal', 'state', 'municipal', 'ward'].forEach(layerKey => {
+    const docs = stack[layerKey] || [];
+    if (!docs.length) return;
+    const layerEl = document.createElement('div');
+    layerEl.className = 'pw-layer';
+    const head = document.createElement('div');
+    head.className = 'pw-layer-head';
+    head.innerHTML = `<span>${LAYER_LABELS[layerKey]}</span><span>${docs.length} doc${docs.length === 1 ? '' : 's'}</span>`;
+    layerEl.appendChild(head);
+    docs.forEach(doc => {
+      const btn = document.createElement('button');
+      btn.className = 'pw-doc-item';
+      btn.type = 'button';
+      btn.innerHTML = `<span>${esc(doc.title)}</span><span class="chev">›</span>`;
+      btn.addEventListener('click', () => openPaperworkDoc(doc));
+      layerEl.appendChild(btn);
+    });
+    view.appendChild(layerEl);
+  });
+}
+
+function openPaperworkDoc(doc){
+  document.getElementById('pwStackView').style.display = 'none';
+  const detail = document.getElementById('pwDocDetail');
+  detail.classList.add('open');
+  document.getElementById('pwDocKind').textContent = doc.kind || 'Document';
+  document.getElementById('pwDocTitle').textContent = doc.title;
+  document.getElementById('pwFullText').textContent = doc.fullText;
+
+  const notesEl = document.getElementById('pwCliffNotes');
+  notesEl.innerHTML = '';
+  (doc.cliffNotes || []).forEach(n => {
+    const li = document.createElement('li');
+    li.textContent = n;
+    notesEl.appendChild(li);
+  });
+
+  const videoPane = document.getElementById('pwVideoPane');
+  videoPane.querySelector('div').textContent = doc.videoAvailable
+    ? '5-minute video breakdown for ' + doc.title
+    : '5-minute video breakdown — production placeholder, not yet recorded for this document.';
+
+  const audioPane = document.getElementById('pwAudioPane');
+  audioPane.querySelector('div').textContent = doc.audioAvailable
+    ? '5-minute audio breakdown for ' + doc.title
+    : '5-minute audio breakdown — production placeholder, not yet recorded for this document.';
+
+  // Reset to the Full Text tab every time a new document opens.
+  document.querySelectorAll('.pw-media-tab').forEach(t => t.classList.toggle('active', t.dataset.pane === 'fulltext'));
+  document.querySelectorAll('.pw-media-pane').forEach(p => p.classList.toggle('active', p.dataset.pane === 'fulltext'));
+}
+
+document.querySelectorAll('.pw-media-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.pw-media-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.pw-media-pane').forEach(p => p.classList.toggle('active', p.dataset.pane === tab.dataset.pane));
+  });
+});
+
+document.getElementById('pwBackBtn').addEventListener('click', () => {
+  document.getElementById('pwDocDetail').classList.remove('open');
+  document.getElementById('pwStackView').style.display = 'flex';
+});
+
+document.getElementById('pwCloseBtn').addEventListener('click', () => document.getElementById('pwOverlay').classList.remove('open'));
+document.getElementById('pwOverlay').addEventListener('click', (e) => {
+  if (e.target.id === 'pwOverlay') e.currentTarget.classList.remove('open');
 });
 
 /* ===== PWA INSTALL ===== */

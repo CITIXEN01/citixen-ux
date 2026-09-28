@@ -1,8 +1,8 @@
 // GET /api/coverage/:state/:city/summary
 //
-// City-level rollup — what a state page or a city's landing card shows
-// before drilling into a specific ward's block grid.
-const { getWard, summarize } = require('../../../_lib/store');
+// City-level rollup — sums every ward under this city, for a state page or
+// a city's landing card before drilling into a specific ward's block grid.
+const { getCity, summarize } = require('../../../_lib/store');
 
 module.exports = (req, res) => {
   if (req.method !== 'GET') {
@@ -11,23 +11,37 @@ module.exports = (req, res) => {
   }
   const { state, city } = req.query;
 
-  // This demo only has one ward seeded per city; a real rollup would sum
-  // every ward under this city rather than reading a single one directly.
-  const wardSlug = 'ward-4';
-  const ward = getWard(state, city, wardSlug);
-  if (!ward) {
-    res.status(404).json({ error: 'City/ward not found', state, city });
+  const c = getCity(state, city);
+  if (!c) {
+    res.status(404).json({ error: 'City not found', state, city });
     return;
   }
 
-  const stats = summarize(ward.cells);
+  const wards = Object.entries(c.wards).map(([wardSlug, ward]) => {
+    const stats = summarize(ward.cells);
+    return {
+      slug: wardSlug,
+      name: ward.name,
+      alderman: ward.alderman,
+      coveragePct: stats.coveragePct,
+      coveredCount: stats.coveredCount,
+      totalCells: stats.total,
+      capExScopedUSD: ward.capExScopedUSD
+    };
+  });
+
+  const totalCells = wards.reduce((sum, w) => sum + w.totalCells, 0);
+  const coveredCount = wards.reduce((sum, w) => sum + w.coveredCount, 0);
+  const capExScopedUSD = wards.reduce((sum, w) => sum + (w.capExScopedUSD || 0), 0);
+
   res.status(200).json({
     state,
     city,
-    ward: wardSlug,
-    wardName: ward.name,
-    coveragePct: stats.coveragePct,
-    coveredCount: stats.coveredCount,
-    totalCells: stats.total
+    cityName: c.name,
+    coveragePct: totalCells ? +(coveredCount / totalCells * 100).toFixed(1) : 0,
+    coveredCount,
+    totalCells,
+    capExScopedUSD,
+    wards
   });
 };
