@@ -101,8 +101,27 @@ textarea.input{resize:none;line-height:1.4}
 .navtab svg{width:19px;height:19px}
 
 #map{height:220px;width:100%;border-radius:12px;border:1px solid var(--border);background:#0d1518;overflow:hidden}
-.dark-tiles{filter:invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);}
 .leaflet-container{background:#0d1518}
+.leaflet-div-icon{background:transparent;border:none}
+
+/* ===== MAP BEACONS (CartoDB Dark Matter basemap) ===== */
+.beacon-incident{position:relative;width:100%;height:100%}
+.beacon-incident .beacon-pulse{position:absolute;inset:-6px;border-radius:50%;background:var(--beacon-color);
+  opacity:.4;animation:beaconPulse 1.8s ease-out infinite}
+.beacon-incident .beacon-core{position:absolute;inset:5px;border-radius:50%;background:var(--beacon-color);
+  border:2px solid #fff;box-shadow:0 0 6px var(--beacon-color)}
+.beacon-user{position:relative;width:100%;height:100%}
+.beacon-user .beacon-pulse{position:absolute;inset:-8px;border-radius:50%;background:#00ff88;
+  opacity:.4;animation:beaconPulse 1.6s ease-out infinite}
+.beacon-user .beacon-core{position:absolute;inset:9px;border-radius:50%;background:#fff;
+  border:2px solid #00ff88;box-shadow:0 0 8px #00ff88}
+@keyframes beaconPulse{0%{transform:scale(.6);opacity:.55}100%{transform:scale(2.1);opacity:0}}
+
+/* ===== DARK POPUPS ===== */
+.leaflet-popup-content-wrapper{background:#12141c;border:1px solid #00ff88;border-radius:10px;color:#ffffff}
+.leaflet-popup-content{color:#ffffff;margin:10px 12px}
+.leaflet-popup-tip{background:#12141c;border:1px solid #00ff88}
+.leaflet-popup-close-button{color:#ffffff !important}
 .feed-item{background:rgba(7,12,14,.6);border:1px solid var(--border);border-radius:10px;padding:12px;
   margin-bottom:8px;cursor:pointer}
 .feed-item:hover{border-color:var(--mint2)}
@@ -451,7 +470,7 @@ textarea.input{resize:none;line-height:1.4}
 
 <script>
 'use strict';
-let map, mapInit=false, markers={}, cat='Pothole / Road';
+let map, mapInit=false, markers={}, cat='Pothole / Road', userMarker=null;
 
 // `ageMin` (minutes since intake) drives the SLA time-in-process color
 // shift in renderFeed()/renderTriageGauge() — a real deployment would
@@ -695,7 +714,10 @@ async function resolveDisplayLocation(){
     const stateCode = (data.principalSubdivisionCode || '').split('-').pop();
     if (city && stateCode) {
       if (labelEl) labelEl.textContent = `${esc(city)}, ${esc(stateCode)} • Active`;
-      onLocationResolved({ city, stateCode: stateCode.toUpperCase() });
+      // lat/lng are the device's own real GPS coordinates (not a guess) — kept
+      // here so the dispatch map can drop a "you are here" beacon; nothing
+      // else about the resolved-location contract changes.
+      onLocationResolved({ city, stateCode: stateCode.toUpperCase(), lat: latitude, lng: longitude });
       return;
     }
     onLocationResolved(null);
@@ -722,6 +744,9 @@ function onLocationResolved(loc){
     applyWardMeta(pickDefaultWardMeta());
     coverageLoaded = false;
     animateCoverage();
+  }
+  if (loc && typeof loc.lat === 'number' && typeof loc.lng === 'number') {
+    plotUserLocationMarker(loc.lat, loc.lng);
   }
 }
 
@@ -1159,10 +1184,17 @@ function initMap(){
   }
   try {
     map=L.map('map',{attributionControl:false}).setView([43.8138,-91.2519],14);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
-      maxZoom:19, className:'dark-tiles'
+    // CartoDB Dark Matter — a genuinely dark basemap, so no CSS invert/hue-rotate
+    // hack is needed (unlike the old OSM-tiles-forced-dark approach elsewhere
+    // in this codebase). Subdomains a-d per CARTO's basemap docs; no API key
+    // required for basemap tiles.
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+      maxZoom:20, subdomains:'abcd'
     }).addTo(map);
     cases.forEach(plotMarker);
+    if (window.CITIXEN_RESOLVED_LOCATION && typeof window.CITIXEN_RESOLVED_LOCATION.lat === 'number') {
+      plotUserLocationMarker(window.CITIXEN_RESOLVED_LOCATION.lat, window.CITIXEN_RESOLVED_LOCATION.lng);
+    }
     mapInit=true;
   } catch (err) {
     console.warn('Map initialization failed — continuing without the live map.', err);
@@ -1176,12 +1208,58 @@ function statusPill(status){
   return status==='Critical' ? 'pill-crit' : status==='Warning' ? 'pill-warn' : 'pill-ok';
 }
 
+// Category-coded incident color. This case data has no explicit `category`
+// field (unlike the public dashboard's cases), so the category is inferred
+// from the title text — a reported "pothole"/road hazard reads Lime, a
+// lighting hazard reads Amber. `status:'Critical'` always wins and reads Red
+// regardless of category, since urgency outranks category for triage color.
+// Anything that matches neither falls back to the existing status color
+// rather than guessing a category that isn't in the data.
+function categoryColor(item){
+  if (item.status === 'Critical') return '#ff4444';
+  const t = (item.title || '').toLowerCase();
+  if (/pothole|road|pavement/.test(t)) return '#00ff88';
+  if (/light/.test(t)) return '#ffbb00';
+  return statusColor(item.status);
+}
+
+function beaconIcon(color, size){
+  const s = size || 26;
+  return L.divIcon({
+    className: '',
+    html: `<div class="beacon-incident" style="--beacon-color:${color}">
+             <span class="beacon-pulse"></span>
+             <span class="beacon-core"></span>
+           </div>`,
+    iconSize: [s, s],
+    iconAnchor: [s / 2, s / 2]
+  });
+}
+
 function plotMarker(item){
-  const col=statusColor(item.status);
-  const icon=L.divIcon({html:`<div style="background:${col};width:14px;height:14px;border-radius:50%;border:2px solid #fff"></div>`,iconSize:[14,14]});
+  const col=categoryColor(item);
+  const icon=beaconIcon(col);
   const m=L.marker([item.lat,item.lng],{icon}).addTo(map);
   m.bindPopup(`<strong>${esc(item.title)}</strong><br><span style="font-size:.7rem">${esc(item.loc)} • ${esc(item.time)}</span>`);
   markers[item.id]=m;
+}
+
+// "You are here" beacon — only plotted once the device's own GPS has
+// actually resolved (see onLocationResolved); never shown as a guess.
+function plotUserLocationMarker(lat, lng){
+  if (!map || typeof L === 'undefined' || typeof lat !== 'number' || typeof lng !== 'number') return;
+  const icon = L.divIcon({
+    className: '',
+    html: `<div class="beacon-user">
+             <span class="beacon-pulse"></span>
+             <span class="beacon-core"></span>
+           </div>`,
+    iconSize: [30, 30],
+    iconAnchor: [15, 15]
+  });
+  if (userMarker) { userMarker.setLatLng([lat, lng]); return; }
+  userMarker = L.marker([lat, lng], { icon, zIndexOffset: 1000 }).addTo(map);
+  userMarker.bindPopup(`<strong>Your location</strong><br><span style="font-size:.7rem">Device GPS</span>`);
 }
 
 // Triage classification for the Map & feed 3-metric gauge: a case tagged

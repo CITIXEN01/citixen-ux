@@ -211,7 +211,26 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .mapwrap{flex:1;position:relative}
 #map{position:absolute;inset:0;background:#0d1518}
 .leaflet-container{background:#0d1518}
-.leaflet-tile-pane{filter:invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);}
+.leaflet-div-icon{background:transparent;border:none}
+
+/* ===== MAP BEACONS (CartoDB Dark Matter basemap) ===== */
+.beacon-incident{position:relative;width:100%;height:100%}
+.beacon-incident .beacon-pulse{position:absolute;inset:-6px;border-radius:50%;background:var(--beacon-color);
+  opacity:.4;animation:beaconPulse 1.8s ease-out infinite}
+.beacon-incident .beacon-core{position:absolute;inset:5px;border-radius:50%;background:var(--beacon-color);
+  border:2px solid #fff;box-shadow:0 0 6px var(--beacon-color)}
+.beacon-user{position:relative;width:100%;height:100%}
+.beacon-user .beacon-pulse{position:absolute;inset:-8px;border-radius:50%;background:#00ff88;
+  opacity:.4;animation:beaconPulse 1.6s ease-out infinite}
+.beacon-user .beacon-core{position:absolute;inset:9px;border-radius:50%;background:#fff;
+  border:2px solid #00ff88;box-shadow:0 0 8px #00ff88}
+@keyframes beaconPulse{0%{transform:scale(.6);opacity:.55}100%{transform:scale(2.1);opacity:0}}
+
+/* ===== DARK POPUPS ===== */
+.leaflet-popup-content-wrapper{background:#12141c;border:1px solid #00ff88;border-radius:10px;color:#ffffff}
+.leaflet-popup-content{color:#ffffff;margin:10px 12px}
+.leaflet-popup-tip{background:#12141c;border:1px solid #00ff88}
+.leaflet-popup-close-button{color:#ffffff !important}
 
 /* ===== MODAL ===== */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:3000;display:none;
@@ -609,16 +628,15 @@ function statusPill(status){ return status==='Critical' ? 'pill-crit' : status==
 function fuzzCoord(n){ return Math.round(n*1000)/1000; }
 
 /* ===== MAP ===== */
-// Standard OpenStreetMap tiles, no API key required. The tile PANE (not the whole
-// map — markers/popups must stay true color) gets a CSS filter (see .leaflet-tile-pane)
-// that inverts + hue-rotates the tiles into a dark, obsidian-matched basemap.
-let map, markers={};
+// CartoDB Dark Matter basemap — genuinely dark tiles, so no CSS invert/hue-rotate
+// filter hack is needed (that filter is removed from .leaflet-tile-pane above).
+let map, markers={}, userMarker=null;
 function addBaseLayer(m){
   const srcTag=document.getElementById('mapSrcTag');
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    maxZoom:19, subdomains:'abc', crossOrigin:true
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+    maxZoom:20, subdomains:'abcd', crossOrigin:true
   }).addTo(m);
-  if(srcTag) srcTag.textContent='TILE SRC: OPENSTREETMAP (DARK FILTER)';
+  if(srcTag) srcTag.textContent='TILE SRC: CARTODB DARK MATTER';
 }
 function initMap(){
   if (typeof L === 'undefined') return; // Leaflet CDN unreachable — degrade gracefully rather than aborting the caller
@@ -626,12 +644,56 @@ function initMap(){
     map=L.map('map',{attributionControl:false}).setView([cities.lacrosse.lat,cities.lacrosse.lng],cities.lacrosse.zoom);
     addBaseLayer(map);
     cases.forEach(plotMarker);
+    if (window.CITIXEN_DEVICE_COORDS) plotUserLocationMarker(window.CITIXEN_DEVICE_COORDS.lat, window.CITIXEN_DEVICE_COORDS.lng);
     setTimeout(()=>map.invalidateSize(),150);
   } catch (err) { /* map unavailable — rest of the page still functions */ }
 }
+
+// Category-coded incident color: Roads/Potholes read Lime, Lighting reads
+// Amber, and a Critical status always reads Red regardless of category
+// (urgency outranks category for triage color). Anything else falls back
+// to the existing status color rather than inventing a category.
+function categoryColor(item){
+  if (item.status === 'Critical') return '#ff4444';
+  const cat = (item.category || '').toLowerCase();
+  if (cat === 'roads') return '#00ff88';
+  if (cat === 'lighting') return '#ffbb00';
+  return statusColor(item.status);
+}
+
+function beaconIcon(color, size){
+  const s = size || 26;
+  return L.divIcon({
+    className: '',
+    html: `<div class="beacon-incident" style="--beacon-color:${color}">
+             <span class="beacon-pulse"></span>
+             <span class="beacon-core"></span>
+           </div>`,
+    iconSize: [s, s],
+    iconAnchor: [s / 2, s / 2]
+  });
+}
+
+// "You are here" beacon, plotted only from the visitor's own real device GPS
+// (never the coarser IP-based fallback) — see detectJurisdictionGuess(). This
+// pin is NOT fuzzed like the public incident pins below: it's shown only in
+// the viewer's own browser and never transmitted anywhere.
+function plotUserLocationMarker(lat, lng){
+  if (!map || typeof L === 'undefined' || typeof lat !== 'number' || typeof lng !== 'number') return;
+  const icon = L.divIcon({
+    className: '',
+    html: `<div class="beacon-user"><span class="beacon-pulse"></span><span class="beacon-core"></span></div>`,
+    iconSize: [30, 30],
+    iconAnchor: [15, 15]
+  });
+  if (userMarker) { userMarker.setLatLng([lat, lng]); return; }
+  userMarker = L.marker([lat, lng], { icon, zIndexOffset: 1000 }).addTo(map);
+  userMarker.bindPopup(`<strong>Your location</strong><br><span style="font-size:.7rem">Device GPS</span>`);
+}
+
 function plotMarker(item){
-  const col=statusColor(item.status);
-  const icon=L.divIcon({html:`<div style="background:${col};width:14px;height:14px;border-radius:50%;border:2px solid #fff"></div>`,iconSize:[14,14]});
+  const col=categoryColor(item);
+  const icon=beaconIcon(col);
   const dLat=fuzzCoord(item.lat), dLng=fuzzCoord(item.lng);
   const m=L.marker([dLat,dLng],{icon}).addTo(map);
   m.bindPopup(`<strong>${esc(item.title)}</strong><br><span style="font-size:.7rem">${esc(item.loc)} • ${esc(item.time)}</span><br><span style="font-size:.68rem;color:#8e9fa8">${esc(item.category)} • ${esc(item.status)}</span>`);
@@ -896,14 +958,19 @@ function nearestCityKey(lat, lng){
 
 async function detectJurisdictionGuess(dir){
   // 1) Browser geolocation, matched to the nearest seeded city.
-  const fromCoords = (lat, lng) => {
+  const fromCoords = (lat, lng, source) => {
     const key = nearestCityKey(lat, lng);
     const [state, city] = key.split('/');
     const s = dir.states.find(s => s.slug === state);
     const c = s && s.cities.find(c => c.slug === city);
     const w = c && c.wards[0];
     if (!s || !c || !w) return null;
-    return { state: s.slug, stateName: s.name, city: c.slug, cityName: c.name, ward: w.slug, wardName: w.name, source: 'device location' };
+    const out = { state: s.slug, stateName: s.name, city: c.slug, cityName: c.name, ward: w.slug, wardName: w.name, source: source || 'device location' };
+    // Real device GPS (never the coarser IP-based fallback) is kept on the
+    // result so the map can drop a "you are here" beacon at the actual
+    // coordinate — this never gets sent anywhere, it's a client-side pin only.
+    if (source !== 'IP address (approximate)') { out._deviceLat = lat; out._deviceLng = lng; }
+    return out;
   };
 
   // A browser permission prompt the person never answers can leave
@@ -915,7 +982,7 @@ async function detectJurisdictionGuess(dir){
   const geoWithHardTimeout = new Promise(resolve => {
     if (!navigator.geolocation) return resolve(null);
     navigator.geolocation.getCurrentPosition(
-      pos => resolve(fromCoords(pos.coords.latitude, pos.coords.longitude)),
+      pos => resolve(fromCoords(pos.coords.latitude, pos.coords.longitude, 'device location')),
       () => resolve(null),
       { timeout: 6000, maximumAge: 300000 }
     );
@@ -936,8 +1003,8 @@ async function detectJurisdictionGuess(dir){
     if (res.ok) {
       const data = await res.json();
       if (typeof data.latitude === 'number' && typeof data.longitude === 'number') {
-        const guess = fromCoords(data.latitude, data.longitude);
-        if (guess) { guess.source = 'IP address (approximate)'; return guess; }
+        const guess = fromCoords(data.latitude, data.longitude, 'IP address (approximate)');
+        if (guess) return guess;
       }
     }
   } catch (e) { /* offline or blocked — fall through to default */ }
@@ -988,6 +1055,10 @@ async function initLocationIntake(){
   // show that honestly (CITYWIDE, no location asserted) rather than naming
   // the internal fallback jurisdiction as if it had actually been detected.
   const wasDetected = guess.source !== 'default';
+  if (typeof guess._deviceLat === 'number') {
+    window.CITIXEN_DEVICE_COORDS = { lat: guess._deviceLat, lng: guess._deviceLng };
+    plotUserLocationMarker(guess._deviceLat, guess._deviceLng);
+  }
   document.getElementById('locDetectedLine').textContent = wasDetected ? jurisdictionLabel(guess) : 'CITYWIDE (location not detected)';
   document.getElementById('locDetectedSource').textContent = wasDetected
     ? 'Detected via ' + guess.source + ' — not stored until you confirm.'
