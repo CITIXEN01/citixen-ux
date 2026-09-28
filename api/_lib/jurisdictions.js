@@ -187,8 +187,8 @@ function municipalLayer(cityName){
 }
 
 function wardLayer(wardName, alderman, cityName){
-  wardName = safeName(wardName, 'this ward');
-  alderman = safeName(alderman, 'The elected representative for this ward');
+  wardName = safeName(wardName, 'Local District');
+  alderman = safeName(alderman, 'The elected representative for this district');
   cityName = safeName(cityName, 'this municipality');
   return [
     {

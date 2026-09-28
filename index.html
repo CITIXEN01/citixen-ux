@@ -73,10 +73,10 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
      fully on-screen regardless of where the trigger button sits. */
   .dropdown-menu{left:0;right:auto;max-width:calc(100vw - 32px)}
 }
-.dropdown-menu button{display:block;width:100%;text-align:left;background:none;border:none;color:var(--text);
-  padding:10px 14px;font-size:.78rem;font-weight:600;cursor:pointer}
-.dropdown-menu button:hover{background:rgba(0,255,136,.1);color:var(--mint2)}
-.dropdown-menu button+button{border-top:1px solid var(--border)}
+.dropdown-menu button,.dropdown-menu a{display:block;width:100%;text-align:left;background:none;border:none;color:var(--text);
+  padding:10px 14px;font-size:.78rem;font-weight:600;cursor:pointer;text-decoration:none;box-sizing:border-box}
+.dropdown-menu button:hover,.dropdown-menu a:hover{background:rgba(0,255,136,.1);color:var(--mint2)}
+.dropdown-menu button+button,.dropdown-menu a+button,.dropdown-menu button+a,.dropdown-menu a+a{border-top:1px solid var(--border)}
 .dropdown-group-label{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;
   color:var(--muted);padding:10px 14px 5px;background:rgba(255,255,255,.02)}
 .dropdown-group-label:not(:first-child){border-top:1px solid var(--border);margin-top:2px}
@@ -310,10 +310,15 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       <div class="dropdown">
         <button class="dropdown-btn" id="civicToolsBtn">Civic Tools <span style="font-size:.6rem;">▾</span></button>
         <div class="dropdown-menu" id="civicToolsMenu">
-          <div class="dropdown-group-label">Ward Intelligence</div>
-          <button data-scroll="dashboard">Ward Map Overview</button>
-          <button data-scroll="dashboard">SLA Resolution Tracker</button>
-          <div class="dropdown-group-label">Citizen Paperwork File</div>
+          <div class="dropdown-group-label">Reporting & Dispatch Stack</div>
+          <a href="/app.html" target="_blank" rel="noopener noreferrer">Mobile Gateway</a>
+          <button data-scroll="dashboard">Live Map</button>
+          <a href="tel:911">Emergency Triage</a>
+          <div class="dropdown-group-label">Municipal Transparency Stack</div>
+          <button data-scroll="dashboard">Public Works Project Ledger</button>
+          <button data-scroll="dashboard">Asset Coverage Grid</button>
+          <button data-scroll="dashboard">Expenditure Allocations</button>
+          <div class="dropdown-group-label">Governance & Legal Stack</div>
           <button id="openPaperworkBtn">Open Citizen Paperwork File ↗</button>
           <button data-loc-change="1">Change My Location</button>
         </div>
@@ -356,7 +361,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         <h3>Citizen Paperwork File</h3>
         <button class="modal-close" id="pwCloseBtn">✕</button>
       </div>
-      <div class="pw-jurisdiction-line" id="pwJurisdictionLine">La Crosse, WI — Ward 4</div>
+      <div class="pw-jurisdiction-line" id="pwJurisdictionLine">Locating jurisdiction…</div>
 
       <a class="pw-report-cta" href="/app.html" id="pwReportCta">
         <svg viewBox="0 0 24 24" width="16" height="16" stroke="#051311" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
@@ -418,7 +423,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
           </g>
         </svg>
         <div class="gd-value" id="gwWardValue">0%</div>
-        <div class="gd-sub" id="gwWardSub">Ward 4</div>
+        <div class="gd-sub" id="gwWardSub">Locating…</div>
       </div>
       <div class="gt-fraction">
         <div class="gd-label">Weekly Resolve Rate</div>
@@ -442,7 +447,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   </section>
 
   <div class="hero-stack">
-    <a class="btn btn-primary btn-hero" href="/app.html" target="_blank" rel="noopener noreferrer">Launch Mobile Reporter ↗</a>
+    <a class="btn btn-primary btn-hero" href="/app.html" target="_blank" rel="noopener noreferrer">Civic Mobile Gateway</a>
     <div class="hud-card" style="max-width:420px;width:100%;">
       <div class="label">Install Mobile Reporter</div>
       <div class="qr-row">
@@ -481,7 +486,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   <section id="dashboard">
     <aside class="sidebar">
       <div class="card">
-        <div class="label"><span>Ward Health Index</span><span id="healthCity" style="color:var(--mint2)">La Crosse</span></div>
+        <div class="label"><span>Ward Health Index</span><span id="healthCity" style="color:var(--mint2)">Locating…</span></div>
         <select class="grid-select" id="gridSelect" aria-label="Select municipal grid" style="width:100%;min-width:0;margin-bottom:10px;">
           <option value="lacrosse">La Crosse, WI (Ward 4 Active)</option>
           <option value="austin">Austin, TX (Ward 2)</option>
@@ -518,7 +523,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       </div>
 
       <div class="card ledger-card">
-        <div class="label"><span id="ledgerTitle">Ward 4 Municipal Expenditure & Allocation</span></div>
+        <div class="label"><span id="ledgerTitle">CITYWIDE MUNICIPAL EXPENDITURE & ALLOCATION</span></div>
         <div class="ledger-tag">AI Categorization Engine // Real-Time Capital Tracking</div>
 
         <div class="ledger-filters" id="ledgerFilters">
@@ -858,7 +863,7 @@ function openModal(key){
   document.getElementById('modalContent').innerHTML=html;
   document.getElementById('modalOverlay').classList.add('open');
 }
-document.querySelectorAll('#civicToolsMenu button').forEach(btn=>{
+document.querySelectorAll('#civicToolsMenu button, #civicToolsMenu a').forEach(btn=>{
   btn.addEventListener('click',()=>{
     civicMenu.classList.remove('open');
     if(btn.dataset.scroll){
@@ -1105,10 +1110,43 @@ function applyJurisdiction(j, opts){
   if (line) line.textContent = jurisdictionLabel(j);
   const cta = document.getElementById('pwReportCta');
   if (cta) cta.href = '/app.html?state=' + j.state + '&city=' + j.city + '&ward=' + j.ward;
+  syncDashboardToJurisdiction(j);
   if (!(opts && opts.silent)) {
     // A citizen just actively confirmed/changed jurisdiction — refresh the
     // paperwork stack in place if the drawer happens to be open already.
     if (document.getElementById('pwOverlay').classList.contains('open')) loadPaperworkStack();
+  }
+}
+
+// Bridges the GPS/IP/confirmed jurisdiction above to the dashboard's
+// Ward Health Index / gauges / Municipal Expenditure ledger, which are
+// driven by the separate `cities` demo-city object (only La Crosse and
+// Chicago overlap with the coverage directory's seeded jurisdictions —
+// Austin has no coverage-directory entry, and Milwaukee has no `cities`
+// entry). When the resolved jurisdiction has no matching demo city, this
+// falls back to the honest citywide-neutral labels rather than leaving a
+// stale or mismatched city's numbers on screen.
+const JURISDICTION_TO_CITY_KEY = { 'wi/la-crosse': 'lacrosse', 'il/chicago': 'chicago' };
+
+function syncDashboardToJurisdiction(j){
+  const key = JURISDICTION_TO_CITY_KEY[j.state + '/' + j.city];
+  const gridSel = document.getElementById('gridSelect');
+  if (key && cities[key]) {
+    if (gridSel) gridSel.value = key;
+    const c = cities[key];
+    document.getElementById('healthCity').textContent = c.name;
+    document.getElementById('healthScore').innerHTML = `${c.health} <span style="font-size:1rem;color:var(--muted)">/ 100</span>`;
+    document.getElementById('healthSla').textContent = `Dispatch response SLA: ${c.sla}% on-time`;
+    setBar('Roads', c.roads); setBar('Lighting', c.lighting); setBar('Sanitation', c.sanitation);
+    setLedger(c);
+    updateTelemetry(c);
+    updateGatewayTelemetry(c);
+    if (map) map.flyTo([c.lat, c.lng], c.zoom, { duration: 1.3 });
+  } else {
+    document.getElementById('healthCity').textContent = j.cityName || 'Citywide';
+    document.getElementById('ledgerTitle').textContent = 'CITYWIDE MUNICIPAL EXPENDITURE & ALLOCATION';
+    const wardSub = document.getElementById('gwWardSub');
+    if (wardSub) wardSub.textContent = 'Citywide Health Index';
   }
 }
 
