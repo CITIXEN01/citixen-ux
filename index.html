@@ -280,6 +280,41 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .frontier-mapwrap{position:relative;height:460px;border-radius:16px;overflow:hidden;border:1px solid var(--border)}
 .frontier-mapwrap #map{position:absolute;inset:0;background:#0d1518}
 @media (max-width:640px){ .frontier-mapwrap{height:360px} }
+.dispatch-mapwrap{height:220px;margin-bottom:12px}
+
+/* ===== AGGREGATE NATIONAL GEO-HATCH™ HEAT MAP — a dedicated stylized
+   canvas (grid + radar sweep + glowing cluster nodes), deliberately NOT
+   the Leaflet field-dispatch map above. Cluster positions are a stylized
+   layout, not a geographic projection. ===== */
+.geo-hatch-search-row{display:flex;gap:8px;margin-top:8px}
+.geo-hatch-search-row input{flex:1;min-width:0;background:rgba(7,12,14,.8);border:1px solid var(--border);
+  color:var(--text);padding:10px 14px;border-radius:10px;font-size:.8rem;outline:none}
+.geo-hatch-search-row input:focus{border-color:var(--mint2)}
+.geo-hatch-canvas{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--border);
+  background:radial-gradient(circle at 50% 40%,rgba(0,255,136,.08),var(--bg-obsidian) 72%)}
+.geo-hatch-grid{position:absolute;inset:0;
+  background-image:linear-gradient(rgba(0,255,136,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,.14) 1px,transparent 1px);
+  background-size:32px 32px}
+.geo-hatch-sweep{position:absolute;top:50%;left:50%;width:140%;padding-bottom:140%;transform:translate(-50%,-50%);
+  border-radius:50%;background:conic-gradient(from 0deg,rgba(0,255,136,.16),transparent 40%);
+  animation:teaserRadarSpin 6s linear infinite}
+.geo-cluster{position:absolute;display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);z-index:2}
+#geoClusterLacrosse{top:32%;left:28%}
+#geoClusterAustin{top:68%;left:46%}
+#geoClusterChicago{top:38%;left:64%}
+.geo-cluster-dot{width:14px;height:14px;border-radius:50%;background:#00FF87;box-shadow:0 0 14px 4px rgba(0,255,135,.7)}
+.geo-cluster-pulse{position:absolute;width:14px;height:14px;border-radius:50%;background:rgba(0,255,135,.6);
+  animation:pulseEmerald 2.2s ease-out infinite}
+.geo-cluster.is-dim .geo-cluster-dot{background:rgba(0,255,135,.35);box-shadow:0 0 8px 2px rgba(0,255,135,.25)}
+.geo-cluster.is-dim .geo-cluster-pulse{display:none}
+.geo-cluster.is-highlight .geo-cluster-dot{box-shadow:0 0 22px 8px rgba(0,255,135,.9)}
+.geo-cluster-label{margin-top:8px;font-size:.66rem;font-weight:700;color:var(--text);text-align:center;
+  background:rgba(5,9,10,.75);padding:4px 8px;border-radius:6px;white-space:nowrap}
+.geo-cluster-metric{display:block;font-size:.6rem;font-weight:600;color:var(--mint2);margin-top:1px}
+.geo-hatch-legend{position:absolute;left:16px;bottom:12px;display:flex;gap:16px;flex-wrap:wrap;z-index:2}
+.geo-hatch-legend span{display:flex;align-items:center;gap:6px;font-size:.62rem;color:var(--muted)}
+.geo-legend-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+@media (max-width:640px){ .geo-hatch-canvas{height:380px !important} .geo-cluster-label{font-size:.6rem} }
 
 /* ===== DEEP-DIVE PANELS — hidden until a drill-down hub is clicked, per
    "keep the top-level page light" refactor. Same accordion-reveal idea as
@@ -955,18 +990,29 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   <div class="small" style="text-align:center;color:var(--muted)" id="installStatus">Waiting for install availability on this browser…</div>
   <div class="small" style="text-align:center;color:var(--muted);max-width:460px;margin:4px auto 20px;">Installs the CITIXEN UX™ Progressive Web App directly to your home screen.</div>
 
-  <!-- ===== FULL-SCREEN NATIONAL GEO-HATCH™ HEAT MAP MODAL — reuses the SAME
-       Leaflet instance (#map / initMap()/map global) that used to render
-       inline mid-scroll; it's simply relocated here behind a modal rather
-       than duplicated. Opening this modal calls map.invalidateSize() since
-       Leaflet can't measure a hidden container's size on first paint. ===== -->
+  <!-- ===== FULL-SCREEN AGGREGATE NATIONAL GEO-HATCH™ HEAT MAP MODAL — a
+       dedicated stylized visualization, NOT the Leaflet field-dispatch map
+       (that instance now lives only inside the Analytics deep-dive's Live
+       dispatch feed card, see #deepdiveAnalytics below). This is a
+       CSS/SVG-drawn obsidian canvas with a grid, a rotating radar sweep,
+       and glowing emerald cluster nodes for each seeded jurisdiction, sized
+       from real numbers where a live backend exists (La Crosse — this
+       project's only live ward data, via loadBig3()) and clearly tagged
+       (Illustrative) where a jurisdiction is still static demo config
+       (Austin/Chicago — see the `cities` object). Node positions are a
+       stylized layout, not a geographic projection. ===== -->
   <div class="modal-overlay" id="nationalHeatMapModal">
     <div class="modal-box" style="max-width:1100px;width:96vw;padding:0;overflow:hidden;">
       <button class="modal-close" id="heatMapCloseBtn" style="z-index:2">✕</button>
       <div class="frontier-map-head" style="padding:18px 20px 10px;">
         <div class="frontier-search-bar">
-          <div class="label" style="justify-content:center;margin-bottom:2px">National Geo-Hatch™ Heat Map</div>
-          <div class="frontier-search-note">Interactive drill-down zoom — Emerald = Audited/Resolved, Amber = Active Dispatch, Gray = Unmapped. Use the Search bar on the homepage to jump to a jurisdiction, then reopen this map.</div>
+          <div class="label" style="justify-content:center;margin-bottom:2px">Aggregate National Geo-Hatch™ Heat Map</div>
+          <div class="frontier-search-note">Emerald glow = reporting density for that jurisdiction. Search a ZIP or ward below to highlight it.</div>
+          <div class="geo-hatch-search-row">
+            <input type="text" id="geoHatchSearchInput" placeholder="Search ZIP or ward (e.g. Ward 4, Austin, 54601)" aria-label="Search ZIP or ward" autocomplete="off">
+            <button class="btn btn-outline" id="geoHatchSearchBtn" type="button">Search</button>
+          </div>
+          <div class="small" id="geoHatchSearchResult" style="color:var(--muted);margin-top:6px;min-height:14px;"></div>
         </div>
         <div class="frontier-ticker-inline">
           <div class="label" style="justify-content:center;margin-bottom:2px">National Geo-Hatch Ticker</div>
@@ -974,9 +1020,28 @@ audio.pw-audio-el{width:100%;margin-top:4px}
           <div class="small" style="color:var(--muted)">Avg. block coverage</div>
         </div>
       </div>
-      <div class="frontier-mapwrap" style="height:520px;margin:0 20px 20px;border-radius:12px;overflow:hidden;">
-        <div id="map"></div>
-        <div class="map-src-tag" id="mapSrcTag">TILE SRC: ESRI DARK GRAY CANVAS</div>
+      <div class="geo-hatch-canvas" id="geoHatchCanvas" style="height:480px;margin:0 20px 20px;">
+        <div class="geo-hatch-grid" aria-hidden="true"></div>
+        <div class="geo-hatch-sweep" aria-hidden="true"></div>
+        <div class="geo-cluster" id="geoClusterLacrosse" data-jurisdiction="lacrosse" data-match="la crosse,lacrosse,wisconsin,wi,ward 4,ward 7,ward 12,ward 3,ward-4,ward-7,ward-12,ward-3,54601">
+          <span class="geo-cluster-pulse"></span>
+          <span class="geo-cluster-dot"></span>
+          <span class="geo-cluster-label">La Crosse, WI<br><span class="geo-cluster-metric" id="geoClusterLacrosseMetric">Loading…</span></span>
+        </div>
+        <div class="geo-cluster" id="geoClusterAustin" data-jurisdiction="austin" data-match="austin,texas,tx,ward 2,78701">
+          <span class="geo-cluster-pulse"></span>
+          <span class="geo-cluster-dot"></span>
+          <span class="geo-cluster-label">Austin, TX<br><span class="geo-cluster-metric" id="geoClusterAustinMetric">—</span></span>
+        </div>
+        <div class="geo-cluster" id="geoClusterChicago" data-jurisdiction="chicago" data-match="chicago,illinois,il,district 7,60601">
+          <span class="geo-cluster-pulse"></span>
+          <span class="geo-cluster-dot"></span>
+          <span class="geo-cluster-label">Chicago, IL<br><span class="geo-cluster-metric" id="geoClusterChicagoMetric">—</span></span>
+        </div>
+        <div class="geo-hatch-legend">
+          <span><span class="geo-legend-dot" style="background:#00FF87"></span>Live backend (La Crosse)</span>
+          <span><span class="geo-legend-dot" style="background:rgba(0,255,135,.35)"></span>Illustrative — pending onboarding</span>
+        </div>
       </div>
     </div>
   </div>
@@ -1032,6 +1097,17 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       </div>
       <div class="card">
         <div class="label"><span>Live dispatch feed</span><span class="small" id="feedCount">3 shown</span></div>
+        <!-- ===== FIELD DISPATCH MAP — the standard Leaflet instance (real
+             OSM tiles, incident beacon pins, "you are here" device-GPS
+             marker) lives exclusively here, inside the Citizen Reporter /
+             Dispatch workflow, and nowhere near the Aggregate Geo-Hatch
+             Heat Map modal above. initMap() targets this #map on page
+             load; invalidateSize() is called when this panel opens since
+             Leaflet can't measure a hidden container. ===== -->
+        <div class="frontier-mapwrap dispatch-mapwrap">
+          <div id="map"></div>
+          <div class="map-src-tag" id="mapSrcTag">TILE SRC: OPENSTREETMAP (DARK FILTER)</div>
+        </div>
         <div class="audit-tabs">
           <button class="audit-tab active" data-view="live">Live Incidents</button>
           <button class="audit-tab" data-view="audit">Immutable Audit Stream</button>
@@ -1716,6 +1792,9 @@ function openDeepdivePanel(panelId, scrollToId, triggerBtn){
   setTimeout(() => {
     const target = scrollToId ? document.getElementById(scrollToId) : panel;
     if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // The Leaflet field-dispatch map now lives only inside #deepdiveAnalytics
+    // (see the Live dispatch feed card); invalidateSize() here is a no-op
+    // for the other panels since `map` is only ever falsy/unaffected by them.
     if (map) map.invalidateSize();
   }, 30);
 }
@@ -1738,15 +1817,56 @@ document.querySelectorAll('[data-close-panel]').forEach(btn => {
   btn.addEventListener('click', () => closeDeepdivePanel(btn.dataset.closePanel));
 });
 
-/* ===== FULL-SCREEN NATIONAL GEO-HATCH™ HEAT MAP MODAL — reuses the same
-   Leaflet #map instance the deep-dive panels used to render inline; opening
-   it just needs invalidateSize() since Leaflet can't measure a hidden
-   container. Wired to the teaser card and launcher buttons inside the
-   Analytics and Civic Stack Operations panels ("Includes field reporting"
-   / heat map access, without a dedicated 4th/5th hub button). ===== */
+/* ===== AGGREGATE NATIONAL GEO-HATCH™ HEAT MAP MODAL — a dedicated
+   stylized canvas (see #geoHatchCanvas markup/CSS), deliberately separate
+   from the Leaflet field-dispatch map (which now lives only inside the
+   Analytics deep-dive's Live dispatch feed card). Wired to the launcher
+   buttons inside the Analytics and Civic Stack Operations panels. ===== */
+function renderGeoHatchClusters(){
+  // La Crosse is this project's one live-backend jurisdiction — reuse the
+  // same matrixData national payload loadBig3() already fetched (never a
+  // second request), so this never invents a number. Austin/Chicago have
+  // no live backend yet, so they render dimmed and tagged (Illustrative)
+  // using their static demo config from the `cities` object.
+  const lcMetric = document.getElementById('geoClusterLacrosseMetric');
+  if (lcMetric) {
+    lcMetric.textContent = matrixData && matrixData.activeCount != null
+      ? matrixData.activeCount + ' active / ' + (matrixData.totalTickets != null ? matrixData.totalTickets : '—') + ' total'
+      : 'Loading…';
+  }
+  const auMetric = document.getElementById('geoClusterAustinMetric');
+  if (auMetric) auMetric.textContent = cities.austin.health + '/100 health (Illustrative)';
+  const chMetric = document.getElementById('geoClusterChicagoMetric');
+  if (chMetric) chMetric.textContent = cities.chicago.health + '/100 health (Illustrative)';
+  const austinNode = document.getElementById('geoClusterAustin');
+  const chicagoNode = document.getElementById('geoClusterChicago');
+  if (austinNode) austinNode.classList.add('is-dim');
+  if (chicagoNode) chicagoNode.classList.add('is-dim');
+  document.querySelectorAll('.geo-cluster').forEach(n => n.classList.remove('is-highlight'));
+  const resultEl = document.getElementById('geoHatchSearchResult');
+  if (resultEl) resultEl.textContent = '';
+  const searchInput = document.getElementById('geoHatchSearchInput');
+  if (searchInput) searchInput.value = '';
+}
+function highlightGeoCluster(query){
+  const resultEl = document.getElementById('geoHatchSearchResult');
+  const q = (query || '').trim().toLowerCase();
+  document.querySelectorAll('.geo-cluster').forEach(n => n.classList.remove('is-highlight'));
+  if (!q) { if (resultEl) resultEl.textContent = ''; return; }
+  const match = Array.from(document.querySelectorAll('.geo-cluster')).find(n =>
+    (n.dataset.match || '').split(',').some(token => token && (q.includes(token) || token.includes(q)))
+  );
+  if (match) {
+    match.classList.add('is-highlight');
+    match.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+    if (resultEl) resultEl.textContent = 'Highlighted: ' + match.querySelector('.geo-cluster-label').firstChild.textContent.trim();
+  } else if (resultEl) {
+    resultEl.textContent = 'No seeded jurisdiction matches that yet — try "La Crosse", "Austin", "Chicago", or a La Crosse ward (e.g. Ward 4).';
+  }
+}
 function openHeatMapModal(){
   document.getElementById('nationalHeatMapModal').classList.add('open');
-  setTimeout(() => { if (map) map.invalidateSize(); }, 30);
+  renderGeoHatchClusters();
 }
 function closeHeatMapModal(){
   document.getElementById('nationalHeatMapModal').classList.remove('open');
@@ -1761,6 +1881,14 @@ document.getElementById('nationalHeatMapModal').addEventListener('click', (e) =>
 });
 const viewHeatMapFromStackBtn = document.getElementById('btnViewHeatMapFromStack');
 if (viewHeatMapFromStackBtn) viewHeatMapFromStackBtn.addEventListener('click', openHeatMapModal);
+const geoHatchSearchBtn = document.getElementById('geoHatchSearchBtn');
+const geoHatchSearchInput = document.getElementById('geoHatchSearchInput');
+if (geoHatchSearchBtn && geoHatchSearchInput) {
+  geoHatchSearchBtn.addEventListener('click', () => highlightGeoCluster(geoHatchSearchInput.value));
+  geoHatchSearchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); highlightGeoCluster(geoHatchSearchInput.value); }
+  });
+}
 
 document.getElementById('privacyPillBtn').addEventListener('click',()=> openModal('anonymity'));
 document.getElementById('modalClose').addEventListener('click',()=> document.getElementById('modalOverlay').classList.remove('open'));
