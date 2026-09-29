@@ -98,6 +98,19 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .footer-staff-link{color:var(--muted);text-decoration:none;border-bottom:1px dashed var(--border);padding-bottom:1px}
 .footer-staff-link:hover{color:var(--mint2);border-color:var(--mint2)}
 
+/* ===== FOOTER SITEMAP (homepage-flow refactor) — secondary docs/actions/legal
+   links live here now that the top-nav "Civic Tools" dropdown is gone. ===== */
+.sitemap-footer{flex-direction:column;align-items:stretch;gap:0;padding:0}
+.sitemap-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;max-width:1100px;margin:0 auto;
+  padding:32px 24px;width:100%}
+.sitemap-col h5{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text);margin-bottom:10px}
+.sitemap-col a,.sitemap-col button{display:block;background:none;border:none;padding:0;margin-bottom:8px;
+  color:var(--muted);text-decoration:none;font-size:.74rem;text-align:left;cursor:pointer;font-family:inherit}
+.sitemap-col a:hover,.sitemap-col button:hover{color:var(--mint2)}
+.sitemap-bottom{border-top:1px solid var(--border);padding:14px 22px max(14px, env(safe-area-inset-bottom));
+  text-align:center;font-size:.68rem;color:var(--muted)}
+@media (max-width:768px){ .sitemap-grid{grid-template-columns:repeat(2,1fr)} }
+
 /* ===== HERO / HUD ===== */
 .hero{padding:44px 24px 8px;text-align:center;max-width:900px;margin:0 auto}
 .hero h1{font-size:2.05rem;font-weight:900;letter-spacing:-.5px;margin-bottom:6px}
@@ -107,6 +120,19 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .hero #exploreDifferenceBtn{margin:0 auto 24px;display:inline-flex}
 .hero-badge{display:inline-flex;align-items:center;background:var(--brand-mint-dim);border:1px solid rgba(0,255,136,.35);
   color:var(--mint2);border-radius:20px;padding:6px 16px;font-size:.72rem;font-weight:700;letter-spacing:.3px;margin-bottom:22px}
+
+/* ===== HERO — C.I. DEFINITION + "IN ENGLISH" TIMELINE (homepage-flow refactor) ===== */
+.hero-eyebrow{font-size:.72rem;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.ci-definition{color:var(--muted);font-size:.92rem;max-width:660px;margin:0 auto 22px;line-height:1.55}
+.ci-plain-sub{font-size:1rem;font-weight:800;color:var(--mint2);margin:6px 0 18px}
+.ci-timeline{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:900px;margin:0 auto 26px;text-align:left}
+.ci-timeline-step{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
+.ci-timeline-step .step-num{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;
+  border-radius:50%;background:var(--brand-mint-dim);color:var(--mint2);font-size:.72rem;font-weight:900;margin-bottom:10px}
+.ci-timeline-step h4{font-size:.82rem;font-weight:800;margin-bottom:6px;letter-spacing:.2px}
+.ci-timeline-step p{font-size:.78rem;color:var(--muted);line-height:1.5}
+@media (max-width:768px){ .ci-timeline{grid-template-columns:1fr} }
+#exploreCiBtn{margin:4px auto 8px;display:inline-flex}
 
 /* ===== LATERAL BRIDGE HUB CARDS ===== */
 .hub-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:920px;margin:0 auto 26px;padding:0 24px}
@@ -135,9 +161,11 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   border:1px solid var(--border);color:var(--mint2);border-radius:20px;padding:10px 18px;
   font-size:.78rem;font-weight:700;cursor:pointer;align-self:center;margin-top:18px;transition:border-color .15s}
 .privacy-pill:hover{border-color:var(--mint2)}
-/* Top-of-page placement (moved above the brand title, per global header restructure) */
+/* Top-of-page placement (moved above the brand title, per global header restructure).
+   Bottom padding + border gives it clear breathing room from the brand/title block
+   directly below, instead of sitting flush against it. */
 .top-privacy-banner{display:flex;justify-content:center;background:var(--bg-obsidian);
-  padding:10px 16px 0}
+  padding:14px 16px 16px;border-bottom:1px solid var(--border)}
 .top-privacy-banner .privacy-pill{margin-top:0}
 
 .hero-stack{display:flex;flex-direction:column;align-items:center;max-width:900px;margin:0 auto;padding:0 24px 8px}
@@ -236,6 +264,55 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .leaflet-tile-pane{filter:invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);}
 .leaflet-div-icon{background:transparent;border:none}
 
+/* ===== NATIONWIDE CIVIC FRONTIER MAP SECTION (homepage-flow refactor) —
+   full-width map + search bar + ticker, replacing the old two-column
+   dashboard/sidebar layout at the top level. ===== */
+.frontier-map-section{max-width:1100px;margin:0 auto;padding:8px 24px 0}
+.frontier-map-head{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.frontier-search-bar{flex:1;min-width:240px;position:relative}
+.frontier-search-bar input{width:100%;background:rgba(7,12,14,.8);border:1px solid var(--border);color:var(--text);
+  padding:12px 16px;border-radius:10px;font-size:.84rem;outline:none}
+.frontier-search-bar input:focus{border-color:var(--mint2)}
+.frontier-search-note{font-size:.66rem;color:var(--muted);margin-top:6px}
+.frontier-ticker-inline{background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:10px 18px;text-align:center;min-width:170px}
+.frontier-ticker-inline .ticker-value{font-size:1.5rem;margin:2px 0}
+.frontier-mapwrap{position:relative;height:460px;border-radius:16px;overflow:hidden;border:1px solid var(--border)}
+.frontier-mapwrap #map{position:absolute;inset:0;background:#0d1518}
+@media (max-width:640px){ .frontier-mapwrap{height:360px} }
+
+/* ===== DEEP-DIVE PANELS — hidden until a drill-down hub is clicked, per
+   "keep the top-level page light" refactor. Same accordion-reveal idea as
+   .tier-detail above, just applied at the section level. ===== */
+.deepdive-panel{display:none;max-width:1100px;margin:0 auto;padding:28px 24px 8px;border-top:1px solid var(--border)}
+.deepdive-panel.open{display:block}
+.deepdive-panel-head{display:flex;justify-content:space-between;align-items:center;max-width:900px;margin:0 auto 18px}
+.deepdive-panel-head h3{font-size:1.05rem;font-weight:900}
+.deepdive-close{background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;
+  padding:6px 12px;font-size:.72rem;font-weight:700;cursor:pointer}
+.deepdive-close:hover{border-color:var(--mint2);color:var(--mint2)}
+.deepdive-cols{display:flex;gap:16px;max-width:900px;margin:0 auto;align-items:flex-start;flex-wrap:wrap}
+.deepdive-cols>*{flex:1;min-width:320px}
+
+/* ===== CIVIC STACK & OPERATIONS CONTAINER ===== */
+.civic-stack-section{max-width:900px;margin:0 auto;padding:48px 24px;border-top:1px solid var(--border)}
+
+/* ===== EMERALD GLOW PRIMARY DELIVERABLE BUTTON ===== */
+.btn-emerald-glow{background:var(--brand-mint);color:#051311;box-shadow:0 0 0 rgba(0,255,136,.5);
+  animation:emeraldPulse 2.4s ease-in-out infinite}
+@keyframes emeraldPulse{
+  0%,100%{box-shadow:0 0 10px 0 rgba(0,255,136,.35)}
+  50%{box-shadow:0 0 22px 4px rgba(0,255,136,.55)}
+}
+
+/* ===== LIGHTWEIGHT DISPATCH + AUDIT LEDGER FEED (bottom, always visible) ===== */
+.lightweight-feed-section{max-width:900px;margin:0 auto;padding:36px 24px 48px;border-top:1px solid var(--border)}
+.mini-feed-row{display:flex;justify-content:space-between;align-items:center;gap:10px;background:rgba(7,12,14,.5);
+  border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:8px;font-size:.78rem}
+.mini-feed-row .mfr-title{font-weight:700}
+.mini-feed-row .mfr-meta{color:var(--muted);font-size:.68rem;margin-top:2px}
+.mini-feed-row .mfr-hash{font-family:var(--mono);font-size:.62rem;color:var(--muted);flex-shrink:0;white-space:nowrap}
+
 /* ===== MAP BEACONS (CartoDB Dark Matter basemap) ===== */
 .beacon-incident{position:relative;width:100%;height:100%}
 .beacon-incident .beacon-pulse{position:absolute;inset:-6px;border-radius:50%;background:var(--beacon-color);
@@ -276,7 +353,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .loc-select-row select{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);
   border-radius:8px;padding:9px 4px;font-size:.7rem;font-weight:700;text-align:center}
 
-/* ===== CITIZEN PAPERWORK FILE DRAWER ===== */
+/* ===== CITIXEN PAPERWORK FILE DRAWER ===== */
 .pw-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:3200;display:none}
 .pw-overlay.open{display:flex;justify-content:flex-end}
 .pw-panel{width:min(480px,100vw);height:100%;background:var(--card);border-left:1px solid var(--border);
@@ -386,6 +463,17 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   .hiw-dot.d1{background:var(--mint2)}
 }
 
+/* ===== CITIXEN CODEX VAULT DRAWER — reuses the exact .ledger-drawer slide-out
+   chrome below (same overlay/panel/head/body classes), just its own tabs +
+   doc-row list. ===== */
+.codex-tabs{display:flex;gap:6px;margin-bottom:14px}
+.codex-tab{flex:1;background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--muted);
+  font-size:.68rem;font-weight:700;padding:9px 8px;border-radius:10px;cursor:pointer;text-align:center}
+.codex-tab.active{border-color:var(--mint2);background:rgba(0,255,136,.14);color:var(--mint2)}
+.codex-doc-row{background:rgba(7,12,14,.6);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px}
+.codex-doc-row .codex-doc-title{font-weight:700;font-size:.82rem;margin-bottom:3px}
+.codex-doc-row .codex-doc-desc{font-size:.72rem;color:var(--muted);line-height:1.4}
+
 /* ===== LIVE PUBLIC LEDGER DRAWER ===== */
 .ledger-drawer{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:2800;display:none}
 .ledger-drawer.open{display:flex;justify-content:flex-end}
@@ -487,25 +575,11 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       <div class="brand-sub">Civic Intelligence Platform</div>
     </div>
 
-    <div class="nav-right">
-      <div class="dropdown">
-        <button class="dropdown-btn" id="civicToolsBtn">Civic Tools <span style="font-size:.6rem;">▾</span></button>
-        <div class="dropdown-menu" id="civicToolsMenu">
-          <div class="dropdown-group-label">Reporting & Dispatch Stack</div>
-          <a href="/app.html" target="_blank" rel="noopener noreferrer">Mobile Gateway</a>
-          <button data-scroll="dashboard">Live Map</button>
-          <a href="tel:911">Emergency Triage</a>
-          <div class="dropdown-group-label">Municipal Transparency Stack</div>
-          <button id="openLedgerDrawerBtn">Live Public Ledger ↗</button>
-          <button data-scroll="dashboard">Public Works Project Ledger</button>
-          <button data-scroll="dashboard">Asset Coverage Grid</button>
-          <button data-scroll="dashboard">Expenditure Allocations</button>
-          <div class="dropdown-group-label">Governance & Legal Stack</div>
-          <button id="openPaperworkBtn">Open CITIXEN Paperwork File ↗</button>
-          <button data-loc-change="1">Change My Location</button>
-        </div>
-      </div>
-    </div>
+    <!-- ===== "Civic Tools" dropdown removed from top nav per homepage-flow
+         refactor — friction-free header. Every action it held (Mobile Gateway,
+         Live Public Ledger, Paperwork File, Change Location, Emergency Triage)
+         now lives in the footer sitemap at the bottom of the page, or inside
+         the relevant deep-dive panel — nothing was deleted, only relocated. ===== -->
   </header>
 
   <!-- ===== SMART LOCATION HEADER — persistent, reflects the SAME resolved
@@ -546,7 +620,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </div>
   </div>
 
-  <!-- ===== CITIZEN PAPERWORK FILE DRAWER ===== -->
+  <!-- ===== CITIXEN PAPERWORK FILE DRAWER ===== -->
   <div class="pw-overlay" id="pwOverlay">
     <div class="pw-panel">
       <div class="pw-head">
@@ -617,137 +691,72 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </div>
   </div>
 
+  <!-- ===== THE CITIXEN CODEX (GOVERNANCE VAULT) — reference-only document
+       vault, two tracks. This is NOT a live legal database or a connection
+       to any real municipal/state records system: every entry below is a
+       short, hand-authored placeholder description, the same "production
+       placeholder, not yet recorded" convention already used by the
+       CITIXEN Paperwork File drawer's video/audio panes. ===== -->
+  <div class="ledger-drawer" id="codexDrawer">
+    <div class="ledger-drawer-panel">
+      <div class="ledger-drawer-head">
+        <strong style="color:var(--mint2)">The CITIXEN Codex — Governance Vault</strong>
+        <button class="modal-close" id="codexCloseBtn">✕</button>
+      </div>
+      <div class="ledger-drawer-body">
+        <div class="codex-tabs" role="tablist" aria-label="Codex track">
+          <button class="codex-tab active" id="codexTabA" type="button" role="tab" aria-selected="true">Track A — Statutory Governance</button>
+          <button class="codex-tab" id="codexTabB" type="button" role="tab" aria-selected="false">Track B — Historical Precedent</button>
+        </div>
+        <div id="codexDocList"></div>
+      </div>
+    </div>
+  </div>
+
   <section class="hero">
-    <h1>CITIXEN UX<sup style="font-size:.5em;opacity:.4;">™</sup></h1>
-    <h2>Civic Intelligence Platform</h2>
-    <p class="ci-headline-sub">What is civic intelligence?</p>
-    <p class="ci-intro-copy">Legacy 311 treats a filed ticket as the finish line. CITIXEN UX™ treats a verified photo and dispatched response as the finish line. Here is the difference.</p>
-    <button class="btn btn-outline" id="exploreDifferenceBtn" type="button">Explore the difference →</button>
+    <div class="hero-eyebrow"><span class="brand-white">CITIXEN</span> <span class="brand-lime">UX</span><sup style="font-size:.7em;opacity:.4;">™</sup></div>
+    <h1>What is Civic (C) Intelligence (I) — (C.I.)?</h1>
+    <p class="ci-definition">Civic Intelligence™ (C.I.) is the real-time synthesis of community ground-truth reporting, automated municipal dispatch, and executive financial auditing.</p>
+    <p class="ci-plain-sub">What does that mean in English?</p>
 
-    <div class="hub-row" role="navigation" aria-label="Dashboard shortcuts">
-      <button class="hub-card" id="hubCoverageBtn" type="button">
-        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-        <span>Analytics &amp; Reporting</span>
-      </button>
-      <button class="hub-card" id="hubSlaBtn" type="button">
-        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19a8 8 0 0 1 16 0"/><line x1="12" y1="19" x2="16.5" y2="10.5"/><circle cx="12" cy="19" r="1.4"/></svg>
-        <span>Expenditures &amp; Projects</span>
-      </button>
-      <button class="hub-card" id="hubStackBtn" type="button">
-        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 21 8 12 13 3 8 12 3"/><polyline points="3 13 12 18 21 13"/><polyline points="3 18 12 23 21 18"/></svg>
-        <span>Civic Stack &amp; Operations</span>
-      </button>
+    <div class="ci-timeline">
+      <div class="ci-timeline-step">
+        <span class="step-num">1</span>
+        <h4>SEE IT &amp; MAP IT</h4>
+        <p>CITIXENS snap a photo. In 30s, your phone tags the 100m grid cell and lights up the map.</p>
+      </div>
+      <div class="ci-timeline-step">
+        <span class="step-num">2</span>
+        <h4>FIX IT &amp; PROVE IT</h4>
+        <p>Municipal crews receive work orders on truck tablets, fix the hazard, and upload proof.</p>
+      </div>
+      <div class="ci-timeline-step">
+        <span class="step-num">3</span>
+        <h4>TRACK IT &amp; AUDIT IT</h4>
+        <p>Every fix locks into an official record bound to city budget line-items. Taxpayers track velocity.</p>
+      </div>
     </div>
+
+    <button class="btn btn-primary btn-hero" id="exploreCiBtn" type="button">[ Explore C.I. ]</button>
   </section>
 
-  <!-- ===== CIVIC INTELLIGENCE DEEP-DIVE — "Explore the difference" scroll target.
-       The "What is Civic Intelligence?" headline + intro paragraph now live in
-       .hero above (per header restructure), so this section opens straight into
-       the comparison / how-it-works / metrics content rather than repeating them.
-       "analytics" anchor: mobile app's Analytics tab "Open Web Dashboard" CTA
-       links to index.html#analytics — targets this metrics/ledger content. ===== -->
+  <!-- ===== "ciDeepDive" section removed per homepage-flow refactor — its four
+       pieces were redistributed, not deleted:
+         - Legacy 311 vs CITIXEN comparison  -> now lives in the "Explore C.I."
+           modal (openCiVsLegacyModal()) instead of sitting inline on the page.
+         - "How it works" looping preview    -> removed outright (explicit spec).
+         - The Big 3 tile card + PDF button  -> the 3x3 Analytics Matrix below is
+           now the single top-level source for Active Hazards / Fix Speed /
+           Completion Rate (no more duplicate tile row); the PDF button moved
+           into the Civic Stack & Operations container, restyled as the primary
+           emerald deliverable action.
+         - Municipal Expenditure & Allocation ledger card -> moved into the
+           Civic Stack & Operations container (same ids/markup, only its
+           position changed).
+       "analytics" anchor (app.html's Analytics tab "Open Web Dashboard" CTA
+       links to index.html#analytics) now sits just above the matrix summary,
+       the closest real equivalent to what it used to point at. ===== -->
   <span id="analytics" aria-hidden="true"></span>
-  <section class="ci-section" id="ciDeepDive">
-    <div class="ci-compare">
-      <div class="ci-col legacy">
-        <h3>
-          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          Legacy 311 — the administrative closure gap
-        </h3>
-        <ul>
-          <li>A ticket is marked "Closed" or "Resolved" the moment it's administratively logged — not when a crew actually shows up.</li>
-          <li>No field verification: there's no way to confirm a crew was ever on site.</li>
-          <li>The public record can't tell a real fix apart from a desk closure — it's an administrative black hole.</li>
-        </ul>
-      </div>
-      <div class="ci-col citixen">
-        <h3>
-          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-          CITIXEN — photo-verified resolution
-        </h3>
-        <ul>
-          <li>A ticket only closes with a timestamped, EXIF-verified proof photo from the crew on site.</li>
-          <li>Field verification is the default, not an audit exception — see any report's timeline at <code style="color:var(--mint2)">/report/:id</code>.</li>
-          <li>The public ledger shows a real Resolution Verification Rate — a desk closure is labeled as exactly that, never hidden.</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- ===== HOW IT WORKS — 20s looping preview (CSS-animated, no video file) ===== -->
-    <div class="hud-card hiw-card">
-      <div class="label" style="justify-content:center">How it works</div>
-      <div class="hiw-loop" role="img" aria-label="Three-step loop: snap a photo, the geohash grid cell lights up, then a server-verified proof closeout appears.">
-        <div class="hiw-frame f1">
-          <svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-          <div class="hiw-caption">1. Snap</div>
-          <div class="hiw-sub">A citizen photographs the hazard — EXIF device ID and GPS tags are stripped before upload.</div>
-        </div>
-        <div class="hiw-frame f2">
-          <svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-          <div class="hiw-caption">2. Geohash grid highlight</div>
-          <div class="hiw-sub">The report's block lights up on the coverage grid — routed to the responsible department automatically.</div>
-        </div>
-        <div class="hiw-frame f3">
-          <svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-          <div class="hiw-caption">3. Verified proof closeout</div>
-          <div class="hiw-sub">A crew closes the ticket with an on-site photo — EXIF timestamp + location verified server-side.</div>
-        </div>
-      </div>
-      <div class="hiw-dots"><span class="hiw-dot d1"></span><span class="hiw-dot d2"></span><span class="hiw-dot d3"></span></div>
-    </div>
-
-    <!-- ===== THE BIG 3 — public health metrics, computed from real seed data ===== -->
-    <div class="hud-card" style="margin-top:26px">
-      <div class="label" style="justify-content:center">The Big 3 — public health metrics</div>
-      <div class="big3-row">
-        <div class="big3-tile"><div class="big3-val" id="big3Active">–</div><div class="big3-lbl">Active Hazards</div></div>
-        <div class="big3-tile"><div class="big3-val" id="big3Speed">–</div><div class="big3-lbl">Fix Speed<br>(avg hrs, snap → closeout)</div></div>
-        <div class="big3-tile"><div class="big3-val" id="big3Verify">–</div><div class="big3-lbl">Completion Rate</div></div>
-      </div>
-      <div class="big3-note">Computed live from seeded ledger and CapEx demo data (see the Live Public Ledger below) — not asserted as a production dataset.</div>
-      <button class="btn btn-outline" id="btnDownloadWardHealthPdf" style="width:100%;justify-content:center;margin-top:12px;">
-        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>
-        Download Ward Health Summary (PDF)
-      </button>
-    </div>
-
-    <!-- ===== CITYWIDE MUNICIPAL EXPENDITURE & ALLOCATION — moved directly below
-         The Big 3 per dashboard restructure. Same id/markup as before (only its
-         position changed), including its existing "not an official finance
-         record" disclosure — that disclosure stays intact; this is seeded demo
-         data, not a live financial feed, whatever the "Real-Time Capital
-         Tracking" tag above it implies. ===== -->
-    <div class="card ledger-card" id="ledgerCard" style="max-width:640px;width:100%;margin:26px auto 0;">
-      <div class="label"><span id="ledgerTitle">CITYWIDE MUNICIPAL EXPENDITURE &amp; ALLOCATION</span></div>
-      <div class="ledger-tag">AI Categorization Engine // Real-Time Capital Tracking</div>
-
-      <div class="ledger-filters" id="ledgerFilters">
-        <button class="ledger-filter active" data-lfilter="All">All</button>
-        <button class="ledger-filter" data-lfilter="Roads">Roads</button>
-        <button class="ledger-filter" data-lfilter="Lighting">Lighting</button>
-        <button class="ledger-filter" data-lfilter="Sanitation">Sanitation</button>
-        <button class="ledger-filter" data-lfilter="Ada">ADA</button>
-      </div>
-
-      <div class="ledger-row" data-lcat="Roads">
-        <div class="ledger-head"><b>Roads &amp; Pavement</b><span class="ledger-amt" id="ledgerRoadsAmt">$124,500 (42%)</span></div>
-        <div class="bar"><span id="ledgerRoadsBar" style="width:42%"></span></div>
-      </div>
-      <div class="ledger-row" data-lcat="Lighting">
-        <div class="ledger-head"><b>Safety &amp; Lighting Grid</b><span class="ledger-amt" id="ledgerLightingAmt">$82,900 (28%)</span></div>
-        <div class="bar"><span id="ledgerLightingBar" style="width:28%;background:var(--warn)"></span></div>
-      </div>
-      <div class="ledger-row" data-lcat="Sanitation">
-        <div class="ledger-head"><b>Sanitation &amp; Waste</b><span class="ledger-amt" id="ledgerSanitationAmt">$53,300 (18%)</span></div>
-        <div class="bar"><span id="ledgerSanitationBar" style="width:18%"></span></div>
-      </div>
-      <div class="ledger-row" data-lcat="Ada">
-        <div class="ledger-head"><b>ADA &amp; Sidewalk Access</b><span class="ledger-amt" id="ledgerAdaAmt">$35,500 (12%)</span></div>
-        <div class="bar"><span id="ledgerAdaBar" style="width:12%"></span></div>
-      </div>
-      <div class="small" style="margin-top:10px;">Illustrative estimates clustered from resolved reports — not an official finance record.</div>
-    </div>
-  </section>
 
   <div class="hero-stack">
     <a class="btn btn-primary btn-hero" href="/app" target="_blank" rel="noopener noreferrer">Launch Mobile Reporter ↗</a>
@@ -781,31 +790,69 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </div>
   </div>
 
-  <section id="dashboard">
-    <!-- ===== DASHBOARD VIEW-SWITCHER — head of the dashboard section, per
-         restructure. Tab 1 keeps the existing map/feed/ledger dashboard as-is;
-         Tab 2 surfaces the same real actions already in the header's "Civic
-         Tools" dropdown, just as an in-page panel — nothing new is invented. ===== -->
-    <div class="dash-tabs" role="tablist" aria-label="Dashboard view">
-      <button class="dash-tab active" id="dashTabLive" type="button" role="tab" aria-selected="true">Live Feed / Live Ledger</button>
-      <button class="dash-tab" id="dashTabTools" type="button" role="tab" aria-selected="false">Civic Tools</button>
+  <!-- ===== 3x3 ANALYTICS MATRIX — SUMMARY VIEW ===== -->
+  <section class="matrix-summary-section" id="matrixSummarySection">
+    <div class="analytics-matrix-card" id="analyticsMatrix">
+      <div class="label" style="justify-content:center">3×3 Analytics Matrix</div>
+      <div class="matrix-view-tabs" role="tablist" aria-label="Matrix view">
+        <button class="matrix-view-tab active" data-view="spatial" type="button">Spatial Map</button>
+        <button class="matrix-view-tab" data-view="ring" type="button">Scorecard Ring</button>
+        <button class="matrix-view-tab" data-view="pulse" type="button">Timeline Pulse</button>
+      </div>
+      <div class="matrix-grid" id="matrixGrid"></div>
+      <div class="small" style="text-align:center;margin-top:10px;color:var(--muted)">High-level KPI totals, computed live from seeded ledger data — not asserted as a production dataset. Tap a tile for its full breakdown.</div>
     </div>
+  </section>
 
-    <div class="dashboard-view" id="dashboardCivicToolsView">
-      <div class="card">
-        <div class="label"><span>Civic Tools</span></div>
-        <div class="civic-tools-grid">
-          <a class="btn btn-outline" href="/app.html" target="_blank" rel="noopener noreferrer">Mobile Gateway ↗</a>
-          <button class="btn btn-outline" id="dashToolsLiveLedger" type="button">Live Public Ledger ↗</button>
-          <button class="btn btn-outline" id="dashToolsPaperwork" type="button">Open CITIXEN Paperwork File ↗</button>
-          <button class="btn btn-outline" id="dashToolsChangeLocation" type="button">Change My Location</button>
-          <a class="btn btn-outline" href="tel:911">Emergency Triage</a>
-        </div>
+  <!-- ===== NATIONWIDE CIVIC FRONTIER MAP ===== -->
+  <section class="frontier-map-section" id="frontierMap">
+    <div class="frontier-map-head">
+      <div class="frontier-search-bar">
+        <input type="text" id="frontierSearchInput" list="frontierSearchList" placeholder="Search Zip, City, Ward…" aria-label="Search Zip, City, Ward">
+        <datalist id="frontierSearchList">
+          <option value="La Crosse, WI">La Crosse, WI</option>
+          <option value="Austin, TX">Austin, TX</option>
+          <option value="Chicago, IL">Chicago, IL</option>
+        </datalist>
+        <div class="frontier-search-note">Matches this demo's seeded jurisdictions (La Crosse, Austin, Chicago) — not a live national ZIP/ward lookup yet.</div>
+      </div>
+      <div class="frontier-ticker-inline">
+        <div class="label" style="justify-content:center;margin-bottom:2px">National Geo-Hatch Ticker</div>
+        <div class="ticker-value" id="nationalCoverageTicker">0%</div>
+        <div class="small" style="color:var(--muted)">Avg. block coverage, seeded cities</div>
       </div>
     </div>
+    <div class="frontier-mapwrap"><div id="map"></div><div class="map-src-tag" id="mapSrcTag">TILE SRC: ESRI DARK GRAY CANVAS</div></div>
+  </section>
 
-    <div class="dashboard-view active" id="dashboardLiveView">
-    <aside class="sidebar">
+  <!-- ===== THREE DEEP DRILL-DOWN ACTION HUBS — each reveals its own hidden
+       deep-dive panel below rather than navigating away; "should only render
+       when clicked into" per the homepage-flow refactor. ===== -->
+  <div class="hub-row" role="navigation" aria-label="Deep-dive sections">
+    <button class="hub-card" id="hubCoverageBtn" type="button" aria-expanded="false" aria-controls="deepdiveAnalytics">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Analytics &amp; Reporting</span>
+    </button>
+    <button class="hub-card" id="hubSlaBtn" type="button" aria-expanded="false" aria-controls="civicStackSection">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19a8 8 0 0 1 16 0"/><line x1="12" y1="19" x2="16.5" y2="10.5"/><circle cx="12" cy="19" r="1.4"/></svg>
+      <span>Expenditures &amp; Projects</span>
+    </button>
+    <button class="hub-card" id="hubStackBtn" type="button" aria-expanded="false" aria-controls="civicStackSection">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 21 8 12 13 3 8 12 3"/><polyline points="3 13 12 18 21 13"/><polyline points="3 18 12 23 21 18"/></svg>
+      <span>The Civic Stack &amp; Operations</span>
+    </button>
+  </div>
+
+  <!-- ===== DEEP-DIVE: ANALYTICS & REPORTING (hidden until hubCoverageBtn is
+       clicked) — the old per-city Health Index sidebar, Live dispatch
+       feed/Immutable Audit Stream toggle, and Report Generator, all
+       relocated here verbatim (same ids/markup/JS) rather than deleted. ===== -->
+  <section class="deepdive-panel" id="deepdiveAnalytics">
+    <div class="deepdive-panel-head">
+      <h3>Analytics &amp; Reporting</h3>
+      <button class="deepdive-close" data-close-panel="deepdiveAnalytics" type="button">Close ✕</button>
+    </div>
+    <div class="deepdive-cols">
       <div class="card" id="coverageGridCard">
         <div class="label"><span>Citywide Health Index</span><span id="healthCity" style="color:var(--mint2)">Locating…</span></div>
         <select class="grid-select" id="gridSelect" aria-label="Select municipal grid" style="width:100%;min-width:0;margin-bottom:10px;">
@@ -842,7 +889,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         </div>
         <div class="small" style="margin-top:10px;">Tap a category to filter the feed below.</div>
       </div>
-      <div class="card" style="flex:1;">
+      <div class="card">
         <div class="label"><span>Live dispatch feed</span><span class="small" id="feedCount">3 shown</span></div>
         <div class="audit-tabs">
           <button class="audit-tab active" data-view="live">Live Incidents</button>
@@ -857,19 +904,40 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         <div id="feed"></div>
         <div id="auditStream" style="display:none;"></div>
       </div>
-    </aside>
-
-    <div class="mapwrap"><div id="map"></div><div class="map-src-tag" id="mapSrcTag">TILE SRC: ESRI DARK GRAY CANVAS</div></div>
+    </div>
+    <div class="report-generator-card" id="reportGenerator" style="margin-top:16px;">
+      <div class="label" style="justify-content:center">Report Generator</div>
+      <div class="report-gen-row">
+        <select id="reportTimeframe" aria-label="Timeframe">
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+          <option value="ytd">YTD</option>
+        </select>
+        <select id="reportFormat" aria-label="Format">
+          <option value="matrix">3×3 Visual Summary</option>
+          <option value="ledger">Raw Audit Ledger</option>
+        </select>
+      </div>
+      <label class="report-gen-toggle">
+        <input type="checkbox" id="reportOfficialMode">
+        Public Official mode — tag responsible departments
+      </label>
+      <div id="reportOutput" class="report-output"></div>
+      <button class="btn btn-primary" id="btnExportPrintReport" style="width:100%;justify-content:center;margin-top:14px;" type="button">
+        🖨️ Export / Print The Civic Record™ (Audited PDF)
+      </button>
     </div>
   </section>
 
-  <!-- ===== CIVIC INTELLIGENCE STATEMENT PIECE =====
-       Civic Stack Visualizer, 3x3 Analytics Matrix, National Geo-Hatch
-       Coverage Ticker, and Report Generator. Metrics reuse the same
-       /api/coverage/big3 data (and its offline fallback) already loaded
-       by loadBig3() above — no second, parallel data pipeline. ===== -->
-  <section class="statement-section" id="civicStatement">
-    <h2 class="statement-header">Civic Intelligence<sup style="font-size:.6em;opacity:.5;">™</sup>: Powered by Civic Memory<sup style="font-size:.6em;opacity:.5;">™</sup></h2>
+  <!-- ===== DEEP-DIVE: THE CIVIC STACK & OPERATIONS CONTAINER (hidden until
+       hubSlaBtn "Expenditures & Projects" or hubStackBtn "The Civic Stack &
+       Operations" is clicked — both open this same container, scrolled to
+       the relevant anchor inside it, rather than duplicating it twice). ===== -->
+  <section class="deepdive-panel civic-stack-section" id="civicStackSection">
+    <div class="deepdive-panel-head">
+      <h3>Civic Intelligence<sup style="font-size:.6em;opacity:.5;">™</sup>: Powered by Civic Memory<sup style="font-size:.6em;opacity:.5;">™</sup></h3>
+      <button class="deepdive-close" data-close-panel="civicStackSection" type="button">Close ✕</button>
+    </div>
     <p class="statement-sub">The Civic Stack™ — how one verified report becomes a permanent, auditable record.</p>
 
     <div class="civic-stack-visualizer" id="civicStackVisualizer">
@@ -898,45 +966,54 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       <div class="tier-detail" data-tier-detail="memory">The public event ledger powered by CITIXEN citizen reports — the same Live Feed / Live Ledger shown in the dashboard above, zero-account by design.</div>
     </div>
 
-    <div class="analytics-matrix-card" id="analyticsMatrix">
-      <div class="label" style="justify-content:center">3×3 Analytics Matrix</div>
-      <div class="matrix-view-tabs" role="tablist" aria-label="Matrix view">
-        <button class="matrix-view-tab active" data-view="spatial" type="button">Spatial Map</button>
-        <button class="matrix-view-tab" data-view="ring" type="button">Scorecard Ring</button>
-        <button class="matrix-view-tab" data-view="pulse" type="button">Timeline Pulse</button>
+    <!-- ===== CITYWIDE MUNICIPAL EXPENDITURE & ALLOCATION — same id/markup as
+         before (only its position changed), including its existing "not an
+         official finance record" disclosure. ===== -->
+    <div class="card ledger-card" id="ledgerCard" style="max-width:640px;width:100%;margin:0 auto 20px;">
+      <div class="label"><span id="ledgerTitle">CITYWIDE MUNICIPAL EXPENDITURE &amp; ALLOCATION</span></div>
+      <div class="ledger-tag">AI Categorization Engine // Real-Time Capital Tracking</div>
+
+      <div class="ledger-filters" id="ledgerFilters">
+        <button class="ledger-filter active" data-lfilter="All">All</button>
+        <button class="ledger-filter" data-lfilter="Roads">Roads</button>
+        <button class="ledger-filter" data-lfilter="Lighting">Lighting</button>
+        <button class="ledger-filter" data-lfilter="Sanitation">Sanitation</button>
+        <button class="ledger-filter" data-lfilter="Ada">ADA</button>
       </div>
-      <div class="matrix-grid" id="matrixGrid"></div>
-      <div class="small" style="text-align:center;margin-top:10px;color:var(--muted)">Computed live from seeded ledger data (same source as The Big 3 above) — not asserted as a production dataset.</div>
+
+      <div class="ledger-row" data-lcat="Roads">
+        <div class="ledger-head"><b>Roads &amp; Pavement</b><span class="ledger-amt" id="ledgerRoadsAmt">$124,500 (42%)</span></div>
+        <div class="bar"><span id="ledgerRoadsBar" style="width:42%"></span></div>
+      </div>
+      <div class="ledger-row" data-lcat="Lighting">
+        <div class="ledger-head"><b>Safety &amp; Lighting Grid</b><span class="ledger-amt" id="ledgerLightingAmt">$82,900 (28%)</span></div>
+        <div class="bar"><span id="ledgerLightingBar" style="width:28%;background:var(--warn)"></span></div>
+      </div>
+      <div class="ledger-row" data-lcat="Sanitation">
+        <div class="ledger-head"><b>Sanitation &amp; Waste</b><span class="ledger-amt" id="ledgerSanitationAmt">$53,300 (18%)</span></div>
+        <div class="bar"><span id="ledgerSanitationBar" style="width:18%"></span></div>
+      </div>
+      <div class="ledger-row" data-lcat="Ada">
+        <div class="ledger-head"><b>ADA &amp; Sidewalk Access</b><span class="ledger-amt" id="ledgerAdaAmt">$35,500 (12%)</span></div>
+        <div class="bar"><span id="ledgerAdaBar" style="width:12%"></span></div>
+      </div>
+      <div class="small" style="margin-top:10px;">Illustrative estimates clustered from resolved reports — not an official finance record.</div>
     </div>
 
-    <div class="geo-hatch-ticker-card">
-      <div class="label" style="justify-content:center">National Geo-Hatch Coverage Ticker</div>
-      <div class="ticker-value" id="nationalCoverageTicker">0%</div>
-      <div class="small" style="color:var(--muted)">Average block coverage across seeded demo municipalities (La Crosse, Austin, Chicago) — not a live nationwide count.</div>
-    </div>
+    <button class="btn btn-emerald-glow" id="btnDownloadWardHealthPdf" style="width:100%;max-width:640px;display:flex;margin:0 auto;justify-content:center;">
+      <svg viewBox="0 0 24 24" width="14" height="14" stroke="#051311" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>
+      🟢 Download Ward Health Summary PDF
+    </button>
+  </section>
 
-    <div class="report-generator-card" id="reportGenerator">
-      <div class="label" style="justify-content:center">Report Generator</div>
-      <div class="report-gen-row">
-        <select id="reportTimeframe" aria-label="Timeframe">
-          <option value="week">This Week</option>
-          <option value="month">This Month</option>
-          <option value="ytd">YTD</option>
-        </select>
-        <select id="reportFormat" aria-label="Format">
-          <option value="matrix">3×3 Visual Summary</option>
-          <option value="ledger">Raw Audit Ledger</option>
-        </select>
-      </div>
-      <label class="report-gen-toggle">
-        <input type="checkbox" id="reportOfficialMode">
-        Public Official mode — tag responsible departments
-      </label>
-      <div id="reportOutput" class="report-output"></div>
-      <button class="btn btn-primary" id="btnExportPrintReport" style="width:100%;justify-content:center;margin-top:14px;" type="button">
-        🖨️ Export / Print The Civic Record™ (Audited PDF)
-      </button>
-    </div>
+  <!-- ===== REAL-TIME DISPATCH & AUDIT LEDGER (LIGHTWEIGHT) — always visible,
+       a handful of recent items only; the full Live Feed/Immutable Audit
+       Stream toggle lives in the Analytics & Reporting deep-dive above, and
+       the full searchable ledger lives in the Live Public Ledger drawer. ===== -->
+  <section class="lightweight-feed-section" id="lightweightFeedSection">
+    <div class="label" style="justify-content:center;margin-bottom:14px">Real-Time Dispatch &amp; Audit Ledger</div>
+    <div id="lightweightFeed"></div>
+    <button class="btn btn-outline" id="btnViewFullLedger" style="width:100%;justify-content:center;margin-top:8px;" type="button">View Full Ledger ↗</button>
   </section>
 
   <!-- MODAL OVERLAY -->
@@ -947,14 +1024,52 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </div>
   </div>
 
-  <footer class="site-footer">
-    <span>CITIXEN UX™ — built for residents, not administrators.</span>
-    <a class="footer-staff-link" href="/dispatch">Dispatch Command Center →</a>
-    <a class="footer-staff-link" href="/rep">Representative Login →</a>
+  <footer class="site-footer sitemap-footer">
+    <div class="sitemap-grid">
+      <div class="sitemap-col">
+        <h5>Platform &amp; App</h5>
+        <a href="/app.html" target="_blank" rel="noopener noreferrer">CITIXEN Mobile App ↗</a>
+        <button type="button" data-scroll-to="frontierMap">Geo-Hatch Map</button>
+        <button type="button" data-scroll-to="matrixSummarySection">3×3 Matrix</button>
+      </div>
+      <div class="sitemap-col">
+        <h5>The Civic Stack™</h5>
+        <button type="button" data-stack-tier="memory">Civic Memory™</button>
+        <button type="button" data-stack-tier="dispatch">Municipal Dispatch</button>
+        <button type="button" data-stack-tier="record">The Civic Record™</button>
+      </div>
+      <div class="sitemap-col">
+        <h5>Statutory Governance</h5>
+        <button type="button" data-codex="a">C.I.™ Charter</button>
+        <button type="button" data-codex="a">Municipal Code</button>
+        <button type="button" data-codex="a">WI Constitution</button>
+        <button type="button" data-codex="a">FOIA Specs</button>
+      </div>
+      <div class="sitemap-col">
+        <h5>Historical Precedent</h5>
+        <button type="button" data-codex="b">Bill of Rights</button>
+        <button type="button" data-codex="b">Public Trust Doctrine</button>
+        <button type="button" data-codex="b">Early Charters</button>
+      </div>
+    </div>
+    <div class="sitemap-bottom">
+      CITIXEN UX™ — built for residents, not administrators. ·
+      <a class="footer-staff-link" href="/dispatch">Dispatch Command Center →</a> ·
+      <a class="footer-staff-link" href="/rep">Representative Login →</a> ·
+      <a class="footer-staff-link" href="tel:911">Emergency 911</a>
+    </div>
   </footer>
 
 <script>
 'use strict';
+
+// ===== LOAD-AT-TOP FIX — a plain visit (or navigating in from app.html
+// without its #analytics deep link) should always land at the very top of
+// the viewport, not wherever the browser's scroll-position restoration or
+// a stale hash leaves it. A real #analytics deep link (app.html's "Open
+// Web Dashboard" CTA) is left alone — only an unhashed load is forced to 0,0. =====
+history.scrollRestoration = 'manual';
+if (!window.location.hash) window.scrollTo(0, 0);
 
 const cities={
   lacrosse:{ name:'La Crosse', region:'Citywide', label:'La Crosse, WI', lat:43.8138, lng:-91.2519, zoom:14, health:88, sla:91, roads:82, lighting:64, sanitation:74,
@@ -1083,15 +1198,13 @@ function plotMarker(item){
   markers[item.id]=m;
 }
 
-/* ===== CITY / WARD SELECTOR ===== */
-document.getElementById('gridSelect').addEventListener('change',(e)=>{
-  const key=e.target.value;
-  if(key==='add'){
-    alert('City onboarding requests are not yet open — check back soon.');
-    e.target.value='lacrosse';
-    return;
-  }
+/* ===== CITY / WARD SELECTOR — shared by the detailed gridSelect dropdown
+   (inside the Analytics & Reporting deep-dive) and the universal search
+   bar above the map (frontierSearchInput), so there's one source of truth
+   for "switch active demo jurisdiction" instead of two. ===== */
+function applyCitySelection(key){
   const c=cities[key];
+  if(!c) return;
   document.getElementById('healthCity').textContent=c.name;
   document.getElementById('healthScore').innerHTML=`${c.health} <span style="font-size:1rem;color:var(--muted)">/ 100</span>`;
   document.getElementById('healthSla').textContent=`Dispatch response SLA: ${c.sla}% on-time`;
@@ -1099,7 +1212,39 @@ document.getElementById('gridSelect').addEventListener('change',(e)=>{
   setLedger(c);
   updateTelemetry(c);
   if(map) map.flyTo([c.lat,c.lng], c.zoom, { duration:1.3 });
+  const gridSel = document.getElementById('gridSelect');
+  if (gridSel) gridSel.value = key;
+}
+document.getElementById('gridSelect').addEventListener('change',(e)=>{
+  const key=e.target.value;
+  if(key==='add'){
+    alert('City onboarding requests are not yet open — check back soon.');
+    e.target.value='lacrosse';
+    return;
+  }
+  applyCitySelection(key);
 });
+// Universal search bar above the map — matches by label against the same
+// seeded cities object (La Crosse/Austin/Chicago), the only jurisdictions
+// this demo actually has data for. No live national ZIP/ward lookup exists
+// here, hence the disclosure note under the input in the markup.
+const CITY_SEARCH_KEY_BY_LABEL = {};
+Object.entries(cities).forEach(([key, c]) => { CITY_SEARCH_KEY_BY_LABEL[c.label.toLowerCase()] = key; });
+function trySearchCity(raw){
+  const q = String(raw || '').trim().toLowerCase();
+  if (!q) return;
+  let key = CITY_SEARCH_KEY_BY_LABEL[q];
+  if (!key) {
+    const match = Object.entries(cities).find(([, c]) => c.name.toLowerCase() === q || c.label.toLowerCase().includes(q));
+    key = match && match[0];
+  }
+  if (key) applyCitySelection(key);
+}
+const frontierSearchInput = document.getElementById('frontierSearchInput');
+if (frontierSearchInput) {
+  frontierSearchInput.addEventListener('change', () => trySearchCity(frontierSearchInput.value));
+  frontierSearchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') trySearchCity(frontierSearchInput.value); });
+}
 function setBar(cat,pct){
   document.getElementById('pct'+cat).textContent=pct+'%';
   document.getElementById('bar'+cat).style.width=pct+'%';
@@ -1169,6 +1314,30 @@ function renderAuditStream(){
     c.appendChild(el);
   });
 }
+
+/* ===== LIGHTWEIGHT COMBINED DISPATCH + AUDIT LEDGER FEED — the always-
+   visible bottom-of-page summary (spec: "Real-Time Dispatch & Audit
+   Ledger (Lightweight)"). Reuses the exact same `cases` and audit-entry
+   data every other feed on this page already renders from — no second,
+   invented data source — just a shorter, plainer list. The full
+   Live Incidents/Immutable Audit Stream toggle lives in the Analytics &
+   Reporting deep-dive; the full searchable ledger lives in the Live
+   Public Ledger drawer (View Full Ledger ↗ button below this list). ===== */
+function renderLightweightFeed(){
+  const el = document.getElementById('lightweightFeed');
+  if (!el) return;
+  const recentCases = cases.slice(0, 3).map(c => ({
+    title: c.title, meta: `${c.loc} • ${c.time}`, hash: null
+  }));
+  const recentAudit = loadSyncedAuditEntries().slice(0, 3).map(a => ({
+    title: a.title, meta: `Resolved ${a.resolved} • ${a.cost}`, hash: a.hash
+  }));
+  const rows = recentCases.concat(recentAudit).slice(0, 6);
+  el.innerHTML = rows.map(r => `<div class="mini-feed-row">
+      <div><div class="mfr-title">${esc(r.title)}</div><div class="mfr-meta">${esc(r.meta)}</div></div>
+      ${r.hash ? `<div class="mfr-hash">SHA-256 ${esc(r.hash)}</div>` : ''}
+    </div>`).join('') || '<div class="small" style="color:var(--muted)">No recent activity yet.</div>';
+}
 document.querySelectorAll('.audit-tab').forEach(tab=>{
   tab.addEventListener('click',()=>{
     document.querySelectorAll('.audit-tab').forEach(t=>t.classList.remove('active'));
@@ -1199,12 +1368,6 @@ document.querySelectorAll('.ledger-filter').forEach(btn=>{
     });
   });
 });
-
-/* ===== CIVIC TOOLS DROPDOWN ===== */
-const civicBtn=document.getElementById('civicToolsBtn');
-const civicMenu=document.getElementById('civicToolsMenu');
-civicBtn.addEventListener('click',(e)=>{ e.stopPropagation(); civicMenu.classList.toggle('open'); });
-document.addEventListener('click',()=> civicMenu.classList.remove('open'));
 
 const modalData={
   constitution:{
@@ -1256,49 +1419,78 @@ function openModal(key){
   document.getElementById('modalContent').innerHTML=html;
   document.getElementById('modalOverlay').classList.add('open');
 }
-document.querySelectorAll('#civicToolsMenu button, #civicToolsMenu a').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    civicMenu.classList.remove('open');
-    if(btn.dataset.scroll){
-      document.getElementById(btn.dataset.scroll).scrollIntoView({ behavior:'smooth' });
-    } else if(btn.id==='openPaperworkBtn'){
-      openPaperworkFile();
-    } else if(btn.dataset.locChange){
-      openLocationPicker();
-    } else if(btn.dataset.modal){
-      openModal(btn.dataset.modal);
-    }
-  });
-});
-/* ===== LATERAL BRIDGE HUB CARDS — scroll/reveal wiring (CSP-safe, no inline onclick) ===== */
-document.getElementById('hubCoverageBtn').addEventListener('click',()=>{
-  document.getElementById('coverageGridCard').scrollIntoView({ behavior:'smooth', block:'center' });
-});
-document.getElementById('hubSlaBtn').addEventListener('click',()=>{
-  document.getElementById('ledgerCard').scrollIntoView({ behavior:'smooth', block:'center' });
-});
-document.getElementById('hubStackBtn').addEventListener('click',()=>{
-  openPaperworkFile();
-});
-document.getElementById('exploreDifferenceBtn').addEventListener('click',()=>{
-  document.getElementById('ciDeepDive').scrollIntoView({ behavior:'smooth' });
-});
-/* ===== DASHBOARD VIEW-SWITCHER ===== */
-function setDashboardTab(view){
-  const isTools = view==='tools';
-  document.getElementById('dashTabTools').classList.toggle('active', isTools);
-  document.getElementById('dashTabTools').setAttribute('aria-selected', String(isTools));
-  document.getElementById('dashTabLive').classList.toggle('active', !isTools);
-  document.getElementById('dashTabLive').setAttribute('aria-selected', String(!isTools));
-  document.getElementById('dashboardCivicToolsView').classList.toggle('active', isTools);
-  document.getElementById('dashboardLiveView').classList.toggle('active', !isTools);
-  if(!isTools) setTimeout(()=>{ if(map) map.invalidateSize(); }, 50);
+
+/* ===== "EXPLORE C.I." MODAL — full C.I. vs Legacy 311 contrast matrix.
+   Same exact wording as the old inline ci-compare block; it now only
+   renders when the hero's "[ Explore C.I. ]" button is clicked, instead
+   of sitting inline on every page load. ===== */
+function openCiVsLegacyModal(){
+  document.getElementById('modalContent').innerHTML = `
+    <h3>Civic Intelligence™ vs. Legacy 311</h3>
+    <div class="ci-compare" style="margin-top:14px">
+      <div class="ci-col legacy">
+        <h3>
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Legacy 311 — the administrative closure gap
+        </h3>
+        <ul>
+          <li>A ticket is marked "Closed" or "Resolved" the moment it's administratively logged — not when a crew actually shows up.</li>
+          <li>No field verification: there's no way to confirm a crew was ever on site.</li>
+          <li>The public record can't tell a real fix apart from a desk closure — it's an administrative black hole.</li>
+        </ul>
+      </div>
+      <div class="ci-col citixen">
+        <h3>
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+          CITIXEN — photo-verified resolution
+        </h3>
+        <ul>
+          <li>A ticket only closes with a timestamped, EXIF-verified proof photo from the crew on site.</li>
+          <li>Field verification is the default, not an audit exception — see any report's timeline at <code style="color:var(--mint2)">/report/:id</code>.</li>
+          <li>The public ledger shows a real Resolution Verification Rate — a desk closure is labeled as exactly that, never hidden.</li>
+        </ul>
+      </div>
+    </div>`;
+  document.getElementById('modalOverlay').classList.add('open');
 }
-document.getElementById('dashTabLive').addEventListener('click',()=> setDashboardTab('live'));
-document.getElementById('dashTabTools').addEventListener('click',()=> setDashboardTab('tools'));
-document.getElementById('dashToolsLiveLedger').addEventListener('click',()=> openLedgerDrawer());
-document.getElementById('dashToolsPaperwork').addEventListener('click',()=> openPaperworkFile());
-document.getElementById('dashToolsChangeLocation').addEventListener('click',()=> openLocationPicker());
+document.getElementById('exploreCiBtn').addEventListener('click', openCiVsLegacyModal);
+
+/* ===== DEEP-DIVE PANEL TOGGLES — the 3 drill-down hubs below the map each
+   reveal (rather than navigate to) their target panel; a second click on
+   the same hub, or its own Close button, hides it again. Two hubs
+   ("Expenditures & Projects" / "The Civic Stack & Operations") share one
+   panel (civicStackSection) and only differ in which element inside it
+   they scroll to. ===== */
+function openDeepdivePanel(panelId, scrollToId, triggerBtn){
+  const panel = document.getElementById(panelId);
+  if (!panel) return;
+  panel.classList.add('open');
+  if (triggerBtn) triggerBtn.setAttribute('aria-expanded', 'true');
+  setTimeout(() => {
+    const target = scrollToId ? document.getElementById(scrollToId) : panel;
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (map) map.invalidateSize();
+  }, 30);
+}
+function closeDeepdivePanel(panelId){
+  const panel = document.getElementById(panelId);
+  if (!panel) return;
+  panel.classList.remove('open');
+  document.querySelectorAll(`[aria-controls="${panelId}"]`).forEach(b => b.setAttribute('aria-expanded', 'false'));
+}
+document.getElementById('hubCoverageBtn').addEventListener('click', (e) => {
+  openDeepdivePanel('deepdiveAnalytics', 'deepdiveAnalytics', e.currentTarget);
+});
+document.getElementById('hubSlaBtn').addEventListener('click', (e) => {
+  openDeepdivePanel('civicStackSection', 'ledgerCard', e.currentTarget);
+});
+document.getElementById('hubStackBtn').addEventListener('click', (e) => {
+  openDeepdivePanel('civicStackSection', 'civicStackVisualizer', e.currentTarget);
+});
+document.querySelectorAll('[data-close-panel]').forEach(btn => {
+  btn.addEventListener('click', () => closeDeepdivePanel(btn.dataset.closePanel));
+});
+
 document.getElementById('privacyPillBtn').addEventListener('click',()=> openModal('anonymity'));
 document.getElementById('modalClose').addEventListener('click',()=> document.getElementById('modalOverlay').classList.remove('open'));
 document.getElementById('modalOverlay').addEventListener('click',(e)=>{
@@ -1557,7 +1749,7 @@ function applyJurisdiction(j, opts){
 }
 
 // SMART LOCATION HEADER — reflects the exact SAME confirmed/detected
-// jurisdiction the Citizen Paperwork File and dashboard already use (see
+// jurisdiction the CITIXEN Paperwork File and dashboard already use (see
 // applyJurisdiction() above); no second, parallel detection system.
 function updateSmartLocationBanner(j){
   const banner = document.getElementById('smartLocationBanner');
@@ -1614,7 +1806,7 @@ document.getElementById('locModalOverlay').addEventListener('click', (e) => {
 initLocationIntake();
 
 /* =====================================================================
-   CITIZEN PAPERWORK FILE — jurisdictional stack drawer
+   CITIXEN PAPERWORK FILE — jurisdictional stack drawer
    -----------------------------------------------------------------
    Fetches the 4-layer stack (Federal / State / Municipal / District-Ward)
    for the currently confirmed jurisdiction from
@@ -1860,6 +2052,18 @@ document.querySelectorAll('.stack-tier').forEach(tier => {
     if (detail) detail.classList.toggle('open', !isOpen);
   });
 });
+// Footer sitemap links into a specific Civic Stack tier: opens the
+// civicStackSection deep-dive panel, expands that one tier's accordion
+// detail, and scrolls it into view — same accordion the tier buttons
+// above already drive, just triggered from the footer instead.
+function openCivicStackTier(tierKey){
+  openDeepdivePanel('civicStackSection', 'civicStackVisualizer', document.getElementById('hubStackBtn'));
+  const tierBtn = document.querySelector(`.stack-tier[data-tier="${tierKey}"]`);
+  const detail = document.querySelector(`.tier-detail[data-tier-detail="${tierKey}"]`);
+  if (tierBtn) tierBtn.setAttribute('aria-expanded', 'true');
+  if (detail) detail.classList.add('open');
+  setTimeout(() => { if (tierBtn) tierBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 60);
+}
 
 /* =====================================================================
    3x3 ANALYTICS MATRIX — Active Hazards / Fix Speed / Completion Rate,
@@ -1905,19 +2109,25 @@ function renderAnalyticsMatrix(data){
   renderReportOutput();
 }
 
+// Shared by renderMatrixView() (the summary tiles) and openMatrixCellModal()
+// (the per-tile deep-dive) — one definition of what each of the 3 metrics
+// is/means, so the summary and the drill-down never drift apart.
+const MATRIX_METRIC_DEFS = [
+  { key: 'activeCount', label: 'Active Hazards', color: '#ffbb00', unit: '', max: 12, trendKey: 'activeCount',
+    desc: 'Open, not-yet-resolved hazard reports across every seeded jurisdiction — a real count of "submitted" + "dispatched" tickets, never a hardcoded headline number.' },
+  { key: 'avgResolutionHours', label: 'Fix Speed', color: '#00ff88', unit: 'h', max: 40, trendKey: 'avgResolutionHours',
+    desc: 'Average hours from a report being snapped to a crew\'s verified proof-photo closeout, averaged over every resolved ticket with a recorded resolution time.' },
+  { key: 'verificationRatePct', label: 'Completion Rate', color: '#00ff88', unit: '%', max: 100, trendKey: 'completionPct',
+    desc: 'Share of resolved tickets closed with a server-verified, on-site proof photo rather than a desk closure — the Resolution Verification Rate.' }
+];
+
 function renderMatrixView(view){
   matrixView = view;
   const grid = document.getElementById('matrixGrid');
   if (!grid || !matrixData) return;
   document.querySelectorAll('.matrix-view-tab').forEach(t => t.classList.toggle('active', t.dataset.view === view));
 
-  const metrics = [
-    { key: 'activeCount', label: 'Active Hazards', color: '#ffbb00', unit: '', max: 12, trendKey: 'activeCount' },
-    { key: 'avgResolutionHours', label: 'Fix Speed', color: '#00ff88', unit: 'h', max: 40, trendKey: 'avgResolutionHours' },
-    { key: 'verificationRatePct', label: 'Completion Rate', color: '#00ff88', unit: '%', max: 100, trendKey: 'completionPct' }
-  ];
-
-  grid.innerHTML = metrics.map(m => {
+  grid.innerHTML = MATRIX_METRIC_DEFS.map(m => {
     const val = matrixData[m.key];
     const display = val == null ? 'N/A' : (val + m.unit);
     let body;
@@ -1931,16 +2141,40 @@ function renderMatrixView(view){
       const filled = val == null ? 0 : Math.round(Math.min(1, val / m.max) * 10);
       body = dotGrid(filled, 10, m.color);
     }
-    return `<div class="matrix-cell">
+    return `<button class="matrix-cell" type="button" data-metric="${m.key}" style="cursor:pointer;border:1px solid var(--border);font-family:inherit">
       <div class="matrix-cell-viz">${body}</div>
       <div class="matrix-cell-val" style="color:${m.color}">${esc(display)}</div>
       <div class="matrix-cell-lbl">${esc(m.label)}</div>
-    </div>`;
+    </button>`;
   }).join('');
 }
 
 document.querySelectorAll('.matrix-view-tab').forEach(tab => {
   tab.addEventListener('click', () => renderMatrixView(tab.dataset.view));
+});
+
+/* ===== MATRIX CELL DEEP-DIVE MODAL — "clicking any individual cell opens
+   its deep analytical breakdown" per the homepage-flow refactor. Delegated
+   on #matrixGrid since renderMatrixView() rebuilds its children on every
+   view switch. ===== */
+function openMatrixCellModal(metricKey){
+  const def = MATRIX_METRIC_DEFS.find(m => m.key === metricKey);
+  if (!def || !matrixData) return;
+  const val = matrixData[def.key];
+  const display = val == null ? 'N/A' : (val + def.unit);
+  const points = (matrixData.trend || []).map(p => p[def.trendKey]);
+  document.getElementById('modalContent').innerHTML = `
+    <h3>${esc(def.label)}</h3>
+    <div class="matrix-cell-val" style="color:${def.color};font-size:2rem;margin:10px 0">${esc(display)}</div>
+    <p>${esc(def.desc)}</p>
+    <h4>9-day trend</h4>
+    ${sparkline(points, def.color)}
+    <p class="small" style="color:var(--muted);margin-top:8px">Illustrative/small-N — computed from the same seeded ledger data as the rest of this page, not a production time series.</p>`;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+document.getElementById('matrixGrid').addEventListener('click', (e) => {
+  const cell = e.target.closest('.matrix-cell');
+  if (cell) openMatrixCellModal(cell.dataset.metric);
 });
 
 /* =====================================================================
@@ -2254,9 +2488,58 @@ async function openLedgerDrawer(){
 function closeLedgerDrawer(){
   document.getElementById('ledgerDrawer').classList.remove('open');
 }
-document.getElementById('openLedgerDrawerBtn').addEventListener('click', () => { civicMenu.classList.remove('open'); openLedgerDrawer(); });
+document.getElementById('btnViewFullLedger').addEventListener('click', () => openLedgerDrawer());
 document.getElementById('ledgerCloseBtn').addEventListener('click', closeLedgerDrawer);
 document.getElementById('ledgerDrawer').addEventListener('click', (e) => { if (e.target.id === 'ledgerDrawer') closeLedgerDrawer(); });
+
+/* ===== THE CITIXEN CODEX (GOVERNANCE VAULT) DRAWER ===== */
+const CODEX_TRACKS = {
+  a: [
+    { title: 'C.I.™ Governance Charter', desc: 'The founding rules for how Civic Intelligence™ data is collected, retained (or not), and used — reference placeholder, not yet published in full.' },
+    { title: 'Municipal Code', desc: 'The seeded jurisdiction\'s local ordinances governing public right-of-way hazards, dispatch SLAs, and capital project procurement — reference placeholder.' },
+    { title: 'WI State Constitution', desc: 'Wisconsin\'s state constitution, referenced for the municipal home-rule authority this platform\'s demo jurisdiction operates under — reference placeholder.' },
+    { title: 'FOIA & ADA Compliance', desc: 'Open-records request handling and ADA accessibility commitments for this platform\'s public-facing pages and data — reference placeholder.' }
+  ],
+  b: [
+    { title: 'U.S. Constitution & Bill of Rights', desc: 'The federal constitutional grounding for citizen petition and open-government rights that this platform\'s civic-reporting model draws on — reference placeholder.' },
+    { title: 'Historical Charters', desc: 'Historical municipal charters establishing the public right-of-way concept this platform\'s hazard reports are scoped to — reference placeholder.' },
+    { title: 'Public Trust Doctrine', desc: 'The legal doctrine holding certain public resources (roads, sidewalks, utilities) in trust for citizen use — the same "public right-of-way" concept the reporting flow checks against — reference placeholder.' }
+  ]
+};
+function renderCodexTrack(track){
+  document.getElementById('codexTabA').classList.toggle('active', track === 'a');
+  document.getElementById('codexTabA').setAttribute('aria-selected', String(track === 'a'));
+  document.getElementById('codexTabB').classList.toggle('active', track === 'b');
+  document.getElementById('codexTabB').setAttribute('aria-selected', String(track === 'b'));
+  document.getElementById('codexDocList').innerHTML = CODEX_TRACKS[track].map(d =>
+    `<div class="codex-doc-row"><div class="codex-doc-title">${esc(d.title)}</div><div class="codex-doc-desc">${esc(d.desc)}</div></div>`
+  ).join('');
+}
+function openCodexDrawer(track){
+  renderCodexTrack(track === 'b' ? 'b' : 'a');
+  document.getElementById('codexDrawer').classList.add('open');
+}
+function closeCodexDrawer(){
+  document.getElementById('codexDrawer').classList.remove('open');
+}
+document.getElementById('codexTabA').addEventListener('click', () => renderCodexTrack('a'));
+document.getElementById('codexTabB').addEventListener('click', () => renderCodexTrack('b'));
+document.getElementById('codexCloseBtn').addEventListener('click', closeCodexDrawer);
+document.getElementById('codexDrawer').addEventListener('click', (e) => { if (e.target.id === 'codexDrawer') closeCodexDrawer(); });
+
+/* ===== FOOTER SITEMAP WIRING (CSP-safe, no inline onclick) ===== */
+document.querySelectorAll('.sitemap-col [data-scroll-to]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const el = document.getElementById(btn.dataset.scrollTo);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+document.querySelectorAll('.sitemap-col [data-stack-tier]').forEach(btn => {
+  btn.addEventListener('click', () => openCivicStackTier(btn.dataset.stackTier));
+});
+document.querySelectorAll('.sitemap-col [data-codex]').forEach(btn => {
+  btn.addEventListener('click', () => openCodexDrawer(btn.dataset.codex));
+});
 const ledgerSearchInputEl = document.getElementById('ledgerSearchInput');
 if (ledgerSearchInputEl) ledgerSearchInputEl.addEventListener('input', () => {
   ledgerFilters.q = ledgerSearchInputEl.value.trim();
@@ -2265,6 +2548,7 @@ if (ledgerSearchInputEl) ledgerSearchInputEl.addEventListener('input', () => {
 
 window.addEventListener('DOMContentLoaded',()=>{
   renderFeed();
+  renderLightweightFeed();
   initMap();
   updateTelemetry(cities.lacrosse);
   loadBig3();
