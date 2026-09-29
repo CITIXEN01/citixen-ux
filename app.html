@@ -1938,6 +1938,7 @@ function initMap(){
       maxZoom:19, className:'dark-tiles'
     }).addTo(map);
     cases.forEach(plotMarker);
+    renderGeoHatchOverlay();
     if (window.CITIXEN_RESOLVED_LOCATION && typeof window.CITIXEN_RESOLVED_LOCATION.lat === 'number') {
       plotUserLocationMarker(window.CITIXEN_RESOLVED_LOCATION.lat, window.CITIXEN_RESOLVED_LOCATION.lng);
     }
@@ -1988,6 +1989,62 @@ function plotMarker(item){
   const m=L.marker([item.lat,item.lng],{icon}).addTo(map);
   m.bindPopup(`<strong>${esc(item.title)}</strong><br><span style="font-size:.7rem">${esc(item.loc)} • ${esc(item.time)}</span>`);
   markers[item.id]=m;
+}
+
+/* =====================================================================
+   GEO-HATCH COVERAGE ENGINE — real vector grid overlay drawn directly on
+   the Leaflet map (not just the card below it). Cells are geo-anchored to
+   this device's actual case coordinates (the same `cases` array plotMarker
+   draws from) — a cell only renders where a real report actually exists,
+   never claiming coverage of empty ground. Amber (hatched) = at least one
+   still-active hazard (triageBucket !== 'resolved') in that cell; Emerald
+   Green = every report in that cell is resolved/secured.
+   ===================================================================== */
+let geoHatchLayerGroup = null;
+const GEO_HATCH_CELL_DEG = 0.0022; // ≈150-200m per cell at this latitude — matches the "Ward (150m)" tier language
+
+function ensureGeoHatchPatternDefs(){
+  if (document.getElementById('geoHatchAmberPattern')) return;
+  const svgNs = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(svgNs, 'svg');
+  svg.setAttribute('width', '0');
+  svg.setAttribute('height', '0');
+  svg.style.position = 'absolute';
+  svg.innerHTML = `<defs>
+    <pattern id="geoHatchAmberPattern" width="8" height="8" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+      <rect width="8" height="8" fill="#ffbb00" fill-opacity="0.16"></rect>
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#ffbb00" stroke-width="3" stroke-opacity="0.55"></line>
+    </pattern>
+  </defs>`;
+  document.body.appendChild(svg);
+}
+
+function renderGeoHatchOverlay(){
+  if (typeof L === 'undefined' || !map) return;
+  ensureGeoHatchPatternDefs();
+  if (geoHatchLayerGroup) map.removeLayer(geoHatchLayerGroup);
+  geoHatchLayerGroup = L.layerGroup().addTo(map);
+  if (!cases.length) return;
+
+  const lats = cases.map(c => c.lat), lngs = cases.map(c => c.lng);
+  const minLat = Math.min(...lats) - GEO_HATCH_CELL_DEG * 1.5;
+  const maxLat = Math.max(...lats) + GEO_HATCH_CELL_DEG * 1.5;
+  const minLng = Math.min(...lngs) - GEO_HATCH_CELL_DEG * 1.5;
+  const maxLng = Math.max(...lngs) + GEO_HATCH_CELL_DEG * 1.5;
+
+  for (let lat = minLat; lat < maxLat; lat += GEO_HATCH_CELL_DEG) {
+    for (let lng = minLng; lng < maxLng; lng += GEO_HATCH_CELL_DEG) {
+      const inCell = cases.filter(c => c.lat >= lat && c.lat < lat + GEO_HATCH_CELL_DEG && c.lng >= lng && c.lng < lng + GEO_HATCH_CELL_DEG);
+      if (!inCell.length) continue; // leave uncharted cells undrawn — no claimed coverage without a real report
+      const hasActive = inCell.some(c => triageBucket(c) !== 'resolved');
+      const bounds = [[lat, lng], [lat + GEO_HATCH_CELL_DEG, lng + GEO_HATCH_CELL_DEG]];
+      L.rectangle(bounds, hasActive ? {
+        color: '#ffbb00', weight: 1.5, fillColor: 'url(#geoHatchAmberPattern)', fillOpacity: 1, className: 'geo-hatch-cell geo-hatch-active'
+      } : {
+        color: '#00ff88', weight: 1.5, fillColor: '#00ff88', fillOpacity: 0.22, className: 'geo-hatch-cell geo-hatch-resolved'
+      }).addTo(geoHatchLayerGroup);
+    }
+  }
 }
 
 // "You are here" beacon — only plotted once the device's own GPS has
@@ -2324,7 +2381,7 @@ async function finalizeSubmitReport(opts){
   cases.unshift(nc);
   renderFeed();
   document.getElementById('mCount').textContent=cases.length+' active';
-  if(mapInit) plotMarker(nc);
+  if(mapInit) { plotMarker(nc); renderGeoHatchOverlay(); }
   document.getElementById('repDesc').value='';
   document.getElementById('photoBox').style.display='none';
 
