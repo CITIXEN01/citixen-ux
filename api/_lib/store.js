@@ -143,6 +143,148 @@ const DB = globalThis.__CITIXEN_COVERAGE_DB__ || (globalThis.__CITIXEN_COVERAGE_
   // a row in the municipality table) — the route files never change.
 });
 
+// =====================================================================
+// PUBLIC LEDGER SEED TICKETS + "THE BIG 3" METRICS
+// -----------------------------------------------------------------
+// Illustrative, hand-authored ticket records backing the Live Public
+// Ledger (see index.html/app.html's ledger drawer and report.html's
+// per-report deep link view). Same honesty convention as the coverage
+// cells above: this is demo/seed data, clearly not a live database, and
+// every metric this session computes ("The Big 3") is a real aggregate
+// computed FROM these records at request time — never a hand-typed
+// headline number. `verified` records whether the closing photo was
+// server-side EXIF/GPS-verified on site (true) or the ticket was closed
+// from a desk with no field proof (false) — deliberately mixed so the
+// Resolution Verification Rate below is a real, non-trivial percentage.
+//
+// `reportId` (e.g. "W4-8092") is generated deterministically from the
+// ward number + a stable hash of the ticket's own id, so the same
+// ticket always resolves to the same shareable /report/:id URL rather
+// than a random one that would change on every reload.
+function hashTo4Digits(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+  return 1000 + (h % 9000);
+}
+
+function makeReportId(wardSlug, ticketId) {
+  const wardNum = (String(wardSlug).match(/\d+/) || ['0'])[0];
+  return 'W' + wardNum + '-' + hashTo4Digits(String(ticketId));
+}
+
+// stage: 'submitted' (filed, not yet dispatched) -> 'dispatched' (crew
+// assigned/en route) -> 'resolved' (closed, with or without a verified
+// proof photo — see `verified`). This mirrors the same 3-step lifecycle
+// app.html's Triage gauge already groups cases into (Open / Tagged to
+// Project / Resolved), just named for the public-facing timeline.
+const WARD_TICKETS = {
+  'ward-4': [
+    { id: 'w4t1', category: 'Pothole', title: 'Deep pothole, right lane', loc: 'Main St & 4th Ave', stage: 'resolved', verified: true, resolutionHours: 14, submittedAgo: '3d ago' },
+    { id: 'w4t2', category: 'Streetlight', title: 'Streetlight outage', loc: 'Grand Ave & 7th St', stage: 'dispatched', verified: null, resolutionHours: null, submittedAgo: '45m ago' },
+    { id: 'w4t3', category: 'Drainage', title: 'Storm drain backing up', loc: 'Pine St Alley', stage: 'resolved', verified: true, resolutionHours: 22, submittedAgo: '5d ago' },
+    { id: 'w4t4', category: 'Sidewalk', title: 'Cracked ADA ramp', loc: 'Cass St & 6th', stage: 'resolved', verified: false, resolutionHours: 9, submittedAgo: '6d ago' },
+    { id: 'w4t5', category: 'Signage', title: 'Stop sign knocked down', loc: 'Cameron Ave', stage: 'submitted', verified: null, resolutionHours: null, submittedAgo: '12m ago' },
+    { id: 'w4t6', category: 'Pothole', title: 'Pavement gap, bike lane', loc: '6th St & Cass', stage: 'resolved', verified: true, resolutionHours: 31, submittedAgo: '8d ago' }
+  ],
+  'ward-7': [
+    { id: 'w7t1', category: 'Streetlight', title: 'Dark corner, no lighting', loc: 'Ward 7 & Copeland', stage: 'resolved', verified: true, resolutionHours: 18, submittedAgo: '4d ago' },
+    { id: 'w7t2', category: 'Pothole', title: 'Large pothole cluster', loc: 'La Crosse St', stage: 'resolved', verified: false, resolutionHours: 27, submittedAgo: '9d ago' },
+    { id: 'w7t3', category: 'Sidewalk', title: 'Sidewalk heave, trip hazard', loc: 'Losey Blvd', stage: 'dispatched', verified: null, resolutionHours: null, submittedAgo: '2h ago' },
+    { id: 'w7t4', category: 'Drainage', title: 'Clogged culvert', loc: 'George St', stage: 'resolved', verified: true, resolutionHours: 12, submittedAgo: '2d ago' }
+  ],
+  'ward-12': [
+    { id: 'w12t1', category: 'Signage', title: 'Faded crosswalk signage', loc: 'National Ave', stage: 'resolved', verified: true, resolutionHours: 20, submittedAgo: '5d ago' },
+    { id: 'w12t2', category: 'Streetlight', title: 'Flickering streetlight', loc: 'Layton Blvd', stage: 'resolved', verified: true, resolutionHours: 16, submittedAgo: '3d ago' },
+    { id: 'w12t3', category: 'Pothole', title: 'Pothole near crosswalk', loc: 'Mitchell St', stage: 'submitted', verified: null, resolutionHours: null, submittedAgo: '30m ago' },
+    { id: 'w12t4', category: 'Sidewalk', title: 'Missing curb ramp', loc: '16th & Greenfield', stage: 'dispatched', verified: null, resolutionHours: null, submittedAgo: '1h ago' }
+  ],
+  'ward-3': [
+    { id: 'w3t1', category: 'Drainage', title: 'Street flooding after rain', loc: 'Halsted St', stage: 'resolved', verified: true, resolutionHours: 25, submittedAgo: '6d ago' },
+    { id: 'w3t2', category: 'Pothole', title: 'Deep pothole, arterial road', loc: 'Ashland Ave', stage: 'resolved', verified: false, resolutionHours: 19, submittedAgo: '4d ago' },
+    { id: 'w3t3', category: 'Streetlight', title: 'Streetlight pole down', loc: 'Milwaukee Ave', stage: 'resolved', verified: true, resolutionHours: 10, submittedAgo: '2d ago' }
+  ]
+};
+
+const WARD_NAMES = { 'ward-4': 'Ward 4', 'ward-7': 'Ward 7', 'ward-12': 'Ward 12', 'ward-3': 'Ward 3' };
+const WARD_JURISDICTION = {
+  'ward-4': { state: 'wi', stateName: 'Wisconsin', city: 'la-crosse', cityName: 'La Crosse' },
+  'ward-7': { state: 'wi', stateName: 'Wisconsin', city: 'la-crosse', cityName: 'La Crosse' },
+  'ward-12': { state: 'wi', stateName: 'Wisconsin', city: 'milwaukee', cityName: 'Milwaukee' },
+  'ward-3': { state: 'il', stateName: 'Illinois', city: 'chicago', cityName: 'Chicago' }
+};
+
+// Flattens every seeded ward's tickets into one list, each carrying its
+// shareable reportId + jurisdiction names — the shape the Live Public
+// Ledger (index.html/app.html) and the per-report deep link (report.html,
+// via /api/report/:id) both read.
+function allTickets() {
+  const out = [];
+  Object.entries(WARD_TICKETS).forEach(([wardSlug, tickets]) => {
+    const j = WARD_JURISDICTION[wardSlug];
+    tickets.forEach(t => {
+      out.push(Object.assign({}, t, {
+        reportId: makeReportId(wardSlug, t.id),
+        ward: wardSlug,
+        wardName: WARD_NAMES[wardSlug],
+        state: j.state, stateName: j.stateName, city: j.city, cityName: j.cityName
+      }));
+    });
+  });
+  return out;
+}
+
+function getTicketByReportId(reportId) {
+  return allTickets().find(t => t.reportId === reportId) || null;
+}
+
+// Small, clearly-labeled CapEx project seed set backing "Capital Project
+// Timeline Adherence" — a handful of named projects with a scheduled vs.
+// actual/current-status field, same illustrative-seed-data convention as
+// everything else in this module. `status` is 'on-track' (still running,
+// currently within its scheduled window), 'on-time' (completed within its
+// scheduled window) or 'delayed' (completed late, or currently past its
+// scheduled window) — only 'delayed' counts against adherence.
+const CAPEX_PROJECTS = [
+  { id: 'cip-1', name: 'Ward 4 Storm Sewer Relining', ward: 'ward-4', scheduled: 'Q3 2026', status: 'on-time' },
+  { id: 'cip-2', name: 'Main St Resurfacing Phase II', ward: 'ward-4', scheduled: 'Q4 2026', status: 'on-track' },
+  { id: 'cip-3', name: 'Ward 7 Streetlight LED Retrofit', ward: 'ward-7', scheduled: 'Q2 2026', status: 'delayed' },
+  { id: 'cip-4', name: 'Losey Blvd Sidewalk/ADA Upgrade', ward: 'ward-7', scheduled: 'Q3 2026', status: 'on-track' },
+  { id: 'cip-5', name: 'Ward 12 Culvert Replacement', ward: 'ward-12', scheduled: 'Q1 2026', status: 'on-time' },
+  { id: 'cip-6', name: 'National Ave Signage Modernization', ward: 'ward-12', scheduled: 'Q4 2026', status: 'on-track' },
+  { id: 'cip-7', name: 'Ashland Ave Arterial Rebuild', ward: 'ward-3', scheduled: 'Q2 2026', status: 'delayed' }
+];
+
+function capExAdherencePct(projects) {
+  const list = projects || CAPEX_PROJECTS;
+  const decided = list.filter(p => p.status !== 'on-track'); // only completed/overdue projects have a real adherence verdict yet
+  if (!decided.length) return null;
+  const onTarget = decided.filter(p => p.status === 'on-time').length;
+  return +(onTarget / decided.length * 100).toFixed(1);
+}
+
+// "The Big 3" — computed for real from the seed records above, not
+// hardcoded. Returns null for a metric when there isn't yet enough seed
+// data to compute it honestly (see capExAdherencePct above).
+function bigThree(wardSlug) {
+  const tickets = wardSlug ? (WARD_TICKETS[wardSlug] || []).map(t => Object.assign({}, t, { reportId: makeReportId(wardSlug, t.id) })) : allTickets();
+  const resolved = tickets.filter(t => t.stage === 'resolved');
+  const withResolutionTime = resolved.filter(t => typeof t.resolutionHours === 'number');
+  const avgResolutionHours = withResolutionTime.length
+    ? +(withResolutionTime.reduce((sum, t) => sum + t.resolutionHours, 0) / withResolutionTime.length).toFixed(1)
+    : null;
+  const verifiedCount = resolved.filter(t => t.verified === true).length;
+  const verificationRatePct = resolved.length ? +(verifiedCount / resolved.length * 100).toFixed(1) : null;
+  const projects = wardSlug ? CAPEX_PROJECTS.filter(p => p.ward === wardSlug) : CAPEX_PROJECTS;
+  return {
+    avgResolutionHours,
+    verificationRatePct,
+    capExAdherencePct: capExAdherencePct(projects),
+    resolvedCount: resolved.length,
+    verifiedCount,
+    totalTickets: tickets.length
+  };
+}
+
 function getWard(state, city, ward) {
   const s = DB[state];
   if (!s) return null;
@@ -183,4 +325,8 @@ function allWards() {
   return out;
 }
 
-module.exports = { DB, getWard, getCity, summarize, allWards, CATEGORIES };
+module.exports = {
+  DB, getWard, getCity, summarize, allWards, CATEGORIES,
+  allTickets, getTicketByReportId, makeReportId,
+  CAPEX_PROJECTS, capExAdherencePct, bigThree, WARD_NAMES, WARD_JURISDICTION
+};

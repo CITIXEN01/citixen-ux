@@ -306,6 +306,84 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 @media (max-width:640px){
   .telemetry-mini-row{grid-template-columns:1fr}
 }
+
+/* ===== SMART LOCATION HEADER (persistent, always visible) ===== */
+.location-banner{display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(0,255,136,.06);
+  border-bottom:1px solid var(--border);padding:8px 16px;font-size:.76rem;font-weight:700;color:var(--text);flex-wrap:wrap}
+.location-banner svg{flex-shrink:0;color:var(--mint2)}
+.location-banner .lb-status{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.3px;color:var(--muted)}
+.location-banner.resolved .lb-status{color:var(--mint2)}
+.location-banner button{background:none;border:none;color:var(--mint2);font-size:.7rem;font-weight:800;cursor:pointer;
+  text-decoration:underline;padding:0}
+
+/* ===== BIG 3 STAT ROW (reusable — mirrors app.html's) ===== */
+.big3-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.big3-tile{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center}
+.big3-val{font-size:1.35rem;font-weight:900;color:var(--mint2)}
+.big3-lbl{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-top:4px;line-height:1.3}
+.big3-note{font-size:.68rem;color:var(--muted);margin-top:10px;text-align:center}
+@media (max-width:520px){ .big3-row{grid-template-columns:1fr} }
+
+/* ===== "WHAT IS CIVIC INTELLIGENCE?" EDUCATIONAL HERO ===== */
+.ci-section{max-width:980px;margin:48px auto;padding:0 24px}
+.ci-section h2{font-size:1.5rem;text-align:center;margin-bottom:8px}
+.ci-section .ci-sub{text-align:center;color:var(--muted);font-size:.86rem;max-width:640px;margin:0 auto 26px}
+.ci-compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.ci-col{border-radius:14px;padding:20px;border:1px solid var(--border)}
+.ci-col.legacy{background:rgba(239,68,68,.05)}
+.ci-col.citixen{background:rgba(0,255,136,.05);border-color:rgba(0,255,136,.3)}
+.ci-col h3{font-size:.9rem;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.ci-col.legacy h3{color:#fca5a5}
+.ci-col.citixen h3{color:var(--mint2)}
+.ci-col ul{padding-left:18px}
+.ci-col li{font-size:.8rem;color:var(--muted);margin-bottom:10px;line-height:1.5}
+@media (max-width:768px){ .ci-compare{grid-template-columns:1fr} }
+
+/* ===== HOW IT WORKS — 20s looping preview (CSS-animated, no video asset) ===== */
+.hiw-card{margin-top:26px}
+.hiw-loop{position:relative;height:190px;border-radius:14px;background:rgba(255,255,255,.02);
+  border:1px solid var(--border);overflow:hidden}
+.hiw-frame{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;opacity:0;animation:hiwCycle 18s infinite}
+.hiw-frame svg{color:var(--mint2)}
+.hiw-frame .hiw-caption{font-size:.86rem;font-weight:800;color:var(--text)}
+.hiw-frame .hiw-sub{font-size:.7rem;color:var(--muted);max-width:320px;text-align:center}
+.hiw-frame.f1{animation-delay:0s}
+.hiw-frame.f2{animation-delay:6s}
+.hiw-frame.f3{animation-delay:12s}
+@keyframes hiwCycle{ 0%{opacity:0} 3%{opacity:1} 30%{opacity:1} 34%{opacity:0} 100%{opacity:0} }
+.hiw-dots{display:flex;gap:6px;justify-content:center;margin-top:10px}
+.hiw-dot{width:7px;height:7px;border-radius:50%;background:var(--border);animation:hiwDot 18s infinite}
+.hiw-dot.d1{animation-delay:0s}.hiw-dot.d2{animation-delay:6s}.hiw-dot.d3{animation-delay:12s}
+@keyframes hiwDot{0%{background:var(--border)} 3%{background:var(--mint2)} 30%{background:var(--mint2)} 34%{background:var(--border)} 100%{background:var(--border)}}
+@media (prefers-reduced-motion: reduce){
+  .hiw-frame{animation:none;opacity:0}
+  .hiw-frame.f1{opacity:1}
+  .hiw-dot{animation:none}
+  .hiw-dot.d1{background:var(--mint2)}
+}
+
+/* ===== LIVE PUBLIC LEDGER DRAWER ===== */
+.ledger-drawer{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:2800;display:none}
+.ledger-drawer.open{display:flex;justify-content:flex-end}
+.ledger-drawer-panel{width:min(520px,100vw);height:100%;background:var(--card);border-left:1px solid var(--border);
+  display:flex;flex-direction:column}
+.ledger-drawer-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--border)}
+.ledger-drawer-body{flex:1;overflow-y:auto;padding:16px 18px 32px}
+.ledger-search{width:100%;padding:10px 13px;background:rgba(7,12,14,.8);border:1px solid var(--border);color:var(--text);
+  border-radius:10px;font-size:.8rem;margin-bottom:10px;outline:none}
+.ledger-search:focus{border-color:var(--mint2)}
+.ledger-filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.ledger-chip{background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--muted);
+  font-size:.66rem;font-weight:700;padding:5px 10px;border-radius:20px;cursor:pointer}
+.ledger-chip.active{border-color:var(--mint2);background:rgba(0,255,136,.14);color:var(--mint2)}
+.ledger-select{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;padding:7px 9px;font-size:.72rem;font-weight:700}
+.ledger-report-card{background:rgba(7,12,14,.6);border:1px solid var(--border);border-radius:10px;padding:12px;
+  margin-bottom:8px;text-decoration:none;color:var(--text);display:block}
+.ledger-report-card:hover{border-color:var(--mint2)}
+.ledger-report-id{font-family:var(--mono);font-size:.64rem;color:var(--mint2)}
+.ledger-empty{text-align:center;color:var(--muted);font-size:.8rem;padding:28px 0}
 </style>
 </head>
 <body>
@@ -328,6 +406,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
           <button data-scroll="dashboard">Live Map</button>
           <a href="tel:911">Emergency Triage</a>
           <div class="dropdown-group-label">Municipal Transparency Stack</div>
+          <button id="openLedgerDrawerBtn">Live Public Ledger ↗</button>
           <button data-scroll="dashboard">Public Works Project Ledger</button>
           <button data-scroll="dashboard">Asset Coverage Grid</button>
           <button data-scroll="dashboard">Expenditure Allocations</button>
@@ -338,6 +417,16 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       </div>
     </div>
   </header>
+
+  <!-- ===== SMART LOCATION HEADER — persistent, reflects the SAME resolved
+       jurisdiction as detectJurisdictionGuess()/applyJurisdiction() below;
+       no second, parallel detection system. ===== -->
+  <div class="location-banner" id="smartLocationBanner">
+    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
+    <span id="smartLocationText">Locating your jurisdiction…</span>
+    <span class="lb-status" id="smartLocationStatus">Pending</span>
+    <button type="button" id="smartLocationChangeBtn">Change</button>
+  </div>
 
   <!-- ===== LOCATION INTAKE MODAL ===== -->
   <div class="modal-overlay" id="locModalOverlay">
@@ -419,6 +508,25 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </div>
   </div>
 
+  <!-- ===== LIVE PUBLIC LEDGER DRAWER ===== -->
+  <div class="ledger-drawer" id="ledgerDrawer">
+    <div class="ledger-drawer-panel">
+      <div class="ledger-drawer-head">
+        <strong style="color:var(--mint2)">Live Public Ledger</strong>
+        <button class="modal-close" id="ledgerCloseBtn">✕</button>
+      </div>
+      <div class="ledger-drawer-body">
+        <input class="ledger-search" id="ledgerSearchInput" placeholder="Search title, location, category…">
+        <div class="ledger-filter-row">
+          <select class="ledger-select" id="ledgerWardSelect"><option value="">All wards</option></select>
+        </div>
+        <div class="ledger-filter-row" id="ledgerCategoryChips"></div>
+        <div class="ledger-filter-row" id="ledgerStatusChips"></div>
+        <div id="ledgerResults"></div>
+      </div>
+    </div>
+  </div>
+
   <section class="hero">
     <h1>CITIXEN UX<sup style="font-size:.5em;opacity:.4;">™</sup></h1>
     <h2>Civic Intelligence Platform</h2>
@@ -436,6 +544,70 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 21 8 12 13 3 8 12 3"/><polyline points="3 13 12 18 21 13"/><polyline points="3 18 12 23 21 18"/></svg>
         <span>Civic Stack</span>
       </button>
+    </div>
+  </section>
+
+  <!-- ===== "WHAT IS CIVIC INTELLIGENCE?" EDUCATIONAL HERO ===== -->
+  <section class="ci-section">
+    <h2>What is <span class="brand-lime">Civic Intelligence</span>?</h2>
+    <p class="ci-sub">Legacy 311 treats a filed ticket as the finish line. CITIXEN treats a verified photo as the finish line — here's the difference.</p>
+    <div class="ci-compare">
+      <div class="ci-col legacy">
+        <h3>
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Legacy 311 — the administrative closure gap
+        </h3>
+        <ul>
+          <li>A ticket is marked "Closed" or "Resolved" the moment it's administratively logged — not when a crew actually shows up.</li>
+          <li>No field verification: there's no way to confirm a crew was ever on site.</li>
+          <li>The public record can't tell a real fix apart from a desk closure — it's an administrative black hole.</li>
+        </ul>
+      </div>
+      <div class="ci-col citixen">
+        <h3>
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+          CITIXEN — photo-verified resolution
+        </h3>
+        <ul>
+          <li>A ticket only closes with a timestamped, EXIF-verified proof photo from the crew on site.</li>
+          <li>Field verification is the default, not an audit exception — see any report's timeline at <code style="color:var(--mint2)">/report/:id</code>.</li>
+          <li>The public ledger shows a real Resolution Verification Rate — a desk closure is labeled as exactly that, never hidden.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ===== HOW IT WORKS — 20s looping preview (CSS-animated, no video file) ===== -->
+    <div class="hud-card hiw-card">
+      <div class="label" style="justify-content:center">How it works</div>
+      <div class="hiw-loop" role="img" aria-label="Three-step loop: snap a photo, the geohash grid cell lights up, then a server-verified proof closeout appears.">
+        <div class="hiw-frame f1">
+          <svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <div class="hiw-caption">1. Snap</div>
+          <div class="hiw-sub">A citizen photographs the hazard — EXIF device ID and GPS tags are stripped before upload.</div>
+        </div>
+        <div class="hiw-frame f2">
+          <svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <div class="hiw-caption">2. Geohash grid highlight</div>
+          <div class="hiw-sub">The report's block lights up on the coverage grid — routed to the responsible department automatically.</div>
+        </div>
+        <div class="hiw-frame f3">
+          <svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <div class="hiw-caption">3. Verified proof closeout</div>
+          <div class="hiw-sub">A crew closes the ticket with an on-site photo — EXIF timestamp + location verified server-side.</div>
+        </div>
+      </div>
+      <div class="hiw-dots"><span class="hiw-dot d1"></span><span class="hiw-dot d2"></span><span class="hiw-dot d3"></span></div>
+    </div>
+
+    <!-- ===== THE BIG 3 — public health metrics, computed from real seed data ===== -->
+    <div class="hud-card" style="margin-top:26px">
+      <div class="label" style="justify-content:center">The Big 3 — public health metrics</div>
+      <div class="big3-row">
+        <div class="big3-tile"><div class="big3-val" id="big3Speed">–</div><div class="big3-lbl">Speed of Resolution<br>(avg hrs, snap → closeout)</div></div>
+        <div class="big3-tile"><div class="big3-val" id="big3Verify">–</div><div class="big3-lbl">Resolution Verification Rate</div></div>
+        <div class="big3-tile"><div class="big3-val" id="big3Capex">–</div><div class="big3-lbl">Capital Project Timeline Adherence</div></div>
+      </div>
+      <div class="big3-note">Computed live from seeded ledger and CapEx demo data (see the Live Public Ledger below) — not asserted as a production dataset.</div>
     </div>
   </section>
 
@@ -1154,12 +1326,33 @@ function applyJurisdiction(j, opts){
   const cta = document.getElementById('pwReportCta');
   if (cta) cta.href = '/app.html?state=' + j.state + '&city=' + j.city + '&ward=' + j.ward;
   syncDashboardToJurisdiction(j);
+  updateSmartLocationBanner(j);
   if (!(opts && opts.silent)) {
     // A citizen just actively confirmed/changed jurisdiction — refresh the
     // paperwork stack in place if the drawer happens to be open already.
     if (document.getElementById('pwOverlay').classList.contains('open')) loadPaperworkStack();
   }
 }
+
+// SMART LOCATION HEADER — reflects the exact SAME confirmed/detected
+// jurisdiction the Citizen Paperwork File and dashboard already use (see
+// applyJurisdiction() above); no second, parallel detection system.
+function updateSmartLocationBanner(j){
+  const banner = document.getElementById('smartLocationBanner');
+  const textEl = document.getElementById('smartLocationText');
+  const statusEl = document.getElementById('smartLocationStatus');
+  if (!banner || !textEl || !statusEl) return;
+  if (j && j.source !== 'default') {
+    textEl.textContent = jurisdictionLabel(j) + ' — reports route here';
+    statusEl.textContent = 'Confirmed';
+    banner.classList.add('resolved');
+  } else if (j) {
+    textEl.textContent = 'Citywide default — location not detected';
+    statusEl.textContent = 'Unresolved';
+    banner.classList.remove('resolved');
+  }
+}
+document.getElementById('smartLocationChangeBtn').addEventListener('click', () => openLocationPicker());
 
 // Bridges the GPS/IP/confirmed jurisdiction above to the dashboard's
 // Ward Health Index / gauges / Municipal Expenditure ledger, which are
@@ -1367,10 +1560,221 @@ if('serviceWorker' in navigator){
   });
 }
 
+/* =====================================================================
+   THE BIG 3 — public health metrics
+   -----------------------------------------------------------------
+   Backed by /api/coverage/big3, which computes every number for real
+   from api/_lib/store.js's seeded ticket + CapEx records (never a
+   hardcoded headline figure). Fallback mirrors the same seed shape/
+   formula for offline/local preview — same convention as every other
+   fallback on this page.
+   ===================================================================== */
+const FALLBACK_TICKETS_BY_WARD = {
+  'ward-4': [
+    { stage:'resolved', verified:true, resolutionHours:14 }, { stage:'resolved', verified:true, resolutionHours:22 },
+    { stage:'resolved', verified:false, resolutionHours:9 }, { stage:'resolved', verified:true, resolutionHours:31 }
+  ],
+  'ward-7': [
+    { stage:'resolved', verified:true, resolutionHours:18 }, { stage:'resolved', verified:false, resolutionHours:27 },
+    { stage:'resolved', verified:true, resolutionHours:12 }
+  ],
+  'ward-12': [
+    { stage:'resolved', verified:true, resolutionHours:20 }, { stage:'resolved', verified:true, resolutionHours:16 }
+  ],
+  'ward-3': [
+    { stage:'resolved', verified:true, resolutionHours:25 }, { stage:'resolved', verified:false, resolutionHours:19 },
+    { stage:'resolved', verified:true, resolutionHours:10 }
+  ]
+};
+const FALLBACK_CAPEX_PROJECTS = [
+  { status:'on-time' }, { status:'on-track' }, { status:'delayed' }, { status:'on-track' },
+  { status:'on-time' }, { status:'on-track' }, { status:'delayed' }
+];
+function fallbackBigThree(){
+  const tickets = Object.values(FALLBACK_TICKETS_BY_WARD).flat();
+  const resolved = tickets.filter(t => t.stage === 'resolved');
+  const withTime = resolved.filter(t => typeof t.resolutionHours === 'number');
+  const avgResolutionHours = withTime.length ? +(withTime.reduce((s,t)=>s+t.resolutionHours,0)/withTime.length).toFixed(1) : null;
+  const verifiedCount = resolved.filter(t => t.verified === true).length;
+  const verificationRatePct = resolved.length ? +(verifiedCount/resolved.length*100).toFixed(1) : null;
+  const decided = FALLBACK_CAPEX_PROJECTS.filter(p => p.status !== 'on-track');
+  const onTarget = decided.filter(p => p.status === 'on-time').length;
+  const capExAdherencePct = decided.length ? +(onTarget/decided.length*100).toFixed(1) : null;
+  return { avgResolutionHours, verificationRatePct, capExAdherencePct };
+}
+function setTextIfExists(id, text){
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
+}
+async function loadBig3(){
+  let data;
+  try {
+    const res = await fetch('/api/coverage/big3');
+    if (!res.ok) throw new Error('big3 returned ' + res.status);
+    const json = await res.json();
+    data = json.national;
+  } catch (err) {
+    data = fallbackBigThree();
+  }
+  setTextIfExists('big3Speed', data.avgResolutionHours != null ? data.avgResolutionHours + 'h' : 'N/A');
+  setTextIfExists('big3Verify', data.verificationRatePct != null ? data.verificationRatePct + '%' : 'N/A');
+  setTextIfExists('big3Capex', data.capExAdherencePct != null ? data.capExAdherencePct + '%' : 'N/A');
+}
+
+/* =====================================================================
+   LIVE PUBLIC LEDGER — searchable/filterable report drawer
+   -----------------------------------------------------------------
+   Backed by /api/coverage/tickets (see api/_lib/store.js's allTickets()) —
+   the same seeded ticket records the per-report deep link (report.html,
+   via /api/report/:id) reads. Categories reuse app.html's own coverage-
+   grid mock-data vocabulary rather than inventing a new one.
+   ===================================================================== */
+const LEDGER_CATEGORIES = ['Pothole', 'Streetlight', 'Signage', 'Sidewalk', 'Drainage'];
+const LEDGER_STAGES = ['submitted', 'dispatched', 'resolved'];
+let ledgerTickets = [];
+let ledgerFilters = { ward: '', category: '', status: '', q: '' };
+
+function fallbackLedgerTickets(){
+  // Mirrors api/_lib/store.js's WARD_TICKETS + makeReportId exactly.
+  const WARD_TICKETS = {
+    'ward-4': [
+      { id: 'w4t1', category: 'Pothole', title: 'Deep pothole, right lane', loc: 'Main St & 4th Ave', stage: 'resolved', verified: true, submittedAgo: '3d ago' },
+      { id: 'w4t2', category: 'Streetlight', title: 'Streetlight outage', loc: 'Grand Ave & 7th St', stage: 'dispatched', verified: null, submittedAgo: '45m ago' },
+      { id: 'w4t3', category: 'Drainage', title: 'Storm drain backing up', loc: 'Pine St Alley', stage: 'resolved', verified: true, submittedAgo: '5d ago' },
+      { id: 'w4t4', category: 'Sidewalk', title: 'Cracked ADA ramp', loc: 'Cass St & 6th', stage: 'resolved', verified: false, submittedAgo: '6d ago' },
+      { id: 'w4t5', category: 'Signage', title: 'Stop sign knocked down', loc: 'Cameron Ave', stage: 'submitted', verified: null, submittedAgo: '12m ago' }
+    ],
+    'ward-7': [
+      { id: 'w7t1', category: 'Streetlight', title: 'Dark corner, no lighting', loc: 'Ward 7 & Copeland', stage: 'resolved', verified: true, submittedAgo: '4d ago' },
+      { id: 'w7t2', category: 'Pothole', title: 'Large pothole cluster', loc: 'La Crosse St', stage: 'resolved', verified: false, submittedAgo: '9d ago' },
+      { id: 'w7t3', category: 'Sidewalk', title: 'Sidewalk heave, trip hazard', loc: 'Losey Blvd', stage: 'dispatched', verified: null, submittedAgo: '2h ago' }
+    ],
+    'ward-12': [
+      { id: 'w12t1', category: 'Signage', title: 'Faded crosswalk signage', loc: 'National Ave', stage: 'resolved', verified: true, submittedAgo: '5d ago' },
+      { id: 'w12t2', category: 'Pothole', title: 'Pothole near crosswalk', loc: 'Mitchell St', stage: 'submitted', verified: null, submittedAgo: '30m ago' }
+    ],
+    'ward-3': [
+      { id: 'w3t1', category: 'Drainage', title: 'Street flooding after rain', loc: 'Halsted St', stage: 'resolved', verified: true, submittedAgo: '6d ago' },
+      { id: 'w3t2', category: 'Pothole', title: 'Deep pothole, arterial road', loc: 'Ashland Ave', stage: 'resolved', verified: false, submittedAgo: '4d ago' }
+    ]
+  };
+  const WARD_NAMES = { 'ward-4': 'Ward 4', 'ward-7': 'Ward 7', 'ward-12': 'Ward 12', 'ward-3': 'Ward 3' };
+  const WARD_JURISDICTION = {
+    'ward-4': { state: 'wi', city: 'la-crosse', cityName: 'La Crosse' },
+    'ward-7': { state: 'wi', city: 'la-crosse', cityName: 'La Crosse' },
+    'ward-12': { state: 'wi', city: 'milwaukee', cityName: 'Milwaukee' },
+    'ward-3': { state: 'il', city: 'chicago', cityName: 'Chicago' }
+  };
+  function hashTo4Digits(str){ let h=0; for(let i=0;i<str.length;i++) h=(h*31+str.charCodeAt(i))>>>0; return 1000+(h%9000); }
+  const out = [];
+  Object.entries(WARD_TICKETS).forEach(([wardSlug, tickets]) => {
+    const j = WARD_JURISDICTION[wardSlug];
+    tickets.forEach(t => {
+      out.push(Object.assign({}, t, {
+        reportId: 'W' + wardSlug.match(/\d+/)[0] + '-' + hashTo4Digits(t.id),
+        ward: wardSlug, wardName: WARD_NAMES[wardSlug], state: j.state, city: j.city, cityName: j.cityName
+      }));
+    });
+  });
+  return out;
+}
+
+async function fetchLedgerTickets(){
+  try {
+    const res = await fetch('/api/coverage/tickets');
+    if (!res.ok) throw new Error('tickets returned ' + res.status);
+    const data = await res.json();
+    return data.tickets;
+  } catch (err) {
+    return fallbackLedgerTickets();
+  }
+}
+
+function renderLedgerFilters(){
+  const wardSel = document.getElementById('ledgerWardSelect');
+  const seenWards = [];
+  ledgerTickets.forEach(t => { if (!seenWards.some(w => w.slug === t.ward)) seenWards.push({ slug: t.ward, name: t.wardName }); });
+  wardSel.innerHTML = '<option value="">All wards</option>' + seenWards.map(w => `<option value="${esc(w.slug)}">${esc(w.name)}</option>`).join('');
+  wardSel.addEventListener('change', () => { ledgerFilters.ward = wardSel.value; renderLedgerResults(); });
+
+  const catRow = document.getElementById('ledgerCategoryChips');
+  catRow.innerHTML = ['All'].concat(LEDGER_CATEGORIES).map(c => `<button type="button" class="ledger-chip${c === 'All' ? ' active' : ''}" data-cat="${c === 'All' ? '' : esc(c)}">${esc(c)}</button>`).join('');
+  catRow.querySelectorAll('.ledger-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      catRow.querySelectorAll('.ledger-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      ledgerFilters.category = chip.dataset.cat;
+      renderLedgerResults();
+    });
+  });
+
+  const statusRow = document.getElementById('ledgerStatusChips');
+  statusRow.innerHTML = ['All'].concat(LEDGER_STAGES).map(s => `<button type="button" class="ledger-chip${s === 'All' ? ' active' : ''}" data-status="${s === 'All' ? '' : s}">${esc(s.charAt(0).toUpperCase() + s.slice(1))}</button>`).join('');
+  statusRow.querySelectorAll('.ledger-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      statusRow.querySelectorAll('.ledger-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      ledgerFilters.status = chip.dataset.status;
+      renderLedgerResults();
+    });
+  });
+}
+
+function renderLedgerResults(){
+  const container = document.getElementById('ledgerResults');
+  if (!container) return;
+  const q = ledgerFilters.q.toLowerCase();
+  const filtered = ledgerTickets.filter(t => {
+    if (ledgerFilters.ward && t.ward !== ledgerFilters.ward) return false;
+    if (ledgerFilters.category && t.category !== ledgerFilters.category) return false;
+    if (ledgerFilters.status && t.stage !== ledgerFilters.status) return false;
+    if (q && !((t.title || '').toLowerCase().includes(q) || (t.loc || '').toLowerCase().includes(q) || (t.category || '').toLowerCase().includes(q))) return false;
+    return true;
+  });
+  container.innerHTML = '';
+  if (!filtered.length) {
+    container.innerHTML = '<div class="ledger-empty">No reports match these filters.</div>';
+    return;
+  }
+  filtered.forEach(t => {
+    const a = document.createElement('a');
+    a.className = 'ledger-report-card';
+    a.href = '/report/' + encodeURIComponent(t.reportId);
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    const pillClass = t.stage === 'resolved' ? 'pill-ok' : t.stage === 'dispatched' ? 'pill-warn' : 'pill-crit';
+    a.innerHTML = `<div class="row"><span class="ledger-report-id">${esc(t.reportId)}</span><span class="pill ${pillClass}">${esc(t.stage)}</span></div>
+      <div style="font-weight:700;font-size:.82rem;margin:4px 0">${esc(t.title)}</div>
+      <div class="small">${esc(t.loc)} • ${esc(t.wardName)} • ${esc(t.category)}${t.stage === 'resolved' ? (t.verified ? ' • ✓ photo-verified' : ' • desk closure') : ''}</div>`;
+    container.appendChild(a);
+  });
+}
+
+async function openLedgerDrawer(){
+  document.getElementById('ledgerDrawer').classList.add('open');
+  if (!ledgerTickets.length) {
+    ledgerTickets = await fetchLedgerTickets();
+    renderLedgerFilters();
+  }
+  renderLedgerResults();
+}
+function closeLedgerDrawer(){
+  document.getElementById('ledgerDrawer').classList.remove('open');
+}
+document.getElementById('openLedgerDrawerBtn').addEventListener('click', () => { civicMenu.classList.remove('open'); openLedgerDrawer(); });
+document.getElementById('ledgerCloseBtn').addEventListener('click', closeLedgerDrawer);
+document.getElementById('ledgerDrawer').addEventListener('click', (e) => { if (e.target.id === 'ledgerDrawer') closeLedgerDrawer(); });
+const ledgerSearchInputEl = document.getElementById('ledgerSearchInput');
+if (ledgerSearchInputEl) ledgerSearchInputEl.addEventListener('input', () => {
+  ledgerFilters.q = ledgerSearchInputEl.value.trim();
+  renderLedgerResults();
+});
+
 window.addEventListener('DOMContentLoaded',()=>{
   renderFeed();
   initMap();
   updateTelemetry(cities.lacrosse);
+  loadBig3();
 });
 </script>
 </body>

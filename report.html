@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CITIXEN UX — Public Report</title>
+<meta name="description" content="Shareable public status page for a single CITIXEN UX hazard report — photo-intake state, dispatch timeline, and server-verified proof-photo closeout.">
+<meta name="theme-color" content="#00ff88">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" type="image/x-icon" href="/favicon.ico?v=4">
+<style>
+:root{
+  --brand-mint:#00ff88 !important;
+  --brand-mint-hover:#00e077 !important;
+  --brand-amber:#ffbb00 !important;
+  --brand-red:#ff4444 !important;
+  --bg-obsidian:#080c0a !important;
+  --bg-card:#0f1713 !important;
+  --border-muted:rgba(255,255,255,0.08) !important;
+  --bg:var(--bg-obsidian); --card:var(--bg-card); --border:var(--border-muted);
+  --mint:var(--brand-mint); --mint2:var(--brand-mint-hover); --text:#f8fafc; --muted:#8e9fa8;
+  --danger:var(--brand-red); --warn:var(--brand-amber);
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+body{background:var(--bg);color:var(--text);min-height:100vh;display:flex;justify-content:center}
+.shell{width:100%;max-width:640px;padding:18px 16px 48px}
+.topline{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.brand-wordmark{font-weight:800;font-size:1rem;letter-spacing:.3px;text-decoration:none;color:var(--text)}
+.brand-white{color:#fff}.brand-lime{color:var(--brand-mint)}
+.brand-tm{font-size:.55em;opacity:.4;margin-left:1px}
+.back-link{font-size:.72rem;color:var(--muted);text-decoration:none;border-bottom:1px dashed var(--border)}
+.back-link:hover{color:var(--mint2);border-color:var(--mint2)}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:14px}
+.label{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:10px}
+.report-id{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.78rem;color:var(--mint2);
+  background:rgba(0,255,136,.08);border:1px solid var(--border);border-radius:8px;padding:3px 9px;display:inline-block}
+h1{font-size:1.3rem;margin:10px 0 4px}
+.meta{font-size:.78rem;color:var(--muted)}
+.pill{padding:3px 9px;border-radius:6px;font-size:.64rem;font-weight:700;text-transform:uppercase;display:inline-block}
+.pill-submitted{background:rgba(142,159,168,.2);color:#cbd5e1}
+.pill-dispatched{background:rgba(245,158,11,.2);color:#fde68a}
+.pill-resolved{background:rgba(0,255,136,.2);color:#a7f3d0}
+
+.photo-box{border:1px dashed var(--mint2);background:rgba(0,255,136,.05);border-radius:12px;padding:20px;text-align:center;margin-top:8px}
+.photo-box svg{margin-bottom:8px}
+.photo-note{font-size:.72rem;color:var(--mint2);margin-top:8px}
+
+.timeline{display:flex;flex-direction:column;gap:0;margin-top:8px}
+.tl-step{display:flex;gap:12px;position:relative;padding-bottom:22px}
+.tl-step:last-child{padding-bottom:0}
+.tl-dot{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  border:2px solid var(--border);background:var(--bg-card);font-size:.6rem;font-weight:900;z-index:1}
+.tl-step.done .tl-dot{border-color:var(--mint2);background:var(--mint2);color:#051311}
+.tl-step.current .tl-dot{border-color:var(--warn);background:var(--warn);color:#051311}
+.tl-line{position:absolute;left:10px;top:22px;bottom:0;width:2px;background:var(--border)}
+.tl-step.done .tl-line{background:var(--mint2)}
+.tl-body b{font-size:.84rem;display:block}
+.tl-body span{font-size:.7rem;color:var(--muted)}
+
+.verify-box{border-radius:12px;padding:14px 16px;margin-top:8px;display:flex;gap:10px;align-items:flex-start}
+.verify-box.verified{background:rgba(0,255,136,.08);border:1px solid var(--border)}
+.verify-box.unverified{background:rgba(255,187,0,.08);border:1px solid var(--border)}
+.verify-box svg{flex-shrink:0;margin-top:2px}
+.verify-box strong{font-size:.82rem;display:block;margin-bottom:2px}
+.verify-box p{font-size:.74rem;color:var(--muted);line-height:1.5}
+
+.big3-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}
+.big3-tile{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:10px 8px;text-align:center}
+.big3-val{font-size:1.15rem;font-weight:900;color:var(--mint2)}
+.big3-lbl{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-top:2px;line-height:1.3}
+
+.demo-note{font-size:.68rem;color:var(--muted);text-align:center;margin-top:6px}
+.cta-row{display:flex;gap:10px;margin-top:16px}
+.btn{flex:1;text-align:center;text-decoration:none;padding:12px;border-radius:10px;font-weight:800;font-size:.8rem}
+.btn-primary{background:var(--mint);color:#051311}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.notfound{text-align:center;padding:60px 20px}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topline">
+    <a class="brand-wordmark" href="/"><span class="brand-white">CITIXEN</span> <span class="brand-lime">UX</span><sup class="brand-tm">™</sup></a>
+    <a class="back-link" href="/">← Public dashboard</a>
+  </div>
+
+  <div id="reportRoot"></div>
+</div>
+
+<script>
+'use strict';
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+// Fallback ticket set — mirrors api/_lib/store.js's WARD_TICKETS/makeReportId
+// exactly, used only when /api/report/:id can't be reached (e.g. this page
+// opened from a plain static file server with no serverless functions
+// running, as during local preview). Same illustrative-seed-data convention
+// as every other coverage endpoint's fallback in this codebase.
+function hashTo4Digits(str){ let h=0; for(let i=0;i<str.length;i++) h=(h*31+str.charCodeAt(i))>>>0; return 1000+(h%9000); }
+function makeReportId(wardSlug, ticketId){ const n=(String(wardSlug).match(/\d+/)||['0'])[0]; return 'W'+n+'-'+hashTo4Digits(String(ticketId)); }
+
+const WARD_TICKETS = {
+  'ward-4': [
+    { id:'w4t1', category:'Pothole', title:'Deep pothole, right lane', loc:'Main St & 4th Ave', stage:'resolved', verified:true, resolutionHours:14, submittedAgo:'3d ago' },
+    { id:'w4t2', category:'Streetlight', title:'Streetlight outage', loc:'Grand Ave & 7th St', stage:'dispatched', verified:null, resolutionHours:null, submittedAgo:'45m ago' },
+    { id:'w4t3', category:'Drainage', title:'Storm drain backing up', loc:'Pine St Alley', stage:'resolved', verified:true, resolutionHours:22, submittedAgo:'5d ago' },
+    { id:'w4t4', category:'Sidewalk', title:'Cracked ADA ramp', loc:'Cass St & 6th', stage:'resolved', verified:false, resolutionHours:9, submittedAgo:'6d ago' },
+    { id:'w4t5', category:'Signage', title:'Stop sign knocked down', loc:'Cameron Ave', stage:'submitted', verified:null, resolutionHours:null, submittedAgo:'12m ago' },
+    { id:'w4t6', category:'Pothole', title:'Pavement gap, bike lane', loc:'6th St & Cass', stage:'resolved', verified:true, resolutionHours:31, submittedAgo:'8d ago' }
+  ],
+  'ward-7': [
+    { id:'w7t1', category:'Streetlight', title:'Dark corner, no lighting', loc:'Ward 7 & Copeland', stage:'resolved', verified:true, resolutionHours:18, submittedAgo:'4d ago' },
+    { id:'w7t2', category:'Pothole', title:'Large pothole cluster', loc:'La Crosse St', stage:'resolved', verified:false, resolutionHours:27, submittedAgo:'9d ago' },
+    { id:'w7t3', category:'Sidewalk', title:'Sidewalk heave, trip hazard', loc:'Losey Blvd', stage:'dispatched', verified:null, resolutionHours:null, submittedAgo:'2h ago' },
+    { id:'w7t4', category:'Drainage', title:'Clogged culvert', loc:'George St', stage:'resolved', verified:true, resolutionHours:12, submittedAgo:'2d ago' }
+  ],
+  'ward-12': [
+    { id:'w12t1', category:'Signage', title:'Faded crosswalk signage', loc:'National Ave', stage:'resolved', verified:true, resolutionHours:20, submittedAgo:'5d ago' },
+    { id:'w12t2', category:'Streetlight', title:'Flickering streetlight', loc:'Layton Blvd', stage:'resolved', verified:true, resolutionHours:16, submittedAgo:'3d ago' },
+    { id:'w12t3', category:'Pothole', title:'Pothole near crosswalk', loc:'Mitchell St', stage:'submitted', verified:null, resolutionHours:null, submittedAgo:'30m ago' },
+    { id:'w12t4', category:'Sidewalk', title:'Missing curb ramp', loc:'16th & Greenfield', stage:'dispatched', verified:null, resolutionHours:null, submittedAgo:'1h ago' }
+  ],
+  'ward-3': [
+    { id:'w3t1', category:'Drainage', title:'Street flooding after rain', loc:'Halsted St', stage:'resolved', verified:true, resolutionHours:25, submittedAgo:'6d ago' },
+    { id:'w3t2', category:'Pothole', title:'Deep pothole, arterial road', loc:'Ashland Ave', stage:'resolved', verified:false, resolutionHours:19, submittedAgo:'4d ago' },
+    { id:'w3t3', category:'Streetlight', title:'Streetlight pole down', loc:'Milwaukee Ave', stage:'resolved', verified:true, resolutionHours:10, submittedAgo:'2d ago' }
+  ]
+};
+const WARD_NAMES = { 'ward-4':'Ward 4', 'ward-7':'Ward 7', 'ward-12':'Ward 12', 'ward-3':'Ward 3' };
+const WARD_JURISDICTION = {
+  'ward-4': { state:'wi', stateName:'Wisconsin', city:'la-crosse', cityName:'La Crosse' },
+  'ward-7': { state:'wi', stateName:'Wisconsin', city:'la-crosse', cityName:'La Crosse' },
+  'ward-12': { state:'wi', stateName:'Wisconsin', city:'milwaukee', cityName:'Milwaukee' },
+  'ward-3': { state:'il', stateName:'Illinois', city:'chicago', cityName:'Chicago' }
+};
+function fallbackTicketByReportId(reportId){
+  for (const [wardSlug, tickets] of Object.entries(WARD_TICKETS)){
+    for (const t of tickets){
+      if (makeReportId(wardSlug, t.id) === reportId){
+        const j = WARD_JURISDICTION[wardSlug];
+        return Object.assign({}, t, { reportId, ward: wardSlug, wardName: WARD_NAMES[wardSlug],
+          state: j.state, stateName: j.stateName, city: j.city, cityName: j.cityName });
+      }
+    }
+  }
+  return null;
+}
+
+async function fetchTicket(id){
+  try {
+    const res = await fetch('/api/report/' + encodeURIComponent(id));
+    if (!res.ok) throw new Error('not ok');
+    const data = await res.json();
+    return data.ticket;
+  } catch (e) {
+    return fallbackTicketByReportId(id);
+  }
+}
+
+function stagePillClass(stage){
+  return stage === 'resolved' ? 'pill-resolved' : stage === 'dispatched' ? 'pill-dispatched' : 'pill-submitted';
+}
+
+function renderNotFound(id){
+  document.getElementById('reportRoot').innerHTML = `
+    <div class="card notfound">
+      <div class="label">Report not found</div>
+      <p style="color:var(--muted);font-size:.85rem;margin-top:8px">No seeded report matches id <strong>${esc(id || '(none)')}</strong>.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="/app.html">File a report</a>
+        <a class="btn btn-outline" href="/">Back to dashboard</a>
+      </div>
+    </div>`;
+}
+
+function timelineHtml(ticket){
+  const steps = [
+    { key:'submitted', title:'Submitted', desc:'Photo captured, EXIF/GPS stripped, routed by category.' },
+    { key:'dispatched', title:'Dispatched', desc:'Assigned to the responsible department, en route.' },
+    { key:'resolved', title:'Resolved', desc: ticket.verified === true
+        ? 'Closed with a server-verified on-site proof photo.'
+        : ticket.verified === false
+          ? 'Closed — desk closure, no on-site proof photo on file.'
+          : 'Awaiting field closeout.' }
+  ];
+  const order = ['submitted', 'dispatched', 'resolved'];
+  const currentIdx = order.indexOf(ticket.stage);
+  return steps.map((s, i) => {
+    const stateClass = i < currentIdx ? 'done' : i === currentIdx ? (ticket.stage === 'resolved' ? 'done' : 'current') : '';
+    const mark = (i < currentIdx || (i === currentIdx && ticket.stage === 'resolved')) ? '✓' : (i + 1);
+    return `<div class="tl-step ${stateClass}">
+      ${i < steps.length - 1 ? '<div class="tl-line"></div>' : ''}
+      <div class="tl-dot">${mark}</div>
+      <div class="tl-body"><b>${esc(s.title)}</b><span>${esc(s.desc)}</span></div>
+    </div>`;
+  }).join('');
+}
+
+function renderTicket(ticket){
+  const pill = stagePillClass(ticket.stage);
+  const jurisdiction = `${esc(ticket.wardName)}, ${esc(ticket.cityName)}, ${esc(ticket.stateCode || ticket.state.toUpperCase())}`;
+
+  let verifyHtml = '';
+  if (ticket.stage === 'resolved') {
+    verifyHtml = ticket.verified
+      ? `<div class="verify-box verified">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="var(--mint2)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+          <div><strong style="color:var(--mint2)">Server-verified proof closeout</strong>
+          <p>EXIF timestamp + location verified server-side against the original report coordinates — this was not closed from a desk.</p></div>
+        </div>`
+      : `<div class="verify-box unverified">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="var(--warn)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div><strong style="color:var(--warn)">Desk closure — no field proof</strong>
+          <p>This ticket was marked resolved without an on-site, EXIF-verified proof photo on file.</p></div>
+        </div>`;
+  }
+
+  document.getElementById('reportRoot').innerHTML = `
+    <div class="card">
+      <span class="report-id">${esc(ticket.reportId)}</span>
+      <h1>${esc(ticket.title)}</h1>
+      <div class="meta">${esc(ticket.loc)} • ${jurisdiction}</div>
+      <div style="margin-top:10px"><span class="pill ${pill}">${esc(ticket.stage)}</span>
+        <span class="meta" style="margin-left:8px">${esc(ticket.category)} • Filed ${esc(ticket.submittedAgo)}</span></div>
+    </div>
+
+    <div class="card">
+      <div class="label">Photo intake</div>
+      <div class="photo-box">
+        <svg viewBox="0 0 24 24" width="32" height="32" stroke="var(--mint2)" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <div class="meta">Proof photo captured on the reporter's device.</div>
+        <div class="photo-note">Device ID and GPS EXIF tags stripped before upload — zero-account, zero-PII by design.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="label">Status timeline</div>
+      <div class="timeline">${timelineHtml(ticket)}</div>
+    </div>
+
+    ${verifyHtml ? `<div class="card">${verifyHtml}</div>` : ''}
+
+    <div class="card">
+      <div class="label">The Big 3 — ${esc(ticket.wardName)}</div>
+      <div id="big3Row" class="big3-row">
+        <div class="big3-tile"><div class="big3-val">…</div><div class="big3-lbl">Speed of Resolution</div></div>
+        <div class="big3-tile"><div class="big3-val">…</div><div class="big3-lbl">Verification Rate</div></div>
+        <div class="big3-tile"><div class="big3-val">…</div><div class="big3-lbl">CapEx On Target</div></div>
+      </div>
+      <div class="demo-note">Computed from seeded demo ledger data — not a live production dataset.</div>
+    </div>
+
+    <div class="cta-row">
+      <a class="btn btn-primary" href="/app.html">File a similar report</a>
+      <a class="btn btn-outline" href="/#dashboard">View full ledger</a>
+    </div>
+  `;
+
+  loadBig3(ticket.ward);
+}
+
+function fallbackBig3(wardSlug){
+  const tickets = (WARD_TICKETS[wardSlug] || []).map(t => Object.assign({}, t));
+  const resolved = tickets.filter(t => t.stage === 'resolved');
+  const withTime = resolved.filter(t => typeof t.resolutionHours === 'number');
+  const avg = withTime.length ? (withTime.reduce((s,t)=>s+t.resolutionHours,0)/withTime.length).toFixed(1) : null;
+  const verifiedCount = resolved.filter(t => t.verified === true).length;
+  const rate = resolved.length ? (verifiedCount/resolved.length*100).toFixed(1) : null;
+  return { avgResolutionHours: avg, verificationRatePct: rate, capExAdherencePct: null };
+}
+
+async function loadBig3(wardSlug){
+  let data;
+  try {
+    const res = await fetch('/api/coverage/big3');
+    if (!res.ok) throw new Error('not ok');
+    const json = await res.json();
+    data = json.perWard[wardSlug] || json.national;
+  } catch (e) {
+    data = fallbackBig3(wardSlug);
+  }
+  const row = document.getElementById('big3Row');
+  if (!row) return;
+  const tiles = row.querySelectorAll('.big3-val');
+  tiles[0].textContent = data.avgResolutionHours != null ? data.avgResolutionHours + 'h' : 'TODO';
+  tiles[1].textContent = data.verificationRatePct != null ? data.verificationRatePct + '%' : 'TODO';
+  tiles[2].textContent = data.capExAdherencePct != null ? data.capExAdherencePct + '%' : 'N/A';
+}
+
+async function init(){
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  if (!id) { renderNotFound(id); return; }
+  const ticket = await fetchTicket(id);
+  if (!ticket) { renderNotFound(id); return; }
+  renderTicket(ticket);
+}
+
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

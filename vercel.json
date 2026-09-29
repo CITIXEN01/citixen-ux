@@ -14,6 +14,10 @@
       "destination": "/admin.html"
     },
     {
+      "source": "/report/:id",
+      "destination": "/report.html?id=:id"
+    },
+    {
       "source": "/((?!api/|app$|admin$|icons/|manifest.json|sw.js|favicon.ico).*)",
       "destination": "/index.html"
     }

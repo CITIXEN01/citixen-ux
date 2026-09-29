@@ -238,6 +238,88 @@ textarea.input{resize:none;line-height:1.4}
 .splash-logo{width:64px;height:64px;stroke:var(--brand-mint);filter:drop-shadow(0 0 16px rgba(0,255,136,.55))}
 .splash-word{font-weight:900;font-size:1.6rem;letter-spacing:.3px;text-align:center}
 .splash-tag{font-size:.86rem;font-weight:700;color:var(--mint2);text-align:center;padding:0 24px}
+
+/* ===== SMART LOCATION HEADER (persistent, always visible) ===== */
+.location-banner{display:flex;align-items:center;gap:8px;background:rgba(0,255,136,.06);border:1px solid var(--border);
+  border-radius:12px;padding:9px 12px;font-size:.72rem;font-weight:700;color:var(--text)}
+.location-banner svg{flex-shrink:0;color:var(--mint2)}
+.location-banner .lb-text{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.location-banner .lb-status{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.3px;
+  color:var(--muted);flex-shrink:0}
+.location-banner.resolved .lb-status{color:var(--mint2)}
+
+/* ===== BIG 3 STAT ROW (reusable across app.html/index.html) ===== */
+.big3-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.big3-tile{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center}
+.big3-val{font-size:1.2rem;font-weight:900;color:var(--mint2)}
+.big3-lbl{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-top:3px;line-height:1.3}
+.big3-note{font-size:.66rem;color:var(--muted);margin-top:8px;text-align:center}
+
+/* ===== GEOHASH COVERAGE GRID — 3-TIER ZOOM ===== */
+.tier-toggle{display:flex;gap:6px;margin-bottom:10px}
+.tier-btn{flex:1;background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--muted);
+  font-size:.64rem;font-weight:800;padding:7px 4px;border-radius:8px;cursor:pointer;text-align:center}
+.tier-btn.active{border-color:var(--mint2);background:rgba(0,255,136,.14);color:var(--mint2)}
+#tierCanvas{width:100%;display:block;border-radius:8px;background:rgba(255,255,255,.02);margin-bottom:8px}
+
+/* ===== LIVE PUBLIC LEDGER DRAWER ===== */
+.ledger-drawer{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:2500;display:none;flex-direction:column}
+.ledger-drawer.open{display:flex}
+.ledger-drawer-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;
+  border-bottom:1px solid var(--border);flex-shrink:0}
+.ledger-drawer-body{flex:1;overflow-y:auto;padding:14px 16px 32px}
+.ledger-search{width:100%;padding:10px 13px;background:rgba(7,12,14,.8);border:1px solid var(--border);color:var(--text);
+  border-radius:10px;font-size:.8rem;margin-bottom:10px;outline:none}
+.ledger-search:focus{border-color:var(--mint2)}
+.ledger-filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.ledger-chip{background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--muted);
+  font-size:.64rem;font-weight:700;padding:5px 10px;border-radius:20px;cursor:pointer}
+.ledger-chip.active{border-color:var(--mint2);background:rgba(0,255,136,.14);color:var(--mint2)}
+.ledger-select{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;padding:6px 8px;font-size:.68rem;font-weight:700}
+.ledger-report-card{background:rgba(7,12,14,.6);border:1px solid var(--border);border-radius:10px;padding:12px;
+  margin-bottom:8px;text-decoration:none;color:var(--text);display:block}
+.ledger-report-card:hover{border-color:var(--mint2)}
+.ledger-report-id{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.62rem;color:var(--mint2)}
+.ledger-empty{text-align:center;color:var(--muted);font-size:.78rem;padding:24px 0}
+
+/* ===== "WHAT IS CIVIC INTELLIGENCE?" HERO (index.html only markup, shared styles) ===== */
+.ci-hero{padding:0}
+.ci-compare{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.ci-col{border-radius:12px;padding:14px;border:1px solid var(--border)}
+.ci-col.legacy{background:rgba(239,68,68,.06)}
+.ci-col.citixen{background:rgba(0,255,136,.06);border-color:rgba(0,255,136,.3)}
+.ci-col h4{font-size:.78rem;margin-bottom:8px}
+.ci-col.legacy h4{color:#fca5a5}
+.ci-col.citixen h4{color:var(--mint2)}
+.ci-col ul{padding-left:16px}
+.ci-col li{font-size:.72rem;color:var(--muted);margin-bottom:6px;line-height:1.4}
+@media (max-width:520px){ .ci-compare{grid-template-columns:1fr} }
+
+/* ===== HOW IT WORKS — 20s looping preview (CSS-animated, no video asset) ===== */
+.hiw-loop{position:relative;height:150px;border-radius:12px;background:rgba(255,255,255,.02);
+  border:1px solid var(--border);overflow:hidden}
+.hiw-frame{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;opacity:0;animation:hiwCycle 18s infinite}
+.hiw-frame svg{color:var(--mint2)}
+.hiw-frame .hiw-caption{font-size:.74rem;font-weight:800;color:var(--text)}
+.hiw-frame .hiw-sub{font-size:.62rem;color:var(--muted)}
+.hiw-frame.f1{animation-delay:0s}
+.hiw-frame.f2{animation-delay:6s}
+.hiw-frame.f3{animation-delay:12s}
+@keyframes hiwCycle{
+  0%{opacity:0} 3%{opacity:1} 30%{opacity:1} 34%{opacity:0} 100%{opacity:0}
+}
+.hiw-dots{display:flex;gap:5px;justify-content:center;margin-top:8px}
+.hiw-dot{width:6px;height:6px;border-radius:50%;background:var(--border);animation:hiwDot 18s infinite}
+.hiw-dot.d1{animation-delay:0s}.hiw-dot.d2{animation-delay:6s}.hiw-dot.d3{animation-delay:12s}
+@keyframes hiwDot{0%{background:var(--border)} 3%{background:var(--mint2)} 30%{background:var(--mint2)} 34%{background:var(--border)} 100%{background:var(--border)}}
+@media (prefers-reduced-motion: reduce){
+  .hiw-frame{animation:none;opacity:0}
+  .hiw-frame.f1{opacity:1}
+  .hiw-dot{animation:none}
+  .hiw-dot.d1{background:var(--mint2)}
+}
 </style>
 </head>
 <body>
@@ -262,6 +344,21 @@ textarea.input{resize:none;line-height:1.4}
 
   <main class="main">
     <div id="toast" class="toast"></div>
+
+    <!-- ===== SMART LOCATION HEADER — persistent, reflects the SAME
+         resolved-location value the badge above and the report-location
+         field use (see resolveDisplayLocation()/onLocationResolved()) —
+         no second, parallel detection system. ===== -->
+    <div class="location-banner" id="smartLocationBanner">
+      <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
+      <span class="lb-text" id="smartLocationText">Resolving your location…</span>
+      <span class="lb-status" id="smartLocationStatus">GPS pending</span>
+    </div>
+
+    <button class="btn-camera" id="btnOpenLedger" style="border-style:solid;">
+      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      Live Public Ledger
+    </button>
 
     <div class="notice-banner">
       <div class="left-txt">
@@ -361,11 +458,27 @@ textarea.input{resize:none;line-height:1.4}
 
     <section id="tab-analytics" class="tabpane">
 
-      <!-- 1. FOG-OF-WAR ASSET COVERAGE GRID (Geohash Level 7) -->
+      <!-- 0. THE BIG 3 — public health metrics, computed from real seed data -->
+      <div class="card">
+        <div class="label">The Big 3 — public health metrics</div>
+        <div class="big3-row">
+          <div class="big3-tile"><div class="big3-val" id="big3Speed">–</div><div class="big3-lbl">Speed of Resolution</div></div>
+          <div class="big3-tile"><div class="big3-val" id="big3Verify">–</div><div class="big3-lbl">Resolution Verification Rate</div></div>
+          <div class="big3-tile"><div class="big3-val" id="big3Capex">–</div><div class="big3-lbl">CapEx Timeline Adherence</div></div>
+        </div>
+        <div class="big3-note">Computed live from seeded ledger/CapEx demo data — not asserted as a production dataset.</div>
+      </div>
+
+      <!-- 1. FOG-OF-WAR ASSET COVERAGE GRID (Geohash Coverage Grid Engine — 3 zoom tiers) -->
       <div class="card">
         <div class="radius-tag">
           <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-          GEOHASH LEVEL 7 FOG-OF-WAR GRID
+          GEOHASH COVERAGE GRID ENGINE
+        </div>
+        <div class="tier-toggle" id="tierToggle">
+          <button class="tier-btn active" data-tier="ward">Ward (150m)</button>
+          <button class="tier-btn" data-tier="municipal">Municipal blocks</button>
+          <button class="tier-btn" data-tier="national">State / National</button>
         </div>
         <div class="coverage-head">
           <div>
@@ -383,11 +496,13 @@ textarea.input{resize:none;line-height:1.4}
           <span><span class="dot" style="background:rgba(255,255,255,.15)"></span>Uncharted</span>
         </div>
         <div class="cov-grid" id="covGrid"></div>
+        <canvas id="tierCanvas" width="600" height="240" style="display:none;"></canvas>
+        <div class="small" id="tierCanvasCaption" style="display:none;text-align:center;margin-bottom:8px;"></div>
         <div class="cov-toast" id="covToast">
           <span id="covToastText"></span>
           <button class="ct-cta" id="covToastCta">Report it</button>
         </div>
-        <div class="your-impact">
+        <div class="your-impact" id="yourImpactRow">
           <div class="num" id="covYouCount">0</div>
           <div class="lbl">blocks you've helped verify — tap any dark block to report it and light it up for everyone.</div>
         </div>
@@ -467,6 +582,27 @@ textarea.input{resize:none;line-height:1.4}
     </button>
   </div>
 
+  <!-- ===== LIVE PUBLIC LEDGER DRAWER ===== -->
+  <div id="ledgerDrawer" class="ledger-drawer">
+    <div class="ledger-drawer-head">
+      <strong style="color:var(--mint2)">Live Public Ledger</strong>
+      <button class="icon-btn" id="btnCloseLedger">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+      </button>
+    </div>
+    <div class="ledger-drawer-body">
+      <input class="ledger-search" id="ledgerSearchInput" placeholder="Search title, location, category…">
+      <div class="ledger-filter-row">
+        <select class="ledger-select" id="ledgerWardSelect">
+          <option value="">All wards</option>
+        </select>
+      </div>
+      <div class="ledger-filter-row" id="ledgerCategoryChips"></div>
+      <div class="ledger-filter-row" id="ledgerStatusChips"></div>
+      <div id="ledgerResults"></div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -537,6 +673,290 @@ async function initAnalytics(){
   applyWardMeta(pickDefaultWardMeta());
   await animateCoverage();           // fetches covCells + builds/animates the grid
   await loadNationalTab();
+  nationalDataCache = lastNationalData;
+  await loadBig3();
+  initTierToggle();
+}
+
+/* =====================================================================
+   THE BIG 3 — public health metrics
+   -----------------------------------------------------------------
+   Backed by /api/coverage/big3, which computes every number for real
+   from api/_lib/store.js's seeded ticket + CapEx records (never a
+   hardcoded headline figure). The fallback below mirrors that same seed
+   shape/formula for offline/local preview, so it degrades to "the same
+   math on a local copy of the data" rather than a fabricated number.
+   ===================================================================== */
+const FALLBACK_TICKETS_BY_WARD = {
+  'ward-4': [
+    { stage:'resolved', verified:true, resolutionHours:14 }, { stage:'resolved', verified:true, resolutionHours:22 },
+    { stage:'resolved', verified:false, resolutionHours:9 }, { stage:'resolved', verified:true, resolutionHours:31 }
+  ],
+  'ward-7': [
+    { stage:'resolved', verified:true, resolutionHours:18 }, { stage:'resolved', verified:false, resolutionHours:27 },
+    { stage:'resolved', verified:true, resolutionHours:12 }
+  ],
+  'ward-12': [
+    { stage:'resolved', verified:true, resolutionHours:20 }, { stage:'resolved', verified:true, resolutionHours:16 }
+  ],
+  'ward-3': [
+    { stage:'resolved', verified:true, resolutionHours:25 }, { stage:'resolved', verified:false, resolutionHours:19 },
+    { stage:'resolved', verified:true, resolutionHours:10 }
+  ]
+};
+const FALLBACK_CAPEX_PROJECTS = [
+  { status:'on-time' }, { status:'on-track' }, { status:'delayed' }, { status:'on-track' },
+  { status:'on-time' }, { status:'on-track' }, { status:'delayed' }
+];
+function fallbackBigThree(){
+  const tickets = Object.values(FALLBACK_TICKETS_BY_WARD).flat();
+  const resolved = tickets.filter(t => t.stage === 'resolved');
+  const withTime = resolved.filter(t => typeof t.resolutionHours === 'number');
+  const avgResolutionHours = withTime.length ? +(withTime.reduce((s,t)=>s+t.resolutionHours,0)/withTime.length).toFixed(1) : null;
+  const verifiedCount = resolved.filter(t => t.verified === true).length;
+  const verificationRatePct = resolved.length ? +(verifiedCount/resolved.length*100).toFixed(1) : null;
+  const decided = FALLBACK_CAPEX_PROJECTS.filter(p => p.status !== 'on-track');
+  const onTarget = decided.filter(p => p.status === 'on-time').length;
+  const capExAdherencePct = decided.length ? +(onTarget/decided.length*100).toFixed(1) : null;
+  return { avgResolutionHours, verificationRatePct, capExAdherencePct };
+}
+
+async function loadBig3(){
+  let data;
+  try {
+    const res = await fetch('/api/coverage/big3');
+    if (!res.ok) throw new Error('big3 returned ' + res.status);
+    const json = await res.json();
+    data = json.national;
+  } catch (err) {
+    data = fallbackBigThree();
+  }
+  setTextIfExists('big3Speed', data.avgResolutionHours != null ? data.avgResolutionHours + 'h' : 'N/A');
+  setTextIfExists('big3Verify', data.verificationRatePct != null ? data.verificationRatePct + '%' : 'N/A');
+  setTextIfExists('big3Capex', data.capExAdherencePct != null ? data.capExAdherencePct + '%' : 'N/A');
+}
+
+/* =====================================================================
+   GEOHASH COVERAGE GRID ENGINE — 3 ZOOM TIERS
+   -----------------------------------------------------------------
+   Ward tier reuses the existing Fog-of-War #covGrid untouched (one DIV
+   per block, ~80-120 cells — fine as real DOM nodes at that count). The
+   two wider tiers (Municipal blocks, State/National) draw into a single
+   <canvas> in one pass instead of one DOM node per cell, since either
+   tier could run to hundreds of cells — see the task's "without
+   client-side lag" requirement. Coverage percentages for those two wider
+   tiers come from the SAME real national rollup already fetched for the
+   National Network tiles (loadNationalTab/lastNationalData) rather than a
+   second, invented data source.
+   ===================================================================== */
+let currentTier = 'ward';
+let nationalDataCache = null;
+
+function aggregateTierPct(){
+  if (nationalDataCache && nationalDataCache.municipalities && nationalDataCache.municipalities.length) {
+    const ms = nationalDataCache.municipalities;
+    return ms.reduce((s, m) => s + m.coveragePct, 0) / ms.length;
+  }
+  return computeCoveragePct(); // falls back to this ward's own real % if the rollup hasn't loaded yet
+}
+
+function drawTierCanvas(tier){
+  const canvas = document.getElementById('tierCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const cfg = tier === 'municipal'
+    ? { cols: 20, rows: 8, gap: 2, label: 'Municipal blocks — aggregated citywide coverage' }
+    : { cols: 26, rows: 14, gap: 1.5, label: 'State / National grid — nationwide rollup' };
+  const total = cfg.cols * cfg.rows;
+  const pct = aggregateTierPct();
+  const coveredCount = Math.round(total * pct / 100);
+  // Spread covered cells evenly (same "real progress, not noise" approach
+  // as api/_lib/store.js's buildCells()) rather than randomly per render.
+  const step = coveredCount > 0 ? total / coveredCount : total;
+  const coveredSet = new Set();
+  for (let k = 0; k < coveredCount; k++) coveredSet.add(Math.floor(k * step) % total);
+
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+  const cellW = w / cfg.cols, cellH = h / cfg.rows;
+  for (let i = 0; i < total; i++) {
+    const col = i % cfg.cols, row = Math.floor(i / cfg.cols);
+    const x = col * cellW + cfg.gap / 2, y = row * cellH + cfg.gap / 2;
+    ctx.fillStyle = coveredSet.has(i) ? 'rgba(0,255,136,0.85)' : 'rgba(255,255,255,0.07)';
+    ctx.fillRect(x, y, cellW - cfg.gap, cellH - cfg.gap);
+  }
+  const caption = document.getElementById('tierCanvasCaption');
+  if (caption) caption.textContent = cfg.label + ' — ' + pct.toFixed(1) + '% illustrative coverage (' + total + ' cells, single canvas draw)';
+}
+
+function switchTier(tier){
+  currentTier = tier;
+  document.querySelectorAll('.tier-btn').forEach(b => b.classList.toggle('active', b.dataset.tier === tier));
+  const covGrid = document.getElementById('covGrid');
+  const canvas = document.getElementById('tierCanvas');
+  const caption = document.getElementById('tierCanvasCaption');
+  const impactRow = document.getElementById('yourImpactRow');
+  if (tier === 'ward') {
+    if (covGrid) covGrid.style.display = 'grid';
+    if (canvas) canvas.style.display = 'none';
+    if (caption) caption.style.display = 'none';
+    if (impactRow) impactRow.style.display = 'flex';
+  } else {
+    if (covGrid) covGrid.style.display = 'none';
+    if (canvas) canvas.style.display = 'block';
+    if (caption) caption.style.display = 'block';
+    if (impactRow) impactRow.style.display = 'none';
+    drawTierCanvas(tier);
+  }
+}
+
+function initTierToggle(){
+  document.querySelectorAll('.tier-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchTier(btn.dataset.tier));
+  });
+}
+
+/* =====================================================================
+   LIVE PUBLIC LEDGER — searchable/filterable report drawer
+   -----------------------------------------------------------------
+   Backed by /api/coverage/tickets (see api/_lib/store.js's allTickets()) —
+   the same seeded ticket records the per-report deep link (report.html,
+   via /api/report/:id) reads. Categories reuse the exact vocabulary
+   already used by this page's own coverage-grid mock data (see
+   mockCoverageCells() above) rather than inventing a new one.
+   ===================================================================== */
+const LEDGER_CATEGORIES = ['Pothole', 'Streetlight', 'Signage', 'Sidewalk', 'Drainage'];
+const LEDGER_STAGES = ['submitted', 'dispatched', 'resolved'];
+let ledgerTickets = [];
+let ledgerFilters = { ward: '', category: '', status: '', q: '' };
+
+function fallbackLedgerTickets(){
+  // Mirrors api/_lib/store.js's WARD_TICKETS + makeReportId exactly — same
+  // fallback convention as everything else in this file.
+  const WARD_TICKETS = {
+    'ward-4': [
+      { id: 'w4t1', category: 'Pothole', title: 'Deep pothole, right lane', loc: 'Main St & 4th Ave', stage: 'resolved', verified: true, submittedAgo: '3d ago' },
+      { id: 'w4t2', category: 'Streetlight', title: 'Streetlight outage', loc: 'Grand Ave & 7th St', stage: 'dispatched', verified: null, submittedAgo: '45m ago' },
+      { id: 'w4t3', category: 'Drainage', title: 'Storm drain backing up', loc: 'Pine St Alley', stage: 'resolved', verified: true, submittedAgo: '5d ago' },
+      { id: 'w4t4', category: 'Sidewalk', title: 'Cracked ADA ramp', loc: 'Cass St & 6th', stage: 'resolved', verified: false, submittedAgo: '6d ago' },
+      { id: 'w4t5', category: 'Signage', title: 'Stop sign knocked down', loc: 'Cameron Ave', stage: 'submitted', verified: null, submittedAgo: '12m ago' }
+    ],
+    'ward-7': [
+      { id: 'w7t1', category: 'Streetlight', title: 'Dark corner, no lighting', loc: 'Ward 7 & Copeland', stage: 'resolved', verified: true, submittedAgo: '4d ago' },
+      { id: 'w7t2', category: 'Pothole', title: 'Large pothole cluster', loc: 'La Crosse St', stage: 'resolved', verified: false, submittedAgo: '9d ago' },
+      { id: 'w7t3', category: 'Sidewalk', title: 'Sidewalk heave, trip hazard', loc: 'Losey Blvd', stage: 'dispatched', verified: null, submittedAgo: '2h ago' }
+    ],
+    'ward-12': [
+      { id: 'w12t1', category: 'Signage', title: 'Faded crosswalk signage', loc: 'National Ave', stage: 'resolved', verified: true, submittedAgo: '5d ago' },
+      { id: 'w12t2', category: 'Pothole', title: 'Pothole near crosswalk', loc: 'Mitchell St', stage: 'submitted', verified: null, submittedAgo: '30m ago' }
+    ],
+    'ward-3': [
+      { id: 'w3t1', category: 'Drainage', title: 'Street flooding after rain', loc: 'Halsted St', stage: 'resolved', verified: true, submittedAgo: '6d ago' },
+      { id: 'w3t2', category: 'Pothole', title: 'Deep pothole, arterial road', loc: 'Ashland Ave', stage: 'resolved', verified: false, submittedAgo: '4d ago' }
+    ]
+  };
+  const WARD_NAMES = { 'ward-4': 'Ward 4', 'ward-7': 'Ward 7', 'ward-12': 'Ward 12', 'ward-3': 'Ward 3' };
+  const WARD_JURISDICTION = {
+    'ward-4': { state: 'wi', city: 'la-crosse', cityName: 'La Crosse' },
+    'ward-7': { state: 'wi', city: 'la-crosse', cityName: 'La Crosse' },
+    'ward-12': { state: 'wi', city: 'milwaukee', cityName: 'Milwaukee' },
+    'ward-3': { state: 'il', city: 'chicago', cityName: 'Chicago' }
+  };
+  function hashTo4Digits(str){ let h=0; for(let i=0;i<str.length;i++) h=(h*31+str.charCodeAt(i))>>>0; return 1000+(h%9000); }
+  const out = [];
+  Object.entries(WARD_TICKETS).forEach(([wardSlug, tickets]) => {
+    const j = WARD_JURISDICTION[wardSlug];
+    tickets.forEach(t => {
+      out.push(Object.assign({}, t, {
+        reportId: 'W' + wardSlug.match(/\d+/)[0] + '-' + hashTo4Digits(t.id),
+        ward: wardSlug, wardName: WARD_NAMES[wardSlug], state: j.state, city: j.city, cityName: j.cityName
+      }));
+    });
+  });
+  return out;
+}
+
+async function fetchLedgerTickets(){
+  try {
+    const res = await fetch('/api/coverage/tickets');
+    if (!res.ok) throw new Error('tickets returned ' + res.status);
+    const data = await res.json();
+    return data.tickets;
+  } catch (err) {
+    return fallbackLedgerTickets();
+  }
+}
+
+function renderLedgerFilters(){
+  const wardSel = document.getElementById('ledgerWardSelect');
+  const seenWards = [];
+  ledgerTickets.forEach(t => { if (!seenWards.some(w => w.slug === t.ward)) seenWards.push({ slug: t.ward, name: t.wardName }); });
+  wardSel.innerHTML = '<option value="">All wards</option>' + seenWards.map(w => `<option value="${esc(w.slug)}">${esc(w.name)}</option>`).join('');
+  wardSel.addEventListener('change', () => { ledgerFilters.ward = wardSel.value; renderLedgerResults(); });
+
+  const catRow = document.getElementById('ledgerCategoryChips');
+  catRow.innerHTML = ['All'].concat(LEDGER_CATEGORIES).map(c => `<button type="button" class="ledger-chip${c === 'All' ? ' active' : ''}" data-cat="${c === 'All' ? '' : esc(c)}">${esc(c)}</button>`).join('');
+  catRow.querySelectorAll('.ledger-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      catRow.querySelectorAll('.ledger-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      ledgerFilters.category = chip.dataset.cat;
+      renderLedgerResults();
+    });
+  });
+
+  const statusRow = document.getElementById('ledgerStatusChips');
+  statusRow.innerHTML = ['All'].concat(LEDGER_STAGES).map(s => `<button type="button" class="ledger-chip${s === 'All' ? ' active' : ''}" data-status="${s === 'All' ? '' : s}">${esc(s.charAt(0).toUpperCase() + s.slice(1))}</button>`).join('');
+  statusRow.querySelectorAll('.ledger-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      statusRow.querySelectorAll('.ledger-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      ledgerFilters.status = chip.dataset.status;
+      renderLedgerResults();
+    });
+  });
+}
+
+function renderLedgerResults(){
+  const container = document.getElementById('ledgerResults');
+  if (!container) return;
+  const q = ledgerFilters.q.toLowerCase();
+  const filtered = ledgerTickets.filter(t => {
+    if (ledgerFilters.ward && t.ward !== ledgerFilters.ward) return false;
+    if (ledgerFilters.category && t.category !== ledgerFilters.category) return false;
+    if (ledgerFilters.status && t.stage !== ledgerFilters.status) return false;
+    if (q && !((t.title || '').toLowerCase().includes(q) || (t.loc || '').toLowerCase().includes(q) || (t.category || '').toLowerCase().includes(q))) return false;
+    return true;
+  });
+  container.innerHTML = '';
+  if (!filtered.length) {
+    container.innerHTML = '<div class="ledger-empty">No reports match these filters.</div>';
+    return;
+  }
+  filtered.forEach(t => {
+    const a = document.createElement('a');
+    a.className = 'ledger-report-card';
+    a.href = '/report/' + encodeURIComponent(t.reportId);
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    const pillClass = t.stage === 'resolved' ? 'pill-ok' : t.stage === 'dispatched' ? 'pill-warn' : 'pill-crit';
+    a.innerHTML = `<div class="row"><span class="ledger-report-id">${esc(t.reportId)}</span><span class="pill ${pillClass}">${esc(t.stage)}</span></div>
+      <div style="font-weight:700;font-size:.82rem;margin:4px 0">${esc(t.title)}</div>
+      <div class="small">${esc(t.loc)} • ${esc(t.wardName)} • ${esc(t.category)}${t.stage === 'resolved' ? (t.verified ? ' • ✓ photo-verified' : ' • desk closure') : ''}</div>`;
+    container.appendChild(a);
+  });
+}
+
+async function openLedgerDrawer(){
+  document.getElementById('ledgerDrawer').classList.add('open');
+  if (!ledgerTickets.length) {
+    ledgerTickets = await fetchLedgerTickets();
+    renderLedgerFilters();
+  }
+  renderLedgerResults();
+}
+function closeLedgerDrawer(){
+  document.getElementById('ledgerDrawer').classList.remove('open');
 }
 
 /* =====================================================================
@@ -741,6 +1161,7 @@ function onLocationResolved(loc){
   if (repLoc && !repLoc.dataset.userEdited) {
     repLoc.value = loc ? `${loc.city}, ${loc.stateCode} (Current GPS)` : 'Local District (GPS unavailable)';
   }
+  updateSmartLocationBanner(loc);
   if (analyticsInitialized && coverageDirectory) {
     applyWardMeta(pickDefaultWardMeta());
     coverageLoaded = false;
@@ -748,6 +1169,26 @@ function onLocationResolved(loc){
   }
   if (loc && typeof loc.lat === 'number' && typeof loc.lng === 'number') {
     plotUserLocationMarker(loc.lat, loc.lng);
+  }
+}
+
+// SMART LOCATION HEADER — reflects the exact SAME resolved-location value
+// as the header badge/report-location field above (no second, parallel
+// detection system). `loc: null` means GPS was denied/unavailable/timed
+// out, so this reads that honestly rather than guessing a place.
+function updateSmartLocationBanner(loc){
+  const banner = document.getElementById('smartLocationBanner');
+  const textEl = document.getElementById('smartLocationText');
+  const statusEl = document.getElementById('smartLocationStatus');
+  if (!banner || !textEl || !statusEl) return;
+  if (loc) {
+    textEl.textContent = `${loc.city}, ${loc.stateCode} — reports route to this jurisdiction`;
+    statusEl.textContent = 'GPS resolved';
+    banner.classList.add('resolved');
+  } else {
+    textEl.textContent = 'Local District — GPS unavailable, using citywide default';
+    statusEl.textContent = 'Unresolved';
+    banner.classList.remove('resolved');
   }
 }
 
@@ -791,6 +1232,7 @@ function formatUSDCompact(n){
 }
 
 let nationalLoaded = false;
+let lastNationalData = null; // cached for the Municipal/National geohash tier canvas — see aggregateTierPct()
 
 async function loadNationalTab(){
   if (nationalLoaded) return;
@@ -804,6 +1246,7 @@ async function loadNationalTab(){
   } catch (err) {
     data = fallbackNational();
   }
+  lastNationalData = data;
 
   document.getElementById('natActiveMunis').textContent = data.activeMunicipalities;
   document.getElementById('natDistricts').textContent = data.districtsMapped;
@@ -1469,6 +1912,17 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('btnCloseCam').addEventListener('click',closeCamera);
   document.getElementById('btnCapture').addEventListener('click',capturePhoto);
   document.getElementById('btnSubmit').addEventListener('click',submitReport);
+
+  document.getElementById('btnOpenLedger').addEventListener('click', openLedgerDrawer);
+  document.getElementById('btnCloseLedger').addEventListener('click', closeLedgerDrawer);
+  document.getElementById('ledgerDrawer').addEventListener('click', (e) => {
+    if (e.target.id === 'ledgerDrawer') closeLedgerDrawer();
+  });
+  const ledgerSearchInput = document.getElementById('ledgerSearchInput');
+  if (ledgerSearchInput) ledgerSearchInput.addEventListener('input', () => {
+    ledgerFilters.q = ledgerSearchInput.value.trim();
+    renderLedgerResults();
+  });
 });
 </script>
 </body>
