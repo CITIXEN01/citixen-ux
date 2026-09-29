@@ -9,6 +9,7 @@
 <meta name="referrer" content="no-referrer">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CITIXEN UX">
 <link rel="manifest" href="/manifest.json?v=4">
 <link rel="icon" type="image/x-icon" href="/favicon.ico?v=4">
 <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png?v=4">
@@ -100,15 +101,12 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .footer-staff-link:hover{color:var(--mint2);border-color:var(--mint2)}
 
 /* ===== FOOTER (homepage-flow refactor) — the 4-column sitemap link grid
-   was removed per the footer-overhaul spec; only the centered slogan
-   callout, the Onboarding Portal button, the IP notice, and the bottom
-   legal line remain. ===== */
+   was removed per the footer-overhaul spec; the PATENTS PENDING notice
+   block was removed outright per a later spec. Only the centered slogan
+   callout, the Onboarding Portal button, and the bottom legal/trademark
+   lines remain. ===== */
 .sitemap-footer{flex-direction:column;align-items:stretch;gap:0;padding:0}
-.footer-slogan-callout{text-align:center;color:#00FF87;font-weight:800;font-size:.82rem;
-  text-transform:uppercase;letter-spacing:1px;padding:32px 24px 16px}
-.ip-notice-container{max-width:640px;margin:0 auto 20px;padding:16px 22px;text-align:center;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-.ip-title{font-size:.68rem;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.ip-subtext{font-size:.66rem;color:var(--muted);line-height:1.5;max-width:560px;margin:0 auto}
+.footer-slogan-callout{text-align:center;color:#00FF87;font-weight:700;font-size:.82rem;padding:32px 24px 16px}
 .sitemap-bottom{border-top:1px solid var(--border);padding:14px 22px max(14px, env(safe-area-inset-bottom));
   text-align:center;font-size:.68rem;color:var(--muted)}
 .trademark-disclosure{text-align:center;font-size:.62rem;color:var(--muted);opacity:.75;line-height:1.5;
@@ -136,6 +134,11 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .hero-qa-heading{font-size:1.2rem;font-weight:900;color:#fff;margin:0 0 8px}
 .hero-qa-body{color:var(--muted);font-size:.9rem;line-height:1.6;max-width:640px;margin:0 auto}
 .hero-qa-accent{color:#00FF87;font-weight:700}
+
+/* ===== INSTITUTIONAL GATEWAY BUTTONS — sits between the App Download
+   section and the footer. Plain mailto CTAs, side-by-side. ===== */
+.institutional-gateway-section{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;max-width:520px;
+  margin:24px auto 8px;padding:0 24px}
 
 /* ===== NATIVE APP STORE ROW + PRIMARY LAUNCH ROW (below hub navigation) ===== */
 .launch-row{text-align:center;margin:6px auto 4px}
@@ -635,7 +638,8 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   border-radius:16px;padding:20px;text-align:center}
 .ticker-value{font-size:2.2rem;font-weight:900;color:var(--mint2);margin:8px 0}
 
-/* Report Generator */
+/* Report Generator — promoted to its own always-visible top-level section */
+.report-generator-section{max-width:900px;margin:0 auto;padding:8px 24px 28px}
 .report-generator-card{max-width:640px;margin:0 auto;background:var(--card);border:1px solid var(--border);
   border-radius:16px;padding:20px}
 .report-gen-row{display:flex;gap:10px;margin-top:12px}
@@ -889,6 +893,38 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </button>
   </section>
 
+  <!-- ===== REPORT GENERATOR — promoted to an always-visible top-level
+       section directly beneath the Live Public Ledger banner, per this
+       round's homepage-scroll-sequence spec ("Report Generator
+       Promotion"). Same #reportGenerator id/markup/JS as before (it used
+       to live inside the hidden Analytics deep-dive), only its position
+       changed. ===== -->
+  <section class="report-generator-section" id="reportGeneratorSection">
+    <div class="report-generator-card" id="reportGenerator">
+      <div class="label" style="justify-content:center">Report Generator</div>
+      <div class="report-gen-row">
+        <select id="reportTimeframe" aria-label="Timeframe">
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+          <option value="ytd">YTD</option>
+        </select>
+        <select id="reportFormat" aria-label="Format">
+          <option value="matrix">3×3 Visual Summary</option>
+          <option value="ledger">Raw Audit Ledger</option>
+        </select>
+      </div>
+      <label class="report-gen-toggle">
+        <input type="checkbox" id="reportOfficialMode">
+        Public Official mode — tag responsible departments
+      </label>
+      <div id="reportOutput" class="report-output"></div>
+      <button class="btn btn-primary" id="btnExportPrintReport" style="width:100%;justify-content:center;margin-top:14px;" type="button">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Export / Print The Civic Record (Audited PDF)
+      </button>
+    </div>
+  </section>
+
   <!-- ===== CITY SNAPSHOT — SUMMARY VIEW (formerly "3x3 Analytics Matrix") ===== -->
   <section class="matrix-summary-section" id="matrixSummarySection">
     <div class="analytics-matrix-card" id="analyticsMatrix">
@@ -901,13 +937,12 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   <!-- ===== THREE DRILL-DOWN ACTION HUBS — sit directly below City Snapshot
        with no header text above them (per the homepage decluttering pass).
        Each reveals its own hidden deep-dive panel rather than navigating
-       away: Analytics -> Health Index, Live Incidents Feed, and (per the
-       "buried data architecture" spec) the National Geo-Hatch Heat Map
-       launcher, now exclusively here (deepdiveAnalytics); Expenditures ->
-       Municipal Expenditure Allocation & CapEx Audit Ledger
-       (civicStackSection, scrolled to ledgerCard); Operations -> Backend
-       Pipeline Architecture only, no heat-map access (civicStackSection,
-       scrolled to civicPipelineVisual). ===== -->
+       away: Analytics -> Health Index, Live dispatch feed/Geo-Hatch map,
+       Bridge Slogan, and response metrics (deepdiveAnalytics);
+       Expenditures -> itemized Civic Memory ledger entries & cost
+       estimates (civicStackSection, scrolled to ledgerCard); Operations ->
+       Civic Stack integrations & administrative data (civicStackSection,
+       scrolled to civicStackAdminCard). ===== -->
   <div class="hub-row" role="navigation" aria-label="Deep-dive sections">
     <button class="hub-card" id="hubCoverageBtn" type="button" aria-expanded="false" aria-controls="deepdiveAnalytics">
       <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><rect x="6" y="10" width="3" height="9"/><rect x="11" y="6" width="3" height="13"/><rect x="16" y="13" width="3" height="6"/></svg>
@@ -942,6 +977,15 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   </div>
   <div class="small" style="text-align:center;color:var(--muted)" id="installStatus">Waiting for install availability on this browser…</div>
   <div class="small" style="text-align:center;color:var(--muted);max-width:460px;margin:4px auto 20px;">Installs the CITIXEN UX™ Progressive Web App directly to your home screen.</div>
+
+  <!-- ===== INSTITUTIONAL GATEWAY BUTTONS — sits between the App Download
+       section and the footer, per this round's homepage-scroll-sequence
+       spec. Both are plain mailto links (no form, no backend) — the
+       honest version of "contact us" until a real intake exists. ===== -->
+  <section class="institutional-gateway-section">
+    <a class="btn btn-outline" href="mailto:contact@citizenux.com?subject=CITIXEN%20UX%20—%20Elected%20Official%20Inquiry">For Elected Officials</a>
+    <a class="btn btn-outline" href="mailto:contact@citizenux.com?subject=CITIXEN%20UX%20—%20Municipality%20Inquiry">For Municipalities</a>
+  </section>
 
   <!-- ===== FULL-SCREEN AGGREGATE NATIONAL GEO-HATCH™ HEAT MAP MODAL — a
        dedicated stylized visualization, NOT the Leaflet field-dispatch map
@@ -1001,7 +1045,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 
   <!-- ===== DEEP-DIVE: ANALYTICS & REPORTING (hidden until hubCoverageBtn is
        clicked) — the old per-city Health Index sidebar, Live dispatch
-       feed/Immutable Audit Stream toggle, and Report Generator, all
+       feed/Civic Memory Stream toggle, and Report Generator, all
        relocated here verbatim (same ids/markup/JS) rather than deleted. ===== -->
   <section class="deepdive-panel" id="deepdiveAnalytics">
     <div class="deepdive-panel-head">
@@ -1010,9 +1054,9 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </div>
     <!-- ===== "COVER AMERICA" GEO-HATCH LAUNCHER + BRIDGE SLOGAN — per the
          buried-data-architecture spec, the heat map trigger lives strictly
-         inside this Analytics drawer now (removed from the Operations
-         drawer, see civicPipelineVisual below), alongside the Citywide
-         Health Index card. ===== -->
+         inside this Analytics drawer, alongside the Citywide Health Index
+         card. The Operations drawer's old duplicate launcher (and its
+         Backend Data Pipeline diagram) were removed outright. ===== -->
     <div style="text-align:center;margin-bottom:14px;">
       <p class="bridge-slogan">One report gets a pothole filled. A thousand reports cover a city. A million reports cover America.</p>
       <button class="btn btn-outline" id="btnViewHeatMapFromAnalytics" type="button">Cover America — View National Heat Map ↗</button>
@@ -1069,7 +1113,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         </div>
         <div class="audit-tabs">
           <button class="audit-tab active" data-view="live">Live Incidents</button>
-          <button class="audit-tab" data-view="audit">Immutable Audit Stream</button>
+          <button class="audit-tab" data-view="audit">Civic Memory Stream</button>
         </div>
         <div class="filter-tabs">
           <button class="filter-tab active" data-filter="All"><span class="dot"></span>All</button>
@@ -1081,29 +1125,11 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         <div id="auditStream" style="display:none;"></div>
       </div>
     </div>
-    <div class="report-generator-card" id="reportGenerator" style="margin-top:16px;">
-      <div class="label" style="justify-content:center">Report Generator</div>
-      <div class="report-gen-row">
-        <select id="reportTimeframe" aria-label="Timeframe">
-          <option value="week">This Week</option>
-          <option value="month">This Month</option>
-          <option value="ytd">YTD</option>
-        </select>
-        <select id="reportFormat" aria-label="Format">
-          <option value="matrix">3×3 Visual Summary</option>
-          <option value="ledger">Raw Audit Ledger</option>
-        </select>
-      </div>
-      <label class="report-gen-toggle">
-        <input type="checkbox" id="reportOfficialMode">
-        Public Official mode — tag responsible departments
-      </label>
-      <div id="reportOutput" class="report-output"></div>
-      <button class="btn btn-primary" id="btnExportPrintReport" style="width:100%;justify-content:center;margin-top:14px;" type="button">
-        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-        Export / Print The Civic Record (Audited PDF)
-      </button>
-    </div>
+    <!-- ===== The Report Generator card that used to live here was promoted
+         to an always-visible top-level section directly beneath the Live
+         Public Ledger banner (see #reportGeneratorSection above City
+         Snapshot) per this round's homepage-scroll-sequence spec. Same
+         #reportGenerator id/markup/JS, only its position changed. ===== -->
   </section>
 
   <!-- ===== DEEP-DIVE: THE CIVIC STACK & OPERATIONS CONTAINER (hidden until
@@ -1115,7 +1141,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       <h3>Expenditures &amp; Operations</h3>
       <button class="deepdive-close" data-close-panel="civicStackSection" type="button">Close ✕</button>
     </div>
-    <p class="statement-sub">Municipal Expenditure Allocation, the CapEx Audit Ledger, and the backend pipeline behind every verified fix.</p>
+    <p class="statement-sub">Municipal Expenditure Allocation, the CapEx Audit Ledger, and the Civic Stack integrations behind every verified fix.</p>
 
     <!-- ===== CITYWIDE MUNICIPAL EXPENDITURE & ALLOCATION — same id/markup as
          before (only its position changed), including its existing "not an
@@ -1149,45 +1175,31 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         <div class="bar"><span id="ledgerAdaBar" style="width:12%"></span></div>
       </div>
       <div class="small" style="margin-top:10px;">(Estimated) — clustered from resolved field reports.</div>
+      <button class="btn btn-outline" id="btnViewItemizedLedger" type="button" style="width:100%;justify-content:center;margin-top:12px;">View Itemized Civic Memory Ledger Entries ↗</button>
+      <div class="small" style="margin-top:8px;color:var(--muted);">Per-project supporting-document attachments — coming soon.</div>
     </div>
 
-    <!-- ===== DECK & BACKEND PIPELINE ALIGNMENT — visual only; every stage
-         past "CITIXEN Capture" is the same simulated pipeline this codebase
-         has used throughout (no real PostGIS dedup, ERP webhook, or crypto
-         audit hash runs anywhere here — see api/_lib/store.js, this
-         project's only actual backend, an in-memory demo seed). ===== -->
-    <!-- ===== Per the buried-data-architecture spec, the heat map access
-         (the old "Live Radar Sweep" launcher + "View National Heat Map"
-         button) was removed from this Operations drawer — it now lives
-         strictly inside the Analytics drawer above (see
-         btnViewHeatMapFromAnalytics/"Cover America"). ===== -->
-    <div class="card" id="civicPipelineVisual" style="max-width:640px;width:100%;margin:0 auto 20px;">
-      <div class="label" style="justify-content:center">Backend Data Pipeline</div>
-      <div class="pipeline-visual">
-        <div class="pipeline-stage"><span class="pipeline-stage-label">CITIXEN Capture</span></div>
-        <div class="pipeline-arrow">──►</div>
-        <div class="pipeline-stage"><span class="pipeline-stage-label">PostGIS Deduplication &amp; PII Scrub</span></div>
-        <div class="pipeline-arrow">──►</div>
-        <div class="pipeline-stage"><span class="pipeline-stage-label">ERP Webhook (Tyler Tech / Accela)</span></div>
-        <div class="pipeline-arrow">──►</div>
-        <div class="pipeline-stage"><span class="pipeline-stage-label">Audit Hash &amp; Emerald Cell</span></div>
-      </div>
-      <div class="small" style="margin-top:10px;">Reference Architecture — engineering blueprint for CITIXEN's field-to-audit pipeline.</div>
+    <!-- ===== CIVIC STACK INTEGRATIONS & ADMINISTRATIVE DATA — replaces the
+         removed Backend Data Pipeline diagram card and Download Ward
+         Health Summary PDF button (both removed outright per this round's
+         spec). Points to the one genuinely administrative/integration
+         control this codebase has: the Municipal Onboarding Portal's
+         webhook token, PII-blur, 911-redirect, and ROW-filtering config
+         (see #wizardOverlay), rather than inventing new fabricated admin
+         views. ===== -->
+    <div class="card" id="civicStackAdminCard" style="max-width:640px;width:100%;margin:0 auto 20px;">
+      <div class="label" style="justify-content:center">Civic Stack Integrations &amp; Administrative Data</div>
+      <div class="small" style="margin:8px 0;">ERP webhook dispatch (Tyler Tech / Accela), PII-blur, and 911-redirect settings are configured per jurisdiction in the Municipal Onboarding Portal below — the same real client-side configuration screen this project uses, not a separate simulated admin view.</div>
+      <button class="btn btn-outline" id="btnOpenOnboardingFromOps" type="button" style="width:100%;justify-content:center;">Open Municipal Onboarding Portal ↗</button>
     </div>
-
-    <button class="btn btn-emerald-glow" id="btnDownloadWardHealthPdf" style="width:100%;max-width:640px;display:flex;margin:0 auto;justify-content:center;">
-      <svg viewBox="0 0 24 24" width="14" height="14" stroke="#051311" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>
-      Download Ward Health Summary PDF
-    </button>
   </section>
 
-  <!-- ===== The National Audit Teaser Card (radar sweep + metrics + CTA)
-       that used to render here was removed from the main homepage body per
-       the decluttering spec. Its "Live Radar Sweep: 100m Geo-Hatch™ Active
-       Audits" visual now lives inside the Operations drawer (civicStackSection
-       / #civicPipelineVisual below), next to the pipeline flow chart, rather
-       than being deleted outright. The heat map modal itself (#nationalHeatMapModal)
-       is unchanged and still reachable from there. ===== -->
+  <!-- ===== The National Audit Teaser Card and its radar-sweep visual
+       (both removed in earlier rounds), and the Operations drawer's
+       Backend Data Pipeline diagram (removed this round), are gone
+       outright — no replacement visual. The heat map modal itself
+       (#nationalHeatMapModal) is unchanged and still reachable only from
+       the Analytics drawer. ===== -->
 
   <!-- ===== The bottom-of-homepage "Search Zip, City, Ward…" search bar
        (#frontierMap) and the always-visible "Real-Time Dispatch & Audit
@@ -1195,7 +1207,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        (#lightweightFeedSection) were both removed outright per the
        homepage-declutter spec. The full searchable ledger remains
        reachable via the Live Public Ledger banner above (openLedgerDrawer()),
-       and the full Live Feed/Immutable Audit Stream toggle remains in the
+       and the full Live Feed/Civic Memory Stream toggle remains in the
        Analytics & Reporting deep-dive. ===== -->
 
   <!-- MODAL OVERLAY -->
@@ -1296,37 +1308,26 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </div>
   </div>
 
-  <!-- ===== FOOTER — the old 4-column sitemap link block (Platform & App /
-       The Civic Stack / Statutory Governance / Historical Precedent) stays
-       removed per the prior footer-overhaul spec. Per this round's spec,
-       the CITIXEN Codex (Governance Vault) drawer is restored (kept "in
-       the background") and reachable from the single #footerCodexLink text
-       link below, rather than the old 2-column Statutory Governance/
-       Historical Precedent footer block. ===== -->
+  <!-- ===== CENTERED MINIMAL FOOTER — the old 4-column sitemap link block
+       stays removed per the prior footer-overhaul spec. The "PROPRIETARY
+       INFRASTRUCTURE PLATFORM — PATENTS PENDING" block was removed
+       outright per this round's spec (it was never a verified claim to
+       begin with — see this session's earlier refusal to originate that
+       wording). "Dispatch Command Center" and "Representative Login" were
+       removed from the public footer; the CITIXEN Codex (Governance
+       Vault) drawer remains reachable from the single, subtle
+       #footerCodexLink text link. ===== -->
   <footer class="site-footer sitemap-footer">
-    <div class="footer-slogan-callout">Upgrade Your Civic Experience</div>
+    <div class="footer-slogan-callout">CITIXEN UX™ — built for residents, designed for modern civic trust.</div>
     <div style="text-align:center;padding:0 22px 20px;">
       <button class="btn btn-outline" id="btnOpenOnboardingWizard" type="button">Municipal Onboarding Portal</button>
     </div>
 
-    <!-- ===== IP NOTICE CONTAINER — styling/layout per spec. Text is a
-         placeholder token, not a legal claim: this session would not
-         insert "Patents Pending" wording without independent verification
-         of an actual USPTO filing (see conversation). Edit ip-title/
-         ip-subtext directly with your final counsel-approved copy. ===== -->
-      <div class="ip-notice-container">
-  <p class="ip-title">PROPRIETARY INFRASTRUCTURE PLATFORM — PATENTS PENDING</p>
-  <p class="ip-subtext">Civic Intelligence, National Geo-Hatch, and real-time municipal webhook dispatch algorithms are protected under U.S. and International Patent Laws.</p>
-</div>
-
     <div class="sitemap-bottom">
-      CITIXEN UX™ — built for residents, not administrators. ·
       <button type="button" id="footerCodexLink" class="footer-staff-link" style="background:none;border:none;padding:0;font:inherit;cursor:pointer">Statutory Governance &amp; Precedent ↗</button> ·
-      <a class="footer-staff-link" href="/dispatch">Dispatch Command Center →</a> ·
-      <a class="footer-staff-link" href="/rep">Representative Login →</a> ·
       <a class="footer-staff-link" href="tel:911">Emergency 911</a>
     </div>
-    <div class="trademark-disclosure">CITIXEN, CITIXEN UX, and their associated logos are trademarks of CITIXEN. All other trademarks, product names, and company names or logos mentioned herein are the property of their respective owners. Use of these terms does not imply any affiliation with or endorsement by their holders.</div>
+    <div class="trademark-disclosure">CITIXEN UX™ and its associated logos are trademarks of Citixen UX Inc. Civic Intelligence, Civic Memory, Geo-Hatch, City Snapshot, and Civic Stack are proprietary marks of Citixen UX Inc. All other trademarks, product names, and company names mentioned herein are the property of their respective owners.</div>
   </footer>
 
 <script>
@@ -1567,7 +1568,7 @@ function renderAuditStream(){
 /* ===== The always-visible bottom-of-page "Real-Time Dispatch & Audit
    Ledger (Lightweight)" summary and its renderLightweightFeed() were
    removed along with their markup per the homepage-declutter spec. The
-   full Live Incidents/Immutable Audit Stream toggle remains in the
+   full Live Incidents/Civic Memory Stream toggle remains in the
    Analytics & Reporting deep-dive; the full searchable ledger remains
    reachable via the Live Public Ledger banner. ===== */
 document.querySelectorAll('.audit-tab').forEach(tab=>{
@@ -1639,7 +1640,7 @@ const modalData={
     body:[
       ['Aggregated, Not Individual','The ledger publishes category totals and counts per ward — never a single citizen\'s report tied back to them, their device, or their location history.'],
       ['No IP or Identity Collection','Nothing about who filed a report — IP address, account, or device ID — is captured in the first place, so there is nothing to include or exclude from the public record.'],
-      ['Auditable by Design','Each resolved entry in the Immutable Audit Stream carries a timestamp and a verification hash, so the sequence of resolutions can be checked for tampering without exposing reporter identity.'],
+      ['Auditable by Design','Each resolved entry in the Civic Memory Stream carries a timestamp and a verification hash, so the sequence of resolutions can be checked for tampering without exposing reporter identity.'],
       ['Open Data, Estimated Costs','Expenditure figures are AI-clustered estimates derived from resolved-case categories, published for transparency — not a substitute for the city\'s official finance office records.']
     ]
   }
@@ -1686,7 +1687,7 @@ document.getElementById('hubSlaBtn').addEventListener('click', (e) => {
   openDeepdivePanel('civicStackSection', 'ledgerCard', e.currentTarget);
 });
 document.getElementById('hubStackBtn').addEventListener('click', (e) => {
-  openDeepdivePanel('civicStackSection', 'civicPipelineVisual', e.currentTarget);
+  openDeepdivePanel('civicStackSection', 'civicStackAdminCard', e.currentTarget);
 });
 document.querySelectorAll('[data-close-panel]').forEach(btn => {
   btn.addEventListener('click', () => closeDeepdivePanel(btn.dataset.closePanel));
@@ -2750,6 +2751,8 @@ function closeLedgerDrawer(){
   document.getElementById('ledgerDrawer').classList.remove('open');
 }
 document.getElementById('liveLedgerBanner').addEventListener('click', () => openLedgerDrawer());
+const btnViewItemizedLedgerEl = document.getElementById('btnViewItemizedLedger');
+if (btnViewItemizedLedgerEl) btnViewItemizedLedgerEl.addEventListener('click', () => openLedgerDrawer());
 document.getElementById('ledgerCloseBtn').addEventListener('click', closeLedgerDrawer);
 document.getElementById('ledgerDrawer').addEventListener('click', (e) => { if (e.target.id === 'ledgerDrawer') closeLedgerDrawer(); });
 
@@ -2876,6 +2879,10 @@ function closeOnboardingWizard(){
 }
 const btnOpenOnboardingWizardEl = document.getElementById('btnOpenOnboardingWizard');
 if (btnOpenOnboardingWizardEl) btnOpenOnboardingWizardEl.addEventListener('click', openOnboardingWizard);
+// Operations drawer's "Civic Stack Integrations & Administrative Data"
+// card opens the same real onboarding-config screen, not a separate one.
+const btnOpenOnboardingFromOpsEl = document.getElementById('btnOpenOnboardingFromOps');
+if (btnOpenOnboardingFromOpsEl) btnOpenOnboardingFromOpsEl.addEventListener('click', openOnboardingWizard);
 const wizardCloseBtnEl = document.getElementById('wizardCloseBtn');
 if (wizardCloseBtnEl) wizardCloseBtnEl.addEventListener('click', closeOnboardingWizard);
 const wizardOverlayEl = document.getElementById('wizardOverlay');
@@ -2989,8 +2996,9 @@ window.addEventListener('DOMContentLoaded',()=>{
   updateTelemetry(cities.lacrosse);
   loadBig3();
   renderNationalCoverageTicker();
-  const pdfBtn = document.getElementById('btnDownloadWardHealthPdf');
-  if (pdfBtn) pdfBtn.addEventListener('click', () => downloadWardHealthPdf(pdfBtn));
+  // The "Download Ward Health Summary PDF" button was removed outright per
+  // this round's spec; downloadWardHealthPdf() itself is kept (real, working
+  // jsPDF generation) in case a future round re-wires it to a control.
 
   /* ===================================================================
      LIVE REFRESH — Big 3 tiles + 3x3 Analytics Matrix + Report Generator

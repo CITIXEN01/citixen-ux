@@ -1,7 +1,7 @@
 {
   "id": "/app",
-  "name": "CITIXEN UX™ Mobile Reporter",
-  "short_name": "CITIXEN",
+  "name": "CITIXEN UX",
+  "short_name": "CITIXEN UX",
   "description": "Zero-account, anonymous civic hazard reporting and live ward dispatch tracking.",
   "start_url": "/app?source=pwa",
   "scope": "/",
