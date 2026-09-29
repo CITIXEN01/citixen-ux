@@ -1,0 +1,50 @@
+/**
+ * CITIXEN UX™ design tokens.
+ *
+ * Extracted verbatim from the :root blocks already shared across
+ * index.html, app.html, dispatch.html, rep.html, and report.html —
+ * this file does not introduce new values, it centralizes the ones
+ * that already exist so Svelte components stop hardcoding hex.
+ *
+ * Tri-Matrix naming note: "Civilian / Front of House", "Politician /
+ * Ward Analytics", and "Worker / Factory Dispatch" (from the Civic
+ * Intelligence one-pager) are copy/label framing for the existing
+ * citizen / representative / dispatch_staff roles (see
+ * src/lib/governance/dispatch.ts) — they are not separate color
+ * tracks. All three matrices share this one token set; do not fork
+ * per-matrix palettes.
+ */
+:root {
+  /* Brand */
+  --brand-mint: #00ff88;
+  --brand-mint-hover: #00e077;
+  --brand-mint-dim: rgba(0, 255, 136, 0.12);
+
+  /* Status / severity accents (shared across all three matrices) */
+  --brand-amber: #ffbb00;
+  --brand-red: #ff4444;
+
+  /* Surfaces */
+  --bg-obsidian: #080c0a;
+  --bg-card: #0f1713;
+  --border-muted: rgba(255, 255, 255, 0.08);
+
+  /* Legacy aliases — same convention as the static pages, kept so any
+     ported markup that still references var(--mint)/var(--card)/etc.
+     resolves without edits. */
+  --bg: var(--bg-obsidian);
+  --card: var(--bg-card);
+  --border: var(--border-muted);
+  --hover: #162529;
+  --mint: var(--brand-mint);
+  --mint2: var(--brand-mint-hover);
+  --text: #f8fafc;
+  --muted: #8e9fa8;
+  --danger: var(--brand-red);
+  --warn: var(--brand-amber);
+  --amber: var(--brand-amber);
+
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+  --mono: 'SF Mono', 'Courier New', ui-monospace, monospace;
+}
