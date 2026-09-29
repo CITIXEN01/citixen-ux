@@ -1,4 +1,7 @@
 {
+  "_notes": {
+    "webDir": "JSON has no comment syntax, so this field documents the choice inline. webDir is '.' (the repo root, where app.html/index.html actually live) because this project has no build step and therefore no bundled web-output directory (a 'dist/', 'build/', or 'www/' folder) for a real Capacitor project to point at. A production Capacitor setup normally expects webDir to be that bundled output, copied into the native shell by `npx cap sync` on every build; this project does not pretend one exists. If a real bundler is ever introduced, update webDir to its actual output folder."
+  },
   "appId": "com.citixenux.app",
   "appName": "CITIXEN UX",
   "webDir": ".",

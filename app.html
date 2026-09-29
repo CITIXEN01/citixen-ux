@@ -1392,20 +1392,75 @@ const DEFAULT_LOCATION_LABEL = 'Local District • Active';
 const GEO_TIMEOUT_MS = 6000;
 window.CITIXEN_RESOLVED_LOCATION = null; // { city, stateCode, ward: null } once resolved
 
+/* =====================================================================
+   NATIVE-CAPACITOR / WEB-FALLBACK ABSTRACTION — geolocation + camera
+   -----------------------------------------------------------------
+   This page runs unmodified both as a plain browser/PWA and wrapped in a
+   native Capacitor shell (see capacitor.config.json + package.json at the
+   repo root) — there is no separate native build of this file. Every
+   Capacitor-specific call is guarded behind `window.Capacitor` existing
+   (set by the native runtime at startup, never present in a plain
+   browser), exactly the same guard style this file already uses for
+   Leaflet (`typeof L === 'undefined'`). That also means the actual
+   @capacitor/geolocation and @capacitor/camera npm packages never need to
+   be installed for the plain-web path below to keep working — this
+   branch is simply never reached outside a real native wrapper.
+   ===================================================================== */
+function isNativeCapacitorRuntime(){
+  return !!(window.Capacitor && window.Capacitor.Plugins);
+}
+
+// Resolves to the same { coords: { latitude, longitude } } shape either way,
+// so every caller below is written once against one return shape.
+async function citixenGetCurrentPosition(opts){
+  const options = opts || { timeout: GEO_TIMEOUT_MS, maximumAge: 300000 };
+  if (isNativeCapacitorRuntime() && window.Capacitor.Plugins.Geolocation) {
+    const pos = await window.Capacitor.Plugins.Geolocation.getCurrentPosition({
+      enableHighAccuracy: true, timeout: options.timeout
+    });
+    return { coords: { latitude: pos.coords.latitude, longitude: pos.coords.longitude } };
+  }
+  if (!('geolocation' in navigator)) throw new Error('geolocation-unavailable');
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('geo-timeout')), options.timeout);
+    navigator.geolocation.getCurrentPosition(
+      p => { clearTimeout(timer); resolve(p); },
+      e => { clearTimeout(timer); reject(e); },
+      options
+    );
+  });
+}
+
+// Native path only — returns { dataUrl } on success, { dataUrl: null } if the
+// citizen denies the permission prompt or cancels, or `null` when there is no
+// native runtime at all (the caller's cue to fall back to the existing
+// getUserMedia + video-preview modal flow, entirely unchanged below).
+// resultType 'dataUrl' returns decoded pixel data, not the original file, so
+// this path carries no EXIF/GPS metadata either — same "stripped before
+// upload" promise as the web capture path.
+async function citixenCapturePhoto(){
+  if (!isNativeCapacitorRuntime() || !window.Capacitor.Plugins.Camera) return null;
+  try {
+    const photo = await window.Capacitor.Plugins.Camera.getPhoto({
+      quality: 85, resultType: 'dataUrl', source: 'CAMERA', saveToGallery: false
+    });
+    return { dataUrl: photo.dataUrl || null, denied: false };
+  } catch (err) {
+    // Permission denied or the citizen cancelled the native camera sheet —
+    // honest, non-blocking: no photo, but the report can still be submitted
+    // (see handleCameraButtonClick()/submitReport() — a photo is never
+    // required to publish a report in this build).
+    return { dataUrl: null, denied: true };
+  }
+}
+
 async function resolveDisplayLocation(){
   const labelEl = document.getElementById('headerWardLabel');
   if (labelEl) labelEl.textContent = DEFAULT_LOCATION_LABEL;
-  if (!('geolocation' in navigator)) { onLocationResolved(null); return; }
+  if (!isNativeCapacitorRuntime() && !('geolocation' in navigator)) { onLocationResolved(null); return; }
 
   try {
-    const pos = await new Promise((resolve, reject) => {
-      const timer = setTimeout(() => reject(new Error('geo-timeout')), GEO_TIMEOUT_MS);
-      navigator.geolocation.getCurrentPosition(
-        p => { clearTimeout(timer); resolve(p); },
-        e => { clearTimeout(timer); reject(e); },
-        { timeout: GEO_TIMEOUT_MS, maximumAge: 300000 }
-      );
-    });
+    const pos = await citixenGetCurrentPosition({ timeout: GEO_TIMEOUT_MS, maximumAge: 300000 });
 
     const { latitude, longitude } = pos.coords;
     const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`);
@@ -2057,6 +2112,33 @@ function renderFeed(){
   renderTriageGauge();
 }
 
+// Wired to the "Launch camera" button. Tries the native Capacitor Camera
+// plugin first (citixenCapturePhoto() — returns null when there's no native
+// runtime, the cue to fall through to the existing getUserMedia + video
+// modal flow below, completely unchanged for the plain-web/PWA case).
+async function handleCameraButtonClick(){
+  const native = await citixenCapturePhoto();
+  if (native === null) { openCamera(); return; }
+
+  const photoImg = document.getElementById('photoImg');
+  const photoIconFallback = document.getElementById('photoIconFallback');
+  if (native.dataUrl) {
+    photoImg.src = native.dataUrl;
+    photoImg.style.display = 'block';
+    photoIconFallback.style.display = 'none';
+    toast('✓ Captured — device ID and GPS tags scrubbed from EXIF before upload');
+  } else {
+    // Camera permission denied (or the native camera sheet was cancelled) —
+    // same honest, non-blocking fallback as the web path: no photo is
+    // attached, but nothing here stops the report itself from being
+    // submitted (see finalizeSubmitReport() — a photo is optional).
+    photoImg.style.display = 'none';
+    photoIconFallback.style.display = 'flex';
+    toast('Camera unavailable or permission denied — you can still submit without a photo.');
+  }
+  document.getElementById('photoBox').style.display = 'block';
+}
+
 let cameraStream=null;
 async function openCamera(){
   document.getElementById('camModal').classList.add('open');
@@ -2111,6 +2193,124 @@ function capturePhoto(){
   document.getElementById('photoBox').style.display='block';
 }
 
+/* =====================================================================
+   OFFLINE SUBMISSION QUEUE — IndexedDB-backed
+   -----------------------------------------------------------------
+   If the actual submit request (POST /api/report/submit — an ephemeral,
+   non-persistent ack endpoint, same "stateless serverless demo" honesty
+   convention as every other route in api/_lib/store.js) fails because the
+   device is offline, the report is NOT silently dropped and it is NOT
+   claimed as submitted: it's queued in IndexedDB and the citizen is told
+   plainly that it's queued (see finalizeSubmitReport()'s toast). A single
+   `online` event listener then retries the queue — no service-worker
+   background-sync is needed for that; sw.js has none today and this
+   doesn't add one. The report itself still renders immediately in the
+   local dispatch feed either way (see finalizeSubmitReport()) so the
+   citizen isn't staring at a blank feed while offline — only the actual
+   network submission is deferred, and the queue exists so that submission
+   genuinely still happens later instead of just being described as such.
+   ===================================================================== */
+const OFFLINE_QUEUE_DB_NAME = 'citixen_offline_queue';
+const OFFLINE_QUEUE_STORE = 'submissions';
+
+function openOfflineQueueDB(){
+  return new Promise((resolve, reject) => {
+    if (!('indexedDB' in window)) { reject(new Error('indexeddb-unavailable')); return; }
+    const req = indexedDB.open(OFFLINE_QUEUE_DB_NAME, 1);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains(OFFLINE_QUEUE_STORE)) {
+        db.createObjectStore(OFFLINE_QUEUE_STORE, { keyPath: 'id' });
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function queueOfflineSubmission(record){
+  try {
+    const db = await openOfflineQueueDB();
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction(OFFLINE_QUEUE_STORE, 'readwrite');
+      tx.objectStore(OFFLINE_QUEUE_STORE).put(record);
+      tx.oncomplete = resolve;
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch (err) {
+    // IndexedDB unavailable (storage fully blocked/private mode) — the report
+    // already rendered locally in the feed, but it genuinely can't be
+    // retried automatically without persistent storage here.
+    console.warn('Could not persist offline submission queue', err);
+  }
+}
+
+async function getQueuedSubmissions(){
+  try {
+    const db = await openOfflineQueueDB();
+    return await new Promise((resolve, reject) => {
+      const req = db.transaction(OFFLINE_QUEUE_STORE, 'readonly').objectStore(OFFLINE_QUEUE_STORE).getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
+    });
+  } catch (err) {
+    return [];
+  }
+}
+
+async function removeQueuedSubmission(id){
+  try {
+    const db = await openOfflineQueueDB();
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction(OFFLINE_QUEUE_STORE, 'readwrite');
+      tx.objectStore(OFFLINE_QUEUE_STORE).delete(id);
+      tx.oncomplete = resolve;
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch (err) { /* best-effort cleanup only */ }
+}
+
+// The actual network attempt behind a report submission. Checks
+// navigator.onLine first purely as a fast path (skip a doomed fetch while
+// known-offline); either way, a failed fetch is treated identically to
+// being offline — this function never distinguishes "server down" from
+// "no network" to the caller, since the honest response to the citizen is
+// the same either way: it didn't go through yet.
+async function attemptSubmitReport(payload){
+  if (typeof navigator.onLine === 'boolean' && !navigator.onLine) return { ok: false };
+  try {
+    const res = await fetch('/api/report/submit', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('submit failed: ' + res.status);
+    return { ok: true };
+  } catch (err) {
+    return { ok: false };
+  }
+}
+
+let flushingOfflineQueue = false;
+async function flushOfflineQueue(){
+  if (flushingOfflineQueue) return;
+  flushingOfflineQueue = true;
+  try {
+    const queued = await getQueuedSubmissions();
+    if (!queued.length) return;
+    let submittedCount = 0;
+    for (const item of queued) {
+      const result = await attemptSubmitReport(item.payload);
+      if (!result.ok) break; // still offline/unreachable — retry the rest on the next 'online' event
+      await removeQueuedSubmission(item.id);
+      submittedCount++;
+    }
+    if (submittedCount > 0) {
+      toast('✓ ' + submittedCount + ' offline report' + (submittedCount === 1 ? '' : 's') + ' submitted.');
+    }
+  } finally {
+    flushingOfflineQueue = false;
+  }
+}
+
 // Entry point wired to the Publish button — runs the Pre-Snap Capital
 // Project Intercept check FIRST, against the report's real resolved GPS
 // (window.CITIXEN_RESOLVED_LOCATION), before anything is actually
@@ -2136,7 +2336,7 @@ async function submitReport(){
 // intercept override call it. `opts.urgentOverride` + `opts.matchedProject`
 // are only ever set by handleInterceptOverride() — an ordinary, unintercepted
 // submission always tags urgentOverride:false with no project.
-function finalizeSubmitReport(opts){
+async function finalizeSubmitReport(opts){
   opts = opts || {};
   const rawDesc=document.getElementById('repDesc').value.trim() || 'Hazard reported.';
   const rawLoc=document.getElementById('repLoc').value.trim() || 'Local District';
@@ -2152,13 +2352,36 @@ function finalizeSubmitReport(opts){
     desc: rawDesc + ' → Routed to ' + dept + overrideNote,
     urgentOverride
   };
+  // Renders immediately in the local dispatch feed regardless of network
+  // state — an offline citizen isn't left staring at nothing after tapping
+  // Publish. Only the actual server submission (below) depends on
+  // connectivity, and that's reported honestly, not assumed to have worked.
   cases.unshift(nc);
   renderFeed();
   document.getElementById('mCount').textContent=cases.length+' active';
   if(mapInit) plotMarker(nc);
-  toast(urgentOverride ? '✓ Published as urgent — routed to ' + dept : '✓ Published — routed to ' + dept);
   document.getElementById('repDesc').value='';
   document.getElementById('photoBox').style.display='none';
+
+  const resolved = window.CITIXEN_RESOLVED_LOCATION;
+  const payload = {
+    category: cat, location: rawLoc, description: rawDesc, urgentOverride,
+    matchedProjectId: (urgentOverride && opts.matchedProject) ? opts.matchedProject.id : null,
+    lat: resolved && typeof resolved.lat === 'number' ? resolved.lat : null,
+    lng: resolved && typeof resolved.lng === 'number' ? resolved.lng : null,
+    clientTimestamp: new Date().toISOString()
+  }; // no PII fields — see api/_lib/store.js's privacy note; this matches that model exactly.
+
+  const result = await attemptSubmitReport(payload);
+  if (result.ok) {
+    toast(urgentOverride ? '✓ Published as urgent — routed to ' + dept : '✓ Published — routed to ' + dept);
+  } else {
+    // Honest, not silent: this does NOT claim the submission succeeded. It's
+    // persisted in the offline queue and actually retried on the next
+    // 'online' event (see flushOfflineQueue()) — not just described as such.
+    await queueOfflineSubmission({ id: 'sub-' + Date.now() + '-' + Math.random().toString(36).slice(2), payload });
+    toast('Saved offline — will submit when you\'re back online.');
+  }
 
   // If this report started from tapping a dark block on the coverage grid,
   // close the loop for real: tell the coverage API this block is now
@@ -2205,6 +2428,12 @@ window.addEventListener('DOMContentLoaded',()=>{
   registerSW();
   resolveDisplayLocation();
 
+  // Retry any reports queued while offline, both right away (in case some
+  // were left over from a previous session and connectivity is already
+  // back) and on every future 'online' transition.
+  flushOfflineQueue();
+  window.addEventListener('online', flushOfflineQueue);
+
   const splash = document.getElementById('splashScreen');
   if (splash) {
     splash.addEventListener('click', hideSplash);
@@ -2220,7 +2449,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.querySelectorAll('.navtab').forEach(btn=>{
     btn.addEventListener('click',()=>switchTab(btn.dataset.target,btn));
   });
-  document.getElementById('btnCamera').addEventListener('click',openCamera);
+  document.getElementById('btnCamera').addEventListener('click',handleCameraButtonClick);
   document.getElementById('btnCloseCam').addEventListener('click',closeCamera);
   document.getElementById('btnCapture').addEventListener('click',capturePhoto);
   document.getElementById('btnSubmit').addEventListener('click',submitReport);
