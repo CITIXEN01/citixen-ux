@@ -99,21 +99,18 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .footer-staff-link{color:var(--muted);text-decoration:none;border-bottom:1px dashed var(--border);padding-bottom:1px}
 .footer-staff-link:hover{color:var(--mint2);border-color:var(--mint2)}
 
-/* ===== FOOTER SITEMAP (homepage-flow refactor) — secondary docs/actions/legal
-   links live here now that the top-nav "Civic Tools" dropdown is gone. ===== */
+/* ===== FOOTER (homepage-flow refactor) — the 4-column sitemap link grid
+   was removed per the footer-overhaul spec; only the centered slogan
+   callout, the Onboarding Portal button, the IP notice, and the bottom
+   legal line remain. ===== */
 .sitemap-footer{flex-direction:column;align-items:stretch;gap:0;padding:0}
-.sitemap-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;max-width:1100px;margin:0 auto;
-  padding:32px 24px;width:100%}
-.sitemap-col h5{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text);margin-bottom:10px}
-.sitemap-col a,.sitemap-col button{display:block;background:none;border:none;padding:0;margin-bottom:8px;
-  color:var(--muted);text-decoration:none;font-size:.74rem;text-align:left;cursor:pointer;font-family:inherit}
-.sitemap-col a:hover,.sitemap-col button:hover{color:var(--mint2)}
+.footer-slogan-callout{text-align:center;color:#00FF87;font-weight:800;font-size:.82rem;
+  text-transform:uppercase;letter-spacing:1px;padding:32px 24px 16px}
 .ip-notice-container{max-width:640px;margin:0 auto 20px;padding:16px 22px;text-align:center;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
 .ip-title{font-size:.68rem;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
 .ip-subtext{font-size:.66rem;color:var(--muted);line-height:1.5;max-width:560px;margin:0 auto}
 .sitemap-bottom{border-top:1px solid var(--border);padding:14px 22px max(14px, env(safe-area-inset-bottom));
   text-align:center;font-size:.68rem;color:var(--muted)}
-@media (max-width:768px){ .sitemap-grid{grid-template-columns:repeat(2,1fr)} }
 
 /* ===== HERO / HUD ===== */
 .hero{padding:44px 24px 8px;text-align:center;max-width:900px;margin:0 auto}
@@ -128,7 +125,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 /* ===== HERO — MASSIVE TITLE + C.I. DEFINITION (master-refactor overhaul) ===== */
 .hero-mega-title{font-size:clamp(2.4rem,9vw,4.6rem);font-weight:900;letter-spacing:-.5px;line-height:1;margin:6px 0 10px;text-shadow:0 0 28px rgba(0,255,136,.28);display:flex;align-items:center;justify-content:center;gap:.18em;flex-wrap:wrap}
 .hero-shield-icon{flex-shrink:0;filter:drop-shadow(0 0 10px rgba(0,255,136,.5))}
-.hero-kicker{font-size:.72rem;font-weight:800;color:#00FF87;text-transform:uppercase;letter-spacing:1.4px;margin:2px 0 10px}
+.hero-kicker{font-size:.72rem;font-weight:800;color:#00FF87;text-transform:uppercase;letter-spacing:1.4px;margin:2px 0 2rem}
 .hero-subtitle{font-size:1.3rem;font-weight:900;color:#fff;margin:0 0 14px}
 .hero-highlight{color:#00FF87}
 .ci-definition{color:var(--muted);font-size:.92rem;max-width:660px;margin:0 auto 6px;line-height:1.55}
@@ -144,17 +141,23 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .store-badge-small{font-size:.58rem;color:#c9c9c9;text-transform:uppercase;letter-spacing:.3px}
 .store-badge-big{font-size:.92rem;font-weight:700}
 
-/* ===== LATERAL BRIDGE HUB CARDS ===== */
+/* ===== LATERAL BRIDGE HUB CARDS — forced side-by-side at every width per
+   the homepage-declutter spec; cards shrink their padding/icon/font size
+   on narrow screens instead of stacking to a single column. ===== */
 .hub-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:920px;margin:0 auto 26px;padding:0 24px}
 .hub-card{display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--card);
   border:1px solid var(--border);border-radius:14px;padding:16px 12px;cursor:pointer;color:var(--text);
-  text-align:center;transition:border-color .15s,transform .15s;font-family:inherit}
+  text-align:center;transition:border-color .15s,transform .15s;font-family:inherit;min-width:0}
 .hub-card:hover{border-color:var(--mint2);transform:translateY(-2px)}
 .hub-card svg{stroke:var(--brand-mint);flex-shrink:0}
 .hub-card span{font-size:.74rem;font-weight:700;line-height:1.3}
 .hub-card-sub{font-size:.62rem !important;font-weight:500 !important;color:var(--muted);margin-top:-4px}
-@media (max-width:768px){
-  .hub-row{grid-template-columns:1fr}
+@media (max-width:640px){
+  .hub-row{gap:8px;padding:0 14px}
+  .hub-card{padding:12px 6px;gap:6px}
+  .hub-card svg{width:20px;height:20px}
+  .hub-card span{font-size:.64rem}
+  .hub-card-sub{font-size:.55rem !important}
 }
 
 .hud-grid{display:grid;grid-template-columns:0.8fr 1.2fr;gap:16px;max-width:980px;margin:0 auto 40px;padding:0 24px}
@@ -264,10 +267,9 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .leaflet-tile-pane{filter:invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);}
 .leaflet-div-icon{background:transparent;border:none}
 
-/* ===== NATIONWIDE CIVIC FRONTIER MAP SECTION (homepage-flow refactor) —
-   full-width map + search bar + ticker, replacing the old two-column
-   dashboard/sidebar layout at the top level. ===== */
-.frontier-map-section{max-width:1100px;margin:0 auto;padding:8px 24px 0}
+/* ===== Shared by the aggregate heat-map modal's search header (below) —
+   .frontier-map-section itself (the bottom-of-homepage search bar) was
+   removed with its markup per the homepage-declutter spec. ===== */
 .frontier-map-head{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
 .frontier-search-bar{flex:1;min-width:240px;position:relative}
 .frontier-search-bar input{width:100%;background:rgba(7,12,14,.8);border:1px solid var(--border);color:var(--text);
@@ -357,12 +359,6 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 @keyframes teaserRadarSpin{to{transform:rotate(360deg)}}
 .teaser-radar-label{font-size:.66rem;font-weight:800;letter-spacing:.3px;color:var(--mint2);text-transform:uppercase;text-align:center}
 
-.lightweight-feed-section{max-width:900px;margin:0 auto;padding:36px 24px 48px;border-top:1px solid var(--border)}
-.mini-feed-row{display:flex;justify-content:space-between;align-items:center;gap:10px;background:rgba(7,12,14,.5);
-  border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:8px;font-size:.78rem}
-.mini-feed-row .mfr-title{font-weight:700}
-.mini-feed-row .mfr-meta{color:var(--muted);font-size:.68rem;margin-top:2px}
-.mini-feed-row .mfr-hash{font-family:var(--mono);font-size:.62rem;color:var(--muted);flex-shrink:0;white-space:nowrap}
 
 /* ===== MAP BEACONS (CartoDB Dark Matter basemap) ===== */
 .beacon-incident{position:relative;width:100%;height:100%}
@@ -553,17 +549,6 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   .hiw-dot.d1{background:var(--mint2)}
 }
 
-/* ===== CITIXEN CODEX VAULT DRAWER — reuses the exact .ledger-drawer slide-out
-   chrome below (same overlay/panel/head/body classes), just its own tabs +
-   doc-row list. ===== */
-.codex-tabs{display:flex;gap:6px;margin-bottom:14px}
-.codex-tab{flex:1;background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--muted);
-  font-size:.68rem;font-weight:700;padding:9px 8px;border-radius:10px;cursor:pointer;text-align:center}
-.codex-tab.active{border-color:var(--mint2);background:rgba(0,255,136,.14);color:var(--mint2)}
-.codex-doc-row{background:rgba(7,12,14,.6);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px}
-.codex-doc-row .codex-doc-title{font-weight:700;font-size:.82rem;margin-bottom:3px}
-.codex-doc-row .codex-doc-desc{font-size:.72rem;color:var(--muted);line-height:1.4}
-
 /* ===== LIVE PUBLIC LEDGER DRAWER ===== */
 .ledger-drawer{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:2800;display:none}
 .ledger-drawer.open{display:flex;justify-content:flex-end}
@@ -591,38 +576,11 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 .statement-header{text-align:center;font-size:1.5rem;font-weight:900;margin-bottom:8px}
 .statement-sub{text-align:center;color:var(--muted);font-size:.86rem;margin-bottom:28px}
 
-/* Civic Stack Visualizer */
-.civic-stack-visualizer{max-width:640px;margin:0 auto 40px;display:flex;flex-direction:column;gap:8px}
-.stack-tier{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);
-  border:1px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;color:var(--text)}
-.stack-tier:hover{border-color:var(--mint2)}
-.stack-tier .tier-index{font-family:var(--mono);font-size:.72rem;color:var(--mint2);font-weight:800}
-.stack-tier .tier-name{font-weight:800;font-size:.92rem;flex:1}
-.stack-tier .tier-role{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
-.stack-tier .tier-chevron{transition:transform .15s;color:var(--muted)}
-
-/* ===== TRI-NODE INTERCONNECTED SYSTEM — Civic Memory / Municipal Dispatch /
-   The Civic Record as 3 linked ecosystem nodes rather than a numbered
-   1-2-3 list. A single emerald connector line runs behind all 3 cards;
-   node index numbers were removed entirely (role labels only). ===== */
-.tri-node-section{max-width:960px;margin:8px auto 28px;padding:0 24px}
-.tri-node-grid{max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;position:relative}
-.tri-node-grid::before{content:'';position:absolute;top:32px;left:6%;right:6%;height:2px;z-index:0;
-  background:linear-gradient(90deg,rgba(0,255,135,.15),#00FF87,rgba(0,255,135,.15));box-shadow:0 0 8px rgba(0,255,135,.5)}
-.tri-node{position:relative;z-index:1}
-.tri-node .stack-tier{position:relative;flex-direction:column;text-align:center;gap:6px;border-color:rgba(0,255,136,.35);padding:16px 12px 20px;background:var(--bg-obsidian)}
-.tri-node .tier-name{font-size:.84rem}
-.tri-node .tier-role{font-size:.6rem}
-.tri-node .tier-chevron{position:absolute;bottom:8px;right:12px}
-.tri-node .tier-detail{margin-top:8px}
-@media (max-width:640px){
-  .tri-node-grid{grid-template-columns:1fr}
-  .tri-node-grid::before{display:none}
-}
-.stack-tier[aria-expanded="true"] .tier-chevron{transform:rotate(180deg);color:var(--mint2)}
-.tier-detail{max-height:0;overflow:hidden;transition:max-height .2s ease;font-size:.82rem;color:var(--muted);
-  padding:0 16px;line-height:1.5}
-.tier-detail.open{max-height:200px;padding:10px 16px}
+/* ===== The always-visible Civic Memory/Municipal Dispatch/Civic Record
+   tri-node accordion (and its earlier vertical Civic Stack Visualizer
+   predecessor) was removed outright per the homepage-declutter spec, so
+   its .civic-stack-visualizer/.stack-tier/.tier-*/.tri-node* CSS was
+   removed with it rather than left orphaned. ===== */
 
 /* 3x3 Analytics Matrix */
 .matrix-summary-section{padding-top:32px}
@@ -815,27 +773,11 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </div>
   </div>
 
-  <!-- ===== THE CITIXEN CODEX (GOVERNANCE VAULT) — reference-only document
-       vault, two tracks. This is NOT a live legal database or a connection
-       to any real municipal/state records system: every entry below is a
-       short, hand-authored placeholder description, the same "production
-       placeholder, not yet recorded" convention already used by the
-       CITIXEN Paperwork File drawer's video/audio panes. ===== -->
-  <div class="ledger-drawer" id="codexDrawer">
-    <div class="ledger-drawer-panel">
-      <div class="ledger-drawer-head">
-        <strong style="color:var(--mint2)">The CITIXEN Codex — Governance Vault</strong>
-        <button class="modal-close" id="codexCloseBtn">✕</button>
-      </div>
-      <div class="ledger-drawer-body">
-        <div class="codex-tabs" role="tablist" aria-label="Codex track">
-          <button class="codex-tab active" id="codexTabA" type="button" role="tab" aria-selected="true">Track A — Statutory Governance</button>
-          <button class="codex-tab" id="codexTabB" type="button" role="tab" aria-selected="false">Track B — Historical Precedent</button>
-        </div>
-        <div id="codexDocList"></div>
-      </div>
-    </div>
-  </div>
+  <!-- ===== The CITIXEN Codex (Governance Vault) reference drawer was
+       removed along with the footer's Statutory Governance/Historical
+       Precedent links that were its only entry point (see footer-overhaul
+       spec) — see also the removed .codex-tab* CSS and
+       openCodexDrawer()/renderCodexTrack()/CODEX_TRACKS JS. ===== -->
 
   <section class="hero">
     <h1 class="hero-mega-title">
@@ -876,47 +818,15 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        the closest real equivalent to what it used to point at. ===== -->
   <span id="analytics" aria-hidden="true"></span>
 
-  <!-- ===== CIVIC INTELLIGENCE™ POWERED BY CIVIC MEMORY™ — TRI-NODE SYSTEM.
-       Relocated here (directly below the hero) from its old home inside the
-       hidden Operations drawer, and restyled from a numbered 1-2-3 vertical
-       accordion into an always-visible 3-column interconnected grid. Same
-       #civicStackVisualizer id, .stack-tier/.tier-detail markup and
-       data-tier attributes as before, so the existing accordion click
-       handler and the footer's "Civic Stack™" links (openCivicStackTier())
-       keep working unchanged — only the layout and index numbering
-       changed. ===== -->
-  <section class="tri-node-section" id="civicMemorySystem">
-    <div style="text-align:center;margin-bottom:16px">
-      <h3 style="font-size:1.1rem">Civic Intelligence<sup style="font-size:.6em;opacity:.5;">™</sup>: Powered by Civic Memory<sup style="font-size:.6em;opacity:.5;">™</sup></h3>
-      <p class="statement-sub">The Civic Stack™ — how one verified report becomes a permanent, auditable record.</p>
-    </div>
-    <div class="civic-stack-visualizer tri-node-grid" id="civicStackVisualizer">
-      <div class="tri-node">
-        <button class="stack-tier" data-tier="memory" type="button" aria-expanded="false">
-          <span class="tier-name">Civic Memory™</span>
-          <span class="tier-role">Sourcing</span>
-          <span class="tier-chevron">▾</span>
-        </button>
-        <div class="tier-detail" data-tier-detail="memory">The public event ledger powered by CITIXEN citizen reports — the same Live Feed / Live Ledger shown in the dashboard above, zero-account by design.</div>
-      </div>
-      <div class="tri-node">
-        <button class="stack-tier" data-tier="dispatch" type="button" aria-expanded="false">
-          <span class="tier-name">Municipal Dispatch</span>
-          <span class="tier-role">Operations</span>
-          <span class="tier-chevron">▾</span>
-        </button>
-        <div class="tier-detail" data-tier-detail="dispatch">Field Work Orders — City Worker SLA tracking and a required on-site proof photo before any ticket closes, so a desk closure is never mistaken for a real fix.</div>
-      </div>
-      <div class="tri-node">
-        <button class="stack-tier" data-tier="record" type="button" aria-expanded="false">
-          <span class="tier-name">The Civic Record™</span>
-          <span class="tier-role">Audit</span>
-          <span class="tier-chevron">▾</span>
-        </button>
-        <div class="tier-detail" data-tier-detail="record">Public Official executive audit &amp; budget line-item binding — the same Big 3 metrics and Municipal Expenditure &amp; Allocation ledger shown in the Expenditures drawer, rolled up for oversight and public accountability.</div>
-      </div>
-    </div>
-  </section>
+  <!-- ===== The always-visible Civic Intelligence™/Civic Memory™ tri-node
+       accordion (Civic Memory™/Sourcing, Municipal Dispatch/Operations,
+       The Civic Record™/Audit) that used to sit here was removed outright
+       per the homepage-declutter spec — it was a static, non-interactive
+       display and the concepts it named are already covered by the Live
+       Public Ledger banner below and the Expenditures/Operations drawers.
+       Its old #civicStackVisualizer id, .stack-tier/.tier-detail markup,
+       CSS, and the openCivicStackTier()/accordion-click JS were all
+       deleted rather than left orphaned. ===== -->
 
   <!-- ===== CITY SNAPSHOT™ — SUMMARY VIEW (formerly "3x3 Analytics Matrix") ===== -->
   <section class="matrix-summary-section" id="matrixSummarySection">
@@ -937,7 +847,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   <section class="ledger-banner-section">
     <button class="ledger-banner" id="liveLedgerBanner" type="button">
       <span class="ledger-banner-pulse" aria-hidden="true"></span>
-      <span class="ledger-banner-label">LIVE PUBLIC LEDGER — REAL-TIME REMEDIATION STREAM</span>
+      <span class="ledger-banner-label">LIVE PUBLIC LEDGER — CIVIC MEMORY™</span>
       <span class="ledger-banner-count" id="ledgerBannerCount">Syncing…</span>
     </button>
   </section>
@@ -959,17 +869,17 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     <button class="hub-card" id="hubCoverageBtn" type="button" aria-expanded="false" aria-controls="deepdiveAnalytics">
       <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><rect x="6" y="10" width="3" height="9"/><rect x="11" y="6" width="3" height="13"/><rect x="16" y="13" width="3" height="6"/></svg>
       <span>Analytics</span>
-      <span class="hub-card-sub">Includes field reporting</span>
+      <span class="hub-card-sub">Data and reports</span>
     </button>
     <button class="hub-card" id="hubSlaBtn" type="button" aria-expanded="false" aria-controls="civicStackSection">
-      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 6.5c0-1.9-2.2-3.5-5-3.5s-5 1.6-5 3.5 2.2 3 5 3.5 5 1.6 5 3.5-2.2 3.5-5 3.5-5-1.6-5-3.5"/></svg>
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7V5a2 2 0 0 1 2-2h8"/><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M2 11h20"/><circle cx="17" cy="15" r="1.3" fill="#00FF87" stroke="none"/></svg>
       <span>Expenditures</span>
-      <span class="hub-card-sub">Capital allocation &amp; sub-projects</span>
+      <span class="hub-card-sub">Budget and projects</span>
     </button>
     <button class="hub-card" id="hubStackBtn" type="button" aria-expanded="false" aria-controls="civicStackSection">
       <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 21 8 12 13 3 8 12 3"/><polyline points="3 13 12 18 21 13"/><polyline points="3 18 12 23 21 18"/></svg>
       <span>Operations</span>
-      <span class="hub-card-sub">Civic Stack™ workflows &amp; API webhooks</span>
+      <span class="hub-card-sub">Civic Stack &amp; integration</span>
     </button>
   </div>
 
@@ -1240,34 +1150,14 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        than being deleted outright. The heat map modal itself (#nationalHeatMapModal)
        is unchanged and still reachable from there. ===== -->
 
-  <!-- ===== SEARCH BAR — retained at the bottom of the homepage scroll per the
-       master-refactor spec ("Retain the Search Bar ... at the bottom"). Same
-       #frontierSearchInput id and trySearchCity()/applyCitySelection() wiring
-       as before; only the inline map and national ticker that used to sit
-       alongside it were removed from the mid-scroll position (they now live
-       in the full-screen heat map modal above). id="frontierMap" is kept so
-       the footer's existing "Geo-Hatch Map" sitemap link still resolves. ===== -->
-  <section class="frontier-map-section" id="frontierMap">
-    <div class="frontier-search-bar" style="max-width:520px;margin:0 auto;">
-      <input type="text" id="frontierSearchInput" list="frontierSearchList" placeholder="Search Zip, City, Ward…" aria-label="Search Zip, City, Ward">
-      <datalist id="frontierSearchList">
-        <option value="La Crosse, WI">La Crosse, WI</option>
-        <option value="Austin, TX">Austin, TX</option>
-        <option value="Chicago, IL">Chicago, IL</option>
-      </datalist>
-      <div class="frontier-search-note">Selecting a match also updates the National Geo-Hatch™ Heat Map above.</div>
-    </div>
-  </section>
-
-  <!-- ===== REAL-TIME DISPATCH & AUDIT LEDGER (LIGHTWEIGHT) — always visible,
-       a handful of recent items only; the full Live Feed/Immutable Audit
-       Stream toggle lives in the Analytics & Reporting deep-dive above, and
-       the full searchable ledger lives in the Live Public Ledger drawer. ===== -->
-  <section class="lightweight-feed-section" id="lightweightFeedSection">
-    <div class="label" style="justify-content:center;margin-bottom:14px">Real-Time Dispatch &amp; Audit Ledger</div>
-    <div id="lightweightFeed"></div>
-    <button class="btn btn-outline" id="btnViewFullLedger" style="width:100%;justify-content:center;margin-top:8px;" type="button">View Full Ledger ↗</button>
-  </section>
+  <!-- ===== The bottom-of-homepage "Search Zip, City, Ward…" search bar
+       (#frontierMap) and the always-visible "Real-Time Dispatch & Audit
+       Ledger" lightweight list + "View Full Ledger ↗" button
+       (#lightweightFeedSection) were both removed outright per the
+       homepage-declutter spec. The full searchable ledger remains
+       reachable via the Live Public Ledger banner above (openLedgerDrawer()),
+       and the full Live Feed/Immutable Audit Stream toggle remains in the
+       Analytics & Reporting deep-dive. ===== -->
 
   <!-- MODAL OVERLAY -->
   <div class="modal-overlay" id="modalOverlay">
@@ -1367,34 +1257,15 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </div>
   </div>
 
+  <!-- ===== FOOTER — the 4-column sitemap link block (Platform & App / The
+       Civic Stack™ / Statutory Governance / Historical Precedent) was
+       removed outright per spec. Its only unique feature, The CITIXEN
+       Codex (Governance Vault) reference drawer, had no other entry point
+       once those links were gone, so it was removed with them rather than
+       left orphaned/unreachable (see the removed #codexDrawer markup, its
+       CSS, and openCodexDrawer()/renderCodexTrack() JS). ===== -->
   <footer class="site-footer sitemap-footer">
-    <div class="sitemap-grid">
-      <div class="sitemap-col">
-        <h5>Platform &amp; App</h5>
-        <a href="/app.html" target="_blank" rel="noopener noreferrer">CITIXEN Mobile App ↗</a>
-        <button type="button" data-scroll-to="frontierMap">Geo-Hatch Map</button>
-        <button type="button" data-scroll-to="matrixSummarySection">City Snapshot™</button>
-      </div>
-      <div class="sitemap-col">
-        <h5>The Civic Stack™</h5>
-        <button type="button" data-stack-tier="memory">Civic Memory™</button>
-        <button type="button" data-stack-tier="dispatch">Municipal Dispatch</button>
-        <button type="button" data-stack-tier="record">The Civic Record™</button>
-      </div>
-      <div class="sitemap-col">
-        <h5>Statutory Governance</h5>
-        <button type="button" data-codex="a">C.I.™ Charter</button>
-        <button type="button" data-codex="a">Municipal Code</button>
-        <button type="button" data-codex="a">WI Constitution</button>
-        <button type="button" data-codex="a">FOIA Specs</button>
-      </div>
-      <div class="sitemap-col">
-        <h5>Historical Precedent</h5>
-        <button type="button" data-codex="b">Bill of Rights</button>
-        <button type="button" data-codex="b">Public Trust Doctrine</button>
-        <button type="button" data-codex="b">Early Charters</button>
-      </div>
-    </div>
+    <div class="footer-slogan-callout">Upgrade Your Civic Experience™</div>
     <div style="text-align:center;padding:0 22px 20px;">
       <button class="btn btn-outline" id="btnOpenOnboardingWizard" type="button">Municipal Onboarding Portal</button>
     </div>
@@ -1555,10 +1426,11 @@ function plotMarker(item){
   markers[item.id]=m;
 }
 
-/* ===== CITY / WARD SELECTOR — shared by the detailed gridSelect dropdown
-   (inside the Analytics & Reporting deep-dive) and the universal search
-   bar above the map (frontierSearchInput), so there's one source of truth
-   for "switch active demo jurisdiction" instead of two. ===== */
+/* ===== CITY / WARD SELECTOR — drives the detailed gridSelect dropdown
+   inside the Analytics & Reporting deep-dive (the bottom-of-homepage
+   universal search bar that used to share this was removed per the
+   homepage-declutter spec, along with trySearchCity()/
+   CITY_SEARCH_KEY_BY_LABEL, its only callers). ===== */
 function applyCitySelection(key){
   const c=cities[key];
   if(!c) return;
@@ -1581,27 +1453,6 @@ document.getElementById('gridSelect').addEventListener('change',(e)=>{
   }
   applyCitySelection(key);
 });
-// Universal search bar above the map — matches by label against the same
-// seeded cities object (La Crosse/Austin/Chicago), the only jurisdictions
-// this demo actually has data for. No live national ZIP/ward lookup exists
-// here, hence the disclosure note under the input in the markup.
-const CITY_SEARCH_KEY_BY_LABEL = {};
-Object.entries(cities).forEach(([key, c]) => { CITY_SEARCH_KEY_BY_LABEL[c.label.toLowerCase()] = key; });
-function trySearchCity(raw){
-  const q = String(raw || '').trim().toLowerCase();
-  if (!q) return;
-  let key = CITY_SEARCH_KEY_BY_LABEL[q];
-  if (!key) {
-    const match = Object.entries(cities).find(([, c]) => c.name.toLowerCase() === q || c.label.toLowerCase().includes(q));
-    key = match && match[0];
-  }
-  if (key) applyCitySelection(key);
-}
-const frontierSearchInput = document.getElementById('frontierSearchInput');
-if (frontierSearchInput) {
-  frontierSearchInput.addEventListener('change', () => trySearchCity(frontierSearchInput.value));
-  frontierSearchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') trySearchCity(frontierSearchInput.value); });
-}
 function setBar(cat,pct){
   document.getElementById('pct'+cat).textContent=pct+'%';
   document.getElementById('bar'+cat).style.width=pct+'%';
@@ -1672,29 +1523,12 @@ function renderAuditStream(){
   });
 }
 
-/* ===== LIGHTWEIGHT COMBINED DISPATCH + AUDIT LEDGER FEED — the always-
-   visible bottom-of-page summary (spec: "Real-Time Dispatch & Audit
-   Ledger (Lightweight)"). Reuses the exact same `cases` and audit-entry
-   data every other feed on this page already renders from — no second,
-   invented data source — just a shorter, plainer list. The full
-   Live Incidents/Immutable Audit Stream toggle lives in the Analytics &
-   Reporting deep-dive; the full searchable ledger lives in the Live
-   Public Ledger drawer (View Full Ledger ↗ button below this list). ===== */
-function renderLightweightFeed(){
-  const el = document.getElementById('lightweightFeed');
-  if (!el) return;
-  const recentCases = cases.slice(0, 3).map(c => ({
-    title: c.title, meta: `${c.loc} • ${c.time}`, hash: null
-  }));
-  const recentAudit = loadSyncedAuditEntries().slice(0, 3).map(a => ({
-    title: a.title, meta: `Resolved ${a.resolved} • ${a.cost}`, hash: a.hash
-  }));
-  const rows = recentCases.concat(recentAudit).slice(0, 6);
-  el.innerHTML = rows.map(r => `<div class="mini-feed-row">
-      <div><div class="mfr-title">${esc(r.title)}</div><div class="mfr-meta">${esc(r.meta)}</div></div>
-      ${r.hash ? `<div class="mfr-hash">SHA-256 ${esc(r.hash)}</div>` : ''}
-    </div>`).join('') || '<div class="small" style="color:var(--muted)">No recent activity yet.</div>';
-}
+/* ===== The always-visible bottom-of-page "Real-Time Dispatch & Audit
+   Ledger (Lightweight)" summary and its renderLightweightFeed() were
+   removed along with their markup per the homepage-declutter spec. The
+   full Live Incidents/Immutable Audit Stream toggle remains in the
+   Analytics & Reporting deep-dive; the full searchable ledger remains
+   reachable via the Live Public Ledger banner. ===== */
 document.querySelectorAll('.audit-tab').forEach(tab=>{
   tab.addEventListener('click',()=>{
     document.querySelectorAll('.audit-tab').forEach(t=>t.classList.remove('active'));
@@ -2446,32 +2280,9 @@ async function loadBig3(){
   renderAnalyticsMatrix(data);
 }
 
-/* =====================================================================
-   CIVIC STACK VISUALIZER — simple accordion, no fabricated interactivity
-   beyond expand/collapse of the real descriptions authored in the markup.
-   ===================================================================== */
-document.querySelectorAll('.stack-tier').forEach(tier => {
-  tier.addEventListener('click', () => {
-    const detail = document.querySelector(`.tier-detail[data-tier-detail="${tier.dataset.tier}"]`);
-    const isOpen = tier.getAttribute('aria-expanded') === 'true';
-    tier.setAttribute('aria-expanded', String(!isOpen));
-    if (detail) detail.classList.toggle('open', !isOpen);
-  });
-});
-// Footer sitemap links into a specific Civic Stack tier: opens the
-// civicStackSection deep-dive panel, expands that one tier's accordion
-// detail, and scrolls it into view — same accordion the tier buttons
-// above already drive, just triggered from the footer instead.
-function openCivicStackTier(tierKey){
-  // The Civic Stack™ visualizer is now always visible just below the hero
-  // (no longer inside a hidden deep-dive panel), so this just expands the
-  // one tier and scrolls it into view.
-  const tierBtn = document.querySelector(`.stack-tier[data-tier="${tierKey}"]`);
-  const detail = document.querySelector(`.tier-detail[data-tier-detail="${tierKey}"]`);
-  if (tierBtn) tierBtn.setAttribute('aria-expanded', 'true');
-  if (detail) detail.classList.add('open');
-  setTimeout(() => { if (tierBtn) tierBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 60);
-}
+/* ===== The Civic Stack Visualizer accordion click-handler and
+   openCivicStackTier() (footer link into it) were removed along with the
+   tri-node markup/CSS above — nothing on the page calls them anymore. ===== */
 
 /* =====================================================================
    3x3 ANALYTICS MATRIX — Active Hazards / Fix Speed / Completion Rate.
@@ -2897,59 +2708,15 @@ async function openLedgerDrawer(){
 function closeLedgerDrawer(){
   document.getElementById('ledgerDrawer').classList.remove('open');
 }
-document.getElementById('btnViewFullLedger').addEventListener('click', () => openLedgerDrawer());
 document.getElementById('liveLedgerBanner').addEventListener('click', () => openLedgerDrawer());
 document.getElementById('ledgerCloseBtn').addEventListener('click', closeLedgerDrawer);
 document.getElementById('ledgerDrawer').addEventListener('click', (e) => { if (e.target.id === 'ledgerDrawer') closeLedgerDrawer(); });
 
-/* ===== THE CITIXEN CODEX (GOVERNANCE VAULT) DRAWER ===== */
-const CODEX_TRACKS = {
-  a: [
-    { title: 'C.I.™ Governance Charter', desc: 'The founding rules for how Civic Intelligence™ data is collected, retained (or not), and used — reference placeholder, not yet published in full.' },
-    { title: 'Municipal Code', desc: 'The seeded jurisdiction\'s local ordinances governing public right-of-way hazards, dispatch SLAs, and capital project procurement — reference placeholder.' },
-    { title: 'WI State Constitution', desc: 'Wisconsin\'s state constitution, referenced for the municipal home-rule authority this platform\'s demo jurisdiction operates under — reference placeholder.' },
-    { title: 'FOIA & ADA Compliance', desc: 'Open-records request handling and ADA accessibility commitments for this platform\'s public-facing pages and data — reference placeholder.' }
-  ],
-  b: [
-    { title: 'U.S. Constitution & Bill of Rights', desc: 'The federal constitutional grounding for citizen petition and open-government rights that this platform\'s civic-reporting model draws on — reference placeholder.' },
-    { title: 'Historical Charters', desc: 'Historical municipal charters establishing the public right-of-way concept this platform\'s hazard reports are scoped to — reference placeholder.' },
-    { title: 'Public Trust Doctrine', desc: 'The legal doctrine holding certain public resources (roads, sidewalks, utilities) in trust for citizen use — the same "public right-of-way" concept the reporting flow checks against — reference placeholder.' }
-  ]
-};
-function renderCodexTrack(track){
-  document.getElementById('codexTabA').classList.toggle('active', track === 'a');
-  document.getElementById('codexTabA').setAttribute('aria-selected', String(track === 'a'));
-  document.getElementById('codexTabB').classList.toggle('active', track === 'b');
-  document.getElementById('codexTabB').setAttribute('aria-selected', String(track === 'b'));
-  document.getElementById('codexDocList').innerHTML = CODEX_TRACKS[track].map(d =>
-    `<div class="codex-doc-row"><div class="codex-doc-title">${esc(d.title)}</div><div class="codex-doc-desc">${esc(d.desc)}</div></div>`
-  ).join('');
-}
-function openCodexDrawer(track){
-  renderCodexTrack(track === 'b' ? 'b' : 'a');
-  document.getElementById('codexDrawer').classList.add('open');
-}
-function closeCodexDrawer(){
-  document.getElementById('codexDrawer').classList.remove('open');
-}
-document.getElementById('codexTabA').addEventListener('click', () => renderCodexTrack('a'));
-document.getElementById('codexTabB').addEventListener('click', () => renderCodexTrack('b'));
-document.getElementById('codexCloseBtn').addEventListener('click', closeCodexDrawer);
-document.getElementById('codexDrawer').addEventListener('click', (e) => { if (e.target.id === 'codexDrawer') closeCodexDrawer(); });
-
-/* ===== FOOTER SITEMAP WIRING (CSP-safe, no inline onclick) ===== */
-document.querySelectorAll('.sitemap-col [data-scroll-to]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const el = document.getElementById(btn.dataset.scrollTo);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
-});
-document.querySelectorAll('.sitemap-col [data-stack-tier]').forEach(btn => {
-  btn.addEventListener('click', () => openCivicStackTier(btn.dataset.stackTier));
-});
-document.querySelectorAll('.sitemap-col [data-codex]').forEach(btn => {
-  btn.addEventListener('click', () => openCodexDrawer(btn.dataset.codex));
-});
+/* ===== The CITIXEN Codex (Governance Vault) drawer JS (CODEX_TRACKS,
+   renderCodexTrack, openCodexDrawer, closeCodexDrawer) and the footer
+   sitemap wiring for the removed 4-column link block (data-scroll-to /
+   data-stack-tier / data-codex) were removed together, since the footer
+   overhaul deleted their only markup/triggers. ===== */
 const ledgerSearchInputEl = document.getElementById('ledgerSearchInput');
 if (ledgerSearchInputEl) ledgerSearchInputEl.addEventListener('input', () => {
   ledgerFilters.q = ledgerSearchInputEl.value.trim();
@@ -3142,7 +2909,6 @@ if (wizDeployBtnEl) wizDeployBtnEl.addEventListener('click', () => {
 
 window.addEventListener('DOMContentLoaded',()=>{
   renderFeed();
-  renderLightweightFeed();
   initMap();
   updateTelemetry(cities.lacrosse);
   loadBig3();
