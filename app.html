@@ -15,6 +15,8 @@
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=4">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<!-- Client-side PDF export for the Ward Health Summary — same CDN-script pattern as Leaflet above, no bundler/build step. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{
   --brand-mint:#00ff88 !important;
@@ -483,6 +485,10 @@ textarea.input{resize:none;line-height:1.4}
           <div class="big3-tile"><div class="big3-val" id="big3Capex">–</div><div class="big3-lbl">CapEx Timeline Adherence</div></div>
         </div>
         <div class="big3-note">Computed live from seeded ledger/CapEx demo data — not asserted as a production dataset.</div>
+        <button class="btn-camera" id="btnDownloadWardHealthPdf" style="border-style:solid;margin-top:4px;">
+          <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>
+          Download Ward Health Summary (PDF)
+        </button>
       </div>
 
       <!-- 1. FOG-OF-WAR ASSET COVERAGE GRID (Geohash Coverage Grid Engine — 3 zoom tiers) -->
@@ -797,6 +803,106 @@ async function loadBig3(){
   setTextIfExists('big3Speed', data.avgResolutionHours != null ? data.avgResolutionHours + 'h' : 'N/A');
   setTextIfExists('big3Verify', data.verificationRatePct != null ? data.verificationRatePct + '%' : 'N/A');
   setTextIfExists('big3Capex', data.capExAdherencePct != null ? data.capExAdherencePct + '%' : 'N/A');
+}
+
+/* =====================================================================
+   WARD HEALTH SUMMARY — ONE-CLICK PDF EXPORT (client-side, via jsPDF)
+   -----------------------------------------------------------------
+   Every figure in this export is pulled from the exact same sources this
+   page already renders from — /api/coverage/big3 (The Big 3 + the real
+   CAPEX_PROJECTS seed set, via ensureCipProjects()) and
+   /api/coverage/tickets (the real seeded ticket ledger, via
+   fetchLedgerTickets()), or their identical seed-mirroring fallbacks used
+   elsewhere on this page when the API is unreachable. Nothing here is a
+   second, invented numbers pipeline.
+   This is a CURRENT SNAPSHOT export, not a synthetic trailing-12-month
+   history: this codebase has no real historical time series to draw on,
+   so none is fabricated for this PDF — the export says so explicitly.
+   Zero-PII: the ticket/CapEx data model behind this export has no
+   reporter-identifying field to begin with (see api/_lib/store.js's
+   privacy note at the top of that file), and nothing here adds one.
+   ===================================================================== */
+async function buildWardHealthPdfData(){
+  let big3National;
+  try {
+    const res = await fetch('/api/coverage/big3');
+    if (!res.ok) throw new Error('big3 returned ' + res.status);
+    const json = await res.json();
+    big3National = json.national;
+  } catch (err) {
+    big3National = fallbackBigThree();
+  }
+  const capExProjects = await ensureCipProjects();
+  const tickets = await fetchLedgerTickets();
+  const ticketCounts = { submitted: 0, dispatched: 0, resolved: 0 };
+  tickets.forEach(t => { if (Object.prototype.hasOwnProperty.call(ticketCounts, t.stage)) ticketCounts[t.stage]++; });
+  const cipCounts = { 'on-time': 0, 'on-track': 0, delayed: 0 };
+  capExProjects.forEach(p => { if (Object.prototype.hasOwnProperty.call(cipCounts, p.status)) cipCounts[p.status]++; });
+  return { big3National, capExProjects, ticketCounts, cipCounts, totalTickets: tickets.length };
+}
+
+async function downloadWardHealthPdf(triggerBtn){
+  if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) {
+    // Mirrors this file's existing "typeof L === 'undefined'" CDN-load guard —
+    // a blocked/offline CDN degrades to a clear toast, not a thrown error.
+    toast('PDF library failed to load — check your connection and try again.');
+    return;
+  }
+  const originalLabel = triggerBtn ? triggerBtn.innerHTML : null;
+  if (triggerBtn) { triggerBtn.disabled = true; triggerBtn.textContent = 'Generating…'; }
+  try {
+    const { big3National, capExProjects, ticketCounts, cipCounts, totalTickets } = await buildWardHealthPdfData();
+    const jurisdictionLine = currentWardMeta
+      ? (currentWardMeta.cityName + ', ' + currentWardMeta.state.toUpperCase() + (currentWardMeta.isGpsMatch ? ' — ' + currentWardMeta.wardName : ' (citywide default)'))
+      : 'Citywide (jurisdiction not confirmed)';
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+    let y = 56;
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(18);
+    doc.text('CITIXEN UX — Ward Health Summary', 40, y); y += 22;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(11);
+    doc.text('Jurisdiction: ' + jurisdictionLine, 40, y); y += 16;
+    doc.text('Generated: ' + new Date().toLocaleString() + '  —  current snapshot, not a 12-month history', 40, y); y += 30;
+
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(13);
+    doc.text('The Big 3 — Public Health Metrics', 40, y); y += 18;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(11);
+    doc.text('Speed of Resolution (avg hrs, report to closeout): ' + (big3National.avgResolutionHours != null ? big3National.avgResolutionHours + 'h' : 'N/A'), 48, y); y += 16;
+    doc.text('Resolution Verification Rate: ' + (big3National.verificationRatePct != null ? big3National.verificationRatePct + '%' : 'N/A'), 48, y); y += 16;
+    doc.text('Capital Project Timeline Adherence: ' + (big3National.capExAdherencePct != null ? big3National.capExAdherencePct + '%' : 'N/A'), 48, y); y += 30;
+
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(13);
+    doc.text('Capital Project (CIP) Intercept Data', 40, y); y += 18;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(11);
+    doc.text('Total scheduled capital projects on file: ' + capExProjects.length, 48, y); y += 16;
+    doc.text('On-time (completed within schedule): ' + cipCounts['on-time'], 48, y); y += 16;
+    doc.text('On-track (in progress, within schedule): ' + cipCounts['on-track'], 48, y); y += 16;
+    doc.text('Delayed (completed late, or past schedule): ' + cipCounts['delayed'], 48, y); y += 30;
+
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(13);
+    doc.text('Ticket / Case Counts by Status', 40, y); y += 18;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(11);
+    doc.text('Submitted (filed, not yet dispatched): ' + ticketCounts.submitted, 48, y); y += 16;
+    doc.text('Dispatched (crew assigned / en route): ' + ticketCounts.dispatched, 48, y); y += 16;
+    doc.text('Resolved (closed): ' + ticketCounts.resolved, 48, y); y += 16;
+    doc.text('Total tickets on file: ' + totalTickets, 48, y); y += 30;
+
+    doc.setFont('helvetica', 'italic'); doc.setFontSize(9);
+    [
+      'This export reflects a current snapshot of CITIXEN UX seed/demo ledger and capital-project',
+      'data, computed live from the same records this app displays (api/_lib/store.js). It is not a',
+      'synthetic trailing-12-month history — no such historical dataset exists in this build. No',
+      'reporter-identifying information is included in this export or in the underlying data model.'
+    ].forEach(line => { doc.text(line, 40, y); y += 12; });
+
+    doc.save('citixen-ward-health-summary.pdf');
+  } catch (err) {
+    console.error('Ward Health PDF generation failed', err);
+    toast('Could not generate the PDF — please try again.');
+  } finally {
+    if (triggerBtn) { triggerBtn.disabled = false; if (originalLabel !== null) triggerBtn.innerHTML = originalLabel; }
+  }
 }
 
 /* =====================================================================
@@ -2132,6 +2238,9 @@ window.addEventListener('DOMContentLoaded',()=>{
 
   document.getElementById('btnInterceptCancel').addEventListener('click', handleInterceptCancel);
   document.getElementById('btnInterceptOverride').addEventListener('click', handleInterceptOverride);
+
+  const pdfBtn = document.getElementById('btnDownloadWardHealthPdf');
+  if (pdfBtn) pdfBtn.addEventListener('click', () => downloadWardHealthPdf(pdfBtn));
 });
 </script>
 </body>
