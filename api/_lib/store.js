@@ -244,14 +244,42 @@ function getTicketByReportId(reportId) {
 // currently within its scheduled window), 'on-time' (completed within its
 // scheduled window) or 'delayed' (completed late, or currently past its
 // scheduled window) — only 'delayed' counts against adherence.
+//
+// GEO FIELDS (`lat`/`lng`/`radiusMeters`) + `category`/`scope` were added
+// for the Pre-Snap Capital Project Intercept System (app.html's reporting
+// flow). These are hand-picked, illustrative coordinates roughly matching
+// each project's named street/ward (several deliberately reuse the exact
+// spot of an existing seeded ticket/case above, e.g. cip-2 sits on Main St
+// & 4th Ave, same as ticket w4t1 and dispatch-map case c1) — NOT a real
+// municipal GIS/CIP import, same honesty convention as every other seed
+// array in this module. `radiusMeters` is a rough "this project's fix
+// covers citizens within roughly this distance" service radius, not a
+// surveyed project boundary. `category` uses the same CATEGORIES
+// vocabulary as the coverage grid above, so a report's category can be
+// checked against a project's category before treating a spatial match as
+// a real "this is already being fixed" intercept.
 const CAPEX_PROJECTS = [
-  { id: 'cip-1', name: 'Ward 4 Storm Sewer Relining', ward: 'ward-4', scheduled: 'Q3 2026', status: 'on-time' },
-  { id: 'cip-2', name: 'Main St Resurfacing Phase II', ward: 'ward-4', scheduled: 'Q4 2026', status: 'on-track' },
-  { id: 'cip-3', name: 'Ward 7 Streetlight LED Retrofit', ward: 'ward-7', scheduled: 'Q2 2026', status: 'delayed' },
-  { id: 'cip-4', name: 'Losey Blvd Sidewalk/ADA Upgrade', ward: 'ward-7', scheduled: 'Q3 2026', status: 'on-track' },
-  { id: 'cip-5', name: 'Ward 12 Culvert Replacement', ward: 'ward-12', scheduled: 'Q1 2026', status: 'on-time' },
-  { id: 'cip-6', name: 'National Ave Signage Modernization', ward: 'ward-12', scheduled: 'Q4 2026', status: 'on-track' },
-  { id: 'cip-7', name: 'Ashland Ave Arterial Rebuild', ward: 'ward-3', scheduled: 'Q2 2026', status: 'delayed' }
+  { id: 'cip-1', name: 'Ward 4 Storm Sewer Relining', ward: 'ward-4', scheduled: 'Q3 2026', status: 'on-time',
+    category: 'Drainage', scope: 'Full storm sewer reline along the Pine St alley corridor, replacing collapsed clay pipe.',
+    lat: 43.8100, lng: -91.2550, radiusMeters: 300 },
+  { id: 'cip-2', name: 'Main St Resurfacing Phase II', ward: 'ward-4', scheduled: 'Q4 2026', status: 'on-track',
+    category: 'Pothole', scope: 'Full-depth mill-and-overlay resurfacing of Main St from 2nd Ave to 6th Ave, including the 4th Ave intersection.',
+    lat: 43.8138, lng: -91.2519, radiusMeters: 250 },
+  { id: 'cip-3', name: 'Ward 7 Streetlight LED Retrofit', ward: 'ward-7', scheduled: 'Q2 2026', status: 'delayed',
+    category: 'Streetlight', scope: 'Citywide swap of Ward 7 cobra-head fixtures to LED, corridor-wide rather than pole-by-pole.',
+    lat: 43.8050, lng: -91.2430, radiusMeters: 400 },
+  { id: 'cip-4', name: 'Losey Blvd Sidewalk/ADA Upgrade', ward: 'ward-7', scheduled: 'Q3 2026', status: 'on-track',
+    category: 'Sidewalk', scope: 'Sidewalk panel replacement and ADA curb ramp upgrades along Losey Blvd.',
+    lat: 43.8020, lng: -91.2380, radiusMeters: 300 },
+  { id: 'cip-5', name: 'Ward 12 Culvert Replacement', ward: 'ward-12', scheduled: 'Q1 2026', status: 'on-time',
+    category: 'Drainage', scope: 'Replacement of an undersized culvert causing recurring backups near National Ave.',
+    lat: 43.0230, lng: -87.9650, radiusMeters: 350 },
+  { id: 'cip-6', name: 'National Ave Signage Modernization', ward: 'ward-12', scheduled: 'Q4 2026', status: 'on-track',
+    category: 'Signage', scope: 'Corridor-wide crosswalk and wayfinding signage replacement along National Ave.',
+    lat: 43.0130, lng: -87.9500, radiusMeters: 500 },
+  { id: 'cip-7', name: 'Ashland Ave Arterial Rebuild', ward: 'ward-3', scheduled: 'Q2 2026', status: 'delayed',
+    category: 'Pothole', scope: 'Full arterial road rebuild of Ashland Ave, subgrade up, not a patch-level repair.',
+    lat: 41.8850, lng: -87.6670, radiusMeters: 400 }
 ];
 
 function capExAdherencePct(projects) {

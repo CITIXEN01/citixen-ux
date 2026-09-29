@@ -283,6 +283,22 @@ textarea.input{resize:none;line-height:1.4}
 .ledger-report-id{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.62rem;color:var(--mint2)}
 .ledger-empty{text-align:center;color:var(--muted);font-size:.78rem;padding:24px 0}
 
+/* ===== PRE-SNAP CAPITAL PROJECT INTERCEPT MODAL ===== */
+.intercept-drawer{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:2700;display:none;
+  align-items:center;justify-content:center;padding:18px}
+.intercept-drawer.open{display:flex}
+.intercept-card{background:var(--card);border:1px solid var(--brand-amber);border-radius:16px;padding:20px;
+  max-width:440px;width:100%}
+.intercept-title{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;
+  color:var(--brand-amber);display:flex;align-items:center;gap:6px;margin-bottom:12px}
+.intercept-project{font-size:1rem;font-weight:900;margin-bottom:6px}
+.intercept-meta{font-size:.76rem;color:var(--muted);margin-bottom:4px;line-height:1.45}
+.intercept-actions{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.btn-intercept-cancel{width:100%;background:rgba(0,255,136,.12);color:var(--mint2);border:1px solid var(--mint2);
+  padding:13px;border-radius:12px;font-weight:800;font-size:.8rem;cursor:pointer}
+.btn-intercept-override{width:100%;background:rgba(255,68,68,.12);color:#fca5a5;border:1px solid var(--danger);
+  padding:13px;border-radius:12px;font-weight:800;font-size:.8rem;cursor:pointer}
+
 /* ===== "WHAT IS CIVIC INTELLIGENCE?" HERO (index.html only markup, shared styles) ===== */
 .ci-hero{padding:0}
 .ci-compare{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
@@ -603,6 +619,24 @@ textarea.input{resize:none;line-height:1.4}
     </div>
   </div>
 
+  <!-- ===== PRE-SNAP CAPITAL PROJECT INTERCEPT MODAL ===== -->
+  <div id="interceptModal" class="intercept-drawer">
+    <div class="intercept-card">
+      <div class="intercept-title">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        This is already scheduled for capital repair
+      </div>
+      <div class="intercept-project" id="interceptProjectName"></div>
+      <div class="intercept-meta" id="interceptScope"></div>
+      <div class="intercept-meta" id="interceptSchedule"></div>
+      <div class="intercept-meta">A patch-level report here duplicates work already scoped for a full fix — unless this hazard can't safely wait.</div>
+      <div class="intercept-actions">
+        <button type="button" class="btn-intercept-cancel" id="btnInterceptCancel">Acknowledge &amp; Cancel</button>
+        <button type="button" class="btn-intercept-override" id="btnInterceptOverride">Flag Urgent Safety Hazard</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -708,6 +742,35 @@ const FALLBACK_CAPEX_PROJECTS = [
   { status:'on-time' }, { status:'on-track' }, { status:'delayed' }, { status:'on-track' },
   { status:'on-time' }, { status:'on-track' }, { status:'delayed' }
 ];
+// Mirrors api/_lib/store.js's CAPEX_PROJECTS exactly (including the
+// geo/category/scope fields added for the Pre-Snap Capital Project
+// Intercept System below) — same fallback convention as everything else in
+// this file. These are illustrative, hand-picked coordinates, NOT a real
+// municipal GIS/CIP import.
+const FALLBACK_CIP_PROJECTS = [
+  { id: 'cip-1', name: 'Ward 4 Storm Sewer Relining', ward: 'ward-4', scheduled: 'Q3 2026', status: 'on-time',
+    category: 'Drainage', scope: 'Full storm sewer reline along the Pine St alley corridor, replacing collapsed clay pipe.',
+    lat: 43.8100, lng: -91.2550, radiusMeters: 300 },
+  { id: 'cip-2', name: 'Main St Resurfacing Phase II', ward: 'ward-4', scheduled: 'Q4 2026', status: 'on-track',
+    category: 'Pothole', scope: 'Full-depth mill-and-overlay resurfacing of Main St from 2nd Ave to 6th Ave, including the 4th Ave intersection.',
+    lat: 43.8138, lng: -91.2519, radiusMeters: 250 },
+  { id: 'cip-3', name: 'Ward 7 Streetlight LED Retrofit', ward: 'ward-7', scheduled: 'Q2 2026', status: 'delayed',
+    category: 'Streetlight', scope: 'Citywide swap of Ward 7 cobra-head fixtures to LED, corridor-wide rather than pole-by-pole.',
+    lat: 43.8050, lng: -91.2430, radiusMeters: 400 },
+  { id: 'cip-4', name: 'Losey Blvd Sidewalk/ADA Upgrade', ward: 'ward-7', scheduled: 'Q3 2026', status: 'on-track',
+    category: 'Sidewalk', scope: 'Sidewalk panel replacement and ADA curb ramp upgrades along Losey Blvd.',
+    lat: 43.8020, lng: -91.2380, radiusMeters: 300 },
+  { id: 'cip-5', name: 'Ward 12 Culvert Replacement', ward: 'ward-12', scheduled: 'Q1 2026', status: 'on-time',
+    category: 'Drainage', scope: 'Replacement of an undersized culvert causing recurring backups near National Ave.',
+    lat: 43.0230, lng: -87.9650, radiusMeters: 350 },
+  { id: 'cip-6', name: 'National Ave Signage Modernization', ward: 'ward-12', scheduled: 'Q4 2026', status: 'on-track',
+    category: 'Signage', scope: 'Corridor-wide crosswalk and wayfinding signage replacement along National Ave.',
+    lat: 43.0130, lng: -87.9500, radiusMeters: 500 },
+  { id: 'cip-7', name: 'Ashland Ave Arterial Rebuild', ward: 'ward-3', scheduled: 'Q2 2026', status: 'delayed',
+    category: 'Pothole', scope: 'Full arterial road rebuild of Ashland Ave, subgrade up, not a patch-level repair.',
+    lat: 41.8850, lng: -87.6670, radiusMeters: 400 }
+];
+
 function fallbackBigThree(){
   const tickets = Object.values(FALLBACK_TICKETS_BY_WARD).flat();
   const resolved = tickets.filter(t => t.stage === 'resolved');
@@ -734,6 +797,118 @@ async function loadBig3(){
   setTextIfExists('big3Speed', data.avgResolutionHours != null ? data.avgResolutionHours + 'h' : 'N/A');
   setTextIfExists('big3Verify', data.verificationRatePct != null ? data.verificationRatePct + '%' : 'N/A');
   setTextIfExists('big3Capex', data.capExAdherencePct != null ? data.capExAdherencePct + '%' : 'N/A');
+}
+
+/* =====================================================================
+   PRE-SNAP CAPITAL PROJECT INTERCEPT SYSTEM
+   -----------------------------------------------------------------
+   Before a citizen's report actually submits, cross-reference their
+   resolved GPS coordinates against api/_lib/store.js's CAPEX_PROJECTS
+   seed set (served here via /api/coverage/big3's capExProjects field —
+   the same endpoint The Big 3 tiles already call, not a second parallel
+   dataset). If they're standing inside a scheduled project's service
+   radius AND that project's category plausibly overlaps their report's
+   category, surface the intercept modal before letting the report
+   through, so a patch-level ticket doesn't get dispatched for something
+   already scoped for a full capital fix.
+
+   Only this file's own resolved GPS location (window.CITIXEN_RESOLVED_LOCATION,
+   set by resolveDisplayLocation()) is ever checked — never a guess. If GPS
+   never resolved, there is nothing honest to cross-reference against, so no
+   intercept can ever fire and the report proceeds exactly as it always did.
+   ===================================================================== */
+let cipProjectsCache = null;
+async function ensureCipProjects(){
+  if (cipProjectsCache) return cipProjectsCache;
+  try {
+    const res = await fetch('/api/coverage/big3');
+    if (!res.ok) throw new Error('big3 returned ' + res.status);
+    const json = await res.json();
+    cipProjectsCache = Array.isArray(json.capExProjects) && json.capExProjects.length ? json.capExProjects : FALLBACK_CIP_PROJECTS;
+  } catch (err) {
+    cipProjectsCache = FALLBACK_CIP_PROJECTS;
+  }
+  return cipProjectsCache;
+}
+
+// Great-circle distance in meters between two lat/lng points.
+function haversineMeters(lat1, lng1, lat2, lng2){
+  const R = 6371000;
+  const toRad = d => d * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1), dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+// Maps this page's report chip categories (see the "1. Category" chip-grid)
+// onto the CAPEX_PROJECTS category vocabulary (Pothole/Streetlight/Signage/
+// Sidewalk/Drainage — same as api/_lib/store.js's CATEGORIES). "Waste /
+// Litter" and "Other" are deliberately left unmapped: no seeded CIP category
+// plausibly overlaps a litter or catch-all report, so those categories can
+// never trigger an intercept, no matter how close a project is.
+const REPORT_TO_CIP_CATEGORY = {
+  'Pothole / Road': 'Pothole',
+  'Power / Lighting': 'Streetlight',
+  'Sidewalk / ADA': 'Sidewalk'
+};
+
+// Returns the closest matching CAPEX_PROJECTS entry the report should be
+// intercepted against, or null if there's no real match. Requires an actual
+// resolved lat/lng (never asserts a match against an unresolved location)
+// AND a category that maps onto the CIP vocabulary AND a project of that
+// same category within its own service radius.
+function findInterceptMatch(reportCategory, lat, lng, projects){
+  if (typeof lat !== 'number' || typeof lng !== 'number') return null;
+  const cipCategory = REPORT_TO_CIP_CATEGORY[reportCategory];
+  if (!cipCategory) return null;
+  let best = null, bestDist = Infinity;
+  (projects || []).forEach(p => {
+    if (p.category !== cipCategory) return;
+    if (typeof p.lat !== 'number' || typeof p.lng !== 'number') return;
+    const radius = typeof p.radiusMeters === 'number' ? p.radiusMeters : 0;
+    const dist = haversineMeters(lat, lng, p.lat, p.lng);
+    if (dist <= radius && dist < bestDist) { best = p; bestDist = dist; }
+  });
+  return best;
+}
+
+let pendingInterceptMatch = null;
+
+function openInterceptModal(project){
+  pendingInterceptMatch = project;
+  setTextIfExists('interceptProjectName', project.name);
+  setTextIfExists('interceptScope', project.scope || 'Scope not on file.');
+  setTextIfExists('interceptSchedule', 'Scheduled ' + project.scheduled + ' — current status: ' + project.status + '.');
+  const modal = document.getElementById('interceptModal');
+  if (modal) modal.classList.add('open');
+}
+
+function closeInterceptModal(){
+  const modal = document.getElementById('interceptModal');
+  if (modal) modal.classList.remove('open');
+}
+
+// "Acknowledge & Cancel" — the citizen agrees the fix is already scheduled
+// and a patch ticket would just be duplicate dispatch effort. Aborts
+// cleanly: no ticket is created, and the toast says exactly why rather than
+// letting the report silently vanish.
+function handleInterceptCancel(){
+  const project = pendingInterceptMatch;
+  pendingInterceptMatch = null;
+  closeInterceptModal();
+  toast('Report not submitted — already scheduled under ' + (project ? project.name : 'a capital project'));
+}
+
+// "Flag Urgent Safety Hazard" — the citizen says this can't safely wait for
+// the scheduled capital work. Proceeds with the normal submission flow, but
+// the resulting case is tagged `urgentOverride: true` and carries a visible
+// note naming the CIP project it was flagged despite, so it's honestly
+// distinguishable from an ordinary report later.
+function handleInterceptOverride(){
+  const project = pendingInterceptMatch;
+  pendingInterceptMatch = null;
+  closeInterceptModal();
+  finalizeSubmitReport({ urgentOverride: true, matchedProject: project });
 }
 
 /* =====================================================================
@@ -1830,21 +2005,52 @@ function capturePhoto(){
   document.getElementById('photoBox').style.display='block';
 }
 
-function submitReport(){
+// Entry point wired to the Publish button — runs the Pre-Snap Capital
+// Project Intercept check FIRST, against the report's real resolved GPS
+// (window.CITIXEN_RESOLVED_LOCATION), before anything is actually
+// submitted. Only a real, close spatial + category match opens the
+// intercept modal; anything else (no GPS resolved, no nearby project, no
+// category overlap) falls straight through to the normal submission flow,
+// unchanged from before this feature existed.
+async function submitReport(){
+  const resolved = window.CITIXEN_RESOLVED_LOCATION;
+  const lat = resolved && typeof resolved.lat === 'number' ? resolved.lat : null;
+  const lng = resolved && typeof resolved.lng === 'number' ? resolved.lng : null;
+  const projects = await ensureCipProjects();
+  const match = findInterceptMatch(cat, lat, lng, projects);
+  if (match) {
+    openInterceptModal(match);
+    return;
+  }
+  finalizeSubmitReport();
+}
+
+// The actual publish flow (unchanged from the original submitReport()),
+// factored out so both the normal path and the "Flag Urgent Safety Hazard"
+// intercept override call it. `opts.urgentOverride` + `opts.matchedProject`
+// are only ever set by handleInterceptOverride() — an ordinary, unintercepted
+// submission always tags urgentOverride:false with no project.
+function finalizeSubmitReport(opts){
+  opts = opts || {};
   const rawDesc=document.getElementById('repDesc').value.trim() || 'Hazard reported.';
   const rawLoc=document.getElementById('repLoc').value.trim() || 'Local District';
   const dept=parseDepartment(rawDesc);
+  const urgentOverride = !!opts.urgentOverride;
+  const overrideNote = urgentOverride && opts.matchedProject
+    ? ' [Flagged despite scheduled CIP work: ' + opts.matchedProject.name + ']'
+    : '';
   const nc={
     id:'c'+Date.now(), title:cat, loc:rawLoc,
     lat:43.8150+(Math.random()-.5)*.01, lng:-91.2500+(Math.random()-.5)*.01,
     status:'Critical', time:'Just now', ageMin:0,
-    desc: rawDesc + ' → Routed to ' + dept
+    desc: rawDesc + ' → Routed to ' + dept + overrideNote,
+    urgentOverride
   };
   cases.unshift(nc);
   renderFeed();
   document.getElementById('mCount').textContent=cases.length+' active';
   if(mapInit) plotMarker(nc);
-  toast('✓ Published — routed to ' + dept);
+  toast(urgentOverride ? '✓ Published as urgent — routed to ' + dept : '✓ Published — routed to ' + dept);
   document.getElementById('repDesc').value='';
   document.getElementById('photoBox').style.display='none';
 
@@ -1923,6 +2129,9 @@ window.addEventListener('DOMContentLoaded',()=>{
     ledgerFilters.q = ledgerSearchInput.value.trim();
     renderLedgerResults();
   });
+
+  document.getElementById('btnInterceptCancel').addEventListener('click', handleInterceptCancel);
+  document.getElementById('btnInterceptOverride').addEventListener('click', handleInterceptOverride);
 });
 </script>
 </body>
