@@ -101,10 +101,11 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .footer-staff-link:hover{color:var(--mint2);border-color:var(--mint2)}
 
 /* ===== FOOTER (homepage-flow refactor) — the 4-column sitemap link grid
-   was removed per the footer-overhaul spec; the PATENTS PENDING notice
-   block was removed outright per a later spec. Only the centered slogan
-   callout, the Onboarding Portal button, and the bottom legal/trademark
-   lines remain. ===== */
+   and the PATENTS PENDING notice block were removed in earlier rounds; the
+   Onboarding Portal button and Emergency 911 link were removed this round
+   (Onboarding Portal remains reachable from the Operations drawer). Only
+   the centered slogan callout, the single Codex link, and the bottom
+   legal/trademark lines remain. ===== */
 .sitemap-footer{flex-direction:column;align-items:stretch;gap:0;padding:0}
 .footer-slogan-callout{text-align:center;color:#00FF87;font-weight:700;font-size:.82rem;padding:32px 24px 16px}
 .sitemap-bottom{border-top:1px solid var(--border);padding:14px 22px max(14px, env(safe-area-inset-bottom));
@@ -134,6 +135,16 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .hero-qa-heading{font-size:1.2rem;font-weight:900;color:#fff;margin:0 0 8px}
 .hero-qa-body{color:var(--muted);font-size:.9rem;line-height:1.6;max-width:640px;margin:0 auto}
 .hero-qa-accent{color:#00FF87;font-weight:700}
+
+/* ===== CROWD SOURCE AMERICA™ HERO BANNER — a centered callout card
+   introducing the nationwide aggregation engine, sitting between the two
+   hero Q&A blocks. ===== */
+.csa-banner-section{max-width:640px;margin:0 auto 8px;padding:0 24px}
+.csa-banner-card{text-align:center;background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.35);
+  border-radius:14px;padding:22px 20px}
+.csa-banner-eyebrow{font-size:.62rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.csa-banner-heading{font-size:1.4rem;font-weight:900;color:#00FF87;margin-bottom:8px}
+.csa-banner-body{font-size:.85rem;color:var(--muted);line-height:1.6;max-width:520px;margin:0 auto}
 
 /* ===== INSTITUTIONAL GATEWAY BUTTONS — sits between the App Download
    section and the footer. Plain mailto CTAs, side-by-side. ===== */
@@ -819,30 +830,78 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   </div>
 
   <!-- ===== SECTION FREEZE — everything from here through the line below
-       ("Upgrade Your Civic Experience™") is locked per this round's spec:
+       ("Upgrade Your Civic Experience") is locked per the ongoing spec:
        do not edit this section's markup, copy, or layout in any future
-       round without an explicit new instruction to unfreeze it. ===== -->
+       round without an explicit new instruction to unfreeze it. The one
+       standing exception, made this round: the ™ symbol was removed from
+       "Upgrade Your Civic Experience" per this round's own explicit,
+       narrowly-scoped branding instruction (item 1) — no other line in
+       this frozen block was touched. ===== -->
   <section class="hero">
     <h1 class="hero-mega-title">
       <svg class="hero-shield-icon" viewBox="0 0 24 24" width="0.78em" height="0.78em" stroke="var(--brand-mint)" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       <span class="brand-white">CITIXEN</span> <span class="brand-lime">UX</span><sup class="brand-tm">™</sup>
     </h1>
-    <p class="hero-kicker">Upgrade Your Civic Experience™</p>
+    <p class="hero-kicker">Upgrade Your Civic Experience</p>
   </section>
   <!-- ===== END SECTION FREEZE ===== -->
 
-  <!-- ===== HERO Q&A BLOCKS — replaces the old single hero-subtitle +
-       ci-definition paragraph. Two white-header Q&A blocks, muted-gray
-       body copy, emerald accent highlights on the lead phrase of each. ===== -->
+  <!-- ===== LIVE PUBLIC LEDGER BANNER — moved directly beneath the hero,
+       ahead of the Q&A blocks, per this round's homepage-scroll-sequence
+       spec. Opens the existing #ledgerDrawer (same drawer as the footer's
+       Codex/audit links). The count is real: set from the same
+       /api/coverage/big3 payload loadBig3() already fetches (see
+       ledgerBannerCount in loadBig3()), not a fabricated incrementing
+       number. ===== -->
+  <section class="ledger-banner-section">
+    <button class="ledger-banner" id="liveLedgerBanner" type="button">
+      <span class="ledger-banner-pulse" aria-hidden="true"></span>
+      <span class="ledger-banner-label">LIVE PUBLIC LEDGER — CIVIC MEMORY</span>
+      <span class="ledger-banner-count" id="ledgerBannerCount">Syncing…</span>
+    </button>
+  </section>
+
+  <!-- ===== HERO Q&A BLOCKS — now split into two separate sections so the
+       new Crowd Source America™ banner can sit between them, per this
+       round's homepage-scroll-sequence spec. Same copy/classes as before,
+       just no longer wrapped in one shared <section>. ===== -->
   <section class="hero-qa-section">
     <div class="hero-qa-block">
       <h2 class="hero-qa-heading">What is Civic Intelligence?</h2>
       <p class="hero-qa-body"><span class="hero-qa-accent">Civic Intelligence (C.I.)</span> is proof from the ground. It combines real-time resident reporting with direct city department tracking and transparent project budget auditing.</p>
     </div>
+  </section>
+
+  <!-- ===== CROWD SOURCE AMERICA™ HERO BANNER — introduces the nationwide
+       aggregation engine, sitting between the two hero Q&A blocks per this
+       round's spec. Purely descriptive copy; the real aggregation view it
+       points toward is the Aggregation Map Gateway button below. ===== -->
+  <section class="csa-banner-section">
+    <div class="csa-banner-card">
+      <div class="csa-banner-eyebrow">Nationwide Aggregation Engine</div>
+      <h2 class="csa-banner-heading">Crowd Source America™</h2>
+      <p class="csa-banner-body">Every CITIXEN UX report feeds one national ledger — turning individual fixes into a live, block-by-block picture of civic conditions across the country.</p>
+    </div>
+  </section>
+
+  <section class="hero-qa-section">
     <div class="hero-qa-block">
       <h2 class="hero-qa-heading">What does this mean for you?</h2>
       <p class="hero-qa-body"><span class="hero-qa-accent">You hold the receipt.</span> Every report you submit creates an uneditable public record that tracks the fix, helps local leadership stay accountable, and ensures your tax dollars actively protect and improve your neighborhood.</p>
     </div>
+  </section>
+
+  <!-- ===== AGGREGATION MAP GATEWAY BUTTON — styled identically to the Live
+       Public Ledger banner below (same .ledger-banner classes), opens the
+       same real #nationalHeatMapModal (the dedicated stylized Geo-Hatch
+       canvas) that the Analytics drawer's own trigger opens — not a
+       duplicate modal. ===== -->
+  <section class="ledger-banner-section">
+    <button class="ledger-banner" id="aggregationMapGatewayBtn" type="button">
+      <span class="ledger-banner-pulse" aria-hidden="true"></span>
+      <span class="ledger-banner-label">CROWD SOURCE AMERICA™ — AGGREGATION HUB</span>
+      <span class="ledger-banner-count">View Map ↗</span>
+    </button>
   </section>
 
   <!-- ===== "ciDeepDive" section removed per homepage-flow refactor — its
@@ -875,33 +934,39 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        point at. ===== -->
   <span id="analytics" aria-hidden="true"></span>
 
-  <!-- ===== HOMEPAGE SCROLL ORDER (per spec): Locked Header -> Hero Q&A ->
-       Live Public Ledger banner -> City Snapshot tiles -> 3-button hub row
-       -> Launch Mobile Reporter + App Store row -> footer. The banner now
-       sits ABOVE City Snapshot (previously below it). ===== -->
+  <!-- ===== HOMEPAGE SCROLL ORDER (per spec): Locked Header -> Live Public
+       Ledger banner -> Hero Q&A block 1 -> Crowd Source America™ banner ->
+       Hero Q&A block 2 -> Aggregation Map Gateway button -> City Snapshot
+       tiles -> Report Generator -> 3-button hub row -> Launch Mobile
+       Reporter + App Store row -> Institutional Gateway buttons -> footer.
+       The Live Public Ledger banner now sits directly beneath the hero
+       (see it just below the SECTION FREEZE boundary above), ahead of the
+       Q&A blocks. ===== -->
 
-  <!-- ===== LIVE PUBLIC LEDGER BANNER — opens the existing #ledgerDrawer
-       (same drawer as the footer's Codex/audit links). The count is real:
-       set from the same /api/coverage/big3 payload loadBig3() already
-       fetches (see ledgerBannerCount in loadBig3()), not a fabricated
-       incrementing number. ===== -->
-  <section class="ledger-banner-section">
-    <button class="ledger-banner" id="liveLedgerBanner" type="button">
-      <span class="ledger-banner-pulse" aria-hidden="true"></span>
-      <span class="ledger-banner-label">LIVE PUBLIC LEDGER — CIVIC MEMORY</span>
-      <span class="ledger-banner-count" id="ledgerBannerCount">Syncing…</span>
-    </button>
+  <!-- ===== CITY SNAPSHOT — SUMMARY VIEW (formerly "3x3 Analytics Matrix") —
+       now sits directly beneath the Aggregation Map Gateway button, ahead
+       of the Report Generator, per this round's scroll-sequence spec. ===== -->
+  <section class="matrix-summary-section" id="matrixSummarySection">
+    <div class="analytics-matrix-card" id="analyticsMatrix">
+      <div class="label" style="justify-content:center">City Snapshot</div>
+      <div class="matrix-grid" id="matrixGrid"></div>
+      <div class="small" style="text-align:center;margin-top:10px;color:var(--muted)">Live Ward Performance Metrics — refreshed automatically from field dispatch data. Tap a tile for its full breakdown.</div>
+    </div>
   </section>
 
-  <!-- ===== REPORT GENERATOR — promoted to an always-visible top-level
-       section directly beneath the Live Public Ledger banner, per this
-       round's homepage-scroll-sequence spec ("Report Generator
-       Promotion"). Same #reportGenerator id/markup/JS as before (it used
-       to live inside the hidden Analytics deep-dive), only its position
-       changed. ===== -->
+  <!-- ===== REPORT GENERATOR — always-visible top-level section directly
+       beneath City Snapshot, per this round's homepage-scroll-sequence
+       spec. Inner layout modified this round: the Export/Print button now
+       sits at the very top of the card, above the timeframe/format
+       dropdowns and stat output, per this round's explicit instruction.
+       Same #reportGenerator id/markup/JS otherwise. ===== -->
   <section class="report-generator-section" id="reportGeneratorSection">
     <div class="report-generator-card" id="reportGenerator">
       <div class="label" style="justify-content:center">Report Generator</div>
+      <button class="btn btn-primary" id="btnExportPrintReport" style="width:100%;justify-content:center;margin-bottom:14px;" type="button">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Export / Print The Civic Record (Audited PDF)
+      </button>
       <div class="report-gen-row">
         <select id="reportTimeframe" aria-label="Timeframe">
           <option value="week">This Week</option>
@@ -918,19 +983,6 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         Public Official mode — tag responsible departments
       </label>
       <div id="reportOutput" class="report-output"></div>
-      <button class="btn btn-primary" id="btnExportPrintReport" style="width:100%;justify-content:center;margin-top:14px;" type="button">
-        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-        Export / Print The Civic Record (Audited PDF)
-      </button>
-    </div>
-  </section>
-
-  <!-- ===== CITY SNAPSHOT — SUMMARY VIEW (formerly "3x3 Analytics Matrix") ===== -->
-  <section class="matrix-summary-section" id="matrixSummarySection">
-    <div class="analytics-matrix-card" id="analyticsMatrix">
-      <div class="label" style="justify-content:center">City Snapshot</div>
-      <div class="matrix-grid" id="matrixGrid"></div>
-      <div class="small" style="text-align:center;margin-top:10px;color:var(--muted)">Live Ward Performance Metrics — refreshed automatically from field dispatch data. Tap a tile for its full breakdown.</div>
     </div>
   </section>
 
@@ -1003,7 +1055,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       <button class="modal-close" id="heatMapCloseBtn" style="z-index:2">✕</button>
       <div class="frontier-map-head" style="padding:18px 20px 10px;">
         <div class="frontier-search-bar">
-          <div class="label" style="justify-content:center;margin-bottom:2px">Aggregate National Geo-Hatch Heat Map</div>
+          <div class="label" style="justify-content:center;margin-bottom:2px">Crowd Source America™ — Aggregation Hub</div>
           <div class="frontier-search-note">Emerald glow = reporting density for that jurisdiction. Search a ZIP or ward below to highlight it.</div>
           <div class="geo-hatch-search-row">
             <input type="text" id="geoHatchSearchInput" placeholder="Search ZIP or ward (e.g. Ward 4, Austin, 54601)" aria-label="Search ZIP or ward" autocomplete="off">
@@ -1058,8 +1110,8 @@ audio.pw-audio-el{width:100%;margin-top:4px}
          card. The Operations drawer's old duplicate launcher (and its
          Backend Data Pipeline diagram) were removed outright. ===== -->
     <div style="text-align:center;margin-bottom:14px;">
-      <p class="bridge-slogan">One report gets a pothole filled. A thousand reports cover a city. A million reports cover America.</p>
-      <button class="btn btn-outline" id="btnViewHeatMapFromAnalytics" type="button">Cover America — View National Heat Map ↗</button>
+      <p class="bridge-slogan">One report gets a pothole filled. A thousand reports cover a city. A million reports Crowd Source America™.</p>
+      <button class="btn btn-outline" id="btnViewHeatMapFromAnalytics" type="button">Crowd Source America™ — View Aggregation Hub ↗</button>
     </div>
     <div class="deepdive-cols">
       <div class="card" id="coverageGridCard">
@@ -1196,10 +1248,12 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 
   <!-- ===== The National Audit Teaser Card and its radar-sweep visual
        (both removed in earlier rounds), and the Operations drawer's
-       Backend Data Pipeline diagram (removed this round), are gone
-       outright — no replacement visual. The heat map modal itself
-       (#nationalHeatMapModal) is unchanged and still reachable only from
-       the Analytics drawer. ===== -->
+       Backend Data Pipeline diagram (removed in an earlier round), are
+       gone outright — no replacement visual. The heat map modal itself
+       (#nationalHeatMapModal) is unchanged in content; it is now reachable
+       from two triggers — the top-level Aggregation Map Gateway button on
+       the main scroll, and the existing trigger inside the Analytics
+       drawer — both opening the same modal via openHeatMapModal(). ===== -->
 
   <!-- ===== The bottom-of-homepage "Search Zip, City, Ward…" search bar
        (#frontierMap) and the always-visible "Real-Time Dispatch & Audit
@@ -1309,25 +1363,27 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   </div>
 
   <!-- ===== CENTERED MINIMAL FOOTER — the old 4-column sitemap link block
-       stays removed per the prior footer-overhaul spec. The "PROPRIETARY
-       INFRASTRUCTURE PLATFORM — PATENTS PENDING" block was removed
-       outright per this round's spec (it was never a verified claim to
-       begin with — see this session's earlier refusal to originate that
-       wording). "Dispatch Command Center" and "Representative Login" were
-       removed from the public footer; the CITIXEN Codex (Governance
-       Vault) drawer remains reachable from the single, subtle
-       #footerCodexLink text link. ===== -->
+       and the "PROPRIETARY INFRASTRUCTURE PLATFORM — PATENTS PENDING"
+       block stay removed per earlier rounds. This round: "Municipal
+       Onboarding Portal" and "Emergency 911" were also removed from the
+       public footer per this round's explicit cleanup instruction — the
+       Onboarding Portal remains fully reachable via the Operations
+       drawer's "Open Municipal Onboarding Portal ↗" button
+       (#btnOpenOnboardingFromOps), and its openOnboardingWizard() JS is
+       unchanged, so nothing here is orphaned. "Dispatch Command Center"
+       and "Representative Login" remain removed from earlier rounds. Only
+       the CITIXEN Codex (Governance Vault) drawer link
+       (#footerCodexLink) remains in the footer's link row. The legal
+       disclosure below states trademark protection only — it does not
+       assert patent protection, since no patent grant or filing has been
+       verified (this project already removed an unverified "Patents
+       Pending" claim earlier in this session on the same grounds). ===== -->
   <footer class="site-footer sitemap-footer">
-    <div class="footer-slogan-callout">CITIXEN UX™ — built for residents, designed for modern civic trust.</div>
-    <div style="text-align:center;padding:0 22px 20px;">
-      <button class="btn btn-outline" id="btnOpenOnboardingWizard" type="button">Municipal Onboarding Portal</button>
-    </div>
-
+    <div class="footer-slogan-callout">CITIXEN UX™ — Crowd Source America™. Built for residents, designed for modern civic trust.</div>
     <div class="sitemap-bottom">
-      <button type="button" id="footerCodexLink" class="footer-staff-link" style="background:none;border:none;padding:0;font:inherit;cursor:pointer">Statutory Governance &amp; Precedent ↗</button> ·
-      <a class="footer-staff-link" href="tel:911">Emergency 911</a>
+      <button type="button" id="footerCodexLink" class="footer-staff-link" style="background:none;border:none;padding:0;font:inherit;cursor:pointer">Statutory Governance &amp; Precedent ↗</button>
     </div>
-    <div class="trademark-disclosure">CITIXEN UX™ and its associated logos are trademarks of Citixen UX Inc. Civic Intelligence, Civic Memory, Geo-Hatch, City Snapshot, and Civic Stack are proprietary marks of Citixen UX Inc. All other trademarks, product names, and company names mentioned herein are the property of their respective owners.</div>
+    <div class="trademark-disclosure">CITIXEN UX™ and Crowd Source America™ are protected trademarks. Civic Intelligence, Civic Memory, Geo-Hatch, City Snapshot, and Civic Stack are proprietary marks. Protected under U.S. and international trademark law. All other trademarks, product names, and logos are the property of their respective owners.</div>
   </footer>
 
 <script>
@@ -1753,6 +1809,11 @@ function closeHeatMapModal(){
 // markup, so only this one trigger remains.
 const viewHeatMapFromAnalyticsBtn = document.getElementById('btnViewHeatMapFromAnalytics');
 if (viewHeatMapFromAnalyticsBtn) viewHeatMapFromAnalyticsBtn.addEventListener('click', openHeatMapModal);
+// Top-level "Crowd Source America™ — Aggregation Hub" gateway button
+// (styled identically to the Live Public Ledger banner) opens the same
+// real #nationalHeatMapModal, not a duplicate modal.
+const aggregationMapGatewayBtnEl = document.getElementById('aggregationMapGatewayBtn');
+if (aggregationMapGatewayBtnEl) aggregationMapGatewayBtnEl.addEventListener('click', openHeatMapModal);
 document.getElementById('heatMapCloseBtn').addEventListener('click', closeHeatMapModal);
 document.getElementById('nationalHeatMapModal').addEventListener('click', (e) => {
   if (e.target.id === 'nationalHeatMapModal') closeHeatMapModal();
@@ -2877,8 +2938,8 @@ function openOnboardingWizard(){
 function closeOnboardingWizard(){
   document.getElementById('wizardOverlay').classList.remove('open');
 }
-const btnOpenOnboardingWizardEl = document.getElementById('btnOpenOnboardingWizard');
-if (btnOpenOnboardingWizardEl) btnOpenOnboardingWizardEl.addEventListener('click', openOnboardingWizard);
+// The footer's "Municipal Onboarding Portal" button was removed outright
+// per this round's footer-cleanup spec; its wiring is removed with it.
 // Operations drawer's "Civic Stack Integrations & Administrative Data"
 // card opens the same real onboarding-config screen, not a separate one.
 const btnOpenOnboardingFromOpsEl = document.getElementById('btnOpenOnboardingFromOps');
