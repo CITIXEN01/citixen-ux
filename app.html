@@ -52,6 +52,19 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
   padding:4px 10px;border-radius:20px;font-weight:700;letter-spacing:.4px;display:flex;align-items:center;gap:6px}
 .badge-dot{width:6px;height:6px;border-radius:50%;background:var(--mint2)}
 
+/* ===== APP MENU BUTTON + SLIDE-OUT PROFILE DRAWER ===== */
+.menu-btn{background:transparent;border:1px solid var(--border);color:var(--text);width:34px;height:34px;
+  border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.app-drawer{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:2800;display:none}
+.app-drawer.open{display:flex;justify-content:flex-end}
+.app-drawer-panel{width:min(400px,86vw);height:100%;background:var(--card);border-left:1px solid var(--border);
+  display:flex;flex-direction:column}
+.app-drawer-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--border)}
+.app-drawer-body{flex:1;overflow-y:auto;padding:16px 18px 32px}
+.bridge-banner{background:linear-gradient(160deg,rgba(0,255,136,.16),rgba(0,255,136,.04));
+  border:1px solid rgba(0,255,136,.4);border-radius:14px;padding:16px}
+.bridge-banner-text{font-size:.84rem;font-weight:700;line-height:1.5;margin-bottom:14px}
+
 .main{padding:14px;display:flex;flex-direction:column;gap:12px;flex:1}
 .tabpane{display:none;flex-direction:column;gap:12px}
 .tabpane.active{display:flex}
@@ -302,6 +315,34 @@ textarea.input{resize:none;line-height:1.4}
 .btn-intercept-override{width:100%;background:rgba(255,68,68,.12);color:#fca5a5;border:1px solid var(--danger);
   padding:13px;border-radius:12px;font-weight:800;font-size:.8rem;cursor:pointer}
 
+/* ===== POST-PHOTO SUBMISSION CONFIRMATION MODAL — same overlay/card chrome
+   as .intercept-drawer/.intercept-card above, mint-bordered instead of
+   amber since this isn't itself a warning state. ===== */
+.confirm-drawer{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:2750;display:none;
+  align-items:center;justify-content:center;padding:18px;overflow-y:auto}
+.confirm-drawer.open{display:flex}
+.confirm-card{background:var(--card);border:1px solid var(--mint2);border-radius:16px;padding:20px;
+  max-width:440px;width:100%;max-height:90vh;overflow-y:auto}
+.confirm-title{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;
+  color:var(--mint2);margin-bottom:12px}
+.confirm-photo-wrap{position:relative;margin-bottom:10px}
+.confirm-photo-wrap img{width:100%;max-height:200px;object-fit:cover;border-radius:10px;border:1px solid var(--mint2);display:block}
+.confirm-privacy-tag{display:flex;align-items:center;gap:6px;background:rgba(0,255,136,.1);border:1px solid var(--mint2);
+  color:var(--mint2);border-radius:8px;padding:8px 10px;font-size:.7rem;font-weight:700;margin-top:8px}
+.confirm-privacy-note{font-size:.64rem;color:var(--muted);margin-top:4px;line-height:1.4}
+.confirm-location-tag{font-size:.78rem;color:var(--text);background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:8px;padding:8px 10px;margin-top:10px;display:flex;align-items:center;gap:6px}
+.confirm-row-check{display:flex;align-items:flex-start;gap:10px;margin-top:16px;font-size:.78rem;line-height:1.4;cursor:pointer}
+.confirm-row-check input{margin-top:2px;flex-shrink:0;width:16px;height:16px;accent-color:var(--brand-mint)}
+.confirm-emergency{background:rgba(255,68,68,.12);border:1px solid var(--danger);border-radius:10px;
+  padding:12px;margin-top:14px;font-size:.74rem;color:#fca5a5;line-height:1.5;font-weight:600}
+.confirm-actions{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.btn-confirm-lock{width:100%;background:var(--mint);color:#051311;border:none;padding:14px;border-radius:12px;
+  font-weight:800;font-size:.84rem;cursor:pointer}
+.btn-confirm-lock:disabled{opacity:.4;cursor:not-allowed}
+.btn-confirm-cancel{width:100%;background:transparent;color:var(--muted);border:1px solid var(--border);
+  padding:13px;border-radius:12px;font-weight:700;font-size:.8rem;cursor:pointer}
+
 /* ===== "WHAT IS CIVIC INTELLIGENCE?" HERO (index.html only markup, shared styles) ===== */
 .ci-hero{padding:0}
 .ci-compare{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
@@ -357,9 +398,41 @@ textarea.input{resize:none;line-height:1.4}
         <svg viewBox="0 0 24 24" width="21" height="21" stroke="var(--brand-mint)" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         <span class="brand-wordmark"><span class="brand-white">CITIXEN</span> <span class="brand-lime">UX</span><sup class="brand-tm">™</sup></span>
       </div>
-      <div class="badge"><span class="badge-dot"></span> <span id="headerWardLabel">Local District • Active</span></div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="badge"><span class="badge-dot"></span> <span id="headerWardLabel">Local District • Active</span></div>
+        <button class="menu-btn" id="appMenuBtn" type="button" aria-label="Open menu" aria-controls="appDrawer" aria-expanded="false">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+      </div>
     </div>
   </header>
+
+  <!-- ===== SLIDE-OUT PROFILE/MENU DRAWER — currently just the App-to-Web
+       Bridge banner (this app is zero-account, so there's no real profile
+       data to show here yet); more menu items can be added to
+       .app-drawer-body later without touching this wiring. ===== -->
+  <div class="app-drawer" id="appDrawer">
+    <div class="app-drawer-panel">
+      <div class="app-drawer-head">
+        <strong>Menu</strong>
+        <button class="menu-btn" id="appDrawerCloseBtn" type="button" aria-label="Close menu">✕</button>
+      </div>
+      <div class="app-drawer-body">
+        <div class="bridge-banner">
+          <div class="bridge-banner-text">🏛️ CIVIC INTELLIGENCE™ DASHBOARD — Tap to access full ward analytics, CapEx budget ledgers, and the CITIXEN Codex.</div>
+          <!-- Same-site relative link (index.html), consistent with every other
+               cross-page link in this app — "citixenux.com" elsewhere in this
+               codebase already refers to this same site, not a different
+               external domain. No #hash here on purpose: index.html's own
+               load-at-top fix lands this at the absolute top of the page
+               (anchor offset 0) rather than scrolled to any section. -->
+          <a class="btn-submit" href="index.html" style="text-decoration:none;display:block;text-align:center;">
+            Open Executive Dashboard ↗
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <main class="main">
     <div id="toast" class="toast"></div>
@@ -631,6 +704,45 @@ textarea.input{resize:none;line-height:1.4}
       <div class="intercept-actions">
         <button type="button" class="btn-intercept-cancel" id="btnInterceptCancel">Acknowledge &amp; Cancel</button>
         <button type="button" class="btn-intercept-override" id="btnInterceptOverride">Flag Urgent Safety Hazard</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== POST-PHOTO SUBMISSION CONFIRMATION MODAL — appears after a photo
+       is captured and the citizen taps Publish, before the report actually
+       goes out (see openPostPhotoConfirm()/finalizeSubmitReport()). The
+       original first-launch splash/brand popup (#splashScreen) is untouched
+       by this — different element, different trigger. ===== -->
+  <div id="postPhotoConfirmModal" class="confirm-drawer">
+    <div class="confirm-card">
+      <div class="confirm-title">Confirm before publishing</div>
+
+      <div class="confirm-photo-wrap">
+        <img id="confirmPhotoImg" alt="Captured hazard photo preview">
+        <div class="confirm-privacy-tag">
+          <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+          🔒 Privacy Engine: Auto-Face &amp; License Plate Blur Active
+        </div>
+        <div class="confirm-privacy-note">Demo indicator — this build scrubs device ID and GPS EXIF metadata from every photo today; automatic visual face/plate blurring is on the roadmap and not yet running on this preview.</div>
+      </div>
+
+      <div class="confirm-location-tag">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="var(--mint2)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span id="confirmLocationTag">Local District</span>
+      </div>
+
+      <label class="confirm-row-check">
+        <input type="checkbox" id="confirmRowCheckbox">
+        <span>I confirm this hazard is in the public right-of-way (road, sidewalk, utility, park).</span>
+      </label>
+
+      <div class="confirm-emergency">
+        ⚠️ EMERGENCY NOTICE: If this is an active life-safety threat, gas leak, or downed power line, please call 911 or your local emergency utility immediately. CITIXEN UX™ is an asynchronous audit engine.
+      </div>
+
+      <div class="confirm-actions">
+        <button type="button" class="btn-confirm-lock" id="btnConfirmLock" disabled>🟢 Lock in Civic Memory™</button>
+        <button type="button" class="btn-confirm-cancel" id="btnConfirmCancel">Cancel / Retake Photo</button>
       </div>
     </div>
   </div>
@@ -1020,7 +1132,7 @@ function handleInterceptOverride(){
   const project = pendingInterceptMatch;
   pendingInterceptMatch = null;
   closeInterceptModal();
-  finalizeSubmitReport({ urgentOverride: true, matchedProject: project });
+  openPostPhotoConfirm({ urgentOverride: true, matchedProject: project });
 }
 
 /* =====================================================================
@@ -1340,7 +1452,7 @@ function pickDefaultWardMeta(){
       };
     }
   }
-  // A deep link from citixenux.com's Citizen Paperwork File ("Free Citizen
+  // A deep link from citixenux.com's CITIXEN Paperwork File ("Free CITIXEN
   // Report" CTA) or a jurisdiction confirmed earlier on index.html carries
   // ?state=&city=&ward= (see applyJurisdictionFromQueryString()) or a stored
   // choice — that's a citizen-confirmed jurisdiction too, so it's fine to
@@ -2350,8 +2462,69 @@ async function submitReport(){
     openInterceptModal(match);
     return;
   }
-  finalizeSubmitReport();
+  openPostPhotoConfirm();
 }
+
+// ===== POST-PHOTO SUBMISSION CONFIRMATION MODAL =====
+// Gates the actual publish: both submitReport()'s normal path and
+// handleInterceptOverride()'s "Flag Urgent Safety Hazard" path now open
+// this modal instead of calling finalizeSubmitReport() directly. Nothing
+// is sent until the citizen ticks the right-of-way checkbox and taps
+// "Lock in Civic Memory™" — Cancel/Retake clears the captured photo so
+// they can recapture, and never submits anything.
+let pendingConfirmOpts = null;
+function openPostPhotoConfirm(opts){
+  pendingConfirmOpts = opts || {};
+
+  const photoImg = document.getElementById('photoImg');
+  const confirmImg = document.getElementById('confirmPhotoImg');
+  const hasPhoto = photoImg && photoImg.style.display !== 'none' && photoImg.src;
+  if (hasPhoto) {
+    confirmImg.src = photoImg.src;
+    confirmImg.style.display = 'block';
+  } else {
+    confirmImg.removeAttribute('src');
+    confirmImg.style.display = 'none';
+  }
+
+  // Auto-detected location tag: the same resolved ward/location this report
+  // will actually submit with (currentWardMeta when the coverage grid has
+  // resolved one, falling back to whatever the citizen has in the location
+  // field) — not a second, separate guess.
+  const locField = document.getElementById('repLoc');
+  const wardLabel = (typeof currentWardMeta !== 'undefined' && currentWardMeta && currentWardMeta.isGpsMatch)
+    ? currentWardMeta.wardName + ', ' + currentWardMeta.cityName
+    : (locField ? locField.value.trim() : '') || 'Local District';
+  document.getElementById('confirmLocationTag').textContent = wardLabel;
+
+  const checkbox = document.getElementById('confirmRowCheckbox');
+  const lockBtn = document.getElementById('btnConfirmLock');
+  checkbox.checked = false;
+  lockBtn.disabled = true;
+
+  document.getElementById('postPhotoConfirmModal').classList.add('open');
+}
+function closePostPhotoConfirm(){
+  document.getElementById('postPhotoConfirmModal').classList.remove('open');
+  pendingConfirmOpts = null;
+}
+document.getElementById('confirmRowCheckbox').addEventListener('change', (e) => {
+  document.getElementById('btnConfirmLock').disabled = !e.target.checked;
+});
+document.getElementById('btnConfirmLock').addEventListener('click', () => {
+  if (document.getElementById('btnConfirmLock').disabled) return;
+  const opts = pendingConfirmOpts || {};
+  closePostPhotoConfirm();
+  finalizeSubmitReport(opts);
+});
+document.getElementById('btnConfirmCancel').addEventListener('click', () => {
+  closePostPhotoConfirm();
+  // Retake: clear the captured photo so the citizen starts the capture
+  // step over, same reset finalizeSubmitReport() itself does on success.
+  const photoImg = document.getElementById('photoImg');
+  if (photoImg) { photoImg.removeAttribute('src'); photoImg.style.display = 'none'; }
+  document.getElementById('photoBox').style.display = 'none';
+});
 
 // The actual publish flow (unchanged from the original submitReport()),
 // factored out so both the normal path and the "Flag Urgent Safety Hazard"
@@ -2438,9 +2611,22 @@ function registerSW(){
   }
 }
 
+/* ===== SLIDE-OUT MENU/PROFILE DRAWER — App-to-Web Bridge ===== */
+function openAppDrawer(){
+  document.getElementById('appDrawer').classList.add('open');
+  document.getElementById('appMenuBtn').setAttribute('aria-expanded', 'true');
+}
+function closeAppDrawer(){
+  document.getElementById('appDrawer').classList.remove('open');
+  document.getElementById('appMenuBtn').setAttribute('aria-expanded', 'false');
+}
+document.getElementById('appMenuBtn').addEventListener('click', openAppDrawer);
+document.getElementById('appDrawerCloseBtn').addEventListener('click', closeAppDrawer);
+document.getElementById('appDrawer').addEventListener('click', (e) => { if (e.target.id === 'appDrawer') closeAppDrawer(); });
+
 // All interaction wiring happens here (no inline onclick attributes anywhere in the markup),
 // which keeps this page compatible with a strict script-src CSP with no 'unsafe-inline'.
-// A deep link from citixenux.com's Citizen Paperwork File ("Free Citizen
+// A deep link from citixenux.com's CITIXEN Paperwork File ("Free CITIXEN
 // Report" CTA) carries ?state=&city=&ward= — honor it by pre-seeding the
 // shared jurisdiction so the Analytics tab opens on that ward the first
 // time it's visited, without waiting on a round trip through the selector.
