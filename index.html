@@ -128,37 +128,10 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 /* ===== HERO — MASSIVE TITLE + C.I. DEFINITION (master-refactor overhaul) ===== */
 .hero-mega-title{font-size:clamp(2.4rem,9vw,4.6rem);font-weight:900;letter-spacing:-.5px;line-height:1;margin:6px 0 10px;text-shadow:0 0 28px rgba(0,255,136,.28);display:flex;align-items:center;justify-content:center;gap:.18em;flex-wrap:wrap}
 .hero-shield-icon{flex-shrink:0;filter:drop-shadow(0 0 10px rgba(0,255,136,.5))}
-.hero-subtitle{font-size:1.05rem;font-weight:800;color:#00FF87;margin:0 0 14px}
+.hero-kicker{font-size:.72rem;font-weight:800;color:#00FF87;text-transform:uppercase;letter-spacing:1.4px;margin:2px 0 10px}
+.hero-subtitle{font-size:1.3rem;font-weight:900;color:#fff;margin:0 0 14px}
 .hero-highlight{color:#00FF87}
 .ci-definition{color:var(--muted);font-size:.92rem;max-width:660px;margin:0 auto 6px;line-height:1.55}
-
-/* ===== 5-NODE ZIGZAG CIRCUIT TIMELINE — sits below the 3x3 matrix, above the
-   hub navigation row. A tight 2-column vertical Z-pattern: nodes alternate
-   left/right column and are visually joined by a single continuous glowing
-   neon-green circuit line (border-based zigzag connectors, not a literal
-   drawn path — no canvas/SVG dependency needed to keep this lightweight). ===== */
-.circuit-timeline-section{max-width:640px;margin:8px auto 26px;padding:0 24px}
-.circuit-timeline{position:relative;display:flex;flex-direction:column;gap:0}
-.circuit-node{position:relative;display:grid;grid-template-columns:44px 1fr;gap:14px;align-items:flex-start;padding:10px 0}
-.circuit-node:nth-child(even){grid-template-columns:1fr 44px}
-.circuit-node:nth-child(even) .circuit-node-dot{order:2}
-.circuit-node:nth-child(even) .circuit-node-body{order:1;text-align:right}
-.circuit-node-dot{width:40px;height:40px;border-radius:50%;background:var(--bg-obsidian);border:2px solid #00FF87;
-  display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:900;color:#00FF87;
-  box-shadow:0 0 14px rgba(0,255,135,.55);flex-shrink:0;z-index:1}
-.circuit-node:not(:last-child)::after{content:'';position:absolute;left:19px;top:44px;width:2px;height:calc(100% - 8px);
-  background:linear-gradient(#00FF87,rgba(0,255,135,.25));box-shadow:0 0 8px rgba(0,255,135,.5);z-index:0}
-.circuit-node:nth-child(even):not(:last-child)::after{left:auto;right:19px}
-.circuit-node-body h4{font-size:.82rem;font-weight:900;letter-spacing:.2px;margin-bottom:3px;color:#00FF87}
-.circuit-node-body p{font-size:.76rem;color:var(--muted);line-height:1.45}
-.circuit-timeline-tagline{text-align:center;font-size:.78rem;font-weight:800;color:var(--mint2);margin-top:14px}
-@media (max-width:480px){
-  .circuit-node,.circuit-node:nth-child(even){grid-template-columns:34px 1fr;gap:10px}
-  .circuit-node-dot{width:32px;height:32px;font-size:.68rem}
-  .circuit-node:not(:last-child)::after{left:15px}
-  .circuit-node:nth-child(even):not(:last-child)::after{right:15px;left:auto}
-  .circuit-node:nth-child(even) .circuit-node-body{text-align:left}
-}
 
 /* ===== NATIVE APP STORE ROW + PRIMARY LAUNCH ROW (below hub navigation) ===== */
 .launch-row{text-align:center;margin:6px auto 4px}
@@ -339,23 +312,15 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .pipeline-arrow{color:var(--muted);font-size:.8rem;flex-shrink:0}
 @media (max-width:560px){ .pipeline-visual{flex-direction:column} .pipeline-arrow{transform:rotate(90deg)} }
 
-.national-teaser-section{max-width:900px;margin:0 auto;padding:8px 24px}
-.national-teaser-card{display:flex;align-items:center;gap:18px;width:100%;text-align:left;background:linear-gradient(135deg,rgba(0,255,136,.10),rgba(0,255,136,.02));
-  border:1px solid rgba(0,255,136,.35);border-radius:16px;padding:18px 20px;cursor:pointer;box-shadow:0 0 30px rgba(0,255,136,.08)}
-.national-teaser-card:hover{border-color:var(--mint2)}
-.teaser-radar-thumb{position:relative;width:84px;height:84px;border-radius:50%;background:radial-gradient(circle,rgba(0,255,136,.18),rgba(0,20,15,.9) 70%);
+.radar-sweep-launcher{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;background:none;
+  border:none;cursor:pointer;margin-bottom:16px;padding:0}
+.teaser-radar-thumb{position:relative;width:64px;height:64px;border-radius:50%;background:radial-gradient(circle,rgba(0,255,136,.18),rgba(0,20,15,.9) 70%);
   border:1px solid rgba(0,255,136,.4);flex-shrink:0;overflow:hidden}
 .teaser-radar-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,255,136,.25) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,.25) 1px,transparent 1px);
-  background-size:12px 12px}
+  background-size:10px 10px}
 .teaser-radar-sweep{position:absolute;inset:0;background:conic-gradient(from 0deg,rgba(0,255,136,.5),transparent 55%);animation:teaserRadarSpin 3.2s linear infinite}
 @keyframes teaserRadarSpin{to{transform:rotate(360deg)}}
-.teaser-body{flex:1;min-width:0}
-.teaser-radar-label{font-size:.66rem;font-weight:800;letter-spacing:.3px;color:var(--mint2);text-transform:uppercase;margin-bottom:6px}
-.teaser-metrics{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.78rem;color:var(--muted);margin-bottom:8px}
-.teaser-metrics strong{color:var(--text)}
-.teaser-metrics em{font-style:normal;color:var(--muted);font-size:.7rem}
-.teaser-cta{display:flex;align-items:center;gap:7px;font-weight:800;font-size:.88rem;color:var(--mint2)}
-@media (max-width:560px){ .national-teaser-card{flex-direction:column;text-align:center} .teaser-metrics{justify-content:center} .teaser-cta{justify-content:center} }
+.teaser-radar-label{font-size:.66rem;font-weight:800;letter-spacing:.3px;color:var(--mint2);text-transform:uppercase;text-align:center}
 
 .lightweight-feed-section{max-width:900px;margin:0 auto;padding:36px 24px 48px;border-top:1px solid var(--border)}
 .mini-feed-row{display:flex;justify-content:space-between;align-items:center;gap:10px;background:rgba(7,12,14,.5);
@@ -600,12 +565,49 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 .stack-tier .tier-name{font-weight:800;font-size:.92rem;flex:1}
 .stack-tier .tier-role{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
 .stack-tier .tier-chevron{transition:transform .15s;color:var(--muted)}
+
+/* ===== TRI-NODE INTERCONNECTED SYSTEM — Civic Memory / Municipal Dispatch /
+   The Civic Record as 3 linked ecosystem nodes rather than a numbered
+   1-2-3 list. A single emerald connector line runs behind all 3 cards;
+   node index numbers were removed entirely (role labels only). ===== */
+.tri-node-section{max-width:960px;margin:8px auto 28px;padding:0 24px}
+.tri-node-grid{max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;position:relative}
+.tri-node-grid::before{content:'';position:absolute;top:32px;left:6%;right:6%;height:2px;z-index:0;
+  background:linear-gradient(90deg,rgba(0,255,135,.15),#00FF87,rgba(0,255,135,.15));box-shadow:0 0 8px rgba(0,255,135,.5)}
+.tri-node{position:relative;z-index:1}
+.tri-node .stack-tier{position:relative;flex-direction:column;text-align:center;gap:6px;border-color:rgba(0,255,136,.35);padding:16px 12px 20px;background:var(--bg-obsidian)}
+.tri-node .tier-name{font-size:.84rem}
+.tri-node .tier-role{font-size:.6rem}
+.tri-node .tier-chevron{position:absolute;bottom:8px;right:12px}
+.tri-node .tier-detail{margin-top:8px}
+@media (max-width:640px){
+  .tri-node-grid{grid-template-columns:1fr}
+  .tri-node-grid::before{display:none}
+}
 .stack-tier[aria-expanded="true"] .tier-chevron{transform:rotate(180deg);color:var(--mint2)}
 .tier-detail{max-height:0;overflow:hidden;transition:max-height .2s ease;font-size:.82rem;color:var(--muted);
   padding:0 16px;line-height:1.5}
 .tier-detail.open{max-height:200px;padding:10px 16px}
 
 /* 3x3 Analytics Matrix */
+.matrix-summary-section{padding-top:32px}
+
+/* ===== LIVE PUBLIC LEDGER BANNER ===== */
+.ledger-banner-section{max-width:640px;margin:0 auto 26px;padding:0 24px}
+.ledger-banner{display:flex;align-items:center;gap:10px;width:100%;background:rgba(0,255,136,.06);
+  border:1px solid rgba(0,255,136,.35);border-radius:12px;padding:12px 16px;cursor:pointer;color:var(--text);text-align:left}
+.ledger-banner:hover{border-color:#00FF87}
+.ledger-banner-pulse{position:relative;width:10px;height:10px;border-radius:50%;background:#00FF87;flex-shrink:0;
+  box-shadow:0 0 6px #00FF87}
+.ledger-banner-pulse::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid #00FF87;
+  animation:pulseEmerald 1.8s ease-out infinite}
+@keyframes pulseEmerald{
+  0%{transform:scale(.6);opacity:.9}
+  100%{transform:scale(2.2);opacity:0}
+}
+.ledger-banner-label{flex:1;font-size:.74rem;font-weight:800;letter-spacing:.3px;color:#00FF87}
+.ledger-banner-count{font-size:.68rem;color:var(--muted);font-weight:700;flex-shrink:0}
+@media (max-width:560px){ .ledger-banner{flex-wrap:wrap} .ledger-banner-label{flex-basis:100%} }
 .analytics-matrix-card{max-width:720px;margin:0 auto 40px;background:var(--card);border:1px solid var(--border);
   border-radius:16px;padding:20px}
 .matrix-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
@@ -805,6 +807,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       <svg class="hero-shield-icon" viewBox="0 0 24 24" width="0.78em" height="0.78em" stroke="var(--brand-mint)" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       <span class="brand-white">CITIXEN</span> <span class="brand-lime">UX</span><sup class="brand-tm">™</sup>
     </h1>
+    <p class="hero-kicker">Upgrade Your Civic Experience™</p>
     <p class="hero-subtitle">What is Civic Intelligence?</p>
     <p class="ci-definition"><span class="hero-highlight">Civic Intelligence™ (C.I.)</span> is the real-time synthesis of community ground-truth reporting, automated municipal dispatch, and executive financial auditing.</p>
   </section>
@@ -838,61 +841,85 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        the closest real equivalent to what it used to point at. ===== -->
   <span id="analytics" aria-hidden="true"></span>
 
-  <!-- ===== 3x3 ANALYTICS MATRIX — SUMMARY VIEW ===== -->
+  <!-- ===== CIVIC INTELLIGENCE™ POWERED BY CIVIC MEMORY™ — TRI-NODE SYSTEM.
+       Relocated here (directly below the hero) from its old home inside the
+       hidden Operations drawer, and restyled from a numbered 1-2-3 vertical
+       accordion into an always-visible 3-column interconnected grid. Same
+       #civicStackVisualizer id, .stack-tier/.tier-detail markup and
+       data-tier attributes as before, so the existing accordion click
+       handler and the footer's "Civic Stack™" links (openCivicStackTier())
+       keep working unchanged — only the layout and index numbering
+       changed. ===== -->
+  <section class="tri-node-section" id="civicMemorySystem">
+    <div style="text-align:center;margin-bottom:16px">
+      <h3 style="font-size:1.1rem">Civic Intelligence<sup style="font-size:.6em;opacity:.5;">™</sup>: Powered by Civic Memory<sup style="font-size:.6em;opacity:.5;">™</sup></h3>
+      <p class="statement-sub">The Civic Stack™ — how one verified report becomes a permanent, auditable record.</p>
+    </div>
+    <div class="civic-stack-visualizer tri-node-grid" id="civicStackVisualizer">
+      <div class="tri-node">
+        <button class="stack-tier" data-tier="memory" type="button" aria-expanded="false">
+          <span class="tier-name">Civic Memory™</span>
+          <span class="tier-role">Sourcing</span>
+          <span class="tier-chevron">▾</span>
+        </button>
+        <div class="tier-detail" data-tier-detail="memory">The public event ledger powered by CITIXEN citizen reports — the same Live Feed / Live Ledger shown in the dashboard above, zero-account by design.</div>
+      </div>
+      <div class="tri-node">
+        <button class="stack-tier" data-tier="dispatch" type="button" aria-expanded="false">
+          <span class="tier-name">Municipal Dispatch</span>
+          <span class="tier-role">Operations</span>
+          <span class="tier-chevron">▾</span>
+        </button>
+        <div class="tier-detail" data-tier-detail="dispatch">Field Work Orders — City Worker SLA tracking and a required on-site proof photo before any ticket closes, so a desk closure is never mistaken for a real fix.</div>
+      </div>
+      <div class="tri-node">
+        <button class="stack-tier" data-tier="record" type="button" aria-expanded="false">
+          <span class="tier-name">The Civic Record™</span>
+          <span class="tier-role">Audit</span>
+          <span class="tier-chevron">▾</span>
+        </button>
+        <div class="tier-detail" data-tier-detail="record">Public Official executive audit &amp; budget line-item binding — the same Big 3 metrics and Municipal Expenditure &amp; Allocation ledger shown in the Expenditures drawer, rolled up for oversight and public accountability.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CITY SNAPSHOT™ — SUMMARY VIEW (formerly "3x3 Analytics Matrix") ===== -->
   <section class="matrix-summary-section" id="matrixSummarySection">
     <div class="analytics-matrix-card" id="analyticsMatrix">
-      <div class="label" style="justify-content:center">3×3 Analytics Matrix</div>
+      <div class="label" style="justify-content:center">City Snapshot™</div>
       <div class="matrix-grid" id="matrixGrid"></div>
       <div class="small" style="text-align:center;margin-top:10px;color:var(--muted)">Live Ward Performance Metrics — refreshed automatically from field dispatch data. Tap a tile for its full breakdown.</div>
     </div>
   </section>
 
-  <!-- ===== COMPACT 5-NODE ZIGZAG CIRCUIT TIMELINE — replaces the old 3-step
-       "SEE IT & MAP IT / FIX IT & PROVE IT / TRACK IT & AUDIT IT" grid per the
-       master-refactor spec. Same underlying process, told as 5 discrete
-       operational nodes; every "automated"/"webhook" claim here is the same
-       honestly-scoped simulation used throughout this codebase (see the
-       Civic Stack Operations pipeline below and its own disclosure). ===== -->
-  <section class="circuit-timeline-section" aria-label="How a report becomes a record">
-    <div class="circuit-timeline">
-      <div class="circuit-node">
-        <div class="circuit-node-dot">1</div>
-        <div class="circuit-node-body"><h4>1. SEE IT</h4><p>CITIXEN captures a ground-truth photo.</p></div>
-      </div>
-      <div class="circuit-node">
-        <div class="circuit-node-dot">2</div>
-        <div class="circuit-node-body"><h4>2. MAP IT</h4><p>100m Geo-Hatch cell auto-tagged &amp; deduplicated.</p></div>
-      </div>
-      <div class="circuit-node">
-        <div class="circuit-node-dot">3</div>
-        <div class="circuit-node-body"><h4>3. FIX IT</h4><p>Automated webhook dispatches field crew.</p></div>
-      </div>
-      <div class="circuit-node">
-        <div class="circuit-node-dot">4</div>
-        <div class="circuit-node-body"><h4>4. PROVE IT</h4><p>Crew uploads proof-of-remediation.</p></div>
-      </div>
-      <div class="circuit-node">
-        <div class="circuit-node-dot">5</div>
-        <div class="circuit-node-body"><h4>5. AUDIT IT</h4><p>Fix bound to CapEx ledger &amp; cryptographically verified.</p></div>
-      </div>
-    </div>
-    <div class="circuit-timeline-tagline">5 Automated Operational Nodes — Triggered by 1 CITIXEN Snap.</div>
+  <!-- ===== LIVE PUBLIC LEDGER BANNER — sits directly beneath City
+       Snapshot™; opens the existing #ledgerDrawer (same drawer as the
+       footer's "The Civic Record™" link and the bottom "View Full Ledger"
+       button) rather than a new, separate ledger view. The count is real:
+       set from the same /api/coverage/big3 payload loadBig3() already
+       fetches (see ledgerBannerCount in loadBig3()), not a fabricated
+       incrementing number. ===== -->
+  <section class="ledger-banner-section">
+    <button class="ledger-banner" id="liveLedgerBanner" type="button">
+      <span class="ledger-banner-pulse" aria-hidden="true"></span>
+      <span class="ledger-banner-label">LIVE PUBLIC LEDGER — REAL-TIME REMEDIATION STREAM</span>
+      <span class="ledger-banner-count" id="ledgerBannerCount">Syncing…</span>
+    </button>
   </section>
 
-  <!-- ===== FIVE DEEP DRILL-DOWN ACTION HUBS — each reveals its own hidden
-       deep-dive panel, or opens the full-screen National Geo-Hatch Heat Map
-       modal, rather than navigating away. Mapping decision (spec named 5
-       buttons but only 2 underlying deep-dive containers plus the new
-       heat-map modal exist): Analytics opens the heat map modal directly, as
-       explicitly specified; Reporting opens the Health Index / Live Feed /
-       Report Generator panel (previously "Analytics & Reporting");
-       Expenditures and Projects both open the Civic Stack & Operations panel,
-       scrolled to the budget ledger vs. the stack visualizer respectively;
-       Civic Stack™ Operations opens that same panel scrolled to the new
-       backend pipeline visual, which itself also offers a "View National
-       Heat Map" launcher — satisfying the spec's separate instruction that
-       this button connect to the heat map modal too, without duplicating
-       the panel. ===== -->
+  <!-- ===== THREE DRILL-DOWN ACTION HUBS — sit directly below the Live Public
+       Ledger banner with no header text above them (per the homepage
+       decluttering pass). Each reveals its own hidden deep-dive panel
+       rather than navigating away: Analytics -> Health Index & Live
+       Incidents Feed (deepdiveAnalytics); Expenditures -> Municipal
+       Expenditure Allocation & CapEx Audit Ledger (civicStackSection,
+       scrolled to ledgerCard); Operations -> Backend Pipeline Architecture
+       & the National Geo-Hatch Heat Map launcher (civicStackSection,
+       scrolled to civicPipelineVisual). The former 5-node "SEE IT/MAP
+       IT/.../AUDIT IT" circuit timeline that used to sit here was removed
+       outright per the decluttered page-flow spec — its place in the flow
+       is now the Civic Memory tri-node system above the City Snapshot™
+       card. ===== -->
   <div class="hub-row" role="navigation" aria-label="Deep-dive sections">
     <button class="hub-card" id="hubCoverageBtn" type="button" aria-expanded="false" aria-controls="deepdiveAnalytics">
       <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><rect x="6" y="10" width="3" height="9"/><rect x="11" y="6" width="3" height="13"/><rect x="16" y="13" width="3" height="6"/></svg>
@@ -1050,36 +1077,10 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        the relevant anchor inside it, rather than duplicating it twice). ===== -->
   <section class="deepdive-panel civic-stack-section" id="civicStackSection">
     <div class="deepdive-panel-head">
-      <h3>Civic Intelligence<sup style="font-size:.6em;opacity:.5;">™</sup>: Powered by Civic Memory<sup style="font-size:.6em;opacity:.5;">™</sup></h3>
+      <h3>Expenditures &amp; Operations</h3>
       <button class="deepdive-close" data-close-panel="civicStackSection" type="button">Close ✕</button>
     </div>
-    <p class="statement-sub">The Civic Stack™ — how one verified report becomes a permanent, auditable record.</p>
-
-    <div class="civic-stack-visualizer" id="civicStackVisualizer">
-      <button class="stack-tier" data-tier="record" type="button" aria-expanded="false">
-        <span class="tier-index">03</span>
-        <span class="tier-name">The Civic Record™</span>
-        <span class="tier-role">Top — Audit</span>
-        <span class="tier-chevron">▾</span>
-      </button>
-      <div class="tier-detail" data-tier-detail="record">Public Official executive audit & budget line-item binding — the same Big 3 metrics and Municipal Expenditure &amp; Allocation ledger shown elsewhere on this page, rolled up for oversight and public accountability.</div>
-
-      <button class="stack-tier" data-tier="dispatch" type="button" aria-expanded="false">
-        <span class="tier-index">02</span>
-        <span class="tier-name">Municipal Dispatch</span>
-        <span class="tier-role">Middle — Operations</span>
-        <span class="tier-chevron">▾</span>
-      </button>
-      <div class="tier-detail" data-tier-detail="dispatch">Field Work Orders — City Worker SLA tracking and a required on-site proof photo before any ticket closes, so a desk closure is never mistaken for a real fix.</div>
-
-      <button class="stack-tier" data-tier="memory" type="button" aria-expanded="false">
-        <span class="tier-index">01</span>
-        <span class="tier-name">Civic Memory™</span>
-        <span class="tier-role">Base — Sourcing</span>
-        <span class="tier-chevron">▾</span>
-      </button>
-      <div class="tier-detail" data-tier-detail="memory">The public event ledger powered by CITIXEN citizen reports — the same Live Feed / Live Ledger shown in the dashboard above, zero-account by design.</div>
-    </div>
+    <p class="statement-sub">Municipal Expenditure Allocation, the CapEx Audit Ledger, and the backend pipeline behind every verified fix. (The Civic Stack™ ecosystem itself — Civic Memory™ / Municipal Dispatch / The Civic Record™ — now lives just below the hero as its own always-visible section.)</p>
 
     <!-- ===== CITYWIDE MUNICIPAL EXPENDITURE & ALLOCATION — same id/markup as
          before (only its position changed), including its existing "not an
@@ -1121,6 +1122,17 @@ audio.pw-audio-el{width:100%;margin-top:4px}
          audit hash runs anywhere here — see api/_lib/store.js, this
          project's only actual backend, an in-memory demo seed). ===== -->
     <div class="card" id="civicPipelineVisual" style="max-width:640px;width:100%;margin:0 auto 20px;">
+      <!-- ===== "Live Radar Sweep: 100m Geo-Hatch™ Active Audits" — relocated
+           here from the old homepage teaser card (now removed) rather than
+           deleted; same radar visual, now a launcher into the Operations
+           drawer's heat map access instead of a top-level homepage card. ===== -->
+      <button class="radar-sweep-launcher" id="radarSweepFromStack" type="button">
+        <div class="teaser-radar-thumb" aria-hidden="true">
+          <div class="teaser-radar-grid"></div>
+          <div class="teaser-radar-sweep"></div>
+        </div>
+        <span class="teaser-radar-label">Live Radar Sweep: 100m Geo-Hatch™ Active Audits</span>
+      </button>
       <div class="label" style="justify-content:center">Backend Data Pipeline</div>
       <div class="pipeline-visual">
         <div class="pipeline-stage"><span class="pipeline-stage-label">CITIXEN Capture</span></div>
@@ -1144,32 +1156,13 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </button>
   </section>
 
-  <!-- ===== HOMEPAGE NATIONAL AUDIT TEASER CARD — the specific figures below
-       (14,280 / $412M / <24h) are this project's own illustrative
-       placeholders (3 seeded jurisdictions), kept from the design brief;
-       "(Preview)" is the one honest marker retained next to them rather
-       than a full disclaimer paragraph. ===== -->
-  <section class="national-teaser-section">
-    <button class="national-teaser-card" id="nationalTeaserCard" type="button" aria-haspopup="dialog" aria-controls="nationalHeatMapModal">
-      <div class="teaser-radar-thumb" aria-hidden="true">
-        <div class="teaser-radar-grid"></div>
-        <div class="teaser-radar-sweep"></div>
-      </div>
-      <div class="teaser-body">
-        <div class="teaser-radar-label">Live Radar Sweep: 100m Geo-Hatch™ Active Audits</div>
-        <div class="teaser-metrics">
-          <span><strong>Active Ward Cells:</strong> 14,280 <em>(100m² Grid Units Monitored)</em></span>
-          <span><strong>Audited CapEx:</strong> $412M <em>(Bound to Ledger)</em></span>
-          <span><strong>Resolution SLA:</strong> &lt; 24h <em>(Automated Field Webhook SLA)</em></span>
-        </div>
-        <div class="teaser-cta">
-          <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
-          SEE HOW CITIXEN™ IS AUDITING AMERICA IN REAL TIME ➔
-        </div>
-        <div class="small" style="color:var(--muted);margin-top:6px">National Civic Intelligence Index — Live Grid Feed (Preview).</div>
-      </div>
-    </button>
-  </section>
+  <!-- ===== The National Audit Teaser Card (radar sweep + metrics + CTA)
+       that used to render here was removed from the main homepage body per
+       the decluttering spec. Its "Live Radar Sweep: 100m Geo-Hatch™ Active
+       Audits" visual now lives inside the Operations drawer (civicStackSection
+       / #civicPipelineVisual below), next to the pipeline flow chart, rather
+       than being deleted outright. The heat map modal itself (#nationalHeatMapModal)
+       is unchanged and still reachable from there. ===== -->
 
   <!-- ===== SEARCH BAR — retained at the bottom of the homepage scroll per the
        master-refactor spec ("Retain the Search Bar ... at the bottom"). Same
@@ -1304,7 +1297,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         <h5>Platform &amp; App</h5>
         <a href="/app.html" target="_blank" rel="noopener noreferrer">CITIXEN Mobile App ↗</a>
         <button type="button" data-scroll-to="frontierMap">Geo-Hatch Map</button>
-        <button type="button" data-scroll-to="matrixSummarySection">3×3 Matrix</button>
+        <button type="button" data-scroll-to="matrixSummarySection">City Snapshot™</button>
       </div>
       <div class="sitemap-col">
         <h5>The Civic Stack™</h5>
@@ -1758,9 +1751,10 @@ function openHeatMapModal(){
 function closeHeatMapModal(){
   document.getElementById('nationalHeatMapModal').classList.remove('open');
 }
-document.getElementById('nationalTeaserCard').addEventListener('click', openHeatMapModal);
 const viewHeatMapFromAnalyticsBtn = document.getElementById('btnViewHeatMapFromAnalytics');
 if (viewHeatMapFromAnalyticsBtn) viewHeatMapFromAnalyticsBtn.addEventListener('click', openHeatMapModal);
+const radarSweepFromStackBtn = document.getElementById('radarSweepFromStack');
+if (radarSweepFromStackBtn) radarSweepFromStackBtn.addEventListener('click', openHeatMapModal);
 document.getElementById('heatMapCloseBtn').addEventListener('click', closeHeatMapModal);
 document.getElementById('nationalHeatMapModal').addEventListener('click', (e) => {
   if (e.target.id === 'nationalHeatMapModal') closeHeatMapModal();
@@ -2320,6 +2314,7 @@ async function loadBig3(){
   setTextIfExists('big3Active', data.activeCount != null ? String(data.activeCount) : 'N/A');
   setTextIfExists('big3Speed', data.avgResolutionHours != null ? data.avgResolutionHours + 'h' : 'N/A');
   setTextIfExists('big3Verify', data.verificationRatePct != null ? data.verificationRatePct + '%' : 'N/A');
+  setTextIfExists('ledgerBannerCount', data.totalTickets != null ? data.totalTickets + ' entries synced' : 'Syncing…');
   renderAnalyticsMatrix(data);
 }
 
@@ -2340,7 +2335,9 @@ document.querySelectorAll('.stack-tier').forEach(tier => {
 // detail, and scrolls it into view — same accordion the tier buttons
 // above already drive, just triggered from the footer instead.
 function openCivicStackTier(tierKey){
-  openDeepdivePanel('civicStackSection', 'civicStackVisualizer', document.getElementById('hubStackBtn'));
+  // The Civic Stack™ visualizer is now always visible just below the hero
+  // (no longer inside a hidden deep-dive panel), so this just expands the
+  // one tier and scrolls it into view.
   const tierBtn = document.querySelector(`.stack-tier[data-tier="${tierKey}"]`);
   const detail = document.querySelector(`.tier-detail[data-tier-detail="${tierKey}"]`);
   if (tierBtn) tierBtn.setAttribute('aria-expanded', 'true');
@@ -2773,6 +2770,7 @@ function closeLedgerDrawer(){
   document.getElementById('ledgerDrawer').classList.remove('open');
 }
 document.getElementById('btnViewFullLedger').addEventListener('click', () => openLedgerDrawer());
+document.getElementById('liveLedgerBanner').addEventListener('click', () => openLedgerDrawer());
 document.getElementById('ledgerCloseBtn').addEventListener('click', closeLedgerDrawer);
 document.getElementById('ledgerDrawer').addEventListener('click', (e) => { if (e.target.id === 'ledgerDrawer') closeLedgerDrawer(); });
 
