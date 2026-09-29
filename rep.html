@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CITIXEN UX — Representative Dashboard</title>
+<meta name="description" content="Public district health dashboard for elected representatives and the residents they serve.">
+<meta name="theme-color" content="#00ff88">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
+<!-- Client-side PDF export — same CDN-script pattern index.html/app.html already use, no bundler/build step. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --brand-mint:#00ff88 !important;
+  --brand-mint-hover:#00e077 !important;
+  --brand-mint-dim:rgba(0,255,136,0.12) !important;
+  --brand-amber:#ffbb00 !important;
+  --brand-red:#ff4444 !important;
+  --bg-obsidian:#080c0a !important;
+  --bg-card:#0f1713 !important;
+  --border-muted:rgba(255,255,255,0.08) !important;
+  /* legacy aliases — one source of truth for color, same convention as index.html/app.html/dispatch.html */
+  --bg:var(--bg-obsidian); --card:var(--bg-card); --border:var(--border-muted); --hover:#162529;
+  --mint:var(--brand-mint); --mint2:var(--brand-mint-hover); --text:#f8fafc; --muted:#8e9fa8;
+  --danger:var(--brand-red); --warn:var(--brand-amber); --amber:var(--brand-amber);
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+button,select,input,textarea{font-family:inherit}
+
+/* ===== HEADER (identical markup/classes across index.html, app.html, dispatch.html, rep.html) ===== */
+header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);padding:14px 24px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand-logo{display:flex;align-items:center;gap:10px}
+.brand-wordmark{font-weight:800;font-size:1.05rem;letter-spacing:.3px}
+.brand-white{color:#ffffff}
+.brand-lime{color:var(--brand-mint)}
+.brand-tm{font-size:.55em;opacity:.4;margin-left:1px}
+.badge-mint{font-size:.65rem;background:rgba(0,255,136,.12);color:var(--mint2);border:1px solid rgba(0,255,136,.4);
+  padding:4px 10px;border-radius:20px;font-weight:700;letter-spacing:.4px;display:flex;align-items:center;gap:6px}
+.badge-dot-mint{width:6px;height:6px;border-radius:50%;background:var(--mint2)}
+.staff-link{font-size:.78rem;color:var(--muted);text-decoration:none;border-bottom:1px dashed var(--border);padding-bottom:2px}
+.staff-link:hover{color:var(--mint2);border-color:var(--mint2)}
+
+.wrap{max-width:1040px;margin:0 auto;padding:24px 20px 60px;width:100%}
+.page-head{margin-bottom:20px}
+.page-head h1{font-size:1.5rem;font-weight:900;letter-spacing:-.3px}
+.page-head p{font-size:.82rem;color:var(--muted);margin-top:6px;line-height:1.5;max-width:640px}
+.public-note{display:inline-flex;align-items:center;gap:6px;background:var(--brand-mint-dim);border:1px solid rgba(0,255,136,.35);
+  color:var(--mint2);border-radius:20px;padding:5px 12px;font-size:.68rem;font-weight:700;margin-top:10px}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:16px}
+.card h2{font-size:.95rem;margin-bottom:4px}
+.card .sub{font-size:.74rem;color:var(--muted);margin-bottom:14px}
+
+.ward-picker{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.grid-select{background:rgba(7,12,14,.8);border:1px solid var(--border);color:var(--text);
+  padding:9px 12px;border-radius:8px;font-size:.8rem;font-weight:700;outline:none}
+.grid-select:focus{border-color:var(--mint2)}
+.alderman-line{font-size:.86rem;font-weight:700;color:var(--text);margin-top:12px}
+.alderman-line .role{color:var(--muted);font-weight:600;font-size:.74rem;display:block;margin-top:2px}
+
+/* ===== DISTRICT HEALTH METRICS ===== */
+.overview{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:12px;overflow:hidden}
+.metric{background:var(--bg-card);padding:16px 18px}
+.metric .label{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:8px}
+.metric .value{font-size:1.6rem;font-weight:900;color:var(--mint2)}
+.metric .sub{font-size:.66rem;color:var(--muted);margin-top:4px}
+@media (max-width:640px){ .overview{grid-template-columns:1fr} }
+
+/* ===== BIG 3 (mirrors index.html/app.html/dispatch.html) ===== */
+.big3-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.big3-tile{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center}
+.big3-val{font-size:1.3rem;font-weight:900;color:var(--mint2)}
+.big3-lbl{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-top:4px;line-height:1.3}
+.big3-note{font-size:.68rem;color:var(--muted);margin-top:10px;text-align:center}
+@media (max-width:520px){ .big3-row{grid-template-columns:1fr} }
+
+/* ===== TICKET STAGE BREAKDOWN ===== */
+.stage-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stage-tile{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+.stage-tile .n{font-size:1.15rem;font-weight:900}
+.stage-tile .l{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-top:2px}
+.ticket-row{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:.78rem}
+.ticket-row:last-child{border-bottom:none}
+.ticket-row .t-loc{color:var(--muted);font-size:.7rem}
+.ticket-row .t-stage{font-size:.62rem;font-weight:800;text-transform:uppercase;padding:3px 8px;border-radius:6px;flex-shrink:0;height:fit-content}
+.t-stage.submitted{background:rgba(255,187,0,.15);color:#fde68a}
+.t-stage.dispatched{background:rgba(0,255,136,.12);color:var(--mint2)}
+.t-stage.resolved{background:rgba(0,255,136,.2);color:#7ffcd4}
+
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:10px;font-weight:800;font-size:.78rem;
+  cursor:pointer;text-decoration:none;padding:10px 16px;border:none;white-space:nowrap}
+.btn-primary{background:var(--mint);color:#051311}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--mint2);color:var(--mint2)}
+
+/* ===== REP TOOLS UI CURTAIN (same honest pattern as dispatch.html's access gate —
+   a client-side curtain, NOT real authentication; see the script comment below) ===== */
+.rep-gate{border:1px dashed var(--border);border-radius:14px;padding:18px;text-align:center}
+.rep-gate input{width:100%;max-width:280px;margin:10px auto 0;display:block;padding:11px 13px;
+  background:rgba(7,12,14,.8);border:1px solid var(--border);color:var(--text);border-radius:10px;
+  font-size:.9rem;letter-spacing:.08em;outline:none;text-align:center}
+.rep-gate input:focus{border-color:var(--mint2)}
+#repGateErr{font-size:.72rem;color:#fca5a5;min-height:1.1em;margin-top:8px}
+.curtain-note{font-size:.66rem;color:var(--muted);margin-top:10px;line-height:1.5}
+#repToolsPanel{display:none}
+#repToolsPanel.unlocked{display:block}
+#repGateBox.hidden{display:none}
+.draft-textarea{width:100%;min-height:80px;resize:vertical;background:rgba(7,12,14,.8);border:1px solid var(--border);
+  color:var(--text);border-radius:10px;padding:10px 12px;font-size:.82rem;margin-bottom:10px}
+.draft-item{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:.78rem}
+.draft-item .meta{font-size:.62rem;color:var(--muted);margin-top:4px}
+.toast{display:none;position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:2500;
+  background:rgba(0,255,136,.2);border:1px solid var(--mint2);color:var(--mint2);
+  padding:10px 16px;border-radius:10px;font-size:.78rem;font-weight:700;text-align:center}
+
+.site-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+  padding:16px 22px max(16px, env(safe-area-inset-bottom));border-top:1px solid var(--border);
+  font-size:.7rem;color:var(--muted);background:var(--bg);margin-top:auto}
+.footer-staff-link{color:var(--muted);text-decoration:none;border-bottom:1px dashed var(--border);padding-bottom:1px}
+.footer-staff-link:hover{color:var(--mint2);border-color:var(--mint2)}
+</style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24" width="21" height="21" stroke="var(--brand-mint)" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span class="brand-wordmark"><span class="brand-white">CITIXEN</span> <span class="brand-lime">UX</span><sup class="brand-tm">™</sup></span>
+      </div>
+      <div class="badge-mint"><span class="badge-dot-mint"></span> REPRESENTATIVE DASHBOARD</div>
+    </div>
+    <a class="staff-link" href="/">← Return to Public Site</a>
+  </header>
+
+  <div id="toast" class="toast"></div>
+
+  <div class="wrap">
+    <div class="page-head">
+      <h1>District Health &amp; Ward Performance</h1>
+      <p>Public accountability data for residents and their elected Alderman/Representative — the same real, live-computed
+        figures shown on the main CITIXEN UX dashboard, broken down by ward. No login is required to view this page.</p>
+      <div class="public-note">
+        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v5"/><circle cx="12" cy="16" r=".3" fill="currentColor"/></svg>
+        Public read access — Rep Tools below require an office access code
+      </div>
+    </div>
+
+    <!-- WARD SELECTOR -->
+    <section class="card">
+      <h2>Select a district</h2>
+      <div class="sub">Same onboarded wards as the main dashboard's jurisdiction picker (api/_lib/store.js).</div>
+      <div class="ward-picker">
+        <select class="grid-select" id="stateSel" aria-label="State"></select>
+        <select class="grid-select" id="citySel" aria-label="City"></select>
+        <select class="grid-select" id="wardSel" aria-label="Ward"></select>
+      </div>
+      <div class="alderman-line" id="aldermanLine">Loading district…</div>
+    </section>
+
+    <!-- DISTRICT HEALTH INDEX -->
+    <section class="card">
+      <h2>District Health Index</h2>
+      <div class="sub" id="healthSourceNote">Ward-level governance metadata — api/_lib/store.js.</div>
+      <div class="overview">
+        <div class="metric">
+          <div class="label">Ward Health Index</div>
+          <div class="value" id="mHealth">–</div>
+          <div class="sub" id="mHealthSub">–</div>
+        </div>
+        <div class="metric">
+          <div class="label">SLA Compliance</div>
+          <div class="value" id="mSla">–</div>
+          <div class="sub">Service-level agreement compliance, ward-wide</div>
+        </div>
+        <div class="metric">
+          <div class="label">CapEx Scoped</div>
+          <div class="value" id="mCapex">–</div>
+          <div class="sub">Capital spend scoped this cycle</div>
+        </div>
+        <div class="metric">
+          <div class="label">Road Condition Index</div>
+          <div class="value" id="mRoad">–</div>
+        </div>
+        <div class="metric">
+          <div class="label">Lighting Condition Index</div>
+          <div class="value" id="mLighting">–</div>
+        </div>
+        <div class="metric">
+          <div class="label">Asset Grid Coverage</div>
+          <div class="value" id="mCoverage">–</div>
+          <div class="sub" id="mCoverageSub">–</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- THE BIG 3 FOR THIS WARD -->
+    <section class="card">
+      <h2>The Big 3 — this ward</h2>
+      <div class="sub">Computed live from the same seeded ticket/CapEx records as the public dashboard's Big 3 (api/coverage/big3) — never a hand-typed headline figure.</div>
+      <div class="big3-row">
+        <div class="big3-tile"><div class="big3-val" id="big3Speed">–</div><div class="big3-lbl">Speed of Resolution</div></div>
+        <div class="big3-tile"><div class="big3-val" id="big3Verify">–</div><div class="big3-lbl">Resolution Verification Rate</div></div>
+        <div class="big3-tile"><div class="big3-val" id="big3Capex">–</div><div class="big3-lbl">CapEx Timeline Adherence</div></div>
+      </div>
+      <div class="big3-note">Current snapshot from seeded ledger/CapEx demo data — not asserted as a production dataset or a historical trend.</div>
+    </section>
+
+    <!-- TICKET LEDGER FOR THIS WARD -->
+    <section class="card">
+      <h2>Ward Ticket Ledger</h2>
+      <div class="sub">Every seeded case in this ward, by stage (api/coverage/tickets).</div>
+      <div class="stage-row" style="margin-bottom:14px;">
+        <div class="stage-tile"><div class="n" id="cSubmitted">0</div><div class="l">Submitted</div></div>
+        <div class="stage-tile"><div class="n" id="cDispatched">0</div><div class="l">Dispatched</div></div>
+        <div class="stage-tile"><div class="n" id="cResolved">0</div><div class="l">Resolved</div></div>
+      </div>
+      <div id="ticketList"></div>
+      <button class="btn btn-outline" id="btnDownloadRepPdf" style="width:100%;justify-content:center;margin-top:14px;">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>
+        Download Ward Health Summary (PDF)
+      </button>
+    </section>
+
+    <!-- REP TOOLS — UI-CURTAIN GATED WRITE-SIDE PANEL -->
+    <section class="card">
+      <h2>Rep Tools</h2>
+      <div class="sub">For the elected office of this ward only. This is a UI curtain, not real authentication — see the script comment in this file.</div>
+
+      <div id="repGateBox" class="rep-gate">
+        <div style="font-weight:800;font-size:.86rem;">Office access code</div>
+        <div class="curtain-note">Enter your office's access code to draft a constituent update or acknowledge a report.</div>
+        <form id="repGateForm" autocomplete="off">
+          <input id="repGateCode" type="password" inputmode="text" autocapitalize="characters" aria-label="Access code" required>
+          <button type="submit" class="btn btn-primary" style="margin-top:10px;">Unlock Rep Tools</button>
+        </form>
+        <div id="repGateErr" aria-live="polite"></div>
+        <div class="curtain-note">Codes are checked client-side against SHA-256 hashes. Anything shipped to the browser
+          can be read — this curtain keeps casual visitors out of the write-side tools, it is not access control.
+          A production deployment would put real auth in front of this panel.</div>
+      </div>
+
+      <div id="repToolsPanel">
+        <div class="alderman-line" id="repSignedInAs" style="margin-bottom:14px;"></div>
+        <h2 style="font-size:.86rem;">Constituent Update (draft)</h2>
+        <div class="sub">Client-side draft/preview only — there is no backend to publish this to yet. Nothing here is sent
+          anywhere; drafts are saved to this browser's local storage so you don't lose them on refresh.</div>
+        <textarea id="draftText" class="draft-textarea" placeholder="e.g. Public Works has scheduled the Main St resurfacing for Q4 2026…"></textarea>
+        <button class="btn btn-primary" id="btnSaveDraft">Save Draft (local only)</button>
+        <div id="draftList" style="margin-top:14px;"></div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="site-footer">
+    <span>CITIXEN UX — accountability data, for residents and their representatives.</span>
+    <a class="footer-staff-link" href="/">← Public Ledger</a>
+  </footer>
+
+<script>
+'use strict';
+
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.display='block';
+  setTimeout(()=>{ t.style.display='none'; },3200);
+}
+function setText(id,v){ const el=document.getElementById(id); if(el) el.textContent=v; }
+function fmtUSD(n){ return '$'+Number(n).toLocaleString(); }
+
+/* =====================================================================
+   WARD DIRECTORY — same /api/coverage/directory endpoint index.html's
+   jurisdiction picker reads, with the identical fallback shape used
+   there for offline/local preview (api/_lib/store.js's real seed wards:
+   La Crosse Ward 4/7, Milwaukee Ward 12, Chicago Ward 3). Nothing here
+   is a parallel, invented ward list.
+   ===================================================================== */
+async function fetchDirectory(){
+  try {
+    const res = await fetch('/api/coverage/directory');
+    if (!res.ok) throw new Error('directory ' + res.status);
+    return await res.json();
+  } catch (e) {
+    return { states: [
+      { slug:'wi', name:'Wisconsin', cities: [
+        { slug:'la-crosse', name:'La Crosse', wards: [
+          { slug:'ward-4', name:'Ward 4', alderman:'Ald. Rebecca Voss', coveragePct:42.5, coveredCount:34, totalCells:80, capExScopedUSD:482600 },
+          { slug:'ward-7', name:'Ward 7', alderman:'Ald. Marcus Dahl', coveragePct:62.5, coveredCount:40, totalCells:64, capExScopedUSD:310000 }
+        ]},
+        { slug:'milwaukee', name:'Milwaukee', wards: [
+          { slug:'ward-12', name:'Ward 12', alderman:'Ald. Priya Shah', coveragePct:58.3, coveredCount:70, totalCells:120, capExScopedUSD:1150000 }
+        ]}
+      ]},
+      { slug:'il', name:'Illinois', cities: [
+        { slug:'chicago', name:'Chicago', wards: [
+          { slug:'ward-3', name:'Ward 3', alderman:'Ald. Denise Coleman', coveragePct:55, coveredCount:55, totalCells:100, capExScopedUSD:940000 }
+        ]}
+      ]}
+    ]};
+  }
+}
+
+// Ward-level health metadata (healthIndex/slaPct/roadPct/lightingPct) —
+// same fallback numbers as api/_lib/store.js's DB, for when
+// /api/coverage/:state/:city/:ward/summary isn't reachable.
+const FALLBACK_WARD_HEALTH = {
+  'ward-4':  { healthIndex:82, slaPct:91, roadPct:78, lightingPct:88 },
+  'ward-7':  { healthIndex:74, slaPct:85, roadPct:70, lightingPct:80 },
+  'ward-12': { healthIndex:79, slaPct:88, roadPct:75, lightingPct:84 },
+  'ward-3':  { healthIndex:76, slaPct:86, roadPct:72, lightingPct:81 }
+};
+
+async function fetchWardSummary(state, city, ward){
+  try {
+    const res = await fetch(`/api/coverage/${state}/${city}/${ward}/summary`);
+    if (!res.ok) throw new Error('summary ' + res.status);
+    return await res.json();
+  } catch (e) {
+    return Object.assign({ state, city, ward }, FALLBACK_WARD_HEALTH[ward] || {});
+  }
+}
+
+// Same seed ledger CAPEX_PROJECTS' ward field-driven adherence formula and
+// FALLBACK_TICKETS_BY_WARD convention index.html already uses for
+// fallbackBigThree() — mirrored here per-ward instead of national.
+const FALLBACK_TICKETS_BY_WARD = {
+  'ward-4': [
+    { stage:'resolved', verified:true, resolutionHours:14 }, { stage:'dispatched', verified:null, resolutionHours:null },
+    { stage:'resolved', verified:true, resolutionHours:22 }, { stage:'resolved', verified:false, resolutionHours:9 },
+    { stage:'submitted', verified:null, resolutionHours:null }, { stage:'resolved', verified:true, resolutionHours:31 }
+  ],
+  'ward-7': [
+    { stage:'resolved', verified:true, resolutionHours:18 }, { stage:'resolved', verified:false, resolutionHours:27 },
+    { stage:'dispatched', verified:null, resolutionHours:null }, { stage:'resolved', verified:true, resolutionHours:12 }
+  ],
+  'ward-12': [
+    { stage:'resolved', verified:true, resolutionHours:20 }, { stage:'resolved', verified:true, resolutionHours:16 },
+    { stage:'submitted', verified:null, resolutionHours:null }, { stage:'dispatched', verified:null, resolutionHours:null }
+  ],
+  'ward-3': [
+    { stage:'resolved', verified:true, resolutionHours:25 }, { stage:'resolved', verified:false, resolutionHours:19 },
+    { stage:'resolved', verified:true, resolutionHours:10 }
+  ]
+};
+const FALLBACK_CAPEX_BY_WARD = {
+  'ward-4':  [{status:'on-time'},{status:'on-track'}],
+  'ward-7':  [{status:'delayed'},{status:'on-track'}],
+  'ward-12': [{status:'on-time'},{status:'on-track'}],
+  'ward-3':  [{status:'delayed'}]
+};
+function localBigThreeForWard(wardSlug){
+  const tickets = FALLBACK_TICKETS_BY_WARD[wardSlug] || [];
+  const resolved = tickets.filter(t => t.stage === 'resolved');
+  const withTime = resolved.filter(t => typeof t.resolutionHours === 'number');
+  const avgResolutionHours = withTime.length ? +(withTime.reduce((s,t)=>s+t.resolutionHours,0)/withTime.length).toFixed(1) : null;
+  const verifiedCount = resolved.filter(t => t.verified === true).length;
+  const verificationRatePct = resolved.length ? +(verifiedCount/resolved.length*100).toFixed(1) : null;
+  const projects = FALLBACK_CAPEX_BY_WARD[wardSlug] || [];
+  const decided = projects.filter(p => p.status !== 'on-track');
+  const onTarget = decided.filter(p => p.status === 'on-time').length;
+  const capExAdherencePct = decided.length ? +(onTarget/decided.length*100).toFixed(1) : null;
+  return { avgResolutionHours, verificationRatePct, capExAdherencePct };
+}
+async function fetchBig3ForWard(wardSlug){
+  try {
+    const res = await fetch('/api/coverage/big3');
+    if (!res.ok) throw new Error('big3 ' + res.status);
+    const json = await res.json();
+    return (json.perWard && json.perWard[wardSlug]) || localBigThreeForWard(wardSlug);
+  } catch (e) {
+    return localBigThreeForWard(wardSlug);
+  }
+}
+
+// Same shape as api/_lib/store.js's WARD_TICKETS, for offline fallback —
+// full per-ticket detail (title/loc/category) so the ledger list below
+// isn't degraded to bare counts when the API is unreachable.
+const FALLBACK_WARD_TICKET_DETAIL = {
+  'ward-4': [
+    { title:'Deep pothole, right lane', loc:'Main St & 4th Ave', stage:'resolved' },
+    { title:'Streetlight outage', loc:'Grand Ave & 7th St', stage:'dispatched' },
+    { title:'Storm drain backing up', loc:'Pine St Alley', stage:'resolved' },
+    { title:'Cracked ADA ramp', loc:'Cass St & 6th', stage:'resolved' },
+    { title:'Stop sign knocked down', loc:'Cameron Ave', stage:'submitted' },
+    { title:'Pavement gap, bike lane', loc:'6th St & Cass', stage:'resolved' }
+  ],
+  'ward-7': [
+    { title:'Dark corner, no lighting', loc:'Ward 7 & Copeland', stage:'resolved' },
+    { title:'Large pothole cluster', loc:'La Crosse St', stage:'resolved' },
+    { title:'Sidewalk heave, trip hazard', loc:'Losey Blvd', stage:'dispatched' },
+    { title:'Clogged culvert', loc:'George St', stage:'resolved' }
+  ],
+  'ward-12': [
+    { title:'Faded crosswalk signage', loc:'National Ave', stage:'resolved' },
+    { title:'Flickering streetlight', loc:'Layton Blvd', stage:'resolved' },
+    { title:'Pothole near crosswalk', loc:'Mitchell St', stage:'submitted' },
+    { title:'Missing curb ramp', loc:'16th & Greenfield', stage:'dispatched' }
+  ],
+  'ward-3': [
+    { title:'Street flooding after rain', loc:'Halsted St', stage:'resolved' },
+    { title:'Deep pothole, arterial road', loc:'Ashland Ave', stage:'resolved' },
+    { title:'Streetlight pole down', loc:'Milwaukee Ave', stage:'resolved' }
+  ]
+};
+async function fetchTicketsForWard(wardSlug){
+  try {
+    const res = await fetch('/api/coverage/tickets');
+    if (!res.ok) throw new Error('tickets ' + res.status);
+    const data = await res.json();
+    return data.tickets.filter(t => t.ward === wardSlug);
+  } catch (e) {
+    return FALLBACK_WARD_TICKET_DETAIL[wardSlug] || [];
+  }
+}
+
+/* =====================================================================
+   STATE — the currently-selected jurisdiction + everything fetched for it
+   ===================================================================== */
+let directory = null;
+let current = { state:null, city:null, ward:null, wardName:null, alderman:null };
+let currentSummary = null, currentBig3 = null, currentTickets = [];
+
+function populateWardPickers(preselect){
+  const stateSel = document.getElementById('stateSel');
+  const citySel = document.getElementById('citySel');
+  const wardSel = document.getElementById('wardSel');
+
+  stateSel.innerHTML = '';
+  directory.states.forEach(s => {
+    const opt = document.createElement('option'); opt.value = s.slug; opt.textContent = s.name;
+    stateSel.appendChild(opt);
+  });
+  if (preselect) stateSel.value = preselect.state;
+
+  const fillCities = () => {
+    const s = directory.states.find(s => s.slug === stateSel.value);
+    citySel.innerHTML = '';
+    (s ? s.cities : []).forEach(c => {
+      const opt = document.createElement('option'); opt.value = c.slug; opt.textContent = c.name;
+      citySel.appendChild(opt);
+    });
+    if (preselect && s && s.cities.some(c => c.slug === preselect.city)) citySel.value = preselect.city;
+    fillWards();
+  };
+  const fillWards = () => {
+    const s = directory.states.find(s => s.slug === stateSel.value);
+    const c = s && s.cities.find(c => c.slug === citySel.value);
+    wardSel.innerHTML = '';
+    (c ? c.wards : []).forEach(w => {
+      const opt = document.createElement('option'); opt.value = w.slug; opt.textContent = w.name;
+      opt.dataset.alderman = w.alderman || '';
+      wardSel.appendChild(opt);
+    });
+    if (preselect && c && c.wards.some(w => w.slug === preselect.ward)) wardSel.value = preselect.ward;
+  };
+
+  stateSel.onchange = () => { fillCities(); loadSelectedWard(); };
+  citySel.onchange = () => { fillWards(); loadSelectedWard(); };
+  wardSel.onchange = () => loadSelectedWard();
+  fillCities();
+}
+
+async function loadSelectedWard(){
+  const stateSel = document.getElementById('stateSel');
+  const citySel = document.getElementById('citySel');
+  const wardSel = document.getElementById('wardSel');
+  const s = directory.states.find(s => s.slug === stateSel.value);
+  const c = s && s.cities.find(c => c.slug === citySel.value);
+  const w = c && c.wards.find(w => w.slug === wardSel.value);
+  if (!s || !c || !w) return;
+
+  current = { state: s.slug, city: c.slug, ward: w.slug, wardName: w.name, alderman: w.alderman, cityName: c.name, stateName: s.name };
+  document.getElementById('aldermanLine').innerHTML =
+    esc(w.alderman || 'Alderman not on file') + '<span class="role">' + esc(c.name) + ', ' + esc(s.slug.toUpperCase()) + ' — ' + esc(w.name) + '</span>';
+
+  const [summary, big3, tickets] = await Promise.all([
+    fetchWardSummary(s.slug, c.slug, w.slug),
+    fetchBig3ForWard(w.slug),
+    fetchTicketsForWard(w.slug)
+  ]);
+  currentSummary = summary; currentBig3 = big3; currentTickets = tickets;
+
+  setText('mHealth', (summary.healthIndex != null ? summary.healthIndex + '%' : 'N/A'));
+  setText('mHealthSub', w.name + ' — ' + (summary.healthIndex >= 90 ? 'Nominal' : summary.healthIndex >= 75 ? 'Stable' : 'Degraded'));
+  setText('mSla', (summary.slaPct != null ? summary.slaPct + '%' : 'N/A'));
+  setText('mCapex', fmtUSD(summary.capExScopedUSD != null ? summary.capExScopedUSD : (w.capExScopedUSD || 0)));
+  setText('mRoad', (summary.roadPct != null ? summary.roadPct + '%' : 'N/A'));
+  setText('mLighting', (summary.lightingPct != null ? summary.lightingPct + '%' : 'N/A'));
+  setText('mCoverage', (summary.coveragePct != null ? summary.coveragePct + '%' : (w.coveragePct != null ? w.coveragePct + '%' : 'N/A')));
+  setText('mCoverageSub', (summary.coveredCount != null ? summary.coveredCount : w.coveredCount) + ' of ' + (summary.totalCells != null ? summary.totalCells : w.totalCells) + ' grid blocks verified');
+
+  setText('big3Speed', big3.avgResolutionHours != null ? big3.avgResolutionHours + 'h' : 'N/A');
+  setText('big3Verify', big3.verificationRatePct != null ? big3.verificationRatePct + '%' : 'N/A');
+  setText('big3Capex', big3.capExAdherencePct != null ? big3.capExAdherencePct + '%' : 'N/A');
+
+  const counts = { submitted:0, dispatched:0, resolved:0 };
+  tickets.forEach(t => { if (Object.prototype.hasOwnProperty.call(counts, t.stage)) counts[t.stage]++; });
+  setText('cSubmitted', counts.submitted);
+  setText('cDispatched', counts.dispatched);
+  setText('cResolved', counts.resolved);
+
+  const list = document.getElementById('ticketList');
+  list.innerHTML = tickets.length
+    ? tickets.map(t => `
+      <div class="ticket-row">
+        <div><div>${esc(t.title)}</div><div class="t-loc">${esc(t.loc)}</div></div>
+        <div class="t-stage ${esc(t.stage)}">${esc(t.stage)}</div>
+      </div>`).join('')
+    : '<div class="sub">No seeded tickets on file for this ward.</div>';
+
+  renderRepGateWard(w.name);
+  renderDrafts();
+}
+
+async function initWardPicker(){
+  directory = await fetchDirectory();
+  populateWardPickers({ state:'wi', city:'la-crosse', ward:'ward-4' });
+  await loadSelectedWard();
+}
+
+/* =====================================================================
+   PDF EXPORT — same client-side jsPDF pattern as index.html/app.html's
+   "Download Ward Health Summary (PDF)" button, scoped to the selected
+   ward. Every figure comes from currentSummary/currentBig3/currentTickets
+   above — the exact same fetched/fallback data this page already
+   renders, never a second numbers pipeline.
+   ===================================================================== */
+async function downloadRepWardPdf(triggerBtn){
+  if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) {
+    alert('PDF library failed to load (check your connection) — could not generate the Ward Health Summary.');
+    return;
+  }
+  const originalLabel = triggerBtn ? triggerBtn.innerHTML : null;
+  if (triggerBtn) { triggerBtn.disabled = true; triggerBtn.textContent = 'Generating…'; }
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit:'pt', format:'letter' });
+    let y = 56;
+    doc.setFont('helvetica','bold'); doc.setFontSize(18);
+    doc.text('CITIXEN UX — Ward Health Summary', 40, y); y += 22;
+    doc.setFont('helvetica','normal'); doc.setFontSize(11);
+    doc.text('District: ' + (current.wardName || '—') + ', ' + (current.cityName || '—') + ', ' + (current.stateName || '—'), 40, y); y += 16;
+    doc.text('Alderman/Representative: ' + (current.alderman || 'Not on file'), 40, y); y += 16;
+    doc.text('Generated: ' + new Date().toLocaleString() + '  —  current snapshot, not a historical trend', 40, y); y += 30;
+
+    doc.setFont('helvetica','bold'); doc.setFontSize(13);
+    doc.text('District Health Index', 40, y); y += 18;
+    doc.setFont('helvetica','normal'); doc.setFontSize(11);
+    const s = currentSummary || {};
+    doc.text('Ward Health Index: ' + (s.healthIndex != null ? s.healthIndex + '%' : 'N/A'), 48, y); y += 16;
+    doc.text('SLA Compliance: ' + (s.slaPct != null ? s.slaPct + '%' : 'N/A'), 48, y); y += 16;
+    doc.text('Road Condition Index: ' + (s.roadPct != null ? s.roadPct + '%' : 'N/A'), 48, y); y += 16;
+    doc.text('Lighting Condition Index: ' + (s.lightingPct != null ? s.lightingPct + '%' : 'N/A'), 48, y); y += 16;
+    doc.text('Asset Grid Coverage: ' + (s.coveragePct != null ? s.coveragePct + '%' : 'N/A'), 48, y); y += 30;
+
+    doc.setFont('helvetica','bold'); doc.setFontSize(13);
+    doc.text('The Big 3 — This Ward', 40, y); y += 18;
+    doc.setFont('helvetica','normal'); doc.setFontSize(11);
+    const b = currentBig3 || {};
+    doc.text('Speed of Resolution (avg hrs): ' + (b.avgResolutionHours != null ? b.avgResolutionHours + 'h' : 'N/A'), 48, y); y += 16;
+    doc.text('Resolution Verification Rate: ' + (b.verificationRatePct != null ? b.verificationRatePct + '%' : 'N/A'), 48, y); y += 16;
+    doc.text('Capital Project Timeline Adherence: ' + (b.capExAdherencePct != null ? b.capExAdherencePct + '%' : 'N/A'), 48, y); y += 30;
+
+    doc.setFont('helvetica','bold'); doc.setFontSize(13);
+    doc.text('Ward Ticket Ledger', 40, y); y += 18;
+    doc.setFont('helvetica','normal'); doc.setFontSize(11);
+    const counts = { submitted:0, dispatched:0, resolved:0 };
+    currentTickets.forEach(t => { if (Object.prototype.hasOwnProperty.call(counts, t.stage)) counts[t.stage]++; });
+    doc.text('Submitted: ' + counts.submitted, 48, y); y += 16;
+    doc.text('Dispatched: ' + counts.dispatched, 48, y); y += 16;
+    doc.text('Resolved: ' + counts.resolved, 48, y); y += 16;
+    doc.text('Total tickets on file: ' + currentTickets.length, 48, y); y += 30;
+
+    doc.setFont('helvetica','italic'); doc.setFontSize(9);
+    [
+      'This export reflects a current snapshot of CITIXEN UX seed/demo ward data, computed live from the',
+      'same records this page displays (api/_lib/store.js). It is not a synthetic historical trend — no such',
+      'dataset exists in this build. No reporter-identifying information is included in this export or in',
+      'the underlying data model.'
+    ].forEach(line => { doc.text(line, 40, y); y += 12; });
+
+    doc.save('citixen-' + (current.ward || 'ward') + '-health-summary.pdf');
+  } catch (err) {
+    console.error('Rep ward PDF generation failed', err);
+    alert('Could not generate the Ward Health Summary PDF — please try again.');
+  } finally {
+    if (triggerBtn) { triggerBtn.disabled = false; if (originalLabel !== null) triggerBtn.innerHTML = originalLabel; }
+  }
+}
+document.getElementById('btnDownloadRepPdf').addEventListener('click', (e) => downloadRepWardPdf(e.currentTarget));
+
+/* =====================================================================
+   REP TOOLS — UI CURTAIN (honest framing, same convention as
+   dispatch.html's staff access gate)
+   -----------------------------------------------------------------
+   Codes are stored as SHA-256 hashes, not plaintext. This is a UI
+   curtain, NOT access control: anything shipped to the browser can be
+   read. A real deployment would put actual auth in front of this panel,
+   the same note dispatch.html's own gate makes about itself. Unlocking
+   it only reveals a client-side "Constituent Update" draft composer —
+   there is no backend to publish drafts to yet, so drafts are saved to
+   this browser's own localStorage and clearly labeled as such, never
+   claimed as sent or published anywhere.
+   ===================================================================== */
+const REP_ACCESS = {
+  '13c56b362535ef010542d6dac7aa160d2ae39f7e850977dd67ed27ae91570767': { role:'Alderman — Ward 4', ward:'ward-4' },
+  '65b801e6fea02395b356adc14f7c6b1a84f966116193378bc9773c04ba7aad3f': { role:'Representative Office', ward:'All' }
+};
+async function sha256(s){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,'0')).join('');
+}
+let repSession = null;
+function unlockRepTools(session){
+  repSession = session;
+  document.getElementById('repGateBox').classList.add('hidden');
+  document.getElementById('repToolsPanel').classList.add('unlocked');
+  renderRepGateWard(current.wardName);
+}
+function renderRepGateWard(wardName){
+  const el = document.getElementById('repSignedInAs');
+  if (!el || !repSession) return;
+  el.textContent = 'Signed in: ' + repSession.role + (wardName ? ' — viewing ' + wardName : '');
+}
+(function(){
+  try {
+    const s = JSON.parse(sessionStorage.getItem('citixen_rep_session') || 'null');
+    if (s && s.role) unlockRepTools(s);
+  } catch (e) { /* storage unavailable — stay on the gate */ }
+})();
+document.getElementById('repGateForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const input = document.getElementById('repGateCode'), err = document.getElementById('repGateErr');
+  if (!(window.crypto && crypto.subtle)) { err.textContent = 'Rep Tools must be opened over HTTPS.'; return; }
+  const hit = REP_ACCESS[await sha256(input.value.trim().toUpperCase())];
+  if (!hit) { err.textContent = 'That code is not recognised.'; input.select(); return; }
+  try { sessionStorage.setItem('citixen_rep_session', JSON.stringify(hit)); } catch (_) {}
+  input.value = ''; err.textContent = '';
+  unlockRepTools(hit);
+});
+
+/* ===== Constituent Update drafts — client-side only, localStorage ===== */
+function draftStorageKey(){ return 'citixen_rep_drafts_' + (current.ward || 'unknown'); }
+function loadDrafts(){
+  try { return JSON.parse(localStorage.getItem(draftStorageKey()) || '[]'); }
+  catch (e) { return []; }
+}
+function saveDrafts(list){
+  try { localStorage.setItem(draftStorageKey(), JSON.stringify(list.slice(0,20))); }
+  catch (e) { /* storage unavailable — draft still shows for this session */ }
+}
+function renderDrafts(){
+  const wrap = document.getElementById('draftList');
+  if (!wrap) return;
+  const drafts = loadDrafts();
+  wrap.innerHTML = drafts.length
+    ? '<div class="sub" style="margin-bottom:6px;">Saved drafts for ' + esc(current.wardName || 'this ward') + ' (local to this browser only):</div>' +
+      drafts.map(d => `<div class="draft-item">${esc(d.text)}<div class="meta">Saved ${esc(d.savedAt)} — not published, draft only</div></div>`).join('')
+    : '<div class="sub">No drafts saved yet for this ward.</div>';
+}
+document.getElementById('btnSaveDraft').addEventListener('click', () => {
+  const ta = document.getElementById('draftText');
+  const text = ta.value.trim();
+  if (!text) { toast('Nothing to save — write a draft first.'); return; }
+  const drafts = loadDrafts();
+  drafts.unshift({ text, savedAt: new Date().toLocaleString() });
+  saveDrafts(drafts);
+  ta.value = '';
+  renderDrafts();
+  toast('Draft saved locally — not published anywhere.');
+});
+
+initWardPicker();
+</script>
+</body>
+</html>

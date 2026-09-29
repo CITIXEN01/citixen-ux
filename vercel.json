@@ -10,15 +10,23 @@
       "destination": "/app.html"
     },
     {
+      "source": "/dispatch",
+      "destination": "/dispatch.html"
+    },
+    {
       "source": "/admin",
-      "destination": "/admin.html"
+      "destination": "/dispatch.html"
+    },
+    {
+      "source": "/rep",
+      "destination": "/rep.html"
     },
     {
       "source": "/report/:id",
       "destination": "/report.html?id=:id"
     },
     {
-      "source": "/((?!api/|app$|admin$|icons/|manifest.json|sw.js|favicon.ico).*)",
+      "source": "/((?!api/|app$|dispatch$|admin$|rep$|icons/|manifest.json|sw.js|favicon.ico).*)",
       "destination": "/index.html"
     }
   ],

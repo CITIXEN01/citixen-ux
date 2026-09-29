@@ -37,7 +37,9 @@ self.addEventListener('fetch', event => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;   // tiles, CDNs, QR: network only
-  if (url.pathname.startsWith('/admin')) return;     // staff console is never cached on device
+  if (url.pathname.startsWith('/admin')) return;      // legacy alias — never cached on device
+  if (url.pathname.startsWith('/dispatch')) return;   // staff console is never cached on device
+  if (url.pathname.startsWith('/rep')) return;        // rep tools gate is never cached on device
 
   if (req.mode === 'navigate') {
     event.respondWith((async () => {

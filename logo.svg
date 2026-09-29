@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 64" width="340" height="64" role="img" aria-label="CITIXEN UX">
   <!-- CITIXEN UX™ vector lockup — Electric Lime shield + wordmark, transparent background.
-       Matches the unified logo markup used across index.html / app.html / admin.html. -->
+       Matches the unified logo markup used across index.html / app.html / dispatch.html / rep.html. -->
   <title>CITIXEN UX</title>
   <g transform="translate(2,10)">
     <path d="M22 44s16-8 16-20V10L22 4 6 10v14c0 12 16 20 16 20z"
