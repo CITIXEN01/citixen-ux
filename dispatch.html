@@ -399,19 +399,32 @@ let map, markers={};
 // dark (see .leaflet-tile-pane) so markers, the Ward 4 boundary and routes stay true
 // mint/red — inverting the whole map would wash those colors out too.
 function initMap(){
-  map=L.map('map',{attributionControl:false}).setView([43.8138,-91.2519],14);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    maxZoom:19, subdomains:'abc', crossOrigin:true
-  }).addTo(map);
-  // Ward 4 boundary — approximate polygon around the pilot ward, mint dashed outline
-  // so dispatch can see at a glance which hazard nodes are in-ward vs. adjacent.
-  L.polygon([
-    [43.8210,-91.2640],[43.8210,-91.2400],[43.8060,-91.2400],[43.8060,-91.2640]
-  ],{color:'#00ff88',weight:2,dashArray:'8 6',fillColor:'#00ff88',fillOpacity:.04,opacity:.6})
-    .addTo(map).bindTooltip('Ward 4 boundary',{sticky:true});
-  // Simulated active service-vehicle route overlay between two ticket locations.
-  L.polyline([[43.8138,-91.2519],[43.8180,-91.2480]],{color:'#00ff88',weight:2,dashArray:'6 5',opacity:.75}).addTo(map);
-  tickets.forEach(plotTicket);
+  // Leaflet loads from a CDN (see <head>); a blocked network, offline device, or
+  // ad-blocker can leave `L` undefined. Guarding this means a failed map load
+  // degrades to "no map" instead of throwing and aborting the rest of dispatch
+  // console init — matching the same guard already used in index.html/app.html.
+  if (typeof L === 'undefined') {
+    console.warn('Leaflet failed to load — the dispatch map is unavailable, but the rest of the console still works.');
+    return;
+  }
+  try {
+    map=L.map('map',{attributionControl:false}).setView([43.8138,-91.2519],14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+      maxZoom:19, subdomains:'abc', crossOrigin:true
+    }).addTo(map);
+    // Ward 4 boundary — approximate polygon around the pilot ward, mint dashed outline
+    // so dispatch can see at a glance which hazard nodes are in-ward vs. adjacent.
+    L.polygon([
+      [43.8210,-91.2640],[43.8210,-91.2400],[43.8060,-91.2400],[43.8060,-91.2640]
+    ],{color:'#00ff88',weight:2,dashArray:'8 6',fillColor:'#00ff88',fillOpacity:.04,opacity:.6})
+      .addTo(map).bindTooltip('Ward 4 boundary',{sticky:true});
+    // Simulated active service-vehicle route overlay between two ticket locations.
+    L.polyline([[43.8138,-91.2519],[43.8180,-91.2480]],{color:'#00ff88',weight:2,dashArray:'6 5',opacity:.75}).addTo(map);
+    tickets.forEach(plotTicket);
+  } catch (err) {
+    console.warn('Dispatch map initialization failed — continuing without the live map.', err);
+    return;
+  }
   // Delegated handler for the popup action buttons (built as an HTML string in
   // plotTicket below) — avoids inline click-handler attributes on generated markup.
   map.on('popupopen', (e) => {
