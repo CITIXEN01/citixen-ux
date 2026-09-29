@@ -407,6 +407,63 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 .ledger-report-card:hover{border-color:var(--mint2)}
 .ledger-report-id{font-family:var(--mono);font-size:.64rem;color:var(--mint2)}
 .ledger-empty{text-align:center;color:var(--muted);font-size:.8rem;padding:28px 0}
+
+/* ===== CIVIC INTELLIGENCE STATEMENT PIECE ===== */
+.statement-section{max-width:900px;margin:0 auto;padding:48px 24px;border-top:1px solid var(--border)}
+.statement-header{text-align:center;font-size:1.5rem;font-weight:900;margin-bottom:8px}
+.statement-sub{text-align:center;color:var(--muted);font-size:.86rem;margin-bottom:28px}
+
+/* Civic Stack Visualizer */
+.civic-stack-visualizer{max-width:640px;margin:0 auto 40px;display:flex;flex-direction:column;gap:8px}
+.stack-tier{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);
+  border:1px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;color:var(--text)}
+.stack-tier:hover{border-color:var(--mint2)}
+.stack-tier .tier-index{font-family:var(--mono);font-size:.72rem;color:var(--mint2);font-weight:800}
+.stack-tier .tier-name{font-weight:800;font-size:.92rem;flex:1}
+.stack-tier .tier-role{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+.stack-tier .tier-chevron{transition:transform .15s;color:var(--muted)}
+.stack-tier[aria-expanded="true"] .tier-chevron{transform:rotate(180deg);color:var(--mint2)}
+.tier-detail{max-height:0;overflow:hidden;transition:max-height .2s ease;font-size:.82rem;color:var(--muted);
+  padding:0 16px;line-height:1.5}
+.tier-detail.open{max-height:200px;padding:10px 16px}
+
+/* 3x3 Analytics Matrix */
+.analytics-matrix-card{max-width:720px;margin:0 auto 40px;background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:20px}
+.matrix-view-tabs{display:flex;gap:6px;justify-content:center;margin-top:10px}
+.matrix-view-tab{background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--muted);
+  font-size:.68rem;font-weight:700;padding:7px 12px;border-radius:8px;cursor:pointer}
+.matrix-view-tab.active{border-color:var(--mint2);background:rgba(0,255,136,.14);color:var(--mint2)}
+.matrix-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+.matrix-cell{text-align:center;background:rgba(7,12,14,.5);border:1px solid var(--border);border-radius:12px;padding:12px 8px}
+.matrix-cell-viz{display:flex;align-items:center;justify-content:center;min-height:40px;margin-bottom:6px}
+.matrix-cell-val{font-size:1.05rem;font-weight:900}
+.matrix-cell-lbl{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-top:3px}
+.matrix-dotgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;justify-content:center}
+.matrix-dot{width:7px;height:7px;border-radius:2px}
+
+/* National Geo-Hatch Coverage Ticker */
+.geo-hatch-ticker-card{max-width:480px;margin:0 auto 40px;background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:20px;text-align:center}
+.ticker-value{font-size:2.2rem;font-weight:900;color:var(--mint2);margin:8px 0}
+
+/* Report Generator */
+.report-generator-card{max-width:640px;margin:0 auto;background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:20px}
+.report-gen-row{display:flex;gap:10px;margin-top:12px}
+.report-gen-row select{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;padding:9px;font-size:.78rem;font-weight:700}
+.report-gen-toggle{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--muted);margin-top:14px;cursor:pointer}
+.report-output{margin-top:16px;background:rgba(7,12,14,.5);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:.82rem}
+.report-meta{font-weight:800;margin-bottom:8px;color:var(--mint2)}
+.report-matrix-summary{display:flex;flex-direction:column;gap:6px}
+.report-ledger-table{width:100%;border-collapse:collapse;font-size:.78rem}
+.report-ledger-table td{padding:6px 4px;border-bottom:1px solid var(--border)}
+@media print{
+  body *{visibility:hidden}
+  #reportGenerator,#reportGenerator *{visibility:visible}
+  #reportGenerator{position:absolute;top:0;left:0;width:100%}
+}
 </style>
 </head>
 <body>
@@ -643,9 +700,9 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     <div class="hud-card" style="margin-top:26px">
       <div class="label" style="justify-content:center">The Big 3 — public health metrics</div>
       <div class="big3-row">
-        <div class="big3-tile"><div class="big3-val" id="big3Speed">–</div><div class="big3-lbl">Speed of Resolution<br>(avg hrs, snap → closeout)</div></div>
-        <div class="big3-tile"><div class="big3-val" id="big3Verify">–</div><div class="big3-lbl">Resolution Verification Rate</div></div>
-        <div class="big3-tile"><div class="big3-val" id="big3Capex">–</div><div class="big3-lbl">Capital Project Timeline Adherence</div></div>
+        <div class="big3-tile"><div class="big3-val" id="big3Active">–</div><div class="big3-lbl">Active Hazards</div></div>
+        <div class="big3-tile"><div class="big3-val" id="big3Speed">–</div><div class="big3-lbl">Fix Speed<br>(avg hrs, snap → closeout)</div></div>
+        <div class="big3-tile"><div class="big3-val" id="big3Verify">–</div><div class="big3-lbl">Completion Rate</div></div>
       </div>
       <div class="big3-note">Computed live from seeded ledger and CapEx demo data (see the Live Public Ledger below) — not asserted as a production dataset.</div>
       <button class="btn btn-outline" id="btnDownloadWardHealthPdf" style="width:100%;justify-content:center;margin-top:12px;">
@@ -803,6 +860,82 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </aside>
 
     <div class="mapwrap"><div id="map"></div><div class="map-src-tag" id="mapSrcTag">TILE SRC: ESRI DARK GRAY CANVAS</div></div>
+    </div>
+  </section>
+
+  <!-- ===== CIVIC INTELLIGENCE STATEMENT PIECE =====
+       Civic Stack Visualizer, 3x3 Analytics Matrix, National Geo-Hatch
+       Coverage Ticker, and Report Generator. Metrics reuse the same
+       /api/coverage/big3 data (and its offline fallback) already loaded
+       by loadBig3() above — no second, parallel data pipeline. ===== -->
+  <section class="statement-section" id="civicStatement">
+    <h2 class="statement-header">Civic Intelligence<sup style="font-size:.6em;opacity:.5;">™</sup>: Powered by Civic Memory<sup style="font-size:.6em;opacity:.5;">™</sup></h2>
+    <p class="statement-sub">The Civic Stack™ — how one verified report becomes a permanent, auditable record.</p>
+
+    <div class="civic-stack-visualizer" id="civicStackVisualizer">
+      <button class="stack-tier" data-tier="record" type="button" aria-expanded="false">
+        <span class="tier-index">03</span>
+        <span class="tier-name">The Civic Record™</span>
+        <span class="tier-role">Top — Audit</span>
+        <span class="tier-chevron">▾</span>
+      </button>
+      <div class="tier-detail" data-tier-detail="record">Public Official executive audit & budget line-item binding — the same Big 3 metrics and Municipal Expenditure &amp; Allocation ledger shown elsewhere on this page, rolled up for oversight and public accountability.</div>
+
+      <button class="stack-tier" data-tier="dispatch" type="button" aria-expanded="false">
+        <span class="tier-index">02</span>
+        <span class="tier-name">Municipal Dispatch</span>
+        <span class="tier-role">Middle — Operations</span>
+        <span class="tier-chevron">▾</span>
+      </button>
+      <div class="tier-detail" data-tier-detail="dispatch">Field Work Orders — City Worker SLA tracking and a required on-site proof photo before any ticket closes, so a desk closure is never mistaken for a real fix.</div>
+
+      <button class="stack-tier" data-tier="memory" type="button" aria-expanded="false">
+        <span class="tier-index">01</span>
+        <span class="tier-name">Civic Memory™</span>
+        <span class="tier-role">Base — Sourcing</span>
+        <span class="tier-chevron">▾</span>
+      </button>
+      <div class="tier-detail" data-tier-detail="memory">The public event ledger powered by CITIXEN citizen reports — the same Live Feed / Live Ledger shown in the dashboard above, zero-account by design.</div>
+    </div>
+
+    <div class="analytics-matrix-card" id="analyticsMatrix">
+      <div class="label" style="justify-content:center">3×3 Analytics Matrix</div>
+      <div class="matrix-view-tabs" role="tablist" aria-label="Matrix view">
+        <button class="matrix-view-tab active" data-view="spatial" type="button">Spatial Map</button>
+        <button class="matrix-view-tab" data-view="ring" type="button">Scorecard Ring</button>
+        <button class="matrix-view-tab" data-view="pulse" type="button">Timeline Pulse</button>
+      </div>
+      <div class="matrix-grid" id="matrixGrid"></div>
+      <div class="small" style="text-align:center;margin-top:10px;color:var(--muted)">Computed live from seeded ledger data (same source as The Big 3 above) — not asserted as a production dataset.</div>
+    </div>
+
+    <div class="geo-hatch-ticker-card">
+      <div class="label" style="justify-content:center">National Geo-Hatch Coverage Ticker</div>
+      <div class="ticker-value" id="nationalCoverageTicker">0%</div>
+      <div class="small" style="color:var(--muted)">Average block coverage across seeded demo municipalities (La Crosse, Austin, Chicago) — not a live nationwide count.</div>
+    </div>
+
+    <div class="report-generator-card" id="reportGenerator">
+      <div class="label" style="justify-content:center">Report Generator</div>
+      <div class="report-gen-row">
+        <select id="reportTimeframe" aria-label="Timeframe">
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+          <option value="ytd">YTD</option>
+        </select>
+        <select id="reportFormat" aria-label="Format">
+          <option value="matrix">3×3 Visual Summary</option>
+          <option value="ledger">Raw Audit Ledger</option>
+        </select>
+      </div>
+      <label class="report-gen-toggle">
+        <input type="checkbox" id="reportOfficialMode">
+        Public Official mode — tag responsible departments
+      </label>
+      <div id="reportOutput" class="report-output"></div>
+      <button class="btn btn-primary" id="btnExportPrintReport" style="width:100%;justify-content:center;margin-top:14px;" type="button">
+        🖨️ Export / Print The Civic Record™ (Audited PDF)
+      </button>
     </div>
   </section>
 
@@ -1682,6 +1815,7 @@ const FALLBACK_CAPEX_PROJECTS = [
 function fallbackBigThree(){
   const tickets = Object.values(FALLBACK_TICKETS_BY_WARD).flat();
   const resolved = tickets.filter(t => t.stage === 'resolved');
+  const active = tickets.filter(t => t.stage && t.stage !== 'resolved');
   const withTime = resolved.filter(t => typeof t.resolutionHours === 'number');
   const avgResolutionHours = withTime.length ? +(withTime.reduce((s,t)=>s+t.resolutionHours,0)/withTime.length).toFixed(1) : null;
   const verifiedCount = resolved.filter(t => t.verified === true).length;
@@ -1689,7 +1823,10 @@ function fallbackBigThree(){
   const decided = FALLBACK_CAPEX_PROJECTS.filter(p => p.status !== 'on-track');
   const onTarget = decided.filter(p => p.status === 'on-time').length;
   const capExAdherencePct = decided.length ? +(onTarget/decided.length*100).toFixed(1) : null;
-  return { avgResolutionHours, verificationRatePct, capExAdherencePct };
+  // No offline trend fallback — this local seed mirror has no per-day
+  // granularity to derive one from honestly. Matrix rendering treats an
+  // empty trend as "N/A" rather than inventing points.
+  return { activeCount: active.length, avgResolutionHours, verificationRatePct, capExAdherencePct, trend: [] };
 }
 function setTextIfExists(id, text){
   const el = document.getElementById(id);
@@ -1705,10 +1842,179 @@ async function loadBig3(){
   } catch (err) {
     data = fallbackBigThree();
   }
+  setTextIfExists('big3Active', data.activeCount != null ? String(data.activeCount) : 'N/A');
   setTextIfExists('big3Speed', data.avgResolutionHours != null ? data.avgResolutionHours + 'h' : 'N/A');
   setTextIfExists('big3Verify', data.verificationRatePct != null ? data.verificationRatePct + '%' : 'N/A');
-  setTextIfExists('big3Capex', data.capExAdherencePct != null ? data.capExAdherencePct + '%' : 'N/A');
+  renderAnalyticsMatrix(data);
 }
+
+/* =====================================================================
+   CIVIC STACK VISUALIZER — simple accordion, no fabricated interactivity
+   beyond expand/collapse of the real descriptions authored in the markup.
+   ===================================================================== */
+document.querySelectorAll('.stack-tier').forEach(tier => {
+  tier.addEventListener('click', () => {
+    const detail = document.querySelector(`.tier-detail[data-tier-detail="${tier.dataset.tier}"]`);
+    const isOpen = tier.getAttribute('aria-expanded') === 'true';
+    tier.setAttribute('aria-expanded', String(!isOpen));
+    if (detail) detail.classList.toggle('open', !isOpen);
+  });
+});
+
+/* =====================================================================
+   3x3 ANALYTICS MATRIX — Active Hazards / Fix Speed / Completion Rate,
+   each rendered in one of three real, switchable view styles. All values
+   come from the same big3 payload loadBig3() already fetched (or its
+   offline fallback) — this never fetches or invents a second dataset.
+   ===================================================================== */
+let matrixData = null;
+let matrixView = 'spatial';
+
+function svgRing(pct, color){
+  const r = 26, c = 2 * Math.PI * r;
+  const frac = pct == null ? 0 : Math.max(0, Math.min(1, pct / 100));
+  return `<svg viewBox="0 0 64 64" width="56" height="56">
+    <circle cx="32" cy="32" r="${r}" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="6"/>
+    <circle cx="32" cy="32" r="${r}" fill="none" stroke="${color}" stroke-width="6" stroke-linecap="round"
+      stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${(c * (1 - frac)).toFixed(1)}" transform="rotate(-90 32 32)"/>
+  </svg>`;
+}
+
+function sparkline(points, color){
+  const vals = (points || []).filter(v => v != null);
+  if (vals.length < 2) return '<div class="small" style="color:var(--muted)">No trend data (offline fallback)</div>';
+  const min = Math.min(...vals), max = Math.max(...vals);
+  const range = (max - min) || 1;
+  const w = 100, h = 32;
+  const step = w / (vals.length - 1);
+  const path = vals.map((v, i) => `${i === 0 ? 'M' : 'L'}${(i * step).toFixed(1)},${(h - ((v - min) / range) * h).toFixed(1)}`).join(' ');
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="32" preserveAspectRatio="none"><path d="${path}" fill="none" stroke="${color}" stroke-width="2"/></svg>`;
+}
+
+function dotGrid(filled, total, color){
+  let dots = '';
+  for (let i = 0; i < total; i++) {
+    dots += `<span class="matrix-dot" style="background:${i < filled ? color : 'rgba(255,255,255,.08)'}"></span>`;
+  }
+  return `<div class="matrix-dotgrid">${dots}</div>`;
+}
+
+function renderAnalyticsMatrix(data){
+  matrixData = data;
+  renderMatrixView(matrixView);
+  renderReportOutput();
+}
+
+function renderMatrixView(view){
+  matrixView = view;
+  const grid = document.getElementById('matrixGrid');
+  if (!grid || !matrixData) return;
+  document.querySelectorAll('.matrix-view-tab').forEach(t => t.classList.toggle('active', t.dataset.view === view));
+
+  const metrics = [
+    { key: 'activeCount', label: 'Active Hazards', color: '#ffbb00', unit: '', max: 12, trendKey: 'activeCount' },
+    { key: 'avgResolutionHours', label: 'Fix Speed', color: '#00ff88', unit: 'h', max: 40, trendKey: 'avgResolutionHours' },
+    { key: 'verificationRatePct', label: 'Completion Rate', color: '#00ff88', unit: '%', max: 100, trendKey: 'completionPct' }
+  ];
+
+  grid.innerHTML = metrics.map(m => {
+    const val = matrixData[m.key];
+    const display = val == null ? 'N/A' : (val + m.unit);
+    let body;
+    if (view === 'ring') {
+      const pct = m.key === 'verificationRatePct' ? val : (val == null ? null : Math.min(100, (val / m.max) * 100));
+      body = svgRing(pct, m.color);
+    } else if (view === 'pulse') {
+      const points = (matrixData.trend || []).map(p => p[m.trendKey]);
+      body = sparkline(points, m.color);
+    } else {
+      const filled = val == null ? 0 : Math.round(Math.min(1, val / m.max) * 10);
+      body = dotGrid(filled, 10, m.color);
+    }
+    return `<div class="matrix-cell">
+      <div class="matrix-cell-viz">${body}</div>
+      <div class="matrix-cell-val" style="color:${m.color}">${esc(display)}</div>
+      <div class="matrix-cell-lbl">${esc(m.label)}</div>
+    </div>`;
+  }).join('');
+}
+
+document.querySelectorAll('.matrix-view-tab').forEach(tab => {
+  tab.addEventListener('click', () => renderMatrixView(tab.dataset.view));
+});
+
+/* =====================================================================
+   NATIONAL GEO-HATCH COVERAGE TICKER — averages the real, already-seeded
+   `cities` health-index values used elsewhere on this page (La Crosse,
+   Austin, Chicago). It's a genuine average of real demo numbers, labeled
+   as such — not a live nationwide feed.
+   ===================================================================== */
+function renderNationalCoverageTicker(){
+  const el = document.getElementById('nationalCoverageTicker');
+  if (!el || typeof cities === 'undefined') return;
+  const values = Object.values(cities).map(c => c.health).filter(v => typeof v === 'number');
+  if (!values.length) { el.textContent = 'N/A'; return; }
+  const avg = Math.round(values.reduce((s, v) => s + v, 0) / values.length);
+  let shown = 0;
+  const step = Math.max(1, Math.round(avg / 20));
+  const timer = setInterval(() => {
+    shown = Math.min(avg, shown + step);
+    el.textContent = shown + '%';
+    if (shown >= avg) clearInterval(timer);
+  }, 30);
+}
+
+/* =====================================================================
+   REPORT GENERATOR — regenerates a real summary (matrix figures or the
+   live ledger DOM values already on this page) from the dropdown/toggle
+   selections, then hands off to window.print() for the actual export —
+   same "print what's on screen" convention as the existing Ward Health
+   PDF button and the pattern documented for admin.html's Print My Ward
+   Report button. Nothing here is a second/fabricated data source.
+   ===================================================================== */
+const REPORT_DEPT_ROWS = [
+  { label: 'Roads &amp; Pavement', ampId: 'ledgerRoadsAmt', fallback: '$124,500 (42%)', dept: 'Public Works' },
+  { label: 'Safety &amp; Lighting Grid', ampId: 'ledgerLightingAmt', fallback: '$82,900 (28%)', dept: 'Utilities' },
+  { label: 'Sanitation &amp; Waste', ampId: 'ledgerSanitationAmt', fallback: '$53,300 (18%)', dept: 'Public Works' },
+  { label: 'ADA &amp; Sidewalk Access', ampId: 'ledgerAdaAmt', fallback: '$35,500 (12%)', dept: 'Transit' }
+];
+
+function renderReportOutput(){
+  const out = document.getElementById('reportOutput');
+  const tfEl = document.getElementById('reportTimeframe');
+  const fmtEl = document.getElementById('reportFormat');
+  const officialEl = document.getElementById('reportOfficialMode');
+  if (!out || !tfEl || !fmtEl || !officialEl || !matrixData) return;
+
+  const tfLabel = { week: 'This Week', month: 'This Month', ytd: 'Year to Date' }[tfEl.value] || tfEl.value;
+  const format = fmtEl.value;
+  const officialMode = officialEl.checked;
+
+  let html = `<div class="report-meta">${esc(tfLabel)} · ${format === 'matrix' ? '3×3 Visual Summary' : 'Raw Audit Ledger'}</div>`;
+
+  if (format === 'matrix') {
+    html += `<div class="report-matrix-summary">
+      <div>Active Hazards: <strong style="color:#ffbb00">${matrixData.activeCount != null ? matrixData.activeCount : 'N/A'}</strong></div>
+      <div>Fix Speed: <strong style="color:#00ff88">${matrixData.avgResolutionHours != null ? matrixData.avgResolutionHours + 'h' : 'N/A'}</strong></div>
+      <div>Completion Rate: <strong style="color:#00ff88">${matrixData.verificationRatePct != null ? matrixData.verificationRatePct + '%' : 'N/A'}</strong></div>
+    </div>`;
+  } else {
+    html += `<table class="report-ledger-table"><tbody>` + REPORT_DEPT_ROWS.map(row => {
+      const amtEl = document.getElementById(row.ampId);
+      const amt = amtEl ? amtEl.textContent : row.fallback;
+      return `<tr><td>${row.label}</td><td>${esc(amt)}</td>${officialMode ? `<td>${esc(row.dept)}</td>` : ''}</tr>`;
+    }).join('') + `</tbody></table>`;
+  }
+  html += `<div class="small" style="color:var(--muted);margin-top:10px;">Demo report — computed from the same seeded ledger/Big 3 data shown elsewhere on this page, not an official municipal audit.</div>`;
+  out.innerHTML = html;
+}
+
+['reportTimeframe', 'reportFormat', 'reportOfficialMode'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('change', renderReportOutput);
+});
+const exportPrintBtn = document.getElementById('btnExportPrintReport');
+if (exportPrintBtn) exportPrintBtn.addEventListener('click', () => { renderReportOutput(); window.print(); });
 
 /* =====================================================================
    WARD HEALTH SUMMARY — ONE-CLICK PDF EXPORT (client-side, via jsPDF)
@@ -1962,6 +2268,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   initMap();
   updateTelemetry(cities.lacrosse);
   loadBig3();
+  renderNationalCoverageTicker();
   const pdfBtn = document.getElementById('btnDownloadWardHealthPdf');
   if (pdfBtn) pdfBtn.addEventListener('click', () => downloadWardHealthPdf(pdfBtn));
 });

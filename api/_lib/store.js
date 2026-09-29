@@ -282,6 +282,18 @@ const CAPEX_PROJECTS = [
     lat: 41.8850, lng: -87.6670, radiusMeters: 400 }
 ];
 
+// Parses a seed "submittedAgo" string ("3d ago", "45m ago", "2h ago") into
+// an approximate days-ago float. Used only to bucket the illustrative trend
+// series below — never shown as a precise timestamp.
+function parseDaysAgo(str) {
+  const m = /^(\d+)\s*(m|h|d)\s+ago$/.exec(String(str || '').trim());
+  if (!m) return 0;
+  const n = Number(m[1]);
+  if (m[2] === 'm') return n / (60 * 24);
+  if (m[2] === 'h') return n / 24;
+  return n;
+}
+
 function capExAdherencePct(projects) {
   const list = projects || CAPEX_PROJECTS;
   const decided = list.filter(p => p.status !== 'on-track'); // only completed/overdue projects have a real adherence verdict yet
@@ -296,6 +308,7 @@ function capExAdherencePct(projects) {
 function bigThree(wardSlug) {
   const tickets = wardSlug ? (WARD_TICKETS[wardSlug] || []).map(t => Object.assign({}, t, { reportId: makeReportId(wardSlug, t.id) })) : allTickets();
   const resolved = tickets.filter(t => t.stage === 'resolved');
+  const active = tickets.filter(t => t.stage !== 'resolved'); // 'submitted' + 'dispatched' — real, not-yet-closed tickets
   const withResolutionTime = resolved.filter(t => typeof t.resolutionHours === 'number');
   const avgResolutionHours = withResolutionTime.length
     ? +(withResolutionTime.reduce((sum, t) => sum + t.resolutionHours, 0) / withResolutionTime.length).toFixed(1)
@@ -304,6 +317,7 @@ function bigThree(wardSlug) {
   const verificationRatePct = resolved.length ? +(verifiedCount / resolved.length * 100).toFixed(1) : null;
   const projects = wardSlug ? CAPEX_PROJECTS.filter(p => p.ward === wardSlug) : CAPEX_PROJECTS;
   return {
+    activeCount: active.length,
     avgResolutionHours,
     verificationRatePct,
     capExAdherencePct: capExAdherencePct(projects),
@@ -311,6 +325,32 @@ function bigThree(wardSlug) {
     verifiedCount,
     totalTickets: tickets.length
   };
+}
+
+// Small, real, day-bucketed trend for the "Timeline Pulse" analytics view —
+// derived from the same seed tickets' submittedAgo/resolutionHours fields
+// above, NOT a fabricated time series. With ~20 total seed tickets this is
+// illustrative/small-N by nature (same "not asserted as a production
+// dataset" caveat as bigThree() itself), but every point is a real
+// count/average over real records, bucketed by day-of-age rather than
+// invented headline numbers.
+function bigThreeTrend(wardSlug, days) {
+  const span = days || 9; // covers every seeded submittedAgo value
+  const tickets = wardSlug ? (WARD_TICKETS[wardSlug] || []) : allTickets();
+  const points = [];
+  for (let d = span; d >= 0; d--) {
+    const asOf = tickets.filter(t => parseDaysAgo(t.submittedAgo) >= d);
+    const resolvedByThen = asOf.filter(t => t.stage === 'resolved');
+    const activeByThen = asOf.filter(t => t.stage !== 'resolved');
+    const withTime = resolvedByThen.filter(t => typeof t.resolutionHours === 'number');
+    points.push({
+      dayAgo: d,
+      activeCount: activeByThen.length,
+      avgResolutionHours: withTime.length ? +(withTime.reduce((s, t) => s + t.resolutionHours, 0) / withTime.length).toFixed(1) : null,
+      completionPct: asOf.length ? +(resolvedByThen.length / asOf.length * 100).toFixed(1) : null
+    });
+  }
+  return points;
 }
 
 function getWard(state, city, ward) {
@@ -356,5 +396,5 @@ function allWards() {
 module.exports = {
   DB, getWard, getCity, summarize, allWards, CATEGORIES,
   allTickets, getTicketByReportId, makeReportId,
-  CAPEX_PROJECTS, capExAdherencePct, bigThree, WARD_NAMES, WARD_JURISDICTION
+  CAPEX_PROJECTS, capExAdherencePct, bigThree, bigThreeTrend, WARD_NAMES, WARD_JURISDICTION
 };
