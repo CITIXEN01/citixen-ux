@@ -373,28 +373,23 @@ textarea.input{resize:none;line-height:1.4}
       <span class="lb-status" id="smartLocationStatus">GPS pending</span>
     </div>
 
-    <button class="btn-camera" id="btnOpenLedger" style="border-style:solid;">
-      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-      Live Public Ledger
-    </button>
-
-    <div class="notice-banner">
-      <div class="left-txt">
-        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        Non-emergency reporting only. Life-safety emergency?
-      </div>
-      <a href="tel:911" class="btn-911">
-        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-        911
-      </a>
-    </div>
-
     <div class="privacy-note">
       <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
       No account required. No personal data retained. Photos are stripped of device ID and GPS EXIF tags before submission.
     </div>
 
+    <!-- 911/Emergency lives ONLY in the Report view per nav restructure. -->
     <section id="tab-report" class="tabpane active">
+      <div class="notice-banner">
+        <div class="left-txt">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Non-emergency reporting only. Life-safety emergency?
+        </div>
+        <a href="tel:911" class="btn-911">
+          <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          911
+        </a>
+      </div>
       <div class="card">
         <div class="label">1. Category</div>
         <div class="chip-grid">
@@ -446,52 +441,19 @@ textarea.input{resize:none;line-height:1.4}
       </div>
     </section>
 
+    <!-- No 911/Emergency and no Live Public Ledger in Map & Feed, per nav restructure. -->
     <section id="tab-map" class="tabpane">
       <div class="card">
         <div class="label"><span>Civic dispatch map</span><span id="mCount" style="color:var(--mint2)">3 active</span></div>
         <div id="map"></div>
       </div>
-      <div class="card">
-        <div class="label" style="justify-content:center">Triage status</div>
-        <div class="triage-gauge">
-          <div class="triage-tile">
-            <div class="triage-num" id="triageOpenCount" style="color:var(--brand-amber)">0</div>
-            <div class="small">Open</div>
-          </div>
-          <div class="triage-tile">
-            <div class="triage-num" id="triageTaggedCount" style="color:var(--mint2)">0</div>
-            <div class="small">Tagged to project</div>
-          </div>
-          <div class="triage-tile">
-            <div class="triage-num" id="triageResolvedCount" style="color:var(--brand-mint)">0</div>
-            <div class="small">Resolved</div>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="label">Live dispatch feed</div>
-        <div id="feed"></div>
-      </div>
-    </section>
 
-    <section id="tab-analytics" class="tabpane">
-
-      <!-- 0. THE BIG 3 — public health metrics, computed from real seed data -->
-      <div class="card">
-        <div class="label">The Big 3 — public health metrics</div>
-        <div class="big3-row">
-          <div class="big3-tile"><div class="big3-val" id="big3Speed">–</div><div class="big3-lbl">Speed of Resolution</div></div>
-          <div class="big3-tile"><div class="big3-val" id="big3Verify">–</div><div class="big3-lbl">Resolution Verification Rate</div></div>
-          <div class="big3-tile"><div class="big3-val" id="big3Capex">–</div><div class="big3-lbl">CapEx Timeline Adherence</div></div>
-        </div>
-        <div class="big3-note">Computed live from seeded ledger/CapEx demo data — not asserted as a production dataset.</div>
-        <button class="btn-camera" id="btnDownloadWardHealthPdf" style="border-style:solid;margin-top:4px;">
-          <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>
-          Download Ward Health Summary (PDF)
-        </button>
-      </div>
-
-      <!-- 1. FOG-OF-WAR ASSET COVERAGE GRID (Geohash Coverage Grid Engine — 3 zoom tiers) -->
+      <!-- CITYWIDE ASSET COVERAGE (Geohash Coverage Grid Engine — 3 zoom tiers) —
+           moved here from Analytics, directly under the Civic dispatch map,
+           per nav restructure. Its init (fetchDirectory/applyWardMeta/
+           animateCoverage/initTierToggle) now runs on this tab via
+           initCoverageGrid(), called from switchTab('tab-map', ...) below,
+           instead of only when Analytics was opened. -->
       <div class="card">
         <div class="radius-tag">
           <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
@@ -530,6 +492,63 @@ textarea.input{resize:none;line-height:1.4}
         </div>
       </div>
 
+      <div class="card">
+        <div class="label" style="justify-content:center">Triage status</div>
+        <div class="triage-gauge">
+          <div class="triage-tile">
+            <div class="triage-num" id="triageOpenCount" style="color:var(--brand-amber)">0</div>
+            <div class="small">Open</div>
+          </div>
+          <div class="triage-tile">
+            <div class="triage-num" id="triageTaggedCount" style="color:var(--mint2)">0</div>
+            <div class="small">Tagged to project</div>
+          </div>
+          <div class="triage-tile">
+            <div class="triage-num" id="triageResolvedCount" style="color:var(--brand-mint)">0</div>
+            <div class="small">Resolved</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="label">Live dispatch feed</div>
+        <div id="feed"></div>
+      </div>
+    </section>
+
+    <!-- No 911/Emergency in Analytics; Live Public Ledger now lives ONLY here, per nav restructure. -->
+    <section id="tab-analytics" class="tabpane">
+
+      <button class="btn-camera" id="btnOpenLedger" style="border-style:solid;">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        Live Public Ledger
+      </button>
+
+      <!-- 0. THE BIG 3 — public health metrics, computed from real seed data -->
+      <div class="card">
+        <div class="label">The Big 3 — public health metrics</div>
+        <div class="big3-row">
+          <div class="big3-tile"><div class="big3-val" id="big3Speed">–</div><div class="big3-lbl">Speed of Resolution</div></div>
+          <div class="big3-tile"><div class="big3-val" id="big3Verify">–</div><div class="big3-lbl">Resolution Verification Rate</div></div>
+          <div class="big3-tile"><div class="big3-val" id="big3Capex">–</div><div class="big3-lbl">CapEx Timeline Adherence</div></div>
+        </div>
+        <div class="big3-note">Computed live from seeded ledger/CapEx demo data — not asserted as a production dataset.</div>
+        <button class="btn-camera" id="btnDownloadWardHealthPdf" style="border-style:solid;margin-top:4px;">
+          <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>
+          Download Ward Health Summary (PDF)
+        </button>
+      </div>
+
+      <!-- 1. PRIMARY CTA — moved directly above National Network Live, per nav restructure -->
+      <div class="card" style="text-align:center;">
+        <div class="label" style="justify-content:center;">City-Wide Analytics</div>
+        <p style="font-size:.78rem;color:var(--muted);margin-bottom:12px;">
+          Access real-time GIS mapping, district heatmaps, and municipal SLAs on the desktop portal.
+        </p>
+        <a href="https://citixenux.com/" target="_blank" rel="noopener noreferrer" class="btn-submit" style="text-decoration:none;">
+          Open Web Dashboard ↗
+        </a>
+      </div>
+
       <!-- 2. NATIONAL NETWORK — LIVE -->
       <div class="card">
         <div class="label" style="justify-content:center">National network — live</div>
@@ -551,21 +570,17 @@ textarea.input{resize:none;line-height:1.4}
         </div>
       </div>
 
-      <!-- 3. NATIONAL COVERAGE DIRECTORY — craigslist-style structured listing -->
+      <!-- 3. NATIONAL COVERAGE DIRECTORY — craigslist-style structured listing.
+           Tapping a listing jumps the Fog-of-War grid to that jurisdiction
+           and switches to the Map & Feed tab, since the grid now lives there
+           (see jumpToMunicipality()) — kept as this deliberate in-app
+           jurisdiction jump rather than an external link, since that's the
+           real, working behavior already documented above pickDefaultWardMeta();
+           flagged in chat as worth confirming if an external web-dashboard
+           link was actually intended instead. -->
       <div class="card">
         <div class="label">National coverage directory</div>
         <div class="muni-list" id="natMuniGrid"></div>
-      </div>
-
-      <!-- 4. PRIMARY CTA -->
-      <div class="card" style="text-align:center;">
-        <div class="label" style="justify-content:center;">City-Wide Analytics</div>
-        <p style="font-size:.78rem;color:var(--muted);margin-bottom:12px;">
-          Access real-time GIS mapping, district heatmaps, and municipal SLAs on the desktop portal.
-        </p>
-        <a href="https://citixenux.com/" target="_blank" rel="noopener noreferrer" class="btn-submit" style="text-decoration:none;">
-          Open Web Dashboard ↗
-        </a>
       </div>
 
     </section>
@@ -691,6 +706,7 @@ function switchTab(id,btn){
   if (btn) btn.classList.add('active');
   if(id==='tab-map'){
     if(!mapInit) initMap();
+    initCoverageGrid();  // Citywide Asset Coverage card now lives on this tab
     // Force Leaflet to recalculate container dimensions once unhidden
     setTimeout(()=>{ if(map) map.invalidateSize(); },200);
   }
@@ -699,7 +715,21 @@ function switchTab(id,btn){
   }
 }
 
+let coverageGridInitialized = false;
 let analyticsInitialized = false;
+
+// Citywide Asset Coverage (Fog-of-War grid) init — split out of initAnalytics()
+// so it runs when Map & Feed opens (where the card now lives), not only when
+// Analytics opens. Idempotent, same as the old analyticsInitialized guard, so
+// visiting either tab first still initializes it exactly once.
+async function initCoverageGrid(){
+  if (coverageGridInitialized) return;
+  coverageGridInitialized = true;
+  coverageDirectory = await fetchDirectory();
+  applyWardMeta(pickDefaultWardMeta());
+  await animateCoverage();           // fetches covCells + builds/animates the grid
+  initTierToggle();
+}
 
 // Flattened Analytics tab: no more manual Ward 4 Local / My Impact /
 // National Network sub-tabs — every section below loads together, and the
@@ -709,13 +739,10 @@ let analyticsInitialized = false;
 async function initAnalytics(){
   if (analyticsInitialized) return;
   analyticsInitialized = true;
-  coverageDirectory = await fetchDirectory();
-  applyWardMeta(pickDefaultWardMeta());
-  await animateCoverage();           // fetches covCells + builds/animates the grid
+  await initCoverageGrid();          // National directory below needs coverageDirectory loaded first
   await loadNationalTab();
   nationalDataCache = lastNationalData;
   await loadBig3();
-  initTierToggle();
 }
 
 /* =====================================================================
@@ -1632,6 +1659,9 @@ function jumpToMunicipality(m){
     ward: m.ward, wardName: m.wardName, alderman: m.alderman, isGpsMatch: false
   }, { explicit: true });
   coverageLoaded = false;
+  // The coverage grid now lives on the Map & Feed tab (see nav restructure) —
+  // switch there first so #covGrid is visible before scrolling to it.
+  switchTab('tab-map', document.querySelectorAll('.navtab')[1]);
   animateCoverage();
   const grid = document.getElementById('covGrid');
   if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'center' });
