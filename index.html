@@ -102,6 +102,9 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .hero{padding:44px 24px 8px;text-align:center;max-width:900px;margin:0 auto}
 .hero h1{font-size:2.05rem;font-weight:900;letter-spacing:-.5px;margin-bottom:6px}
 .hero h2{font-size:1rem;font-weight:700;color:var(--mint2);margin-bottom:14px}
+.hero .ci-headline-sub{font-size:1.3rem;font-weight:800;color:var(--text);margin-bottom:10px}
+.hero .ci-intro-copy{color:var(--muted);font-size:.86rem;max-width:640px;margin:0 auto 16px}
+.hero #exploreDifferenceBtn{margin:0 auto 24px;display:inline-flex}
 .hero-badge{display:inline-flex;align-items:center;background:var(--brand-mint-dim);border:1px solid rgba(0,255,136,.35);
   color:var(--mint2);border-radius:20px;padding:6px 16px;font-size:.72rem;font-weight:700;letter-spacing:.3px;margin-bottom:22px}
 
@@ -132,6 +135,10 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   border:1px solid var(--border);color:var(--mint2);border-radius:20px;padding:10px 18px;
   font-size:.78rem;font-weight:700;cursor:pointer;align-self:center;margin-top:18px;transition:border-color .15s}
 .privacy-pill:hover{border-color:var(--mint2)}
+/* Top-of-page placement (moved above the brand title, per global header restructure) */
+.top-privacy-banner{display:flex;justify-content:center;background:var(--bg-obsidian);
+  padding:10px 16px 0}
+.top-privacy-banner .privacy-pill{margin-top:0}
 
 .hero-stack{display:flex;flex-direction:column;align-items:center;max-width:900px;margin:0 auto;padding:0 24px 8px}
 .hud-left{display:flex;flex-direction:column;gap:16px}
@@ -140,7 +147,12 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .mobile-media{display:flex;justify-content:center;padding:8px 24px 36px}
 
 /* ===== BENTO DECK ===== */
-#dashboard{display:flex;border-top:1px solid var(--border);min-height:560px;position:relative;isolation:isolate}
+/* #dashboard is now a column wrapper (tab bar + one active view); the row
+   layout for the map/feed view lives on #dashboardLiveView instead. */
+#dashboard{border-top:1px solid var(--border);min-height:560px;position:relative;isolation:isolate}
+.dashboard-view{display:none}
+.dashboard-view.active{display:flex}
+#dashboardLiveView.active{min-height:560px}
 .sidebar{width:380px;flex-shrink:0;min-height:0;padding:20px;display:flex;flex-direction:column;gap:16px;
   border-right:1px solid var(--border);overflow-y:auto;max-height:calc(100vh - 64px);position:relative;z-index:1}
 .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
@@ -169,6 +181,14 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .ledger-head{display:flex;justify-content:space-between;font-size:.76rem;margin-bottom:4px}
 .ledger-head b{color:var(--text)}
 .ledger-amt{font-size:.72rem;color:var(--muted)}
+
+/* ===== DASHBOARD VIEW-SWITCHER ===== */
+.dash-tabs{display:flex;gap:8px;padding:14px 20px 0}
+.dash-tab{flex:1;max-width:260px;background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--muted);
+  font-size:.74rem;font-weight:700;padding:10px 12px;border-radius:10px;cursor:pointer;text-align:center}
+.dash-tab.active{border-color:var(--mint2);background:rgba(0,255,136,.14);color:var(--mint2)}
+.civic-tools-grid{display:flex;flex-direction:column;gap:10px}
+.civic-tools-grid .btn{width:100%;justify-content:center}
 
 /* ===== AUDIT STREAM ===== */
 .audit-tabs{display:flex;gap:6px;margin-bottom:10px}
@@ -298,7 +318,8 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 
 
 @media (max-width:1000px){
-  #dashboard{flex-direction:column;min-height:0}
+  #dashboard{min-height:0}
+  #dashboardLiveView.active{flex-direction:column;min-height:0}
   .sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border);max-height:none}
   .mapwrap{height:420px}
   .hud-grid{grid-template-columns:1fr}
@@ -389,6 +410,16 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 </style>
 </head>
 <body>
+
+  <!-- ===== GLOBAL: Privacy & Anonymity badge — absolute top of page hierarchy,
+       above the brand title, per global header restructure. Same button/id/click
+       handler as before; only its position in the DOM moved. ===== -->
+  <div class="top-privacy-banner">
+    <button class="privacy-pill" id="privacyPillBtn">
+      <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+      Privacy &amp; Anonymity Engine — Verified
+    </button>
+  </div>
 
   <header class="topbar">
     <div class="brand">
@@ -532,15 +563,18 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   <section class="hero">
     <h1>CITIXEN UX<sup style="font-size:.5em;opacity:.4;">™</sup></h1>
     <h2>Civic Intelligence Platform</h2>
+    <p class="ci-headline-sub">What is civic intelligence?</p>
+    <p class="ci-intro-copy">Legacy 311 treats a filed ticket as the finish line. CITIXEN UX™ treats a verified photo and dispatched response as the finish line. Here is the difference.</p>
+    <button class="btn btn-outline" id="exploreDifferenceBtn" type="button">Explore the difference →</button>
 
     <div class="hub-row" role="navigation" aria-label="Dashboard shortcuts">
       <button class="hub-card" id="hubCoverageBtn" type="button">
         <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-        <span>Analytics and Reporting</span>
+        <span>Analytics &amp; Reporting</span>
       </button>
       <button class="hub-card" id="hubSlaBtn" type="button">
         <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19a8 8 0 0 1 16 0"/><line x1="12" y1="19" x2="16.5" y2="10.5"/><circle cx="12" cy="19" r="1.4"/></svg>
-        <span>Expenditures and Projects</span>
+        <span>Expenditures &amp; Projects</span>
       </button>
       <button class="hub-card" id="hubStackBtn" type="button">
         <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 21 8 12 13 3 8 12 3"/><polyline points="3 13 12 18 21 13"/><polyline points="3 18 12 23 21 18"/></svg>
@@ -549,10 +583,11 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </div>
   </section>
 
-  <!-- ===== "WHAT IS CIVIC INTELLIGENCE?" EDUCATIONAL HERO ===== -->
-  <section class="ci-section">
-    <h2>What is <span class="brand-lime">Civic Intelligence</span>?</h2>
-    <p class="ci-sub">Legacy 311 treats a filed ticket as the finish line. CITIXEN treats a verified photo as the finish line — here's the difference.</p>
+  <!-- ===== CIVIC INTELLIGENCE DEEP-DIVE — "Explore the difference" scroll target.
+       The "What is Civic Intelligence?" headline + intro paragraph now live in
+       .hero above (per header restructure), so this section opens straight into
+       the comparison / how-it-works / metrics content rather than repeating them. ===== -->
+  <section class="ci-section" id="ciDeepDive">
     <div class="ci-compare">
       <div class="ci-col legacy">
         <h3>
@@ -615,6 +650,43 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         Download Ward Health Summary (PDF)
       </button>
     </div>
+
+    <!-- ===== CITYWIDE MUNICIPAL EXPENDITURE & ALLOCATION — moved directly below
+         The Big 3 per dashboard restructure. Same id/markup as before (only its
+         position changed), including its existing "not an official finance
+         record" disclosure — that disclosure stays intact; this is seeded demo
+         data, not a live financial feed, whatever the "Real-Time Capital
+         Tracking" tag above it implies. ===== -->
+    <div class="card ledger-card" id="ledgerCard" style="max-width:640px;width:100%;margin:26px auto 0;">
+      <div class="label"><span id="ledgerTitle">CITYWIDE MUNICIPAL EXPENDITURE &amp; ALLOCATION</span></div>
+      <div class="ledger-tag">AI Categorization Engine // Real-Time Capital Tracking</div>
+
+      <div class="ledger-filters" id="ledgerFilters">
+        <button class="ledger-filter active" data-lfilter="All">All</button>
+        <button class="ledger-filter" data-lfilter="Roads">Roads</button>
+        <button class="ledger-filter" data-lfilter="Lighting">Lighting</button>
+        <button class="ledger-filter" data-lfilter="Sanitation">Sanitation</button>
+        <button class="ledger-filter" data-lfilter="Ada">ADA</button>
+      </div>
+
+      <div class="ledger-row" data-lcat="Roads">
+        <div class="ledger-head"><b>Roads &amp; Pavement</b><span class="ledger-amt" id="ledgerRoadsAmt">$124,500 (42%)</span></div>
+        <div class="bar"><span id="ledgerRoadsBar" style="width:42%"></span></div>
+      </div>
+      <div class="ledger-row" data-lcat="Lighting">
+        <div class="ledger-head"><b>Safety &amp; Lighting Grid</b><span class="ledger-amt" id="ledgerLightingAmt">$82,900 (28%)</span></div>
+        <div class="bar"><span id="ledgerLightingBar" style="width:28%;background:var(--warn)"></span></div>
+      </div>
+      <div class="ledger-row" data-lcat="Sanitation">
+        <div class="ledger-head"><b>Sanitation &amp; Waste</b><span class="ledger-amt" id="ledgerSanitationAmt">$53,300 (18%)</span></div>
+        <div class="bar"><span id="ledgerSanitationBar" style="width:18%"></span></div>
+      </div>
+      <div class="ledger-row" data-lcat="Ada">
+        <div class="ledger-head"><b>ADA &amp; Sidewalk Access</b><span class="ledger-amt" id="ledgerAdaAmt">$35,500 (12%)</span></div>
+        <div class="bar"><span id="ledgerAdaBar" style="width:12%"></span></div>
+      </div>
+      <div class="small" style="margin-top:10px;">Illustrative estimates clustered from resolved reports — not an official finance record.</div>
+    </div>
   </section>
 
   <div class="hero-stack">
@@ -640,42 +712,6 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         </div>
       </div>
     </div>
-
-    <div class="card ledger-card" id="ledgerCard" style="max-width:640px;width:100%;">
-      <div class="label"><span id="ledgerTitle">CITYWIDE MUNICIPAL EXPENDITURE & ALLOCATION</span></div>
-      <div class="ledger-tag">AI Categorization Engine // Real-Time Capital Tracking</div>
-
-      <div class="ledger-filters" id="ledgerFilters">
-        <button class="ledger-filter active" data-lfilter="All">All</button>
-        <button class="ledger-filter" data-lfilter="Roads">Roads</button>
-        <button class="ledger-filter" data-lfilter="Lighting">Lighting</button>
-        <button class="ledger-filter" data-lfilter="Sanitation">Sanitation</button>
-        <button class="ledger-filter" data-lfilter="Ada">ADA</button>
-      </div>
-
-      <div class="ledger-row" data-lcat="Roads">
-        <div class="ledger-head"><b>Roads & Pavement</b><span class="ledger-amt" id="ledgerRoadsAmt">$124,500 (42%)</span></div>
-        <div class="bar"><span id="ledgerRoadsBar" style="width:42%"></span></div>
-      </div>
-      <div class="ledger-row" data-lcat="Lighting">
-        <div class="ledger-head"><b>Safety & Lighting Grid</b><span class="ledger-amt" id="ledgerLightingAmt">$82,900 (28%)</span></div>
-        <div class="bar"><span id="ledgerLightingBar" style="width:28%;background:var(--warn)"></span></div>
-      </div>
-      <div class="ledger-row" data-lcat="Sanitation">
-        <div class="ledger-head"><b>Sanitation & Waste</b><span class="ledger-amt" id="ledgerSanitationAmt">$53,300 (18%)</span></div>
-        <div class="bar"><span id="ledgerSanitationBar" style="width:18%"></span></div>
-      </div>
-      <div class="ledger-row" data-lcat="Ada">
-        <div class="ledger-head"><b>ADA & Sidewalk Access</b><span class="ledger-amt" id="ledgerAdaAmt">$35,500 (12%)</span></div>
-        <div class="bar"><span id="ledgerAdaBar" style="width:12%"></span></div>
-      </div>
-      <div class="small" style="margin-top:10px;">Illustrative estimates clustered from resolved reports — not an official finance record.</div>
-    </div>
-
-    <button class="privacy-pill" id="privacyPillBtn">
-      <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-      Privacy &amp; Anonymity Engine — Verified
-    </button>
   </div>
 
   <div class="mobile-media">
@@ -686,6 +722,29 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   </div>
 
   <section id="dashboard">
+    <!-- ===== DASHBOARD VIEW-SWITCHER — head of the dashboard section, per
+         restructure. Tab 1 keeps the existing map/feed/ledger dashboard as-is;
+         Tab 2 surfaces the same real actions already in the header's "Civic
+         Tools" dropdown, just as an in-page panel — nothing new is invented. ===== -->
+    <div class="dash-tabs" role="tablist" aria-label="Dashboard view">
+      <button class="dash-tab active" id="dashTabLive" type="button" role="tab" aria-selected="true">Live Feed / Live Ledger</button>
+      <button class="dash-tab" id="dashTabTools" type="button" role="tab" aria-selected="false">Civic Tools</button>
+    </div>
+
+    <div class="dashboard-view" id="dashboardCivicToolsView">
+      <div class="card">
+        <div class="label"><span>Civic Tools</span></div>
+        <div class="civic-tools-grid">
+          <a class="btn btn-outline" href="/app.html" target="_blank" rel="noopener noreferrer">Mobile Gateway ↗</a>
+          <button class="btn btn-outline" id="dashToolsLiveLedger" type="button">Live Public Ledger ↗</button>
+          <button class="btn btn-outline" id="dashToolsPaperwork" type="button">Open CITIXEN Paperwork File ↗</button>
+          <button class="btn btn-outline" id="dashToolsChangeLocation" type="button">Change My Location</button>
+          <a class="btn btn-outline" href="tel:911">Emergency Triage</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-view active" id="dashboardLiveView">
     <aside class="sidebar">
       <div class="card" id="coverageGridCard">
         <div class="label"><span>Citywide Health Index</span><span id="healthCity" style="color:var(--mint2)">Locating…</span></div>
@@ -741,6 +800,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </aside>
 
     <div class="mapwrap"><div id="map"></div><div class="map-src-tag" id="mapSrcTag">TILE SRC: ESRI DARK GRAY CANVAS</div></div>
+    </div>
   </section>
 
   <!-- MODAL OVERLAY -->
@@ -1084,6 +1144,25 @@ document.getElementById('hubSlaBtn').addEventListener('click',()=>{
 document.getElementById('hubStackBtn').addEventListener('click',()=>{
   openPaperworkFile();
 });
+document.getElementById('exploreDifferenceBtn').addEventListener('click',()=>{
+  document.getElementById('ciDeepDive').scrollIntoView({ behavior:'smooth' });
+});
+/* ===== DASHBOARD VIEW-SWITCHER ===== */
+function setDashboardTab(view){
+  const isTools = view==='tools';
+  document.getElementById('dashTabTools').classList.toggle('active', isTools);
+  document.getElementById('dashTabTools').setAttribute('aria-selected', String(isTools));
+  document.getElementById('dashTabLive').classList.toggle('active', !isTools);
+  document.getElementById('dashTabLive').setAttribute('aria-selected', String(!isTools));
+  document.getElementById('dashboardCivicToolsView').classList.toggle('active', isTools);
+  document.getElementById('dashboardLiveView').classList.toggle('active', !isTools);
+  if(!isTools) setTimeout(()=>{ if(map) map.invalidateSize(); }, 50);
+}
+document.getElementById('dashTabLive').addEventListener('click',()=> setDashboardTab('live'));
+document.getElementById('dashTabTools').addEventListener('click',()=> setDashboardTab('tools'));
+document.getElementById('dashToolsLiveLedger').addEventListener('click',()=> openLedgerDrawer());
+document.getElementById('dashToolsPaperwork').addEventListener('click',()=> openPaperworkFile());
+document.getElementById('dashToolsChangeLocation').addEventListener('click',()=> openLocationPicker());
 document.getElementById('privacyPillBtn').addEventListener('click',()=> openModal('anonymity'));
 document.getElementById('modalClose').addEventListener('click',()=> document.getElementById('modalOverlay').classList.remove('open'));
 document.getElementById('modalOverlay').addEventListener('click',(e)=>{
