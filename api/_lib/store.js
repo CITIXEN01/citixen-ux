@@ -323,8 +323,22 @@ function bigThree(wardSlug) {
   const verifiedCount = resolved.filter(t => t.verified === true).length;
   const verificationRatePct = resolved.length ? +(verifiedCount / resolved.length * 100).toFixed(1) : null;
   const projects = wardSlug ? CAPEX_PROJECTS.filter(p => p.ward === wardSlug) : CAPEX_PROJECTS;
+  // Active-hazard severity breakdown — a real split of the same `active`
+  // array above by actual ticket fields, not a fabricated 3-way split:
+  // Critical = flagged via the real urgentOverride field (the same flag
+  // handleInterceptOverride()/openPostPhotoConfirm() set in app.html);
+  // Moderate = already dispatched to a crew; Low = submitted, not yet
+  // triaged. There is no separate "severity" field in this data model —
+  // this derives the label from stage/urgentOverride rather than inventing
+  // a 4th field.
+  const activeCritical = active.filter(t => t.urgentOverride).length;
+  const activeModerate = active.filter(t => !t.urgentOverride && t.stage === 'dispatched').length;
+  const activeLow = active.filter(t => !t.urgentOverride && t.stage !== 'dispatched').length;
   return {
     activeCount: active.length,
+    activeCritical,
+    activeModerate,
+    activeLow,
     avgResolutionHours,
     verificationRatePct,
     capExAdherencePct: capExAdherencePct(projects),
