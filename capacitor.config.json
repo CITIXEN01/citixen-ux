@@ -1,13 +1,16 @@
 {
   "_notes": {
-    "webDir": "JSON has no comment syntax, so this field documents the choice inline. webDir is '.' (the repo root, where app.html/index.html actually live) because this project has no build step and therefore no bundled web-output directory (a 'dist/', 'build/', or 'www/' folder) for a real Capacitor project to point at. A production Capacitor setup normally expects webDir to be that bundled output, copied into the native shell by `npx cap sync` on every build; this project does not pretend one exists. If a real bundler is ever introduced, update webDir to its actual output folder."
+    "webDir": "JSON has no comment syntax, so this field documents the choice inline. webDir is '.' (the repo root, where app.html/index.html actually live) because this project has no build step and therefore no bundled web-output directory (a 'dist/', 'build/', or 'www/' folder) for a real Capacitor project to point at. A production Capacitor setup normally expects webDir to be that bundled output, copied into the native shell by `npx cap sync` on every build; this project does not pretend one exists. If a real bundler is ever introduced, update webDir to its actual output folder.",
+    "server.url": "Capacitor's native shell loads 'index.html' from webDir by default — but this repo's root index.html is the PUBLIC MARKETING GATEWAY, not the mobile reporter, so a bare local webDir load would launch the wrong page. Since there's no build step to rename/copy app.html into an index.html-named entry point, server.url instead points the native WebView directly at the deployed mobile-reporter route, so the native app launches app.html (Snap & Go / Capacitor camera+GPS bridge) rather than the dashboard. Swap this for a local webDir-based load only once a real bundler produces a dedicated native-app output folder with app.html as its own index.html."
   },
   "appId": "com.citixenux.app",
   "appName": "CITIXEN UX",
   "webDir": ".",
   "bundledWebRuntime": false,
   "server": {
-    "androidScheme": "https"
+    "androidScheme": "https",
+    "url": "https://citixenux.com/app",
+    "cleartext": false
   },
   "ios": {
     "contentInset": "always",
