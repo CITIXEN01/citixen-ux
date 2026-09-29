@@ -177,7 +177,14 @@ function makeReportId(wardSlug, ticketId) {
 // proof photo — see `verified`). This mirrors the same 3-step lifecycle
 // app.html's Triage gauge already groups cases into (Open / Tagged to
 // Project / Resolved), just named for the public-facing timeline.
-const WARD_TICKETS = {
+// Pinned to globalThis (same pattern as DB above) so tickets appended by
+// addTicket() below — i.e. real citizen submissions from app.html's
+// /api/report/submit — survive repeated requires and warm-lambda reuse
+// instead of resetting to the seed list on every cold module load. This
+// does NOT make the store durable: a Vercel cold start or a request that
+// lands on a different concurrent instance still won't see it. That's the
+// same honest limitation documented at the top of this file, not a new one.
+const WARD_TICKETS = globalThis.__CITIXEN_WARD_TICKETS__ || (globalThis.__CITIXEN_WARD_TICKETS__ = {
   'ward-4': [
     { id: 'w4t1', category: 'Pothole', title: 'Deep pothole, right lane', loc: 'Main St & 4th Ave', stage: 'resolved', verified: true, resolutionHours: 14, submittedAgo: '3d ago' },
     { id: 'w4t2', category: 'Streetlight', title: 'Streetlight outage', loc: 'Grand Ave & 7th St', stage: 'dispatched', verified: null, resolutionHours: null, submittedAgo: '45m ago' },
@@ -203,7 +210,7 @@ const WARD_TICKETS = {
     { id: 'w3t2', category: 'Pothole', title: 'Deep pothole, arterial road', loc: 'Ashland Ave', stage: 'resolved', verified: false, resolutionHours: 19, submittedAgo: '4d ago' },
     { id: 'w3t3', category: 'Streetlight', title: 'Streetlight pole down', loc: 'Milwaukee Ave', stage: 'resolved', verified: true, resolutionHours: 10, submittedAgo: '2d ago' }
   ]
-};
+});
 
 const WARD_NAMES = { 'ward-4': 'Ward 4', 'ward-7': 'Ward 7', 'ward-12': 'Ward 12', 'ward-3': 'Ward 3' };
 const WARD_JURISDICTION = {
@@ -353,6 +360,44 @@ function bigThreeTrend(wardSlug, days) {
   return points;
 }
 
+// Appends a real citizen submission (from app.html's Publish flow, via
+// POST /api/report/submit) into the same WARD_TICKETS array the seed
+// records live in — so it's picked up by allTickets(), bigThree() and
+// bigThreeTrend() on the very next read, the same as any seed ticket.
+// It is NOT a second data model: a submitted ticket looks exactly like a
+// seed one (same fields, stage:'submitted', unresolved/unverified until a
+// real close event exists). Falls back to Ward 4 when no jurisdiction was
+// resolved yet, matching pickDefaultWardMeta()'s own first-seeded-ward
+// fallback in app.html — an internal default, never a guessed/shown name.
+// Same statelessness caveat as the rest of this module: this only persists
+// within the current warm lambda instance, not across cold starts or
+// concurrent instances — see the note above WARD_TICKETS.
+function addTicket(input) {
+  input = input || {};
+  const wardSlug = (input.ward && WARD_TICKETS[input.ward]) ? input.ward : 'ward-4';
+  const id = 'sub-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7);
+  const category = CATEGORIES.includes(input.category) ? input.category : 'Pothole';
+  const ticket = {
+    id,
+    category,
+    title: (input.description ? String(input.description).slice(0, 140) : category + ' reported'),
+    loc: input.location ? String(input.location).slice(0, 120) : 'Local District',
+    stage: 'submitted',
+    verified: null,
+    resolutionHours: null,
+    submittedAgo: '0m ago',
+    urgentOverride: !!input.urgentOverride,
+    matchedProjectId: input.matchedProjectId || null,
+    // Full-precision device GPS, same field the reference SQL schema's
+    // geog column models — kept here only in-memory, fuzzed/rounded the
+    // same way the client already does before ever showing it on a map.
+    lat: typeof input.lat === 'number' ? input.lat : null,
+    lng: typeof input.lng === 'number' ? input.lng : null
+  };
+  WARD_TICKETS[wardSlug].push(ticket);
+  return { reportId: makeReportId(wardSlug, id), ward: wardSlug };
+}
+
 function getWard(state, city, ward) {
   const s = DB[state];
   if (!s) return null;
@@ -395,6 +440,6 @@ function allWards() {
 
 module.exports = {
   DB, getWard, getCity, summarize, allWards, CATEGORIES,
-  allTickets, getTicketByReportId, makeReportId,
+  allTickets, getTicketByReportId, makeReportId, addTicket,
   CAPEX_PROJECTS, capExAdherencePct, bigThree, bigThreeTrend, WARD_NAMES, WARD_JURISDICTION
 };

@@ -2271,6 +2271,28 @@ window.addEventListener('DOMContentLoaded',()=>{
   renderNationalCoverageTicker();
   const pdfBtn = document.getElementById('btnDownloadWardHealthPdf');
   if (pdfBtn) pdfBtn.addEventListener('click', () => downloadWardHealthPdf(pdfBtn));
+
+  /* ===================================================================
+     LIVE REFRESH — Big 3 tiles + 3x3 Analytics Matrix + Report Generator
+     -------------------------------------------------------------------
+     app.html and this dashboard are two separate documents (a citizen's
+     phone vs. this browser tab) with no shared connection between them —
+     there's no websocket/SSE push wired into this demo, and a real one
+     would need actual server infrastructure this project doesn't have
+     yet. What IS real and already wired: app.html's Publish flow now
+     writes the new ticket into the same in-memory store this page's
+     /api/coverage/big3 call reads from (see api/report/submit.js's
+     addTicket()). So this page polls that endpoint on an interval —
+     ordinary client-side refresh, not a push — which is enough for a new
+     submission to surface here within one interval, with no manual
+     browser reload. loadBig3() already re-renders the Big3 tiles, the
+     matrix (renderAnalyticsMatrix), and the report generator's live
+     output from that same response — nothing new to wire beyond calling
+     it again. Same in-memory-store caveat as everywhere else in this
+     project applies: this reflects submissions landed on the same warm
+     lambda instance, not a durable cross-instance feed.
+     =================================================================== */
+  setInterval(loadBig3, 20000);
 });
 </script>
 </body>

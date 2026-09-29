@@ -2386,17 +2386,33 @@ async function finalizeSubmitReport(opts){
   document.getElementById('photoBox').style.display='none';
 
   const resolved = window.CITIXEN_RESOLVED_LOCATION;
+  // Jurisdiction routing: currentWardMeta is only set once the coverage
+  // grid has initialized (tab-map visit or initAnalytics()) — if a report
+  // is published before that (e.g. straight from the splash/Report tab),
+  // fall back to the same first-seeded-ward default pickDefaultWardMeta()
+  // itself falls back to. This is an internal routing key for the shared
+  // store, never a name shown to the citizen as their detected location.
+  const ward = currentWardMeta ? currentWardMeta.ward : 'ward-4';
+  const wardState = currentWardMeta ? currentWardMeta.state : 'wi';
+  const wardCity = currentWardMeta ? currentWardMeta.city : 'la-crosse';
   const payload = {
     category: cat, location: rawLoc, description: rawDesc, urgentOverride,
     matchedProjectId: (urgentOverride && opts.matchedProject) ? opts.matchedProject.id : null,
     lat: resolved && typeof resolved.lat === 'number' ? resolved.lat : null,
     lng: resolved && typeof resolved.lng === 'number' ? resolved.lng : null,
+    ward, state: wardState, city: wardCity,
     clientTimestamp: new Date().toISOString()
   }; // no PII fields — see api/_lib/store.js's privacy note; this matches that model exactly.
 
   const result = await attemptSubmitReport(payload);
   if (result.ok) {
     toast(urgentOverride ? '✓ Published as urgent — routed to ' + dept : '✓ Published — routed to ' + dept);
+    // Now that the ticket actually landed in the shared store (see
+    // api/report/submit.js -> addTicket()), pull the Big 3 again so this
+    // device's own Analytics tab reflects it immediately — no refresh, no
+    // waiting for the next tab switch. The geo-hatch grid already updated
+    // above from the local `cases` array; this is the server-derived half.
+    loadBig3();
   } else {
     // Honest, not silent: this does NOT claim the submission succeeded. It's
     // persisted in the offline queue and actually retried on the next
