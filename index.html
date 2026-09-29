@@ -343,6 +343,48 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .modal-box p{font-size:.78rem;color:var(--muted);line-height:1.55}
 .modal-close{float:right;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem}
 
+/* ===== MUNICIPAL ONBOARDING WIZARD — same overlay pattern as .modal-overlay
+   above, wider box to fit form fields across 5 steps. Every "integration"
+   here (boundary lookup, ERP link, webhook ping) is simulated client-side —
+   this codebase has no real municipal-boundary API, ERP connector, or
+   webhook receiver — and each step says so, same honesty convention as
+   the rest of this page. ===== */
+.wizard-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:26px;
+  max-width:560px;width:100%;max-height:88vh;overflow-y:auto}
+.wizard-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.wizard-head h3{font-size:1.1rem;color:var(--mint2)}
+.wizard-steps{display:flex;gap:6px;margin:16px 0 22px}
+.wizard-step-dot{flex:1;height:4px;border-radius:4px;background:rgba(255,255,255,.1)}
+.wizard-step-dot.done{background:var(--mint2)}
+.wizard-step-dot.current{background:var(--brand-amber)}
+.wizard-step-label{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:14px}
+.wizard-panel{display:none}
+.wizard-panel.active{display:block}
+.wizard-field{margin-bottom:14px}
+.wizard-field label{display:block;font-size:.72rem;font-weight:700;color:var(--text);margin-bottom:6px}
+.wizard-field input,.wizard-field select{width:100%;background:rgba(7,12,14,.8);border:1px solid var(--border);
+  color:var(--text);padding:10px 12px;border-radius:10px;font-size:.82rem;outline:none;font-family:inherit}
+.wizard-field input:focus,.wizard-field select:focus{border-color:var(--mint2)}
+.wizard-sim-indicator{display:flex;align-items:center;gap:8px;font-size:.72rem;color:var(--muted);margin-top:8px}
+.wizard-sim-dot{width:8px;height:8px;border-radius:50%;background:var(--brand-amber);flex-shrink:0}
+.wizard-sim-dot.ok{background:var(--brand-mint)}
+.wizard-toggle-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
+.wizard-toggle-row:last-child{border-bottom:none}
+.wizard-toggle-row .wt-label{font-size:.82rem;font-weight:700}
+.wizard-toggle-row .wt-desc{font-size:.68rem;color:var(--muted);margin-top:2px}
+.wizard-switch{position:relative;width:40px;height:22px;flex-shrink:0}
+.wizard-switch input{opacity:0;width:100%;height:100%;margin:0;position:absolute;cursor:pointer;z-index:1}
+.wizard-switch .track{position:absolute;inset:0;background:rgba(255,255,255,.12);border-radius:20px;transition:background .15s}
+.wizard-switch .knob{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .15s}
+.wizard-switch input:checked + .track{background:var(--brand-mint)}
+.wizard-switch input:checked ~ .knob{transform:translateX(18px)}
+.wizard-nav{display:flex;gap:10px;margin-top:22px}
+.wizard-summary{background:rgba(0,255,136,.08);border:1px solid var(--mint2);border-radius:12px;padding:16px;margin-top:10px}
+.wizard-summary-row{display:flex;justify-content:space-between;font-size:.76rem;padding:5px 0;border-bottom:1px dashed var(--border)}
+.wizard-summary-row:last-child{border-bottom:none}
+.wizard-deploy-progress{display:none;text-align:center;padding:20px 0}
+.wizard-deploy-progress.active{display:block}
+
 /* ===== LOCATION INTAKE MODAL ===== */
 .loc-modal-box{max-width:420px;text-align:center}
 .loc-modal-box h3{color:var(--mint2)}
@@ -1024,6 +1066,96 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </div>
   </div>
 
+  <!-- ===== MUNICIPAL ONBOARDING WIZARD — a lightweight, entirely
+       client-side simulation of provisioning a new municipality onto
+       CITIXEN UX™. No real backend exists for any of this yet: there is
+       no municipal-boundary lookup service, no ERP connector, and no
+       webhook receiver anywhere in this codebase (api/_lib/store.js is
+       the only "backend," and it's an in-memory demo seed as documented
+       throughout this page). Every "indicator" in this wizard says so
+       plainly rather than implying a live integration that isn't there. ===== -->
+  <div class="modal-overlay" id="wizardOverlay">
+    <div class="wizard-box">
+      <button class="modal-close" id="wizardCloseBtn">✕</button>
+      <div class="wizard-head"><h3>Provision Your Municipality in 5 Clicks</h3></div>
+      <div class="wizard-steps" id="wizardStepDots"></div>
+      <div class="wizard-step-label" id="wizardStepLabel"></div>
+
+      <div class="wizard-panel active" data-step="1">
+        <div class="wizard-field">
+          <label for="wizJurisdictionName">City / County Name</label>
+          <input type="text" id="wizJurisdictionName" placeholder="e.g. La Crosse, WI">
+        </div>
+        <div class="wizard-field">
+          <label for="wizZip">ZIP Code</label>
+          <input type="text" id="wizZip" inputmode="numeric" placeholder="e.g. 54601">
+        </div>
+        <div class="wizard-sim-indicator" id="wizBoundaryIndicator">
+          <span class="wizard-sim-dot"></span>
+          <span>Enter a name and ZIP to run the boundary lookup.</span>
+        </div>
+        <div class="small" style="color:var(--muted);margin-top:6px">Demo simulation — no real municipal-boundary API is connected here; this estimates a boundary shape from what you typed.</div>
+      </div>
+
+      <div class="wizard-panel" data-step="2">
+        <div class="wizard-field">
+          <label for="wizErpVendor">Legacy ERP / Work-Order Vendor</label>
+          <select id="wizErpVendor">
+            <option value="">Select a vendor…</option>
+            <option value="tyler">Tyler Technologies</option>
+            <option value="accela">Accela</option>
+            <option value="cityworks">Cityworks</option>
+            <option value="cartegraph">Cartegraph</option>
+            <option value="standalone">Standalone (no ERP)</option>
+          </select>
+        </div>
+        <div class="small" style="color:var(--muted);margin-top:6px" id="wizErpNote">No live connector exists yet for any vendor listed — this records your selection for the provisioning summary only.</div>
+      </div>
+
+      <div class="wizard-panel" data-step="3">
+        <div class="wizard-field">
+          <label for="wizApiToken">API Webhook Token</label>
+          <input type="text" id="wizApiToken" placeholder="Paste or generate a token…" autocomplete="off">
+        </div>
+        <button class="btn btn-outline" id="wizTestPingBtn" type="button" style="width:100%;justify-content:center;">Test bi-directional ping</button>
+        <div class="wizard-sim-indicator" id="wizPingIndicator">
+          <span class="wizard-sim-dot"></span>
+          <span>Not tested yet.</span>
+        </div>
+        <div class="small" style="color:var(--muted);margin-top:6px">Demo simulation — there is no webhook receiver behind this token yet; the ping above is not a real network round trip.</div>
+      </div>
+
+      <div class="wizard-panel" data-step="4">
+        <div class="wizard-toggle-row">
+          <div><div class="wt-label">Auto-PII Blur</div><div class="wt-desc">Strip EXIF device/GPS tags from every submitted photo.</div></div>
+          <label class="wizard-switch"><input type="checkbox" id="wizToggleBlur" checked><span class="track"></span><span class="knob"></span></label>
+        </div>
+        <div class="wizard-toggle-row">
+          <div><div class="wt-label">911 Emergency Redirect</div><div class="wt-desc">Show the life-safety emergency notice on every report submission.</div></div>
+          <label class="wizard-switch"><input type="checkbox" id="wizToggle911" checked><span class="track"></span><span class="knob"></span></label>
+        </div>
+        <div class="wizard-toggle-row">
+          <div><div class="wt-label">ROW Filtering</div><div class="wt-desc">Require the public right-of-way confirmation before any report locks in.</div></div>
+          <label class="wizard-switch"><input type="checkbox" id="wizToggleRow" checked><span class="track"></span><span class="knob"></span></label>
+        </div>
+      </div>
+
+      <div class="wizard-panel" data-step="5">
+        <p style="font-size:.82rem;color:var(--muted);margin-bottom:12px">Review, then deploy. This simulates instant Geo-Hatch map provisioning — it doesn't create a live jurisdiction in the API, which is still seeded/in-memory (see api/_lib/store.js).</p>
+        <div class="wizard-deploy-progress" id="wizDeployProgress">
+          <div class="wizard-sim-indicator" style="justify-content:center;font-size:.8rem;" id="wizDeployStatus"><span class="wizard-sim-dot"></span><span>Provisioning Geo-Hatch grid…</span></div>
+        </div>
+        <div class="wizard-summary" id="wizSummary" style="display:none;"></div>
+        <button class="btn btn-emerald-glow" id="wizDeployBtn" type="button" style="width:100%;justify-content:center;margin-top:16px;">🟢 Deploy CITIXEN Stack™</button>
+      </div>
+
+      <div class="wizard-nav">
+        <button class="btn btn-outline" id="wizBackBtn" type="button" style="flex:1;justify-content:center;">Back</button>
+        <button class="btn btn-primary" id="wizNextBtn" type="button" style="flex:1;justify-content:center;">Next</button>
+      </div>
+    </div>
+  </div>
+
   <footer class="site-footer sitemap-footer">
     <div class="sitemap-grid">
       <div class="sitemap-col">
@@ -1051,6 +1183,9 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         <button type="button" data-codex="b">Public Trust Doctrine</button>
         <button type="button" data-codex="b">Early Charters</button>
       </div>
+    </div>
+    <div style="text-align:center;padding:0 22px 20px;">
+      <button class="btn btn-outline" id="btnOpenOnboardingWizard" type="button">🏛️ Municipal Onboarding Portal</button>
     </div>
     <div class="sitemap-bottom">
       CITIXEN UX™ — built for residents, not administrators. ·
@@ -2544,6 +2679,190 @@ const ledgerSearchInputEl = document.getElementById('ledgerSearchInput');
 if (ledgerSearchInputEl) ledgerSearchInputEl.addEventListener('input', () => {
   ledgerFilters.q = ledgerSearchInputEl.value.trim();
   renderLedgerResults();
+});
+
+/* ===================================================================
+   MUNICIPAL ONBOARDING WIZARD (index.html)
+   -------------------------------------------------------------------
+   Every "integration" here (boundary lookup, ERP link, webhook ping) is
+   simulated client-side — this codebase has no real municipal-boundary
+   API, ERP connector, or webhook receiver anywhere in this codebase
+   (api/_lib/store.js is the only "backend," and it's an in-memory demo
+   seed as documented throughout this page). Every indicator in this
+   wizard says so plainly rather than implying a live integration that
+   isn't there. Nothing here writes to store.js or provisions a real
+   jurisdiction; "Deploy" only renders a client-side summary.
+   =================================================================== */
+const WIZARD_TOTAL_STEPS = 5;
+let wizardCurrentStep = 1;
+let wizardPingOk = false;
+let wizardDeployed = false;
+
+function renderWizardStepDots(){
+  const dotsEl = document.getElementById('wizardStepDots');
+  if (!dotsEl) return;
+  let html = '';
+  for (let i = 1; i <= WIZARD_TOTAL_STEPS; i++) {
+    let cls = 'wizard-step-dot';
+    if (i < wizardCurrentStep) cls += ' done';
+    else if (i === wizardCurrentStep) cls += ' current';
+    html += `<span class="${cls}"></span>`;
+  }
+  dotsEl.innerHTML = html;
+  const labels = {
+    1: 'Step 1 of 5 — Jurisdiction',
+    2: 'Step 2 of 5 — ERP Integration',
+    3: 'Step 3 of 5 — API Webhook',
+    4: 'Step 4 of 5 — Guardrail Configuration',
+    5: 'Step 5 of 5 — Deployment'
+  };
+  const labelEl = document.getElementById('wizardStepLabel');
+  if (labelEl) labelEl.textContent = labels[wizardCurrentStep] || '';
+}
+
+function showWizardStep(step){
+  wizardCurrentStep = Math.max(1, Math.min(WIZARD_TOTAL_STEPS, step));
+  document.querySelectorAll('.wizard-panel').forEach(panel => {
+    panel.classList.toggle('active', Number(panel.dataset.step) === wizardCurrentStep);
+  });
+  renderWizardStepDots();
+  const backBtn = document.getElementById('wizBackBtn');
+  const nextBtn = document.getElementById('wizNextBtn');
+  if (backBtn) backBtn.style.visibility = wizardCurrentStep === 1 ? 'hidden' : 'visible';
+  if (nextBtn) nextBtn.textContent = wizardCurrentStep === WIZARD_TOTAL_STEPS ? 'Finish' : 'Next';
+}
+
+function openOnboardingWizard(){
+  wizardCurrentStep = 1;
+  wizardPingOk = false;
+  wizardDeployed = false;
+  const jn = document.getElementById('wizJurisdictionName'); if (jn) jn.value = '';
+  const zp = document.getElementById('wizZip'); if (zp) zp.value = '';
+  const boundaryEl = document.getElementById('wizBoundaryIndicator');
+  if (boundaryEl) boundaryEl.innerHTML = '<span class="wizard-sim-dot"></span><span>Enter a name and ZIP to run the boundary lookup.</span>';
+  const erpSel = document.getElementById('wizErpVendor'); if (erpSel) erpSel.value = '';
+  const erpNote = document.getElementById('wizErpNote');
+  if (erpNote) erpNote.textContent = 'No live connector exists yet for any vendor listed — this records your selection for the provisioning summary only.';
+  const tokenEl = document.getElementById('wizApiToken'); if (tokenEl) tokenEl.value = '';
+  const pingEl = document.getElementById('wizPingIndicator');
+  if (pingEl) pingEl.innerHTML = '<span class="wizard-sim-dot"></span><span>Not tested yet.</span>';
+  ['wizToggleBlur','wizToggle911','wizToggleRow'].forEach(id => { const t = document.getElementById(id); if (t) t.checked = true; });
+  const deployProgress = document.getElementById('wizDeployProgress'); if (deployProgress) deployProgress.classList.remove('active');
+  const summaryEl = document.getElementById('wizSummary'); if (summaryEl) { summaryEl.style.display = 'none'; summaryEl.innerHTML = ''; }
+  const deployBtn = document.getElementById('wizDeployBtn'); if (deployBtn) { deployBtn.disabled = false; deployBtn.textContent = '🟢 Deploy CITIXEN Stack™'; }
+  showWizardStep(1);
+  document.getElementById('wizardOverlay').classList.add('open');
+}
+function closeOnboardingWizard(){
+  document.getElementById('wizardOverlay').classList.remove('open');
+}
+const btnOpenOnboardingWizardEl = document.getElementById('btnOpenOnboardingWizard');
+if (btnOpenOnboardingWizardEl) btnOpenOnboardingWizardEl.addEventListener('click', openOnboardingWizard);
+const wizardCloseBtnEl = document.getElementById('wizardCloseBtn');
+if (wizardCloseBtnEl) wizardCloseBtnEl.addEventListener('click', closeOnboardingWizard);
+const wizardOverlayEl = document.getElementById('wizardOverlay');
+if (wizardOverlayEl) wizardOverlayEl.addEventListener('click', (e) => { if (e.target.id === 'wizardOverlay') closeOnboardingWizard(); });
+
+/* Step 1 — simulated boundary lookup: purely derived from what was typed,
+   no geocoding service is called. */
+function updateWizardBoundaryIndicator(){
+  const nameEl = document.getElementById('wizJurisdictionName');
+  const zipEl = document.getElementById('wizZip');
+  const boundaryEl = document.getElementById('wizBoundaryIndicator');
+  if (!nameEl || !zipEl || !boundaryEl) return;
+  const name = nameEl.value.trim();
+  const zip = zipEl.value.trim();
+  if (name.length > 1 && /^\d{5}$/.test(zip)) {
+    boundaryEl.innerHTML = '<span class="wizard-sim-dot ok"></span><span>Boundary estimated for <strong>' + name.replace(/</g,'&lt;') + '</strong> (ZIP ' + zip + ') — demo shape only, not a real municipal-boundary lookup.</span>';
+  } else if (name.length > 1 || zip.length > 0) {
+    boundaryEl.innerHTML = '<span class="wizard-sim-dot"></span><span>Keep typing a full name and 5-digit ZIP to estimate a boundary…</span>';
+  } else {
+    boundaryEl.innerHTML = '<span class="wizard-sim-dot"></span><span>Enter a name and ZIP to run the boundary lookup.</span>';
+  }
+}
+const wizJurisdictionNameEl = document.getElementById('wizJurisdictionName');
+if (wizJurisdictionNameEl) wizJurisdictionNameEl.addEventListener('input', updateWizardBoundaryIndicator);
+const wizZipEl = document.getElementById('wizZip');
+if (wizZipEl) wizZipEl.addEventListener('input', updateWizardBoundaryIndicator);
+
+/* Step 2 — ERP vendor note updates per selection, still no live connector. */
+const wizErpVendorEl = document.getElementById('wizErpVendor');
+if (wizErpVendorEl) wizErpVendorEl.addEventListener('change', () => {
+  const noteEl = document.getElementById('wizErpNote');
+  if (!noteEl) return;
+  const label = wizErpVendorEl.options[wizErpVendorEl.selectedIndex] ? wizErpVendorEl.options[wizErpVendorEl.selectedIndex].text : '';
+  if (!wizErpVendorEl.value) {
+    noteEl.textContent = 'No live connector exists yet for any vendor listed — this records your selection for the provisioning summary only.';
+  } else if (wizErpVendorEl.value === 'standalone') {
+    noteEl.textContent = 'Standalone mode selected — CITIXEN UX™ will not attempt to hand off work orders to any external ERP.';
+  } else {
+    noteEl.textContent = 'No live ' + label + ' connector exists in this codebase yet — this records your selection for the provisioning summary only.';
+  }
+});
+
+/* Step 3 — simulated bi-directional ping test, no network round trip. */
+const wizTestPingBtnEl = document.getElementById('wizTestPingBtn');
+if (wizTestPingBtnEl) wizTestPingBtnEl.addEventListener('click', () => {
+  const pingEl = document.getElementById('wizPingIndicator');
+  const tokenEl = document.getElementById('wizApiToken');
+  if (!pingEl) return;
+  const hasToken = tokenEl && tokenEl.value.trim().length > 0;
+  pingEl.innerHTML = '<span class="wizard-sim-dot"></span><span>Pinging…</span>';
+  setTimeout(() => {
+    if (hasToken) {
+      wizardPingOk = true;
+      pingEl.innerHTML = '<span class="wizard-sim-dot ok"></span><span>Simulated ping OK — no real webhook receiver exists behind this token.</span>';
+    } else {
+      wizardPingOk = false;
+      pingEl.innerHTML = '<span class="wizard-sim-dot"></span><span>Enter a token first — nothing to ping yet.</span>';
+    }
+  }, 700);
+});
+
+/* Step navigation */
+const wizBackBtnEl = document.getElementById('wizBackBtn');
+if (wizBackBtnEl) wizBackBtnEl.addEventListener('click', () => { if (wizardCurrentStep > 1) showWizardStep(wizardCurrentStep - 1); });
+const wizNextBtnEl = document.getElementById('wizNextBtn');
+if (wizNextBtnEl) wizNextBtnEl.addEventListener('click', () => {
+  if (wizardCurrentStep < WIZARD_TOTAL_STEPS) { showWizardStep(wizardCurrentStep + 1); return; }
+  closeOnboardingWizard();
+});
+
+/* Step 5 — simulated deploy: builds a client-side summary only. */
+const wizDeployBtnEl = document.getElementById('wizDeployBtn');
+if (wizDeployBtnEl) wizDeployBtnEl.addEventListener('click', () => {
+  if (wizardDeployed) return;
+  wizardDeployed = true;
+  wizDeployBtnEl.disabled = true;
+  const progressEl = document.getElementById('wizDeployProgress');
+  const statusEl = document.getElementById('wizDeployStatus');
+  const summaryEl = document.getElementById('wizSummary');
+  if (progressEl) progressEl.classList.add('active');
+  if (statusEl) statusEl.innerHTML = '<span class="wizard-sim-dot"></span><span>Provisioning Geo-Hatch grid…</span>';
+  setTimeout(() => {
+    if (statusEl) statusEl.innerHTML = '<span class="wizard-sim-dot ok"></span><span>Geo-Hatch grid provisioned (simulated) — no live jurisdiction was created.</span>';
+    const name = (document.getElementById('wizJurisdictionName') || {}).value || 'Unnamed jurisdiction';
+    const zip = (document.getElementById('wizZip') || {}).value || '—';
+    const erpSel = document.getElementById('wizErpVendor');
+    const erpLabel = erpSel && erpSel.value ? erpSel.options[erpSel.selectedIndex].text : 'Not selected';
+    const tokenEl = document.getElementById('wizApiToken');
+    const tokenState = tokenEl && tokenEl.value.trim() ? (wizardPingOk ? 'Provided — simulated ping OK' : 'Provided — not pinged') : 'Not provided';
+    const blurOn = document.getElementById('wizToggleBlur').checked;
+    const redirectOn = document.getElementById('wizToggle911').checked;
+    const rowOn = document.getElementById('wizToggleRow').checked;
+    if (summaryEl) {
+      summaryEl.style.display = 'block';
+      summaryEl.innerHTML =
+        '<div class="wizard-summary-row"><span>Jurisdiction</span><strong>' + String(name).replace(/</g,'&lt;') + ' (' + String(zip).replace(/</g,'&lt;') + ')</strong></div>' +
+        '<div class="wizard-summary-row"><span>ERP Vendor</span><strong>' + erpLabel + '</strong></div>' +
+        '<div class="wizard-summary-row"><span>API Webhook Token</span><strong>' + tokenState + '</strong></div>' +
+        '<div class="wizard-summary-row"><span>Auto-PII Blur</span><strong>' + (blurOn ? 'On' : 'Off') + '</strong></div>' +
+        '<div class="wizard-summary-row"><span>911 Emergency Redirect</span><strong>' + (redirectOn ? 'On' : 'Off') + '</strong></div>' +
+        '<div class="wizard-summary-row"><span>ROW Filtering</span><strong>' + (rowOn ? 'On' : 'Off') + '</strong></div>' +
+        '<div class="small" style="color:var(--muted);margin-top:10px">Demo summary only — this does not create a live jurisdiction, connect an ERP, or register a webhook. api/_lib/store.js remains this project\'s only backend, and it is still an in-memory demo seed.</div>';
+    }
+    if (wizDeployBtnEl) wizDeployBtnEl.textContent = '✓ Deployed (Demo)';
+  }, 1400);
 });
 
 window.addEventListener('DOMContentLoaded',()=>{
