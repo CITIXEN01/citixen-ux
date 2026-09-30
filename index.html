@@ -136,15 +136,14 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .hero-qa-body{color:var(--muted);font-size:.9rem;line-height:1.6;max-width:640px;margin:0 auto}
 .hero-qa-accent{color:#00FF87;font-weight:700}
 
-/* ===== CROWD SOURCE AMERICA™ NARRATIVE BLOCK — plain centered text, no
-   card/box, per this round's color-breakup spec ("clean white body text,
-   no heavy green box"). Only the small eyebrow label carries the Civic
-   Gold (#FFB800) accent that distinguishes the national campaign from the
-   emerald CITIXEN UX™ platform elements. ===== */
+/* ===== CROWD SOURCE AMERICA™ NARRATIVE BLOCK (Position 3 of the
+   alternating section cadence) — plain centered text, no card/box. The
+   heading itself now carries the Civic Gold (#FFB800) accent per this
+   round's explicit copy spec (the separate small eyebrow label from the
+   prior round was folded into this one heading). ===== */
 .csa-banner-section{max-width:640px;margin:0 auto 8px;padding:0 24px}
 .csa-banner-card{text-align:center;padding:6px 0 18px}
-.csa-banner-eyebrow{font-size:.62rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#FFB800;margin-bottom:6px}
-.csa-banner-heading{font-size:1.4rem;font-weight:900;color:#FFFFFF;margin-bottom:8px}
+.csa-banner-heading{font-size:1.4rem;font-weight:900;color:#FFB800;margin-bottom:8px}
 .csa-banner-body{font-size:.85rem;color:#94A3B8;line-height:1.6;max-width:520px;margin:0 auto}
 
 /* ===== INSTITUTIONAL GATEWAY BUTTONS — sits between the App Download
@@ -828,49 +827,43 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </button>
   </section>
 
-  <!-- ===== HERO Q&A BLOCKS — now split into two separate sections so the
-       new Crowd Source America™ banner can sit between them, per this
-       round's homepage-scroll-sequence spec. Same copy/classes as before,
-       just no longer wrapped in one shared <section>. ===== -->
+  <!-- ===== ALTERNATING SECTION CADENCE (per this round's spec):
+       Position 1 — consolidated "What is CITIXEN UX™?" explanation (the
+       two separate hero Q&A blocks from earlier rounds are merged into
+       one heading/body here, same accent-span copy, just consolidated).
+       Position 2 — the Civic Gold Aggregation Hub gateway button.
+       Position 3 — the Crowd Source America™ campaign title/narrative.
+       ===== -->
   <section class="hero-qa-section">
     <div class="hero-qa-block">
-      <h2 class="hero-qa-heading">What is Civic Intelligence?</h2>
-      <p class="hero-qa-body"><span class="hero-qa-accent">Civic Intelligence (C.I.)</span> is proof from the ground. It combines real-time resident reporting with direct city department tracking and transparent project budget auditing.</p>
+      <h2 class="hero-qa-heading">What is CITIXEN UX™?</h2>
+      <p class="hero-qa-body">CITIXEN UX™ is the modern standard for resident-first municipal engagement. Powered by <span class="hero-qa-accent">Civic Intelligence (C.I.)</span>, it combines real-time resident reporting with direct city department tracking and transparent project budget auditing—creating an uneditable public record where <span class="hero-qa-accent">you hold the receipt</span> to ensure your tax dollars actively protect and improve your neighborhood.</p>
     </div>
   </section>
 
-  <!-- ===== CROWD SOURCE AMERICA™ HERO BANNER — introduces the nationwide
-       aggregation engine, sitting between the two hero Q&A blocks per this
-       round's spec. Purely descriptive copy; the real aggregation view it
-       points toward is the Aggregation Map Gateway button below. ===== -->
-  <section class="csa-banner-section">
-    <div class="csa-banner-card">
-      <div class="csa-banner-eyebrow">Nationwide Aggregation Engine</div>
-      <h2 class="csa-banner-heading">Crowd Source America™</h2>
-      <p class="csa-banner-body">Every CITIXEN UX report feeds one national ledger — turning individual fixes into a live, block-by-block picture of civic conditions across the country.</p>
-    </div>
-  </section>
-
-  <section class="hero-qa-section">
-    <div class="hero-qa-block">
-      <h2 class="hero-qa-heading">What does this mean for you?</h2>
-      <p class="hero-qa-body"><span class="hero-qa-accent">You hold the receipt.</span> Every report you submit creates an uneditable public record that tracks the fix, helps local leadership stay accountable, and ensures your tax dollars actively protect and improve your neighborhood.</p>
-    </div>
-  </section>
-
-  <!-- ===== AGGREGATION MAP GATEWAY BUTTON — same .ledger-banner layout as
-       the Live Public Ledger banner, but in the Civic Gold variant
-       (.ledger-banner-gold) per this round's color-breakup spec, so the
+  <!-- ===== AGGREGATION MAP GATEWAY BUTTON — Position 2. Same .ledger-banner
+       layout as the Live Public Ledger banner, but in the Civic Gold
+       variant (.ledger-banner-gold) per the color-breakup spec, so the
        national Crowd Source America™ campaign reads as visually distinct
        from CITIXEN UX™'s emerald platform elements. Opens the same real
-       #nationalHeatMapModal (now a real Leaflet instance — see below) that
-       the Analytics drawer's own trigger opens — not a duplicate modal. ===== -->
+       #nationalHeatMapModal (a real Leaflet instance — see below) that the
+       Analytics drawer's own trigger opens — not a duplicate modal. ===== -->
   <section class="ledger-banner-section">
     <button class="ledger-banner ledger-banner-gold" id="aggregationMapGatewayBtn" type="button">
       <span class="ledger-banner-pulse" aria-hidden="true"></span>
       <span class="ledger-banner-label">CROWD SOURCE AMERICA™ — AGGREGATION HUB</span>
       <span class="ledger-banner-count">View Map ↗</span>
     </button>
+  </section>
+
+  <!-- ===== CROWD SOURCE AMERICA™ NARRATIVE BLOCK — Position 3. Plain
+       centered text, no card/box (per the earlier color-breakup spec);
+       the heading carries the Civic Gold accent. ===== -->
+  <section class="csa-banner-section">
+    <div class="csa-banner-card">
+      <h2 class="csa-banner-heading">Crowd Source America™</h2>
+      <p class="csa-banner-body">Every CITIXEN UX™ report feeds into one unified national ledger—turning individual local fixes into a live, block-by-block picture of civic conditions across the country.</p>
+    </div>
   </section>
 
   <!-- ===== "ciDeepDive" section removed per homepage-flow refactor — its
@@ -904,30 +897,30 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   <span id="analytics" aria-hidden="true"></span>
 
   <!-- ===== HOMEPAGE SCROLL ORDER (per spec): Locked Header -> Live Public
-       Ledger banner -> Hero Q&A block 1 -> Crowd Source America™ banner ->
-       Hero Q&A block 2 -> Aggregation Map Gateway button -> City Snapshot
-       tiles -> Report Generator -> 3-button hub row -> Launch Mobile
-       Reporter + App Store row -> Institutional Gateway buttons -> footer.
-       The Live Public Ledger banner now sits directly beneath the hero
-       (see it just below the SECTION FREEZE boundary above), ahead of the
-       Q&A blocks. ===== -->
+       Ledger banner -> [alternating cadence: "What is CITIXEN UX™?"
+       consolidated explanation -> Aggregation Map Gateway button ->
+       Crowd Source America™ narrative] -> City Snapshot tiles -> Report
+       Generator -> 3-button hub row -> Launch Mobile Reporter + App Store
+       row -> Institutional Gateway buttons -> footer. The Live Public
+       Ledger banner sits directly beneath the hero (see it just below the
+       SECTION FREEZE boundary above), ahead of the alternating cadence. ===== -->
 
-  <!-- ===== CITY SNAPSHOT — now a single geolocated dashboard for the
-       visitor's own jurisdiction, per this round's spec. The label
-       (#citySnapshotLabel) is driven by the SAME real geolocation/
+  <!-- ===== CITY SNAPSHOT — a single geolocated dashboard for the visitor's
+       own jurisdiction. #snapshot-city-name starts as "Detecting
+       location…" and is filled in by the SAME real geolocation/
        jurisdiction system the frozen header's location bar already uses
-       (detectJurisdictionGuess() -> applyJurisdiction() ->
-       syncDashboardToJurisdiction(), below) — no second, parallel
-       detection system — and defaults to "La Crosse, WI Snapshot" while
-       that's pending or if it's denied, same default as the rest of the
-       page. Active Hazards / Fix Speed / Completion Rate remain the one
-       real live dataset this project has (/api/coverage/big3 — see
-       loadBig3()); the 4th tile, Ward Health Index, is the same
-       cities{} seed value already shown in the Analytics deep-dive's
-       Citywide Health Index card, not a new number. ===== -->
+       (detectJurisdictionGuess() -> navigator.geolocation.getCurrentPosition()
+       -> applyJurisdiction() -> syncDashboardToJurisdiction(), below) — no
+       second, parallel detection system — falling back to "La Crosse, WI
+       Snapshot" if geolocation is denied/blocked/unsupported or times out,
+       same default as the rest of the page. Active Hazards / Fix Speed /
+       Completion Rate remain the one real live dataset this project has
+       (/api/coverage/big3 — see loadBig3()); the 4th tile, Ward Health
+       Index, is the same cities{} seed value already shown in the
+       Analytics deep-dive's Citywide Health Index card, not a new number. ===== -->
   <section class="matrix-summary-section" id="matrixSummarySection">
     <div class="analytics-matrix-card" id="analyticsMatrix">
-      <div class="label" style="justify-content:center" id="citySnapshotLabel">La Crosse, WI Snapshot</div>
+      <div class="label" style="justify-content:center" id="citySnapshotLabel"><span id="snapshot-city-name">Detecting location…</span> Snapshot</div>
       <div class="matrix-grid" id="matrixGrid"></div>
       <div class="small" style="text-align:center;margin-top:10px;color:var(--muted)">Live Ward Performance Metrics — refreshed automatically from field dispatch data. Tap a metric tile for its full breakdown.</div>
     </div>
@@ -1900,6 +1893,19 @@ function jurisdictionLabel(j){
   return j.cityName + ', ' + j.state.toUpperCase() + ' — ' + j.wardName;
 }
 
+// City Snapshot header (#snapshot-city-name) — reads the SAME
+// detectJurisdictionGuess() result (real navigator.geolocation, with the
+// IP/default fallbacks already built into that function), no second
+// detection path. guess.source === 'default' means GPS/IP both failed or
+// were denied, which for this project's DEFAULT_JURISDICTION is exactly
+// "La Crosse, WI" — the honest fallback this round's spec asks for.
+function updateCitySnapshotFromGuess(guess){
+  const nameEl = document.getElementById('snapshot-city-name');
+  if (!nameEl || !guess) return;
+  const key = JURISDICTION_TO_CITY_KEY[guess.state + '/' + guess.city];
+  nameEl.textContent = (key && cities[key]) ? cities[key].label : jurisdictionLabel(guess);
+}
+
 async function initLocationIntake(){
   jurisdictionDirectory = await fetchJurisdictionDirectory();
 
@@ -1910,6 +1916,15 @@ async function initLocationIntake(){
   }
 
   const guess = await detectJurisdictionGuess(jurisdictionDirectory);
+  // City Snapshot's header updates from the raw detection result itself,
+  // independent of the confirm-gated jurisdiction flow below (which only
+  // applies/stores a jurisdiction once the visitor clicks Confirm) — the
+  // Snapshot label is read-only display text, not something this project
+  // stores or acts on, so it can reflect navigator.geolocation's result (or
+  // its honest "La Crosse, WI" default if GPS/IP detection failed) right
+  // away rather than sitting on "Detecting location…" until a manual
+  // confirmation click.
+  updateCitySnapshotFromGuess(guess);
   // guess.source === 'default' means GPS and IP detection both failed —
   // show that honestly (CITYWIDE, no location asserted) rather than naming
   // the internal fallback jurisdiction as if it had actually been detected.
@@ -2044,7 +2059,11 @@ const JURISDICTION_TO_CITY_KEY = { 'wi/la-crosse': 'lacrosse', 'il/chicago': 'ch
 function syncDashboardToJurisdiction(j){
   const key = JURISDICTION_TO_CITY_KEY[j.state + '/' + j.city];
   const gridSel = document.getElementById('gridSelect');
-  const snapshotLabelEl = document.getElementById('citySnapshotLabel');
+  // Only the inner #snapshot-city-name span is rewritten — the outer
+  // #citySnapshotLabel keeps its " Snapshot" suffix in the markup, per
+  // this round's explicit `<span id="snapshot-city-name">…</span> Snapshot`
+  // structure.
+  const snapshotCityNameEl = document.getElementById('snapshot-city-name');
   if (key && cities[key]) {
     if (gridSel) gridSel.value = key;
     const c = cities[key];
@@ -2058,7 +2077,7 @@ function syncDashboardToJurisdiction(j){
     // Geolocated City Snapshot (#matrixSummarySection) — same resolved
     // jurisdiction, same cities{} seed value, per this round's spec.
     currentWardHealth = c.health;
-    if (snapshotLabelEl) snapshotLabelEl.textContent = c.label + ' Snapshot';
+    if (snapshotCityNameEl) snapshotCityNameEl.textContent = c.label;
     if (matrixData) renderMatrixView();
   } else {
     document.getElementById('healthCity').textContent = j.cityName || 'Citywide';
@@ -2067,8 +2086,11 @@ function syncDashboardToJurisdiction(j){
     // label the City Snapshot with the real detected jurisdiction name
     // rather than silently keeping a mismatched previous label, but keep
     // the Ward Health Index tile on its last known/default value since
-    // there's no seed data for this jurisdiction.
-    if (snapshotLabelEl) snapshotLabelEl.textContent = (j.cityName ? jurisdictionLabel(j) : 'Citywide') + ' Snapshot';
+    // there's no seed data for this jurisdiction. If detection genuinely
+    // failed (guess.source === 'default', handled by the caller before
+    // this function ever sees a jurisdiction), initLocationIntake() below
+    // leaves this at its "La Crosse, WI" default instead of calling here.
+    if (snapshotCityNameEl) snapshotCityNameEl.textContent = j.cityName ? jurisdictionLabel(j) : 'Citywide';
   }
 }
 
