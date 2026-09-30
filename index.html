@@ -128,32 +128,24 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .trademark-disclosure{text-align:center;font-size:.62rem;color:var(--muted);opacity:.75;line-height:1.5;
   max-width:640px;margin:0 auto;padding:0 22px 18px}
 
-/* ===== HERO / HUD ===== */
-.hero{padding:44px 24px 8px;text-align:center;max-width:900px;margin:0 auto}
-.hero h1{font-size:2.05rem;font-weight:900;letter-spacing:-.5px;margin-bottom:6px}
-.hero h2{font-size:1rem;font-weight:700;color:var(--mint2);margin-bottom:14px}
-.hero .ci-headline-sub{font-size:1.3rem;font-weight:800;color:var(--text);margin-bottom:10px}
-.hero .ci-intro-copy{color:var(--muted);font-size:.86rem;max-width:640px;margin:0 auto 16px}
-.hero #exploreDifferenceBtn{margin:0 auto 24px;display:inline-flex}
-.hero-badge{display:inline-flex;align-items:center;background:var(--brand-mint-dim);border:1px solid rgba(0,255,136,.35);
-  color:var(--mint2);border-radius:20px;padding:6px 16px;font-size:.72rem;font-weight:700;letter-spacing:.3px;margin-bottom:22px}
-
-/* ===== HERO — MASSIVE TITLE + C.I. DEFINITION (master-refactor overhaul)
-   Enlarged this round per item 12's "#hero-title" sizing spec — applied to
-   .hero-mega-title, the actual hero title element (no element in this file
-   carries id="hero-title"). font-weight bumped 900->800 and the clamp
-   widened to 2.2rem-3.8rem per the literal spec values. ===== */
-.hero-mega-title{font-size:clamp(2.2rem,8.5vw,3.8rem);white-space:nowrap;font-weight:800;letter-spacing:-0.02em;line-height:1.1;margin:8px 0;text-align:center;text-shadow:0 0 28px rgba(0,255,136,.28);display:flex;align-items:center;justify-content:center;gap:.35em}
-.hero-shield-icon{flex-shrink:0;filter:drop-shadow(0 0 10px rgba(0,255,136,.5))}
-/* Hero-lockup-only ™ proportional override (28% of "UX" cap-height,
-   top-aligned) per this round's item 1 — scoped to .hero-mega-title so the
-   shared .tm-symbol styling used elsewhere (CSA heading, drawer copy,
-   footer, etc.) is untouched. */
-.hero-mega-title .tm-symbol{font-size:.28em !important;vertical-align:top;position:relative;top:-.05em}
-.hero-kicker{font-size:.72rem;font-weight:700;color:#FFFFFF;text-transform:uppercase;letter-spacing:0.08em;margin:2px 0 4px}
-/* "CITIZEN DASHBOARD" pivoted from muted grey to bold Electric Ice-Cyan
-   per this round's item 12. */
-.hero-kicker-sub{font-size:.95rem;color:#0EA5E9;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin:10px 0 2rem;text-align:center}
+/* ===== POST-BRANDING-CLEANUP CORRECTIVE ROUND: the entire center hero
+   branding block (second shield SVG + giant two-tone "CITIXEN UX™" title +
+   "Upgrade Your Civic Experience" kicker) was removed outright per this
+   round's explicit instruction — the top sticky nav header is now the
+   page's ONE "CITIXEN UX™" brand mark, no duplicate lower on the page.
+   That block's dedicated CSS (.hero, .hero-mega-title, .hero-shield-icon,
+   .hero-kicker, .hero-kicker-sub, and the already-dead .hero h1/h2/
+   .ci-headline-sub/.ci-intro-copy/#exploreDifferenceBtn/.hero-badge rules
+   left over from earlier refactors) is removed with it — nothing else in
+   the file referenced any of it. In its place: a lightweight "CITIZEN
+   DASHBOARD" sub-header directly under the jurisdiction bar, followed by a
+   subtle tagline, with tightened vertical padding so the map and live
+   metrics land inside the first mobile viewport instead of scrolled below
+   a second branding block. ===== */
+.citizen-dashboard-subheader{text-align:center;color:#0EA5E9;font-weight:700;font-size:.95rem;
+  letter-spacing:0.08em;text-transform:uppercase;margin:12px 0 6px}
+.hero-tagline-subtle{text-align:center;color:#F8FAFC;opacity:.8;font-size:.85rem;
+  max-width:520px;margin:0 auto 16px;padding:0 24px}
 
 /* ===== HERO Q&A BLOCKS — two white-header Q&A cards directly below the
    locked hero, replacing the old single hero-subtitle/ci-definition pair. ===== */
@@ -691,10 +683,10 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 
 
 /* ===== TRADEMARK (™) TYPOGRAPHY — lightweight superscript treatment
-   applied via <sup class="tm-symbol"> across headings/copy this round,
-   distinct from the two pre-existing frozen <sup class="brand-tm"> ™
-   lockups inside the topbar wordmark and hero title (left untouched
-   per the section-freeze rule). ===== */
+   applied via <sup class="tm-symbol"> across headings/copy, distinct from
+   the pre-existing <sup class="brand-tm"> ™ lockup inside the topbar
+   wordmark (the page's one brand mark, now that the duplicate center hero
+   title has been removed). ===== */
 .tm-symbol{font-weight:300 !important;font-size:.55em !important;margin-left:3px !important;opacity:.8;vertical-align:super}
 /* Flush variant — no left margin, for lockups (the "What is CITIXEN UX™?"
    heading, per this round's spec) where the ™ must sit tight against the
@@ -987,49 +979,23 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </div>
   </div>
 
-  <!-- ===== HERO HOOK TAGLINE — per this round's item 11, positioned
-       directly between the green Smart Location bar above and the hero
-       title below (previously this sentence lived further down, inside
-       the now-dissolved hero-qa-section — see the note above Gateway Pill
-       2 for where the rest of that block went). Placed outside the frozen
-       hero section itself, immediately before it, so the frozen block's
-       own markup stays untouched by this move. ===== -->
-  <p style="max-width:640px;margin:18px auto 0;padding:0 24px;font-size:1.05rem;text-align:center;color:var(--text)">The modern standard for resident-first municipal engagement.</p>
+  <!-- ===== The SECTION-FREEZE hero block that used to sit here (second
+       shield SVG + giant two-tone "CITIXEN UX™" heading + "Upgrade Your
+       Civic Experience" kicker + "Citizen Dashboard" subtitle) has been
+       removed outright per this round's explicit corrective instruction —
+       it duplicated the top sticky nav's own "CITIXEN UX™" brand mark and
+       was eating the primary mobile viewport. The nav header is now the
+       page's one brand mark. In its place: a lightweight "CITIZEN
+       DASHBOARD" sub-header directly under the green jurisdiction bar,
+       then the tagline, then straight into the two stacked live pills —
+       no second branding block between the jurisdiction bar and the real
+       content. ===== -->
+  <p class="citizen-dashboard-subheader">Citizen Dashboard</p>
+  <p class="hero-tagline-subtle">The modern standard for resident-first municipal engagement.</p>
 
-  <!-- ===== SECTION FREEZE — everything from here through the line below
-       ("Citizen Dashboard") is locked per the ongoing spec: do not edit
-       this section's markup, copy, or layout in any future round without
-       an explicit new instruction to unfreeze it. Standing exceptions so
-       far: the ™ symbol was removed from "Upgrade Your Civic Experience"
-       in an earlier round per that round's own narrowly-scoped branding
-       instruction; a later round explicitly cyan-pivoted the shield icon,
-       heading, and subtitle (that round's item 9); a later round reversed
-       that pivot back to the original white/Emerald Green palette and
-       added the "Citizen Dashboard" subtitle line; and THIS round enlarges
-       the title (item 12's #hero-title sizing, applied to .hero-mega-title)
-       and pivots "Citizen Dashboard" to bold Electric Ice-Cyan (also item
-       12) — both CSS-only layout changes, no markup/copy edits, each an
-       explicit, narrowly-scoped instruction for this exact content, not a
-       general unfreeze. This round's seal-to-text proportional-ratio pass
-       (item 1) likewise only touched this section's CSS (gap/™ sizing), not
-       its markup. The heading's two-tone white "CITIXEN" + Emerald "UX™"
-       spans also stay consistent with the page's "two-tone CITIXEN UX"
-       sweep —
-       no more standing exception needed there. No other line in this
-       frozen block was touched. ===== -->
-  <section class="hero">
-    <h1 class="hero-mega-title">
-      <svg class="hero-shield-icon" viewBox="0 0 24 24" width="0.78em" height="0.78em" stroke="#00FF87" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      <span style="color:#FFFFFF; font-weight:bold;">CITIXEN</span> <span style="color:#00FF87; font-weight:bold;">UX</span><sup class="tm-symbol">™</sup>
-    </h1>
-    <p class="hero-kicker">Upgrade Your Civic Experience</p>
-    <p class="hero-kicker-sub">Citizen Dashboard</p>
-  </section>
-  <!-- ===== END SECTION FREEZE ===== -->
-
-  <!-- ===== LIVE PUBLIC LEDGER BANNER — moved directly beneath the hero,
-       ahead of the Q&A blocks. Opens the existing #ledgerDrawer (same
-       drawer as the footer's Codex/audit links). Restyled this round as
+  <!-- ===== LIVE PUBLIC LEDGER BANNER — sits directly beneath the Citizen
+       Dashboard sub-header/tagline above. Opens the existing #ledgerDrawer
+       (same drawer as the footer's Codex/audit links). Restyled this round as
        the unified single-line .gateway-pill (automotive-cockpit palette
        pivot): Electric Ice-Cyan border/background, Emerald "LIVE" badge.
        The trailing count is real — set from the same /api/coverage/big3
@@ -1045,17 +1011,18 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </button>
   </section>
 
-  <!-- ===== ALTERNATING SECTION CADENCE (updated per this round's items
-       7/9/11): Gateway Pill 1 (PUBLIC LEDGER) and Pill 2 (AGGREGATION HUB)
-       now stack directly on top of each other with a tight ~10px gap
+  <!-- ===== ALTERNATING SECTION CADENCE (updated across recent rounds):
+       Gateway Pill 1 (PUBLIC LEDGER) and Pill 2 (AGGREGATION HUB) stack
+       directly on top of each other with a tight ~10px gap
        (.gateway-pill-stacked on Pill 1's section) — the "What is CITIXEN
-       UX™?" narrative block that used to sit between them has been
-       dissolved: its always-visible hook sentence moved up to sit between
-       the green location bar and the hero title (see the tagline paragraph
-       just above the hero section), and the collapsible "Learn More ▾"
-       drawer (workflow row / engine line / receipt line / era tagline)
-       moved down to directly below the Crowd Source America™ / US Map
-       container (see #btnLearnMoreToggle after the CSA narrative below).
+       UX™?" narrative block that used to sit between them was dissolved in
+       an earlier round: its always-visible hook sentence moved up to sit
+       between the green location bar and this section (see the "Citizen
+       Dashboard" sub-header + tagline just above), and the collapsible
+       "Learn More ▾" drawer (workflow row / engine line / receipt line /
+       era tagline) moved down to directly below the Crowd Source America™
+       / US Map container (see #btnLearnMoreToggle after the CSA narrative
+       below).
        Position 2 — the Aggregation Hub gateway button (Electric Cyan
        variant, .ledger-banner-cyan — Civic Gold is retired), sits
        directly ABOVE the pixel map.
@@ -1189,14 +1156,18 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        point at. ===== -->
   <span id="analytics" aria-hidden="true"></span>
 
-  <!-- ===== HOMEPAGE SCROLL ORDER (updated per this round's items 7/9/11):
-       Locked Header -> green Smart Location bar -> hook tagline -> Hero ->
-       Gateway Pill 1 (Public Ledger) + Pill 2 (Aggregation Hub), stacked
-       tight -> Live Report Pixel Map -> Crowd Source America™ narrative ->
-       Learn More drawer -> City Snapshot tiles -> 3-pill "Explore More
-       Data" stack -> Launch Mobile Reporter + App Store row -> Institutional
-       Gateway buttons -> footer (which now also carries the real Export
-       Civic Record trigger, see the note above). ===== -->
+  <!-- ===== HOMEPAGE SCROLL ORDER (updated per this round's branding-cleanup
+       corrective spec): Locked Header (carries the one "CITIXEN UX™" brand
+       mark) -> green Smart Location bar -> "Citizen Dashboard" sub-header
+       + tagline -> Gateway Pill 1 (Public Ledger) + Pill 2 (Aggregation
+       Hub), stacked tight -> Live Report Pixel Map -> Crowd Source
+       America™ narrative -> Learn More drawer -> City Snapshot tiles ->
+       3-pill "Explore More Data" stack -> Launch Mobile Reporter + App
+       Store row -> Institutional Gateway buttons -> footer (which also
+       carries the real Export Civic Record trigger, see the note above).
+       The duplicate center-page "CITIXEN UX™" hero block that used to sit
+       between the location bar and the pills has been removed outright —
+       see the note above the Citizen Dashboard sub-header. ===== -->
 
   <!-- ===== The "LIVE CIVIC RECORD / Export Record ↗" gateway pill that used
        to sit here (directly above City Snapshot) was removed per this
