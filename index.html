@@ -67,9 +67,10 @@
      this page draws from these two tokens instead of each component
      hardcoding its own base + hairline-border rule: a translucent Deep
      Midnight Navy (#0B101D) glass card fill (with blur, so the page's own
-     navy canvas shows faintly through) and a matching Laser Mint hairline
-     with a subtle breathing glow (see .telemetry-card/@keyframes
-     telemetryGlow and similar per-component glow rules below). */
+     navy canvas shows faintly through) and a matching Laser Mint hairline.
+     A per-component breathing box-shadow glow used to layer on top of this
+     hairline on several cards; this round's "Zero Neon Bloom" spec retired
+     all of that in favor of the plain, calm 1px keyline seen here. */
   --surface-card-bg:rgba(11,16,29,0.85) !important;
   --surface-card-border:1px solid rgba(0,230,153,0.22) !important;
   --surface-input-bg:rgba(3,7,18,0.95) !important;
@@ -250,8 +251,8 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
    literal spec. ===== */
 .hub-row{display:flex;flex-direction:column;max-width:920px;margin:0 auto 26px;padding:0 16px;box-sizing:border-box}
 .hub-card{position:relative;display:flex;align-items:center;justify-content:space-between;width:100%;
-  background:var(--surface-card-bg);backdrop-filter:blur(12px);box-shadow:0 0 12px rgba(0,230,153,.08);
-  border:var(--surface-card-border);border-radius:9999px;padding:12px 18px;
+  background:var(--surface-card-bg);backdrop-filter:blur(12px);
+  border:var(--surface-card-border);border-radius:12px;padding:12px 18px;
   margin-bottom:14px;box-sizing:border-box;cursor:pointer;color:var(--text);text-align:left;
   transition:border-color .15s;font-family:inherit;min-width:0;gap:10px}
 .hub-card:last-child{margin-bottom:0}
@@ -262,31 +263,24 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 /* The circled "(i)" info badge (.hub-card-info) that used to trigger the
    section-preview modal was removed per an earlier round's spec — it
    visually overlapped the main icon/arrow CTA. The same real trigger now
-   lives on the subtitle text itself (moved to the right-hand action group
-   per this round's button-anatomy spec — Left: dot + icon + bold title;
-   Right: muted subtitle + arrow, with no dash separator anywhere), so it
-   gets an underline-on-hover affordance instead of a separate badge. */
+   lives on the subtitle text itself (in the right-hand action group —
+   Left: icon + bold title; Right: muted subtitle + arrow, with no dash
+   separator anywhere), so it gets an underline-on-hover affordance instead
+   of a separate badge. */
 .hub-card-sub[role="button"]{cursor:pointer;text-decoration:underline;text-decoration-color:transparent;transition:text-decoration-color .15s,color .15s}
 .hub-card-sub[role="button"]:hover{color:#00E699;text-decoration-color:#00E699}
 .hub-card-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .hub-card-arrow{font-size:.8rem;font-weight:600;color:#00E699;flex-shrink:0}
 .hub-card:hover{border-color:#00E699}
 /* ===== "LIVING TELEMETRY" TILE STYLE — layered on top of the shared
-   .hub-card shell, matching the Live Public Ledger pill's own dark glass +
-   breathing mint glow (see .ledger-pill-glow above) rather than the plain
-   translucent card surface the rest of the page uses. Dual-ring outline =
-   the mint border plus a second inset ring via box-shadow, both breathing
-   together in telemetryGlow. */
+   .hub-card shell. This round's "Zero Neon Bloom" spec retires the
+   breathing dual-ring box-shadow glow (formerly telemetryGlow) and the
+   leading pulsing dot (formerly .telemetry-pulse-dot, now fully removed —
+   the Rule-of-Three button anatomy in this round's spec has no dot at all)
+   in favor of the same calm, static 1px Laser Mint border every other card
+   on the page uses, at the shared 12px corner radius. */
 .telemetry-card{background:rgba(3,7,18,.85);border:1px solid rgba(0,230,153,.35);
-  border-radius:14px;animation:telemetryGlow 3s ease-in-out infinite}
-@keyframes telemetryGlow{
-  0%,100%{box-shadow:0 0 14px rgba(0,230,153,.35),inset 0 0 0 1px rgba(0,230,153,.12)}
-  50%{box-shadow:0 0 20px rgba(0,230,153,.55),inset 0 0 0 1px rgba(0,230,153,.22)}
-}
-.telemetry-pulse-dot{position:relative;width:7px;height:7px;border-radius:50%;background:#00E699;
-  flex-shrink:0;box-shadow:0 0 6px #00E699;display:inline-block}
-.telemetry-pulse-dot::after{content:'';position:absolute;inset:-4px;border-radius:50%;
-  border:2px solid #00E699;animation:pulseEmerald 1.8s ease-out infinite}
+  border-radius:12px}
 
 /* ===== CITIXEN UX™ INTERACTIVE FEATURE & SECURITY SECTION — rebuilt in an
    earlier round (item 4) from a static 3-column bullet grid into a
@@ -375,16 +369,19 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
    share the same .nav-jurisdiction-badge look; this row just lays them out
    side by side and lets them wrap/shrink gracefully on narrow screens. */
 /* ===== GEOTAGGED LOCAL TELEMETRY SCORECARD (this round's item 4) — a
-   single full-width card replacing the previous round's dual pill row,
-   using the same Deep Midnight Navy glass + Laser Mint keyline surface
-   tokens as every other card on the page. Its header doubles as the real
-   jurisdiction/Change-Location trigger. ===== */
+   single full-width card replacing an earlier round's dual pill row, using
+   the same Deep Midnight Navy glass + Laser Mint keyline surface tokens as
+   every other card on the page. Its header doubles as the real
+   jurisdiction/Change-Location trigger. This round's "Zero Neon Bloom" +
+   "Calm Base, Centered Title" spec retires the breathing telemetryGlow
+   animation and centers the now-plain, dot-free header text; the card's
+   corner radius is standardized to 12px alongside the Live Public Ledger
+   pill and the Civic Intelligence Stack buttons. ===== */
 .telemetry-scorecard-card{display:block;width:100%;max-width:640px;text-align:left;
   background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);
-  border-radius:14px;padding:14px 18px;cursor:pointer;font-family:inherit;color:var(--text);
-  animation:telemetryGlow 3s ease-in-out infinite}
-.telemetry-scorecard-head{display:flex;align-items:center;gap:8px;color:var(--mint2);
-  font-size:.72rem;font-weight:800;letter-spacing:.04em;margin-bottom:12px}
+  border-radius:12px;padding:14px 18px;cursor:pointer;font-family:inherit;color:var(--text)}
+.telemetry-scorecard-head{display:flex;align-items:center;justify-content:center;color:var(--mint2);
+  font-size:.72rem;font-weight:800;letter-spacing:.04em;margin-bottom:12px;text-align:center}
 .telemetry-scorecard-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center}
 .telemetry-scorecard-col{padding:6px 2px}
 .telemetry-scorecard-val{font-size:1.15rem;font-weight:900;color:#FFFFFF}
@@ -471,14 +468,6 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 
 .filter-tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
 
-/* ===== LEDGER CARD ===== */
-.ledger-card{border-color:rgba(0,230,153,.35)}
-.ledger-tag{font-size:.62rem;color:var(--muted);letter-spacing:.4px;margin-bottom:12px}
-.ledger-row{margin-bottom:12px}
-.ledger-row:last-child{margin-bottom:0}
-.ledger-head{display:flex;justify-content:space-between;font-size:.76rem;margin-bottom:4px}
-.ledger-head b{color:var(--text)}
-.ledger-amt{font-size:.72rem;color:var(--muted)}
 
 /* ===== DASHBOARD VIEW-SWITCHER ===== */
 .dash-tabs{display:flex;gap:8px;padding:14px 20px 0}
@@ -509,14 +498,6 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .filter-tab.active{border-color:var(--mint2);background:rgba(0,230,153,.14);color:var(--mint2)}
 .filter-tab.active[data-filter="Critical"]{border-color:var(--danger);color:#fca5a5;background:rgba(239,68,68,.12)}
 .filter-tab.active[data-filter="Warning"]{border-color:var(--warn);color:#fde68a;background:rgba(245,158,11,.12)}
-
-/* ===== LEDGER FILTER ===== */
-.ledger-filters{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
-.ledger-filter{background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--muted);
-  font-size:.6rem;font-weight:700;padding:4px 9px;border-radius:20px;cursor:pointer;font-family:var(--mono)}
-.ledger-filter.active{border-color:var(--mint2);background:rgba(0,230,153,.14);color:var(--mint2)}
-.ledger-row{transition:opacity .15s}
-.ledger-row.dimmed{opacity:.28}
 
 .map-src-tag{font-family:var(--mono);font-size:.6rem;color:var(--muted);letter-spacing:.4px;
   position:absolute;bottom:8px;right:12px;background:rgba(5,9,10,.7);padding:2px 8px;border-radius:4px;z-index:500}
@@ -875,60 +856,46 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 /* 3x3 Analytics Matrix */
 .matrix-summary-section{padding-top:32px}
 
-/* ===== UNIFIED SINGLE-LINE GATEWAY PILLS — all 3 top-level gateway
-   buttons (Live Public Ledger, Crowd Source America™ Aggregation Hub,
-   Export/Print Civic Record) share this one .gateway-pill shell per this
-   round's spec: a thin single-line horizontal pill, left-aligned
-   "[dot] LIVE" indicator. Per-button border/background colors are set
-   inline on each button (Fresh Mint #00E699 border for the data gateway,
-   white for the print action) rather than via variant
-   classes, matching the exact markup given this round. .pulsing-dot is
-   the one shared "LIVE" indicator — Emerald Green (#00E699), strictly
-   reserved for live/active indicators per this round's palette-pivot
-   spec — reused by all 3 buttons and by the pixel map's city nodes. ===== */
+/* ===== UNIFIED SINGLE-LINE GATEWAY PILL — the Live Public Ledger button
+   is the sole remaining user of this .gateway-pill shell (the Aggregation
+   Hub and Export/Print pills that once shared it were relocated/retired in
+   earlier rounds). This round's "Zero Neon Bloom" spec retires the
+   breathing box-shadow glow and the blinking "LIVE" dot in favor of a
+   calm, static 1px Laser Mint border on Deep Midnight Navy — the same
+   plain-frame language as the Crowd Save America map card — and a
+   uniform 12px rectangular corner radius shared with the Scorecard and
+   Civic Intelligence Stack buttons. ===== */
+/* Ledger Trust Subtitle (this round's item 2.3) — centered, muted line
+   directly above the Live Public Ledger pill reassuring the reader the
+   ledger costs nothing and needs no identity to use. */
+.ledger-trust-subtitle{max-width:640px;margin:0 auto 10px;padding:0 24px;
+  text-align:center;color:#9CA3AF;font-size:.76rem;font-weight:500}
 .ledger-banner-section{max-width:640px;margin:0 auto 24px;padding:0 24px}
 /* Gap below the Live Public Ledger pill before the national map box, per
-   this round's item 3 literal spec (margin-bottom: 16px) — the pill is now
-   the only one directly above the map, since the Aggregation Hub pill that
-   used to stack beneath it was relocated (see .pixel-map-brand /
+   an earlier round's item 3 literal spec (margin-bottom: 16px) — the pill
+   is the only one directly above the map, since the Aggregation Hub pill
+   that used to stack beneath it was relocated (see .pixel-map-brand /
    .pixel-map-view-trigger, nested inside the map card itself). */
 .gateway-pill-stacked{margin-bottom:16px}
-/* Equal sizing for both pills per this round's item 3 — identical
-   min-height/padding/box-sizing/flex/radius baked into the shared class so
-   Public Ledger and Aggregation Hub can never drift apart in dimensions. */
 .gateway-pill{display:flex;justify-content:space-between;align-items:center;width:100%;
-  min-height:52px;box-sizing:border-box;padding:14px 20px;border-radius:9999px;
+  min-height:52px;box-sizing:border-box;padding:14px 20px;border-radius:12px;
   cursor:pointer;font-family:inherit;text-decoration:none;
   transition:filter .15s}
 .gateway-pill-left{display:inline-flex;align-items:center;gap:6px;flex-shrink:0;font-size:.75rem;font-weight:700}
-/* Typographic hierarchy per this round's item 1: "PUBLIC LEDGER" is the
-   pill's visual focal point (1.1rem/800), sized well above the LIVE badge
-   and the View Now action on either side of it. */
+/* Typographic hierarchy: "PUBLIC LEDGER" is the pill's visual focal point
+   (1.1rem/800), sized well above the LIVE badge and the View Now action on
+   either side of it. */
 .gateway-pill-center{flex:1 1 auto;flex-grow:1;min-width:0;text-align:center;font-weight:800;font-size:1.1rem;
   letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   padding:0 8px}
 .gateway-pill-right{flex-shrink:0;text-align:right;font-size:.8rem;font-weight:600;color:#00E699;
   white-space:nowrap}
 .gateway-pill:hover{filter:brightness(1.2)}
-.pulsing-dot{position:relative;width:8px;height:8px;border-radius:50%;background:#00E699;flex-shrink:0;
-  box-shadow:0 0 6px #00E699;display:inline-block}
-.pulsing-dot::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid #00E699;
-  animation:pulseEmerald 1.8s ease-out infinite}
-@keyframes pulseEmerald{
-  0%{transform:scale(.6);opacity:.9}
-  100%{transform:scale(2.2);opacity:0}
-}
-/* LIVE PUBLIC LEDGER glowing pill (this round's item 2) — a Fresh Mint
-   box-shadow glow with a slow breathing pulse, layered on top of the
-   shared .gateway-pill shell via this dedicated class rather than an
-   unwieldy inline `animation` property. */
-.ledger-pill-glow{border:1px solid rgba(0,230,153,.25);background:#090D16;
-  animation:ledgerPillGlow 2.5s ease-in-out infinite}
-@keyframes ledgerPillGlow{
-  0%,100%{box-shadow:0 0 14px rgba(0,230,153,.55),inset 0 0 6px rgba(0,230,153,.2)}
-  50%{box-shadow:0 0 22px rgba(0,230,153,.85),inset 0 0 10px rgba(0,230,153,.35)}
-}
-
+/* Calm, static frame for the Live Public Ledger pill — replaces the
+   earlier .ledger-pill-glow breathing box-shadow class outright (this
+   round's Zero Neon Bloom spec), reusing the same surface tokens as every
+   other calm card on the page. */
+.gateway-pill-calm{border:var(--surface-card-border);background:var(--bg-obsidian)}
 
 /* ===== TRADEMARK (™) TYPOGRAPHY — lightweight superscript treatment
    applied via <sup class="tm-symbol"> across headings/copy, distinct from
@@ -1315,28 +1282,32 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   <p class="citizen-dashboard-subheader"><span class="cds-white">Citixen</span> <span class="cds-mint">Dashboard</span></p>
   <p class="hero-tagline-subtle">Real-time community reporting and municipal tracking.</p>
 
-  <!-- ===== GEOTAGGED LOCAL TELEMETRY SCORECARD (this round's item 4,
-       replacing last round's dual side-by-side status pills with a single
-       3-column card). The header itself IS the jurisdiction/Change
+  <!-- ===== GEOTAGGED SCORECARD (this round's item 2.5 — "Calm Base,
+       Centered Title"). The header itself IS the jurisdiction/Change
        Location trigger (same real openLocationPicker() flow the old
-       #navJurisdictionBadge used). All three metrics are computed live in
-       updateTelemetryScorecard() from this jurisdiction's real
-       ledgerTickets/ward data — not the spec's illustrative "90/112",
-       "42.5%", "3.2 Days" figures, which this dataset (2 known La Crosse
-       wards, a small real seeded ticket set) has no way to match exactly:
+       #navJurisdictionBadge used), now a plain centered static line per
+       this round's "no blinking indicators" spec — the pulsing-dot marker
+       used in earlier rounds is removed outright here (not just
+       de-animated), and .pulsing-dot has no other caller left on this
+       page, so its CSS/keyframe were removed with it. All three metrics
+       are still computed live in updateTelemetryScorecard() from this
+       jurisdiction's real ledgerTickets/ward data — not the spec's
+       illustrative "7/10", "100%", "0.8 Days" figures, which this dataset
+       (2 known La Crosse wards, a small real seeded ticket set) has no way
+       to match exactly:
        * Reports Resolved — resolved / total real tickets for this city.
        * City Covered — the same real ward-coverage percentage
-         (logged wards / known wards) as last round's Block Coverage
+         (logged wards / known wards) as an earlier round's Block Coverage
          Ticker/Ward Coverage Tracker; true census-block granularity stays
          the disclosed H3 roadmap target in the Civic Memory™ Architecture
          drawer.
-       * Avg SLA Response — average resolutionHours across this city's
-         resolved tickets, converted to days. ===== -->
+       * Avg City Response (renamed this round from "Avg SLA Response" for
+         plain-English clarity) — average resolutionHours across this
+         city's resolved tickets, converted to days. ===== -->
   <section class="geo-pill-section" style="padding-top:8px;">
     <button type="button" class="telemetry-scorecard-card" id="navJurisdictionBadge" aria-label="Change your jurisdiction">
       <div class="telemetry-scorecard-head">
-        <span class="pulsing-dot"></span>
-        <span id="navJurisdictionText">LA CROSSE, WI — LOCAL TELEMETRY SCORECARD</span>
+        <span id="navJurisdictionText">LA CROSSE, WI SCORECARD</span>
       </div>
       <div class="telemetry-scorecard-grid">
         <div class="telemetry-scorecard-col">
@@ -1349,7 +1320,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         </div>
         <div class="telemetry-scorecard-col">
           <div class="telemetry-scorecard-val" id="scorecardSla">—</div>
-          <div class="telemetry-scorecard-lbl">Avg SLA Response</div>
+          <div class="telemetry-scorecard-lbl">Avg City Response</div>
         </div>
       </div>
     </button>
@@ -1361,88 +1332,78 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        beneath it has been removed from this position — see note below).
        Opens the existing #ledgerDrawer (same drawer as the footer's
        Codex/audit links). Uses the unified single-line .gateway-pill
-       shell: Fresh Mint border/background, Fresh Mint "LIVE" badge, flush
-       flex alignment (space-between, 14px 20px padding, 52px min-height,
-       16px bottom margin via .gateway-pill-stacked). Per this round's
-       item 3, the trailing text is now the static action label "View Now"
-       rather than the real live ticket count — the count itself was
-       genuine (bound to /api/coverage/big3 via loadBig3()), but the spec
-       calls for a plain call-to-action here instead, so the now-unused
-       #ledgerBannerCount span and its loadBig3() binding are removed
-       rather than left as dead markup. This round's item 2 adds an
-       animated Fresh Mint glow with a slow breathing pulse via the new
-       .ledger-pill-glow class (moved out of the inline style attribute
-       into a dedicated class + @keyframes, since an inline `animation`
-       property would be unwieldy here). ===== -->
+       shell: flush flex alignment (space-between, 14px 20px padding,
+       52px min-height, 16px bottom margin via .gateway-pill-stacked). Per
+       an earlier round's item 3, the trailing text is the static action
+       label "View Now" rather than the real live ticket count — the count
+       itself was genuine (bound to /api/coverage/big3 via loadBig3()), but
+       the spec calls for a plain call-to-action here instead, so the
+       now-unused #ledgerBannerCount span and its loadBig3() binding were
+       removed rather than left as dead markup. This round's "Zero Neon
+       Bloom" spec retires the breathing Fresh Mint glow (formerly
+       .ledger-pill-glow) and the blinking "LIVE" dot in favor of the calm
+       static .gateway-pill-calm frame and a plain "LIVE" label, plus a
+       centered, muted "free & anonymous" trust line directly above the
+       pill. ===== -->
+  <p class="ledger-trust-subtitle">free &amp; anonymous</p>
   <section class="ledger-banner-section gateway-pill-stacked">
-    <button id="liveLedgerBanner" class="gateway-pill ledger-pill-glow" type="button" style="border-radius: 9999px;">
-      <span class="gateway-pill-left" style="color: #00E699;"><span class="pulsing-dot"></span>LIVE</span>
+    <button id="liveLedgerBanner" class="gateway-pill gateway-pill-calm" type="button">
+      <span class="gateway-pill-left" style="color: #00E699;">LIVE</span>
       <span class="gateway-pill-center" style="color: #FFFFFF;">PUBLIC LEDGER</span>
       <span class="gateway-pill-right">View Now ↗</span>
     </button>
   </section>
 
-  <!-- ===== CIVIC INTELLIGENCE STACK™ — moved this round from below the
-       "How Your Report Moves" diagram to directly beneath the Live Public
-       Ledger pill (see the new HOMEPAGE SCROLL ORDER note above the pill),
-       and restyled from plain translucent hub-cards into "Living
-       Telemetry" tiles matching the Live Public Ledger pill's own dark
-       glass + breathing mint glow treatment (.telemetry-card below). Each
-       tile's own static "View / Export ↗" side-button is gone — clicking
-       the tile still opens its real deep-dive panel exactly as before
-       (aria-controls unchanged), and exporting that panel is now reached
-       via the universal long-press / right-click / Cmd+P (or Ctrl+P)
-       shortcut wired to every data card in attachCardExportShortcuts()
-       below, rather than a dedicated on-card button crowding the UI. ===== -->
+  <!-- ===== CIVIC INTELLIGENCE STACK™ — sits directly beneath the Live
+       Public Ledger pill. This round's "Rule of Three" spec drops the
+       "YOUR" prefix from the section title and each card title, and
+       reduces the stack from 4 tiles to 3 — Analytics, Municipal Portal,
+       Civic Memory™ — dropping the standalone Expenditures/Projects &
+       Public Works card outright. Its target deep-dive
+       (#civicStackSection, the CapEx Audit Ledger / SLA cost model) had no
+       other real entry point on the page, so per this session's
+       dead-code-removal convention that panel and its exclusive JS
+       (setLedger(), the .ledger-filter delegation, renderSlaCostModel(),
+       the hubSlaBtn listener, and the submoduleExpenditures info-modal
+       entry) were removed with it rather than left unreachable — see the
+       JS section below. Tiles keep the calm, static .telemetry-card frame
+       (this round's "Zero Neon Bloom" spec — no more breathing glow or
+       pulsing leading dot) at the shared 12px corner radius. Analytics and
+       Municipal Portal still reveal their existing real deep-dive panels
+       (deepdiveAnalytics; renderMunicipalPanel()/#municipalPanel — no
+       fabricated citywide asset inventory; its coverage/risk figures are
+       honest proxies computed from the same real ledger tickets and
+       jurisdiction directory the rest of the page already uses). Civic
+       Memory™'s real trigger stays repointed to #civicCharterDrawer (State
+       Constitution / Spatial Hashing / Privacy Protocols tabs). The Live
+       Public Ledger itself is not orphaned by any of this: it keeps its
+       own dedicated top-level entry point, the "LIVE PUBLIC LEDGER" pill
+       directly above this stack. ===== -->
   <div id="civic-stack-container">
   <section class="matrix-summary-section" id="matrixSummarySection">
-    <h3 style="color: #00E699; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin: 20px 0 6px; text-align: center;">Your Civic Intelligence Stack<sup class="tm-symbol">™</sup></h3>
+    <h3 style="color: #00E699; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin: 20px 0 6px; text-align: center;">Civic Intelligence Stack<sup class="tm-symbol">™</sup></h3>
     <p style="color:var(--muted);font-size:.78rem;text-align:center;font-style:italic;margin:0 0 16px;">Click on any live module below for an instant report.</p>
   </section>
 
-  <!-- ===== "LIVING TELEMETRY" 4-TILE STACK — grown from three pills to
-       four in an earlier round, adding a real "Municipal" button (see
-       renderMunicipalPanel()/#municipalPanel below — no fabricated
-       citywide asset inventory; its coverage/risk figures are honest
-       proxies computed from the same real ledger tickets and jurisdiction
-       directory the rest of the page already uses). Analytics and
-       Expenditures still reveal their existing real deep-dive panels
-       (deepdiveAnalytics; civicStackSection scrolled to ledgerCard). Civic
-       Memory™ is relabeled "Architecture & Charter" and its real trigger
-       is repointed to #civicCharterDrawer (State Constitution / Spatial
-       Hashing / Privacy Protocols tabs). The Live Public Ledger itself is
-       not orphaned by this: it keeps its own dedicated top-level entry
-       point, the "LIVE PUBLIC LEDGER" pill directly above this stack. ===== -->
   <div class="hub-row" role="navigation" aria-label="Deep-dive sections">
     <button class="hub-card telemetry-card" id="hubCoverageBtn" type="button" aria-expanded="false" aria-controls="deepdiveAnalytics" data-export-context="Analytics &amp; Reporting">
       <span class="hub-card-main">
-        <span class="telemetry-pulse-dot" aria-hidden="true"></span>
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><rect x="6" y="10" width="3" height="9"/><rect x="11" y="6" width="3" height="13"/><rect x="16" y="13" width="3" height="6"/></svg>
-        <span class="hub-card-title">Your Analytics</span>
+        <span class="hub-card-title">Analytics</span>
       </span>
       <span class="hub-card-actions"><span class="hub-card-sub" id="hubCoverageInfoBtn" role="button" tabindex="0" aria-label="What the Analytics section covers">Data &amp; Reports</span><span class="hub-card-arrow">↗</span></span>
     </button>
-    <button class="hub-card telemetry-card" id="hubSlaBtn" type="button" aria-expanded="false" aria-controls="civicStackSection" data-export-context="the CapEx Audit Ledger">
+    <button class="hub-card telemetry-card" id="hubMunicipalBtn" type="button" aria-expanded="false" aria-controls="municipalPanel" data-export-context="the Municipal Work Orders &amp; Response Tracker">
       <span class="hub-card-main">
-        <span class="telemetry-pulse-dot" aria-hidden="true"></span>
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7V5a2 2 0 0 1 2-2h8"/><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M2 11h20"/><circle cx="17" cy="15" r="1.3" fill="#00E699" stroke="none"/></svg>
-        <span class="hub-card-title">Your Expenditures</span>
-      </span>
-      <span class="hub-card-actions"><span class="hub-card-sub" id="hubSlaInfoBtn" role="button" tabindex="0" aria-label="What the Expenditures section covers">Projects &amp; Public Works</span><span class="hub-card-arrow">↗</span></span>
-    </button>
-    <button class="hub-card telemetry-card" id="hubMunicipalBtn" type="button" aria-expanded="false" aria-controls="municipalPanel" data-export-context="the Municipal Work Orders &amp; SLA Tracker">
-      <span class="hub-card-main">
-        <span class="telemetry-pulse-dot" aria-hidden="true"></span>
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9l8-5 8 5v12"/><path d="M9 21v-6h6v6"/><path d="M4 21h16"/></svg>
-        <span class="hub-card-title">Your Municipal Portal</span>
+        <span class="hub-card-title">Municipal Portal</span>
       </span>
-      <span class="hub-card-actions"><span class="hub-card-sub" id="hubMunicipalInfoBtn" role="button" tabindex="0" aria-label="What the Municipal section covers">Work Orders &amp; SLA</span><span class="hub-card-arrow">↗</span></span>
+      <span class="hub-card-actions"><span class="hub-card-sub" id="hubMunicipalInfoBtn" role="button" tabindex="0" aria-label="What the Municipal section covers">Work Orders &amp; Response</span><span class="hub-card-arrow">↗</span></span>
     </button>
     <button class="hub-card telemetry-card" id="hubStackBtn" type="button" aria-expanded="false" aria-controls="civicCharterDrawer" data-export-context="the Civic Memory™ Public Ledger &amp; Standards">
       <span class="hub-card-main">
-        <span class="telemetry-pulse-dot" aria-hidden="true"></span>
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 21 8 12 13 3 8 12 3"/><polyline points="3 13 12 18 21 13"/><polyline points="3 18 12 23 21 18"/></svg>
-        <span class="hub-card-title">Your Civic Memory™</span>
+        <span class="hub-card-title">Civic Memory™</span>
       </span>
       <span class="hub-card-actions"><span class="hub-card-sub" id="hubStackInfoBtn" role="button" tabindex="0" aria-label="What the Civic Memory framework covers">Public Ledger &amp; Standards</span><span class="hub-card-arrow">↗</span></span>
     </button>
@@ -1879,75 +1840,15 @@ audio.pw-audio-el{width:100%;margin-top:4px}
          above City Snapshot. ===== -->
   </section>
 
-  <!-- ===== DEEP-DIVE: THE CIVIC STACK & OPERATIONS CONTAINER (hidden until
-       hubSlaBtn "Expenditures & Projects" or hubStackBtn "The Civic Stack &
-       Operations" is clicked — both open this same container, scrolled to
-       the relevant anchor inside it, rather than duplicating it twice). ===== -->
-  <section class="deepdive-panel civic-stack-section" id="civicStackSection">
-    <div class="deepdive-panel-head">
-      <h3>Expenditures &amp; Operations</h3>
-      <div class="deepdive-head-actions">
-        <button class="deepdive-export-btn" data-export-context="the CapEx Audit Ledger" type="button">Export ↗</button>
-        <button class="deepdive-close" data-close-panel="civicStackSection" type="button">Close ✕</button>
-      </div>
-    </div>
-    <p class="statement-sub">Municipal Expenditure Allocation, the CapEx Audit Ledger, and the Civic Stack integrations behind every verified fix.</p>
-
-    <!-- ===== CITYWIDE MUNICIPAL EXPENDITURE & ALLOCATION — same id/markup as
-         before (only its position changed), including its existing "not an
-         official finance record" disclosure. ===== -->
-    <div class="card ledger-card" id="ledgerCard" style="max-width:640px;width:100%;margin:0 auto 20px;">
-      <div class="label"><span id="ledgerTitle">CITYWIDE MUNICIPAL EXPENDITURE &amp; ALLOCATION</span></div>
-      <div class="ledger-tag">AI Categorization Engine // Real-Time Capital Tracking</div>
-
-      <div class="ledger-filters" id="ledgerFilters">
-        <button class="ledger-filter active" data-lfilter="All">All</button>
-        <button class="ledger-filter" data-lfilter="Roads">Roads</button>
-        <button class="ledger-filter" data-lfilter="Lighting">Lighting</button>
-        <button class="ledger-filter" data-lfilter="Sanitation">Sanitation</button>
-        <button class="ledger-filter" data-lfilter="Ada">ADA</button>
-      </div>
-
-      <div class="ledger-row" data-lcat="Roads">
-        <div class="ledger-head"><b>Roads &amp; Pavement</b><span class="ledger-amt" id="ledgerRoadsAmt">$124,500 (42%)</span></div>
-        <div class="bar"><span id="ledgerRoadsBar" style="width:42%"></span></div>
-      </div>
-      <div class="ledger-row" data-lcat="Lighting">
-        <div class="ledger-head"><b>Safety &amp; Lighting Grid</b><span class="ledger-amt" id="ledgerLightingAmt">$82,900 (28%)</span></div>
-        <div class="bar"><span id="ledgerLightingBar" style="width:28%;background:var(--warn)"></span></div>
-      </div>
-      <div class="ledger-row" data-lcat="Sanitation">
-        <div class="ledger-head"><b>Sanitation &amp; Waste</b><span class="ledger-amt" id="ledgerSanitationAmt">$53,300 (18%)</span></div>
-        <div class="bar"><span id="ledgerSanitationBar" style="width:18%"></span></div>
-      </div>
-      <div class="ledger-row" data-lcat="Ada">
-        <div class="ledger-head"><b>ADA &amp; Sidewalk Access</b><span class="ledger-amt" id="ledgerAdaAmt">$35,500 (12%)</span></div>
-        <div class="bar"><span id="ledgerAdaBar" style="width:12%"></span></div>
-      </div>
-      <div class="small" style="margin-top:10px;">(Estimated) — clustered from resolved field reports.</div>
-      <!-- ===== SLA COST MODELING (this round's Module 2 request) — the
-           per-unit figures ($350/pothole, $1,200/streetlight) are the
-           spec's own disclosed public-contract-average assumptions, applied
-           here to real, live category counts from ledgerTickets rather
-           than to a fabricated total. Clearly labeled as an illustrative
-           estimate, not a verified municipal invoice. ===== -->
-      <div class="small" id="ledgerSlaCostModel" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);"></div>
-      <button class="btn btn-outline" id="btnViewItemizedLedger" type="button" style="width:100%;justify-content:center;margin-top:12px;">View Itemized Civic Memory Ledger Entries ↗</button>
-      <div class="small" style="margin-top:8px;color:var(--muted);">Per-project supporting-document attachments — coming soon.</div>
-    </div>
-
-    <!-- ===== CIVIC STACK INTEGRATIONS & ADMINISTRATIVE DATA — the Municipal
-         Onboarding Portal wizard this card used to link to was removed
-         entirely this round (per this round's explicit Operations-drawer
-         cleanup instruction: button, modal markup, and its JS all
-         deleted — see the JS section below for what that took with it).
-         This card is left as a plain, honest status statement rather than
-         pointing at a control that no longer exists. ===== -->
-    <div class="card" id="civicStackAdminCard" style="max-width:640px;width:100%;margin:0 auto 20px;">
-      <div class="label" style="justify-content:center">Civic Stack Integrations &amp; Administrative Data</div>
-      <div class="small" style="margin:8px 0;">ERP webhook dispatch (Tyler Tech / Accela), PII-blur, and 911-redirect configuration for onboarding a new jurisdiction is not currently exposed anywhere in this build — the client-side wizard that used to demonstrate it was removed this round along with its only entry point.</div>
-    </div>
-  </section>
+  <!-- ===== The "Expenditures & Operations" deep-dive (CapEx Audit Ledger,
+       SLA cost modeling, Civic Stack Integrations admin card) was removed
+       outright this round along with the Civic Intelligence Stack's
+       Expenditures tile (its only entry point) — per this session's
+       dead-code-removal convention rather than leaving an unreachable
+       panel on the page. Its exclusive JS (setLedger(), the
+       .ledger-filter delegation, renderSlaCostModel()/SLA_COST_PER_UNIT,
+       the hubSlaBtn click listener, and the submoduleExpenditures
+       info-modal entry) was removed with it — see the JS section below. ===== -->
 
   <!-- ===== DEEP-DIVE: MUNICIPAL — WORK ORDERS & SLA TRACKER (hidden until
        hubMunicipalBtn is clicked) — new this round. This dataset has no
@@ -1962,9 +1863,9 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        example. ===== -->
   <section class="deepdive-panel civic-stack-section" id="municipalPanel">
     <div class="deepdive-panel-head">
-      <h3>Municipal — Work Orders &amp; SLA Tracker</h3>
+      <h3>Municipal — Work Orders &amp; Response</h3>
       <div class="deepdive-head-actions">
-        <button class="deepdive-export-btn" data-export-context="the Municipal Work Orders &amp; SLA Tracker" type="button">Export ↗</button>
+        <button class="deepdive-export-btn" data-export-context="the Municipal Work Orders &amp; Response Tracker" type="button">Export ↗</button>
         <button class="deepdive-close" data-close-panel="municipalPanel" type="button">Close ✕</button>
       </div>
     </div>
@@ -2125,11 +2026,10 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     <div class="export-record-box" id="exportRecordContent"></div>
   </div>
 
-  <!-- ===== INTEGRATED SHARE &amp; EXPORT HUB (this round's item 5) — one
-       shared modal reachable from the new "Export ↗" button inside each of
-       the 4 Civic Intelligence Stack deep-dive panels (Analytics,
-       Expenditures, Municipal, Civic Memory). Every action is a real,
-       working capability rather than a fabricated one:
+  <!-- ===== INTEGRATED SHARE &amp; EXPORT HUB — one shared modal reachable
+       from the "Export ↗" button inside each of the Civic Intelligence
+       Stack's deep-dive panels (Analytics, Municipal, Civic Memory). Every
+       action is a real, working capability rather than a fabricated one:
        - "Print / Save to PDF" reuses the exact same real, already-built
          Export Civic Record flow (openExportRecordModal()) instead of a
          second print implementation.
@@ -2349,7 +2249,6 @@ function applyCitySelection(key){
   document.getElementById('healthScore').innerHTML=`${c.health} <span style="font-size:1rem;color:var(--muted)">/ 100</span>`;
   document.getElementById('healthSla').textContent=`Dispatch response SLA: ${c.sla}% on-time`;
   setBar('Roads',c.roads); setBar('Lighting',c.lighting); setBar('Sanitation',c.sanitation);
-  setLedger(c);
   updateTelemetry(c);
   if(map) map.flyTo([c.lat,c.lng], c.zoom, { duration:1.3 });
   const gridSel = document.getElementById('gridSelect');
@@ -2378,17 +2277,6 @@ function updateTelemetry(c){
   set('telResolved', c.resolvedWeek);
   set('telTotal', c.totalWeek);
 }
-function fmtUSD(n){ return '$'+n.toLocaleString('en-US'); }
-function setLedger(c){
-  document.getElementById('ledgerTitle').textContent = `${c.region} Municipal Expenditure & Allocation`;
-  const map2={ roads:'Roads', lighting:'Lighting', sanitation:'Sanitation', ada:'Ada' };
-  Object.entries(map2).forEach(([key,suffix])=>{
-    const [amt,pct]=c.ledger[key];
-    document.getElementById('ledger'+suffix+'Amt').textContent = `${fmtUSD(amt)} (${pct}%)`;
-    document.getElementById('ledger'+suffix+'Bar').style.width = pct+'%';
-  });
-}
-
 /* ===== FEED ===== */
 function renderFeed(){
   const c=document.getElementById('feed'); c.innerHTML='';
@@ -2459,18 +2347,6 @@ document.querySelectorAll('.bar-row').forEach(row=>{
   });
 });
 
-/* ===== FILTERABLE PUBLIC LEDGER ===== */
-document.querySelectorAll('.ledger-filter').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    document.querySelectorAll('.ledger-filter').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    const sel=btn.dataset.lfilter;
-    document.querySelectorAll('.ledger-row').forEach(row=>{
-      row.classList.toggle('dimmed', sel!=='All' && row.dataset.lcat!==sel);
-    });
-  });
-});
-
 const modalData={
   submoduleAnalytics:{
     title:'Analytics — What This Section Covers',
@@ -2478,14 +2354,6 @@ const modalData={
       ['SLA Performance','How quickly reports are routed and resolved against each ward\'s published response-time commitment.'],
       ['Hazard Category Frequency','Which hazard categories (roads, lighting, sanitation, etc.) are reported most often, ward by ward.'],
       ['Response Time Trends','How resolution speed is moving over time, drawn from the same dispatch data field crews see.']
-    ]
-  },
-  submoduleExpenditures:{
-    title:'Expenditures — What This Section Covers',
-    body:[
-      ['Capital Improvement Allocations','How budgeted capital-improvement dollars are distributed across active repair categories.'],
-      ['Ward-by-Ward Resource Spend','Itemized, per-ward spend estimates drawn from resolved-case categories in the Civic Memory ledger.'],
-      ['Repair ROI','A rough return-on-investment read on completed repairs — cost against the hazard volume it resolved.']
     ]
   },
   submoduleOperations:{
@@ -2597,12 +2465,10 @@ function openModal(key){
 }
 
 
-/* ===== DEEP-DIVE PANEL TOGGLES — the 3 drill-down hubs below the map each
-   reveal (rather than navigate to) their target panel; a second click on
-   the same hub, or its own Close button, hides it again. Two hubs
-   ("Expenditures & Projects" / "The Civic Stack & Operations") share one
-   panel (civicStackSection) and only differ in which element inside it
-   they scroll to. ===== */
+/* ===== DEEP-DIVE PANEL TOGGLES — the 3 Civic Intelligence Stack tiles
+   below the Live Public Ledger pill each reveal (rather than navigate to)
+   their target panel; a second click on the same tile, or its own Close
+   button, hides it again. ===== */
 function openDeepdivePanel(panelId, scrollToId, triggerBtn){
   const panel = document.getElementById(panelId);
   if (!panel) return;
@@ -2628,32 +2494,6 @@ document.getElementById('hubCoverageBtn').addEventListener('click', async (e) =>
   if (!ledgerTickets.length) ledgerTickets = await fetchLedgerTickets();
   renderWardCoverageTracker();
 });
-document.getElementById('hubSlaBtn').addEventListener('click', async (e) => {
-  openDeepdivePanel('civicStackSection', 'ledgerCard', e.currentTarget);
-  if (!ledgerTickets.length) ledgerTickets = await fetchLedgerTickets();
-  renderSlaCostModel();
-});
-// SLA Cost Modeling — see the markup comment on #ledgerSlaCostModel for
-// why these per-unit figures are used against real category counts rather
-// than a fabricated total.
-const SLA_COST_PER_UNIT = { Pothole: 350, Streetlight: 1200 };
-function renderSlaCostModel(){
-  const el = document.getElementById('ledgerSlaCostModel');
-  if (!el) return;
-  const j = activeJurisdiction();
-  const cityTickets = j ? ledgerTickets.filter(t => t.city === j.city && t.state === j.state) : [];
-  const parts = Object.keys(SLA_COST_PER_UNIT).map(cat => {
-    const count = cityTickets.filter(t => t.category === cat).length;
-    return { cat, count, cost: count * SLA_COST_PER_UNIT[cat] };
-  }).filter(p => p.count > 0);
-  const total = parts.reduce((sum, p) => sum + p.cost, 0);
-  if (!parts.length) {
-    el.textContent = 'No Pothole or Streetlight reports on file for this jurisdiction yet to model.';
-    return;
-  }
-  const breakdown = parts.map(p => p.count + ' ' + p.cat + (p.count === 1 ? '' : 's') + ' × $' + SLA_COST_PER_UNIT[p.cat].toLocaleString()).join(', ');
-  el.innerHTML = '<b>SLA Cost Modeling (estimated):</b> ~$' + total.toLocaleString() + ' — ' + esc(breakdown) + '. Public-contract-average unit costs applied to this jurisdiction\'s real logged report counts — not a verified municipal invoice.';
-}
 document.getElementById('hubMunicipalBtn').addEventListener('click', async (e) => {
   e.currentTarget.setAttribute('aria-expanded', 'true');
   if (!ledgerTickets.length) ledgerTickets = await fetchLedgerTickets();
@@ -2898,7 +2738,6 @@ document.getElementById('citixenTileSecurity').addEventListener('click', () => t
 // the two interactions from firing together on the same click.
 const hubInfoBindings = [
   ['hubCoverageInfoBtn', 'submoduleAnalytics'],
-  ['hubSlaInfoBtn', 'submoduleExpenditures'],
   ['hubMunicipalInfoBtn', 'submoduleMunicipal'],
   ['hubStackInfoBtn', 'submoduleCivicMemory']
 ];
@@ -3400,13 +3239,14 @@ function applyJurisdiction(j, opts){
 // called directly from initLocationIntake() with the raw detection guess
 // (see below) so the header updates the instant GPS/IP detection resolves,
 // rather than waiting on the separate confirm-gated jurisdiction flow. This
-// round's spec format is "CITY, ST — LOCAL TELEMETRY SCORECARD" (all caps),
-// replacing the previous "City, ST • Active" pill phrasing.
+// round's spec format is the shorter, plain "CITY, ST SCORECARD" (all
+// caps), replacing the previous "CITY, ST — LOCAL TELEMETRY SCORECARD"
+// phrasing.
 function updateSmartLocationBanner(j){
   const textEl = document.getElementById('navJurisdictionText');
   if (!textEl) return;
   if (j) {
-    textEl.textContent = (j.cityName + ', ' + j.state.toUpperCase() + ' — Local Telemetry Scorecard').toUpperCase();
+    textEl.textContent = (j.cityName + ', ' + j.state.toUpperCase() + ' Scorecard').toUpperCase();
   }
 }
 document.getElementById('navJurisdictionBadge').addEventListener('click', () => openLocationPicker());
@@ -3431,7 +3271,6 @@ function syncDashboardToJurisdiction(j){
     document.getElementById('healthScore').innerHTML = `${c.health} <span style="font-size:1rem;color:var(--muted)">/ 100</span>`;
     document.getElementById('healthSla').textContent = `Dispatch response SLA: ${c.sla}% on-time`;
     setBar('Roads', c.roads); setBar('Lighting', c.lighting); setBar('Sanitation', c.sanitation);
-    setLedger(c);
     updateTelemetry(c);
     if (map) map.flyTo([c.lat, c.lng], c.zoom, { duration: 1.3 });
     // City Snapshot (which used to be re-labeled here too) was removed
@@ -3441,7 +3280,6 @@ function syncDashboardToJurisdiction(j){
     currentWardHealth = c.health;
   } else {
     document.getElementById('healthCity').textContent = j.cityName || 'Citywide';
-    document.getElementById('ledgerTitle').textContent = 'CITYWIDE MUNICIPAL EXPENDITURE & ALLOCATION';
   }
 }
 
@@ -4476,8 +4314,6 @@ document.getElementById('liveLedgerBanner').addEventListener('click', () => open
 // Intelligence copy behind a toggle) was removed entirely per this
 // round's item 5 — #btnLearnMoreToggle and #learnMoreDrawer no longer
 // exist in the markup, so this show/hide wiring is removed with them.
-const btnViewItemizedLedgerEl = document.getElementById('btnViewItemizedLedger');
-if (btnViewItemizedLedgerEl) btnViewItemizedLedgerEl.addEventListener('click', () => openLedgerDrawer());
 document.getElementById('ledgerCloseBtn').addEventListener('click', closeLedgerDrawer);
 document.getElementById('ledgerDrawer').addEventListener('click', (e) => { if (e.target.id === 'ledgerDrawer') closeLedgerDrawer(); });
 
