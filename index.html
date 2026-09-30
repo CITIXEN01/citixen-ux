@@ -609,6 +609,28 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 }
 .nowrap-pair{white-space:nowrap}
 
+/* ===== HIGH-PRIORITY EXPORT/PRINT GATEWAY — a solid Emerald Green
+   action button sitting above the City Snapshot container, distinct
+   from the Report Generator's own #btnExportPrintReport button (see
+   #btnCsaExportPrint's click handler: a plain window.print(), no
+   report-render step first). Dark text/icon for contrast against the
+   solid fill, a soft outer glow, and a dark blinking dot indicator
+   (light-on-dark, the inverse of the emerald-on-dark dots used
+   elsewhere) so it still reads clearly against the green background. ===== */
+.csa-print-gateway-section{max-width:640px;margin:0 auto 26px;padding:0 24px}
+.csa-print-gateway-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;
+  background:#00FF87;border:none;border-radius:12px;padding:14px 16px;cursor:pointer;
+  color:#050505;font-weight:800;font-size:.82rem;letter-spacing:.4px;
+  box-shadow:0 0 18px rgba(0,255,135,.45)}
+.csa-print-gateway-btn:hover{box-shadow:0 0 24px rgba(0,255,135,.65)}
+.csa-print-gateway-dot{position:relative;width:8px;height:8px;border-radius:50%;background:#050505;flex-shrink:0}
+.csa-print-gateway-dot::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid #050505;
+  animation:pulseGatewayDot 1.8s ease-out infinite}
+@keyframes pulseGatewayDot{
+  0%{transform:scale(.6);opacity:.8}
+  100%{transform:scale(2.4);opacity:0}
+}
+
 /* ===== TRADEMARK (™) TYPOGRAPHY — lightweight superscript treatment
    applied via <sup class="tm-symbol"> across headings/copy this round,
    distinct from the two pre-existing frozen <sup class="brand-tm"> ™
@@ -621,24 +643,27 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 .tm-symbol-flush{margin-left:0 !important}
 
 /* ===== NATIONAL LIVE REPORT PIXEL MAP — decorative, stylized US
-   silhouette rendered as a dense grid of dim pixels with bright,
-   pulsing city nodes. Purely decorative (see renderNationalPixelMap());
-   the silhouette is a hand-authored approximation, not a precise
-   cartographic projection — same convention as the Aggregation Hub's
-   own stylized marker layout. Per this round's motion-fix spec, nodes
-   are stationary: @keyframes staticPulse only fades opacity in place
-   (no transform/scale, no panning or floating) so each node stays
-   strictly pinned at its fixed coordinate. ===== */
+   silhouette rendered as a dense grid of dim, cyan-tinted pixels clipped
+   strictly inside a crisp vector outline of the US mainland (also traced
+   with a visible stroke, .pixel-map-outline, via <use> of the same path
+   so the coastline reads clearly), with bright Emerald Green (#00FF87)
+   city nodes only — no cyan/blue nodes, per this round's spec. Purely
+   decorative (see renderNationalPixelMap()); the silhouette is a
+   hand-authored approximation, not a precise cartographic projection —
+   same convention as the Aggregation Hub's own stylized marker layout.
+   Nodes and grid-pixel flashes are stationary: @keyframes staticPulse
+   only fades opacity in place (no transform/scale, no panning or
+   floating) so nothing on this canvas ever pans, moves, or zooms. ===== */
 .pixel-map-section{max-width:720px;margin:0 auto 20px;padding:0 24px}
-.pixel-map-card{position:relative;height:190px;background:#000;border:1px solid #0284C7;border-radius:16px;overflow:hidden}
+.pixel-map-card{position:relative;height:190px;background:#050505;border:1px solid #0284C7;border-radius:16px;overflow:hidden}
 .pixel-map-svg{width:100%;height:100%;display:block}
-.pixel-map-dot{opacity:.2}
+.pixel-map-dot{opacity:.2;transition:fill .2s}
+.pixel-map-dot-active{fill:#00FF87 !important;opacity:.95;animation:staticPulse 1.1s ease-out}
+.pixel-map-outline{fill:none;stroke:#0EA5E9;stroke-width:1.5;opacity:.55}
 .pixel-map-node-core{opacity:0}
 .pixel-map-node-pulse{opacity:0}
 .pixel-map-node-emerald .pixel-map-node-core{fill:#00FF87}
 .pixel-map-node-emerald .pixel-map-node-pulse{fill:#00FF87}
-.pixel-map-node-cyan .pixel-map-node-core{fill:#0EA5E9}
-.pixel-map-node-cyan .pixel-map-node-pulse{fill:#0EA5E9}
 .pixel-map-node-core{animation:staticPulse 2.4s ease-in-out infinite}
 .pixel-map-node-pulse{animation:staticPulse 2.4s ease-in-out infinite reverse}
 @keyframes staticPulse{
@@ -889,9 +914,24 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   <section class="hero-qa-section">
     <div class="hero-qa-block">
       <h2 class="hero-qa-heading">What is <span style="color:#00FF87;">CITIXEN UX<sup class="tm-symbol tm-symbol-flush">™</sup></span>?</h2>
-      <p style="margin-bottom: 1.25rem;"><span style="color:#00FF87; font-weight:bold;">CITIXEN UX<sup class="tm-symbol tm-symbol-flush">™</sup></span> is the modern standard for resident-first municipal engagement.</p>
-      <p style="margin-bottom: 1.25rem;">Powered by <span style="color:#00FF87; font-weight:bold;">Civic Intelligence (C.I.)</span>, CITIXEN UX<sup class="tm-symbol tm-symbol-flush">™</sup> combines real-time resident reporting with direct city department tracking and transparent project budget auditing.</p>
-      <p style="margin-bottom: 1.5rem;"><span style="color:#00FF87; font-weight:bold;">Creating an uneditable public record, you hold the receipt</span> to ensure your tax dollars actively protect and improve your neighborhood.</p>
+      <p style="margin-bottom: 1.25rem;">
+        <span style="color:#00FF87; font-weight:bold;">CITIXEN UX<sup class="tm-symbol tm-symbol-flush">™</sup></span> is the modern standard for resident-first municipal engagement.<br>
+        <span style="color:#00FF87; font-weight:bold; display: inline-flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 0.95rem;">
+          <span style="display:inline-flex; align-items:center; gap:4px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00FF87" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Snap
+          </span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00FF87" stroke-width="2" opacity="0.6"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          <span style="display:inline-flex; align-items:center; gap:4px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00FF87" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Track
+          </span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00FF87" stroke-width="2" opacity="0.6"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          <span style="display:inline-flex; align-items:center; gap:4px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00FF87" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Audit
+          </span>
+        </span>
+      </p>
+      <p style="margin-bottom: 1.25rem;"><span style="color:#00FF87; font-weight:bold;">CITIXEN UX<sup class="tm-symbol tm-symbol-flush">™</sup></span> combines real-time resident reporting with direct city department tracking and transparent project budget auditing.</p>
+      <p style="margin-bottom: 1.5rem;"><span style="color:#00FF87; font-weight:bold;">Creating an uneditable public record, you hold the receipt</span> to ensure your tax dollars actively protect and improve your neighborhood. <span style="color:#00FF87; font-weight:bold;">Welcome to the era of Civic Intelligence (C.I.).</span></p>
     </div>
   </section>
 
@@ -915,15 +955,18 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </button>
   </section>
 
-  <!-- ===== NATIONAL LIVE REPORT PIXEL MAP — Position 3, re-ordered this
-       round to sit directly BENEATH the Aggregation Hub gateway button
-       (was above it). A decorative, stylized US silhouette (a refined,
-       hand-authored approximation used only as an SVG clip-path — same
+  <!-- ===== NATIONAL LIVE REPORT PIXEL MAP — Position 3, sits directly
+       BENEATH the Aggregation Hub gateway button. A decorative, stylized
+       US silhouette (a refined, hand-authored approximation — same
        "stylized layout, not a geographic projection" convention as the
-       Aggregation Hub's own markers) rendered as a dense grid of dim
-       pixels, with five bright city nodes (La Crosse, Chicago, Austin,
-       New York, Los Angeles) alternating Emerald/Cyan. Nodes are
-       stationary — fixed pixel coordinates, opacity-only staticPulse
+       Aggregation Hub's own markers) traced once via #usSilhouetteOutline
+       and reused (via <use>) both as the clip-path for the dim cyan grid
+       and as a crisp, visible coastline stroke (.pixel-map-outline) on
+       top of it, so the two can never drift out of sync. Grid pixels
+       flash Emerald Green at randomized intervals (igniteRandomPixel(),
+       see below) and the map interior carries only Emerald Green city
+       nodes — no cyan/blue nodes, per this round's spec. Everything here
+       is stationary — fixed coordinates, opacity-only staticPulse
        animation, no panning/floating/zooming (see the CSS notes above
        and renderNationalPixelMap() below). Purely decorative; it draws
        no real per-city report data, unlike the Aggregation Hub's
@@ -932,11 +975,13 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     <div class="pixel-map-card" id="national-pixel-map">
       <svg class="pixel-map-svg" viewBox="0 0 800 440" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
         <defs>
+          <path id="usSilhouetteOutline" d="M120,40 L150,35 L400,30 L600,35 L650,60 L630,90 L660,110 L645,130 L630,160 L620,190 L640,200 L610,230 L600,260 L615,290 L650,320 L660,360 L630,380 L590,350 L560,330 L520,340 L480,350 L440,360 L400,370 L370,390 L340,400 L300,395 L280,370 L250,340 L220,320 L180,310 L140,290 L110,260 L100,220 L90,180 L85,140 L95,100 L110,60 Z"/>
           <clipPath id="usSilhouetteClip">
-            <path d="M120,40 L150,35 L400,30 L600,35 L650,60 L630,90 L660,110 L645,130 L630,160 L620,190 L640,200 L610,230 L600,260 L615,290 L650,320 L660,360 L630,380 L590,350 L560,330 L520,340 L480,350 L440,360 L400,370 L370,390 L340,400 L300,395 L280,370 L250,340 L220,320 L180,310 L140,290 L110,260 L100,220 L90,180 L85,140 L95,100 L110,60 Z"/>
+            <use href="#usSilhouetteOutline"/>
           </clipPath>
         </defs>
         <g id="pixelMapGrid" clip-path="url(#usSilhouetteClip)"></g>
+        <use href="#usSilhouetteOutline" class="pixel-map-outline"/>
         <g id="pixelMapNodes"></g>
       </svg>
     </div>
@@ -992,6 +1037,24 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        row -> Institutional Gateway buttons -> footer. The Live Public
        Ledger banner sits directly beneath the hero (see it just below the
        SECTION FREEZE boundary above), ahead of the alternating cadence. ===== -->
+
+  <!-- ===== HIGH-PRIORITY EXPORT/PRINT GATEWAY — a second, more prominent
+       print entry point sitting directly ABOVE the City Snapshot
+       container, per this round's spec. Distinct from the existing
+       #btnExportPrintReport button inside the Report Generator card below
+       (which renders the report output first, then prints): this one is
+       a simple, one-click window.print() trigger for whatever is
+       currently on screen — no report-render step. Solid Emerald Green
+       background with dark text, a soft glow, and a live blinking dot
+       indicator (reuses the same .ledger-banner-pulse pulse-ring pattern
+       used elsewhere on this page). ===== -->
+  <section class="csa-print-gateway-section">
+    <button class="csa-print-gateway-btn" id="btnCsaExportPrint" type="button">
+      <span class="csa-print-gateway-dot" aria-hidden="true"></span>
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#050505" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      EXPORT / PRINT CIVIC RECORD
+    </button>
+  </section>
 
   <!-- ===== CITY SNAPSHOT — a single geolocated dashboard for the visitor's
        own jurisdiction. #snapshot-city-name starts as "Detecting
@@ -2589,21 +2652,24 @@ document.getElementById('matrixGrid').addEventListener('click', (e) => {
 });
 
 /* =====================================================================
-   NATIONAL LIVE REPORT PIXEL MAP — draws the dense dim-pixel grid inside
-   the hand-authored #usSilhouetteClip SVG clip-path, then overlays five
-   bright, pulsing city nodes (La Crosse, Chicago, Austin, New York, Los
-   Angeles) alternating Emerald (#00FF87) and Electric Cyan (#0EA5E9).
-   This is purely decorative — it draws no real per-city report data,
-   unlike the Aggregation Hub's live-tagged La Crosse marker elsewhere on
-   this page — and the silhouette itself is a stylized approximation, not
-   a precise cartographic projection (same convention documented on the
-   Aggregation Hub's own marker layout).
+   NATIONAL LIVE REPORT PIXEL MAP — draws the dense dim cyan-tinted pixel
+   grid inside the hand-authored #usSilhouetteClip SVG clip-path, then
+   overlays seven bright, pulsing Emerald Green (#00FF87) city nodes — no
+   cyan/blue nodes, per this round's spec. igniteRandomPixel() then
+   randomly flashes individual grid squares Emerald Green at randomized
+   intervals to simulate live aggregated reporting. This is purely
+   decorative — it draws no real per-city report data, unlike the
+   Aggregation Hub's live-tagged La Crosse marker elsewhere on this page
+   — and the silhouette itself is a stylized approximation, not a precise
+   cartographic projection (same convention documented on the
+   Aggregation Hub's own marker layout). Everything here is stationary:
+   nodes and flashed pixels only fade opacity in place (@keyframes
+   staticPulse) — nothing pans, floats, or zooms.
    ===================================================================== */
 function renderNationalPixelMap(){
   const grid = document.getElementById('pixelMapGrid');
   const nodesLayer = document.getElementById('pixelMapNodes');
   if (!grid || !nodesLayer) return;
-  const svgNS = 'http://www.w3.org/2000/svg';
   const cols = 40, rows = 22, cell = 800 / cols;
   let dots = '';
   for (let r = 0; r < rows; r++) {
@@ -2618,21 +2684,47 @@ function renderNationalPixelMap(){
   // the refined silhouette clip-path — not derived from real
   // latitude/longitude. Fixed, stationary coordinates: nodes never pan,
   // float, or move — only their opacity pulses (see @keyframes
-  // staticPulse), per this round's motion-fix spec.
+  // staticPulse), per this round's motion-fix spec. All Emerald Green —
+  // cyan/blue nodes were removed outright this round.
   const nodes = [
-    { name: 'La Crosse', x: 420, y: 110, color: 'emerald' },
-    { name: 'Chicago',    x: 460, y: 130, color: 'cyan' },
-    { name: 'Austin',     x: 330, y: 370, color: 'emerald' },
-    { name: 'New York',   x: 620, y: 140, color: 'cyan' },
-    { name: 'Los Angeles',x: 110, y: 240, color: 'emerald' }
+    { name: 'La Crosse',  x: 420, y: 110 },
+    { name: 'Chicago',    x: 460, y: 130 },
+    { name: 'Austin',     x: 330, y: 370 },
+    { name: 'New York',   x: 620, y: 140 },
+    { name: 'Los Angeles',x: 110, y: 240 },
+    { name: 'Miami',      x: 630, y: 355 },
+    { name: 'Seattle',    x: 115, y: 65 }
   ];
-  nodesLayer.innerHTML = nodes.map(n => {
-    const cls = 'pixel-map-node-' + n.color;
-    return '<g class="' + cls + '">' +
+  nodesLayer.innerHTML = nodes.map(n =>
+    '<g class="pixel-map-node-emerald">' +
       '<circle class="pixel-map-node-pulse" cx="' + n.x + '" cy="' + n.y + '" r="10"></circle>' +
       '<circle class="pixel-map-node-core" cx="' + n.x + '" cy="' + n.y + '" r="4"></circle>' +
-      '</g>';
-  }).join('');
+    '</g>'
+  ).join('');
+
+  scheduleNextPixelIgnite();
+}
+
+// Flashes a single random grid pixel Emerald Green for one staticPulse
+// cycle (opacity-only, no scale/transform), then hands off to a
+// randomized-delay setTimeout for the next flash — so illuminations
+// arrive at randomized intervals rather than a fixed tick, per this
+// round's spec, with no zooming, moving, or floating canvas movement.
+function igniteRandomPixel(){
+  const grid = document.getElementById('pixelMapGrid');
+  if (!grid) return;
+  const dots = grid.querySelectorAll('.pixel-map-dot');
+  if (!dots.length) return;
+  const dot = dots[Math.floor(Math.random() * dots.length)];
+  dot.classList.add('pixel-map-dot-active');
+  setTimeout(() => dot.classList.remove('pixel-map-dot-active'), 1100);
+}
+function scheduleNextPixelIgnite(){
+  const delay = 200 + Math.random() * 700;
+  setTimeout(() => {
+    igniteRandomPixel();
+    scheduleNextPixelIgnite();
+  }, delay);
 }
 
 /* =====================================================================
@@ -2708,6 +2800,11 @@ function renderReportOutput(){
 });
 const exportPrintBtn = document.getElementById('btnExportPrintReport');
 if (exportPrintBtn) exportPrintBtn.addEventListener('click', () => { renderReportOutput(); window.print(); });
+// High-priority gateway button above City Snapshot — a simple, direct
+// window.print() trigger per this round's spec, with no report-render
+// step first (distinct from #btnExportPrintReport above).
+const csaExportPrintBtn = document.getElementById('btnCsaExportPrint');
+if (csaExportPrintBtn) csaExportPrintBtn.addEventListener('click', () => window.print());
 
 /* =====================================================================
    WARD HEALTH SUMMARY — ONE-CLICK PDF EXPORT (client-side, via jsPDF)
