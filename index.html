@@ -221,7 +221,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .hub-row{display:flex;flex-direction:column;max-width:920px;margin:0 auto 26px;padding:0 16px;box-sizing:border-box}
 .hub-card{position:relative;display:flex;align-items:center;justify-content:space-between;width:100%;
   background:#030712;box-shadow:0 0 12px rgba(0,230,153,.08);
-  border:1px solid rgba(0,230,153,.35);border-radius:9999px;padding:12px 18px;
+  border:1px solid rgba(0,230,153,.25);border-radius:9999px;padding:12px 18px;
   margin-bottom:14px;box-sizing:border-box;cursor:pointer;color:var(--text);text-align:left;
   transition:border-color .15s;font-family:inherit;min-width:0;gap:10px}
 .hub-card:last-child{margin-bottom:0}
@@ -254,16 +254,22 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 
 #installStatus{font-size:.66rem;color:var(--muted);margin-top:8px}
 
-.privacy-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(0,230,153,.08);
-  border:1px solid #00E699;color:#00E699;border-radius:20px;padding:10px 18px;
-  font-size:.78rem;font-weight:700;cursor:pointer;align-self:center;margin-top:18px;transition:border-color .15s}
-.privacy-pill:hover{border-color:#00E699;filter:brightness(1.15)}
-/* Top-of-page placement (moved above the brand title, per global header restructure).
-   Bottom padding + border gives it clear breathing room from the brand/title block
-   directly below, instead of sitting flush against it. */
-.top-privacy-banner{display:flex;justify-content:center;background:var(--bg-obsidian);
-  padding:14px 16px 16px;border-bottom:1px solid var(--border)}
-.top-privacy-banner .privacy-pill{margin-top:0}
+/* The floating "Privacy & Anonymity Engine — Verified" top banner
+   (.privacy-pill/.top-privacy-banner) was removed per this round's nav
+   cleanup — its real openModal('anonymity') trigger is relocated to the
+   footer sitemap (#footerAnonymityLink) instead of being deleted. */
+/* ===== NAV JURISDICTION BADGE — right side of the top nav, mirroring the
+   app's own "● City, ST • Active" .badge/.badge-dot pattern exactly (see
+   #headerWardLabel in app.html). Replaces the old floating "Locating your
+   jurisdiction…" banner; the real resolved-jurisdiction text and the
+   "Change Location" trigger both now live here (see
+   updateSmartLocationBanner()/openLocationPicker() below) rather than on
+   a separate banner element. ===== */
+.nav-jurisdiction-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,230,153,.12);
+  border:1px solid rgba(0,230,153,.4);color:var(--mint2);font-size:.72rem;font-weight:700;
+  padding:7px 14px;border-radius:20px;cursor:pointer;font-family:inherit;flex-shrink:0;
+  transition:border-color .15s,filter .15s}
+.nav-jurisdiction-badge:hover{border-color:#00E699;filter:brightness(1.15)}
 
 /* ===== BENTO DECK ===== */
 /* #dashboard is now a column wrapper (tab bar + one active view); the row
@@ -467,7 +473,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   align-items:center;justify-content:center;padding:20px}
 .modal-overlay.open{display:flex}
 .modal-box{background:#030712;box-shadow:0 0 12px rgba(0,230,153,.08);
-  border:1px solid rgba(0,230,153,.35);border-radius:14px;padding:24px;
+  border:1px solid rgba(0,230,153,.25);border-radius:14px;padding:24px;
   max-width:480px;width:100%;max-height:80vh;overflow-y:auto}
 .modal-box h3{font-size:1.05rem;margin-bottom:14px;color:var(--mint2)}
 .modal-box h4{font-size:.82rem;margin:14px 0 4px;color:var(--text)}
@@ -514,7 +520,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
    fill). ===== */
 .pw-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:3200;display:none}
 .pw-overlay.open{display:flex;justify-content:flex-end}
-.pw-panel{width:min(480px,100vw);height:100%;background:#030712;box-shadow:0 0 12px rgba(0,230,153,.08);border-left:1px solid rgba(0,230,153,.35);
+.pw-panel{width:min(480px,100vw);height:100%;background:#030712;box-shadow:0 0 12px rgba(0,230,153,.08);border-left:1px solid rgba(0,230,153,.25);
   overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
 .pw-head{display:flex;justify-content:space-between;align-items:center}
 .pw-head h3{color:var(--mint2);font-size:1.05rem}
@@ -565,11 +571,10 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   .telemetry-mini-row{grid-template-columns:1fr}
 }
 
-/* ===== SMART LOCATION HEADER (persistent, always visible) ===== */
-.location-banner{display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(0,230,153,.06);
-  border-bottom:1px solid var(--border);padding:8px 16px;font-size:.76rem;font-weight:700;color:#00E699;flex-wrap:wrap}
-.location-banner button{background:none;border:none;color:#00E699;font-size:.7rem;font-weight:800;cursor:pointer;
-  text-decoration:underline;padding:0}
+/* The floating "Locating your jurisdiction…" banner (.location-banner)
+   was removed per this round's nav cleanup — see .nav-jurisdiction-badge
+   above, which now carries this same real resolved-jurisdiction text and
+   "Change Location" trigger inside the top nav itself. */
 
 /* ===== BIG 3 STAT ROW (reusable — mirrors app.html's) ===== */
 .big3-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
@@ -634,7 +639,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
    purge" (retires the earlier rgba(15,23,42,.75) frosted-glass fill). ===== */
 .ledger-drawer{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:2800;display:none}
 .ledger-drawer.open{display:flex;justify-content:flex-end}
-.ledger-drawer-panel{width:min(520px,100vw);height:100%;background:#030712;box-shadow:0 0 12px rgba(0,230,153,.08);border-left:1px solid rgba(0,230,153,.35);
+.ledger-drawer-panel{width:min(520px,100vw);height:100%;background:#030712;box-shadow:0 0 12px rgba(0,230,153,.08);border-left:1px solid rgba(0,230,153,.25);
   display:flex;flex-direction:column}
 .ledger-drawer-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--border)}
 .ledger-drawer-body{flex:1;overflow-y:auto;padding:16px 18px 32px}
@@ -745,17 +750,16 @@ audio.pw-audio-el{width:100%;margin-top:4px}
    floating) so nothing on this canvas ever pans, moves, or zooms. ===== */
 .pixel-map-section{max-width:720px;margin:0 auto 20px;padding:0 24px}
 /* Fill pivoted from a translucent slate glass to flat obsidian (#030712);
-   the border stays a crisp Fresh Mint stroke. Per this round's map-sizing
-   spec, the card is now a column layout — a fixed-height SVG graphic area
-   on top, plus a normal-flow action row (.pixel-map-action-row) beneath it
-   for the "View Map ↗" trigger — instead of one flat height with the
-   button absolutely overlaid on the graphic, so the button can no longer
-   cover the Florida/East Coast region of the silhouette. */
-.pixel-map-card{position:relative;display:flex;flex-direction:column;background:#030712;border:1px solid rgba(0,230,153,.35);border-radius:16px;overflow:hidden;box-shadow:0 0 12px rgba(0,230,153,.08)}
-/* Per this round's item 2, the SVG graphic is pushed down (margin-top)
-   below the now top-left-anchored title so the northern US border never
-   overlaps the title text. */
-.pixel-map-svg{width:100%;height:210px;display:block;flex-shrink:0;margin-top:28px}
+   the border stays a crisp Fresh Mint stroke. The card is a column
+   layout — a header row, the SVG graphic area, then a normal-flow action
+   row (.pixel-map-action-row) for the "View Map ↗" trigger — instead of
+   one flat height with the button absolutely overlaid on the graphic, so
+   the button can no longer cover the Florida/East Coast region of the
+   silhouette. Padding widened this round (20px top/sides) so the header
+   and graphic both sit comfortably inside the frame with clear breathing
+   room rather than crowding it. */
+.pixel-map-card{position:relative;display:flex;flex-direction:column;background:#030712;border:1px solid rgba(0,230,153,.25);border-radius:16px;overflow:hidden;box-shadow:0 0 12px rgba(0,230,153,.08);padding:20px 20px 0}
+.pixel-map-svg{width:100%;height:210px;display:block;flex-shrink:0;margin:0 auto}
 .pixel-map-dot{opacity:.2;transition:fill .25s,opacity .4s}
 /* Grid fills pivoted from Emerald Green (#00E699) to Fresh Mint (#00E699)
    per this round's item 18. */
@@ -767,19 +771,18 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 .pixel-map-node-pulse{opacity:0}
 .pixel-map-node-emerald .pixel-map-node-core{fill:#00E699}
 .pixel-map-node-emerald .pixel-map-node-pulse{fill:#00E699}
-/* ===== INTEGRATED MAP CARD BRANDING — per this round's item 2, the brand
-   title is anchored in the TOP-LEFT corner of the card frame (rather than
-   centered across the top) as an overlay above the SVG graphic area
-   (z-index:2 keeps it above the grid/nodes without touching the SVG's own
-   z-ordering); .pixel-map-svg's margin-top pushes the graphic itself down
-   so the northern US border never sits under the title text. The
-   "View Map ↗" trigger stays in a normal-flow action row BELOW the
-   graphic (.pixel-map-action-row), anchored to the bottom-right corner of
-   the same card frame, so neither label ever overlaps the map. ===== */
-.pixel-map-brand{position:absolute;top:16px;left:16px;z-index:2;
-  color:#00E699;font-weight:700;font-size:.88rem;letter-spacing:.05em;pointer-events:none}
+/* ===== INTEGRATED MAP CARD BRANDING — the brand title is a normal-flow
+   header centered across the top of the card frame (matching the
+   "EXPLORE MORE DATA" header's own type treatment: mint, 800 weight,
+   uppercase, wide letter-spacing), sitting fully above the SVG graphic
+   area rather than overlaid on it, so it can never crowd or overlap the
+   map. The "View Map ↗" trigger stays in a normal-flow action row BELOW
+   the graphic (.pixel-map-action-row), anchored to the bottom-right
+   corner of the same card frame. ===== */
+.pixel-map-brand{color:#00E699;font-weight:800;font-size:1.1rem;letter-spacing:.08em;
+  text-transform:uppercase;text-align:center;width:100%;margin-bottom:20px}
 .pixel-map-action-row{display:flex;justify-content:flex-end;align-items:center;
-  flex-shrink:0;padding:10px 14px 12px}
+  flex-shrink:0;padding:14px 0 16px}
 .pixel-map-view-trigger{display:inline-flex;align-items:center;gap:6px;
   background:rgba(0,230,153,.08);border:1px solid #00E699;color:#00E699;
   font-size:.72rem;font-weight:700;padding:6px 14px;border-radius:9999px;
@@ -859,16 +862,17 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 </head>
 <body>
 
-  <!-- ===== GLOBAL: Privacy & Anonymity badge — absolute top of page hierarchy,
-       above the brand title, per global header restructure. Same button/id/click
-       handler as before; only its position in the DOM moved. ===== -->
-  <div class="top-privacy-banner">
-    <button class="privacy-pill" id="privacyPillBtn">
-      <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-      Privacy &amp; Anonymity Engine — Verified
-    </button>
-  </div>
-
+  <!-- ===== HEADER / GLOBAL NAV — matches the app's clean top-nav pattern per
+       this round's web-dashboard nav cleanup: brand wordmark on the left,
+       a single live jurisdiction status badge on the right (reusing the
+       app's own "● City, ST • Active" .badge/.badge-dot look). The floating
+       "Privacy & Anonymity Engine — Verified" banner and the "Locating your
+       jurisdiction…" banner that used to stack below the header are both
+       removed; their real triggers are relocated rather than deleted —
+       the anonymity modal is now reachable from the footer sitemap
+       (#footerAnonymityLink) and "Change Location" now lives on this same
+       jurisdiction badge (see updateSmartLocationBanner()/openLocationPicker()
+       below). ===== -->
   <header class="topbar">
     <div class="brand">
       <div class="brand-logo">
@@ -879,20 +883,11 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       <div class="brand-sub">Civic Intelligence Platform</div>
     </div>
 
-    <!-- ===== "Civic Tools" dropdown removed from top nav per homepage-flow
-         refactor — friction-free header. Every action it held (Mobile Gateway,
-         Live Public Ledger, Paperwork File, Change Location, Emergency Triage)
-         now lives in the footer sitemap at the bottom of the page, or inside
-         the relevant deep-dive panel — nothing was deleted, only relocated. ===== -->
+    <button type="button" class="nav-jurisdiction-badge" id="navJurisdictionBadge" aria-label="Change your jurisdiction">
+      <span class="pulsing-dot"></span>
+      <span id="navJurisdictionText">La Crosse, WI • Active</span>
+    </button>
   </header>
-
-  <!-- ===== SMART LOCATION HEADER — persistent, reflects the SAME resolved
-       jurisdiction as detectJurisdictionGuess()/applyJurisdiction() below;
-       no second, parallel detection system. ===== -->
-  <div class="location-banner" id="smartLocationBanner">
-    <span id="smartLocationText">Locating your jurisdiction…</span>
-    <button type="button" id="smartLocationChangeBtn">Change Location</button>
-  </div>
 
   <!-- ===== LOCATION INTAKE MODAL ===== -->
   <div class="modal-overlay" id="locModalOverlay">
@@ -1061,7 +1056,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        #ledgerBannerCount span and its loadBig3() binding are removed
        rather than left as dead markup. ===== -->
   <section class="ledger-banner-section gateway-pill-stacked">
-    <button id="liveLedgerBanner" class="gateway-pill" type="button" style="border: 1px solid rgba(0, 230, 153, 0.4); background: rgba(0, 230, 153, 0.05); border-radius: 9999px;">
+    <button id="liveLedgerBanner" class="gateway-pill" type="button" style="border: 1px solid rgba(0, 230, 153, 0.25); background: #030712; border-radius: 9999px; box-shadow: 0 0 12px rgba(0, 230, 153, 0.08);">
       <span class="gateway-pill-left" style="color: #00E699;"><span class="pulsing-dot"></span>LIVE</span>
       <span class="gateway-pill-center" style="color: #FFFFFF;">PUBLIC LEDGER</span>
       <span class="gateway-pill-right">View Now ↗</span>
@@ -1098,15 +1093,17 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        staticPulse node animation, no panning/floating/zooming. Purely
        decorative; it draws no real per-city report data, unlike the
        Aggregation Hub's live-tagged La Crosse marker.
-       Per this round's map-container spec: the title overlay is centered
-       horizontally (not left-aligned) and reads "Crowd Save America"; the
-       "View Map ↗" trigger (#aggregationMapGatewayBtn) moved out of the
-       graphic area into a normal-flow .pixel-map-action-row below the SVG,
-       so the card no longer needs the button to overlap the silhouette —
-       the SVG itself grew slightly (190px -> 210px) and the card gained a
-       true bottom section, both aimed at keeping the button clear of the
-       Florida/East Coast region. Same trigger id and click handler as
-       before, so no JS wiring changed — only its position/markup moved. ===== -->
+       The title reads "CrowdSaveAmerica™", centered horizontally as a
+       normal-flow header above the SVG graphic (styled to match the
+       "EXPLORE MORE DATA" header's own type treatment) rather than an
+       overlay on top of it, with the card's own padding widened so
+       neither the header nor the graphic ever crowd the frame. The
+       "View Map ↗" trigger (#aggregationMapGatewayBtn) lives in a
+       normal-flow .pixel-map-action-row below the SVG, anchored to the
+       bottom-right corner, so it can never overlap the silhouette
+       (including the Florida/East Coast region). Same trigger id and
+       click handler throughout every round's restyling, so no JS wiring
+       has ever changed here — only position/markup. ===== -->
   <section class="pixel-map-section">
     <div class="pixel-map-card" id="national-pixel-map">
       <div class="pixel-map-brand">CrowdSaveAmerica<sup class="tm-symbol">™</sup></div>
@@ -1206,9 +1203,10 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        Completion Rate gauge card that used to live here) was removed
        entirely per an earlier round — see the JS/CSS removal notes near
        renderAnalyticsMatrix()/.gauge-card above. Only its "Explore More
-       Data" header survives, sitting directly below the Learn More
-       accordion, immediately followed by the same 3-pill hub-row it
-       always introduced. ===== -->
+       Data" header survives, sitting directly below the national map card
+       (the Learn More accordion that used to sit between them has since
+       been removed again), immediately followed by the same 3-pill
+       hub-row it always introduced. ===== -->
   <section class="matrix-summary-section" id="matrixSummarySection">
     <h3 style="color: #00E699; font-size: 1.15rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin: 24px 0 24px 0; text-align: center;">Explore More Data</h3>
   </section>
@@ -1539,6 +1537,10 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     <div class="sitemap-bottom">
       <button type="button" id="footerCodexLink" class="footer-staff-link" style="background:none;border:none;padding:0;font:inherit;cursor:pointer">Statutory Governance &amp; Precedent ↗</button>
       <button type="button" id="footerExportRecordLink" class="footer-staff-link" style="background:none;border:none;padding:0;font:inherit;cursor:pointer;margin-left:18px">Export Civic Record ↗</button>
+      <!-- Real trigger relocated from the removed top-of-page "Privacy &
+           Anonymity Engine — Verified" banner, per this round's nav
+           cleanup — opens the same Anonymity Whitepaper modal. -->
+      <button type="button" id="footerAnonymityLink" class="footer-staff-link" style="background:none;border:none;padding:0;font:inherit;cursor:pointer;margin-left:18px">Privacy &amp; Anonymity Engine ↗</button>
     </div>
     <div class="trademark-disclosure"><span style="color:#FFFFFF; font-weight:bold;">CITIXEN</span> <span style="color:#00E699; font-weight:bold;">UX</span><sup class="tm-symbol">™</sup> and Crowd Source America<sup class="tm-symbol">™</sup> are protected trademarks. Civic Intelligence, Civic Memory, Geo-Hatch, City Snapshot, and Civic Stack are proprietary marks. Protected under U.S. and international trademark laws. All other trademarks, product names, and logos are the property of their respective owners.</div>
   </footer>
@@ -2099,7 +2101,11 @@ if (geoHatchSearchBtn && geoHatchSearchInput) {
   });
 }
 
-document.getElementById('privacyPillBtn').addEventListener('click',()=> openModal('anonymity'));
+// The floating "Privacy & Anonymity Engine — Verified" top banner
+// (#privacyPillBtn) was removed per this round's nav cleanup — its real
+// openModal('anonymity') trigger now lives on the footer sitemap link
+// (#footerAnonymityLink) instead.
+document.getElementById('footerAnonymityLink').addEventListener('click',()=> openModal('anonymity'));
 document.getElementById('modalClose').addEventListener('click',()=> document.getElementById('modalOverlay').classList.remove('open'));
 document.getElementById('modalOverlay').addEventListener('click',(e)=>{
   if(e.target.id==='modalOverlay') e.currentTarget.classList.remove('open');
@@ -2245,7 +2251,7 @@ async function detectJurisdictionGuess(dir){
   if (geo) return geo;
 
   // 4) Default seed jurisdiction — "LA CROSSE, WI", displayed immediately
-  //    (see #smartLocationText's pre-filled markup / updateSmartLocationBanner())
+  //    (see #navJurisdictionText's pre-filled markup / updateSmartLocationBanner())
   //    rather than left on a "Detecting location…" placeholder while this
   //    chain runs.
   const s = dir.states.find(s => s.slug === DEFAULT_JURISDICTION.state);
@@ -2420,30 +2426,24 @@ function applyJurisdiction(j, opts){
   }
 }
 
-// SMART LOCATION HEADER — reflects the exact SAME confirmed/detected
+// NAV JURISDICTION BADGE — reflects the exact SAME confirmed/detected
 // jurisdiction the CITIXEN Paperwork File and dashboard already use (see
 // applyJurisdiction() above); no second, parallel detection system. Also
 // called directly from initLocationIntake() with the raw detection guess
-// (see below) so the header updates the instant GPS/IP detection
-// resolves, per this round's spec, rather than waiting on the separate
-// confirm-gated jurisdiction flow.
+// (see below) so the badge updates the instant GPS/IP detection resolves,
+// rather than waiting on the separate confirm-gated jurisdiction flow.
+// Formerly a standalone "Locating your jurisdiction…" banner; per this
+// round's nav cleanup it now lives inside the top nav itself, in the
+// same "City, ST • Active" phrasing as the app's own header badge
+// (#headerWardLabel in app.html).
 function updateSmartLocationBanner(j){
-  const banner = document.getElementById('smartLocationBanner');
-  const textEl = document.getElementById('smartLocationText');
-  if (!banner || !textEl) return;
-  if (j && j.source !== 'default') {
-    textEl.textContent = 'Jurisdiction: ' + j.cityName + ', ' + j.state.toUpperCase();
-    banner.classList.add('resolved');
-  } else if (j) {
-    // Honest default-jurisdiction fallback wording per this round's item 10
-    // (the literal "La Crosse, WI — Active Jurisdiction" phrasing), shown
-    // instantly whenever the 800ms-raced IP-geo chain below times out or is
-    // blocked, rather than leaving the banner on its placeholder text.
-    textEl.textContent = j.cityName + ', ' + j.state.toUpperCase() + ' — Active Jurisdiction';
-    banner.classList.remove('resolved');
+  const textEl = document.getElementById('navJurisdictionText');
+  if (!textEl) return;
+  if (j) {
+    textEl.textContent = j.cityName + ', ' + j.state.toUpperCase() + ' • Active';
   }
 }
-document.getElementById('smartLocationChangeBtn').addEventListener('click', () => openLocationPicker());
+document.getElementById('navJurisdictionBadge').addEventListener('click', () => openLocationPicker());
 
 // Bridges the GPS/IP/confirmed jurisdiction above to the dashboard's
 // Ward Health Index / gauges / Municipal Expenditure ledger, which are
