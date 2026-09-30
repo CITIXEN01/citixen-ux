@@ -35,8 +35,9 @@
   /* Global canvas pivoted from the prior Deep Slate Obsidian (#0B132B/
      #0F172A — read by this round as still "blue/navy") to ultra-dark pitch
      obsidian per this round's item 1: #030712 body, with card/glass
-     surfaces given their own explicit rgba(17,24,39,.7) + cyan-hairline +
-     blur(16px) treatment (see .modal-box, .gauge-card, .hub-card,
+     surfaces given their own explicit rgba(15,23,42,.75) + Fresh Mint hairline
+     (#00E699, cyan fully retired this round) + blur(16px) treatment (see
+     .modal-box, .gauge-card, .hub-card,
      .analytics-matrix-card, .ledger-drawer-panel below) rather than a flat
      var(--card) fill, since "frosted glass" needs the alpha + blur, not
      just a darker hex. --bg-card stays as a solid opaque fallback (same
@@ -81,7 +82,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 
 .grid-select{background:rgba(7,12,14,.8);border:1px solid var(--border);color:var(--text);
   padding:8px 12px;border-radius:8px;font-size:.76rem;font-weight:700;outline:none;min-width:230px}
-.grid-select:focus{border-color:#0EA5E9}
+.grid-select:focus{border-color:#00E699}
 
 .nav-right{display:flex;align-items:center;gap:10px;position:relative}
 .dropdown{position:relative}
@@ -149,13 +150,18 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
    subtle tagline, with tightened vertical padding so the map and live
    metrics land inside the first mobile viewport instead of scrolled below
    a second branding block. ===== */
-/* Enlarged into a bold focal-point title per this round's item 2
-   (previously a small .95rem sub-header) — the tagline beneath it pivots
-   from soft-white to muted slate (#94A3B8) to stay clearly secondary next
-   to the now much larger title. */
+/* Enlarged into a bold focal-point title (previously a small .95rem
+   sub-header) — per this round's item 2, the title itself now splits into
+   two colors via child spans (.cds-white "CITIZEN" / .cds-mint
+   "DASHBOARD") rather than one flat color on the whole line, so the base
+   class carries only shared sizing/weight/spacing, not a color. The
+   tagline beneath stays muted slate (#94A3B8) to read clearly secondary
+   next to the large title. */
 .citizen-dashboard-subheader{font-size:clamp(1.6rem,5vw,2.4rem);font-weight:900;letter-spacing:0.08em;
-  text-transform:uppercase;color:#0EA5E9;text-align:center;margin:16px 0 8px}
-.hero-tagline-subtle{text-align:center;color:#94A3B8;font-size:.9rem;
+  text-transform:uppercase;text-align:center;margin:16px 0 8px}
+.citizen-dashboard-subheader .cds-white{color:#FFFFFF}
+.citizen-dashboard-subheader .cds-mint{color:#00E699}
+.hero-tagline-subtle{text-align:center;color:#94A3B8;font-size:.88rem;
   max-width:520px;margin:0 auto 20px;padding:0 24px}
 
 /* ===== HERO Q&A BLOCKS — two white-header Q&A cards directly below the
@@ -178,10 +184,10 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 
 /* ===== CROWD SOURCE AMERICA™ NARRATIVE BLOCK (Position 3 of the
    alternating section cadence) — plain centered text, no card/box. The
-   heading itself now carries the Electric Cyan (#0EA5E9) accent — the
-   prior Civic Gold treatment was fully retired this round in favor of
-   the cyan/midnight-blue palette (see the .ledger-banner-cyan and
-   .agg-hub-heading recolors below). ===== */
+   heading itself carries the Fresh Mint (#00E699) accent — the prior
+   Civic Gold treatment, and later the cyan/midnight-blue palette, were
+   both fully retired in favor of the pure obsidian + mint palette (see
+   the .agg-hub-heading recolor below). ===== */
 .csa-banner-section{max-width:640px;margin:0 auto 8px;padding:0 24px}
 .csa-banner-card{text-align:center;padding:6px 0 18px}
 .csa-banner-heading{font-size:1.4rem;font-weight:700;color:#00FF87;letter-spacing:0.05em;margin-bottom:8px}
@@ -199,7 +205,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .app-store-row{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:14px auto 4px;max-width:520px;padding:0 24px}
 .store-badge{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid #FFFFFF;border-radius:10px;
   padding:8px 16px;color:#fff;cursor:pointer;min-width:170px}
-.store-badge:hover{border-color:#0EA5E9}
+.store-badge:hover{border-color:#00E699}
 .store-badge-icon{font-size:1.4rem;line-height:1}
 .store-badge-text{display:flex;flex-direction:column;align-items:flex-start;text-align:left}
 .store-badge-small{font-size:.58rem;color:#c9c9c9;text-transform:uppercase;letter-spacing:.3px}
@@ -209,26 +215,26 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
    style pills (Analytics / Expenditures / Operations), replacing the old
    3-column grid per this round's item 6. Same pill shell language as the
    top .gateway-pill buttons: width 100%, pill-radius, frosted-slate glass,
-   cyan hairline border, stacked with a 10px bottom margin. ===== */
+   Fresh Mint hairline border, stacked with a 10px bottom margin. ===== */
 .hub-row{display:flex;flex-direction:column;max-width:920px;margin:0 auto 26px;padding:0 16px;box-sizing:border-box}
 .hub-card{position:relative;display:flex;align-items:center;justify-content:space-between;width:100%;
-  background:rgba(17,24,39,.7);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border:1px solid rgba(14,165,233,.25);border-radius:9999px;padding:12px 18px;
+  background:rgba(15,23,42,.75);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(0,230,153,.25);border-radius:9999px;padding:12px 18px;
   margin-bottom:10px;box-sizing:border-box;cursor:pointer;color:var(--text);text-align:left;
   transition:border-color .15s;font-family:inherit;min-width:0;gap:10px}
 .hub-card:last-child{margin-bottom:0}
 .hub-card-main{display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 auto}
-.hub-card svg{stroke:#0EA5E9;flex-shrink:0}
+.hub-card svg{stroke:#00E699;flex-shrink:0}
 .hub-card-text{display:flex;align-items:baseline;gap:6px;min-width:0;flex-wrap:wrap}
 .hub-card-text .hub-card-title{font-size:.8rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
 .hub-card-sub{font-size:.72rem !important;font-weight:500 !important;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hub-card-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}
-.hub-card-arrow{font-size:.8rem;font-weight:600;color:#0EA5E9;flex-shrink:0}
+.hub-card-arrow{font-size:.8rem;font-weight:600;color:#00E699;flex-shrink:0}
 .hub-card-info{width:18px;height:18px;border-radius:50%;
-  border:1px solid #0EA5E9;color:#0EA5E9;font-size:.66rem;font-weight:700;font-style:italic;font-family:Georgia,serif;
-  display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(14,165,233,.08);flex-shrink:0}
-.hub-card-info:hover{background:rgba(14,165,233,.22)}
-.hub-card:hover{border-color:#0EA5E9}
+  border:1px solid #00E699;color:#00E699;font-size:.66rem;font-weight:700;font-style:italic;font-family:Georgia,serif;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(0,230,153,.08);flex-shrink:0}
+.hub-card-info:hover{background:rgba(0,230,153,.22)}
+.hub-card:hover{border-color:#00E699}
 @media (max-width:640px){
   .hub-row{padding:0 14px}
   .hub-card{padding:10px 14px}
@@ -362,27 +368,27 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .dispatch-mapwrap{height:220px;margin-bottom:12px}
 
 /* ===== CROWD SOURCE AMERICA™ AGGREGATION HUB — a real Leaflet map
-   (#aggregation-map-container) with Electric Cyan (#0EA5E9) markers, per
-   this round's color-palette-swap spec (Civic Gold #FFB800 is fully
-   retired). .agg-hub-heading/.agg-hub-ticker recolor this modal's two
-   ".label"/ticker headers cyan without touching the shared .label class
-   used elsewhere on the page. .tiles-degraded keeps the dark canvas
-   background visible if the OSM tile layer fails to load (see
-   initAggregationMap()'s tileerror handler). ===== */
+   (#aggregation-map-container) with Fresh Mint (#00E699) markers, per
+   this round's total blue/cyan purge (Civic Gold #FFB800 and the prior
+   cyan accent are both fully retired). .agg-hub-heading/.agg-hub-ticker
+   recolor this modal's two ".label"/ticker headers mint without touching
+   the shared .label class used elsewhere on the page. .tiles-degraded
+   keeps the dark canvas background visible if the OSM tile layer fails
+   to load (see initAggregationMap()'s tileerror handler). ===== */
 .geo-hatch-search-row{display:flex;gap:8px;margin-top:8px}
 .geo-hatch-search-row input{flex:1;min-width:0;background:rgba(7,12,14,.8);border:1px solid var(--border);
   color:var(--text);padding:10px 14px;border-radius:10px;font-size:.8rem;outline:none}
 .geo-hatch-search-row input:focus{border-color:var(--mint2)}
-.agg-hub-heading{color:#0EA5E9}
-.agg-hub-ticker{color:#0EA5E9}
+.agg-hub-heading{color:#00E699}
+.agg-hub-ticker{color:#00E699}
 .aggregation-map-wrap{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--border);background:var(--bg-obsidian)}
-.aggregation-map-wrap.tiles-degraded{background:radial-gradient(circle at 50% 40%,rgba(14,165,233,.08),var(--bg-obsidian) 72%)}
+.aggregation-map-wrap.tiles-degraded{background:radial-gradient(circle at 50% 40%,rgba(0,230,153,.08),var(--bg-obsidian) 72%)}
 #aggregation-map-container{position:absolute;inset:0;background:var(--bg-obsidian)}
 .agg-marker-beacon{position:relative;width:100%;height:100%}
-.agg-marker-beacon .agg-marker-pulse{position:absolute;inset:-6px;border-radius:50%;background:#0EA5E9;
+.agg-marker-beacon .agg-marker-pulse{position:absolute;inset:-6px;border-radius:50%;background:#00E699;
   opacity:.45;animation:beaconPulse 2s ease-out infinite}
-.agg-marker-beacon .agg-marker-core{position:absolute;inset:4px;border-radius:50%;background:#0EA5E9;
-  border:2px solid #fff;box-shadow:0 0 8px #0EA5E9}
+.agg-marker-beacon .agg-marker-core{position:absolute;inset:4px;border-radius:50%;background:#00E699;
+  border:2px solid #fff;box-shadow:0 0 8px #00E699}
 .geo-hatch-legend{position:absolute;left:16px;bottom:12px;display:flex;gap:16px;flex-wrap:wrap;z-index:1000;pointer-events:none}
 .geo-hatch-legend span{display:flex;align-items:center;gap:6px;font-size:.62rem;color:var(--muted)}
 .geo-legend-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
@@ -391,7 +397,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 /* ===== DEEP-DIVE PANELS — hidden until a drill-down hub is clicked, per
    "keep the top-level page light" refactor. Same accordion-reveal idea as
    .tier-detail above, just applied at the section level. ===== */
-.deepdive-panel{display:none;max-width:1100px;margin:0 auto;padding:28px 24px 8px;border-top:1px solid #0EA5E9}
+.deepdive-panel{display:none;max-width:1100px;margin:0 auto;padding:28px 24px 8px;border-top:1px solid #00E699}
 .deepdive-panel.open{display:block}
 .deepdive-panel-head{display:flex;justify-content:space-between;align-items:center;max-width:900px;margin:0 auto 18px}
 .deepdive-panel-head h3{font-size:1.05rem;font-weight:900}
@@ -448,13 +454,13 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .leaflet-popup-close-button{color:#ffffff !important}
 
 /* ===== MODAL — deep obsidian frosted glass per this round's item 1
-   (rgba(17,24,39,.7) + cyan hairline + backdrop-filter: blur(16px)), over
+   (rgba(15,23,42,.75) + Fresh Mint hairline + backdrop-filter: blur(16px)), over
    the same dark overlay backdrop as before. ===== */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:3000;display:none;
   align-items:center;justify-content:center;padding:20px}
 .modal-overlay.open{display:flex}
-.modal-box{background:rgba(17,24,39,.7);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border:1px solid rgba(14,165,233,.25);border-radius:14px;padding:24px;
+.modal-box{background:rgba(15,23,42,.75);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(0,230,153,.25);border-radius:14px;padding:24px;
   max-width:480px;width:100%;max-height:80vh;overflow-y:auto}
 .modal-box h3{font-size:1.05rem;margin-bottom:14px;color:var(--mint2)}
 .modal-box h4{font-size:.82rem;margin:14px 0 4px;color:var(--text)}
@@ -467,21 +473,21 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
    body.export-record-print-mode @media print rule further down, which
    isolates just this card for a clean black-on-white PDF/paper export. ===== */
 .export-record-box{max-width:640px;width:100%;max-height:86vh;overflow-y:auto;background:#050505;
-  border:1px solid #0EA5E9;border-radius:14px;padding:26px}
-.export-record-head{text-align:center;border-bottom:1px solid rgba(14,165,233,.3);padding-bottom:14px;margin-bottom:18px}
-.export-record-head h3{color:#0EA5E9;font-size:1rem;letter-spacing:.04em;margin-bottom:6px}
+  border:1px solid #00E699;border-radius:14px;padding:26px}
+.export-record-head{text-align:center;border-bottom:1px solid rgba(0,230,153,.3);padding-bottom:14px;margin-bottom:18px}
+.export-record-head h3{color:#00E699;font-size:1rem;letter-spacing:.04em;margin-bottom:6px}
 .export-record-meta{font-size:.7rem;color:var(--muted);font-family:var(--mono)}
-.export-record-section-label{color:#0EA5E9;font-size:.72rem;font-weight:700;text-transform:uppercase;
+.export-record-section-label{color:#00E699;font-size:.72rem;font-weight:700;text-transform:uppercase;
   letter-spacing:.05em;margin:18px 0 10px}
 .export-record-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.export-record-tile{border:1px solid rgba(14,165,233,.3);border-radius:10px;padding:12px;text-align:center}
+.export-record-tile{border:1px solid rgba(0,230,153,.3);border-radius:10px;padding:12px;text-align:center}
 .export-record-tile-val{font-size:1.3rem;font-weight:800;color:#00FF87}
 .export-record-tile-lbl{font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin-top:2px}
 .export-record-table{width:100%;border-collapse:collapse;font-size:.72rem}
-.export-record-table th{text-align:left;color:#0EA5E9;font-size:.62rem;text-transform:uppercase;
-  letter-spacing:.03em;padding:6px 8px;border-bottom:1px solid rgba(14,165,233,.3)}
+.export-record-table th{text-align:left;color:#00E699;font-size:.62rem;text-transform:uppercase;
+  letter-spacing:.03em;padding:6px 8px;border-bottom:1px solid rgba(0,230,153,.3)}
 .export-record-table td{padding:7px 8px;border-bottom:1px solid rgba(255,255,255,.06);color:var(--text)}
-.export-record-foot{text-align:center;margin-top:20px;padding-top:14px;border-top:1px solid rgba(14,165,233,.3);
+.export-record-foot{text-align:center;margin-top:20px;padding-top:14px;border-top:1px solid rgba(0,230,153,.3);
   font-size:.7rem;color:var(--muted)}
 .export-record-actions{display:flex;gap:10px;justify-content:center;margin-top:18px}
 
@@ -494,12 +500,12 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .loc-select-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:14px 0}
 .loc-select-row select{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);
   border-radius:8px;padding:9px 4px;font-size:.7rem;font-weight:700;text-align:center}
-.loc-select-row select:focus{border-color:#0EA5E9}
+.loc-select-row select:focus{border-color:#00E699}
 
 /* ===== CITIXEN PAPERWORK FILE DRAWER ===== */
 .pw-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:3200;display:none}
 .pw-overlay.open{display:flex;justify-content:flex-end}
-.pw-panel{width:min(480px,100vw);height:100%;background:rgba(17,24,39,.7);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-left:1px solid rgba(14,165,233,.25);
+.pw-panel{width:min(480px,100vw);height:100%;background:rgba(15,23,42,.75);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-left:1px solid rgba(0,230,153,.25);
   overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
 .pw-head{display:flex;justify-content:space-between;align-items:center}
 .pw-head h3{color:var(--mint2);font-size:1.05rem}
@@ -618,7 +624,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 /* ===== LIVE PUBLIC LEDGER DRAWER ===== */
 .ledger-drawer{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:2800;display:none}
 .ledger-drawer.open{display:flex;justify-content:flex-end}
-.ledger-drawer-panel{width:min(520px,100vw);height:100%;background:rgba(17,24,39,.7);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-left:1px solid rgba(14,165,233,.25);
+.ledger-drawer-panel{width:min(520px,100vw);height:100%;background:rgba(15,23,42,.75);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-left:1px solid rgba(0,230,153,.25);
   display:flex;flex-direction:column}
 .ledger-drawer-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--border)}
 .ledger-drawer-body{flex:1;overflow-y:auto;padding:16px 18px 32px}
@@ -631,7 +637,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 .ledger-chip.active{border-color:var(--mint2);background:rgba(0,255,136,.14);color:var(--mint2)}
 .ledger-select{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);
   border-radius:8px;padding:7px 9px;font-size:.72rem;font-weight:700}
-.ledger-select:focus{border-color:#0EA5E9}
+.ledger-select:focus{border-color:#00E699}
 /* Street/ZIP scope bar + Print Location Report control (item 2) and the
    Pro Tier upsell link beneath it, sitting directly above the inventory
    card list. */
@@ -663,18 +669,18 @@ audio.pw-audio-el{width:100%;margin-top:4px}
    Export/Print Civic Record) share this one .gateway-pill shell per this
    round's spec: a thin single-line horizontal pill, left-aligned
    "[dot] LIVE" indicator. Per-button border/background colors are set
-   inline on each button (Electric Ice-Cyan #0EA5E9 border for the two
-   data gateways, white for the print action) rather than via variant
+   inline on each button (Fresh Mint #00E699 border for the data gateway,
+   white for the print action) rather than via variant
    classes, matching the exact markup given this round. .pulsing-dot is
    the one shared "LIVE" indicator — Emerald Green (#00FF87), strictly
    reserved for live/active indicators per this round's palette-pivot
    spec — reused by all 3 buttons and by the pixel map's city nodes. ===== */
 .ledger-banner-section{max-width:640px;margin:0 auto 24px;padding:0 24px}
-/* Explicit 14px stack gap between Gateway Pill 1 (Public Ledger) and Pill 2
-   (Aggregation Hub) per this round's item 3 (widened from the prior
-   round's ~10px) — applied only to Pill 1's section so Pill 2 keeps its
-   normal 24px margin before the pixel map. */
-.gateway-pill-stacked{margin-bottom:14px}
+/* Gap below the Live Public Ledger pill before the national map box, per
+   this round's item 3 literal spec (margin-bottom: 16px) — the pill is now
+   the only one directly above the map, since the Aggregation Hub pill that
+   used to stack beneath it was relocated (see .pixel-map-caption-link). */
+.gateway-pill-stacked{margin-bottom:16px}
 /* Equal sizing for both pills per this round's item 3 — identical
    min-height/padding/box-sizing/flex/radius baked into the shared class so
    Public Ledger and Aggregation Hub can never drift apart in dimensions. */
@@ -686,7 +692,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 .gateway-pill-center{flex:1 1 auto;min-width:0;text-align:center;font-weight:700;font-size:.8rem;
   letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   padding:0 8px}
-.gateway-pill-right{flex-shrink:0;text-align:right;font-size:.75rem;font-weight:600;color:#0EA5E9;
+.gateway-pill-right{flex-shrink:0;text-align:right;font-size:.75rem;font-weight:600;color:#00E699;
   white-space:nowrap}
 .gateway-pill:hover{filter:brightness(1.2)}
 .pulsing-dot{position:relative;width:8px;height:8px;border-radius:50%;background:#00FF87;flex-shrink:0;
@@ -711,11 +717,12 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 .tm-symbol-flush{margin-left:0 !important}
 
 /* ===== NATIONAL LIVE REPORT PIXEL MAP — decorative, stylized US
-   silhouette rendered as a dense grid of dim, cyan-tinted pixels clipped
-   strictly inside a crisp vector outline of the US mainland (also traced
-   with a visible stroke, .pixel-map-outline, via <use> of the same path
-   so the coastline reads clearly), with bright Emerald Green (#00FF87)
-   city nodes only — no cyan/blue nodes, per this round's spec. Purely
+   silhouette rendered as a dense grid of dim, Fresh Mint-tinted pixels
+   clipped strictly inside a crisp vector outline of the US mainland (also
+   traced with a visible stroke, .pixel-map-outline, via <use> of the same
+   path so the coastline reads clearly), with bright Emerald Green (#00FF87)
+   city nodes only — no cyan/blue anywhere on this canvas, per this
+   round's total blue/cyan purge. Purely
    decorative (see renderNationalPixelMap()); the silhouette is a
    hand-authored approximation, not a precise cartographic projection —
    same convention as the Aggregation Hub's own stylized marker layout.
@@ -723,19 +730,28 @@ audio.pw-audio-el{width:100%;margin-top:4px}
    only fades opacity in place (no transform/scale, no panning or
    floating) so nothing on this canvas ever pans, moves, or zooms. ===== */
 .pixel-map-section{max-width:720px;margin:0 auto 20px;padding:0 24px}
-.pixel-map-card{position:relative;height:190px;background:#050505;border:1px solid #0284C7;border-radius:16px;overflow:hidden}
+.pixel-map-card{position:relative;height:190px;background:rgba(15,23,42,.8);border:1px solid rgba(0,230,153,.35);border-radius:16px;overflow:hidden}
 .pixel-map-svg{width:100%;height:100%;display:block}
 .pixel-map-dot{opacity:.2;transition:fill .25s,opacity .4s}
 /* Grid fills pivoted from Emerald Green (#00FF87) to Fresh Mint (#00E699)
    per this round's item 18. */
-.pixel-map-dot-lit{fill:#00E699 !important;stroke:#0EA5E9;stroke-width:.75;opacity:.6 !important;
+.pixel-map-dot-lit{fill:#00E699 !important;stroke:#00E699;stroke-width:.75;opacity:.6 !important;
   filter:drop-shadow(0 0 2px rgba(0,230,153,.6))}
-.pixel-map-outline{fill:none;stroke:#0EA5E9;stroke-width:1.5;opacity:.55;transition:opacity .3s,filter .3s}
-.pixel-map-outline-pulse{opacity:1;filter:drop-shadow(0 0 6px rgba(14,165,233,.9)) drop-shadow(0 0 10px rgba(0,230,153,.5))}
+.pixel-map-outline{fill:none;stroke:#00E699;stroke-width:1.5;opacity:.55;transition:opacity .3s,filter .3s}
+.pixel-map-outline-pulse{opacity:1;filter:drop-shadow(0 0 6px rgba(0,230,153,.9)) drop-shadow(0 0 10px rgba(0,230,153,.5))}
 .pixel-map-node-core{opacity:0}
 .pixel-map-node-pulse{opacity:0}
 .pixel-map-node-emerald .pixel-map-node-core{fill:#00E699}
 .pixel-map-node-emerald .pixel-map-node-pulse{fill:#00E699}
+/* Relocated Aggregation Hub trigger (item 3) — a plain-button caption
+   directly beneath the map card, styled as a quiet mint link rather than
+   a second full gateway pill, since it's a secondary "open the live map"
+   action, not a primary gateway. */
+.pixel-map-caption-link{display:flex;align-items:center;justify-content:center;gap:6px;
+  width:100%;margin-top:10px;background:none;border:none;padding:6px 0;
+  color:#00E699;font-size:.78rem;font-weight:700;letter-spacing:.02em;
+  cursor:pointer;font-family:inherit;transition:filter .15s}
+.pixel-map-caption-link:hover{filter:brightness(1.25)}
 .pixel-map-node-core{animation:staticPulse 2.4s ease-in-out infinite}
 .pixel-map-node-pulse{animation:staticPulse 2.4s ease-in-out infinite reverse}
 @keyframes staticPulse{
@@ -743,8 +759,8 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   50%{opacity:.3}
   100%{opacity:.9}
 }
-.analytics-matrix-card{max-width:720px;margin:0 auto 40px;background:rgba(17,24,39,.7);
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(14,165,233,.25);
+.analytics-matrix-card{max-width:720px;margin:0 auto 40px;background:rgba(15,23,42,.75);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(0,230,153,.25);
   border-radius:16px;padding:20px}
 .matrix-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-top:14px}
 .matrix-cell-val{font-size:1.3rem;font-weight:900}
@@ -761,15 +777,15 @@ audio.pw-audio-el{width:100%;margin-top:4px}
    (the old plain-tile styles) are now fully unused and have been removed;
    .matrix-cell-val is kept — openMatrixCellModal()'s deep-dive display
    still uses it. ===== */
-.gauge-card{text-align:center;background:rgba(17,24,39,.7);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border:1px solid rgba(14,165,233,.25);
+.gauge-card{text-align:center;background:rgba(15,23,42,.75);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(0,230,153,.25);
   border-radius:12px;padding:16px;cursor:pointer;font-family:inherit;color:var(--text);
   display:flex;flex-direction:column;align-items:center}
-.gauge-card:hover{border-color:#0EA5E9}
+.gauge-card:hover{border-color:#00E699}
 .gauge-svg{width:100%;max-width:128px;height:auto;overflow:visible}
-.gauge-track{fill:none;stroke:rgba(14,165,233,.18)}
+.gauge-track{fill:none;stroke:rgba(0,230,153,.18)}
 .gauge-track-zone{fill:none;opacity:.85}
-.gauge-tick{stroke:#0EA5E9;stroke-width:1.5;opacity:.75}
+.gauge-tick{stroke:#00E699;stroke-width:1.5;opacity:.75}
 .gauge-tick-sla{stroke:#FFFFFF;stroke-width:2}
 .gauge-fill{fill:none;stroke:#00FF87;filter:drop-shadow(0 0 3px rgba(0,255,135,.7))}
 .gauge-needle{stroke:#00FF87;stroke-width:2;stroke-linecap:round;filter:drop-shadow(0 0 3px rgba(0,255,135,.9))}
@@ -967,7 +983,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
           <button type="button" id="ledgerScopePrintBtn" class="btn btn-outline" style="white-space:nowrap;padding:8px 14px;font-size:.76rem">Print Location Report</button>
         </div>
         <div class="ledger-pro-tier-row">
-          <button type="button" id="ledgerProTierLink" style="background:none;border:none;padding:0;font:inherit;color:#0EA5E9;cursor:pointer;text-decoration:underline">Need Multi-Ward CSV or Enterprise Data? Upgrade to Pro</button>
+          <button type="button" id="ledgerProTierLink" style="background:none;border:none;padding:0;font:inherit;color:#00E699;cursor:pointer;text-decoration:underline">Need Multi-Ward CSV or Enterprise Data? Upgrade to Pro</button>
         </div>
         <div id="ledgerResults"></div>
       </div>
@@ -1009,21 +1025,24 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        then the tagline, then straight into the two stacked live pills —
        no second branding block between the jurisdiction bar and the real
        content. ===== -->
-  <p class="citizen-dashboard-subheader">Citizen Dashboard</p>
-  <p class="hero-tagline-subtle">The modern standard for resident-first municipal engagement.</p>
+  <p class="citizen-dashboard-subheader"><span class="cds-white">Citizen</span> <span class="cds-mint">Dashboard</span></p>
+  <p class="hero-tagline-subtle">Real-time community reporting and municipal tracking for your local area.</p>
 
   <!-- ===== LIVE PUBLIC LEDGER BANNER — sits directly beneath the Citizen
-       Dashboard sub-header/tagline above. Opens the existing #ledgerDrawer
-       (same drawer as the footer's Codex/audit links). Restyled this round as
-       the unified single-line .gateway-pill (automotive-cockpit palette
-       pivot): Electric Ice-Cyan border/background, Emerald "LIVE" badge.
-       The trailing count is real — set from the same /api/coverage/big3
-       payload loadBig3() already fetches (see #ledgerBannerCount in
-       loadBig3()), not the spec's illustrative "17 entries synced"
-       hardcoded literally — a fabricated static count would misrepresent
-       real ledger data, so the live-updating span id is kept. ===== -->
+       Dashboard sub-header/tagline above, and now directly ABOVE the
+       national map box per this round's item 3 (the Aggregation Hub pill
+       that used to stack beneath it has been removed from this position —
+       see note below). Opens the existing #ledgerDrawer (same drawer as
+       the footer's Codex/audit links). Uses the unified single-line
+       .gateway-pill shell: Fresh Mint border/background, Emerald "LIVE"
+       badge. The trailing count is real — set from the same
+       /api/coverage/big3 payload loadBig3() already fetches (see
+       #ledgerBannerCount in loadBig3()), not the spec's illustrative "17
+       entries synced" hardcoded literally — a fabricated static count
+       would misrepresent real ledger data, so the live-updating span id
+       is kept. ===== -->
   <section class="ledger-banner-section gateway-pill-stacked">
-    <button id="liveLedgerBanner" class="gateway-pill" type="button" style="border: 1px solid #0EA5E9; background: rgba(14, 165, 233, 0.05); border-radius: 9999px;">
+    <button id="liveLedgerBanner" class="gateway-pill" type="button" style="border: 1px solid rgba(0, 230, 153, 0.4); background: rgba(0, 230, 153, 0.05); border-radius: 9999px;">
       <span class="gateway-pill-left" style="color: #00FF87;"><span class="pulsing-dot"></span>LIVE</span>
       <span class="gateway-pill-center" style="color: #FFFFFF;">PUBLIC LEDGER</span>
       <span class="gateway-pill-right"><span id="ledgerBannerCount">Syncing…</span> ↗</span>
@@ -1031,42 +1050,26 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   </section>
 
   <!-- ===== ALTERNATING SECTION CADENCE (updated across recent rounds):
-       Gateway Pill 1 (PUBLIC LEDGER) and Pill 2 (AGGREGATION HUB) stack
-       directly on top of each other with a tight ~10px gap
-       (.gateway-pill-stacked on Pill 1's section) — the "What is CITIXEN
-       UX™?" narrative block that used to sit between them was dissolved in
-       an earlier round: its always-visible hook sentence moved up to sit
-       between the green location bar and this section (see the "Citizen
-       Dashboard" sub-header + tagline just above), and the collapsible
-       "Learn More ▾" drawer (workflow row / engine line / receipt line /
-       era tagline) moved down to directly below the Crowd Source America™
-       / US Map container (see #btnLearnMoreToggle after the CSA narrative
-       below).
-       Position 2 — the Aggregation Hub gateway button (Electric Cyan
-       variant, .ledger-banner-cyan — Civic Gold is retired), sits
-       directly ABOVE the pixel map.
-       Position 3 — the embedded Live Report Pixel Map, directly beneath
-       the gateway button.
+       Per this round's item 3 ("remove any redundant secondary
+       aggregation pills above the map"), the Aggregation Hub gateway pill
+       that used to stack directly beneath the Public Ledger pill here has
+       been removed from this position — the Public Ledger pill is now
+       the only pill directly above the map. The Aggregation Hub's real
+       trigger (openHeatMapModal(), a genuine Leaflet-based national
+       aggregation map) is not deleted — deleting it would remove real
+       functionality — it is relocated to a small caption-link directly
+       beneath the pixel map itself (#aggregationMapGatewayBtn, same id,
+       same click handler, see the pixel-map-section below), which reads
+       naturally as "here's the live map this preview represents."
+       Position 2 — the embedded Live Report Pixel Map, directly beneath
+       the Public Ledger pill.
+       Position 3 — the relocated Aggregation Hub caption-link, directly
+       beneath the pixel map.
        Position 4 — the Crowd Source America™ campaign title/narrative,
        immediately followed by the relocated Learn More drawer. ===== -->
 
-  <!-- ===== AGGREGATION MAP GATEWAY BUTTON — Position 2. Same unified
-       .gateway-pill shell as the Live Public Ledger banner (automotive-
-       cockpit palette pivot: Electric Ice-Cyan border/background,
-       Emerald "LIVE" badge). Opens the same real #nationalHeatMapModal (a
-       real Leaflet instance — see below) that the Analytics drawer's own
-       trigger opens — not a duplicate modal. Sits directly above the
-       pixel map. ===== -->
-  <section class="ledger-banner-section">
-    <button id="aggregationMapGatewayBtn" class="gateway-pill" type="button" style="border: 1px solid #0EA5E9; background: rgba(14, 165, 233, 0.05); border-radius: 9999px;">
-      <span class="gateway-pill-left" style="color: #00FF87;"><span class="pulsing-dot"></span>LIVE</span>
-      <span class="gateway-pill-center" style="color: #FFFFFF;">AGGREGATION HUB</span>
-      <span class="gateway-pill-right">Crowd Source America Map ↗</span>
-    </button>
-  </section>
-
-  <!-- ===== NATIONAL LIVE REPORT PIXEL MAP — Position 3, sits directly
-       BENEATH the Aggregation Hub gateway button. #usSilhouetteOutline's
+  <!-- ===== NATIONAL LIVE REPORT PIXEL MAP — Position 2, sits directly
+       BENEATH the Live Public Ledger pill. #usSilhouetteOutline's
        'd' path this round was generated by running OpenCV contour
        detection (findContours + approxPolyDP, 52 vertices) against the
        reference US-silhouette screenshot attached this round, then scaled
@@ -1074,7 +1077,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        reference image, not a precise cartographic/geodetic projection
        (same "stylized, not geographic" convention already documented for
        the Aggregation Hub's own markers). Reused once via <use> both as
-       the clip-path for the dim cyan grid and as a crisp, visible
+       the clip-path for the dim Fresh Mint grid and as a crisp, visible
        coastline stroke (.pixel-map-outline) on top of it, so the two can
        never drift out of sync. Grid pixels light progressively and stay
        lit, one every 150ms across a 15s build-up-and-reset loop
@@ -1084,7 +1087,9 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        staticPulse node animation, no
        panning/floating/zooming.
        Purely decorative; it draws no real per-city report data, unlike
-       the Aggregation Hub's live-tagged La Crosse marker. ===== -->
+       the Aggregation Hub's live-tagged La Crosse marker. Directly beneath
+       the map sits the relocated Aggregation Hub caption-link (see next
+       comment) — the map's real "open the live map" trigger. ===== -->
   <section class="pixel-map-section">
     <div class="pixel-map-card" id="national-pixel-map">
       <svg class="pixel-map-svg" viewBox="0 0 800 440" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
@@ -1099,10 +1104,21 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         <g id="pixelMapNodes"></g>
       </svg>
     </div>
+    <!-- ===== RELOCATED AGGREGATION HUB TRIGGER — Position 3. Per this
+         round's item 3, the standalone Aggregation Hub gateway pill that
+         used to sit above the map was removed; this caption-link keeps
+         its real click handler (openHeatMapModal(), the same
+         #nationalHeatMapModal Leaflet instance the Analytics drawer also
+         opens) reachable, now placed directly beneath the preview map it
+         describes. Same element id as before so the existing JS listener
+         needs no change. ===== -->
+    <button id="aggregationMapGatewayBtn" type="button" class="pixel-map-caption-link">
+      <span class="pulsing-dot"></span> Crowd Source America Map ↗
+    </button>
   </section>
 
   <!-- ===== CROWD SOURCE AMERICA™ NARRATIVE BLOCK — Position 4. Plain
-       centered text, no card/box; the heading carries the Electric Cyan
+       centered text, no card/box; the heading carries the Fresh Mint
        accent (Civic Gold retired). Every "CITIXEN UX™" mention in this
        block's body copy is styled Emerald Green bold per this round's
        spec. ===== -->
@@ -1229,7 +1245,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       <div class="matrix-grid" id="matrixGrid"></div>
       <div class="small" style="text-align:center;margin-top:10px;color:var(--muted)">Live City Performance Metrics — Aggregated from verified field dispatch logs and real-time resident submissions. Tap a metric tile for its full breakdown.</div>
     </div>
-    <h3 style="color: #0EA5E9; font-size: 1.15rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin: 36px 0 24px 0; text-align: center;">Explore More Data</h3>
+    <h3 style="color: #00E699; font-size: 1.15rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin: 36px 0 24px 0; text-align: center;">Explore More Data</h3>
   </section>
 
   <!-- ===== THREE DRILL-DOWN ACTION HUBS — sit directly below City Snapshot
@@ -1254,7 +1270,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </button>
     <button class="hub-card" id="hubSlaBtn" type="button" aria-expanded="false" aria-controls="civicStackSection">
       <span class="hub-card-main">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7V5a2 2 0 0 1 2-2h8"/><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M2 11h20"/><circle cx="17" cy="15" r="1.3" fill="#0EA5E9" stroke="none"/></svg>
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7V5a2 2 0 0 1 2-2h8"/><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M2 11h20"/><circle cx="17" cy="15" r="1.3" fill="#00E699" stroke="none"/></svg>
         <span class="hub-card-text"><span class="hub-card-title">Expenditures</span><span class="hub-card-sub">— Budget and Projects</span></span>
       </span>
       <span class="hub-card-actions">
@@ -1307,13 +1323,13 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        "API KEY REQUIRED" watermark, so this round swapped to OSM, same
        fix already applied to the field-dispatch map's tiles (see
        addBaseLayer() and the global .leaflet-tile-pane filter, which
-       dark-themes these OSM tiles the same way, automatically). Electric
-       Cyan (#0EA5E9) markers for each seeded jurisdiction, sized from
+       dark-themes these OSM tiles the same way, automatically). Fresh
+       Mint (#00E699) markers for each seeded jurisdiction, sized from
        real numbers where a live backend exists (La Crosse — this
        project's only live ward data, via loadBig3()) and clearly tagged
        (Illustrative) where a jurisdiction is still static demo config
        (Austin/Chicago — see the `cities` object). If tiles fail to load,
-       the dark canvas background and cyan markers still render (see
+       the dark canvas background and mint markers still render (see
        initAggregationMap()'s tileerror handler below) rather than a
        blank/broken map. Separate Leaflet instance from the field-dispatch
        map inside the Analytics deep-dive. ===== -->
@@ -1323,7 +1339,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       <div class="frontier-map-head" style="padding:18px 20px 10px;">
         <div class="frontier-search-bar">
           <div class="label agg-hub-heading" style="justify-content:center;margin-bottom:2px">Crowd Source America<sup class="tm-symbol">™</sup> — Aggregation Hub</div>
-          <div class="frontier-search-note">Cyan marker = a seeded jurisdiction. Search a city or ZIP below to fly to it.</div>
+          <div class="frontier-search-note">Mint marker = a seeded jurisdiction. Search a city or ZIP below to fly to it.</div>
           <div class="geo-hatch-search-row">
             <input type="text" id="geoHatchSearchInput" placeholder="Search city or ZIP (e.g. La Crosse, Austin, 54601)" aria-label="Search city or ZIP" autocomplete="off">
             <button class="btn btn-outline" id="geoHatchSearchBtn" type="button">Search</button>
@@ -1339,8 +1355,8 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       <div class="aggregation-map-wrap" id="aggregationMapWrap" style="height:480px;margin:0 20px 20px;">
         <div id="aggregation-map-container"></div>
         <div class="geo-hatch-legend">
-          <span><span class="geo-legend-dot" style="background:#0EA5E9"></span>Live backend (La Crosse)</span>
-          <span><span class="geo-legend-dot" style="background:rgba(14,165,233,.35)"></span>Illustrative — pending onboarding</span>
+          <span><span class="geo-legend-dot" style="background:#00E699"></span>Live backend (La Crosse)</span>
+          <span><span class="geo-legend-dot" style="background:rgba(0,230,153,.35)"></span>Illustrative — pending onboarding</span>
         </div>
       </div>
     </div>
@@ -1978,7 +1994,7 @@ document.querySelectorAll('[data-close-panel]').forEach(btn => {
    map's tiles; see addBaseLayer() below and the global .leaflet-tile-pane
    CSS filter, which dark-themes OSM's tiles for both map instances). If
    tile fetching fails (offline, CDN blocked), the container's own dark
-   background (see .aggregation-map-wrap CSS) plus the three cyan markers
+   background (see .aggregation-map-wrap CSS) plus the three mint markers
    below still render, so the view degrades to "dark canvas with markers"
    rather than a blank/broken map. Separate Leaflet map instance from the
    field-dispatch `map` used in the Analytics deep-dive — this never
@@ -2000,7 +2016,7 @@ const AGGREGATION_MAP_CITIES = {
     match: ['austin','texas','tx','ward 2','78701'] }
 };
 
-function cyanMarkerIcon(){
+function mintMarkerIcon(){
   return L.divIcon({
     className: '',
     html: '<div class="agg-marker-beacon"><span class="agg-marker-pulse"></span><span class="agg-marker-core"></span></div>',
@@ -2049,7 +2065,7 @@ function initAggregationMap(){
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     });
     tiles.on('tileerror', () => {
-      // A real tile-load failure — keep the dark canvas background and cyan
+      // A real tile-load failure — keep the dark canvas background and mint
       // markers rather than showing a broken/blank map underneath them.
       if (aggregationMapTilesFailed) return;
       aggregationMapTilesFailed = true;
@@ -2059,7 +2075,7 @@ function initAggregationMap(){
     tiles.addTo(aggregationMap);
     Object.keys(AGGREGATION_MAP_CITIES).forEach(key => {
       const c = AGGREGATION_MAP_CITIES[key];
-      const marker = L.marker([c.lat, c.lng], { icon: cyanMarkerIcon() }).addTo(aggregationMap);
+      const marker = L.marker([c.lat, c.lng], { icon: mintMarkerIcon() }).addTo(aggregationMap);
       marker.bindTooltip(aggregationMarkerLabel(key), { direction: 'top', offset: [0, -10] });
       aggregationMapMarkers[key] = marker;
     });
@@ -2098,9 +2114,10 @@ function closeHeatMapModal(){
 // round with their markup, so only these two triggers remain.
 const viewHeatMapFromAnalyticsBtn = document.getElementById('btnViewHeatMapFromAnalytics');
 if (viewHeatMapFromAnalyticsBtn) viewHeatMapFromAnalyticsBtn.addEventListener('click', openHeatMapModal);
-// Top-level "Crowd Source America™ — Aggregation Hub" gateway button
-// (Electric Cyan .ledger-banner-cyan variant) opens the same real
-// #nationalHeatMapModal, not a duplicate modal.
+// Relocated "Crowd Source America™ — Aggregation Hub" trigger (now a
+// .pixel-map-caption-link directly beneath the preview map, per this
+// round's item 3) opens the same real #nationalHeatMapModal, not a
+// duplicate modal.
 const aggregationMapGatewayBtnEl = document.getElementById('aggregationMapGatewayBtn');
 if (aggregationMapGatewayBtnEl) aggregationMapGatewayBtnEl.addEventListener('click', openHeatMapModal);
 document.getElementById('heatMapCloseBtn').addEventListener('click', closeHeatMapModal);
@@ -2862,10 +2879,10 @@ function threatSpectrumBar(data){
    COCKPIT SPEEDOMETER GAUGE BUILDER — a small polar-coordinate helper
    plus one generic gauge-SVG builder shared by all 3 instruments (Fix
    Speed, Completion Rate, City Health Index). Each gauge is drawn as a
-   dim cyan "track" arc (the full 0-max sweep) with a glowing emerald
+   dim Fresh Mint "track" arc (the full 0-max sweep) with a glowing emerald
    "fill" arc overlaid on top (0-to-current-value) — both drawn with the
    SAME <circle> + stroke-dasharray/rotate trick so they can never drift
-   out of alignment — plus cyan calibration tick marks and a glowing
+   out of alignment — plus Fresh Mint calibration tick marks and a glowing
    emerald needle, all computed from REAL matrixData/currentWardHealth
    values, never the illustrative 18.6h/75%/88 example numbers from the
    spec. Nothing here is a canvas/JS animation loop — it's one static SVG
@@ -3065,10 +3082,10 @@ document.getElementById('matrixGrid').addEventListener('click', (e) => {
 });
 
 /* =====================================================================
-   NATIONAL LIVE REPORT PIXEL MAP — draws the dense dim cyan-tinted pixel
-   grid inside the OpenCV-traced #usSilhouetteClip SVG clip-path, then
-   overlays six bright, pulsing Emerald Green (#00FF87) city nodes — no
-   cyan/blue nodes. runPixelMapBuildUpCycle() then drives a fixed 15-second
+   NATIONAL LIVE REPORT PIXEL MAP — draws the dense dim Fresh Mint-tinted
+   pixel grid inside the OpenCV-traced #usSilhouetteClip SVG clip-path,
+   then overlays six bright, pulsing Emerald Green (#00FF87) city nodes —
+   no cyan/blue nodes anywhere. runPixelMapBuildUpCycle() then drives a fixed 15-second
    "build-up & reset" loop, per this round's spec: every node lit during
    the 14s fill sequence STAYS lit (no flash-and-fade), a brief outline
    pulse-glow marks the ~14s-15s peak-density moment, and the whole grid
@@ -3090,7 +3107,7 @@ function renderNationalPixelMap(){
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       const x = c * cell, y = r * (440 / rows);
-      dots += '<rect class="pixel-map-dot" x="' + (x + 1) + '" y="' + (y + 1) + '" width="' + (cell - 2) + '" height="' + ((440 / rows) - 2) + '" fill="#0EA5E9"></rect>';
+      dots += '<rect class="pixel-map-dot" x="' + (x + 1) + '" y="' + (y + 1) + '" width="' + (cell - 2) + '" height="' + ((440 / rows) - 2) + '" fill="#00E699"></rect>';
     }
   }
   grid.innerHTML = dots;
