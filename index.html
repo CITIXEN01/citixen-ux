@@ -11,6 +11,11 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="CITIXEN UX">
 <link rel="manifest" href="/manifest.json?v=4">
+<!-- Clean, sharp Emerald Green shield-outline favicon per this round's spec,
+     encoded as an inline data:image/svg+xml so it renders crisp at any tab
+     size with no extra network request; PNG/ICO variants kept as fallbacks
+     for browsers/contexts that don't support SVG favicons. -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-3z' fill='none' stroke='%2300FF87' stroke-width='2'/%3E%3C/svg%3E">
 <link rel="icon" type="image/x-icon" href="/favicon.ico?v=4">
 <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png?v=4">
 <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png?v=4">
@@ -124,9 +129,10 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   color:var(--mint2);border-radius:20px;padding:6px 16px;font-size:.72rem;font-weight:700;letter-spacing:.3px;margin-bottom:22px}
 
 /* ===== HERO — MASSIVE TITLE + C.I. DEFINITION (master-refactor overhaul) ===== */
-.hero-mega-title{font-size:clamp(2.4rem,9vw,4.6rem);font-weight:900;letter-spacing:-.5px;line-height:1;margin:6px 0 10px;text-shadow:0 0 28px rgba(14,165,233,.35);display:flex;align-items:center;justify-content:center;gap:.18em;flex-wrap:wrap}
+.hero-mega-title{font-size:clamp(1.8rem,6.5vw,3rem);white-space:nowrap;font-weight:900;letter-spacing:-0.02em;line-height:1.1;margin:8px 0;text-align:center;text-shadow:0 0 28px rgba(0,255,136,.28);display:flex;align-items:center;justify-content:center;gap:.18em}
 .hero-shield-icon{flex-shrink:0;filter:drop-shadow(0 0 10px rgba(0,255,136,.5))}
-.hero-kicker{font-size:.72rem;font-weight:800;color:#0EA5E9;text-transform:uppercase;letter-spacing:1.4px;margin:2px 0 2rem}
+.hero-kicker{font-size:.72rem;font-weight:700;color:#FFFFFF;text-transform:uppercase;letter-spacing:0.08em;margin:2px 0 4px}
+.hero-kicker-sub{font-size:.85rem;color:#94A3B8;text-transform:uppercase;letter-spacing:0.1em;margin:4px 0 2rem;text-align:center}
 
 /* ===== HERO Q&A BLOCKS — two white-header Q&A cards directly below the
    locked hero, replacing the old single hero-subtitle/ci-definition pair. ===== */
@@ -154,7 +160,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
    .agg-hub-heading recolors below). ===== */
 .csa-banner-section{max-width:640px;margin:0 auto 8px;padding:0 24px}
 .csa-banner-card{text-align:center;padding:6px 0 18px}
-.csa-banner-heading{font-size:1.4rem;font-weight:900;color:#0EA5E9;margin-bottom:8px}
+.csa-banner-heading{font-size:1.4rem;font-weight:700;color:#00FF87;letter-spacing:0.05em;margin-bottom:8px}
 .csa-banner-body{font-size:.85rem;color:#94A3B8;line-height:1.6;max-width:520px;margin:0 auto}
 
 /* ===== INSTITUTIONAL GATEWAY BUTTONS — sits between the App Download
@@ -162,8 +168,10 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .institutional-gateway-section{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;max-width:520px;
   margin:24px auto 8px;padding:0 24px}
 
-/* ===== NATIVE APP STORE ROW + PRIMARY LAUNCH ROW (below hub navigation) ===== */
-.launch-row{text-align:center;margin:6px auto 4px}
+/* ===== NATIVE APP STORE ROW + PRIMARY LAUNCH ROW (below hub navigation) =====
+   Launch row gets symmetric left/right padding so "Launch Mobile Reporter"
+   aligns evenly with the hub-cards above and the app-store row below it. ===== */
+.launch-row{text-align:center;margin:6px auto 4px;width:100%;padding:0 16px;box-sizing:border-box}
 .app-store-row{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:14px auto 4px;max-width:520px;padding:0 24px}
 .store-badge{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid #FFFFFF;border-radius:10px;
   padding:8px 16px;color:#fff;cursor:pointer;min-width:170px}
@@ -175,11 +183,13 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 
 /* ===== LATERAL BRIDGE HUB CARDS — forced side-by-side at every width per
    the homepage-declutter spec; cards shrink their padding/icon/font size
-   on narrow screens instead of stacking to a single column. ===== */
+   on narrow screens instead of stacking to a single column. Obsidian-glass
+   surface unified with the City Snapshot gauge cards per this round's spec. ===== */
 .hub-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:920px;margin:0 auto 26px;padding:0 24px}
-.hub-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--card);
-  border:1px solid #0EA5E9;border-radius:14px;padding:16px 12px;cursor:pointer;color:var(--text);
-  text-align:center;transition:border-color .15s,transform .15s;font-family:inherit;min-width:0}
+.hub-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;
+  background:rgba(15,23,42,.6);border:1px solid rgba(14,165,233,.3);border-radius:14px;padding:16px 12px;
+  cursor:pointer;color:var(--text);text-align:center;transition:border-color .15s,transform .15s;
+  font-family:inherit;min-width:0}
 .hub-card-info{position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;
   border:1px solid #0EA5E9;color:#0EA5E9;font-size:.66rem;font-weight:700;font-style:italic;font-family:Georgia,serif;
   display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(14,165,233,.08)}
@@ -202,10 +212,10 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 
 #installStatus{font-size:.66rem;color:var(--muted);margin-top:8px}
 
-.privacy-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(14,165,233,.08);
-  border:1px solid #0EA5E9;color:#0EA5E9;border-radius:20px;padding:10px 18px;
+.privacy-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(0,255,135,.08);
+  border:1px solid #00FF87;color:#00FF87;border-radius:20px;padding:10px 18px;
   font-size:.78rem;font-weight:700;cursor:pointer;align-self:center;margin-top:18px;transition:border-color .15s}
-.privacy-pill:hover{border-color:#0EA5E9;filter:brightness(1.2)}
+.privacy-pill:hover{border-color:#00FF87;filter:brightness(1.15)}
 /* Top-of-page placement (moved above the brand title, per global header restructure).
    Bottom padding + border gives it clear breathing room from the brand/title block
    directly below, instead of sitting flush against it. */
@@ -507,9 +517,9 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 }
 
 /* ===== SMART LOCATION HEADER (persistent, always visible) ===== */
-.location-banner{display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(14,165,233,.08);
-  border-bottom:1px solid var(--border);padding:8px 16px;font-size:.76rem;font-weight:700;color:#0EA5E9;flex-wrap:wrap}
-.location-banner button{background:none;border:none;color:#0EA5E9;font-size:.7rem;font-weight:800;cursor:pointer;
+.location-banner{display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(0,255,135,.06);
+  border-bottom:1px solid var(--border);padding:8px 16px;font-size:.76rem;font-weight:700;color:#00FF87;flex-wrap:wrap}
+.location-banner button{background:none;border:none;color:#00FF87;font-size:.7rem;font-weight:800;cursor:pointer;
   text-decoration:underline;padding:0}
 
 /* ===== BIG 3 STAT ROW (reusable — mirrors app.html's) ===== */
@@ -691,21 +701,22 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 .analytics-matrix-card{max-width:720px;margin:0 auto 40px;background:var(--card);border:1px solid #0EA5E9;
   border-radius:16px;padding:20px}
 .matrix-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-top:14px}
-.matrix-cell{text-align:center;background:rgba(15,23,42,.6);border:1px solid rgba(14,165,233,.25);border-radius:12px;padding:14px 10px}
-.matrix-cell-viz{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:34px;margin-top:8px}
 .matrix-cell-val{font-size:1.3rem;font-weight:900}
-.matrix-cell-lbl{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-top:3px}
-.matrix-breakdown{font-size:.66rem;color:var(--muted);margin-top:4px;line-height:1.4}
 
-/* ===== COCKPIT SPEEDOMETER INSTRUMENT GAUGES — Fix Speed / Completion
-   Rate / City Health Index, replacing their old bar/breakdown visuals with
-   real radial-dial instruments (see renderInstrumentGauges() below). Same
-   "dark glass" instrument-backdrop language across all three; Active
-   Hazards keeps its existing severity-breakdown tile (see .matrix-cell
-   above) re-skinned to match, since this round's spec named only these 3
-   for the gauge redesign. ===== */
+/* ===== 3 BESPOKE CITY SNAPSHOT VISUALIZERS — Active Hazards (digital
+   threat counter + segmented priority spectrum bar), Fix Speed (240°
+   tachometer sweep), Completion Rate (360° donut ring + real resolved/
+   total ratio caption). All three share the same obsidian-glass card
+   surface (.gauge-card). City Health Index has been dropped from this
+   container per this round's "replace the 4-block layout with 3"
+   instruction — the same real value remains visible in the Analytics
+   deep-dive's Citywide Health Index card, so no real functionality is
+   lost. .matrix-cell/.matrix-cell-viz/.matrix-cell-lbl/.matrix-breakdown
+   (the old plain-tile styles) are now fully unused and have been removed;
+   .matrix-cell-val is kept — openMatrixCellModal()'s deep-dive display
+   still uses it. ===== */
 .gauge-card{text-align:center;background:rgba(15,23,42,.6);border:1px solid rgba(14,165,233,.25);
-  border-radius:12px;padding:12px 8px 10px;cursor:pointer;font-family:inherit;color:var(--text);
+  border-radius:12px;padding:16px;cursor:pointer;font-family:inherit;color:var(--text);
   display:flex;flex-direction:column;align-items:center}
 .gauge-card:hover{border-color:#0EA5E9}
 .gauge-svg{width:100%;max-width:128px;height:auto;overflow:visible}
@@ -719,6 +730,15 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 .gauge-unit-text{fill:var(--muted);font-weight:700;font-family:inherit}
 .gauge-cell-lbl{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-top:2px}
 .gauge-cell-caption{font-size:.58rem;color:var(--muted);margin-top:2px}
+.gauge-ratio-caption{font-size:.62rem;color:var(--muted);margin-top:4px;font-weight:700;letter-spacing:.2px}
+.threat-counter-value{font-size:2rem;font-weight:900;font-family:inherit;line-height:1;margin-top:2px;
+  text-shadow:0 0 12px rgba(255,187,0,.5)}
+.threat-spectrum-bar{display:flex;width:100%;height:8px;border-radius:4px;overflow:hidden;margin-top:10px;
+  background:rgba(15,23,42,.8)}
+.threat-spectrum-seg{height:100%}
+.threat-spectrum-legend{display:flex;justify-content:space-between;width:100%;margin-top:6px;
+  font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.2px}
+.threat-legend-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:3px}
 
 /* National Geo-Hatch Coverage Ticker */
 .geo-hatch-ticker-card{max-width:480px;margin:0 auto 40px;background:var(--card);border:1px solid var(--border);
@@ -917,28 +937,29 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   </div>
 
   <!-- ===== SECTION FREEZE — everything from here through the line below
-       ("Upgrade Your Civic Experience") is locked per the ongoing spec:
-       do not edit this section's markup, copy, or layout in any future
-       round without an explicit new instruction to unfreeze it. Two
-       standing exceptions now: the ™ symbol was removed from "Upgrade
-       Your Civic Experience" in an earlier round per that round's own
-       narrowly-scoped branding instruction; and this round explicitly
-       named the shield icon, the "CITIXEN UX™" heading, and this
-       subtitle for a cyan palette pivot (item 9) — so just those three
-       pieces are recolored to Electric Ice-Cyan (#0EA5E9) below, inline,
-       rather than via the shared .brand-white/.brand-lime/.brand-tm
-       classes (which stay untouched, since the small header-bar wordmark
-       above reuses them and was not named in this instruction). This
-       heading is also therefore the one deliberate exception to this
-       round's separate "two-tone CITIXEN UX" sweep (item 6) — the more
-       specific instruction about this exact heading wins. No other line
-       in this frozen block was touched. ===== -->
+       ("Citizen Dashboard") is locked per the ongoing spec: do not edit
+       this section's markup, copy, or layout in any future round without
+       an explicit new instruction to unfreeze it. Standing exceptions so
+       far: the ™ symbol was removed from "Upgrade Your Civic Experience"
+       in an earlier round per that round's own narrowly-scoped branding
+       instruction; a later round explicitly cyan-pivoted the shield icon,
+       heading, and subtitle (that round's item 9); and THIS round
+       explicitly reverses that pivot back to the original white/Emerald
+       Green palette (this round's item 1) and adds the new "Citizen
+       Dashboard" subtitle line — each an explicit, narrowly-scoped
+       instruction for this exact content, not a general unfreeze. The
+       heading's two-tone white "CITIXEN" + Emerald "UX™" spans (this
+       round's own literal item 1 markup) also make it consistent again
+       with this round's separate "two-tone CITIXEN UX" sweep (item 12) —
+       no more standing exception needed there. No other line in this
+       frozen block was touched. ===== -->
   <section class="hero">
     <h1 class="hero-mega-title">
-      <svg class="hero-shield-icon" viewBox="0 0 24 24" width="0.78em" height="0.78em" stroke="#0EA5E9" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      <span style="color:#0EA5E9">CITIXEN UX</span><sup class="brand-tm">™</sup>
+      <svg class="hero-shield-icon" viewBox="0 0 24 24" width="0.78em" height="0.78em" stroke="#00FF87" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span style="color:#FFFFFF; font-weight:bold;">CITIXEN</span> <span style="color:#00FF87; font-weight:bold;">UX</span><sup class="tm-symbol">™</sup>
     </h1>
     <p class="hero-kicker">Upgrade Your Civic Experience</p>
+    <p class="hero-kicker-sub">Citizen Dashboard</p>
   </section>
   <!-- ===== END SECTION FREEZE ===== -->
 
@@ -982,7 +1003,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        toggled by plain JS — see below), per this round's spec. ===== -->
   <section class="hero-qa-section">
     <div class="hero-qa-block">
-      <p style="margin-bottom: 0.75rem; font-size: 1.05rem; text-align: center;"><span style="color:#FFFFFF; font-weight:bold;">CITIXEN</span> <span style="color:#00FF87; font-weight:bold;">UX</span><sup class="tm-symbol">™</sup> is the modern standard for resident-first municipal engagement.</p>
+      <p style="margin-bottom: 0.75rem; font-size: 1.05rem; text-align: center;">The modern standard for resident-first municipal engagement.</p>
       <button id="btnLearnMoreToggle" type="button" style="background: transparent; border: 1px solid #00FF87; color: #00FF87; padding: 4px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; display: block; margin: 14px auto 24px auto;">Learn More ▾</button>
       <div id="learnMoreDrawer" hidden style="margin-top: 18px; margin-bottom: 22px; font-size: 0.85rem; color: #94A3B8;">
         <div class="hero-qa-workflow-row">
@@ -2664,7 +2685,8 @@ function fallbackBigThree(){
   // No offline trend fallback — this local seed mirror has no per-day
   // granularity to derive one from honestly. Matrix rendering treats an
   // empty trend as "N/A" rather than inventing points.
-  return { activeCount: active.length, activeCritical, activeModerate, activeLow, avgResolutionHours, verificationRatePct, capExAdherencePct, trend: [] };
+  return { activeCount: active.length, activeCritical, activeModerate, activeLow, avgResolutionHours, verificationRatePct,
+    capExAdherencePct, resolvedCount: resolved.length, totalTickets: tickets.length, trend: [] };
 }
 function setTextIfExists(id, text){
   const el = document.getElementById(id);
@@ -2737,16 +2759,25 @@ const MATRIX_METRIC_DEFS = [
     desc: 'Share of resolved tickets closed with a server-verified, on-site proof photo rather than a desk closure — the Resolution Verification Rate.' }
 ];
 
-// Severity breakdown for Active Hazards — real Critical/Moderate/Low split
-// from matrixData (see bigThree()'s comment in api/_lib/store.js). Active
-// Hazards keeps this existing tile style (re-skinned to the cockpit "dark
-// glass" look via .matrix-cell's updated CSS) rather than becoming a 4th
-// gauge — this round's spec named exactly 3 dials (Fix Speed, Completion
-// Rate, City Health Index).
-function activeHazardsBreakdown(data){
-  if (data.activeCount == null) return '';
+// Segmented priority spectrum bar for the Active Hazards "digital threat
+// counter" visualizer — real Critical/Moderate/Low split from matrixData
+// (see bigThree()'s comment in api/_lib/store.js), rendered as a
+// proportional 3-segment bar rather than plain text.
+function threatSpectrumBar(data){
   const c = data.activeCritical || 0, m = data.activeModerate || 0, l = data.activeLow || 0;
-  return `<div class="matrix-breakdown">${c} Critical | ${m} Moderate | ${l} Low</div>`;
+  const total = c + m + l;
+  if (!total) return '<div class="small" style="color:var(--muted);margin-top:8px">N/A</div>';
+  const cPct = (c / total * 100).toFixed(1), mPct = (m / total * 100).toFixed(1), lPct = (l / total * 100).toFixed(1);
+  return `<div class="threat-spectrum-bar">
+      <div class="threat-spectrum-seg" style="width:${cPct}%;background:#ef4444" title="${c} Critical"></div>
+      <div class="threat-spectrum-seg" style="width:${mPct}%;background:#f59e0b" title="${m} Moderate"></div>
+      <div class="threat-spectrum-seg" style="width:${lPct}%;background:#00FF87" title="${l} Low"></div>
+    </div>
+    <div class="threat-spectrum-legend">
+      <span><span class="threat-legend-dot" style="background:#ef4444"></span>Critical ${c}</span>
+      <span><span class="threat-legend-dot" style="background:#f59e0b"></span>Moderate ${m}</span>
+      <span><span class="threat-legend-dot" style="background:#00FF87"></span>Low ${l}</span>
+    </div>`;
 }
 
 /* =====================================================================
@@ -2819,44 +2850,49 @@ function buildGaugeSvg(opts){
   '</svg>';
 }
 
+// This round's spec replaces the previous 4-visualizer City Snapshot
+// (Active Hazards + Fix Speed + Completion Rate + City Health Index) with
+// exactly 3 bespoke telemetry visualizers — City Health Index is dropped
+// from THIS container only; the same real currentWardHealth value remains
+// visible in the Analytics deep-dive's Citywide Health Index card, so no
+// real functionality is actually lost, just this one duplicate display.
 function renderMatrixView(){
   const grid = document.getElementById('matrixGrid');
   if (!grid || !matrixData) return;
 
-  // Active Hazards — unchanged tile/data wiring, re-skinned only.
+  // Visualizer 1 — Active Hazards: a bold digital "threat counter" readout
+  // plus the real Critical/Moderate/Low split as a proportional segmented
+  // spectrum bar (see threatSpectrumBar()), rather than plain text.
   const activeDef = MATRIX_METRIC_DEFS.find(m => m.key === 'activeCount');
   const activeVal = matrixData.activeCount;
   const activeDisplay = activeVal == null ? 'N/A' : String(activeVal);
-  const activeHazardsCell = `<button class="matrix-cell" type="button" data-metric="activeCount" style="cursor:pointer;font-family:inherit">
-    <div class="matrix-cell-val" style="color:${activeDef.color}">${esc(activeDisplay)}</div>
-    <div class="matrix-cell-lbl">${esc(activeDef.label)}</div>
-    <div class="matrix-cell-viz">${activeHazardsBreakdown(matrixData)}</div>
+  const activeHazardsCell = `<button class="gauge-card" type="button" data-metric="activeCount">
+    <div class="threat-counter-value" style="color:${activeDef.color}">${esc(activeDisplay)}</div>
+    <div class="gauge-cell-lbl">${esc(activeDef.label)}</div>
+    ${threatSpectrumBar(matrixData)}
   </button>`;
 
-  // Gauge 1 — Fix Speed: 270° radial dial (classic cockpit sweep, bottom-
-  // left to bottom-right through the top), 0-40h range, plus a fixed
-  // white SLA-target tick at the real SLA_TARGET_HOURS (24h) position.
+  // Visualizer 2 — Fix Speed: 240° precision tachometer sweep (bottom-left
+  // to bottom-right through the top), 0-40h range, plus a fixed white
+  // SLA-target tick at the real SLA_TARGET_HOURS (24h) position.
   const fixSpeedDef = MATRIX_METRIC_DEFS.find(m => m.key === 'avgResolutionHours');
   const fixSpeedGauge = buildGaugeSvg({
     value: matrixData.avgResolutionHours, max: fixSpeedDef.max, unit: 'h', label: fixSpeedDef.label,
-    startDeg: 135, sweepDeg: 270, tickCount: 9, slaFraction: SLA_TARGET_HOURS / fixSpeedDef.max, size: 128
+    startDeg: 150, sweepDeg: 240, tickCount: 8, slaFraction: SLA_TARGET_HOURS / fixSpeedDef.max, size: 128
   });
 
-  // Gauge 2 — Completion Rate: 180° semicircular tachometer, left to
-  // right through the top, 0-100% range.
+  // Visualizer 3 — Completion Rate: full 360° donut progress ring, plus
+  // the real resolved/total ticket ratio (matrixData.resolvedCount /
+  // matrixData.totalTickets — both real fields from bigThree(), not the
+  // spec's illustrative "1,420 / 1,893" example) centered below it.
   const completionDef = MATRIX_METRIC_DEFS.find(m => m.key === 'verificationRatePct');
   const completionGauge = buildGaugeSvg({
     value: matrixData.verificationRatePct, max: completionDef.max, unit: '%', label: completionDef.label,
-    startDeg: 180, sweepDeg: 180, tickCount: 10, slaFraction: null, size: 128
-  });
-
-  // Gauge 3 — City Health Index: full 360° circular telemetry ring, same
-  // cities{} seed value (currentWardHealth) the Analytics deep-dive's
-  // Citywide Health Index card already shows — not a new number.
-  const healthGauge = buildGaugeSvg({
-    value: currentWardHealth, max: 100, unit: '', label: 'City Health Index',
     startDeg: 270, sweepDeg: 360, tickCount: 20, slaFraction: null, size: 128
   });
+  const resolvedRatio = (matrixData.resolvedCount != null && matrixData.totalTickets != null)
+    ? matrixData.resolvedCount.toLocaleString('en-US') + ' / ' + matrixData.totalTickets.toLocaleString('en-US') + ' Resolved'
+    : 'N/A';
 
   grid.innerHTML = activeHazardsCell +
     `<button class="gauge-card" type="button" data-metric="avgResolutionHours">
@@ -2867,11 +2903,8 @@ function renderMatrixView(){
     <button class="gauge-card" type="button" data-metric="verificationRatePct">
       ${completionGauge}
       <div class="gauge-cell-lbl">Completion Rate</div>
-    </button>
-    <div class="gauge-card" style="cursor:default">
-      ${healthGauge}
-      <div class="gauge-cell-lbl">City Health Index</div>
-    </div>`;
+      <div class="gauge-ratio-caption">${esc(resolvedRatio)}</div>
+    </button>`;
 }
 
 /* ===== MATRIX CELL DEEP-DIVE MODAL — "clicking any individual cell opens
@@ -2899,9 +2932,9 @@ function openMatrixCellModal(metricKey){
   document.getElementById('modalOverlay').classList.add('open');
 }
 document.getElementById('matrixGrid').addEventListener('click', (e) => {
-  // Selects by [data-metric] rather than a specific tile class, since
-  // Active Hazards (.matrix-cell) and the Fix Speed/Completion Rate
-  // gauges (.gauge-card) are both clickable deep-dive triggers now.
+  // Selects by [data-metric] rather than a specific tile class — all 3
+  // visualizers (Active Hazards, Fix Speed, Completion Rate) share the
+  // same .gauge-card clickable deep-dive trigger now.
   const cell = e.target.closest('[data-metric]');
   if (cell) openMatrixCellModal(cell.dataset.metric);
 });
