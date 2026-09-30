@@ -310,7 +310,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
    this round's map-engine and color-breakup spec. .agg-hub-heading/
    .agg-hub-ticker recolor this modal's two ".label"/ticker headers gold
    without touching the shared .label class used elsewhere on the page.
-   .tiles-degraded keeps the dark canvas background visible if the Carto
+   .tiles-degraded keeps the dark canvas background visible if the OSM
    tile layer fails to load (see initAggregationMap()'s tileerror
    handler). ===== */
 .geo-hatch-search-row{display:flex;gap:8px;margin-top:8px}
@@ -1013,10 +1013,15 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 
   <!-- ===== FULL-SCREEN CROWD SOURCE AMERICA™ AGGREGATION HUB MODAL — a
        real Leaflet map (#aggregation-map-container), not a CSS/SVG-drawn
-       canvas, per this round's map-engine spec. Loads Carto Dark Matter
-       tiles; gold (#FFB800) markers for each seeded jurisdiction, sized
-       from real numbers where a live backend exists (La Crosse — this
-       project's only live ward data, via loadBig3()) and clearly tagged
+       canvas. Loads plain OpenStreetMap raster tiles — Carto's Dark
+       Matter basemap started requiring an API key and was rendering an
+       "API KEY REQUIRED" watermark, so this round swapped to OSM, same
+       fix already applied to the field-dispatch map's tiles (see
+       addBaseLayer() and the global .leaflet-tile-pane filter, which
+       dark-themes these OSM tiles the same way, automatically). Gold
+       (#FFB800) markers for each seeded jurisdiction, sized from real
+       numbers where a live backend exists (La Crosse — this project's
+       only live ward data, via loadBig3()) and clearly tagged
        (Illustrative) where a jurisdiction is still static demo config
        (Austin/Chicago — see the `cities` object). If tiles fail to load,
        the dark canvas background and gold markers still render (see
@@ -1617,14 +1622,18 @@ document.querySelectorAll('[data-close-panel]').forEach(btn => {
 
 /* =====================================================================
    CROWD SOURCE AMERICA™ AGGREGATION HUB MODAL — a real Leaflet instance
-   (#aggregation-map-container), not a CSS/SVG-drawn canvas, per this
-   round's map-engine spec. Loads CORS-compliant Carto Dark Matter tiles;
-   if tile fetching fails (offline, CDN blocked, CORS), the container's
-   own dark background (see .aggregation-map-wrap CSS) plus the three gold
-   markers below still render, so the view degrades to "dark canvas with
-   markers" rather than a blank/broken map. Separate Leaflet map instance
-   from the field-dispatch `map` used in the Analytics deep-dive — this
-   never touches that instance or its markers. ===== */
+   (#aggregation-map-container), not a CSS/SVG-drawn canvas. Loads plain
+   OpenStreetMap raster tiles (Carto's Dark Matter basemap started
+   requiring an API key and was showing an on-tile watermark instead of a
+   map — same issue and same fix already applied to the field-dispatch
+   map's tiles; see addBaseLayer() below and the global .leaflet-tile-pane
+   CSS filter, which dark-themes OSM's tiles for both map instances). If
+   tile fetching fails (offline, CDN blocked), the container's own dark
+   background (see .aggregation-map-wrap CSS) plus the three gold markers
+   below still render, so the view degrades to "dark canvas with markers"
+   rather than a blank/broken map. Separate Leaflet map instance from the
+   field-dispatch `map` used in the Analytics deep-dive — this never
+   touches that instance or its markers. ===== */
 let aggregationMap = null;
 const aggregationMapMarkers = {};
 let aggregationMapTilesFailed = false;
@@ -1677,10 +1686,18 @@ function initAggregationMap(){
   }
   if (typeof L === 'undefined') return; // Leaflet CDN unreachable — legend/markers still degrade gracefully below
   try {
-    aggregationMap = L.map('aggregation-map-container', { attributionControl: false, scrollWheelZoom: false })
+    // Carto's Dark Matter basemap now requires an API key (its tiles were
+    // rendering an "API KEY REQUIRED" watermark instead of the map), so
+    // this round swaps to standard OpenStreetMap raster tiles — 100% free,
+    // keyless, no watermark. Attribution control is left on (rather than
+    // the previous attributionControl:false) since OSM's tile usage
+    // policy requires visible attribution, which the tileLayer's own
+    // `attribution` option below feeds into it.
+    aggregationMap = L.map('aggregation-map-container', { scrollWheelZoom: false })
       .setView([39.8283, -98.5795], 4);
-    const tiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      subdomains: 'abcd', maxZoom: 19
+    const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     });
     tiles.on('tileerror', () => {
       // A real tile-load failure — keep the dark canvas background and gold
