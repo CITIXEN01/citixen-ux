@@ -615,28 +615,36 @@ audio.pw-audio-el{width:100%;margin-top:4px}
    lockups inside the topbar wordmark and hero title (left untouched
    per the section-freeze rule). ===== */
 .tm-symbol{font-weight:300 !important;font-size:.55em !important;margin-left:3px !important;opacity:.8;vertical-align:super}
+/* Flush variant — no left margin, for lockups (the "What is CITIXEN UX™?"
+   heading, per this round's spec) where the ™ must sit tight against the
+   preceding letter with no visible gap. */
+.tm-symbol-flush{margin-left:0 !important}
 
 /* ===== NATIONAL LIVE REPORT PIXEL MAP — decorative, stylized US
    silhouette rendered as a dense grid of dim pixels with bright,
    pulsing city nodes. Purely decorative (see renderNationalPixelMap());
    the silhouette is a hand-authored approximation, not a precise
    cartographic projection — same convention as the Aggregation Hub's
-   own stylized marker layout. ===== */
+   own stylized marker layout. Per this round's motion-fix spec, nodes
+   are stationary: @keyframes staticPulse only fades opacity in place
+   (no transform/scale, no panning or floating) so each node stays
+   strictly pinned at its fixed coordinate. ===== */
 .pixel-map-section{max-width:720px;margin:0 auto 20px;padding:0 24px}
 .pixel-map-card{position:relative;height:190px;background:#000;border:1px solid #0284C7;border-radius:16px;overflow:hidden}
 .pixel-map-svg{width:100%;height:100%;display:block}
 .pixel-map-dot{opacity:.2}
 .pixel-map-node-core{opacity:0}
-.pixel-map-node-pulse{opacity:0;transform-origin:center}
+.pixel-map-node-pulse{opacity:0}
 .pixel-map-node-emerald .pixel-map-node-core{fill:#00FF87}
 .pixel-map-node-emerald .pixel-map-node-pulse{fill:#00FF87}
 .pixel-map-node-cyan .pixel-map-node-core{fill:#0EA5E9}
 .pixel-map-node-cyan .pixel-map-node-pulse{fill:#0EA5E9}
-.pixel-map-node-core,.pixel-map-node-pulse{animation:pixelPulse 2.4s ease-in-out infinite}
-@keyframes pixelPulse{
-  0%{opacity:.9;transform:scale(1)}
-  50%{opacity:.35;transform:scale(1.8)}
-  100%{opacity:.9;transform:scale(1)}
+.pixel-map-node-core{animation:staticPulse 2.4s ease-in-out infinite}
+.pixel-map-node-pulse{animation:staticPulse 2.4s ease-in-out infinite reverse}
+@keyframes staticPulse{
+  0%{opacity:.9}
+  50%{opacity:.3}
+  100%{opacity:.9}
 }
 .analytics-matrix-card{max-width:720px;margin:0 auto 40px;background:var(--card);border:1px solid var(--border);
   border-radius:16px;padding:20px}
@@ -868,58 +876,37 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   </section>
 
   <!-- ===== ALTERNATING SECTION CADENCE:
-       Position 1 — "What is CITIXEN UX™?" explanation, now 3 separate
-       lines/paragraphs per this round's spec (was one merged paragraph).
-       Embedded Live Report Pixel Map — sits directly beneath Position 1
-       and above Position 2, per this round's spec.
-       Position 2 — the Aggregation Hub gateway button, now in the
-       Electric Cyan variant (.ledger-banner-cyan) — Civic Gold is fully
-       retired this round, see the color-breakup notes below.
-       Position 3 — the Crowd Source America™ campaign title/narrative.
+       Position 1 — "What is CITIXEN UX™?" explanation, 3 separate
+       lines/paragraphs per this round's exact-copy spec.
+       Position 2 — the Aggregation Hub gateway button (Electric Cyan
+       variant, .ledger-banner-cyan — Civic Gold is retired), now
+       re-ordered to sit directly ABOVE the pixel map per this round's
+       spec (previously below it).
+       Position 3 — the embedded Live Report Pixel Map, directly beneath
+       the gateway button.
+       Position 4 — the Crowd Source America™ campaign title/narrative.
        ===== -->
   <section class="hero-qa-section">
     <div class="hero-qa-block">
-      <h2 class="hero-qa-heading">What is CITIXEN UX<sup class="tm-symbol">™</sup>?</h2>
-      <p class="hero-qa-body">CITIXEN UX<sup class="tm-symbol">™</sup> is the modern standard for resident-first municipal engagement.</p>
-      <p class="hero-qa-body">Powered by <span class="hero-qa-accent">Civic Intelligence (C.I.)</span>, it combines real-time resident reporting with direct city department tracking and transparent project budget auditing—creating an uneditable public record.</p>
-      <p class="hero-qa-body"><span class="hero-qa-accent">You hold the receipt</span> to ensure your tax dollars actively protect and improve your neighborhood.</p>
-    </div>
-  </section>
-
-  <!-- ===== NATIONAL LIVE REPORT PIXEL MAP — a decorative, stylized US
-       silhouette (an approximate polygon used only as an SVG clip-path —
-       same "stylized layout, not a geographic projection" convention as
-       the Aggregation Hub's own markers) rendered as a dense grid of dim
-       pixels, with five bright, pulsing city nodes (La Crosse, Chicago,
-       Austin, New York, Los Angeles) alternating Emerald/Cyan. Purely
-       decorative — see renderNationalPixelMap() below; it draws no real
-       per-city report data, unlike the Aggregation Hub's live-tagged
-       La Crosse marker. ===== -->
-  <section class="pixel-map-section">
-    <div class="pixel-map-card" id="national-pixel-map">
-      <svg class="pixel-map-svg" viewBox="0 0 800 440" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
-        <defs>
-          <clipPath id="usSilhouetteClip">
-            <path d="M150,40 L620,40 L620,90 L560,70 L600,120 L650,90 L700,60 L740,100 L700,150 L720,190 L690,230 L670,280 L690,320 L660,360 L680,390 L720,430 L680,400 L630,390 L560,400 L500,390 L460,420 L400,400 L350,440 L320,400 L270,380 L220,360 L180,330 L150,360 L130,320 L110,260 L120,200 L100,140 L110,90 Z"/>
-          </clipPath>
-        </defs>
-        <g id="pixelMapGrid" clip-path="url(#usSilhouetteClip)"></g>
-        <g id="pixelMapNodes"></g>
-      </svg>
+      <h2 class="hero-qa-heading">What is <span style="color:#00FF87;">CITIXEN UX<sup class="tm-symbol tm-symbol-flush">™</sup></span>?</h2>
+      <p style="margin-bottom: 1.25rem;"><span style="color:#00FF87; font-weight:bold;">CITIXEN UX<sup class="tm-symbol tm-symbol-flush">™</sup></span> is the modern standard for resident-first municipal engagement.</p>
+      <p style="margin-bottom: 1.25rem;">Powered by <span style="color:#00FF87; font-weight:bold;">Civic Intelligence (C.I.)</span>, CITIXEN UX<sup class="tm-symbol tm-symbol-flush">™</sup> combines real-time resident reporting with direct city department tracking and transparent project budget auditing.</p>
+      <p style="margin-bottom: 1.5rem;"><span style="color:#00FF87; font-weight:bold;">Creating an uneditable public record, you hold the receipt</span> to ensure your tax dollars actively protect and improve your neighborhood.</p>
     </div>
   </section>
 
   <!-- ===== AGGREGATION MAP GATEWAY BUTTON — Position 2. Same .ledger-banner
-       layout as the Live Public Ledger banner, now in the Electric Cyan
-       variant (.ledger-banner-cyan — Civic Gold is retired this round,
-       see the color-breakup notes near .ledger-banner-cyan's CSS), so the
+       layout as the Live Public Ledger banner, in the Electric Cyan
+       variant (.ledger-banner-cyan — Civic Gold is retired, see the
+       color-breakup notes near .ledger-banner-cyan's CSS), so the
        national Crowd Source America™ campaign still reads as visually
        distinct from CITIXEN UX™'s emerald platform elements. "AGGREGATION
        HUB" is wrapped in a no-wrap span so "HUB" never orphans onto its
        own line on narrow viewports (see the max-width:640px rule below).
        Opens the same real #nationalHeatMapModal (a real Leaflet instance
        — see below) that the Analytics drawer's own trigger opens — not a
-       duplicate modal. ===== -->
+       duplicate modal. Re-ordered this round to sit directly above the
+       pixel map (was below it). ===== -->
   <section class="ledger-banner-section">
     <button class="ledger-banner ledger-banner-cyan" id="aggregationMapGatewayBtn" type="button">
       <span class="ledger-banner-pulse" aria-hidden="true"></span>
@@ -928,13 +915,42 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </button>
   </section>
 
-  <!-- ===== CROWD SOURCE AMERICA™ NARRATIVE BLOCK — Position 3. Plain
-       centered text, no card/box; the heading now carries the Electric
-       Cyan accent (Civic Gold retired this round). ===== -->
+  <!-- ===== NATIONAL LIVE REPORT PIXEL MAP — Position 3, re-ordered this
+       round to sit directly BENEATH the Aggregation Hub gateway button
+       (was above it). A decorative, stylized US silhouette (a refined,
+       hand-authored approximation used only as an SVG clip-path — same
+       "stylized layout, not a geographic projection" convention as the
+       Aggregation Hub's own markers) rendered as a dense grid of dim
+       pixels, with five bright city nodes (La Crosse, Chicago, Austin,
+       New York, Los Angeles) alternating Emerald/Cyan. Nodes are
+       stationary — fixed pixel coordinates, opacity-only staticPulse
+       animation, no panning/floating/zooming (see the CSS notes above
+       and renderNationalPixelMap() below). Purely decorative; it draws
+       no real per-city report data, unlike the Aggregation Hub's
+       live-tagged La Crosse marker. ===== -->
+  <section class="pixel-map-section">
+    <div class="pixel-map-card" id="national-pixel-map">
+      <svg class="pixel-map-svg" viewBox="0 0 800 440" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+        <defs>
+          <clipPath id="usSilhouetteClip">
+            <path d="M120,40 L150,35 L400,30 L600,35 L650,60 L630,90 L660,110 L645,130 L630,160 L620,190 L640,200 L610,230 L600,260 L615,290 L650,320 L660,360 L630,380 L590,350 L560,330 L520,340 L480,350 L440,360 L400,370 L370,390 L340,400 L300,395 L280,370 L250,340 L220,320 L180,310 L140,290 L110,260 L100,220 L90,180 L85,140 L95,100 L110,60 Z"/>
+          </clipPath>
+        </defs>
+        <g id="pixelMapGrid" clip-path="url(#usSilhouetteClip)"></g>
+        <g id="pixelMapNodes"></g>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ===== CROWD SOURCE AMERICA™ NARRATIVE BLOCK — Position 4. Plain
+       centered text, no card/box; the heading carries the Electric Cyan
+       accent (Civic Gold retired). Every "CITIXEN UX™" mention in this
+       block's body copy is styled Emerald Green bold per this round's
+       spec. ===== -->
   <section class="csa-banner-section">
     <div class="csa-banner-card">
       <h2 class="csa-banner-heading">Crowd Source America<sup class="tm-symbol">™</sup></h2>
-      <p class="csa-banner-body">Every CITIXEN UX<sup class="tm-symbol">™</sup> report feeds into one unified national ledger—turning individual local fixes into a live, block-by-block picture of civic conditions across the country.</p>
+      <p class="csa-banner-body">Every <span style="color:#00FF87; font-weight:bold;">CITIXEN UX<sup class="tm-symbol">™</sup></span> report feeds into one unified national ledger—turning individual local fixes into a live, block-by-block picture of civic conditions across the country.</p>
     </div>
   </section>
 
@@ -2599,13 +2615,16 @@ function renderNationalPixelMap(){
   grid.innerHTML = dots;
 
   // Approximate pixel-space positions for each node, hand-placed within
-  // the silhouette clip-path — not derived from real latitude/longitude.
+  // the refined silhouette clip-path — not derived from real
+  // latitude/longitude. Fixed, stationary coordinates: nodes never pan,
+  // float, or move — only their opacity pulses (see @keyframes
+  // staticPulse), per this round's motion-fix spec.
   const nodes = [
-    { name: 'La Crosse', x: 470, y: 150, color: 'emerald' },
-    { name: 'Chicago',    x: 520, y: 165, color: 'cyan' },
-    { name: 'Austin',     x: 430, y: 300, color: 'emerald' },
-    { name: 'New York',   x: 660, y: 150, color: 'cyan' },
-    { name: 'Los Angeles',x: 190, y: 250, color: 'emerald' }
+    { name: 'La Crosse', x: 420, y: 110, color: 'emerald' },
+    { name: 'Chicago',    x: 460, y: 130, color: 'cyan' },
+    { name: 'Austin',     x: 330, y: 370, color: 'emerald' },
+    { name: 'New York',   x: 620, y: 140, color: 'cyan' },
+    { name: 'Los Angeles',x: 110, y: 240, color: 'emerald' }
   ];
   nodesLayer.innerHTML = nodes.map(n => {
     const cls = 'pixel-map-node-' + n.color;
