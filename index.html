@@ -227,12 +227,15 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .hub-card-text{display:flex;align-items:baseline;gap:6px;min-width:0;flex-wrap:wrap}
 .hub-card-text .hub-card-title{font-size:.8rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
 .hub-card-sub{font-size:.72rem !important;font-weight:500 !important;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* The circled "(i)" info badge (.hub-card-info) that used to trigger the
+   section-preview modal was removed per this round's spec — it visually
+   overlapped the main icon/arrow CTA. The same real trigger now lives on
+   the subtitle text itself, so it gets an underline-on-hover affordance
+   instead of a separate badge. */
+.hub-card-sub[role="button"]{cursor:pointer;text-decoration:underline;text-decoration-color:transparent;transition:text-decoration-color .15s,color .15s}
+.hub-card-sub[role="button"]:hover{color:#00E699;text-decoration-color:#00E699}
 .hub-card-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .hub-card-arrow{font-size:.8rem;font-weight:600;color:#00E699;flex-shrink:0}
-.hub-card-info{width:18px;height:18px;border-radius:50%;
-  border:1px solid #00E699;color:#00E699;font-size:.66rem;font-weight:700;font-style:italic;font-family:Georgia,serif;
-  display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(0,230,153,.08);flex-shrink:0}
-.hub-card-info:hover{background:rgba(0,230,153,.22)}
 .hub-card:hover{border-color:#00E699}
 @media (max-width:640px){
   .hub-row{padding:0 14px}
@@ -730,11 +733,15 @@ audio.pw-audio-el{width:100%;margin-top:4px}
    only fades opacity in place (no transform/scale, no panning or
    floating) so nothing on this canvas ever pans, moves, or zooms. ===== */
 .pixel-map-section{max-width:720px;margin:0 auto 20px;padding:0 24px}
-/* Fill pivoted from a translucent slate glass to flat obsidian (#030712)
-   per this round's item 4 literal spec ("obsidian glass (#030712)"); the
-   border stays a crisp Fresh Mint stroke. */
-.pixel-map-card{position:relative;height:190px;background:#030712;border:1px solid rgba(0,230,153,.35);border-radius:16px;overflow:hidden}
-.pixel-map-svg{width:100%;height:100%;display:block}
+/* Fill pivoted from a translucent slate glass to flat obsidian (#030712);
+   the border stays a crisp Fresh Mint stroke. Per this round's map-sizing
+   spec, the card is now a column layout — a fixed-height SVG graphic area
+   on top, plus a normal-flow action row (.pixel-map-action-row) beneath it
+   for the "View Map ↗" trigger — instead of one flat height with the
+   button absolutely overlaid on the graphic, so the button can no longer
+   cover the Florida/East Coast region of the silhouette. */
+.pixel-map-card{position:relative;display:flex;flex-direction:column;background:#030712;border:1px solid rgba(0,230,153,.35);border-radius:16px;overflow:hidden}
+.pixel-map-svg{width:100%;height:210px;display:block;flex-shrink:0}
 .pixel-map-dot{opacity:.2;transition:fill .25s,opacity .4s}
 /* Grid fills pivoted from Emerald Green (#00E699) to Fresh Mint (#00E699)
    per this round's item 18. */
@@ -746,21 +753,21 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 .pixel-map-node-pulse{opacity:0}
 .pixel-map-node-emerald .pixel-map-node-core{fill:#00E699}
 .pixel-map-node-emerald .pixel-map-node-pulse{fill:#00E699}
-/* ===== INTEGRATED MAP CARD BRANDING — per this round's item 4, the
-   standalone "Crowd Source America" title/body text and the floating
-   caption-link below the map are both retired; instead, the brand label
-   (top-left) and the "View Map ↗" trigger (bottom-right) are absolutely
-   positioned INSIDE .pixel-map-card's own relative box, nested directly
-   in the map's border rather than floating above or below it. z-index:2
-   keeps both above the SVG grid/nodes (which paint at the default stack
-   level) without needing to touch the SVG's own z-ordering. ===== */
-.pixel-map-brand{position:absolute;top:12px;left:14px;z-index:2;
-  color:#00E699;font-weight:700;font-size:.95rem;pointer-events:none}
-.pixel-map-view-trigger{position:absolute;bottom:12px;right:14px;z-index:2;
-  display:inline-flex;align-items:center;gap:6px;background:rgba(0,230,153,.08);
-  border:1px solid #00E699;color:#00E699;font-size:.72rem;font-weight:700;
-  padding:6px 14px;border-radius:9999px;cursor:pointer;font-family:inherit;
-  transition:filter .15s}
+/* ===== INTEGRATED MAP CARD BRANDING — the brand title is centered
+   horizontally as an overlay across the TOP of the SVG graphic area
+   (z-index:2 keeps it above the grid/nodes without touching the SVG's own
+   z-ordering); the "View Map ↗" trigger now sits in a normal-flow action
+   row BELOW the graphic (.pixel-map-action-row), not overlaid on top of
+   it, so it can no longer cover the Florida/East Coast region per this
+   round's sizing spec. ===== */
+.pixel-map-brand{position:absolute;top:12px;left:0;right:0;z-index:2;
+  text-align:center;color:#00E699;font-weight:700;font-size:.95rem;pointer-events:none}
+.pixel-map-action-row{display:flex;justify-content:flex-end;align-items:center;
+  flex-shrink:0;padding:10px 14px 12px}
+.pixel-map-view-trigger{display:inline-flex;align-items:center;gap:6px;
+  background:rgba(0,230,153,.08);border:1px solid #00E699;color:#00E699;
+  font-size:.72rem;font-weight:700;padding:6px 14px;border-radius:9999px;
+  cursor:pointer;font-family:inherit;transition:filter .15s}
 .pixel-map-view-trigger:hover{filter:brightness(1.25)}
 .pixel-map-node-core{animation:staticPulse 2.4s ease-in-out infinite}
 .pixel-map-node-pulse{animation:staticPulse 2.4s ease-in-out infinite reverse}
@@ -769,6 +776,38 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   50%{opacity:.3}
   100%{opacity:.9}
 }
+/* Per this round's map-density spec: each node <g> starts fully
+   transparent and fades in (not just pulses in place) as
+   runPixelMapBuildUpCycle() reveals it during the 14s fill sequence, so
+   the map visually "fills up" with data points rather than showing a
+   fixed set of already-visible dots. Once a node's wrapper is revealed,
+   its child .pixel-map-node-core/-pulse keep breathing via the existing
+   staticPulse animation underneath the fade-in. */
+.pixel-map-node-emerald{opacity:0;transition:opacity .6s ease}
+.pixel-map-node-emerald.revealed{opacity:1}
+/* ===== LEARN MORE ACCORDION — re-added per this round's item 2, sitting
+   directly below the map card and centered above the "Explore More Data"
+   header. Reuses the real Snap/Track/Audit workflow-row copy and the
+   CITIXEN UX / "hold the receipt" / Civic Intelligence paragraphs that
+   were deleted along with the old .hero-qa-* treatment in an earlier
+   round; new class names are used throughout since that CSS was fully
+   retired, while the #btnLearnMoreToggle/#learnMoreDrawer ids are reused
+   since nothing else claims them. ===== */
+.learn-more-section{max-width:640px;margin:0 auto 20px;padding:0 24px;text-align:center}
+.learn-more-toggle{display:inline-flex;align-items:center;gap:8px;background:rgba(0,230,153,.08);
+  border:1px solid #00E699;color:#00E699;font-size:.78rem;font-weight:700;letter-spacing:.04em;
+  text-transform:uppercase;padding:8px 20px;border-radius:9999px;cursor:pointer;
+  font-family:inherit;transition:filter .15s}
+.learn-more-toggle:hover{filter:brightness(1.25)}
+.learn-more-chevron{display:inline-block;font-size:.85rem;transition:transform .2s ease}
+.learn-more-toggle[aria-expanded="true"] .learn-more-chevron{transform:rotate(180deg)}
+.learn-more-drawer{margin-top:16px;padding:20px;text-align:left;background:rgba(15,23,42,.75);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(0,230,153,.3);border-radius:16px}
+.learn-more-workflow-row{display:flex;align-items:center;justify-content:center;gap:10px;
+  flex-wrap:wrap;color:var(--text);font-size:.85rem;font-weight:600;margin-bottom:16px}
+.learn-more-body{color:var(--muted);font-size:.85rem;line-height:1.55;margin:0 0 10px}
+.learn-more-body:last-child{margin-bottom:0}
 /* ===== CITY SNAPSHOT (LA CROSSE, WI — Active Hazards bar / Fix Speed
    dial / Completion Rate donut) was removed entirely per this round's
    item 5, along with the "Learn More ▾" toggle. Its CSS
@@ -1060,16 +1099,18 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        staticPulse node animation, no panning/floating/zooming. Purely
        decorative; it draws no real per-city report data, unlike the
        Aggregation Hub's live-tagged La Crosse marker.
-       Per this round's item 4, the standalone "Crowd Source America"
-       title/body text and the floating caption-link below the map (from
-       last round) are both removed — instead, .pixel-map-brand (top-left)
-       and #aggregationMapGatewayBtn/.pixel-map-view-trigger (bottom-right)
-       sit as absolutely-positioned overlays INSIDE .pixel-map-card's own
-       border, nested directly in the box rather than floating above/below
-       it. Same trigger id and click handler as before, so no JS wiring
-       changed — only its position moved. ===== -->
+       Per this round's map-container spec: the title overlay is centered
+       horizontally (not left-aligned) and reads "Crowd Save America"; the
+       "View Map ↗" trigger (#aggregationMapGatewayBtn) moved out of the
+       graphic area into a normal-flow .pixel-map-action-row below the SVG,
+       so the card no longer needs the button to overlap the silhouette —
+       the SVG itself grew slightly (190px -> 210px) and the card gained a
+       true bottom section, both aimed at keeping the button clear of the
+       Florida/East Coast region. Same trigger id and click handler as
+       before, so no JS wiring changed — only its position/markup moved. ===== -->
   <section class="pixel-map-section">
     <div class="pixel-map-card" id="national-pixel-map">
+      <div class="pixel-map-brand">Crowd Save America</div>
       <svg class="pixel-map-svg" viewBox="0 0 800 440" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
         <defs>
           <path id="usSilhouetteOutline" d="M760.0,60.1 L738.9,21.8 L722.8,20.4 L711.9,67.1 L653.5,82.4 L640.7,116.4 L569.9,161.2 L555.7,152.5 L563.7,118.5 L548.7,123.6 L552.4,99.2 L533.4,90.4 L509.3,162.7 L503.5,100.7 L527.9,82.4 L552.0,85.0 L496.5,75.1 L499.5,61.2 L448.7,78.0 L473.2,57.6 L415.1,33.9 L302.7,42.6 L69.9,31.3 L68.1,58.0 L45.1,41.5 L45.4,207.2 L62.6,246.3 L126.1,309.4 L208.6,330.2 L264.8,321.1 L304.6,369.3 L333.0,360.9 L372.4,415.6 L391.8,419.3 L387.8,387.9 L404.6,365.6 L441.8,348.5 L490.0,358.7 L479.0,344.1 L507.1,332.8 L568.1,341.5 L617.7,417.1 L626.1,394.8 L597.6,330.9 L603.8,312.0 L681.6,229.9 L655.3,198.1 L664.8,174.4 L678.3,185.7 L682.3,145.9 L732.3,126.2 L717.3,99.2 Z"/>
@@ -1081,8 +1122,9 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         <use href="#usSilhouetteOutline" class="pixel-map-outline"/>
         <g id="pixelMapNodes"></g>
       </svg>
-      <div class="pixel-map-brand">Crowd Source America<sup class="tm-symbol tm-symbol-flush">™</sup></div>
-      <button id="aggregationMapGatewayBtn" type="button" class="pixel-map-view-trigger">View Map ↗</button>
+      <div class="pixel-map-action-row">
+        <button id="aggregationMapGatewayBtn" type="button" class="pixel-map-view-trigger">View Map ↗</button>
+      </div>
     </div>
   </section>
 
@@ -1154,13 +1196,50 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        click handler now lives on #footerExportRecordLink in the footer
        instead. ===== -->
 
+  <!-- ===== LEARN MORE ACCORDION — re-added per this round's spec, sitting
+       directly below the national map card and centered above the
+       "Explore More Data" header. Same real, non-fabricated copy the
+       previous "Learn More ▾" disclosure carried (workflow row + the 3
+       CITIXEN UX / receipt / Civic Intelligence lines) before it was
+       removed in an earlier round — reused rather than invented, since it
+       was genuine descriptive product copy, not data. New class names
+       (.learn-more-*) since the old .hero-qa-* CSS was deleted along with
+       that earlier removal; #btnLearnMoreToggle/#learnMoreDrawer ids are
+       reused since nothing else in the file claims them. Chevron flips via
+       aria-expanded rather than swapping the glyph, so no extra JS string
+       logic is needed beyond toggling one attribute + the [hidden]
+       attribute. ===== -->
+  <section class="learn-more-section">
+    <button id="btnLearnMoreToggle" type="button" class="learn-more-toggle" aria-expanded="false" aria-controls="learnMoreDrawer">
+      Learn More <span class="learn-more-chevron" aria-hidden="true">&#8744;</span>
+    </button>
+    <div id="learnMoreDrawer" class="learn-more-drawer" hidden>
+      <div class="learn-more-workflow-row">
+        <span style="display:inline-flex; align-items:center; gap:6px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Snap
+        </span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00E699" stroke-width="2" opacity="0.6"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        <span style="display:inline-flex; align-items:center; gap:6px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Track
+        </span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00E699" stroke-width="2" opacity="0.6"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        <span style="display:inline-flex; align-items:center; gap:6px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Audit
+        </span>
+      </div>
+      <p class="learn-more-body"><span style="color:#FFFFFF; font-weight:bold;">CITIXEN</span> <span style="color:#00E699; font-weight:bold;">UX</span><sup class="tm-symbol">™</sup> combines real-time resident reporting with direct city department tracking and transparent budget auditing.</p>
+      <p class="learn-more-body">Create an uneditable public record and <span style="color:#00E699; font-weight:bold;">hold the receipt</span> to ensure your tax dollars actively protect and improve your neighborhood.</p>
+      <p class="learn-more-body" style="font-weight:500;">Welcome to the era of <span style="color:#00E699; font-weight:bold;">Civic Intelligence (C.I.)</span>.</p>
+    </div>
+  </section>
+
   <!-- ===== CITY SNAPSHOT (the geolocated Active Hazards / Fix Speed /
        Completion Rate gauge card that used to live here) was removed
-       entirely per this round's item 5 — see the JS/CSS removal notes
-       near renderAnalyticsMatrix()/.gauge-card above. Only its "Explore
-       More Data" header survives, now sitting directly below the national
-       map card per this round's item 6, immediately followed by the same
-       3-pill hub-row it always introduced. ===== -->
+       entirely per an earlier round — see the JS/CSS removal notes near
+       renderAnalyticsMatrix()/.gauge-card above. Only its "Explore More
+       Data" header survives, sitting directly below the Learn More
+       accordion, immediately followed by the same 3-pill hub-row it
+       always introduced. ===== -->
   <section class="matrix-summary-section" id="matrixSummarySection">
     <h3 style="color: #00E699; font-size: 1.15rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin: 24px 0 24px 0; text-align: center;">Explore More Data</h3>
   </section>
@@ -1180,30 +1259,27 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     <button class="hub-card" id="hubCoverageBtn" type="button" aria-expanded="false" aria-controls="deepdiveAnalytics">
       <span class="hub-card-main">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><rect x="6" y="10" width="3" height="9"/><rect x="11" y="6" width="3" height="13"/><rect x="16" y="13" width="3" height="6"/></svg>
-        <span class="hub-card-text"><span class="hub-card-title">Analytics</span><span class="hub-card-sub">— Data and reports</span></span>
+        <span class="hub-card-text"><span class="hub-card-title">Analytics</span><span class="hub-card-sub" id="hubCoverageInfoBtn" role="button" tabindex="0" aria-label="What the Analytics section covers">— Data &amp; Reports</span></span>
       </span>
       <span class="hub-card-actions">
-        <span class="hub-card-info" id="hubCoverageInfoBtn" role="button" tabindex="0" aria-label="What the Analytics section covers">i</span>
         <span class="hub-card-arrow" aria-hidden="true">↗</span>
       </span>
     </button>
     <button class="hub-card" id="hubSlaBtn" type="button" aria-expanded="false" aria-controls="civicStackSection">
       <span class="hub-card-main">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7V5a2 2 0 0 1 2-2h8"/><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M2 11h20"/><circle cx="17" cy="15" r="1.3" fill="#00E699" stroke="none"/></svg>
-        <span class="hub-card-text"><span class="hub-card-title">Expenditures</span><span class="hub-card-sub">— Budget and Projects</span></span>
+        <span class="hub-card-text"><span class="hub-card-title">Expenditures</span><span class="hub-card-sub" id="hubSlaInfoBtn" role="button" tabindex="0" aria-label="What the Expenditures section covers">— Budget &amp; Projects</span></span>
       </span>
       <span class="hub-card-actions">
-        <span class="hub-card-info" id="hubSlaInfoBtn" role="button" tabindex="0" aria-label="What the Expenditures section covers">i</span>
         <span class="hub-card-arrow" aria-hidden="true">↗</span>
       </span>
     </button>
     <button class="hub-card" id="hubStackBtn" type="button" aria-expanded="false" aria-controls="civicStackSection">
       <span class="hub-card-main">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 21 8 12 13 3 8 12 3"/><polyline points="3 13 12 18 21 13"/><polyline points="3 18 12 23 21 18"/></svg>
-        <span class="hub-card-text"><span class="hub-card-title">Operations</span><span class="hub-card-sub">— Civic Stack &amp; Integration</span></span>
+        <span class="hub-card-text"><span class="hub-card-title">Operations</span><span class="hub-card-sub" id="hubStackInfoBtn" role="button" tabindex="0" aria-label="What the Operations section covers">— Civic Stack &amp; Integration</span></span>
       </span>
       <span class="hub-card-actions">
-        <span class="hub-card-info" id="hubStackInfoBtn" role="button" tabindex="0" aria-label="What the Operations section covers">i</span>
         <span class="hub-card-arrow" aria-hidden="true">↗</span>
       </span>
     </button>
@@ -1882,11 +1958,13 @@ document.getElementById('hubStackBtn').addEventListener('click', (e) => {
   openDeepdivePanel('civicStackSection', 'civicStackAdminCard', e.currentTarget);
 });
 
-// SUB-MODULE FOCUS-AREA PREVIEWS — the small "i" badge on each of the 3
-// hub-cards opens a quick modal naming what that section covers (this
-// round's spec copy), without triggering the card's own real expand-to-
-// deep-dive-panel behavior above — stopPropagation keeps the two
-// interactions from firing together on the same click.
+// SUB-MODULE FOCUS-AREA PREVIEWS — the circled "(i)" badge that used to
+// carry this trigger was removed per this round's spec (it visually
+// overlapped the main icon/arrow CTA); the same real modal trigger is
+// relocated onto each hub-card's own subtitle text (e.g. "— Data &
+// Reports") instead of being deleted, without triggering the card's own
+// real expand-to-deep-dive-panel behavior above — stopPropagation keeps
+// the two interactions from firing together on the same click.
 const hubInfoBindings = [
   ['hubCoverageInfoBtn', 'submoduleAnalytics'],
   ['hubSlaInfoBtn', 'submoduleExpenditures'],
@@ -2749,14 +2827,37 @@ function renderNationalPixelMap(){
   // against the current #usSilhouetteOutline polygon so every node lands
   // inside the coastline, not derived from real latitude/longitude).
   // Fixed, stationary coordinates: nodes never pan, float, or move — only
-  // their opacity pulses (see @keyframes staticPulse). All Emerald Green.
+  // their opacity fades in/pulses (see .pixel-map-node-emerald.revealed and
+  // @keyframes staticPulse). All Emerald Green. Per this round's map-density
+  // spec (30-50 dynamic points), the original 6 real seeded jurisdictions
+  // (La Crosse/Chicago/Austin/New York/Los Angeles/Miami — the same cities
+  // the Aggregation Hub uses) are kept and named; the other 34 points fill
+  // out the count to 40 total. They are deliberately left unnamed — they
+  // are NOT additional real jurisdictions or report locations (this
+  // project only has real live data for La Crosse), just decorative
+  // filler points confirmed inside the silhouette polygon by a
+  // point-in-polygon check against the same #usSilhouetteOutline path,
+  // spread out to avoid clumping.
   const nodes = [
     { name: 'La Crosse',  x: 420, y: 140 },
     { name: 'Chicago',    x: 455, y: 160 },
     { name: 'Austin',     x: 330, y: 320 },
     { name: 'New York',   x: 650, y: 150 },
     { name: 'Los Angeles',x: 110, y: 230 },
-    { name: 'Miami',      x: 385, y: 405 }
+    { name: 'Miami',      x: 385, y: 405 },
+    // 34 unnamed decorative fill points (see comment above).
+    { x: 249.8, y: 120.9 }, { x: 568.2, y: 295.5 }, { x: 351.1, y: 46.5 },
+    { x: 210.9, y: 229.6 }, { x: 78.3,  y: 111.6 }, { x: 508.4, y: 244.8 },
+    { x: 294.8, y: 94.9 },  { x: 124.0, y: 72.2 },  { x: 644.8, y: 267.4 },
+    { x: 321.2, y: 247.5 }, { x: 217.2, y: 146.4 }, { x: 115.1, y: 124.6 },
+    { x: 498.6, y: 175.5 }, { x: 178.1, y: 315.7 }, { x: 172.7, y: 181.1 },
+    { x: 444.3, y: 298.6 }, { x: 218.0, y: 47.4 },  { x: 335.6, y: 119.4 },
+    { x: 135.7, y: 276.6 }, { x: 606.5, y: 197.5 }, { x: 103.8, y: 181.9 },
+    { x: 244.1, y: 281.8 }, { x: 137.0, y: 202.4 }, { x: 405.4, y: 103.8 },
+    { x: 480.2, y: 93.8 },  { x: 586.1, y: 242.7 }, { x: 60.4,  y: 159.8 },
+    { x: 272.2, y: 57.3 },  { x: 387.9, y: 246.7 }, { x: 207.8, y: 85.9 },
+    { x: 386.1, y: 337.1 }, { x: 352.3, y: 214.8 }, { x: 739.1, y: 72.9 },
+    { x: 337.8, y: 165.6 }
   ];
   nodesLayer.innerHTML = nodes.map(n =>
     '<g class="pixel-map-node-emerald">' +
@@ -2779,37 +2880,55 @@ function pixelMapFindNearestDot(dots, targetX, targetY){
   return best;
 }
 
-const PIXEL_MAP_FILL_INTERVAL_MS = 150;   // one new node lit every 150ms
+const PIXEL_MAP_FILL_INTERVAL_MS = 150;   // one new grid square lit every 150ms
+const PIXEL_MAP_NODE_REVEAL_INTERVAL_MS = 350; // one new node fades in every 350ms
 const PIXEL_MAP_FILL_DURATION_MS = 14000; // Fill Sequence: 0s-14s
 const PIXEL_MAP_CYCLE_DURATION_MS = 15000; // full cycle length, incl. reset
 let pixelMapFillTimer = null;
+let pixelMapNodeRevealTimer = null;
 let pixelMapCycleTimer = null;
 
 // Runs one full 15s "build-up & reset" pass and re-schedules itself,
 // forming an infinite loop:
-//   0s      — Start Cycle: clear every lit node except the 1 origin seed
-//             node (the grid square nearest La Crosse's marker — this
-//             project's home jurisdiction — which anchors every pass).
+//   0s      — Start Cycle: clear every lit grid square and every revealed
+//             node except the 1 origin seed (the grid square/node nearest
+//             La Crosse's marker — this project's home jurisdiction —
+//             which anchors every pass).
 //   0s-14s  — Fill Sequence: every 150ms, light one random still-unlit
-//             node; it stays lit for the rest of this cycle.
-//   14s-15s — Peak Density: filling stops (~93 nodes lit at 150ms
-//             cadence over 14s, matching this round's "~100 nodes"
-//             full-aggregation target), and the coastline outline gets a
-//             brief pulse-glow to mark the moment.
-//   15s     — Reset: wipe back down to the 1 seed node; the next pass
-//             starts immediately.
+//             grid square; separately, every 350ms, fade in one random
+//             still-hidden node (see .pixel-map-node-emerald.revealed) —
+//             at ~40 nodes total and a 350ms cadence, every node has
+//             faded in by roughly the 14s mark, so the map visually
+//             "fills up" with active-looking points rather than showing a
+//             fixed set of already-visible dots, per this round's spec.
+//             Each stays lit/revealed for the rest of this cycle.
+//   14s-15s — Peak Density: filling/revealing stops (~93 grid squares lit
+//             at 150ms cadence over 14s, matching this round's "~100
+//             nodes" full-aggregation target for the background grid),
+//             and the coastline outline gets a brief pulse-glow to mark
+//             the moment.
+//   15s     — Reset: wipe back down to the 1 seed grid square/node; the
+//             next pass starts immediately.
 function runPixelMapBuildUpCycle(){
   const grid = document.getElementById('pixelMapGrid');
+  const nodesLayer = document.getElementById('pixelMapNodes');
   if (!grid) return;
   const dots = Array.prototype.slice.call(grid.querySelectorAll('.pixel-map-dot'));
+  const nodeGroups = nodesLayer ? Array.prototype.slice.call(nodesLayer.querySelectorAll('.pixel-map-node-emerald')) : [];
   if (!dots.length) return;
 
   if (pixelMapFillTimer) { clearInterval(pixelMapFillTimer); pixelMapFillTimer = null; }
+  if (pixelMapNodeRevealTimer) { clearInterval(pixelMapNodeRevealTimer); pixelMapNodeRevealTimer = null; }
   if (pixelMapCycleTimer) { clearTimeout(pixelMapCycleTimer); pixelMapCycleTimer = null; }
 
   dots.forEach(d => d.classList.remove('pixel-map-dot-lit'));
   const originSeed = pixelMapFindNearestDot(dots, 420, 140); // La Crosse
   if (originSeed) originSeed.classList.add('pixel-map-dot-lit');
+
+  nodeGroups.forEach(g => g.classList.remove('revealed'));
+  // Origin node (La Crosse, the first entry in the nodes[] array) starts
+  // revealed immediately, same convention as the grid's origin seed dot.
+  if (nodeGroups.length) nodeGroups[0].classList.add('revealed');
 
   pixelMapFillTimer = setInterval(() => {
     const unlit = dots.filter(d => !d.classList.contains('pixel-map-dot-lit'));
@@ -2818,8 +2937,16 @@ function runPixelMapBuildUpCycle(){
     dot.classList.add('pixel-map-dot-lit');
   }, PIXEL_MAP_FILL_INTERVAL_MS);
 
+  pixelMapNodeRevealTimer = setInterval(() => {
+    const hidden = nodeGroups.filter(g => !g.classList.contains('revealed'));
+    if (!hidden.length) { clearInterval(pixelMapNodeRevealTimer); pixelMapNodeRevealTimer = null; return; }
+    const group = hidden[Math.floor(Math.random() * hidden.length)];
+    group.classList.add('revealed');
+  }, PIXEL_MAP_NODE_REVEAL_INTERVAL_MS);
+
   setTimeout(() => {
     if (pixelMapFillTimer) { clearInterval(pixelMapFillTimer); pixelMapFillTimer = null; }
+    if (pixelMapNodeRevealTimer) { clearInterval(pixelMapNodeRevealTimer); pixelMapNodeRevealTimer = null; }
     const outline = document.querySelector('.pixel-map-outline');
     if (outline) {
       outline.classList.add('pixel-map-outline-pulse');
@@ -3206,10 +3333,19 @@ function closeLedgerDrawer(){
 }
 document.getElementById('liveLedgerBanner').addEventListener('click', () => openLedgerDrawer());
 
-// The HERO "LEARN MORE" DISCLOSURE (workflow row + engine/receipt/era
-// lines behind a toggle) was removed entirely per this round's item 5 —
-// #btnLearnMoreToggle and #learnMoreDrawer no longer exist in the markup,
-// so this show/hide wiring is removed with them.
+// LEARN MORE ACCORDION — re-added per this round's item 2, sitting below
+// the map card. Toggles the drawer's [hidden] attribute and mirrors the
+// open/closed state onto aria-expanded (which also drives the chevron's
+// flip animation in CSS).
+const btnLearnMoreToggleEl = document.getElementById('btnLearnMoreToggle');
+const learnMoreDrawerEl = document.getElementById('learnMoreDrawer');
+if (btnLearnMoreToggleEl && learnMoreDrawerEl) {
+  btnLearnMoreToggleEl.addEventListener('click', () => {
+    const isOpen = btnLearnMoreToggleEl.getAttribute('aria-expanded') === 'true';
+    btnLearnMoreToggleEl.setAttribute('aria-expanded', String(!isOpen));
+    learnMoreDrawerEl.hidden = isOpen;
+  });
+}
 const btnViewItemizedLedgerEl = document.getElementById('btnViewItemizedLedger');
 if (btnViewItemizedLedgerEl) btnViewItemizedLedgerEl.addEventListener('click', () => openLedgerDrawer());
 document.getElementById('ledgerCloseBtn').addEventListener('click', closeLedgerDrawer);
