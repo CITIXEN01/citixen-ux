@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>CITIXEN UX™ — Master Production Gateway</title>
 <meta name="description" content="Zero-account civic hazard reporting and real-time ward health tracking for CITIXEN UX.">
+<!-- Open Graph metadata (this round's item 1) — the og:image points at the
+     brand shield asset path given in the spec; this build does not host
+     that file itself, so the tag is provided as directed without a claim
+     that the asset resolves from here. -->
+<meta property="og:title" content="CITIXEN UX™ — Civic Intelligence Platform">
+<meta property="og:description" content="Ground-truth transparency & 11M block national audit framework.">
+<meta property="og:image" content="https://citixenux.com/assets/citixen-brand-shield.png">
 <meta name="theme-color" content="#00E699">
 <meta name="referrer" content="no-referrer">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -41,32 +48,29 @@
   --brand-mint-dim:rgba(0,230,153,0.12) !important;
   --brand-amber:#ffbb00 !important;
   --brand-red:#ff4444 !important;
-  /* Global canvas pivoted from the prior Deep Slate Obsidian (#0B132B/
-     #0F172A) to ultra-dark pitch obsidian (#030712 body). An earlier round
-     gave card/glass surfaces their own explicit rgba(15,23,42,.75) +
-     Fresh Mint hairline + blur(16px) treatment; a later round's "absolute
-     blue purge" retired that intermediate slate-tinted glass fill too
-     (still a navy/slate hex under the alpha), so card/pill/modal/map-frame
-     surfaces (.modal-box, .hub-card, .pw-panel, .ledger-drawer-panel,
-     .pixel-map-card, below) now share one flat #030712 fill with a Fresh
-     Mint hairline border and a soft mint glow (box-shadow) instead.
+  /* Global canvas shifted this round ("Palette Shift, Brand Assets & Link
+     Metadata") from flat Pitch Obsidian (#030712) to Deep Midnight Navy
+     (#090D16), with card/glass surfaces now drawing from a #0B101D-based
+     translucent glass overlay + blur rather than the prior obsidian-tinted
+     fill. Precision Laser Mint (#00E699) 1px keylines are unchanged — same
+     hex the page has used as Fresh Mint since Round 14, just renamed in
+     this round's spec language; no color value changed for the accent
+     itself, only the canvas/card base underneath it.
      --bg-card stays as a solid opaque fallback (same #111827 hex the old
      frosted rgba resolved to at full opacity) for the handful of
      non-glass elements that still reference var(--card) as a plain
      background. */
-  --bg-obsidian:#030712 !important;
+  --bg-obsidian:#090D16 !important;
   --bg-card:#111827 !important;
   --border-muted:rgba(255,255,255,0.08) !important;
-  /* ===== STANDARDIZED SURFACE TOKENS — per this round's item 1 ("Absolute
-     Color Purge & Canvas Matching"), every card/panel/drawer surface on
-     this page (and app.html's, kept in sync) now draws from these two
-     tokens instead of each component hardcoding its own flat-obsidian +
-     hairline-border rule: a translucent glass card fill (with blur, so the
-     page's own obsidian canvas shows faintly through) and a matching
-     Fresh Mint hairline. Replaces the flat #030712 + rgba(0,230,153,.25)
-     border treatment introduced in an earlier round's "absolute blue
-     purge" — same intent (no navy/slate glass), refined fill. */
-  --surface-card-bg:rgba(11,15,25,0.85) !important;
+  /* ===== STANDARDIZED SURFACE TOKENS — every card/panel/drawer surface on
+     this page draws from these two tokens instead of each component
+     hardcoding its own base + hairline-border rule: a translucent Deep
+     Midnight Navy (#0B101D) glass card fill (with blur, so the page's own
+     navy canvas shows faintly through) and a matching Laser Mint hairline
+     with a subtle breathing glow (see .telemetry-card/@keyframes
+     telemetryGlow and similar per-component glow rules below). */
+  --surface-card-bg:rgba(11,16,29,0.85) !important;
   --surface-card-border:1px solid rgba(0,230,153,0.22) !important;
   --surface-input-bg:rgba(3,7,18,0.95) !important;
   --surface-input-border:1px solid rgba(255,255,255,0.08) !important;
@@ -164,6 +168,9 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
    legal/trademark lines remain. ===== */
 .sitemap-footer{flex-direction:column;align-items:stretch;gap:0;padding:0}
 .footer-slogan-callout{text-align:center;color:#00E699;font-weight:700;font-size:.82rem;padding:32px 24px 16px}
+.footer-privacy-confirm{display:flex;justify-content:center;align-items:center;gap:6px;
+  color:var(--muted);font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+  padding:20px 24px 0}
 .sitemap-bottom{border-top:1px solid var(--border);padding:14px 22px max(14px, env(safe-area-inset-bottom));
   text-align:center;font-size:.68rem;color:var(--muted)}
 .trademark-disclosure{text-align:center;font-size:.62rem;color:var(--muted);opacity:.75;line-height:1.5;
@@ -363,6 +370,12 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   padding:7px 14px;border-radius:20px;cursor:pointer;font-family:inherit;flex-shrink:0;
   transition:border-color .15s,filter .15s}
 .nav-jurisdiction-badge:hover{border-color:#00E699;filter:brightness(1.15)}
+/* Dual side-by-side status pills (this round's item 3.3) — both pills
+   share the same .nav-jurisdiction-badge look; this row just lays them out
+   side by side and lets them wrap/shrink gracefully on narrow screens. */
+.dual-pill-row{gap:10px;flex-wrap:wrap}
+.block-coverage-badge{white-space:nowrap}
+.block-coverage-badge svg{flex-shrink:0}
 
 /* ===== "HOW YOUR REPORT MOVES" RADIAL NUCLEUS CARD — replaces an earlier
    round's now-superseded standalone "Civic Memory™" concept card (its
@@ -425,6 +438,13 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
 .stat-big{font-size:2.2rem;font-weight:900;color:var(--mint2)}
 .telemetry-mini-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0 14px}
+/* Ward Coverage Tracker chips (this round's honest Module-1 grid) */
+.ward-cov-chip{display:inline-flex;flex-direction:column;align-items:flex-start;gap:2px;
+  padding:8px 12px;border-radius:10px;font-size:.7rem;font-weight:700;border:1px solid var(--border)}
+.ward-cov-chip .ward-cov-name{color:var(--text)}
+.ward-cov-chip.unmapped{border-color:rgba(255,255,255,.15);color:var(--muted)}
+.ward-cov-chip.in-audit{border-color:rgba(255,187,0,.5);color:#ffbb00}
+.ward-cov-chip.surveyed{border-color:rgba(0,230,153,.5);color:#00E699}
 .tmini{background:var(--brand-mint-dim);border:1px solid var(--border);border-radius:10px;padding:8px;text-align:center}
 .tmini-value{font-size:1.05rem;font-weight:900;color:var(--mint2)}
 .tmini-unit{font-size:.6rem;color:var(--muted);margin-left:2px;text-transform:uppercase}
@@ -608,11 +628,9 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .leaflet-popup-tip{background:#12141c;border:1px solid #00E699}
 .leaflet-popup-close-button{color:#ffffff !important}
 
-/* ===== MODAL — flat obsidian (#030712) with a Fresh Mint hairline border
-   and soft mint glow per this round's "absolute blue purge" item 3
-   (earlier rounds used a translucent rgba(15,23,42,.75) frosted-glass
-   fill here; that slate-tinted glass is retired along with the rest of
-   the canvas), over the same dark overlay backdrop as before. ===== */
+/* ===== MODAL — Deep Midnight Navy glass (var(--surface-card-bg), #0B101D-
+   based) with a Laser Mint hairline border and soft mint glow, over the
+   same dark overlay backdrop as before. ===== */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:3000;display:none;
   align-items:center;justify-content:center;padding:20px}
 .modal-overlay.open{display:flex}
@@ -623,10 +641,6 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .modal-box h4{font-size:.82rem;margin:14px 0 4px;color:var(--text)}
 .modal-box p{font-size:.78rem;color:var(--muted);line-height:1.55}
 .modal-close{float:right;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem}
-/* Welcome modal: dedicated close-button placement so it can't skew the
-   centered headline group (float:right on .modal-close wraps text asymmetrically). */
-#tourWelcomeOverlay .modal-box{position:relative}
-.tour-welcome-close{position:absolute;top:1rem;right:1.2rem;margin:0;float:none}
 
 /* ===== EXPORT CIVIC RECORD MODAL — a real preview built from the same
    loadBig3()/ledgerTickets data already on screen (see
@@ -814,7 +828,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
    card list. */
 .ledger-scope-bar{display:flex;gap:8px;align-items:center;margin-bottom:10px}
 .ledger-scope-bar .ledger-search{margin-bottom:0;flex:1 1 auto;min-width:0}
-.ledger-print-cta{background:#030712;border:1px solid #00E699;color:#00E699;font-weight:700;
+.ledger-print-cta{background:#090D16;border:1px solid #00E699;color:#00E699;font-weight:700;
   font-size:.76rem;padding:10px 16px;border-radius:9999px;white-space:nowrap;cursor:pointer;
   font-family:inherit;transition:filter .15s}
 .ledger-print-cta:hover{filter:brightness(1.25)}
@@ -888,7 +902,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
    box-shadow glow with a slow breathing pulse, layered on top of the
    shared .gateway-pill shell via this dedicated class rather than an
    unwieldy inline `animation` property. */
-.ledger-pill-glow{border:1px solid rgba(0,230,153,.25);background:#030712;
+.ledger-pill-glow{border:1px solid rgba(0,230,153,.25);background:#090D16;
   animation:ledgerPillGlow 2.5s ease-in-out infinite}
 @keyframes ledgerPillGlow{
   0%,100%{box-shadow:0 0 14px rgba(0,230,153,.55),inset 0 0 6px rgba(0,230,153,.2)}
@@ -921,8 +935,8 @@ audio.pw-audio-el{width:100%;margin-top:4px}
    only fades opacity in place (no transform/scale, no panning or
    floating) so nothing on this canvas ever pans, moves, or zooms. ===== */
 .pixel-map-section{max-width:720px;margin:0 auto 20px;padding:0 24px}
-/* Fill pivoted from a translucent slate glass to flat obsidian (#030712);
-   the border stays a crisp Fresh Mint stroke. The card is a column
+/* Fill uses the shared Deep Midnight Navy glass surface tokens; the
+   border stays a crisp Laser Mint stroke. The card is a column
    layout — a header row, the SVG graphic area, then a normal-flow action
    row (.pixel-map-action-row) for the "View Map ↗" trigger — instead of
    one flat height with the button absolutely overlaid on the graphic, so
@@ -1007,50 +1021,14 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   border-radius:16px;padding:20px;text-align:center}
 .ticker-value{font-size:2.2rem;font-weight:900;color:var(--mint2);margin:8px 0}
 
-/* ===== AI CIVIC GUIDE ONBOARDING TOUR — the standing floating trigger
-   pill this section used to style (.ai-tour-pill) was permanently removed
-   per this round's "Onboarding Tour Purge" item. The welcome modal now
-   only ever opens via a single first-visit auto-launch, gated on
-   localStorage 'citixen_tour_seen' (see the DOMContentLoaded handler
-   below) — there is no standing button left to reopen it. "Take 30-Second
-   Guided Tour" (once launched) still starts the same real 4-step
-   spotlight walkthrough over real, already-on-screen elements — the
-   Resident node in the report-flow diagram, the Live Public Ledger pill,
-   the Crowd Save America map, and the Civic Intelligence Stack — nothing
-   here is a fabricated flow. ===== */
-.tour-welcome-actions{display:flex;flex-direction:column;gap:10px;margin-top:18px}
-.tour-welcome-actions .btn{width:100%;justify-content:center}
-/* ===== SPOTLIGHT TOUR OVERLAY — a dark backdrop with a moving "cutout"
-   ring drawn around the current step's real target element (positioned in
-   JS from that element's actual getBoundingClientRect(), not a fixed
-   coordinate), plus a small tooltip card with Prev/Next/Skip controls. */
-.tour-spotlight-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:2600;display:none}
-.tour-spotlight-overlay.open{display:block}
-.tour-spotlight-ring{position:absolute;border:2px solid #00E699;border-radius:14px;
-  box-shadow:0 0 0 9999px rgba(0,0,0,.7),0 0 18px rgba(0,230,153,.6);
-  transition:top .3s ease,left .3s ease,width .3s ease,height .3s ease;pointer-events:none}
-.tour-tooltip{position:absolute;max-width:280px;background:var(--surface-card-bg);backdrop-filter:blur(12px);
-  border:var(--surface-card-border);border-radius:12px;padding:16px 18px;box-shadow:0 0 16px rgba(0,230,153,.25);
-  transition:top .3s ease,left .3s ease}
-.tour-tooltip-title{color:var(--text);font-size:.9rem;font-weight:800;margin-bottom:6px}
-.tour-tooltip-desc{color:var(--muted);font-size:.76rem;line-height:1.5;margin-bottom:14px}
-.tour-tooltip-actions{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.tour-tooltip-actions button{background:none;border:none;color:var(--muted);font-family:inherit;font-size:.72rem;
-  font-weight:700;cursor:pointer;padding:6px 2px}
-.tour-tooltip-actions .tour-next-btn{color:#00E699}
-.tour-tooltip-actions button:disabled{opacity:.35;cursor:default}
-.tour-dots{display:flex;align-items:center;gap:6px}
-/* ● ○ ○ ○ pagination: the active dot reads solid/filled, inactive dots
-   render as hollow outlined rings (transparent fill, visible border) —
-   this replaces the plain "Step X of Y" text header this round removes. */
-.tour-dot{width:6px;height:6px;border-radius:50%;background:transparent;border:1.4px solid rgba(255,255,255,.35);
-  box-sizing:border-box;transition:background .2s,transform .2s,border-color .2s}
-.tour-dot.active{background:#00E699;border-color:#00E699;transform:scale(1.35)}
-/* Elevates the real spotlighted target element (not just the decorative
-   ring) above the dark backdrop overlay with a brightened glass fill, per
-   this round's "Target Elevation & Brightness" spec. Added/removed on the
-   real DOM target in positionTourStep()/endTour(). */
-.tour-target-elevated{position:relative;z-index:10001;background:rgba(0,230,153,.15)!important;border-radius:14px}
+/* ===== STREAMLINED ONBOARDING MODAL — this round retires the old
+   "AI Civic Guide" welcome modal, its floating trigger pill, and its
+   4-step spotlight walkthrough entirely (all dead CSS this section used
+   to hold — .ai-tour-pill*, .tour-welcome-actions, .tour-spotlight-*,
+   .tour-tooltip-*, .tour-dot*, .tour-target-elevated — removed with it).
+   The replacement modal reuses the shared .modal-box shell and the real
+   .civic-triad-* diagram styling already defined elsewhere on this page;
+   it needs no dedicated CSS of its own. ===== */
 
 /* The old Report Generator card (and its dedicated #reportGenerator-only
    @media print isolation rule) was removed outright in an earlier round —
@@ -1305,34 +1283,42 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </div>
   </div>
 
-  <!-- ===== JURISDICTION STATUS PILL — per this round's item 2 vertical
-       stacking order, position 2 (directly under the header's Privacy
-       Shield badge, directly above the "Citixen Dashboard" title). Same
-       "● City, ST • Active" real resolved-jurisdiction text and "Change
-       Location" trigger as before (see updateSmartLocationBanner()/
-       openLocationPicker() below) — only its position moved again this
-       round, from beneath the national map to here. ===== -->
-  <section class="geo-pill-section">
+  <!-- ===== HERO HEADER BLOCK — per this round's reordered "Above-the-Fold
+       Header & Live Telemetry Layout" (item 3), the "Citixen Dashboard"
+       headline + tagline now sits directly under the sticky top bar,
+       ABOVE the dual status-pill row below (previously the jurisdiction
+       pill came first). The SECTION-FREEZE hero block that used to sit
+       here (second shield SVG + giant two-tone "CITIXEN UX™" heading +
+       "Upgrade Your Civic Experience" kicker) stays removed per an earlier
+       round's explicit corrective instruction — it duplicated the top
+       sticky nav's own brand mark. ===== -->
+  <p class="citizen-dashboard-subheader"><span class="cds-white">Citixen</span> <span class="cds-mint">Dashboard</span></p>
+  <p class="hero-tagline-subtle">Real-time community reporting and municipal tracking.</p>
+
+  <!-- ===== DUAL SIDE-BY-SIDE STATUS PILLS (this round's item 3.3) — the
+       jurisdiction pill (left, unchanged real "● City, ST • Active" text
+       and Change Location trigger, see updateSmartLocationBanner()/
+       openLocationPicker() below) now sits beside a new real "Block
+       Coverage Ticker" pill (right, updateBlockCoverageTicker() below).
+       Honesty note: this build's real jurisdiction directory only carries
+       ward-level granularity (2 known wards for the demo La Crosse
+       jurisdiction), not an actual 11,000,000-block national census
+       dataset, so this ticker is wired to the same real, dynamically
+       computed ward-coverage numbers renderMunicipalPanel() already uses
+       (logged wards / known wards) rather than a fabricated "80 blocks"
+       figure — true block-level (H3 Resolution 9) granularity is the same
+       roadmap target already disclosed in the Civic Memory™ Architecture
+       drawer's Spatial Hashing tab. ===== -->
+  <section class="geo-pill-section dual-pill-row">
     <button type="button" class="nav-jurisdiction-badge" id="navJurisdictionBadge" aria-label="Change your jurisdiction">
       <span class="pulsing-dot"></span>
       <span id="navJurisdictionText">La Crosse, WI • Active</span>
     </button>
+    <button type="button" class="nav-jurisdiction-badge block-coverage-badge" id="blockCoverageTicker" aria-label="Open the Municipal ward coverage tracker">
+      <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>
+      <span id="blockCoverageTickerText">Loading coverage…</span>
+    </button>
   </section>
-
-  <!-- ===== The SECTION-FREEZE hero block that used to sit here (second
-       shield SVG + giant two-tone "CITIXEN UX™" heading + "Upgrade Your
-       Civic Experience" kicker + "Citizen Dashboard" subtitle) has been
-       removed outright per this round's explicit corrective instruction —
-       it duplicated the top sticky nav's own "CITIXEN UX™" brand mark and
-       was eating the primary mobile viewport. The nav header is now the
-       page's one brand mark. In its place: a lightweight "CITIXEN
-       DASHBOARD" sub-header (brand spelling per a later round) directly
-       under the green jurisdiction bar, then the tagline (trimmed this
-       round to drop "for your local area" per the spec's literal text),
-       then straight into the Live Public Ledger pill — no second branding
-       block between the jurisdiction bar and the real content. ===== -->
-  <p class="citizen-dashboard-subheader"><span class="cds-white">Citixen</span> <span class="cds-mint">Dashboard</span></p>
-  <p class="hero-tagline-subtle">Real-time community reporting and municipal tracking.</p>
 
   <!-- ===== LIVE PUBLIC LEDGER BANNER — sits directly beneath the Citixen
        Dashboard sub-header/tagline above, and directly ABOVE the
@@ -1524,84 +1510,14 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </div>
   </div>
 
-  <!-- ===== "HOW YOUR REPORT MOVES" RADIAL NUCLEUS CARD — Position 7
-       this round's vertical stacking order, directly beneath the national
-       map card. The jurisdiction pill and the old standalone "Civic
-       Memory™" concept card that used to sit here were both
-       relocated/retired in an earlier round (pill now sits above the
-       "Citixen Dashboard" title; the concept card's narrative now opens
-       the Civic Memory™ engine button's "View Charter" drawer below
-       instead of a passive scroll-past card). This round replaces the
-       prior top-down tree with a radial hub-and-spoke layout: a glowing,
-       double-ringed CITIXEN UX™ nucleus badge at the center (a pulsing
-       outer halo, a static outer ring, and a solid inner circle, with the
-       shield icon and the "CITIXEN UX™" wordmark both set directly inside
-       the inner circle this round, rather than as a separate label
-       floating above it), with three equal-length dashed vector spokes
-       radiating out to the same 3 real leaf nodes at 120° apart. Each
-       spoke's endpoints are trimmed via vector math to sit strictly 12px
-       outside both the nucleus's outer ring (r=36) and each leaf's circle
-       (r=26) along its own direction unit vector, rather than drawn
-       center-to-center or flush against either edge, so no dash segment
-       pokes into either circle's icon or labels (this replaces the
-       previous round's flush-to-edge solid arrow markers, now removed —
-       the spec no longer calls for arrowheads, just crisp dashed lines).
-       Each leaf node name is a real, reachable part of this build, not an
-       invented pipeline: "Resident" is the mobile reporting flow
-       (app.html) — and doubles as this page's AI Civic Guide tour target
-       (#reportTreeNodeResident) — "Public Ledger" is the real
-       #ledgerDrawer every submitted report becomes visible in, and
-       "Municipal Portal" is the Municipal engine button's Work Orders &
-       SLA Tracker panel below. ===== -->
-  <section class="civic-triad-section">
-    <div class="civic-triad-card">
-      <div class="civic-triad-header">How Your Report Moves</div>
-      <svg class="civic-triad-svg" viewBox="0 0 320 310" role="img" aria-label="Diagram: a central CITIXEN UX nucleus radiates equally to Resident, Public Ledger, and Municipal Portal">
-        <!-- Spokes: dashed (stroke-dasharray set on .civic-triad-spoke), each
-             trimmed 12px outside the nucleus's outer ring (r=36) and 12px
-             outside the leaf's circle (r=26) along the spoke's direction
-             unit vector, per this round's "strict boundary math" spec. -->
-        <line x1="160" y1="127" x2="160" y2="118" class="civic-triad-spoke"/>
-        <line x1="118.59" y1="199.24" x2="110.79" y2="203.81" class="civic-triad-spoke"/>
-        <line x1="201.41" y1="199.24" x2="209.21" y2="203.81" class="civic-triad-spoke"/>
-        <!-- Double-ringed nucleus badge (this round's fix): a pulsing outer
-             halo, a static outer ring (r=36) and the solid inner circle
-             (r=32) together read as "double-ringed", with the shield icon
-             and the "CITIXEN UX™" wordmark both placed directly inside the
-             inner circle rather than as a separate label floating above
-             it. -->
-        <g id="reportTreeNucleus">
-          <circle cx="160" cy="175" r="48" class="civic-triad-nucleus-halo"/>
-          <circle cx="160" cy="175" r="36" class="civic-triad-outer-ring"/>
-          <circle cx="160" cy="175" r="32" class="civic-triad-root-circle"/>
-          <g transform="translate(149.8,155.8) scale(0.85)">
-            <path d="M12 2L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-3z" fill="none" stroke="#00E699" stroke-width="1.8" stroke-linejoin="round"/>
-          </g>
-          <text x="160" y="192" class="civic-triad-root-label-center">CITIXEN UX<tspan baseline-shift="super" font-size="4.5">™</tspan></text>
-        </g>
-        <g id="reportTreeNodeResident">
-          <circle cx="160" cy="80" r="26" class="civic-triad-node-circle"/>
-          <path d="M160 68a6 6 0 1 0 0.001 0z" fill="none" stroke="#00E699" stroke-width="1.6"/>
-          <path d="M148 94c2-7 7-11 12-11s10 4 12 11" fill="none" stroke="#00E699" stroke-width="1.6" stroke-linecap="round"/>
-          <text x="160" y="30" class="civic-triad-node-label">Resident</text>
-          <text x="160" y="16" class="civic-triad-node-sub">Mobile report capture</text>
-        </g>
-        <g id="reportTreeNodeLedger">
-          <circle cx="78" cy="223" r="26" class="civic-triad-node-circle"/>
-          <path d="M66 211h24M66 219h24M66 227h16" fill="none" stroke="#00E699" stroke-width="1.6" stroke-linecap="round"/>
-          <text x="78" y="273" class="civic-triad-node-label">Public Ledger</text>
-          <text x="78" y="287" class="civic-triad-node-sub">Live, searchable record</text>
-        </g>
-        <g id="reportTreeNodeMunicipal">
-          <circle cx="242" cy="223" r="26" class="civic-triad-node-circle"/>
-          <path d="M230 235v-14l12-8 12 8v14z" fill="none" stroke="#00E699" stroke-width="1.6" stroke-linejoin="round"/>
-          <path d="M236 235v-8h12v8" fill="none" stroke="#00E699" stroke-width="1.6"/>
-          <text x="242" y="273" class="civic-triad-node-label">Municipal Portal</text>
-          <text x="242" y="287" class="civic-triad-node-sub">Work orders &amp; SLA</text>
-        </g>
-      </svg>
-    </div>
-  </section>
+  <!-- ===== "HOW YOUR REPORT MOVES" radial diagram — relocated this round
+       from a standalone scroll-past section into the streamlined onboarding
+       modal (#reportMovesOnboardingModal, see markup further down) per the
+       "Streamlined Onboarding Flow" spec: it is no longer part of the main
+       page's scroll order at all, only the onboarding modal (auto-launched
+       once on first visit, reopenable anytime via the footer's "How Your
+       Report Moves" link). The diagram's own markup, ids, and geometry are
+       unchanged from the previous round — only its container moved. ===== -->
 
   <!-- ===== CROWD SOURCE AMERICA™ NARRATIVE BLOCK — Position 4. Plain
        centered text, no card/box; the heading carries the Fresh Mint
@@ -1838,6 +1754,24 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       <p class="bridge-slogan">One report gets a pothole filled. A thousand reports cover a city. A million reports Crowd Source America<sup class="tm-symbol">™</sup>.</p>
       <button class="btn btn-outline" id="btnViewHeatMapFromAnalytics" type="button">Crowd Source America<sup class="tm-symbol">™</sup> — View Aggregation Hub ↗</button>
     </div>
+    <!-- ===== WARD COVERAGE TRACKER (this round's Module 1 request) — the
+         spec asks for an "11M Census Block Tracker" breaking a jurisdiction
+         into Unmapped / In Audit / Fully Surveyed cells. This build's real
+         jurisdiction directory only carries ward-level granularity today
+         (2 known wards for the demo La Crosse jurisdiction, not 11M census
+         blocks), so this grid honestly tracks the real wards instead of a
+         fabricated block count — true block-level (H3 Resolution 9)
+         granularity is the same roadmap target already disclosed in the
+         Civic Memory™ Architecture drawer's Spatial Hashing tab. Status per
+         ward is computed live from real ledgerTickets (see
+         renderWardCoverageTracker()): zero logged reports = Unmapped, at
+         least one open report = In Audit, every logged report resolved =
+         Fully Surveyed. ===== -->
+    <div class="card" style="max-width:640px;margin:0 auto 16px;">
+      <div class="label"><span>Ward Coverage Tracker</span><span class="small" id="wardCoverageTrackerNote" style="color:var(--muted)"></span></div>
+      <div id="wardCoverageGrid" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
+      <div class="small" style="margin-top:10px;color:var(--muted);">Block-level (H3 Resolution 9) granularity is this architecture's roadmap target — see Your Civic Memory™ → Architecture &amp; Charter → Spatial Hashing.</div>
+    </div>
     <div class="deepdive-cols">
       <div class="card" id="coverageGridCard">
         <div class="label"><span>Citywide Health Index</span><span id="healthCity" style="color:var(--mint2)">Locating…</span></div>
@@ -1956,6 +1890,13 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         <div class="bar"><span id="ledgerAdaBar" style="width:12%"></span></div>
       </div>
       <div class="small" style="margin-top:10px;">(Estimated) — clustered from resolved field reports.</div>
+      <!-- ===== SLA COST MODELING (this round's Module 2 request) — the
+           per-unit figures ($350/pothole, $1,200/streetlight) are the
+           spec's own disclosed public-contract-average assumptions, applied
+           here to real, live category counts from ledgerTickets rather
+           than to a fabricated total. Clearly labeled as an illustrative
+           estimate, not a verified municipal invoice. ===== -->
+      <div class="small" id="ledgerSlaCostModel" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);"></div>
       <button class="btn btn-outline" id="btnViewItemizedLedger" type="button" style="width:100%;justify-content:center;margin-top:12px;">View Itemized Civic Memory Ledger Entries ↗</button>
       <div class="small" style="margin-top:8px;color:var(--muted);">Per-project supporting-document attachments — coming soon.</div>
     </div>
@@ -1998,6 +1939,19 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       <div class="label"><span>Citywide Asset Coverage</span><span id="municipalCoveragePct" style="color:var(--mint2)">—</span></div>
       <div class="small" id="municipalCoverageNote">Locating jurisdiction…</div>
       <div class="small" style="margin-top:8px;color:var(--muted);">"Coverage" here means wards with at least one logged report on file, not a survey of physical municipal assets — this platform tracks resident-submitted hazard reports, not a GIS asset ledger.</div>
+    </div>
+
+    <!-- ===== 3-STAGE LIFECYCLE TRACKER (this round's Module 3 request) —
+         real counts by the same real ledgerTickets.stage values this
+         dataset already carries (submitted/dispatched/resolved), not an
+         invented status scheme. ===== -->
+    <div class="card" id="municipalLifecycleCard" style="max-width:640px;width:100%;margin:0 auto 16px;">
+      <div class="label"><span>Report Lifecycle — Citywide</span></div>
+      <div class="telemetry-mini-row" style="grid-template-columns:1fr 1fr 1fr;">
+        <div class="tmini"><div class="tmini-value" id="municipalStageSubmitted">0</div><div class="tmini-label">Submitted</div></div>
+        <div class="tmini"><div class="tmini-value" id="municipalStageDispatched">0</div><div class="tmini-label">Dispatched</div></div>
+        <div class="tmini"><div class="tmini-value" id="municipalStageResolved">0</div><div class="tmini-label">Resolved</div></div>
+      </div>
     </div>
 
     <div class="card" id="municipalWardCard" style="max-width:640px;width:100%;margin:0 auto 16px;">
@@ -2066,64 +2020,61 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </div>
   </div>
 
-  <!-- ===== AI CIVIC GUIDE — the persistent floating "AI Civic Guide | Take
-       Tour ↗" bottom-right pill (#aiTourTriggerPill) is permanently
-       removed per this round's "Onboarding Tour Purge" item — its .ai-tour-
-       pill* CSS is removed below too rather than left as dead styling. The
-       welcome modal below now runs ONLY as a single first-visit
-       auto-launch, gated on the real localStorage 'citixen_tour_seen' flag
-       (see the DOMContentLoaded handler further down) — there is no
-       standing UI control left to re-open it once dismissed. ===== -->
-
-  <!-- ===== AI CIVIC GUIDE — WELCOME MODAL. Reuses the shared .modal-box
-       shell, with the two-tone "Welcome to CITIXEN " / "UX™" wordmark and
-       muted "HOME OF CIVIC INTELLIGENCE" subheader. The close button uses
-       a dedicated .tour-welcome-close (position:absolute, see CSS above)
-       instead of the shared .modal-close's float:right, which used to wrap
-       the h3 headline asymmetrically and skew the whole header group off
-       center. This round restores a secondary "Explore Dashboard" CTA
-       alongside the primary "Take 30-Second Guided Tour" button (removed
-       then re-added across rounds as the spec's own button count changed)
-       — both, plus the ✕ close button, dismiss the modal and mark the tour
-       seen so it never auto-fires again on this browser; only the primary
-       button also starts the spotlight walkthrough. ===== -->
-  <div class="modal-overlay" id="tourWelcomeOverlay">
+  <!-- ===== STREAMLINED ONBOARDING MODAL (#reportMovesOnboardingModal) —
+       replaces the previous multi-step "AI Civic Guide" welcome modal +
+       4-step spotlight walkthrough entirely (both fully removed as dead
+       markup/CSS/JS per this round's "Streamlined Onboarding Flow" spec).
+       Auto-launches once on first visit only, gated on the same real
+       localStorage 'citixen_tour_seen' flag as before (see the
+       DOMContentLoaded handler further down), and is reachable anytime
+       afterward via the footer's "How Your Report Moves" link
+       (#footerReportMovesLink). Its content IS the real "How Your Report
+       Moves" radial diagram (same markup/ids/geometry the page used to
+       render inline — see the removal note above), not a text summary of
+       it, per the spec's "Modal Design: Symmetrical 3-node radial nucleus
+       diagram" instruction. Single dismiss action
+       (#reportMovesDismissBtn, "Got It — Enter Dashboard") replaces the
+       old two-button choice, since there is no longer a guided tour to
+       optionally start. ===== -->
+  <div class="modal-overlay" id="reportMovesOnboardingModal">
     <div class="modal-box" style="max-width:420px;text-align:center">
-      <button class="modal-close tour-welcome-close" id="tourWelcomeCloseBtn">✕</button>
-      <h3 style="margin-bottom:2px;"><span style="color:#FFFFFF">Welcome to CITIXEN </span><span style="color:#00E699">UX<sup class="tm-symbol">™</sup></span></h3>
-      <div style="color:#94A3B8;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;">HOME OF CIVIC INTELLIGENCE</div>
-      <p>A completely free, zero-tracking platform connecting your real-time observations directly to civic accountability.</p>
-      <div class="tour-welcome-actions">
-        <button type="button" class="btn btn-primary btn-hero" id="tourStartBtn" style="margin:0">Take 30-Second Guided Tour</button>
-        <button type="button" class="btn btn-outline btn-hero" id="tourExploreBtn" style="margin:0">Explore Dashboard</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== AI CIVIC GUIDE — SPOTLIGHT TOUR OVERLAY. #tourSpotlightRing and
-       #tourTooltip are repositioned in JS from each step's real target
-       element's getBoundingClientRect() (see startTour()/showTourStep()
-       below) — never a hardcoded coordinate. The "Step X of Y" text header
-       is removed per this round's spec; step progress is communicated
-       solely by the ● ○ ○ ○ pagination row (#tourDots, built once from
-       TOUR_STEPS.length) in the middle of the bottom nav, between Skip and
-       Prev/Next, per the "[ Skip ] | ● ○ ○ ○ | [ ← Prev ] [ Next → /
-       Finish ]" layout. The spotlighted target element itself (not just
-       this decorative ring) is elevated via .tour-target-elevated, added
-       in positionTourStep() and removed in endTour(). ===== -->
-  <div class="tour-spotlight-overlay" id="tourSpotlightOverlay">
-    <div class="tour-spotlight-ring" id="tourSpotlightRing"></div>
-    <div class="tour-tooltip" id="tourTooltip">
-      <div class="tour-tooltip-title" id="tourTooltipTitle"></div>
-      <div class="tour-tooltip-desc" id="tourTooltipDesc"></div>
-      <div class="tour-tooltip-actions">
-        <button type="button" id="tourSkipBtn">Skip</button>
-        <div class="tour-dots" id="tourDots"></div>
-        <div>
-          <button type="button" id="tourPrevBtn">← Prev</button>
-          <button type="button" id="tourNextBtn" class="tour-next-btn">Next →</button>
-        </div>
-      </div>
+      <h3 style="margin-bottom:4px;">How Your Report Moves</h3>
+      <p class="small" style="margin-bottom:10px;">A completely free, zero-tracking platform connecting your real-time observations directly to civic accountability.</p>
+      <svg class="civic-triad-svg" viewBox="0 0 320 310" role="img" aria-label="Diagram: a central CITIXEN UX nucleus radiates equally to Resident, Public Ledger, and Municipal Portal">
+        <line x1="160" y1="127" x2="160" y2="118" class="civic-triad-spoke"/>
+        <line x1="118.59" y1="199.24" x2="110.79" y2="203.81" class="civic-triad-spoke"/>
+        <line x1="201.41" y1="199.24" x2="209.21" y2="203.81" class="civic-triad-spoke"/>
+        <g id="reportTreeNucleus">
+          <circle cx="160" cy="175" r="48" class="civic-triad-nucleus-halo"/>
+          <circle cx="160" cy="175" r="36" class="civic-triad-outer-ring"/>
+          <circle cx="160" cy="175" r="32" class="civic-triad-root-circle"/>
+          <g transform="translate(149.8,155.8) scale(0.85)">
+            <path d="M12 2L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-3z" fill="none" stroke="#00E699" stroke-width="1.8" stroke-linejoin="round"/>
+          </g>
+          <text x="160" y="192" class="civic-triad-root-label-center">CITIXEN UX<tspan baseline-shift="super" font-size="4.5">™</tspan></text>
+        </g>
+        <g id="reportTreeNodeResident">
+          <circle cx="160" cy="80" r="26" class="civic-triad-node-circle"/>
+          <path d="M160 68a6 6 0 1 0 0.001 0z" fill="none" stroke="#00E699" stroke-width="1.6"/>
+          <path d="M148 94c2-7 7-11 12-11s10 4 12 11" fill="none" stroke="#00E699" stroke-width="1.6" stroke-linecap="round"/>
+          <text x="160" y="30" class="civic-triad-node-label">Resident</text>
+          <text x="160" y="16" class="civic-triad-node-sub">Mobile report capture</text>
+        </g>
+        <g id="reportTreeNodeLedger">
+          <circle cx="78" cy="223" r="26" class="civic-triad-node-circle"/>
+          <path d="M66 211h24M66 219h24M66 227h16" fill="none" stroke="#00E699" stroke-width="1.6" stroke-linecap="round"/>
+          <text x="78" y="273" class="civic-triad-node-label">Public Ledger</text>
+          <text x="78" y="287" class="civic-triad-node-sub">Live, searchable record</text>
+        </g>
+        <g id="reportTreeNodeMunicipal">
+          <circle cx="242" cy="223" r="26" class="civic-triad-node-circle"/>
+          <path d="M230 235v-14l12-8 12 8v14z" fill="none" stroke="#00E699" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M236 235v-8h12v8" fill="none" stroke="#00E699" stroke-width="1.6"/>
+          <text x="242" y="273" class="civic-triad-node-label">Municipal Portal</text>
+          <text x="242" y="287" class="civic-triad-node-sub">Work orders &amp; SLA</text>
+        </g>
+      </svg>
+      <button type="button" class="btn btn-primary btn-hero" id="reportMovesDismissBtn" style="margin:14px 0 0;width:100%;justify-content:center;">Got It — Enter Dashboard</button>
     </div>
   </div>
 
@@ -2196,10 +2147,19 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        verified (this project already removed an unverified "Patents
        Pending" claim earlier in this session on the same grounds). ===== -->
   <footer class="site-footer sitemap-footer">
+    <!-- Static brand shield + "Privacy Engine: Verified" confirmation (this
+         round's item 3.8) — a non-interactive echo of the same real
+         #navPrivacyBadge claim in the sticky top bar, not a second,
+         separately-verified privacy system. -->
+    <div class="footer-privacy-confirm" aria-hidden="false">
+      <svg viewBox="0 0 24 24" width="15" height="15" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+      <span>Privacy Engine: Verified</span>
+    </div>
     <div class="footer-slogan-callout"><span style="color:#FFFFFF; font-weight:bold;">CITIXEN</span> <span style="color:#00E699; font-weight:bold;">UX</span><sup class="tm-symbol">™</sup> — Crowd Source America<sup class="tm-symbol">™</sup>. Built for residents, designed for modern civic trust.</div>
     <div class="sitemap-bottom">
       <button type="button" id="footerCodexLink" class="footer-staff-link" style="background:none;border:none;padding:0;font:inherit;cursor:pointer">Statutory Governance &amp; Precedent ↗</button>
       <button type="button" id="footerExportRecordLink" class="footer-staff-link" style="background:none;border:none;padding:0;font:inherit;cursor:pointer;margin-left:18px">Export Civic Record ↗</button>
+      <button type="button" id="footerReportMovesLink" class="footer-staff-link" style="background:none;border:none;padding:0;font:inherit;cursor:pointer;margin-left:18px">How Your Report Moves ↗</button>
     </div>
     <div class="trademark-disclosure"><span style="color:#FFFFFF; font-weight:bold;">CITIXEN</span> <span style="color:#00E699; font-weight:bold;">UX</span><sup class="tm-symbol">™</sup> and Crowd Source America<sup class="tm-symbol">™</sup> are protected trademarks. Civic Intelligence, Civic Memory, Geo-Hatch, City Snapshot, and Civic Stack are proprietary marks. Protected under U.S. and international trademark laws. All other trademarks, product names, and logos are the property of their respective owners.</div>
   </footer>
@@ -2628,12 +2588,37 @@ function closeDeepdivePanel(panelId){
   panel.classList.remove('open');
   document.querySelectorAll(`[aria-controls="${panelId}"]`).forEach(b => b.setAttribute('aria-expanded', 'false'));
 }
-document.getElementById('hubCoverageBtn').addEventListener('click', (e) => {
+document.getElementById('hubCoverageBtn').addEventListener('click', async (e) => {
   openDeepdivePanel('deepdiveAnalytics', 'deepdiveAnalytics', e.currentTarget);
+  if (!ledgerTickets.length) ledgerTickets = await fetchLedgerTickets();
+  renderWardCoverageTracker();
 });
-document.getElementById('hubSlaBtn').addEventListener('click', (e) => {
+document.getElementById('hubSlaBtn').addEventListener('click', async (e) => {
   openDeepdivePanel('civicStackSection', 'ledgerCard', e.currentTarget);
+  if (!ledgerTickets.length) ledgerTickets = await fetchLedgerTickets();
+  renderSlaCostModel();
 });
+// SLA Cost Modeling — see the markup comment on #ledgerSlaCostModel for
+// why these per-unit figures are used against real category counts rather
+// than a fabricated total.
+const SLA_COST_PER_UNIT = { Pothole: 350, Streetlight: 1200 };
+function renderSlaCostModel(){
+  const el = document.getElementById('ledgerSlaCostModel');
+  if (!el) return;
+  const j = activeJurisdiction();
+  const cityTickets = j ? ledgerTickets.filter(t => t.city === j.city && t.state === j.state) : [];
+  const parts = Object.keys(SLA_COST_PER_UNIT).map(cat => {
+    const count = cityTickets.filter(t => t.category === cat).length;
+    return { cat, count, cost: count * SLA_COST_PER_UNIT[cat] };
+  }).filter(p => p.count > 0);
+  const total = parts.reduce((sum, p) => sum + p.cost, 0);
+  if (!parts.length) {
+    el.textContent = 'No Pothole or Streetlight reports on file for this jurisdiction yet to model.';
+    return;
+  }
+  const breakdown = parts.map(p => p.count + ' ' + p.cat + (p.count === 1 ? '' : 's') + ' × $' + SLA_COST_PER_UNIT[p.cat].toLocaleString()).join(', ');
+  el.innerHTML = '<b>SLA Cost Modeling (estimated):</b> ~$' + total.toLocaleString() + ' — ' + esc(breakdown) + '. Public-contract-average unit costs applied to this jurisdiction\'s real logged report counts — not a verified municipal invoice.';
+}
 document.getElementById('hubMunicipalBtn').addEventListener('click', async (e) => {
   e.currentTarget.setAttribute('aria-expanded', 'true');
   if (!ledgerTickets.length) ledgerTickets = await fetchLedgerTickets();
@@ -2671,11 +2656,11 @@ document.getElementById('civicCharterDrawer').addEventListener('click', (e) => {
    "coverage" and "risk gap" are both disclosed proxies built from real
    report counts — never an invented dollar figure or coverage percent.
    ===================================================================== */
-function renderMunicipalPanel(){
-  const j = activeJurisdiction();
-  const cityLabelEl = document.getElementById('municipalCityLabel');
-  if (cityLabelEl) cityLabelEl.textContent = j ? j.cityName : 'Citywide';
-
+// Shared ward-coverage computation — real logged-wards / known-wards ratio
+// for the active jurisdiction, used by both renderMunicipalPanel() below and
+// the header's real "Block Coverage Ticker" pill (updateBlockCoverageTicker()
+// further down) so the two never drift out of sync or duplicate the math.
+function computeWardCoverage(j){
   let knownWards = [];
   if (j && jurisdictionDirectory) {
     const st = jurisdictionDirectory.states.find(s => s.slug === j.state);
@@ -2684,7 +2669,45 @@ function renderMunicipalPanel(){
   }
   const cityTickets = j ? ledgerTickets.filter(t => t.city === j.city && t.state === j.state) : [];
   const loggedWardSlugs = new Set(cityTickets.map(t => t.ward));
-  const coveragePct = knownWards.length ? Math.round((loggedWardSlugs.size / knownWards.length) * 100) : null;
+  const pct = knownWards.length ? Math.round((loggedWardSlugs.size / knownWards.length) * 100) : null;
+  return { knownWards, loggedWardSlugs, pct };
+}
+// Ward Coverage Tracker (Analytics panel) — real per-ward status computed
+// from the same ledgerTickets/jurisdictionDirectory data as
+// computeWardCoverage() above: Unmapped (0 logged reports), In Audit (at
+// least one open report), Fully Surveyed (every logged report resolved).
+function renderWardCoverageTracker(){
+  const gridEl = document.getElementById('wardCoverageGrid');
+  const noteEl = document.getElementById('wardCoverageTrackerNote');
+  if (!gridEl) return;
+  const j = activeJurisdiction();
+  const { knownWards } = computeWardCoverage(j);
+  if (!knownWards.length) {
+    gridEl.innerHTML = '';
+    if (noteEl) noteEl.textContent = 'No ward directory on file';
+    return;
+  }
+  if (noteEl) noteEl.textContent = knownWards.length + ' known ward' + (knownWards.length === 1 ? '' : 's');
+  gridEl.innerHTML = knownWards.map(w => {
+    const wardTickets = ledgerTickets.filter(t => t.city === j.city && t.state === j.state && t.ward === w.slug);
+    let statusClass, statusLabel;
+    if (!wardTickets.length) { statusClass = 'unmapped'; statusLabel = 'Unmapped'; }
+    else if (wardTickets.every(t => t.stage === 'resolved')) { statusClass = 'surveyed'; statusLabel = 'Fully Surveyed'; }
+    else { statusClass = 'in-audit'; statusLabel = 'In Audit'; }
+    return `<div class="ward-cov-chip ${statusClass}"><span class="ward-cov-name">${esc(w.name)}</span><span>${statusLabel} — ${wardTickets.length} report${wardTickets.length === 1 ? '' : 's'}</span></div>`;
+  }).join('');
+}
+function renderMunicipalPanel(){
+  const j = activeJurisdiction();
+  const cityLabelEl = document.getElementById('municipalCityLabel');
+  if (cityLabelEl) cityLabelEl.textContent = j ? j.cityName : 'Citywide';
+
+  const cityTicketsForLifecycle = j ? ledgerTickets.filter(t => t.city === j.city && t.state === j.state) : [];
+  document.getElementById('municipalStageSubmitted').textContent = cityTicketsForLifecycle.filter(t => t.stage === 'submitted').length;
+  document.getElementById('municipalStageDispatched').textContent = cityTicketsForLifecycle.filter(t => t.stage === 'dispatched').length;
+  document.getElementById('municipalStageResolved').textContent = cityTicketsForLifecycle.filter(t => t.stage === 'resolved').length;
+
+  const { knownWards, loggedWardSlugs, pct: coveragePct } = computeWardCoverage(j);
   document.getElementById('municipalCoveragePct').textContent = coveragePct != null ? coveragePct + '%' : 'N/A';
   document.getElementById('municipalCoverageNote').textContent = knownWards.length
     ? loggedWardSlugs.size + ' of ' + knownWards.length + ' known ward' + (knownWards.length === 1 ? '' : 's') + ' in ' + (j ? j.cityName : 'this jurisdiction') + ' have at least one logged report on file.'
@@ -2698,6 +2721,29 @@ function renderMunicipalPanel(){
   const riskGapPct = wardTickets.length ? Math.round(((wardTickets.length - wardResolved) / wardTickets.length) * 100) : null;
   document.getElementById('municipalRiskGapPct').textContent = riskGapPct != null ? riskGapPct + '%' : 'N/A';
 }
+// ===== BLOCK COVERAGE TICKER (header pill) — reuses computeWardCoverage()
+// above so this real number always matches the Municipal panel's own
+// coverage stat exactly. Fetches ledgerTickets eagerly if nothing has
+// loaded them yet, since this pill is above the fold and shouldn't wait on
+// the user opening the Municipal panel first.
+async function updateBlockCoverageTicker(){
+  const textEl = document.getElementById('blockCoverageTickerText');
+  if (!textEl) return;
+  if (!ledgerTickets.length) {
+    try { ledgerTickets = await fetchLedgerTickets(); } catch (e) { /* leave the loading label if this fails */ }
+  }
+  const j = activeJurisdiction();
+  const { knownWards, loggedWardSlugs, pct } = computeWardCoverage(j);
+  textEl.textContent = knownWards.length
+    ? (pct != null ? pct : 0) + '% Covered (' + loggedWardSlugs.size + '/' + knownWards.length + ' Wards)'
+    : 'No ward directory on file';
+}
+document.getElementById('blockCoverageTicker').addEventListener('click', async (e) => {
+  document.getElementById('hubMunicipalBtn').setAttribute('aria-expanded', 'true');
+  if (!ledgerTickets.length) ledgerTickets = await fetchLedgerTickets();
+  openDeepdivePanel('municipalPanel', 'municipalPanel', document.getElementById('hubMunicipalBtn'));
+  renderMunicipalPanel();
+});
 document.getElementById('municipalVerifyJurisdictionBtn').addEventListener('click', () => openLocationPicker());
 document.getElementById('municipalRequestAccessBtn').addEventListener('click', () => {
   const el = document.getElementById('institutionalAccessSection');
@@ -3288,6 +3334,8 @@ function applyJurisdiction(j, opts){
   if (cta) cta.href = '/app.html?state=' + j.state + '&city=' + j.city + '&ward=' + j.ward;
   syncDashboardToJurisdiction(j);
   updateSmartLocationBanner(j);
+  updateBlockCoverageTicker();
+  renderWardCoverageTracker();
   if (!(opts && opts.silent)) {
     // A citizen just actively confirmed/changed jurisdiction — refresh the
     // paperwork stack in place if the drawer happens to be open already.
@@ -3884,6 +3932,15 @@ async function openExportRecordModal(){
   });
   const recordHash = simpleRecordHash(hashInput);
 
+  // ===== CONTEXTUAL SUBSET METRICS (this round's "Instant Preview & Share"
+  // item) — computed live from the exact rows this record is exporting
+  // (this jurisdiction's real ledgerTickets), not a fabricated figure. If
+  // no jurisdiction is resolved yet, falls back to the full loaded set.
+  const scopedTickets = j ? ledgerTickets.filter(t => t.city === j.city && t.state === j.state) : ledgerTickets;
+  const scopedResolved = scopedTickets.filter(t => t.stage === 'resolved').length;
+  const scopedPending = scopedTickets.length - scopedResolved;
+  const scopedResolvedRatePct = scopedTickets.length ? ((scopedResolved / scopedTickets.length) * 100).toFixed(1) : '0.0';
+
   document.getElementById('exportRecordContent').innerHTML = `
     <div class="export-record-head">
       <h3><span style="color:#FFFFFF">CITIXEN</span> <span style="color:#00E699">UX</span><sup class="tm-symbol">™</sup> | OFFICIAL CIVIC RECORD</h3>
@@ -3896,6 +3953,8 @@ async function openExportRecordModal(){
       <div class="export-record-tile"><div class="export-record-tile-val">${esc(completionRate)}</div><div class="export-record-tile-lbl">Completion Rate</div></div>
       <div class="export-record-tile"><div class="export-record-tile-val">${esc(cityHealthIndex)}</div><div class="export-record-tile-lbl">City Health Index</div></div>
     </div>
+    <div class="export-record-section-label">Contextual Subset Metrics — This Record's Rows</div>
+    <div class="export-record-meta" style="text-align:left;">Matching Reports: ${scopedTickets.length} &nbsp;|&nbsp; Resolved Rate: ${scopedResolved}/${scopedTickets.length} (${scopedResolvedRatePct}%) &nbsp;|&nbsp; Pending Action: ${scopedPending}</div>
     <div class="export-record-section-label">Recent Verified Field Reports</div>
     <table class="export-record-table">
       <thead><tr><th>Category</th><th>Street</th><th>Status</th><th>Timestamp</th></tr></thead>
@@ -3903,15 +3962,28 @@ async function openExportRecordModal(){
     </table>
     <div class="export-record-foot">
       Verified via Civic Intelligence Ledger — Uneditable Public Record.<br>
-      <span style="font-size:.62rem">Hash is a deterministic content fingerprint of this record, not a blockchain or notarized signature.</span>
+      <span style="font-size:.62rem">Hash is a deterministic content fingerprint of this record, not a blockchain or notarized signature. Subset metrics reflect this jurisdiction's real logged reports, not a fabricated sample.</span>
     </div>
     <div class="export-record-actions">
       <button type="button" class="btn btn-outline" id="exportRecordCloseBtn">Close</button>
+      <button type="button" class="btn btn-outline" id="exportRecordShareBtn" aria-label="Share this record via your device's native share sheet">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.6" x2="15.4" y2="6.4"/><line x1="8.6" y1="13.4" x2="15.4" y2="17.6"/></svg>
+        Share
+      </button>
       <button type="button" class="btn btn-primary" id="exportRecordPrintBtn">Print / Save PDF</button>
     </div>`;
 
   document.getElementById('exportRecordOverlay').classList.add('open');
   document.getElementById('exportRecordCloseBtn').addEventListener('click', closeExportRecordModal);
+  document.getElementById('exportRecordShareBtn').addEventListener('click', async () => {
+    // Native Web Share API first (real OS share sheet — "One-Tap Breakout"
+    // per this round's spec); if unsupported, honestly fall back to a
+    // clipboard copy rather than pretending to share.
+    const shared = await shareViaWebShareApi();
+    if (!shared) {
+      try { await navigator.clipboard.writeText(location.href); } catch (e) {}
+    }
+  });
   document.getElementById('exportRecordPrintBtn').addEventListener('click', () => {
     document.body.classList.add('export-record-print-mode');
     window.print();
@@ -4512,105 +4584,26 @@ document.getElementById('ledgerDeepAnalyticsLink').addEventListener('click', () 
 // wiring remains.
 
 /* =====================================================================
-   AI CIVIC GUIDE ONBOARDING TOUR (this round)
-   -----------------------------------------------------------------
-   Each step below targets a real element id already on this page — the
-   real pulsing Live Public Ledger pill, the Resident node in
-   the "How Your Report Moves" diagram, the real Crowd Save America map
-   card, and #civic-stack-container (the real Civic Intelligence Stack
-   header + all 4 buttons, wrapped as one unit this round specifically so
-   this step can spotlight the whole section) — never an invented flow.
-   Reordered this round to open on the Ledger (dot 1) before the Resident
-   Field Unit node (dot 2), per the revised spec. The Crowd Save America
-   step's copy is careful to describe today's real ward-tier grid rather
-   than claim the roadmap-only H3 hexagonal mesh already ships (see the
-   Civic Memory™ Architecture & Charter drawer's own "Spatial Hashing" tab
-   for that same disclosure). ===================================================================== */
+   STREAMLINED ONBOARDING MODAL (this round) — replaces the previous
+   "AI Civic Guide" welcome modal + 4-step spotlight tour entirely. Opens
+   once on a genuine first visit (real localStorage flag, never re-fires
+   once set), and is reachable anytime afterward via the footer's "How
+   Your Report Moves" link. No step state, no target elevation, no
+   spotlight positioning math — just the real radial diagram inside a
+   normal modal with one dismiss action. ===================================================================== */
 const CITIXEN_TOUR_SEEN_KEY = 'citixen_tour_seen';
-// Step bodies use inline <span style="color:#00E699"> emphasis spans per this
-// round's spec, so positionTourStep() below renders .desc via innerHTML
-// (safe: every string here is author-authored, never user input).
-const TOUR_STEPS = [
-  { targetId: 'liveLedgerBanner', title: 'The Public Ledger', desc: '<span style="color:#00E699;">The heart of Civic Intelligence.</span> Every report, status update, and municipal action is etched into a live, unalterable record for complete community transparency.' },
-  { targetId: 'reportTreeNodeResident', title: 'Zero-Tracking Field Capture', desc: '<span style="color:#00E699;">How reports enter the ledger.</span> Photos and location data are stripped of all personal metadata on-device before submission — <span style="color:#00E699;">100% anonymous proof.</span>' },
-  { targetId: 'national-pixel-map', title: 'Crowd Save America™ Campaign', desc: '<span style="color:#00E699;">Taking back control of our communities.</span> Millions of Americans now share a live, unvarnished view of our national infrastructure. As citizens log local reports, active cells light up nationwide — turning local observation into <span style="color:#00E699;">unanimous civic power.</span> (Today\'s grid is ward-tier; H3 hexagonal spatial hashing is this architecture\'s roadmap target, not yet shipped.)' },
-  { targetId: 'civic-stack-container', title: 'Civic Intelligence Stack™', desc: '<span style="color:#00E699;">Four real dashboards, each one tap away.</span> Interconnected through CITIXEN UX™ to turn raw community data into an unstoppable tool for local accountability and civic action.' }
-];
-let tourStepIndex = 0;
-let tourElevatedEl = null; // the real spotlighted DOM target currently carrying .tour-target-elevated
-function renderTourDots(i){
-  const dotsEl = document.getElementById('tourDots');
-  dotsEl.innerHTML = TOUR_STEPS.map((_, di) => '<span class="tour-dot' + (di === i ? ' active' : '') + '"></span>').join('');
+function openReportMovesModal(){
+  document.getElementById('reportMovesOnboardingModal').classList.add('open');
 }
-function positionTourStep(i){
-  const step = TOUR_STEPS[i];
-  const el = document.getElementById(step.targetId);
-  const ring = document.getElementById('tourSpotlightRing');
-  const tooltip = document.getElementById('tourTooltip');
-  if (!el || !ring || !tooltip) return false;
-  const pad = 10;
-  const rect = el.getBoundingClientRect();
-  ring.style.top = (rect.top - pad) + 'px';
-  ring.style.left = (rect.left - pad) + 'px';
-  ring.style.width = (rect.width + pad * 2) + 'px';
-  ring.style.height = (rect.height + pad * 2) + 'px';
-  document.getElementById('tourTooltipTitle').textContent = step.title;
-  document.getElementById('tourTooltipDesc').innerHTML = step.desc;
-  document.getElementById('tourPrevBtn').disabled = (i === 0);
-  document.getElementById('tourNextBtn').textContent = (i === TOUR_STEPS.length - 1) ? 'Finish' : 'Next →';
-  renderTourDots(i);
-  // Elevate the real spotlighted target element itself (not just the
-  // decorative ring) above the dark backdrop with a brightened glass fill.
-  if (tourElevatedEl && tourElevatedEl !== el) tourElevatedEl.classList.remove('tour-target-elevated');
-  el.classList.add('tour-target-elevated');
-  tourElevatedEl = el;
-  // Place the tooltip below the target when there's room, otherwise above —
-  // clamped so it never runs off either edge of the viewport.
-  const spaceBelow = window.innerHeight - rect.bottom;
-  const tooltipTop = spaceBelow > 180 ? rect.bottom + pad + 6 : Math.max(12, rect.top - pad - 6 - tooltip.offsetHeight);
-  let tooltipLeft = rect.left + rect.width / 2 - tooltip.offsetWidth / 2;
-  tooltipLeft = Math.min(Math.max(12, tooltipLeft), window.innerWidth - tooltip.offsetWidth - 12);
-  tooltip.style.top = tooltipTop + 'px';
-  tooltip.style.left = tooltipLeft + 'px';
-  return true;
-}
-function showTourStep(i){
-  if (i < 0 || i >= TOUR_STEPS.length) { endTour(); return; }
-  tourStepIndex = i;
-  const el = document.getElementById(TOUR_STEPS[i].targetId);
-  if (!el) { showTourStep(i + 1); return; } // skip a step whose real target isn't present rather than spotlight nothing
-  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  setTimeout(() => positionTourStep(i), 320);
-}
-function startTour(){
-  document.getElementById('tourSpotlightOverlay').classList.add('open');
-  showTourStep(0);
-}
-function endTour(){
-  document.getElementById('tourSpotlightOverlay').classList.remove('open');
-  if (tourElevatedEl) { tourElevatedEl.classList.remove('tour-target-elevated'); tourElevatedEl = null; }
-}
-function closeTourWelcome(){
-  document.getElementById('tourWelcomeOverlay').classList.remove('open');
+function closeReportMovesModal(){
+  document.getElementById('reportMovesOnboardingModal').classList.remove('open');
   try { localStorage.setItem(CITIXEN_TOUR_SEEN_KEY, '1'); } catch (e) {}
 }
-document.getElementById('tourWelcomeCloseBtn').addEventListener('click', closeTourWelcome);
-document.getElementById('tourWelcomeOverlay').addEventListener('click', (e) => {
-  if (e.target.id === 'tourWelcomeOverlay') closeTourWelcome();
+document.getElementById('reportMovesDismissBtn').addEventListener('click', closeReportMovesModal);
+document.getElementById('reportMovesOnboardingModal').addEventListener('click', (e) => {
+  if (e.target.id === 'reportMovesOnboardingModal') closeReportMovesModal();
 });
-document.getElementById('tourStartBtn').addEventListener('click', () => {
-  closeTourWelcome();
-  startTour();
-});
-document.getElementById('tourExploreBtn').addEventListener('click', closeTourWelcome);
-document.getElementById('tourSkipBtn').addEventListener('click', endTour);
-document.getElementById('tourPrevBtn').addEventListener('click', () => showTourStep(tourStepIndex - 1));
-document.getElementById('tourNextBtn').addEventListener('click', () => {
-  if (tourStepIndex === TOUR_STEPS.length - 1) { endTour(); } else { showTourStep(tourStepIndex + 1); }
-});
-window.addEventListener('resize', () => {
-  if (document.getElementById('tourSpotlightOverlay').classList.contains('open')) positionTourStep(tourStepIndex);
-});
+document.getElementById('footerReportMovesLink').addEventListener('click', openReportMovesModal);
 
 window.addEventListener('DOMContentLoaded',()=>{
   renderFeed();
@@ -4619,18 +4612,19 @@ window.addEventListener('DOMContentLoaded',()=>{
   loadBig3();
   renderNationalCoverageTicker();
   renderNationalPixelMap();
+  updateBlockCoverageTicker();
   // The "Download Ward Health Summary PDF" button was removed outright per
   // this round's spec; downloadWardHealthPdf() itself is kept (real, working
   // jsPDF generation) in case a future round re-wires it to a control.
 
-  // AI Civic Guide — auto-launch the welcome modal on a genuine first
-  // visit only, gated on the real localStorage flag (never re-fires once
-  // set); a short delay lets the rest of the page finish laying out
-  // first. The floating trigger pill remains available to reopen it any
-  // time regardless of this flag.
+  // Streamlined onboarding — auto-launch the "How Your Report Moves" modal
+  // on a genuine first visit only, gated on the real localStorage flag
+  // (never re-fires once set); a short delay lets the rest of the page
+  // finish laying out first. The footer's "How Your Report Moves" link
+  // remains available to reopen it any time regardless of this flag.
   try {
     if (!localStorage.getItem(CITIXEN_TOUR_SEEN_KEY)) {
-      setTimeout(() => document.getElementById('tourWelcomeOverlay').classList.add('open'), 1200);
+      setTimeout(openReportMovesModal, 1200);
     }
   } catch (e) {}
 
