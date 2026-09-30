@@ -254,22 +254,41 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 
 #installStatus{font-size:.66rem;color:var(--muted);margin-top:8px}
 
-/* The floating "Privacy & Anonymity Engine — Verified" top banner
-   (.privacy-pill/.top-privacy-banner) was removed per this round's nav
-   cleanup — its real openModal('anonymity') trigger is relocated to the
-   footer sitemap (#footerAnonymityLink) instead of being deleted. */
-/* ===== NAV JURISDICTION BADGE — right side of the top nav, mirroring the
-   app's own "● City, ST • Active" .badge/.badge-dot pattern exactly (see
-   #headerWardLabel in app.html). Replaces the old floating "Locating your
-   jurisdiction…" banner; the real resolved-jurisdiction text and the
-   "Change Location" trigger both now live here (see
-   updateSmartLocationBanner()/openLocationPicker() below) rather than on
-   a separate banner element. ===== */
+/* ===== NAV PRIVACY SHIELD BADGE — right side of the top nav, a compact
+   clean-SVG shield + mint text (no OS emoji) carrying the same real
+   openModal('anonymity') trigger the old floating "Privacy & Anonymity
+   Engine — Verified" banner had. ===== */
+.nav-privacy-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(0,230,153,.12);
+  border:1px solid rgba(0,230,153,.4);color:var(--mint2);font-size:.72rem;font-weight:700;
+  padding:7px 14px;border-radius:20px;cursor:pointer;font-family:inherit;flex-shrink:0;
+  transition:border-color .15s,filter .15s}
+.nav-privacy-badge svg{flex-shrink:0}
+.nav-privacy-badge:hover{border-color:#00E699;filter:brightness(1.15)}
+
+/* ===== JURISDICTION STATUS PILL — relocated per this round's item 2 from
+   the top nav to directly below the national map card, with 16px vertical
+   padding around it. Same "● City, ST • Active" real resolved-jurisdiction
+   text and "Change Location" trigger as before (see
+   updateSmartLocationBanner()/openLocationPicker() below) — only its
+   position moved, mirroring the app's own #headerWardLabel badge look. ===== */
+.geo-pill-section{display:flex;justify-content:center;padding:16px 24px}
 .nav-jurisdiction-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,230,153,.12);
   border:1px solid rgba(0,230,153,.4);color:var(--mint2);font-size:.72rem;font-weight:700;
   padding:7px 14px;border-radius:20px;cursor:pointer;font-family:inherit;flex-shrink:0;
   transition:border-color .15s,filter .15s}
 .nav-jurisdiction-badge:hover{border-color:#00E699;filter:brightness(1.15)}
+
+/* ===== CIVIC MEMORY™ CONCEPT CARD — per this round's item 2, sits
+   directly beneath the relocated jurisdiction pill, explaining the
+   overarching framework connecting the Public Ledger, Projects and
+   Budgets. Same flat obsidian + subtle Fresh Mint border treatment as
+   every other app container card. ===== */
+.civic-memory-card-section{max-width:640px;margin:0 auto 20px;padding:0 24px}
+.civic-memory-card{background:#030712;border:1px solid rgba(0,230,153,.25);border-radius:12px;
+  padding:16px;text-align:center}
+.civic-memory-card-header{color:#00E699;font-weight:800;font-size:.9rem;letter-spacing:.06em;
+  text-transform:uppercase;margin-bottom:10px}
+.civic-memory-card-narrative{color:#94A3B8;font-size:.85rem;line-height:1.45}
 
 /* ===== BENTO DECK ===== */
 /* #dashboard is now a column wrapper (tab bar + one active view); the row
@@ -643,6 +662,17 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   display:flex;flex-direction:column}
 .ledger-drawer-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--border)}
 .ledger-drawer-body{flex:1;overflow-y:auto;padding:16px 18px 32px}
+/* ===== LEDGER HEADER TYPOGRAPHY — per this round's item 3 header match. ===== */
+.ledger-live-badge{color:#00E699;font-weight:800;font-size:1rem;margin-right:8px;display:inline-block;
+  animation:ledgerLivePulse 2s ease-in-out infinite}
+@keyframes ledgerLivePulse{0%,100%{opacity:1}50%{opacity:.35}}
+.ledger-main-title{color:#FFFFFF;font-weight:900;font-size:1.1rem;letter-spacing:.08em;text-transform:uppercase}
+/* ===== GEOLOCATION BADGE — real resolved-jurisdiction text, same source
+   as the nav pill (see updateLedgerGeoBadge()). Clean inline SVG pin, no
+   OS emoji. ===== */
+.ledger-geo-badge{display:flex;align-items:center;gap:6px;color:var(--mint2);font-size:.76rem;
+  font-weight:700;margin-bottom:10px}
+.ledger-geo-badge svg{flex-shrink:0}
 .ledger-search{width:100%;padding:10px 13px;background:rgba(7,12,14,.8);border:1px solid var(--border);color:var(--text);
   border-radius:10px;font-size:.8rem;margin-bottom:10px;outline:none}
 .ledger-search:focus{border-color:var(--mint2)}
@@ -650,15 +680,18 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 .ledger-chip{background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--muted);
   font-size:.66rem;font-weight:700;padding:5px 10px;border-radius:20px;cursor:pointer}
 .ledger-chip.active{border-color:var(--mint2);background:rgba(0,230,153,.14);color:var(--mint2)}
-.ledger-select{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);
-  border-radius:8px;padding:7px 9px;font-size:.72rem;font-weight:700}
-.ledger-select:focus{border-color:#00E699}
-/* Street/ZIP scope bar + Print Location Report control (item 2) and the
-   Pro Tier upsell link beneath it, sitting directly above the inventory
+/* Street/ZIP scope bar + Print Location Report CTA, and the Go Deeper
+   into Analytics link beneath it, sitting directly above the inventory
    card list. */
-.ledger-scope-bar{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.ledger-scope-bar{display:flex;gap:8px;align-items:center;margin-bottom:10px}
 .ledger-scope-bar .ledger-search{margin-bottom:0;flex:1 1 auto;min-width:0}
-.ledger-pro-tier-row{margin-bottom:14px;font-size:.72rem}
+.ledger-print-cta{background:#030712;border:1px solid #00E699;color:#00E699;font-weight:700;
+  font-size:.76rem;padding:10px 16px;border-radius:9999px;white-space:nowrap;cursor:pointer;
+  font-family:inherit;transition:filter .15s}
+.ledger-print-cta:hover{filter:brightness(1.25)}
+.ledger-deep-analytics-link{display:block;background:none;border:none;padding:0;font:inherit;
+  color:#00E699;font-size:.78rem;font-weight:700;cursor:pointer;text-decoration:underline;
+  margin-bottom:14px}
 .ledger-report-card{background:rgba(7,12,14,.6);border:1px solid var(--border);border-radius:10px;padding:12px;
   margin-bottom:8px;text-decoration:none;color:var(--text);display:block}
 .ledger-report-card:hover{border-color:var(--mint2)}
@@ -780,7 +813,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
    the graphic (.pixel-map-action-row), anchored to the bottom-right
    corner of the same card frame. ===== */
 .pixel-map-brand{color:#00E699;font-weight:800;font-size:1.1rem;letter-spacing:.08em;
-  text-transform:uppercase;text-align:center;width:100%;margin-bottom:20px}
+  text-transform:uppercase;text-align:center;width:100%;margin-bottom:16px}
 .pixel-map-action-row{display:flex;justify-content:flex-end;align-items:center;
   flex-shrink:0;padding:14px 0 16px}
 .pixel-map-view-trigger{display:inline-flex;align-items:center;gap:6px;
@@ -795,13 +828,13 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   50%{opacity:.3}
   100%{opacity:.9}
 }
-/* Per this round's map-density spec: each node <g> starts fully
-   transparent and fades in (not just pulses in place) as
-   runPixelMapBuildUpCycle() reveals it during the 14s fill sequence, so
-   the map visually "fills up" with data points rather than showing a
-   fixed set of already-visible dots. Once a node's wrapper is revealed,
-   its child .pixel-map-node-core/-pulse keep breathing via the existing
-   staticPulse animation underneath the fade-in. */
+/* Each node <g> starts fully transparent and fades in permanently (not
+   just pulsing in place) as runPixelMapCumulativeFill() reveals it, so
+   the map visually and cumulatively "fills up" with data points over
+   time rather than showing a fixed set of already-visible dots. Once a
+   node's wrapper is revealed it stays revealed for good; its child
+   .pixel-map-node-core/-pulse keep breathing via the existing
+   staticPulse animation underneath. */
 .pixel-map-node-emerald{opacity:0;transition:opacity .6s ease}
 .pixel-map-node-emerald.revealed{opacity:1}
 /* ===== LEARN MORE ACCORDION — removed entirely per this round's item 5
@@ -862,17 +895,17 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 </head>
 <body>
 
-  <!-- ===== HEADER / GLOBAL NAV — matches the app's clean top-nav pattern per
-       this round's web-dashboard nav cleanup: brand wordmark on the left,
-       a single live jurisdiction status badge on the right (reusing the
-       app's own "● City, ST • Active" .badge/.badge-dot look). The floating
-       "Privacy & Anonymity Engine — Verified" banner and the "Locating your
-       jurisdiction…" banner that used to stack below the header are both
-       removed; their real triggers are relocated rather than deleted —
-       the anonymity modal is now reachable from the footer sitemap
-       (#footerAnonymityLink) and "Change Location" now lives on this same
-       jurisdiction badge (see updateSmartLocationBanner()/openLocationPicker()
-       below). ===== -->
+  <!-- ===== HEADER / GLOBAL NAV — per this round's top-nav/privacy-shield
+       integration: brand wordmark on the left, a compact Privacy &
+       Anonymity Shield badge on the right (a clean inline SVG shield, no
+       OS emoji). This same real openModal('anonymity') trigger the old
+       floating "Privacy & Anonymity Engine — Verified" banner carried is
+       reused here (see #navPrivacyBadge below) rather than duplicated —
+       the brief footer-sitemap relocation from an earlier round is
+       retired now that the shield has a permanent home in the nav again.
+       The jurisdiction status badge that previously sat on this side of
+       the header has been relocated below the national map card instead
+       (see .geo-pill-section below), per this round's item 2. ===== -->
   <header class="topbar">
     <div class="brand">
       <div class="brand-logo">
@@ -883,9 +916,9 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       <div class="brand-sub">Civic Intelligence Platform</div>
     </div>
 
-    <button type="button" class="nav-jurisdiction-badge" id="navJurisdictionBadge" aria-label="Change your jurisdiction">
-      <span class="pulsing-dot"></span>
-      <span id="navJurisdictionText">La Crosse, WI • Active</span>
+    <button type="button" class="nav-privacy-badge" id="navPrivacyBadge" aria-label="Privacy and anonymity details">
+      <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+      <span>Privacy Engine: Verified</span>
     </button>
   </header>
 
@@ -969,34 +1002,59 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </div>
   </div>
 
-  <!-- ===== LIVE PUBLIC LEDGER DRAWER ===== -->
+  <!-- ===== LIVE PUBLIC LEDGER DRAWER — overhauled per this round's item 3:
+       header retyped into the "● LIVE" / "PUBLIC LEDGER" hierarchy, the
+       ward dropdown and "Upgrade to Pro" upsell text both removed
+       outright (the ward dropdown's real filtering is superseded by the
+       new radius pills below — see ledgerFilters.radius), and a real
+       detected-location badge + concentric distance pills added ahead of
+       the existing real street/ZIP scope + Print Location Report control.
+       A "Go Deeper into Analytics ↗" link now routes into the same real
+       Analytics deep-dive panel the ANALYTICS hub pill opens. ===== -->
   <div class="ledger-drawer" id="ledgerDrawer">
     <div class="ledger-drawer-panel">
       <div class="ledger-drawer-head">
-        <strong style="color:var(--mint2)">Live Public Ledger</strong>
+        <div>
+          <span class="ledger-live-badge">● LIVE</span><span class="ledger-main-title">Public Ledger</span>
+        </div>
         <button class="modal-close" id="ledgerCloseBtn">✕</button>
       </div>
       <div class="ledger-drawer-body">
+        <!-- ===== GEOLOCATION & RADIUS SEARCH MATRIX — the badge reflects
+             the SAME resolved jurisdiction as the nav pill/dashboard (see
+             updateLedgerGeoBadge()); the radius pills are a real, honest
+             ward/city-tier proxy for distance (1 Mile = current ward only,
+             5 Miles = current city's wards, 10 Miles = no restriction) —
+             this dataset has no per-report GPS coordinates to compute a
+             true mile radius against, so rather than fabricate one, the
+             filter uses the real jurisdiction hierarchy tickets already
+             carry (t.ward/t.city/t.state), same honesty convention as the
+             ZIP scope bar below. ===== -->
+        <div class="ledger-geo-badge">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>Current Area: <span id="ledgerGeoBadgeText">La Crosse, WI</span></span>
+        </div>
         <input class="ledger-search" id="ledgerSearchInput" placeholder="Search title, location, category, ticket ID…">
-        <div class="ledger-filter-row">
-          <select class="ledger-select" id="ledgerWardSelect"><option value="">All wards</option></select>
+        <div class="ledger-filter-row" id="ledgerRadiusChips">
+          <button type="button" class="ledger-chip" data-radius="1">1 Mile</button>
+          <button type="button" class="ledger-chip" data-radius="5">5 Miles</button>
+          <button type="button" class="ledger-chip active" data-radius="10">10 Miles</button>
         </div>
         <div class="ledger-filter-row" id="ledgerCategoryChips"></div>
         <div class="ledger-filter-row" id="ledgerStatusChips"></div>
-        <!-- ===== STREET / ZIP SCOPE BAR + REPORT GENERATOR — per this
-             round's item 2. Street input real-filters against the real
-             ticket `loc` field; a 5-digit ZIP is titled as a "District
-             Report" but, since no ticket in this dataset carries a real
-             ZIP code, it falls back to the same currently-filtered
-             inventory as the blank/default case with an honest note in
-             the generated PDF rather than fabricating ZIP-level data. ===== -->
+        <!-- ===== STREET / ZIP SCOPE BAR + REPORT GENERATOR — per an
+             earlier round's item 2. Street input real-filters against the
+             real ticket `loc` field; a 5-digit ZIP is titled as a
+             "District Report" but, since no ticket in this dataset
+             carries a real ZIP code, it falls back to the same
+             currently-filtered inventory as the blank/default case with
+             an honest note in the generated PDF rather than fabricating
+             ZIP-level data. ===== -->
         <div class="ledger-scope-bar">
-          <input type="text" id="ledgerScopeInput" class="ledger-search" style="margin:0" placeholder="Enter Street Name or 5-Digit ZIP…">
-          <button type="button" id="ledgerScopePrintBtn" class="btn btn-outline" style="white-space:nowrap;padding:8px 14px;font-size:.76rem">Print Location Report</button>
+          <input type="text" id="ledgerScopeInput" class="ledger-search" style="margin:0" placeholder="Enter street address or ZIP code...">
+          <button type="button" id="ledgerScopePrintBtn" class="ledger-print-cta">Print Location Report</button>
         </div>
-        <div class="ledger-pro-tier-row">
-          <button type="button" id="ledgerProTierLink" style="background:none;border:none;padding:0;font:inherit;color:#00E699;cursor:pointer;text-decoration:underline">Need Multi-Ward CSV or Enterprise Data? Upgrade to Pro</button>
-        </div>
+        <button type="button" id="ledgerDeepAnalyticsLink" class="ledger-deep-analytics-link">Go Deeper into Analytics ↗</button>
         <div id="ledgerResults"></div>
       </div>
     </div>
@@ -1085,28 +1143,30 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        the Aggregation Hub's own markers). Reused once via <use> both as
        the clip-path for the dim Fresh Mint grid and as a crisp, visible
        coastline stroke (.pixel-map-outline) on top of it, so the two can
-       never drift out of sync. Grid pixels light progressively and stay
-       lit, one every 150ms across a 15s build-up-and-reset loop
-       (runPixelMapBuildUpCycle(), see below), and the map interior
-       carries only Emerald Green city nodes — no cyan/blue nodes.
-       Everything here is stationary — fixed coordinates, opacity-only
-       staticPulse node animation, no panning/floating/zooming. Purely
+       never drift out of sync. Grid pixels light progressively, one every
+       150ms, and per this round's item 5 each lit dot/revealed node
+       STICKS permanently — the fill is cumulative and never resets (see
+       runPixelMapCumulativeFill() below) — so the map interior gradually
+       fills up toward full national aggregate coverage, carrying only
+       Emerald Green city nodes throughout — no cyan/blue nodes.
+       Coordinates are fixed; nothing here pans, floats, or zooms. Purely
        decorative; it draws no real per-city report data, unlike the
        Aggregation Hub's live-tagged La Crosse marker.
-       The title reads "CrowdSaveAmerica™", centered horizontally as a
-       normal-flow header above the SVG graphic (styled to match the
-       "EXPLORE MORE DATA" header's own type treatment) rather than an
-       overlay on top of it, with the card's own padding widened so
-       neither the header nor the graphic ever crowd the frame. The
-       "View Map ↗" trigger (#aggregationMapGatewayBtn) lives in a
-       normal-flow .pixel-map-action-row below the SVG, anchored to the
-       bottom-right corner, so it can never overlap the silhouette
-       (including the Florida/East Coast region). Same trigger id and
-       click handler throughout every round's restyling, so no JS wiring
-       has ever changed here — only position/markup. ===== -->
+       The title reads "CROWD SAVE AMERICA™" (explicit spaces, not a
+       compound word), centered horizontally as a normal-flow header above
+       the SVG graphic (styled to match the "MORE FEATURES" header's own
+       type treatment) rather than an overlay on top of it, with the
+       card's own padding widened so neither the header nor the graphic
+       ever crowd the frame. The "View Map ↗" trigger
+       (#aggregationMapGatewayBtn) lives in a normal-flow
+       .pixel-map-action-row below the SVG, anchored to the bottom-right
+       corner, so it can never overlap the silhouette (including the
+       Florida/East Coast region). Same trigger id and click handler
+       throughout every round's restyling, so no JS wiring has ever
+       changed here — only position/markup. ===== -->
   <section class="pixel-map-section">
     <div class="pixel-map-card" id="national-pixel-map">
-      <div class="pixel-map-brand">CrowdSaveAmerica<sup class="tm-symbol">™</sup></div>
+      <div class="pixel-map-brand">CROWD SAVE AMERICA<sup class="tm-symbol">™</sup></div>
       <svg class="pixel-map-svg" viewBox="0 0 800 440" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
         <defs>
           <path id="usSilhouetteOutline" d="M760.0,60.1 L738.9,21.8 L722.8,20.4 L711.9,67.1 L653.5,82.4 L640.7,116.4 L569.9,161.2 L555.7,152.5 L563.7,118.5 L548.7,123.6 L552.4,99.2 L533.4,90.4 L509.3,162.7 L503.5,100.7 L527.9,82.4 L552.0,85.0 L496.5,75.1 L499.5,61.2 L448.7,78.0 L473.2,57.6 L415.1,33.9 L302.7,42.6 L69.9,31.3 L68.1,58.0 L45.1,41.5 L45.4,207.2 L62.6,246.3 L126.1,309.4 L208.6,330.2 L264.8,321.1 L304.6,369.3 L333.0,360.9 L372.4,415.6 L391.8,419.3 L387.8,387.9 L404.6,365.6 L441.8,348.5 L490.0,358.7 L479.0,344.1 L507.1,332.8 L568.1,341.5 L617.7,417.1 L626.1,394.8 L597.6,330.9 L603.8,312.0 L681.6,229.9 L655.3,198.1 L664.8,174.4 L678.3,185.7 L682.3,145.9 L732.3,126.2 L717.3,99.2 Z"/>
@@ -1121,6 +1181,25 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       <div class="pixel-map-action-row">
         <button id="aggregationMapGatewayBtn" type="button" class="pixel-map-view-trigger">View Map ↗</button>
       </div>
+    </div>
+  </section>
+
+  <!-- ===== JURISDICTION STATUS PILL — relocated here per this round's item 2
+       (previously the top nav's right-side badge, now replaced there by the
+       Privacy Shield badge — see the header comment above). ===== -->
+  <section class="geo-pill-section">
+    <button type="button" class="nav-jurisdiction-badge" id="navJurisdictionBadge" aria-label="Change your jurisdiction">
+      <span class="pulsing-dot"></span>
+      <span id="navJurisdictionText">La Crosse, WI • Active</span>
+    </button>
+  </section>
+
+  <!-- ===== CIVIC MEMORY™ CONCEPT CARD — inserted per this round's item 2,
+       directly beneath the relocated jurisdiction pill. ===== -->
+  <section class="civic-memory-card-section">
+    <div class="civic-memory-card">
+      <div class="civic-memory-card-header">CITIXEN UX™ — CIVIC INTELLIGENCE PLATFORM</div>
+      <p class="civic-memory-card-narrative">Civic Memory™ is the overarching municipal architectural framework connecting real-time resident field reports (Public Ledger) directly to active infrastructure work (Projects) and tax expenditure audits (Budgets).</p>
     </div>
   </section>
 
@@ -1208,20 +1287,27 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        been removed again), immediately followed by the same 3-pill
        hub-row it always introduced. ===== -->
   <section class="matrix-summary-section" id="matrixSummarySection">
-    <h3 style="color: #00E699; font-size: 1.15rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin: 24px 0 24px 0; text-align: center;">Explore More Data</h3>
+    <h3 style="color: #00E699; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin: 20px 0 16px; text-align: center;">More Features</h3>
   </section>
 
-  <!-- ===== THREE DRILL-DOWN ACTION HUBS — sit directly below the "Explore
-       More Data" header, which now sits directly below the national map
-       card per this round's item 6. Each pill has a 12px bottom margin
-       (.hub-card) for clean, un-crunched vertical spacing between them,
-       per this round's literal spec. Each reveals its own hidden deep-dive
-       panel rather than navigating away: Analytics -> Health Index, Live
-       dispatch feed/Geo-Hatch map, Bridge Slogan, and response metrics
-       (deepdiveAnalytics); Expenditures -> itemized Civic Memory ledger
-       entries & cost estimates (civicStackSection, scrolled to
-       ledgerCard); Operations -> Civic Stack integrations & administrative
-       data (civicStackSection, scrolled to civicStackAdminCard). ===== -->
+  <!-- ===== THREE DRILL-DOWN ACTION HUBS — sit directly below the "More
+       Features" header, which now sits directly below the Civic Memory™
+       concept card per this round's item 6. Each pill keeps its 14px
+       bottom margin (.hub-card) and now shows an explicit action label
+       next to its arrow instead of a bare "↗". Analytics and Expenditures
+       still reveal their existing real deep-dive panels: Analytics ->
+       Health Index, Live dispatch feed/Geo-Hatch map, Bridge Slogan, and
+       response metrics (deepdiveAnalytics); Expenditures -> itemized
+       Civic Memory ledger entries & cost estimates (civicStackSection,
+       scrolled to ledgerCard). The third pill is relabeled "Civic
+       Memory™ — Public Ledger Framework" per this round's spec, so its
+       real trigger is repointed from the old "Operations" deep-dive
+       (civicStackSection scrolled to civicStackAdminCard) to the actual
+       Live Public Ledger drawer (openLedgerDrawer()) — a more honest
+       match for its new label. The Civic Stack/Operations content this
+       pill used to scroll to is not deleted: it's the same
+       civicStackSection panel the Expenditures pill still opens, just no
+       longer auto-scrolled-to directly. ===== -->
   <div class="hub-row" role="navigation" aria-label="Deep-dive sections">
     <button class="hub-card" id="hubCoverageBtn" type="button" aria-expanded="false" aria-controls="deepdiveAnalytics">
       <span class="hub-card-main">
@@ -1229,7 +1315,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         <span class="hub-card-text"><span class="hub-card-title">Analytics</span><span class="hub-card-sub" id="hubCoverageInfoBtn" role="button" tabindex="0" aria-label="What the Analytics section covers">— Data &amp; Reports</span></span>
       </span>
       <span class="hub-card-actions">
-        <span class="hub-card-arrow" aria-hidden="true">↗</span>
+        <span class="hub-card-arrow">View Report ↗</span>
       </span>
     </button>
     <button class="hub-card" id="hubSlaBtn" type="button" aria-expanded="false" aria-controls="civicStackSection">
@@ -1238,16 +1324,16 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         <span class="hub-card-text"><span class="hub-card-title">Expenditures</span><span class="hub-card-sub" id="hubSlaInfoBtn" role="button" tabindex="0" aria-label="What the Expenditures section covers">— Budget &amp; Projects</span></span>
       </span>
       <span class="hub-card-actions">
-        <span class="hub-card-arrow" aria-hidden="true">↗</span>
+        <span class="hub-card-arrow">Export Report ↗</span>
       </span>
     </button>
-    <button class="hub-card" id="hubStackBtn" type="button" aria-expanded="false" aria-controls="civicStackSection">
+    <button class="hub-card" id="hubStackBtn" type="button" aria-expanded="false" aria-controls="ledgerDrawer">
       <span class="hub-card-main">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 21 8 12 13 3 8 12 3"/><polyline points="3 13 12 18 21 13"/><polyline points="3 18 12 23 21 18"/></svg>
-        <span class="hub-card-text"><span class="hub-card-title">Operations</span><span class="hub-card-sub" id="hubStackInfoBtn" role="button" tabindex="0" aria-label="What the Operations section covers">— Civic Stack &amp; Integration</span></span>
+        <span class="hub-card-text"><span class="hub-card-title">Civic Memory™</span><span class="hub-card-sub" id="hubStackInfoBtn" role="button" tabindex="0" aria-label="What the Civic Memory framework covers">— Public Ledger Framework</span></span>
       </span>
       <span class="hub-card-actions">
-        <span class="hub-card-arrow" aria-hidden="true">↗</span>
+        <span class="hub-card-arrow">Learn More ↗</span>
       </span>
     </button>
   </div>
@@ -1537,10 +1623,6 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     <div class="sitemap-bottom">
       <button type="button" id="footerCodexLink" class="footer-staff-link" style="background:none;border:none;padding:0;font:inherit;cursor:pointer">Statutory Governance &amp; Precedent ↗</button>
       <button type="button" id="footerExportRecordLink" class="footer-staff-link" style="background:none;border:none;padding:0;font:inherit;cursor:pointer;margin-left:18px">Export Civic Record ↗</button>
-      <!-- Real trigger relocated from the removed top-of-page "Privacy &
-           Anonymity Engine — Verified" banner, per this round's nav
-           cleanup — opens the same Anonymity Whitepaper modal. -->
-      <button type="button" id="footerAnonymityLink" class="footer-staff-link" style="background:none;border:none;padding:0;font:inherit;cursor:pointer;margin-left:18px">Privacy &amp; Anonymity Engine ↗</button>
     </div>
     <div class="trademark-disclosure"><span style="color:#FFFFFF; font-weight:bold;">CITIXEN</span> <span style="color:#00E699; font-weight:bold;">UX</span><sup class="tm-symbol">™</sup> and Crowd Source America<sup class="tm-symbol">™</sup> are protected trademarks. Civic Intelligence, Civic Memory, Geo-Hatch, City Snapshot, and Civic Stack are proprietary marks. Protected under U.S. and international trademark laws. All other trademarks, product names, and logos are the property of their respective owners.</div>
   </footer>
@@ -1926,7 +2008,17 @@ document.getElementById('hubSlaBtn').addEventListener('click', (e) => {
   openDeepdivePanel('civicStackSection', 'ledgerCard', e.currentTarget);
 });
 document.getElementById('hubStackBtn').addEventListener('click', (e) => {
-  openDeepdivePanel('civicStackSection', 'civicStackAdminCard', e.currentTarget);
+  // Civic Memory™ pill now opens the real Live Public Ledger drawer
+  // (a more honest match for its "Public Ledger Framework" label) instead
+  // of the old Civic Stack/Operations admin-card deep-dive panel — that
+  // panel's content remains reachable via the Expenditures pill above,
+  // so nothing real is orphaned by this rewiring.
+  e.currentTarget.setAttribute('aria-expanded', 'true');
+  openLedgerDrawer();
+});
+document.getElementById('ledgerCloseBtn').addEventListener('click', () => {
+  document.getElementById('hubStackBtn').setAttribute('aria-expanded', 'false');
+  closeLedgerDrawer();
 });
 
 // SUB-MODULE FOCUS-AREA PREVIEWS — the circled "(i)" badge that used to
@@ -2101,11 +2193,11 @@ if (geoHatchSearchBtn && geoHatchSearchInput) {
   });
 }
 
-// The floating "Privacy & Anonymity Engine — Verified" top banner
-// (#privacyPillBtn) was removed per this round's nav cleanup — its real
-// openModal('anonymity') trigger now lives on the footer sitemap link
-// (#footerAnonymityLink) instead.
-document.getElementById('footerAnonymityLink').addEventListener('click',()=> openModal('anonymity'));
+// The Privacy & Anonymity Shield badge (#navPrivacyBadge) integrated
+// directly into the top nav per this round's item 4 carries the same
+// real openModal('anonymity') trigger the original floating banner (and
+// its brief footer-link relocation) had.
+document.getElementById('navPrivacyBadge').addEventListener('click',()=> openModal('anonymity'));
 document.getElementById('modalClose').addEventListener('click',()=> document.getElementById('modalOverlay').classList.remove('open'));
 document.getElementById('modalOverlay').addEventListener('click',(e)=>{
   if(e.target.id==='modalOverlay') e.currentTarget.classList.remove('open');
@@ -2763,18 +2855,19 @@ function renderAnalyticsMatrix(data){
 /* =====================================================================
    NATIONAL LIVE REPORT PIXEL MAP — draws the dense dim Fresh Mint-tinted
    pixel grid inside the OpenCV-traced #usSilhouetteClip SVG clip-path,
-   then overlays six bright, pulsing Emerald Green (#00E699) city nodes —
-   no cyan/blue nodes anywhere. runPixelMapBuildUpCycle() then drives a fixed 15-second
-   "build-up & reset" loop, per this round's spec: every node lit during
-   the 14s fill sequence STAYS lit (no flash-and-fade), a brief outline
-   pulse-glow marks the ~14s-15s peak-density moment, and the whole grid
-   (except the one origin seed node) wipes back to unlit at the 15s mark
-   before the next pass starts immediately — an infinite loop. This is
-   purely decorative — it draws no real per-city report data, unlike the
+   then overlays city nodes in Fresh Mint (#00E699) — no cyan/blue nodes
+   anywhere. Per this round's item 5, runPixelMapCumulativeFill() lights
+   grid squares and reveals nodes sequentially and PERMANENTLY — every
+   square/node lit STICKS lit for good, with no reset cycle — so the map
+   gradually and cumulatively fills up over time rather than looping
+   through a repeating build-up-and-wipe cycle (an earlier round's
+   design). Once every square and node is lit, the outline gets a single
+   pulse-glow and the fill simply stops, fully aggregated. This is purely
+   decorative — it draws no real per-city report data, unlike the
    Aggregation Hub's live-tagged La Crosse marker elsewhere on this page —
    and the silhouette itself is a stylized approximation, not a precise
    cartographic projection (same convention documented on the Aggregation
-   Hub's own marker layout). Everything here is stationary: nodes pulse in
+   Hub's own marker layout). Node positions are stationary: they pulse in
    place (@keyframes staticPulse) and lit pixels never pan, float, or zoom.
    ===================================================================== */
 function renderNationalPixelMap(){
@@ -2835,7 +2928,7 @@ function renderNationalPixelMap(){
     '</g>'
   ).join('');
 
-  runPixelMapBuildUpCycle();
+  runPixelMapCumulativeFill();
 }
 
 function pixelMapFindNearestDot(dots, targetX, targetY){
@@ -2849,36 +2942,27 @@ function pixelMapFindNearestDot(dots, targetX, targetY){
   return best;
 }
 
-const PIXEL_MAP_FILL_INTERVAL_MS = 150;   // one new grid square lit every 150ms
-const PIXEL_MAP_NODE_REVEAL_INTERVAL_MS = 350; // one new node fades in every 350ms
-const PIXEL_MAP_FILL_DURATION_MS = 14000; // Fill Sequence: 0s-14s
-const PIXEL_MAP_CYCLE_DURATION_MS = 15000; // full cycle length, incl. reset
+const PIXEL_MAP_FILL_INTERVAL_MS = 150;   // one new grid square lights (and stays lit) every 150ms
+const PIXEL_MAP_NODE_REVEAL_INTERVAL_MS = 350; // one new node fades in (and stays) every 350ms
 let pixelMapFillTimer = null;
 let pixelMapNodeRevealTimer = null;
-let pixelMapCycleTimer = null;
 
-// Runs one full 15s "build-up & reset" pass and re-schedules itself,
-// forming an infinite loop:
-//   0s      — Start Cycle: clear every lit grid square and every revealed
-//             node except the 1 origin seed (the grid square/node nearest
-//             La Crosse's marker — this project's home jurisdiction —
-//             which anchors every pass).
-//   0s-14s  — Fill Sequence: every 150ms, light one random still-unlit
-//             grid square; separately, every 350ms, fade in one random
-//             still-hidden node (see .pixel-map-node-emerald.revealed) —
-//             at ~40 nodes total and a 350ms cadence, every node has
-//             faded in by roughly the 14s mark, so the map visually
-//             "fills up" with active-looking points rather than showing a
-//             fixed set of already-visible dots, per this round's spec.
-//             Each stays lit/revealed for the rest of this cycle.
-//   14s-15s — Peak Density: filling/revealing stops (~93 grid squares lit
-//             at 150ms cadence over 14s, matching this round's "~100
-//             nodes" full-aggregation target for the background grid),
-//             and the coastline outline gets a brief pulse-glow to mark
-//             the moment.
-//   15s     — Reset: wipe back down to the 1 seed grid square/node; the
-//             next pass starts immediately.
-function runPixelMapBuildUpCycle(){
+// Runs once per page load and never resets, per this round's item 5:
+//   Start — the one origin seed (the grid square/node nearest La Crosse's
+//           marker — this project's home jurisdiction) lights/reveals
+//           immediately, anchoring the fill.
+//   Then  — every 150ms, light one random still-unlit grid square;
+//           separately, every 350ms, fade in one random still-hidden
+//           node (see .pixel-map-node-emerald.revealed). Each lit square
+//           and each revealed node STICKS permanently — nothing here ever
+//           un-lights or fades back out — so the grid cumulatively fills
+//           up toward full national aggregate coverage over time instead
+//           of looping through a repeating build-up-and-wipe cycle.
+//   Done  — once every grid square is lit, its timer clears itself and
+//           the coastline outline gets a single pulse-glow marking full
+//           aggregation; the node-reveal timer clears itself the same way
+//           once every node has faded in.
+function runPixelMapCumulativeFill(){
   const grid = document.getElementById('pixelMapGrid');
   const nodesLayer = document.getElementById('pixelMapNodes');
   if (!grid) return;
@@ -2886,22 +2970,24 @@ function runPixelMapBuildUpCycle(){
   const nodeGroups = nodesLayer ? Array.prototype.slice.call(nodesLayer.querySelectorAll('.pixel-map-node-emerald')) : [];
   if (!dots.length) return;
 
-  if (pixelMapFillTimer) { clearInterval(pixelMapFillTimer); pixelMapFillTimer = null; }
-  if (pixelMapNodeRevealTimer) { clearInterval(pixelMapNodeRevealTimer); pixelMapNodeRevealTimer = null; }
-  if (pixelMapCycleTimer) { clearTimeout(pixelMapCycleTimer); pixelMapCycleTimer = null; }
-
-  dots.forEach(d => d.classList.remove('pixel-map-dot-lit'));
   const originSeed = pixelMapFindNearestDot(dots, 420, 140); // La Crosse
   if (originSeed) originSeed.classList.add('pixel-map-dot-lit');
 
-  nodeGroups.forEach(g => g.classList.remove('revealed'));
   // Origin node (La Crosse, the first entry in the nodes[] array) starts
   // revealed immediately, same convention as the grid's origin seed dot.
   if (nodeGroups.length) nodeGroups[0].classList.add('revealed');
 
   pixelMapFillTimer = setInterval(() => {
     const unlit = dots.filter(d => !d.classList.contains('pixel-map-dot-lit'));
-    if (!unlit.length) return;
+    if (!unlit.length) {
+      clearInterval(pixelMapFillTimer); pixelMapFillTimer = null;
+      const outline = document.querySelector('.pixel-map-outline');
+      if (outline) {
+        outline.classList.add('pixel-map-outline-pulse');
+        setTimeout(() => outline.classList.remove('pixel-map-outline-pulse'), 900);
+      }
+      return;
+    }
     const dot = unlit[Math.floor(Math.random() * unlit.length)];
     dot.classList.add('pixel-map-dot-lit');
   }, PIXEL_MAP_FILL_INTERVAL_MS);
@@ -2912,18 +2998,6 @@ function runPixelMapBuildUpCycle(){
     const group = hidden[Math.floor(Math.random() * hidden.length)];
     group.classList.add('revealed');
   }, PIXEL_MAP_NODE_REVEAL_INTERVAL_MS);
-
-  setTimeout(() => {
-    if (pixelMapFillTimer) { clearInterval(pixelMapFillTimer); pixelMapFillTimer = null; }
-    if (pixelMapNodeRevealTimer) { clearInterval(pixelMapNodeRevealTimer); pixelMapNodeRevealTimer = null; }
-    const outline = document.querySelector('.pixel-map-outline');
-    if (outline) {
-      outline.classList.add('pixel-map-outline-pulse');
-      setTimeout(() => outline.classList.remove('pixel-map-outline-pulse'), 900);
-    }
-  }, PIXEL_MAP_FILL_DURATION_MS);
-
-  pixelMapCycleTimer = setTimeout(runPixelMapBuildUpCycle, PIXEL_MAP_CYCLE_DURATION_MS);
 }
 
 /* =====================================================================
@@ -3171,7 +3245,7 @@ async function downloadWardHealthPdf(triggerBtn){
 const LEDGER_CATEGORIES = ['Pothole', 'Streetlight', 'Signage', 'Sidewalk', 'Drainage'];
 const LEDGER_STAGES = ['submitted', 'dispatched', 'resolved'];
 let ledgerTickets = [];
-let ledgerFilters = { ward: '', category: '', status: '', q: '' };
+let ledgerFilters = { radius: 10, category: '', status: '', q: '' };
 
 function fallbackLedgerTickets(){
   // Mirrors api/_lib/store.js's WARD_TICKETS + makeReportId exactly.
@@ -3229,12 +3303,27 @@ async function fetchLedgerTickets(){
   }
 }
 
+// Real ward/city-tier proxy for the "distance" pills — see the markup
+// comment above #ledgerRadiusChips for why no true per-mile radius is
+// computed. Matches against the SAME resolved jurisdiction the nav pill
+// shows (activeJurisdiction()), never a fabricated coordinate.
+function ledgerTicketWithinRadius(t, radiusMiles){
+  if (radiusMiles >= 10) return true;
+  const j = activeJurisdiction();
+  if (!j) return true;
+  if (radiusMiles <= 1) return t.ward === j.ward;
+  return t.city === j.city && t.state === j.state;
+}
 function renderLedgerFilters(){
-  const wardSel = document.getElementById('ledgerWardSelect');
-  const seenWards = [];
-  ledgerTickets.forEach(t => { if (!seenWards.some(w => w.slug === t.ward)) seenWards.push({ slug: t.ward, name: t.wardName }); });
-  wardSel.innerHTML = '<option value="">All wards</option>' + seenWards.map(w => `<option value="${esc(w.slug)}">${esc(w.name)}</option>`).join('');
-  wardSel.addEventListener('change', () => { ledgerFilters.ward = wardSel.value; renderLedgerResults(); });
+  const radiusRow = document.getElementById('ledgerRadiusChips');
+  radiusRow.querySelectorAll('.ledger-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      radiusRow.querySelectorAll('.ledger-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      ledgerFilters.radius = Number(chip.dataset.radius);
+      renderLedgerResults();
+    });
+  });
 
   const catRow = document.getElementById('ledgerCategoryChips');
   catRow.innerHTML = ['All'].concat(LEDGER_CATEGORIES).map(c => `<button type="button" class="ledger-chip${c === 'All' ? ' active' : ''}" data-cat="${c === 'All' ? '' : esc(c)}">${esc(c)}</button>`).join('');
@@ -3264,7 +3353,7 @@ function renderLedgerResults(){
   if (!container) return;
   const q = ledgerFilters.q.toLowerCase();
   const filtered = ledgerTickets.filter(t => {
-    if (ledgerFilters.ward && t.ward !== ledgerFilters.ward) return false;
+    if (!ledgerTicketWithinRadius(t, ledgerFilters.radius)) return false;
     if (ledgerFilters.category && t.category !== ledgerFilters.category) return false;
     if (ledgerFilters.status && t.stage !== ledgerFilters.status) return false;
     if (q && !((t.title || '').toLowerCase().includes(q) || (t.loc || '').toLowerCase().includes(q) || (t.category || '').toLowerCase().includes(q) || (t.reportId || '').toLowerCase().includes(q))) return false;
@@ -3289,8 +3378,16 @@ function renderLedgerResults(){
   });
 }
 
+// Reflects the exact SAME resolved jurisdiction as the nav pill (see
+// updateSmartLocationBanner()) — no second, parallel detection system.
+function updateLedgerGeoBadge(){
+  const el = document.getElementById('ledgerGeoBadgeText');
+  const j = activeJurisdiction();
+  if (el && j) el.textContent = j.cityName + ', ' + j.state.toUpperCase();
+}
 async function openLedgerDrawer(){
   document.getElementById('ledgerDrawer').classList.add('open');
+  updateLedgerGeoBadge();
   if (!ledgerTickets.length) {
     ledgerTickets = await fetchLedgerTickets();
     renderLedgerFilters();
@@ -3368,12 +3465,12 @@ if (ledgerSearchInputEl) ledgerSearchInputEl.addEventListener('input', () => {
    so rather than fabricate ZIP-level matches, a ZIP scope falls back to
    the SAME currently-filtered inventory as the blank/default case, with
    an honest note printed into the PDF saying so. Blank input prints
-   exactly the ledger's current filtered view (search/ward/category/status),
-   matching what's on screen. ===== */
+   exactly the ledger's current filtered view (search/radius/category/
+   status), matching what's on screen. ===== */
 function ledgerCurrentlyFilteredTickets(){
   const q = (ledgerFilters.q || '').toLowerCase();
   return ledgerTickets.filter(t => {
-    if (ledgerFilters.ward && t.ward !== ledgerFilters.ward) return false;
+    if (!ledgerTicketWithinRadius(t, ledgerFilters.radius)) return false;
     if (ledgerFilters.category && t.category !== ledgerFilters.category) return false;
     if (ledgerFilters.status && t.stage !== ledgerFilters.status) return false;
     if (q && !((t.title || '').toLowerCase().includes(q) || (t.loc || '').toLowerCase().includes(q) || (t.category || '').toLowerCase().includes(q) || (t.reportId || '').toLowerCase().includes(q))) return false;
@@ -3448,16 +3545,15 @@ async function printLedgerLocationReport(){
 const ledgerScopePrintBtnEl = document.getElementById('ledgerScopePrintBtn');
 if (ledgerScopePrintBtnEl) ledgerScopePrintBtnEl.addEventListener('click', printLedgerLocationReport);
 
-// Pro Tier upsell link — no standalone "Institutional Access modal" exists
-// in this codebase (Institutional Access is the real "For Elected
-// Officials" / "For Municipalities" mailto gateway section further down
-// the page), so this scrolls to that real section rather than opening a
-// fabricated modal.
-const ledgerProTierLinkEl = document.getElementById('ledgerProTierLink');
-if (ledgerProTierLinkEl) ledgerProTierLinkEl.addEventListener('click', () => {
+// The "Need Multi-Ward CSV or Enterprise Data? Upgrade to Pro" upsell
+// link (#ledgerProTierLink) was removed entirely per this round's item 3
+// ("purge monetization bloat") — the real "For Elected Officials" / "For
+// Municipalities" section it scrolled to (#institutionalAccessSection) is
+// its own normal, independently-reachable part of the page flow further
+// down, so nothing real became unreachable by removing this shortcut.
+document.getElementById('ledgerDeepAnalyticsLink').addEventListener('click', () => {
   closeLedgerDrawer();
-  const target = document.getElementById('institutionalAccessSection');
-  if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  document.getElementById('hubCoverageBtn').click();
 });
 
 // ===== The Municipal Onboarding Wizard (previously ~190 lines here: step
