@@ -11,11 +11,12 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="CITIXEN UX">
 <link rel="manifest" href="/manifest.json?v=4">
-<!-- Clean, sharp Emerald Green shield-outline favicon per this round's spec,
-     encoded as an inline data:image/svg+xml so it renders crisp at any tab
-     size with no extra network request; PNG/ICO variants kept as fallbacks
-     for browsers/contexts that don't support SVG favicons. -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-3z' fill='none' stroke='%2300FF87' stroke-width='2'/%3E%3C/svg%3E">
+<!-- Clean, sharp Fresh Mint (#00E699) shield-outline favicon, updated this
+     round from the prior Emerald Green (#00FF87) shade, encoded as an
+     inline data:image/svg+xml so it renders crisp at any tab size with no
+     extra network request; PNG/ICO variants kept as fallbacks for
+     browsers/contexts that don't support SVG favicons. -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-3z' fill='none' stroke='%2300E699' stroke-width='2'/%3E%3C/svg%3E">
 <link rel="icon" type="image/x-icon" href="/favicon.ico?v=4">
 <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png?v=4">
 <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png?v=4">
@@ -31,8 +32,12 @@
   --brand-mint-dim:rgba(0,255,136,0.12) !important;
   --brand-amber:#ffbb00 !important;
   --brand-red:#ff4444 !important;
-  --bg-obsidian:#080c0a !important;
-  --bg-card:#0f1713 !important;
+  /* Global canvas pivoted to Deep Slate Obsidian per this round's item 13
+     (#0B132B body / #0F172A card surfaces, replacing the prior near-black
+     green-tinted obsidian) — every var(--bg)/var(--card) usage across the
+     page inherits this in one place. */
+  --bg-obsidian:#0B132B !important;
+  --bg-card:#0F172A !important;
   --border-muted:rgba(255,255,255,0.08) !important;
   /* legacy aliases — every existing var(--mint)/var(--card)/etc. usage below inherits
      the brand tokens above unchanged, so there is one source of truth for color. */
@@ -52,13 +57,18 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   border-bottom:1px solid var(--border);padding:max(12px, env(safe-area-inset-top)) 22px max(12px, env(safe-area-inset-bottom));
   display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
-.brand-logo{display:flex;align-items:center;gap:10px}
-.brand-logo svg{filter:drop-shadow(0 0 6px rgba(0,255,136,.55))}
-/* ===== UNIFIED LOGO LOCKUP (identical markup/classes across index.html, dispatch.html, app.html) ===== */
+/* ===== UNIFIED LOGO LOCKUP (identical markup/classes across index.html, dispatch.html, app.html)
+   Seal-to-text proportional ratios per this round's item 1: shield sized in
+   1em relative to a .brand-logo font-size that matches the wordmark's own
+   1.05rem, so the icon tracks the text's cap-height 1:1; 0.35em horizontal
+   gap (~50% of the shield's own width) between shield and "C"; the ™ set to
+   28% of "UX"'s cap-height, top-aligned. ===== */
+.brand-logo{display:flex;align-items:center;gap:.35em;font-size:1.05rem}
+.brand-logo svg{width:1em;height:1em;flex-shrink:0;filter:drop-shadow(0 0 6px rgba(0,255,136,.55))}
 .brand-wordmark{font-weight:800;font-size:1.05rem;letter-spacing:.3px}
 .brand-white{color:#ffffff}
 .brand-lime{color:var(--brand-mint)}
-.brand-tm{font-size:.55em;opacity:.4;margin-left:1px}
+.brand-tm{font-size:.28em;opacity:.4;margin-left:1px;vertical-align:top;position:relative;top:-.1em}
 .brand-sub{font-size:.64rem;color:var(--muted);letter-spacing:.6px;text-transform:uppercase;padding-left:2px}
 .brand-pipe{color:var(--border);font-weight:400;margin:0 2px}
 
@@ -128,11 +138,22 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .hero-badge{display:inline-flex;align-items:center;background:var(--brand-mint-dim);border:1px solid rgba(0,255,136,.35);
   color:var(--mint2);border-radius:20px;padding:6px 16px;font-size:.72rem;font-weight:700;letter-spacing:.3px;margin-bottom:22px}
 
-/* ===== HERO — MASSIVE TITLE + C.I. DEFINITION (master-refactor overhaul) ===== */
-.hero-mega-title{font-size:clamp(1.8rem,6.5vw,3rem);white-space:nowrap;font-weight:900;letter-spacing:-0.02em;line-height:1.1;margin:8px 0;text-align:center;text-shadow:0 0 28px rgba(0,255,136,.28);display:flex;align-items:center;justify-content:center;gap:.18em}
+/* ===== HERO — MASSIVE TITLE + C.I. DEFINITION (master-refactor overhaul)
+   Enlarged this round per item 12's "#hero-title" sizing spec — applied to
+   .hero-mega-title, the actual hero title element (no element in this file
+   carries id="hero-title"). font-weight bumped 900->800 and the clamp
+   widened to 2.2rem-3.8rem per the literal spec values. ===== */
+.hero-mega-title{font-size:clamp(2.2rem,8.5vw,3.8rem);white-space:nowrap;font-weight:800;letter-spacing:-0.02em;line-height:1.1;margin:8px 0;text-align:center;text-shadow:0 0 28px rgba(0,255,136,.28);display:flex;align-items:center;justify-content:center;gap:.35em}
 .hero-shield-icon{flex-shrink:0;filter:drop-shadow(0 0 10px rgba(0,255,136,.5))}
+/* Hero-lockup-only ™ proportional override (28% of "UX" cap-height,
+   top-aligned) per this round's item 1 — scoped to .hero-mega-title so the
+   shared .tm-symbol styling used elsewhere (CSA heading, drawer copy,
+   footer, etc.) is untouched. */
+.hero-mega-title .tm-symbol{font-size:.28em !important;vertical-align:top;position:relative;top:-.05em}
 .hero-kicker{font-size:.72rem;font-weight:700;color:#FFFFFF;text-transform:uppercase;letter-spacing:0.08em;margin:2px 0 4px}
-.hero-kicker-sub{font-size:.85rem;color:#94A3B8;text-transform:uppercase;letter-spacing:0.1em;margin:4px 0 2rem;text-align:center}
+/* "CITIZEN DASHBOARD" pivoted from muted grey to bold Electric Ice-Cyan
+   per this round's item 12. */
+.hero-kicker-sub{font-size:.95rem;color:#0EA5E9;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin:10px 0 2rem;text-align:center}
 
 /* ===== HERO Q&A BLOCKS — two white-header Q&A cards directly below the
    locked hero, replacing the old single hero-subtitle/ci-definition pair. ===== */
@@ -181,29 +202,35 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .store-badge-small{font-size:.58rem;color:#c9c9c9;text-transform:uppercase;letter-spacing:.3px}
 .store-badge-big{font-size:.92rem;font-weight:700}
 
-/* ===== LATERAL BRIDGE HUB CARDS — forced side-by-side at every width per
-   the homepage-declutter spec; cards shrink their padding/icon/font size
-   on narrow screens instead of stacking to a single column. Obsidian-glass
-   surface unified with the City Snapshot gauge cards per this round's spec. ===== */
-.hub-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:920px;margin:0 auto 26px;padding:0 24px}
-.hub-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;
-  background:rgba(15,23,42,.6);border:1px solid rgba(14,165,233,.3);border-radius:14px;padding:16px 12px;
-  cursor:pointer;color:var(--text);text-align:center;transition:border-color .15s,transform .15s;
-  font-family:inherit;min-width:0}
-.hub-card-info{position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;
-  border:1px solid #0EA5E9;color:#0EA5E9;font-size:.66rem;font-weight:700;font-style:italic;font-family:Georgia,serif;
-  display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(14,165,233,.08)}
-.hub-card-info:hover{background:rgba(14,165,233,.22)}
-.hub-card:hover{border-color:#0EA5E9;transform:translateY(-2px)}
+/* ===== EXPLORE MORE DATA — full-width vertical stack of horizontal gateway-
+   style pills (Analytics / Expenditures / Operations), replacing the old
+   3-column grid per this round's item 6. Same pill shell language as the
+   top .gateway-pill buttons: width 100%, pill-radius, frosted-slate glass,
+   cyan hairline border, stacked with a 10px bottom margin. ===== */
+.hub-row{display:flex;flex-direction:column;max-width:920px;margin:0 auto 26px;padding:0 16px;box-sizing:border-box}
+.hub-card{position:relative;display:flex;align-items:center;justify-content:space-between;width:100%;
+  background:rgba(30,41,59,.7);border:1px solid rgba(14,165,233,.3);border-radius:9999px;padding:12px 18px;
+  margin-bottom:10px;box-sizing:border-box;cursor:pointer;color:var(--text);text-align:left;
+  transition:border-color .15s;font-family:inherit;min-width:0;gap:10px}
+.hub-card:last-child{margin-bottom:0}
+.hub-card-main{display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 auto}
 .hub-card svg{stroke:#0EA5E9;flex-shrink:0}
-.hub-card span{font-size:.74rem;font-weight:700;line-height:1.3}
-.hub-card-sub{font-size:.62rem !important;font-weight:500 !important;color:var(--muted);margin-top:-4px}
+.hub-card-text{display:flex;align-items:baseline;gap:6px;min-width:0;flex-wrap:wrap}
+.hub-card-text .hub-card-title{font-size:.8rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.hub-card-sub{font-size:.72rem !important;font-weight:500 !important;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hub-card-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.hub-card-arrow{font-size:.8rem;font-weight:600;color:#0EA5E9;flex-shrink:0}
+.hub-card-info{width:18px;height:18px;border-radius:50%;
+  border:1px solid #0EA5E9;color:#0EA5E9;font-size:.66rem;font-weight:700;font-style:italic;font-family:Georgia,serif;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(14,165,233,.08);flex-shrink:0}
+.hub-card-info:hover{background:rgba(14,165,233,.22)}
+.hub-card:hover{border-color:#0EA5E9}
 @media (max-width:640px){
-  .hub-row{gap:8px;padding:0 14px}
-  .hub-card{padding:12px 6px;gap:6px}
+  .hub-row{padding:0 14px}
+  .hub-card{padding:10px 14px}
   .hub-card svg{width:20px;height:20px}
-  .hub-card span{font-size:.64rem}
-  .hub-card-sub{font-size:.55rem !important}
+  .hub-card-text .hub-card-title{font-size:.72rem}
+  .hub-card-sub{font-size:.64rem !important}
 }
 
 .hud-grid{display:grid;grid-template-columns:0.8fr 1.2fr;gap:16px;max-width:980px;margin:0 auto 40px;padding:0 24px}
@@ -416,11 +443,14 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .leaflet-popup-tip{background:#12141c;border:1px solid #00ff88}
 .leaflet-popup-close-button{color:#ffffff !important}
 
-/* ===== MODAL ===== */
+/* ===== MODAL — frosted-slate glass per this round's item 13
+   (rgba(30,41,59,.7) + backdrop-filter: blur(12px)), over the same dark
+   overlay backdrop as before. ===== */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:3000;display:none;
   align-items:center;justify-content:center;padding:20px}
 .modal-overlay.open{display:flex}
-.modal-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;
+.modal-box{background:rgba(30,41,59,.7);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid var(--border);border-radius:14px;padding:24px;
   max-width:480px;width:100%;max-height:80vh;overflow-y:auto}
 .modal-box h3{font-size:1.05rem;margin-bottom:14px;color:var(--mint2)}
 .modal-box h4{font-size:.82rem;margin:14px 0 4px;color:var(--text)}
@@ -584,7 +614,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 /* ===== LIVE PUBLIC LEDGER DRAWER ===== */
 .ledger-drawer{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:2800;display:none}
 .ledger-drawer.open{display:flex;justify-content:flex-end}
-.ledger-drawer-panel{width:min(520px,100vw);height:100%;background:var(--card);border-left:1px solid var(--border);
+.ledger-drawer-panel{width:min(520px,100vw);height:100%;background:rgba(30,41,59,.7);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-left:1px solid var(--border);
   display:flex;flex-direction:column}
 .ledger-drawer-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--border)}
 .ledger-drawer-body{flex:1;overflow-y:auto;padding:16px 18px 32px}
@@ -598,6 +628,12 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 .ledger-select{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);
   border-radius:8px;padding:7px 9px;font-size:.72rem;font-weight:700}
 .ledger-select:focus{border-color:#0EA5E9}
+/* Street/ZIP scope bar + Print Location Report control (item 2) and the
+   Pro Tier upsell link beneath it, sitting directly above the inventory
+   card list. */
+.ledger-scope-bar{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.ledger-scope-bar .ledger-search{margin-bottom:0;flex:1 1 auto;min-width:0}
+.ledger-pro-tier-row{margin-bottom:14px;font-size:.72rem}
 .ledger-report-card{background:rgba(7,12,14,.6);border:1px solid var(--border);border-radius:10px;padding:12px;
   margin-bottom:8px;text-decoration:none;color:var(--text);display:block}
 .ledger-report-card:hover{border-color:var(--mint2)}
@@ -630,6 +666,10 @@ audio.pw-audio-el{width:100%;margin-top:4px}
    reserved for live/active indicators per this round's palette-pivot
    spec — reused by all 3 buttons and by the pixel map's city nodes. ===== */
 .ledger-banner-section{max-width:640px;margin:0 auto 24px;padding:0 24px}
+/* Tight ~10px stack gap between Gateway Pill 1 (Public Ledger) and Pill 2
+   (Aggregation Hub) per this round's item 9 — applied only to Pill 1's
+   section so Pill 2 keeps its normal 24px margin before the pixel map. */
+.gateway-pill-stacked{margin-bottom:10px}
 .gateway-pill{display:flex;justify-content:space-between;align-items:center;width:100%;
   box-sizing:border-box;padding:12px 18px;cursor:pointer;font-family:inherit;text-decoration:none;
   transition:filter .15s}
@@ -649,12 +689,6 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   100%{transform:scale(2.2);opacity:0}
 }
 
-/* ===== HIGH-PRIORITY EXPORT/PRINT GATEWAY — sits above the City
-   Snapshot container. The separate Report Generator card (and its own
-   #btnExportPrintReport button) was removed outright this round, so this
-   is now the page's one print entry point: a plain window.print(), via
-   the unified .gateway-pill shell like the other two gateway buttons. ===== */
-.csa-print-gateway-section{max-width:640px;margin:0 auto 26px;padding:0 24px}
 
 /* ===== TRADEMARK (™) TYPOGRAPHY — lightweight superscript treatment
    applied via <sup class="tm-symbol"> across headings/copy this round,
@@ -683,14 +717,16 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 .pixel-map-card{position:relative;height:190px;background:#050505;border:1px solid #0284C7;border-radius:16px;overflow:hidden}
 .pixel-map-svg{width:100%;height:100%;display:block}
 .pixel-map-dot{opacity:.2;transition:fill .25s,opacity .4s}
-.pixel-map-dot-lit{fill:#00FF87 !important;stroke:#0EA5E9;stroke-width:.75;opacity:.6 !important;
-  filter:drop-shadow(0 0 2px rgba(0,255,135,.6))}
+/* Grid fills pivoted from Emerald Green (#00FF87) to Fresh Mint (#00E699)
+   per this round's item 18. */
+.pixel-map-dot-lit{fill:#00E699 !important;stroke:#0EA5E9;stroke-width:.75;opacity:.6 !important;
+  filter:drop-shadow(0 0 2px rgba(0,230,153,.6))}
 .pixel-map-outline{fill:none;stroke:#0EA5E9;stroke-width:1.5;opacity:.55;transition:opacity .3s,filter .3s}
-.pixel-map-outline-pulse{opacity:1;filter:drop-shadow(0 0 6px rgba(14,165,233,.9)) drop-shadow(0 0 10px rgba(0,255,135,.5))}
+.pixel-map-outline-pulse{opacity:1;filter:drop-shadow(0 0 6px rgba(14,165,233,.9)) drop-shadow(0 0 10px rgba(0,230,153,.5))}
 .pixel-map-node-core{opacity:0}
 .pixel-map-node-pulse{opacity:0}
-.pixel-map-node-emerald .pixel-map-node-core{fill:#00FF87}
-.pixel-map-node-emerald .pixel-map-node-pulse{fill:#00FF87}
+.pixel-map-node-emerald .pixel-map-node-core{fill:#00E699}
+.pixel-map-node-emerald .pixel-map-node-pulse{fill:#00E699}
 .pixel-map-node-core{animation:staticPulse 2.4s ease-in-out infinite}
 .pixel-map-node-pulse{animation:staticPulse 2.4s ease-in-out infinite reverse}
 @keyframes staticPulse{
@@ -721,6 +757,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 .gauge-card:hover{border-color:#0EA5E9}
 .gauge-svg{width:100%;max-width:128px;height:auto;overflow:visible}
 .gauge-track{fill:none;stroke:rgba(14,165,233,.18)}
+.gauge-track-zone{fill:none;opacity:.85}
 .gauge-tick{stroke:#0EA5E9;stroke-width:1.5;opacity:.75}
 .gauge-tick-sla{stroke:#FFFFFF;stroke-width:2}
 .gauge-fill{fill:none;stroke:#00FF87;filter:drop-shadow(0 0 3px rgba(0,255,135,.7))}
@@ -730,7 +767,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 .gauge-unit-text{fill:var(--muted);font-weight:700;font-family:inherit}
 .gauge-cell-lbl{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-top:2px}
 .gauge-cell-caption{font-size:.58rem;color:var(--muted);margin-top:2px}
-.gauge-ratio-caption{font-size:.62rem;color:var(--muted);margin-top:4px;font-weight:700;letter-spacing:.2px}
+.gauge-center-sub{fill:#F8FAFC;font-weight:600;letter-spacing:.05em;font-family:inherit}
 .threat-counter-value{font-size:2rem;font-weight:900;font-family:inherit;line-height:1;margin-top:2px;
   text-shadow:0 0 12px rgba(255,187,0,.5)}
 .threat-spectrum-bar{display:flex;width:100%;height:8px;border-radius:4px;overflow:hidden;margin-top:10px;
@@ -791,7 +828,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   <header class="topbar">
     <div class="brand">
       <div class="brand-logo">
-        <svg viewBox="0 0 24 24" width="21" height="21" stroke="var(--brand-mint)" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <svg viewBox="0 0 24 24" stroke="var(--brand-mint)" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         <span class="brand-wordmark"><span class="brand-white">CITIXEN</span> <span class="brand-lime">UX</span><sup class="brand-tm">™</sup></span>
       </div>
       <span class="brand-pipe" aria-hidden="true">|</span>
@@ -901,12 +938,26 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         <button class="modal-close" id="ledgerCloseBtn">✕</button>
       </div>
       <div class="ledger-drawer-body">
-        <input class="ledger-search" id="ledgerSearchInput" placeholder="Search title, location, category…">
+        <input class="ledger-search" id="ledgerSearchInput" placeholder="Search title, location, category, ticket ID…">
         <div class="ledger-filter-row">
           <select class="ledger-select" id="ledgerWardSelect"><option value="">All wards</option></select>
         </div>
         <div class="ledger-filter-row" id="ledgerCategoryChips"></div>
         <div class="ledger-filter-row" id="ledgerStatusChips"></div>
+        <!-- ===== STREET / ZIP SCOPE BAR + REPORT GENERATOR — per this
+             round's item 2. Street input real-filters against the real
+             ticket `loc` field; a 5-digit ZIP is titled as a "District
+             Report" but, since no ticket in this dataset carries a real
+             ZIP code, it falls back to the same currently-filtered
+             inventory as the blank/default case with an honest note in
+             the generated PDF rather than fabricating ZIP-level data. ===== -->
+        <div class="ledger-scope-bar">
+          <input type="text" id="ledgerScopeInput" class="ledger-search" style="margin:0" placeholder="Enter Street Name or 5-Digit ZIP…">
+          <button type="button" id="ledgerScopePrintBtn" class="btn btn-outline" style="white-space:nowrap;padding:8px 14px;font-size:.76rem">Print Location Report</button>
+        </div>
+        <div class="ledger-pro-tier-row">
+          <button type="button" id="ledgerProTierLink" style="background:none;border:none;padding:0;font:inherit;color:#0EA5E9;cursor:pointer;text-decoration:underline">Need Multi-Ward CSV or Enterprise Data? Upgrade to Pro</button>
+        </div>
         <div id="ledgerResults"></div>
       </div>
     </div>
@@ -936,6 +987,15 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </div>
   </div>
 
+  <!-- ===== HERO HOOK TAGLINE — per this round's item 11, positioned
+       directly between the green Smart Location bar above and the hero
+       title below (previously this sentence lived further down, inside
+       the now-dissolved hero-qa-section — see the note above Gateway Pill
+       2 for where the rest of that block went). Placed outside the frozen
+       hero section itself, immediately before it, so the frozen block's
+       own markup stays untouched by this move. ===== -->
+  <p style="max-width:640px;margin:18px auto 0;padding:0 24px;font-size:1.05rem;text-align:center;color:var(--text)">The modern standard for resident-first municipal engagement.</p>
+
   <!-- ===== SECTION FREEZE — everything from here through the line below
        ("Citizen Dashboard") is locked per the ongoing spec: do not edit
        this section's markup, copy, or layout in any future round without
@@ -943,14 +1003,18 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        far: the ™ symbol was removed from "Upgrade Your Civic Experience"
        in an earlier round per that round's own narrowly-scoped branding
        instruction; a later round explicitly cyan-pivoted the shield icon,
-       heading, and subtitle (that round's item 9); and THIS round
-       explicitly reverses that pivot back to the original white/Emerald
-       Green palette (this round's item 1) and adds the new "Citizen
-       Dashboard" subtitle line — each an explicit, narrowly-scoped
-       instruction for this exact content, not a general unfreeze. The
-       heading's two-tone white "CITIXEN" + Emerald "UX™" spans (this
-       round's own literal item 1 markup) also make it consistent again
-       with this round's separate "two-tone CITIXEN UX" sweep (item 12) —
+       heading, and subtitle (that round's item 9); a later round reversed
+       that pivot back to the original white/Emerald Green palette and
+       added the "Citizen Dashboard" subtitle line; and THIS round enlarges
+       the title (item 12's #hero-title sizing, applied to .hero-mega-title)
+       and pivots "Citizen Dashboard" to bold Electric Ice-Cyan (also item
+       12) — both CSS-only layout changes, no markup/copy edits, each an
+       explicit, narrowly-scoped instruction for this exact content, not a
+       general unfreeze. This round's seal-to-text proportional-ratio pass
+       (item 1) likewise only touched this section's CSS (gap/™ sizing), not
+       its markup. The heading's two-tone white "CITIXEN" + Emerald "UX™"
+       spans also stay consistent with the page's "two-tone CITIXEN UX"
+       sweep —
        no more standing exception needed there. No other line in this
        frozen block was touched. ===== -->
   <section class="hero">
@@ -973,7 +1037,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        loadBig3()), not the spec's illustrative "17 entries synced"
        hardcoded literally — a fabricated static count would misrepresent
        real ledger data, so the live-updating span id is kept. ===== -->
-  <section class="ledger-banner-section">
+  <section class="ledger-banner-section gateway-pill-stacked">
     <button id="liveLedgerBanner" class="gateway-pill" type="button" style="border: 1px solid #0EA5E9; background: rgba(14, 165, 233, 0.05); border-radius: 9999px;">
       <span class="gateway-pill-left" style="color: #00FF87;"><span class="pulsing-dot"></span>LIVE</span>
       <span class="gateway-pill-center" style="color: #FFFFFF;">PUBLIC LEDGER</span>
@@ -981,50 +1045,24 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </button>
   </section>
 
-  <!-- ===== ALTERNATING SECTION CADENCE:
-       Position 1 — the CITIXEN UX™ narrative block. The "What is CITIXEN
-       UX™?" heading was removed outright this round (mobile-narrative
-       cleanup spec) — .hero-qa-heading's CSS rule is unused now but left
-       in place, unreferenced. 4 lines: definition -> two-tone (white
-       icon / Emerald text+arrow) Snap->Track->Audit workflow row ->
-       engine line -> receipt line -> standalone white "era of Civic
-       Intelligence (C.I.)" line.
+  <!-- ===== ALTERNATING SECTION CADENCE (updated per this round's items
+       7/9/11): Gateway Pill 1 (PUBLIC LEDGER) and Pill 2 (AGGREGATION HUB)
+       now stack directly on top of each other with a tight ~10px gap
+       (.gateway-pill-stacked on Pill 1's section) — the "What is CITIXEN
+       UX™?" narrative block that used to sit between them has been
+       dissolved: its always-visible hook sentence moved up to sit between
+       the green location bar and the hero title (see the tagline paragraph
+       just above the hero section), and the collapsible "Learn More ▾"
+       drawer (workflow row / engine line / receipt line / era tagline)
+       moved down to directly below the Crowd Source America™ / US Map
+       container (see #btnLearnMoreToggle after the CSA narrative below).
        Position 2 — the Aggregation Hub gateway button (Electric Cyan
        variant, .ledger-banner-cyan — Civic Gold is retired), sits
        directly ABOVE the pixel map.
        Position 3 — the embedded Live Report Pixel Map, directly beneath
        the gateway button.
-       Position 4 — the Crowd Source America™ campaign title/narrative.
-       ===== -->
-  <!-- ===== HERO COLLAPSIBLE "LEARN MORE" — only the hook sentence is
-       always visible; the workflow row, engine line, receipt line, and
-       era tagline are now tucked behind #btnLearnMoreToggle inside
-       #learnMoreDrawer (hidden by default via the [hidden] attribute,
-       toggled by plain JS — see below), per this round's spec. ===== -->
-  <section class="hero-qa-section">
-    <div class="hero-qa-block">
-      <p style="margin-bottom: 0.75rem; font-size: 1.05rem; text-align: center;">The modern standard for resident-first municipal engagement.</p>
-      <button id="btnLearnMoreToggle" type="button" style="background: transparent; border: 1px solid #00FF87; color: #00FF87; padding: 4px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; display: block; margin: 14px auto 24px auto;">Learn More ▾</button>
-      <div id="learnMoreDrawer" hidden style="margin-top: 18px; margin-bottom: 22px; font-size: 0.85rem; color: #94A3B8;">
-        <div class="hero-qa-workflow-row">
-          <span style="display:inline-flex; align-items:center; gap:6px;">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Snap
-          </span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00FF87" stroke-width="2" opacity="0.6"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          <span style="display:inline-flex; align-items:center; gap:6px;">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Track
-          </span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00FF87" stroke-width="2" opacity="0.6"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          <span style="display:inline-flex; align-items:center; gap:6px;">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Audit
-          </span>
-        </div>
-        <p style="margin-bottom: 1.25rem;"><span style="color:#FFFFFF; font-weight:bold;">CITIXEN</span> <span style="color:#00FF87; font-weight:bold;">UX</span><sup class="tm-symbol">™</sup> combines real-time resident reporting with direct city department tracking and transparent budget auditing.</p>
-        <p style="margin-bottom: 1rem;">Create an uneditable public record and <span style="color:#00FF87; font-weight:bold;">hold the receipt</span> to ensure your tax dollars actively protect and improve your neighborhood.</p>
-        <p style="margin-top: 1rem; font-weight: 500;">Welcome to the era of <span style="color:#00FF87; font-weight:bold;">Civic Intelligence (C.I.)</span>.</p>
-      </div>
-    </div>
-  </section>
+       Position 4 — the Crowd Source America™ campaign title/narrative,
+       immediately followed by the relocated Learn More drawer. ===== -->
 
   <!-- ===== AGGREGATION MAP GATEWAY BUTTON — Position 2. Same unified
        .gateway-pill shell as the Live Public Ledger banner (automotive-
@@ -1089,6 +1127,38 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </div>
   </section>
 
+  <!-- ===== HERO COLLAPSIBLE "LEARN MORE" — relocated per this round's item
+       7 to sit directly below the Crowd Source America™ narrative / US Map
+       container (previously it sat between Gateway Pill 1 and Pill 2, up
+       in the hero area — see the note above Pill 1 for the full move).
+       Only the toggle is always visible; the workflow row, engine line,
+       receipt line, and era tagline stay tucked behind #btnLearnMoreToggle
+       inside #learnMoreDrawer (hidden by default via the [hidden]
+       attribute, toggled by the same plain JS as before). ===== -->
+  <section class="hero-qa-section">
+    <div class="hero-qa-block">
+      <button id="btnLearnMoreToggle" type="button" style="background: transparent; border: 1px solid #00FF87; color: #00FF87; padding: 4px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; display: block; margin: 14px auto 24px auto;">Learn More ▾</button>
+      <div id="learnMoreDrawer" hidden style="margin-top: 18px; margin-bottom: 22px; font-size: 0.85rem; color: #94A3B8;">
+        <div class="hero-qa-workflow-row">
+          <span style="display:inline-flex; align-items:center; gap:6px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Snap
+          </span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00FF87" stroke-width="2" opacity="0.6"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          <span style="display:inline-flex; align-items:center; gap:6px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Track
+          </span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00FF87" stroke-width="2" opacity="0.6"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          <span style="display:inline-flex; align-items:center; gap:6px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Audit
+          </span>
+        </div>
+        <p style="margin-bottom: 1.25rem;"><span style="color:#FFFFFF; font-weight:bold;">CITIXEN</span> <span style="color:#00FF87; font-weight:bold;">UX</span><sup class="tm-symbol">™</sup> combines real-time resident reporting with direct city department tracking and transparent budget auditing.</p>
+        <p style="margin-bottom: 1rem;">Create an uneditable public record and <span style="color:#00FF87; font-weight:bold;">hold the receipt</span> to ensure your tax dollars actively protect and improve your neighborhood.</p>
+        <p style="margin-top: 1rem; font-weight: 500;">Welcome to the era of <span style="color:#00FF87; font-weight:bold;">Civic Intelligence (C.I.)</span>.</p>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== "ciDeepDive" section removed per homepage-flow refactor — its
        pieces were redistributed, not deleted:
          - Legacy 311 vs CITIXEN comparison  -> removed outright per the
@@ -1119,30 +1189,25 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        point at. ===== -->
   <span id="analytics" aria-hidden="true"></span>
 
-  <!-- ===== HOMEPAGE SCROLL ORDER (per spec): Locked Header -> Live Public
-       Ledger banner -> [alternating cadence: "What is CITIXEN UX™?"
-       consolidated explanation -> Aggregation Map Gateway button ->
-       Crowd Source America™ narrative] -> City Snapshot tiles -> Report
-       Generator -> 3-button hub row -> Launch Mobile Reporter + App Store
-       row -> Institutional Gateway buttons -> footer. The Live Public
-       Ledger banner sits directly beneath the hero (see it just below the
-       SECTION FREEZE boundary above), ahead of the alternating cadence. ===== -->
+  <!-- ===== HOMEPAGE SCROLL ORDER (updated per this round's items 7/9/11):
+       Locked Header -> green Smart Location bar -> hook tagline -> Hero ->
+       Gateway Pill 1 (Public Ledger) + Pill 2 (Aggregation Hub), stacked
+       tight -> Live Report Pixel Map -> Crowd Source America™ narrative ->
+       Learn More drawer -> City Snapshot tiles -> 3-pill "Explore More
+       Data" stack -> Launch Mobile Reporter + App Store row -> Institutional
+       Gateway buttons -> footer (which now also carries the real Export
+       Civic Record trigger, see the note above). ===== -->
 
-  <!-- ===== HIGH-PRIORITY EXPORT/PRINT GATEWAY — sits directly ABOVE the
-       City Snapshot container. Opens the real Export Civic Record modal
-       preview (openExportRecordModal(), see below) rather than printing
-       directly. The third unified .gateway-pill — center label shortened
-       to "CIVIC RECORD" and its border/background pivoted to Electric
-       Ice-Cyan this round, matching the other two pills — keeps a real
-       addEventListener click handler (see below), not an inline onclick=,
-       to keep this file's CSP-safe-JS convention. ===== -->
-  <section class="csa-print-gateway-section">
-    <button id="btnCsaExportPrint" class="gateway-pill" type="button" style="border: 1px solid #0EA5E9; background: rgba(14, 165, 233, 0.05); border-radius: 9999px;">
-      <span class="gateway-pill-left" style="color: #00FF87;"><span class="pulsing-dot"></span>LIVE</span>
-      <span class="gateway-pill-center" style="color: #FFFFFF;">CIVIC RECORD</span>
-      <span class="gateway-pill-right">Export Record ↗</span>
-    </button>
-  </section>
+  <!-- ===== The "LIVE CIVIC RECORD / Export Record ↗" gateway pill that used
+       to sit here (directly above City Snapshot) was removed per this
+       round's item 7. It was the ONLY trigger for the real Export Civic
+       Record modal preview (openExportRecordModal(), still defined below,
+       still doing real work from real data) — deleting it outright would
+       have made that feature unreachable, so per this codebase's existing
+       "relocate to the footer sitemap, don't delete the feature" pattern
+       (see the Civic Tools dropdown note near the header above), its real
+       click handler now lives on #footerExportRecordLink in the footer
+       instead. ===== -->
 
   <!-- ===== CITY SNAPSHOT — a single geolocated dashboard for the visitor's
        own jurisdiction. #snapshot-city-name starts pre-filled with the
@@ -1188,22 +1253,34 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        scrolled to civicStackAdminCard). ===== -->
   <div class="hub-row" role="navigation" aria-label="Deep-dive sections">
     <button class="hub-card" id="hubCoverageBtn" type="button" aria-expanded="false" aria-controls="deepdiveAnalytics">
-      <span class="hub-card-info" id="hubCoverageInfoBtn" role="button" tabindex="0" aria-label="What the Analytics section covers">i</span>
-      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><rect x="6" y="10" width="3" height="9"/><rect x="11" y="6" width="3" height="13"/><rect x="16" y="13" width="3" height="6"/></svg>
-      <span>Analytics</span>
-      <span class="hub-card-sub">Data and reports</span>
+      <span class="hub-card-main">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><rect x="6" y="10" width="3" height="9"/><rect x="11" y="6" width="3" height="13"/><rect x="16" y="13" width="3" height="6"/></svg>
+        <span class="hub-card-text"><span class="hub-card-title">Analytics</span><span class="hub-card-sub">— Data and reports</span></span>
+      </span>
+      <span class="hub-card-actions">
+        <span class="hub-card-info" id="hubCoverageInfoBtn" role="button" tabindex="0" aria-label="What the Analytics section covers">i</span>
+        <span class="hub-card-arrow" aria-hidden="true">↗</span>
+      </span>
     </button>
     <button class="hub-card" id="hubSlaBtn" type="button" aria-expanded="false" aria-controls="civicStackSection">
-      <span class="hub-card-info" id="hubSlaInfoBtn" role="button" tabindex="0" aria-label="What the Expenditures section covers">i</span>
-      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7V5a2 2 0 0 1 2-2h8"/><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M2 11h20"/><circle cx="17" cy="15" r="1.3" fill="#0EA5E9" stroke="none"/></svg>
-      <span>Expenditures</span>
-      <span class="hub-card-sub">Budget and Projects</span>
+      <span class="hub-card-main">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7V5a2 2 0 0 1 2-2h8"/><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M2 11h20"/><circle cx="17" cy="15" r="1.3" fill="#0EA5E9" stroke="none"/></svg>
+        <span class="hub-card-text"><span class="hub-card-title">Expenditures</span><span class="hub-card-sub">— Budget and Projects</span></span>
+      </span>
+      <span class="hub-card-actions">
+        <span class="hub-card-info" id="hubSlaInfoBtn" role="button" tabindex="0" aria-label="What the Expenditures section covers">i</span>
+        <span class="hub-card-arrow" aria-hidden="true">↗</span>
+      </span>
     </button>
     <button class="hub-card" id="hubStackBtn" type="button" aria-expanded="false" aria-controls="civicStackSection">
-      <span class="hub-card-info" id="hubStackInfoBtn" role="button" tabindex="0" aria-label="What the Operations section covers">i</span>
-      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 21 8 12 13 3 8 12 3"/><polyline points="3 13 12 18 21 13"/><polyline points="3 18 12 23 21 18"/></svg>
-      <span>Operations</span>
-      <span class="hub-card-sub">Civic Stack &amp; Integration</span>
+      <span class="hub-card-main">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 21 8 12 13 3 8 12 3"/><polyline points="3 13 12 18 21 13"/><polyline points="3 18 12 23 21 18"/></svg>
+        <span class="hub-card-text"><span class="hub-card-title">Operations</span><span class="hub-card-sub">— Civic Stack &amp; Integration</span></span>
+      </span>
+      <span class="hub-card-actions">
+        <span class="hub-card-info" id="hubStackInfoBtn" role="button" tabindex="0" aria-label="What the Operations section covers">i</span>
+        <span class="hub-card-arrow" aria-hidden="true">↗</span>
+      </span>
     </button>
   </div>
 
@@ -1228,7 +1305,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        section and the footer, per this round's homepage-scroll-sequence
        spec. Both are plain mailto links (no form, no backend) — the
        honest version of "contact us" until a real intake exists. ===== -->
-  <section class="institutional-gateway-section">
+  <section class="institutional-gateway-section" id="institutionalAccessSection">
     <a class="btn btn-outline" href="mailto:contact@citizenux.com?subject=CITIXEN%20UX%20—%20Elected%20Official%20Inquiry">For Elected Officials</a>
     <a class="btn btn-outline" href="mailto:contact@citizenux.com?subject=CITIXEN%20UX%20—%20Municipality%20Inquiry">For Municipalities</a>
   </section>
@@ -1491,6 +1568,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     <div class="footer-slogan-callout"><span style="color:#FFFFFF; font-weight:bold;">CITIXEN</span> <span style="color:#00FF87; font-weight:bold;">UX</span><sup class="tm-symbol">™</sup> — Crowd Source America<sup class="tm-symbol">™</sup>. Built for residents, designed for modern civic trust.</div>
     <div class="sitemap-bottom">
       <button type="button" id="footerCodexLink" class="footer-staff-link" style="background:none;border:none;padding:0;font:inherit;cursor:pointer">Statutory Governance &amp; Precedent ↗</button>
+      <button type="button" id="footerExportRecordLink" class="footer-staff-link" style="background:none;border:none;padding:0;font:inherit;cursor:pointer;margin-left:18px">Export Civic Record ↗</button>
     </div>
     <div class="trademark-disclosure"><span style="color:#FFFFFF; font-weight:bold;">CITIXEN</span> <span style="color:#00FF87; font-weight:bold;">UX</span><sup class="tm-symbol">™</sup> and Crowd Source America<sup class="tm-symbol">™</sup> are protected trademarks. Civic Intelligence, Civic Memory, Geo-Hatch, City Snapshot, and Civic Stack are proprietary marks. Protected under U.S. and international trademark laws. All other trademarks, product names, and logos are the property of their respective owners.</div>
   </footer>
@@ -2151,10 +2229,14 @@ async function detectJurisdictionGuess(dir){
   // navigator.geolocation, (4) the honest default jurisdiction — each step
   // bounded by its own timeout so a hung request always falls through
   // rather than leaving the City Snapshot / Smart Location header stuck on
-  // "Detecting location…".
+  // "Detecting location…". Per this round's item 10, both IP-geolocation
+  // calls now race an 800ms timeout (tightened from 4000ms) so a blocked or
+  // slow IP-geo API falls through to the default jurisdiction almost
+  // instantly instead of leaving the header stuck for several seconds.
+  const IP_GEO_TIMEOUT_MS = 800;
 
   // 1) ipapi.co (HTTPS, no key required).
-  const ipapiCoResult = await fetchIpGeoJson('https://ipapi.co/json/', 4000);
+  const ipapiCoResult = await fetchIpGeoJson('https://ipapi.co/json/', IP_GEO_TIMEOUT_MS);
   if (ipapiCoResult) {
     const guess = fromCoords(ipapiCoResult.latitude, ipapiCoResult.longitude, 'IP address (approximate)');
     if (guess) return guess;
@@ -2164,7 +2246,7 @@ async function detectJurisdictionGuess(dir){
   //    this as mixed content on an HTTPS page, which fetch() surfaces as a
   //    normal rejection caught inside fetchIpGeoJson(), so this step simply
   //    falls through to geolocation in that case rather than hanging).
-  const ipApiComResult = await fetchIpGeoJson('http://ip-api.com/json/', 4000);
+  const ipApiComResult = await fetchIpGeoJson('http://ip-api.com/json/', IP_GEO_TIMEOUT_MS);
   if (ipApiComResult) {
     const guess = fromCoords(ipApiComResult.latitude, ipApiComResult.longitude, 'IP address (approximate)');
     if (guess) return guess;
@@ -2401,7 +2483,11 @@ function updateSmartLocationBanner(j){
     textEl.textContent = 'Jurisdiction: ' + j.cityName + ', ' + j.state.toUpperCase();
     banner.classList.add('resolved');
   } else if (j) {
-    textEl.textContent = 'Jurisdiction: ' + j.cityName + ', ' + j.state.toUpperCase() + ' (default)';
+    // Honest default-jurisdiction fallback wording per this round's item 10
+    // (the literal "La Crosse, WI — Active Jurisdiction" phrasing), shown
+    // instantly whenever the 800ms-raced IP-geo chain below times out or is
+    // blocked, rather than leaving the banner on its placeholder text.
+    textEl.textContent = j.cityName + ', ' + j.state.toUpperCase() + ' — Active Jurisdiction';
     banner.classList.remove('resolved');
   }
 }
@@ -2753,7 +2839,7 @@ function renderAnalyticsMatrix(data){
 const MATRIX_METRIC_DEFS = [
   { key: 'activeCount', label: 'Active Hazards', color: '#ffbb00', unit: '', max: 12, trendKey: 'activeCount',
     desc: 'Open, not-yet-resolved hazard reports across every seeded jurisdiction — a real count of "submitted" + "dispatched" tickets, never a hardcoded headline number.' },
-  { key: 'avgResolutionHours', label: 'Fix Speed', color: '#00ff88', unit: 'h', max: 40, trendKey: 'avgResolutionHours',
+  { key: 'avgResolutionHours', label: 'Fix Speed', color: '#00ff88', unit: 'h', max: 60, trendKey: 'avgResolutionHours',
     desc: 'Average hours from a report being snapped to a crew\'s verified proof-photo closeout, averaged over every resolved ticket with a recorded resolution time.' },
   { key: 'verificationRatePct', label: 'Completion Rate', color: '#00ff88', unit: '%', max: 100, trendKey: 'completionPct',
     desc: 'Share of resolved tickets closed with a server-verified, on-site proof photo rather than a desk closure — the Resolution Verification Rate.' }
@@ -2762,21 +2848,23 @@ const MATRIX_METRIC_DEFS = [
 // Segmented priority spectrum bar for the Active Hazards "digital threat
 // counter" visualizer — real Critical/Moderate/Low split from matrixData
 // (see bigThree()'s comment in api/_lib/store.js), rendered as a
-// proportional 3-segment bar rather than plain text.
+// proportional 3-segment bar rather than plain text. Ordered Low -> Moderate
+// -> Critical (green first, left-to-right) per this round's item 8 flip;
+// green is Fresh Mint (#00E699), this round's new accent shade.
 function threatSpectrumBar(data){
   const c = data.activeCritical || 0, m = data.activeModerate || 0, l = data.activeLow || 0;
   const total = c + m + l;
   if (!total) return '<div class="small" style="color:var(--muted);margin-top:8px">N/A</div>';
   const cPct = (c / total * 100).toFixed(1), mPct = (m / total * 100).toFixed(1), lPct = (l / total * 100).toFixed(1);
   return `<div class="threat-spectrum-bar">
-      <div class="threat-spectrum-seg" style="width:${cPct}%;background:#ef4444" title="${c} Critical"></div>
+      <div class="threat-spectrum-seg" style="width:${lPct}%;background:#00E699" title="${l} Low"></div>
       <div class="threat-spectrum-seg" style="width:${mPct}%;background:#f59e0b" title="${m} Moderate"></div>
-      <div class="threat-spectrum-seg" style="width:${lPct}%;background:#00FF87" title="${l} Low"></div>
+      <div class="threat-spectrum-seg" style="width:${cPct}%;background:#ef4444" title="${c} Critical"></div>
     </div>
     <div class="threat-spectrum-legend">
-      <span><span class="threat-legend-dot" style="background:#ef4444"></span>Critical ${c}</span>
+      <span><span class="threat-legend-dot" style="background:#00E699"></span>Low ${l}</span>
       <span><span class="threat-legend-dot" style="background:#f59e0b"></span>Moderate ${m}</span>
-      <span><span class="threat-legend-dot" style="background:#00FF87"></span>Low ${l}</span>
+      <span><span class="threat-legend-dot" style="background:#ef4444"></span>Critical ${c}</span>
     </div>`;
 }
 
@@ -2805,7 +2893,7 @@ function gaugePolarPoint(cx, cy, r, angleDeg){
 // circumference draws exactly the arc segment we want with no path-arc
 // trigonometry required.
 function buildGaugeSvg(opts){
-  const { value, max, unit, label, startDeg, sweepDeg, tickCount, slaFraction, size } = opts;
+  const { value, max, unit, label, startDeg, sweepDeg, tickCount, slaFraction, size, zones, centerText, centerSub } = opts;
   const cx = size / 2, cy = size / 2, r = size * 0.36, strokeW = size * 0.07;
   const circumference = 2 * Math.PI * r;
   const clamped = value == null ? 0 : Math.max(0, Math.min(max, value));
@@ -2831,22 +2919,58 @@ function buildGaugeSvg(opts){
     const p2 = gaugePolarPoint(cx, cy, r - strokeW * 2.1, slaAngle);
     slaTick = '<line class="gauge-tick-sla" x1="' + p1.x.toFixed(1) + '" y1="' + p1.y.toFixed(1) + '" x2="' + p2.x.toFixed(1) + '" y2="' + p2.y.toFixed(1) + '"/>';
   }
+
+  // Color-zoned SLA dial (Fix Speed only, per this round's item 3): instead
+  // of one dim track + a single-color fill arc, draw the whole track as
+  // 3 colored zone segments (Green/Amber/Red for within-SLA/at-risk/
+  // over-SLA) computed from real `max`/zone fractions — no fill overlay,
+  // since the zones themselves carry the meaning; the needle is tinted to
+  // match whichever zone the current real value falls in.
+  let trackMarkup, needleColor = null;
+  if (zones && zones.length) {
+    trackMarkup = zones.map(z => {
+      const zStart = startDeg + sweepDeg * z.from;
+      const zLen = circumference * (sweepDeg * (z.to - z.from) / 360);
+      const zRotation = 'rotate(' + zStart.toFixed(2) + ' ' + cx + ' ' + cy + ')';
+      return '<circle class="gauge-track-zone" cx="' + cx + '" cy="' + cy + '" r="' + r + '" stroke="' + z.color + '" stroke-width="' + strokeW + '" stroke-dasharray="' + zLen.toFixed(1) + ' ' + (circumference - zLen).toFixed(1) + '" transform="' + zRotation + '"/>';
+    }).join('');
+    if (value != null) {
+      const zoneHit = zones.find(z => fraction >= z.from && fraction <= z.to) || zones[zones.length - 1];
+      needleColor = zoneHit.color;
+    }
+  } else {
+    trackMarkup = '<circle class="gauge-track" cx="' + cx + '" cy="' + cy + '" r="' + r + '" stroke-width="' + strokeW + '" stroke-dasharray="' + visibleLen.toFixed(1) + ' ' + (circumference - visibleLen).toFixed(1) + '" transform="' + rotation + '"/>' +
+      (value != null ? '<circle class="gauge-fill" cx="' + cx + '" cy="' + cy + '" r="' + r + '" stroke-width="' + (strokeW * 0.75).toFixed(1) + '" stroke-dasharray="' + fillLen.toFixed(1) + ' ' + (circumference - fillLen).toFixed(1) + '" transform="' + rotation + '"/>' : '');
+  }
+
   const needleAngle = startDeg + sweepDeg * fraction;
   const needleTip = gaugePolarPoint(cx, cy, r - strokeW * 0.4, needleAngle);
+  const needleStyle = needleColor ? ' style="stroke:' + needleColor + ';filter:drop-shadow(0 0 3px ' + needleColor + ')"' : '';
+  const hubStyle = needleColor ? ' style="fill:' + needleColor + ';filter:drop-shadow(0 0 2px ' + needleColor + ')"' : '';
   const needle = value == null ? '' :
-    '<line class="gauge-needle" x1="' + cx + '" y1="' + cy + '" x2="' + needleTip.x.toFixed(1) + '" y2="' + needleTip.y.toFixed(1) + '"/>' +
-    '<circle class="gauge-needle-hub" cx="' + cx + '" cy="' + cy + '" r="' + (strokeW * 0.45).toFixed(1) + '"/>';
+    '<line class="gauge-needle"' + needleStyle + ' x1="' + cx + '" y1="' + cy + '" x2="' + needleTip.x.toFixed(1) + '" y2="' + needleTip.y.toFixed(1) + '"/>' +
+    '<circle class="gauge-needle-hub"' + hubStyle + ' cx="' + cx + '" cy="' + cy + '" r="' + (strokeW * 0.45).toFixed(1) + '"/>';
   const display = value == null ? 'N/A' : String(value);
-  const valueFontSize = (size * 0.15).toFixed(1);
+  // Ratio strings ("12 / 17") run longer than a bare percentage, so they
+  // get a slightly smaller center font to avoid crowding the 128-unit dial.
+  const valueFontSize = (size * (centerText != null ? 0.115 : 0.15)).toFixed(1);
   const unitFontSize = (size * 0.07).toFixed(1);
+  const subFontSize = (size * 0.065).toFixed(1);
+  const valueStyle = needleColor ? ' style="fill:' + needleColor + '"' : '';
+  // centerText/centerSub let a gauge show a different real-data readout in
+  // its center than the value driving the arc/needle (e.g. Completion Rate
+  // shows the real resolved/total ratio here while the ring itself still
+  // sweeps by percentage) — see this round's item 4.
+  const centerDisplay = centerText != null ? centerText : display;
+  const centerY = centerSub != null ? cy - valueFontSize * 0.12 : cy + valueFontSize * 0.32;
 
-  return '<svg class="gauge-svg" viewBox="0 0 ' + size + ' ' + size + '" role="img" aria-label="' + label + ': ' + esc(display + (value != null ? unit : '')) + '">' +
-    '<circle class="gauge-track" cx="' + cx + '" cy="' + cy + '" r="' + r + '" stroke-width="' + strokeW + '" stroke-dasharray="' + visibleLen.toFixed(1) + ' ' + (circumference - visibleLen).toFixed(1) + '" transform="' + rotation + '"/>' +
-    (value != null ? '<circle class="gauge-fill" cx="' + cx + '" cy="' + cy + '" r="' + r + '" stroke-width="' + (strokeW * 0.75).toFixed(1) + '" stroke-dasharray="' + fillLen.toFixed(1) + ' ' + (circumference - fillLen).toFixed(1) + '" transform="' + rotation + '"/>' : '') +
+  return '<svg class="gauge-svg" viewBox="0 0 ' + size + ' ' + size + '" role="img" aria-label="' + label + ': ' + esc((centerText != null ? centerText : display + (value != null ? unit : ''))) + '">' +
+    trackMarkup +
     ticks + slaTick + needle +
-    '<text class="gauge-value-text" x="' + cx + '" y="' + (cy + valueFontSize * 0.32) + '" font-size="' + valueFontSize + '" text-anchor="middle">' + esc(display) +
-      (value != null ? '<tspan class="gauge-unit-text" font-size="' + unitFontSize + '">' + esc(unit) + '</tspan>' : '') +
+    '<text class="gauge-value-text"' + valueStyle + ' x="' + cx + '" y="' + centerY + '" font-size="' + valueFontSize + '" text-anchor="middle">' + esc(centerDisplay) +
+      (centerText == null && value != null ? '<tspan class="gauge-unit-text" font-size="' + unitFontSize + '">' + esc(unit) + '</tspan>' : '') +
     '</text>' +
+    (centerSub != null ? '<text class="gauge-center-sub" x="' + cx + '" y="' + (cy + valueFontSize * 0.62) + '" font-size="' + subFontSize + '" text-anchor="middle">' + esc(centerSub) + '</text>' : '') +
   '</svg>';
 }
 
@@ -2873,26 +2997,37 @@ function renderMatrixView(){
   </button>`;
 
   // Visualizer 2 — Fix Speed: 240° precision tachometer sweep (bottom-left
-  // to bottom-right through the top), 0-40h range, plus a fixed white
-  // SLA-target tick at the real SLA_TARGET_HOURS (24h) position.
+  // to bottom-right through the top), 0-60h range (widened from 40h so the
+  // full 3-zone SLA dial — Green 0-24h / Amber 24-48h / Red 48h+ — fits
+  // with room past the red threshold), plus a fixed white SLA-target tick
+  // at the real SLA_TARGET_HOURS (24h) position — which lands exactly on
+  // the Green/Amber zone boundary, per this round's item 3.
   const fixSpeedDef = MATRIX_METRIC_DEFS.find(m => m.key === 'avgResolutionHours');
   const fixSpeedGauge = buildGaugeSvg({
     value: matrixData.avgResolutionHours, max: fixSpeedDef.max, unit: 'h', label: fixSpeedDef.label,
-    startDeg: 150, sweepDeg: 240, tickCount: 8, slaFraction: SLA_TARGET_HOURS / fixSpeedDef.max, size: 128
+    startDeg: 150, sweepDeg: 240, tickCount: 8, slaFraction: SLA_TARGET_HOURS / fixSpeedDef.max, size: 128,
+    zones: [
+      { from: 0, to: 24 / fixSpeedDef.max, color: '#00E699' },
+      { from: 24 / fixSpeedDef.max, to: 48 / fixSpeedDef.max, color: '#F59E0B' },
+      { from: 48 / fixSpeedDef.max, to: 1, color: '#EF4444' }
+    ]
   });
 
-  // Visualizer 3 — Completion Rate: full 360° donut progress ring, plus
-  // the real resolved/total ticket ratio (matrixData.resolvedCount /
-  // matrixData.totalTickets — both real fields from bigThree(), not the
-  // spec's illustrative "1,420 / 1,893" example) centered below it.
+  // Visualizer 3 — Completion Rate: full 360° donut progress ring (the ring
+  // fill still sweeps by the real verificationRatePct), with the center
+  // readout replaced by the real resolved/total ticket ratio
+  // (matrixData.resolvedCount / matrixData.totalTickets — both real fields
+  // from bigThree(), not the spec's illustrative "12 / 17" example) and a
+  // "RESOLVED" sub-label per this round's item 4.
   const completionDef = MATRIX_METRIC_DEFS.find(m => m.key === 'verificationRatePct');
+  const resolvedRatioText = (matrixData.resolvedCount != null && matrixData.totalTickets != null)
+    ? matrixData.resolvedCount.toLocaleString('en-US') + ' / ' + matrixData.totalTickets.toLocaleString('en-US')
+    : 'N/A';
   const completionGauge = buildGaugeSvg({
     value: matrixData.verificationRatePct, max: completionDef.max, unit: '%', label: completionDef.label,
-    startDeg: 270, sweepDeg: 360, tickCount: 20, slaFraction: null, size: 128
+    startDeg: 270, sweepDeg: 360, tickCount: 20, slaFraction: null, size: 128,
+    centerText: resolvedRatioText, centerSub: 'RESOLVED'
   });
-  const resolvedRatio = (matrixData.resolvedCount != null && matrixData.totalTickets != null)
-    ? matrixData.resolvedCount.toLocaleString('en-US') + ' / ' + matrixData.totalTickets.toLocaleString('en-US') + ' Resolved'
-    : 'N/A';
 
   grid.innerHTML = activeHazardsCell +
     `<button class="gauge-card" type="button" data-metric="avgResolutionHours">
@@ -2903,7 +3038,7 @@ function renderMatrixView(){
     <button class="gauge-card" type="button" data-metric="verificationRatePct">
       ${completionGauge}
       <div class="gauge-cell-lbl">Completion Rate</div>
-      <div class="gauge-ratio-caption">${esc(resolvedRatio)}</div>
+      <div class="gauge-cell-caption">${esc(matrixData.verificationRatePct != null ? matrixData.verificationRatePct + '% Verified' : 'N/A')}</div>
     </button>`;
 }
 
@@ -3184,7 +3319,11 @@ document.getElementById('exportRecordOverlay').addEventListener('click', (e) => 
   if (e.target.id === 'exportRecordOverlay') closeExportRecordModal();
 });
 
-const csaExportPrintBtn = document.getElementById('btnCsaExportPrint');
+// #btnCsaExportPrint's "CIVIC RECORD" gateway pill was removed from the
+// page body per this round's item 7; its real click handler moved to the
+// footer link that replaced it (see #footerExportRecordLink in the
+// footer sitemap) so openExportRecordModal() stays reachable.
+const csaExportPrintBtn = document.getElementById('footerExportRecordLink');
 if (csaExportPrintBtn) csaExportPrintBtn.addEventListener('click', () => openExportRecordModal());
 
 /* =====================================================================
@@ -3393,7 +3532,7 @@ function renderLedgerResults(){
     if (ledgerFilters.ward && t.ward !== ledgerFilters.ward) return false;
     if (ledgerFilters.category && t.category !== ledgerFilters.category) return false;
     if (ledgerFilters.status && t.stage !== ledgerFilters.status) return false;
-    if (q && !((t.title || '').toLowerCase().includes(q) || (t.loc || '').toLowerCase().includes(q) || (t.category || '').toLowerCase().includes(q))) return false;
+    if (q && !((t.title || '').toLowerCase().includes(q) || (t.loc || '').toLowerCase().includes(q) || (t.category || '').toLowerCase().includes(q) || (t.reportId || '').toLowerCase().includes(q))) return false;
     return true;
   });
   container.innerHTML = '';
@@ -3489,6 +3628,109 @@ const ledgerSearchInputEl = document.getElementById('ledgerSearchInput');
 if (ledgerSearchInputEl) ledgerSearchInputEl.addEventListener('input', () => {
   ledgerFilters.q = ledgerSearchInputEl.value.trim();
   renderLedgerResults();
+});
+
+/* =====================================================================
+   STREET / ZIP SCOPE BAR — REPORT GENERATOR MATRIX (this round's item 2)
+   -----------------------------------------------------------------
+   Street-name input REALLY filters against every ticket's real `loc`
+   field (a genuine substring match, e.g. "Main St" narrows to tickets
+   whose location string contains it). A 5-digit ZIP gets the spec's
+   "District Report: ZIP …" title, but this dataset has no per-ticket ZIP
+   field to filter by — no seeded ticket, real or fallback, carries one —
+   so rather than fabricate ZIP-level matches, a ZIP scope falls back to
+   the SAME currently-filtered inventory as the blank/default case, with
+   an honest note printed into the PDF saying so. Blank input prints
+   exactly the ledger's current filtered view (search/ward/category/status),
+   matching what's on screen. ===== */
+function ledgerCurrentlyFilteredTickets(){
+  const q = (ledgerFilters.q || '').toLowerCase();
+  return ledgerTickets.filter(t => {
+    if (ledgerFilters.ward && t.ward !== ledgerFilters.ward) return false;
+    if (ledgerFilters.category && t.category !== ledgerFilters.category) return false;
+    if (ledgerFilters.status && t.stage !== ledgerFilters.status) return false;
+    if (q && !((t.title || '').toLowerCase().includes(q) || (t.loc || '').toLowerCase().includes(q) || (t.category || '').toLowerCase().includes(q) || (t.reportId || '').toLowerCase().includes(q))) return false;
+    return true;
+  });
+}
+async function printLedgerLocationReport(){
+  if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) {
+    alert('PDF library failed to load (check your connection) — could not generate the Location Report.');
+    return;
+  }
+  const scopeInput = document.getElementById('ledgerScopeInput');
+  const raw = scopeInput ? scopeInput.value.trim() : '';
+  const isZip = /^\d{5}$/.test(raw);
+  let title, rows, scopeNote;
+  if (isZip) {
+    title = 'District Report: ZIP ' + raw;
+    rows = ledgerCurrentlyFilteredTickets();
+    scopeNote = 'This build\'s ticket records are not tagged with ZIP codes, so this report shows the ' +
+      'currently filtered public-inventory view (search/ward/category/status), not a true ZIP-scoped result.';
+  } else if (raw) {
+    title = 'Civic Audit: ' + raw + ' Corridor';
+    const needle = raw.toLowerCase();
+    rows = ledgerTickets.filter(t => (t.loc || '').toLowerCase().includes(needle));
+    scopeNote = 'Filtered to reports whose location string contains "' + raw + '" — a real substring match ' +
+      'against the live ledger\'s location field.';
+  } else {
+    title = 'Public Ledger Inventory';
+    rows = ledgerCurrentlyFilteredTickets();
+    scopeNote = 'Shows the ledger\'s currently filtered view (search/ward/category/status) exactly as displayed.';
+  }
+
+  const printBtn = document.getElementById('ledgerScopePrintBtn');
+  const originalLabel = printBtn ? printBtn.textContent : null;
+  if (printBtn) { printBtn.disabled = true; printBtn.textContent = 'Generating…'; }
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+    let y = 56;
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(18);
+    doc.text('CITIXEN UX — ' + title, 40, y); y += 22;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
+    doc.text('Generated: ' + new Date().toLocaleString(), 40, y); y += 14;
+    doc.setFont('helvetica', 'italic'); doc.setFontSize(9);
+    const noteLines = doc.splitTextToSize(scopeNote, 500);
+    noteLines.forEach(line => { doc.text(line, 40, y); y += 12; });
+    y += 14;
+
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
+    doc.text('Matching reports: ' + rows.length, 40, y); y += 20;
+    doc.setFontSize(10);
+    if (!rows.length) {
+      doc.setFont('helvetica', 'normal');
+      doc.text('No reports match this scope.', 48, y); y += 16;
+    }
+    rows.forEach(t => {
+      if (y > 720) { doc.addPage(); y = 56; }
+      doc.setFont('helvetica', 'bold'); doc.text(t.reportId + '  —  ' + t.stage.toUpperCase(), 48, y); y += 13;
+      doc.setFont('helvetica', 'normal');
+      doc.text(t.title, 48, y); y += 13;
+      doc.text(t.loc + '  •  ' + t.wardName + '  •  ' + t.category, 48, y); y += 18;
+    });
+
+    doc.save('citixen-location-report-' + (isZip ? 'zip-' + raw : raw ? raw.toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'filtered') + '.pdf');
+  } catch (err) {
+    console.error('Location Report PDF generation failed', err);
+    alert('Could not generate the Location Report PDF — please try again.');
+  } finally {
+    if (printBtn) { printBtn.disabled = false; if (originalLabel !== null) printBtn.textContent = originalLabel; }
+  }
+}
+const ledgerScopePrintBtnEl = document.getElementById('ledgerScopePrintBtn');
+if (ledgerScopePrintBtnEl) ledgerScopePrintBtnEl.addEventListener('click', printLedgerLocationReport);
+
+// Pro Tier upsell link — no standalone "Institutional Access modal" exists
+// in this codebase (Institutional Access is the real "For Elected
+// Officials" / "For Municipalities" mailto gateway section further down
+// the page), so this scrolls to that real section rather than opening a
+// fabricated modal.
+const ledgerProTierLinkEl = document.getElementById('ledgerProTierLink');
+if (ledgerProTierLinkEl) ledgerProTierLinkEl.addEventListener('click', () => {
+  closeLedgerDrawer();
+  const target = document.getElementById('institutionalAccessSection');
+  if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
 });
 
 // ===== The Municipal Onboarding Wizard (previously ~190 lines here: step
