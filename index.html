@@ -257,14 +257,15 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .hub-card:last-child{margin-bottom:0}
 .hub-card-main{display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 auto}
 .hub-card svg{stroke:#00E699;flex-shrink:0}
-.hub-card-text{display:flex;align-items:baseline;gap:6px;min-width:0;flex-wrap:wrap}
-.hub-card-text .hub-card-title{font-size:.8rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.hub-card-title{font-size:.8rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#FFFFFF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .hub-card-sub{font-size:.72rem !important;font-weight:500 !important;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* The circled "(i)" info badge (.hub-card-info) that used to trigger the
-   section-preview modal was removed per this round's spec — it visually
-   overlapped the main icon/arrow CTA. The same real trigger now lives on
-   the subtitle text itself, so it gets an underline-on-hover affordance
-   instead of a separate badge. */
+   section-preview modal was removed per an earlier round's spec — it
+   visually overlapped the main icon/arrow CTA. The same real trigger now
+   lives on the subtitle text itself (moved to the right-hand action group
+   per this round's button-anatomy spec — Left: dot + icon + bold title;
+   Right: muted subtitle + arrow, with no dash separator anywhere), so it
+   gets an underline-on-hover affordance instead of a separate badge. */
 .hub-card-sub[role="button"]{cursor:pointer;text-decoration:underline;text-decoration-color:transparent;transition:text-decoration-color .15s,color .15s}
 .hub-card-sub[role="button"]:hover{color:#00E699;text-decoration-color:#00E699}
 .hub-card-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}
@@ -337,7 +338,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   .hub-row{padding:0 14px}
   .hub-card{padding:10px 14px}
   .hub-card svg{width:20px;height:20px}
-  .hub-card-text .hub-card-title{font-size:.72rem}
+  .hub-card-title{font-size:.72rem}
   .hub-card-sub{font-size:.64rem !important}
 }
 
@@ -373,9 +374,21 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 /* Dual side-by-side status pills (this round's item 3.3) — both pills
    share the same .nav-jurisdiction-badge look; this row just lays them out
    side by side and lets them wrap/shrink gracefully on narrow screens. */
-.dual-pill-row{gap:10px;flex-wrap:wrap}
-.block-coverage-badge{white-space:nowrap}
-.block-coverage-badge svg{flex-shrink:0}
+/* ===== GEOTAGGED LOCAL TELEMETRY SCORECARD (this round's item 4) — a
+   single full-width card replacing the previous round's dual pill row,
+   using the same Deep Midnight Navy glass + Laser Mint keyline surface
+   tokens as every other card on the page. Its header doubles as the real
+   jurisdiction/Change-Location trigger. ===== */
+.telemetry-scorecard-card{display:block;width:100%;max-width:640px;text-align:left;
+  background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);
+  border-radius:14px;padding:14px 18px;cursor:pointer;font-family:inherit;color:var(--text);
+  animation:telemetryGlow 3s ease-in-out infinite}
+.telemetry-scorecard-head{display:flex;align-items:center;gap:8px;color:var(--mint2);
+  font-size:.72rem;font-weight:800;letter-spacing:.04em;margin-bottom:12px}
+.telemetry-scorecard-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center}
+.telemetry-scorecard-col{padding:6px 2px}
+.telemetry-scorecard-val{font-size:1.15rem;font-weight:900;color:#FFFFFF}
+.telemetry-scorecard-lbl{font-size:.64rem;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.03em}
 
 /* ===== "HOW YOUR REPORT MOVES" RADIAL NUCLEUS CARD — replaces an earlier
    round's now-superseded standalone "Civic Memory™" concept card (its
@@ -555,11 +568,18 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .aggregation-map-wrap{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--border);background:var(--bg-obsidian)}
 .aggregation-map-wrap.tiles-degraded{background:radial-gradient(circle at 50% 40%,rgba(0,230,153,.08),var(--bg-obsidian) 72%)}
 #aggregation-map-container{position:absolute;inset:0;background:var(--bg-obsidian)}
-.agg-marker-beacon{position:relative;width:100%;height:100%}
-.agg-marker-beacon .agg-marker-pulse{position:absolute;inset:-6px;border-radius:50%;background:#00E699;
-  opacity:.45;animation:beaconPulse 2s ease-out infinite}
-.agg-marker-beacon .agg-marker-core{position:absolute;inset:4px;border-radius:50%;background:#00E699;
-  border:2px solid #fff;box-shadow:0 0 8px #00E699}
+/* Brand Shield map markers — the real Leaflet L.divIcon() markers on this
+   Aggregation Hub map are rendered as scaled-down CITIXEN UX™ brand shields
+   (same #00E699 1px-outline shield path used in the nav logo/privacy badge)
+   instead of generic dots, per this round's spec. This stays honestly on
+   the page's existing Leaflet implementation — the MapLibre GL JS symbol-
+   layer approach named in the spec is the same disclosed roadmap item as
+   the H3/PMTiles line in the Civic Memory™ Architecture drawer's Spatial
+   Hashing tab, not a live integration here. */
+.agg-marker-shield{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+.agg-marker-shield .agg-marker-pulse{position:absolute;inset:-6px;border-radius:50%;background:#00E699;
+  opacity:.35;animation:beaconPulse 2s ease-out infinite}
+.agg-marker-shield svg{position:relative;filter:drop-shadow(0 0 4px rgba(0,230,153,.65))}
 .geo-hatch-legend{position:absolute;left:16px;bottom:12px;display:flex;gap:16px;flex-wrap:wrap;z-index:1000;pointer-events:none}
 .geo-hatch-legend span{display:flex;align-items:center;gap:6px;font-size:.62rem;color:var(--muted)}
 .geo-legend-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
@@ -1077,7 +1097,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   <header class="topbar">
     <div class="brand">
       <div class="brand-logo">
-        <svg viewBox="0 0 24 24" stroke="var(--brand-mint)" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <svg viewBox="0 0 24 24" stroke="#00E699" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         <span class="brand-wordmark"><span class="brand-white">CITIXEN</span> <span class="brand-lime">UX</span><sup class="brand-tm">™</sup></span>
       </div>
       <span class="brand-pipe" aria-hidden="true">|</span>
@@ -1085,7 +1105,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </div>
 
     <button type="button" class="nav-privacy-badge" id="navPrivacyBadge" aria-label="Privacy and anonymity details">
-      <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+      <svg viewBox="0 0 24 24" width="14" height="14" stroke="#00E699" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
       <span>Privacy Engine: Verified</span>
     </button>
   </header>
@@ -1295,28 +1315,43 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   <p class="citizen-dashboard-subheader"><span class="cds-white">Citixen</span> <span class="cds-mint">Dashboard</span></p>
   <p class="hero-tagline-subtle">Real-time community reporting and municipal tracking.</p>
 
-  <!-- ===== DUAL SIDE-BY-SIDE STATUS PILLS (this round's item 3.3) — the
-       jurisdiction pill (left, unchanged real "● City, ST • Active" text
-       and Change Location trigger, see updateSmartLocationBanner()/
-       openLocationPicker() below) now sits beside a new real "Block
-       Coverage Ticker" pill (right, updateBlockCoverageTicker() below).
-       Honesty note: this build's real jurisdiction directory only carries
-       ward-level granularity (2 known wards for the demo La Crosse
-       jurisdiction), not an actual 11,000,000-block national census
-       dataset, so this ticker is wired to the same real, dynamically
-       computed ward-coverage numbers renderMunicipalPanel() already uses
-       (logged wards / known wards) rather than a fabricated "80 blocks"
-       figure — true block-level (H3 Resolution 9) granularity is the same
-       roadmap target already disclosed in the Civic Memory™ Architecture
-       drawer's Spatial Hashing tab. ===== -->
-  <section class="geo-pill-section dual-pill-row">
-    <button type="button" class="nav-jurisdiction-badge" id="navJurisdictionBadge" aria-label="Change your jurisdiction">
-      <span class="pulsing-dot"></span>
-      <span id="navJurisdictionText">La Crosse, WI • Active</span>
-    </button>
-    <button type="button" class="nav-jurisdiction-badge block-coverage-badge" id="blockCoverageTicker" aria-label="Open the Municipal ward coverage tracker">
-      <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>
-      <span id="blockCoverageTickerText">Loading coverage…</span>
+  <!-- ===== GEOTAGGED LOCAL TELEMETRY SCORECARD (this round's item 4,
+       replacing last round's dual side-by-side status pills with a single
+       3-column card). The header itself IS the jurisdiction/Change
+       Location trigger (same real openLocationPicker() flow the old
+       #navJurisdictionBadge used). All three metrics are computed live in
+       updateTelemetryScorecard() from this jurisdiction's real
+       ledgerTickets/ward data — not the spec's illustrative "90/112",
+       "42.5%", "3.2 Days" figures, which this dataset (2 known La Crosse
+       wards, a small real seeded ticket set) has no way to match exactly:
+       * Reports Resolved — resolved / total real tickets for this city.
+       * City Covered — the same real ward-coverage percentage
+         (logged wards / known wards) as last round's Block Coverage
+         Ticker/Ward Coverage Tracker; true census-block granularity stays
+         the disclosed H3 roadmap target in the Civic Memory™ Architecture
+         drawer.
+       * Avg SLA Response — average resolutionHours across this city's
+         resolved tickets, converted to days. ===== -->
+  <section class="geo-pill-section" style="padding-top:8px;">
+    <button type="button" class="telemetry-scorecard-card" id="navJurisdictionBadge" aria-label="Change your jurisdiction">
+      <div class="telemetry-scorecard-head">
+        <span class="pulsing-dot"></span>
+        <span id="navJurisdictionText">LA CROSSE, WI — LOCAL TELEMETRY SCORECARD</span>
+      </div>
+      <div class="telemetry-scorecard-grid">
+        <div class="telemetry-scorecard-col">
+          <div class="telemetry-scorecard-val" id="scorecardResolved">—</div>
+          <div class="telemetry-scorecard-lbl">Reports Resolved</div>
+        </div>
+        <div class="telemetry-scorecard-col">
+          <div class="telemetry-scorecard-val" id="scorecardCovered">—</div>
+          <div class="telemetry-scorecard-lbl">City Covered</div>
+        </div>
+        <div class="telemetry-scorecard-col">
+          <div class="telemetry-scorecard-val" id="scorecardSla">—</div>
+          <div class="telemetry-scorecard-lbl">Avg SLA Response</div>
+        </div>
+      </div>
     </button>
   </section>
 
@@ -1362,7 +1397,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   <div id="civic-stack-container">
   <section class="matrix-summary-section" id="matrixSummarySection">
     <h3 style="color: #00E699; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin: 20px 0 6px; text-align: center;">Your Civic Intelligence Stack<sup class="tm-symbol">™</sup></h3>
-    <p style="color:var(--muted);font-size:.78rem;text-align:center;font-style:italic;margin:0 0 16px;">Click on any live module below for a deeper dive.</p>
+    <p style="color:var(--muted);font-size:.78rem;text-align:center;font-style:italic;margin:0 0 16px;">Click on any live module below for an instant report.</p>
   </section>
 
   <!-- ===== "LIVING TELEMETRY" 4-TILE STACK — grown from three pills to
@@ -1383,33 +1418,33 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       <span class="hub-card-main">
         <span class="telemetry-pulse-dot" aria-hidden="true"></span>
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><rect x="6" y="10" width="3" height="9"/><rect x="11" y="6" width="3" height="13"/><rect x="16" y="13" width="3" height="6"/></svg>
-        <span class="hub-card-text"><span class="hub-card-title">Your Analytics</span><span class="hub-card-sub" id="hubCoverageInfoBtn" role="button" tabindex="0" aria-label="What the Analytics section covers">— Data &amp; Reports</span></span>
+        <span class="hub-card-title">Your Analytics</span>
       </span>
-      <span class="hub-card-actions"><span class="hub-card-arrow">↗</span></span>
+      <span class="hub-card-actions"><span class="hub-card-sub" id="hubCoverageInfoBtn" role="button" tabindex="0" aria-label="What the Analytics section covers">Data &amp; Reports</span><span class="hub-card-arrow">↗</span></span>
     </button>
     <button class="hub-card telemetry-card" id="hubSlaBtn" type="button" aria-expanded="false" aria-controls="civicStackSection" data-export-context="the CapEx Audit Ledger">
       <span class="hub-card-main">
         <span class="telemetry-pulse-dot" aria-hidden="true"></span>
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7V5a2 2 0 0 1 2-2h8"/><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M2 11h20"/><circle cx="17" cy="15" r="1.3" fill="#00E699" stroke="none"/></svg>
-        <span class="hub-card-text"><span class="hub-card-title">Your Expenditures</span><span class="hub-card-sub" id="hubSlaInfoBtn" role="button" tabindex="0" aria-label="What the Expenditures section covers">— Budget &amp; Public Works</span></span>
+        <span class="hub-card-title">Your Expenditures</span>
       </span>
-      <span class="hub-card-actions"><span class="hub-card-arrow">↗</span></span>
+      <span class="hub-card-actions"><span class="hub-card-sub" id="hubSlaInfoBtn" role="button" tabindex="0" aria-label="What the Expenditures section covers">Projects &amp; Public Works</span><span class="hub-card-arrow">↗</span></span>
     </button>
     <button class="hub-card telemetry-card" id="hubMunicipalBtn" type="button" aria-expanded="false" aria-controls="municipalPanel" data-export-context="the Municipal Work Orders &amp; SLA Tracker">
       <span class="hub-card-main">
         <span class="telemetry-pulse-dot" aria-hidden="true"></span>
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9l8-5 8 5v12"/><path d="M9 21v-6h6v6"/><path d="M4 21h16"/></svg>
-        <span class="hub-card-text"><span class="hub-card-title">Your Municipal Portal</span><span class="hub-card-sub" id="hubMunicipalInfoBtn" role="button" tabindex="0" aria-label="What the Municipal section covers">— Work Orders &amp; SLA Tracker</span></span>
+        <span class="hub-card-title">Your Municipal Portal</span>
       </span>
-      <span class="hub-card-actions"><span class="hub-card-arrow">↗</span></span>
+      <span class="hub-card-actions"><span class="hub-card-sub" id="hubMunicipalInfoBtn" role="button" tabindex="0" aria-label="What the Municipal section covers">Work Orders &amp; SLA</span><span class="hub-card-arrow">↗</span></span>
     </button>
-    <button class="hub-card telemetry-card" id="hubStackBtn" type="button" aria-expanded="false" aria-controls="civicCharterDrawer" data-export-context="the Civic Memory™ Architecture &amp; Charter">
+    <button class="hub-card telemetry-card" id="hubStackBtn" type="button" aria-expanded="false" aria-controls="civicCharterDrawer" data-export-context="the Civic Memory™ Public Ledger &amp; Standards">
       <span class="hub-card-main">
         <span class="telemetry-pulse-dot" aria-hidden="true"></span>
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 21 8 12 13 3 8 12 3"/><polyline points="3 13 12 18 21 13"/><polyline points="3 18 12 23 21 18"/></svg>
-        <span class="hub-card-text"><span class="hub-card-title">Your Civic Memory™</span><span class="hub-card-sub" id="hubStackInfoBtn" role="button" tabindex="0" aria-label="What the Civic Memory framework covers">— Architecture &amp; Charter</span></span>
+        <span class="hub-card-title">Your Civic Memory™</span>
       </span>
-      <span class="hub-card-actions"><span class="hub-card-arrow">↗</span></span>
+      <span class="hub-card-actions"><span class="hub-card-sub" id="hubStackInfoBtn" role="button" tabindex="0" aria-label="What the Civic Memory framework covers">Public Ledger &amp; Standards</span><span class="hub-card-arrow">↗</span></span>
     </button>
   </div>
   </div><!-- /#civic-stack-container -->
@@ -2152,7 +2187,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
          #navPrivacyBadge claim in the sticky top bar, not a second,
          separately-verified privacy system. -->
     <div class="footer-privacy-confirm" aria-hidden="false">
-      <svg viewBox="0 0 24 24" width="15" height="15" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+      <svg viewBox="0 0 24 24" width="15" height="15" stroke="#00E699" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
       <span>Privacy Engine: Verified</span>
     </div>
     <div class="footer-slogan-callout"><span style="color:#FFFFFF; font-weight:bold;">CITIXEN</span> <span style="color:#00E699; font-weight:bold;">UX</span><sup class="tm-symbol">™</sup> — Crowd Source America<sup class="tm-symbol">™</sup>. Built for residents, designed for modern civic trust.</div>
@@ -2658,7 +2693,7 @@ document.getElementById('civicCharterDrawer').addEventListener('click', (e) => {
    ===================================================================== */
 // Shared ward-coverage computation — real logged-wards / known-wards ratio
 // for the active jurisdiction, used by both renderMunicipalPanel() below and
-// the header's real "Block Coverage Ticker" pill (updateBlockCoverageTicker()
+// the header's real Telemetry Scorecard card (updateTelemetryScorecard()
 // further down) so the two never drift out of sync or duplicate the math.
 function computeWardCoverage(j){
   let knownWards = [];
@@ -2721,29 +2756,40 @@ function renderMunicipalPanel(){
   const riskGapPct = wardTickets.length ? Math.round(((wardTickets.length - wardResolved) / wardTickets.length) * 100) : null;
   document.getElementById('municipalRiskGapPct').textContent = riskGapPct != null ? riskGapPct + '%' : 'N/A';
 }
-// ===== BLOCK COVERAGE TICKER (header pill) — reuses computeWardCoverage()
-// above so this real number always matches the Municipal panel's own
-// coverage stat exactly. Fetches ledgerTickets eagerly if nothing has
-// loaded them yet, since this pill is above the fold and shouldn't wait on
-// the user opening the Municipal panel first.
-async function updateBlockCoverageTicker(){
-  const textEl = document.getElementById('blockCoverageTickerText');
-  if (!textEl) return;
+// Shared average-resolution-time helper — real resolutionHours across
+// resolved tickets in a given ticket set, converted to days. Used by both
+// the Telemetry Scorecard's Avg SLA Response column below and the Export
+// Civic Record modal's SLA Velocity metric so the two never drift out of
+// sync or duplicate the math. Returns null when no resolved ticket in the
+// set has a recorded resolutionHours value.
+function computeAvgResolutionDays(tickets){
+  const timed = tickets.filter(t => t.stage === 'resolved' && typeof t.resolutionHours === 'number');
+  if (!timed.length) return null;
+  const avgHours = timed.reduce((sum, t) => sum + t.resolutionHours, 0) / timed.length;
+  return avgHours / 24;
+}
+// ===== TELEMETRY SCORECARD (header card) — reuses computeWardCoverage() and
+// computeAvgResolutionDays() above so these real numbers always match the
+// Municipal panel's and the Export Civic Record modal's own stats exactly.
+// Fetches ledgerTickets eagerly if nothing has loaded them yet, since this
+// card is above the fold and shouldn't wait on the user opening a panel.
+async function updateTelemetryScorecard(){
+  const resolvedEl = document.getElementById('scorecardResolved');
+  const coveredEl = document.getElementById('scorecardCovered');
+  const slaEl = document.getElementById('scorecardSla');
+  if (!resolvedEl || !coveredEl || !slaEl) return;
   if (!ledgerTickets.length) {
-    try { ledgerTickets = await fetchLedgerTickets(); } catch (e) { /* leave the loading label if this fails */ }
+    try { ledgerTickets = await fetchLedgerTickets(); } catch (e) { /* leave the placeholder dashes if this fails */ }
   }
   const j = activeJurisdiction();
-  const { knownWards, loggedWardSlugs, pct } = computeWardCoverage(j);
-  textEl.textContent = knownWards.length
-    ? (pct != null ? pct : 0) + '% Covered (' + loggedWardSlugs.size + '/' + knownWards.length + ' Wards)'
-    : 'No ward directory on file';
+  const cityTickets = j ? ledgerTickets.filter(t => t.city === j.city && t.state === j.state) : ledgerTickets;
+  const resolvedCount = cityTickets.filter(t => t.stage === 'resolved').length;
+  resolvedEl.textContent = cityTickets.length ? (resolvedCount + ' / ' + cityTickets.length) : '—';
+  const { knownWards, pct } = computeWardCoverage(j);
+  coveredEl.textContent = knownWards.length ? (pct != null ? pct : 0) + '%' : 'N/A';
+  const avgDays = computeAvgResolutionDays(cityTickets);
+  slaEl.textContent = avgDays != null ? avgDays.toFixed(1) + ' Days' : 'N/A';
 }
-document.getElementById('blockCoverageTicker').addEventListener('click', async (e) => {
-  document.getElementById('hubMunicipalBtn').setAttribute('aria-expanded', 'true');
-  if (!ledgerTickets.length) ledgerTickets = await fetchLedgerTickets();
-  openDeepdivePanel('municipalPanel', 'municipalPanel', document.getElementById('hubMunicipalBtn'));
-  renderMunicipalPanel();
-});
 document.getElementById('municipalVerifyJurisdictionBtn').addEventListener('click', () => openLocationPicker());
 document.getElementById('municipalRequestAccessBtn').addEventListener('click', () => {
   const el = document.getElementById('institutionalAccessSection');
@@ -2900,9 +2946,14 @@ const AGGREGATION_MAP_CITIES = {
 };
 
 function mintMarkerIcon(){
+  // Real Leaflet L.divIcon() marker, rendered as the same CITIXEN UX™ brand
+  // shield path (#00E699, 1px stroke) used by the nav logo and Privacy
+  // Engine badge, in place of a generic dot/square — per this round's Brand
+  // Shield Map Nodes spec. The map itself stays honestly Leaflet, not
+  // MapLibre GL JS (see the CSS comment above this function).
   return L.divIcon({
     className: '',
-    html: '<div class="agg-marker-beacon"><span class="agg-marker-pulse"></span><span class="agg-marker-core"></span></div>',
+    html: '<div class="agg-marker-shield"><span class="agg-marker-pulse"></span><svg viewBox="0 0 24 24" width="18" height="18" stroke="#00E699" stroke-width="1" fill="rgba(0,230,153,0.28)" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>',
     iconSize: [18, 18],
     iconAnchor: [9, 9]
   });
@@ -3334,7 +3385,7 @@ function applyJurisdiction(j, opts){
   if (cta) cta.href = '/app.html?state=' + j.state + '&city=' + j.city + '&ward=' + j.ward;
   syncDashboardToJurisdiction(j);
   updateSmartLocationBanner(j);
-  updateBlockCoverageTicker();
+  updateTelemetryScorecard();
   renderWardCoverageTracker();
   if (!(opts && opts.silent)) {
     // A citizen just actively confirmed/changed jurisdiction — refresh the
@@ -3343,21 +3394,19 @@ function applyJurisdiction(j, opts){
   }
 }
 
-// NAV JURISDICTION BADGE — reflects the exact SAME confirmed/detected
+// TELEMETRY SCORECARD HEADER — reflects the exact SAME confirmed/detected
 // jurisdiction the CITIXEN Paperwork File and dashboard already use (see
 // applyJurisdiction() above); no second, parallel detection system. Also
 // called directly from initLocationIntake() with the raw detection guess
-// (see below) so the badge updates the instant GPS/IP detection resolves,
-// rather than waiting on the separate confirm-gated jurisdiction flow.
-// Formerly a standalone "Locating your jurisdiction…" banner; per this
-// round's nav cleanup it now lives inside the top nav itself, in the
-// same "City, ST • Active" phrasing as the app's own header badge
-// (#headerWardLabel in app.html).
+// (see below) so the header updates the instant GPS/IP detection resolves,
+// rather than waiting on the separate confirm-gated jurisdiction flow. This
+// round's spec format is "CITY, ST — LOCAL TELEMETRY SCORECARD" (all caps),
+// replacing the previous "City, ST • Active" pill phrasing.
 function updateSmartLocationBanner(j){
   const textEl = document.getElementById('navJurisdictionText');
   if (!textEl) return;
   if (j) {
-    textEl.textContent = j.cityName + ', ' + j.state.toUpperCase() + ' • Active';
+    textEl.textContent = (j.cityName + ', ' + j.state.toUpperCase() + ' — Local Telemetry Scorecard').toUpperCase();
   }
 }
 document.getElementById('navJurisdictionBadge').addEventListener('click', () => openLocationPicker());
@@ -3940,6 +3989,10 @@ async function openExportRecordModal(){
   const scopedResolved = scopedTickets.filter(t => t.stage === 'resolved').length;
   const scopedPending = scopedTickets.length - scopedResolved;
   const scopedResolvedRatePct = scopedTickets.length ? ((scopedResolved / scopedTickets.length) * 100).toFixed(1) : '0.0';
+  // SLA Velocity — shares computeAvgResolutionDays() with the header
+  // Telemetry Scorecard's Avg SLA Response column so the two never drift.
+  const scopedAvgDays = computeAvgResolutionDays(scopedTickets);
+  const scopedSlaVelocity = scopedAvgDays != null ? scopedAvgDays.toFixed(1) + ' Days' : 'N/A';
 
   document.getElementById('exportRecordContent').innerHTML = `
     <div class="export-record-head">
@@ -3954,7 +4007,7 @@ async function openExportRecordModal(){
       <div class="export-record-tile"><div class="export-record-tile-val">${esc(cityHealthIndex)}</div><div class="export-record-tile-lbl">City Health Index</div></div>
     </div>
     <div class="export-record-section-label">Contextual Subset Metrics — This Record's Rows</div>
-    <div class="export-record-meta" style="text-align:left;">Matching Reports: ${scopedTickets.length} &nbsp;|&nbsp; Resolved Rate: ${scopedResolved}/${scopedTickets.length} (${scopedResolvedRatePct}%) &nbsp;|&nbsp; Pending Action: ${scopedPending}</div>
+    <div class="export-record-meta" style="text-align:left;">Matching Reports: ${scopedTickets.length} &nbsp;|&nbsp; Resolved Rate: ${scopedResolved}/${scopedTickets.length} (${scopedResolvedRatePct}%) &nbsp;|&nbsp; Pending Action: ${scopedPending} &nbsp;|&nbsp; SLA Velocity: ${esc(scopedSlaVelocity)}</div>
     <div class="export-record-section-label">Recent Verified Field Reports</div>
     <table class="export-record-table">
       <thead><tr><th>Category</th><th>Street</th><th>Status</th><th>Timestamp</th></tr></thead>
@@ -4612,7 +4665,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   loadBig3();
   renderNationalCoverageTicker();
   renderNationalPixelMap();
-  updateBlockCoverageTicker();
+  updateTelemetryScorecard();
   // The "Download Ward Health Summary PDF" button was removed outright per
   // this round's spec; downloadWardHealthPdf() itself is kept (real, working
   // jsPDF generation) in case a future round re-wires it to a control.
