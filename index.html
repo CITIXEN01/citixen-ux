@@ -290,13 +290,19 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
    open directly below the icon row (.citixen-feature-accordion,
    max-height transition rather than display:none/block, so it animates).
    Same glass card surface token as every other container. ===== */
-.citixen-feature-section{max-width:920px;margin:0 auto 26px;padding:0 16px}
-.citixen-feature-heading{display:flex;align-items:center;justify-content:center;gap:8px;
-  color:#00E699;font-weight:800;font-size:1.1rem;letter-spacing:.08em;text-transform:uppercase;
-  margin:20px 0 6px;text-align:center}
+.citixen-feature-section{max-width:920px;margin:0 auto 18px;padding:0 16px}
+/* Narrative Link (this round's item 8) — split out of the old combined
+   feature-section heading into its own standalone row: brand shield +
+   "CITIXEN UX™" left-aligned, "Learn More ↗" right-aligned on the same
+   baseline. */
+.citixen-narrative-link{max-width:920px;margin:0 auto 18px;padding:0 16px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.citixen-narrative-link-title{display:flex;align-items:center;gap:8px;
+  color:#00E699;font-weight:800;font-size:1.1rem;letter-spacing:.08em;text-transform:uppercase}
 .citixen-feature-learn-more{display:inline-block;background:none;border:none;padding:0;font:inherit;
-  color:#00E699;font-size:.8rem;font-weight:700;cursor:pointer;text-decoration:underline}
-.citixen-trust-badge{display:flex;align-items:flex-start;gap:12px;max-width:640px;margin:18px auto 0;
+  color:#00E699;font-size:.8rem;font-weight:700;cursor:pointer;text-decoration:underline;flex-shrink:0}
+.citixen-trust-badge{display:flex;align-items:flex-start;gap:12px;max-width:640px;width:calc(100% - 32px);
+  box-sizing:border-box;margin:0 auto 18px;
   background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);
   border-radius:12px;padding:14px 16px}
 .citixen-trust-badge svg{flex-shrink:0;margin-top:2px}
@@ -518,6 +524,10 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 /* ===== Shared by the aggregate heat-map modal's search header (below) —
    .frontier-map-section itself (the bottom-of-homepage search bar) was
    removed with its markup per the homepage-declutter spec. ===== */
+/* Crowd Save America™ Entry Hub welcome banner — sits at the top of the
+   real Aggregation Hub modal (this round's item 2.1). */
+.agg-hub-welcome-banner{padding:18px 20px 4px;text-align:center;border-bottom:1px solid rgba(0,230,153,.15)}
+.agg-hub-welcome-banner p{color:var(--muted);font-size:.82rem;line-height:1.5;max-width:640px;margin:0 auto 14px}
 .frontier-map-head{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
 .frontier-search-bar{flex:1;min-width:240px;position:relative}
 .frontier-search-bar input{width:100%;background:rgba(7,12,14,.8);border:1px solid var(--border);color:var(--text);
@@ -891,11 +901,28 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 .gateway-pill-right{flex-shrink:0;text-align:right;font-size:.8rem;font-weight:600;color:#00E699;
   white-space:nowrap}
 .gateway-pill:hover{filter:brightness(1.2)}
-/* Calm, static frame for the Live Public Ledger pill — replaces the
-   earlier .ledger-pill-glow breathing box-shadow class outright (this
-   round's Zero Neon Bloom spec), reusing the same surface tokens as every
-   other calm card on the page. */
-.gateway-pill-calm{border:var(--surface-card-border);background:var(--bg-obsidian)}
+/* ===== FOCUSED LIVING GLOW (Public Ledger Only) — this round's item 1.3
+   reverses the previous round's "Zero Neon Bloom" for this ONE button:
+   the Live Public Ledger pill alone gets back its breathing Fresh Mint
+   box-shadow glow and a pulsing "LIVE" indicator dot. Every other card
+   (Scorecard, Civic Intelligence Stack, Privacy Card, Option Grid) stays
+   calm and static per this round's item 1.3 — these classes are scoped
+   to this one button only and are not the old shared .pulsing-dot/
+   .ledger-pill-glow globals removed last round. */
+.ledger-pill-glow{border:1px solid rgba(0,230,153,.35);background:#090D16;
+  animation:ledgerPillGlow 2.5s ease-in-out infinite}
+@keyframes ledgerPillGlow{
+  0%,100%{box-shadow:0 0 8px rgba(0,230,153,.18)}
+  50%{box-shadow:0 0 16px rgba(0,230,153,.4)}
+}
+.ledger-pulse-dot{position:relative;width:8px;height:8px;border-radius:50%;background:#00E699;flex-shrink:0;
+  box-shadow:0 0 6px #00E699;display:inline-block}
+.ledger-pulse-dot::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid #00E699;
+  animation:ledgerPulseRing 1.8s ease-out infinite}
+@keyframes ledgerPulseRing{
+  0%{transform:scale(.6);opacity:.9}
+  100%{transform:scale(2.2);opacity:0}
+}
 
 /* ===== TRADEMARK (™) TYPOGRAPHY — lightweight superscript treatment
    applied via <sup class="tm-symbol"> across headings/copy, distinct from
@@ -1328,27 +1355,28 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 
   <!-- ===== LIVE PUBLIC LEDGER BANNER — sits directly beneath the Citixen
        Dashboard sub-header/tagline above, and directly ABOVE the
-       national map box (the Aggregation Hub pill that used to stack
-       beneath it has been removed from this position — see note below).
-       Opens the existing #ledgerDrawer (same drawer as the footer's
-       Codex/audit links). Uses the unified single-line .gateway-pill
-       shell: flush flex alignment (space-between, 14px 20px padding,
-       52px min-height, 16px bottom margin via .gateway-pill-stacked). Per
-       an earlier round's item 3, the trailing text is the static action
-       label "View Now" rather than the real live ticket count — the count
-       itself was genuine (bound to /api/coverage/big3 via loadBig3()), but
-       the spec calls for a plain call-to-action here instead, so the
-       now-unused #ledgerBannerCount span and its loadBig3() binding were
-       removed rather than left as dead markup. This round's "Zero Neon
-       Bloom" spec retires the breathing Fresh Mint glow (formerly
-       .ledger-pill-glow) and the blinking "LIVE" dot in favor of the calm
-       static .gateway-pill-calm frame and a plain "LIVE" label, plus a
-       centered, muted "free & anonymous" trust line directly above the
-       pill. ===== -->
+       Civic Intelligence Stack (the Aggregation Hub pill that used to
+       stack beneath it has been removed from this position — see note
+       below). Opens the existing #ledgerDrawer (same drawer as the
+       footer's Codex/audit links). Uses the unified single-line
+       .gateway-pill shell: flush flex alignment (space-between, 14px 20px
+       padding, 52px min-height, 16px bottom margin via
+       .gateway-pill-stacked). Per an earlier round's item 3, the trailing
+       text is the static action label "View Now" rather than the real
+       live ticket count — the count itself was genuine (bound to
+       /api/coverage/big3 via loadBig3()), but the spec calls for a plain
+       call-to-action here instead, so the now-unused #ledgerBannerCount
+       span and its loadBig3() binding were removed rather than left as
+       dead markup. This round's "Focused Living Glow" spec re-enables the
+       breathing Fresh Mint glow (.ledger-pill-glow) and a pulsing "LIVE"
+       indicator dot (.ledger-pulse-dot) exclusively on this one button —
+       every other card on the page (Scorecard, Stack, Privacy Card,
+       Option Grid) stays calm and static — plus the centered, muted
+       "free & anonymous" trust line directly above the pill. ===== -->
   <p class="ledger-trust-subtitle">free &amp; anonymous</p>
   <section class="ledger-banner-section gateway-pill-stacked">
-    <button id="liveLedgerBanner" class="gateway-pill gateway-pill-calm" type="button">
-      <span class="gateway-pill-left" style="color: #00E699;">LIVE</span>
+    <button id="liveLedgerBanner" class="gateway-pill ledger-pill-glow" type="button">
+      <span class="gateway-pill-left" style="color: #00E699;"><span class="ledger-pulse-dot" aria-hidden="true"></span>LIVE</span>
       <span class="gateway-pill-center" style="color: #FFFFFF;">PUBLIC LEDGER</span>
       <span class="gateway-pill-right">View Now ↗</span>
     </button>
@@ -1410,68 +1438,79 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   </div>
   </div><!-- /#civic-stack-container -->
 
-  <!-- ===== ALTERNATING SECTION CADENCE (updated across recent rounds):
-       the Live Public Ledger pill is the only pill directly above the map.
-       The Aggregation Hub's real trigger (openHeatMapModal(), a genuine
-       Leaflet-based national aggregation map) is not deleted — per this
-       round's item 4, its branding and trigger are now nested INSIDE the
-       map card itself (#aggregationMapGatewayBtn, same id, same click
-       handler) rather than floating above or below it as a separate
-       element.
-       Position 2 — the embedded Live Report Pixel Map, with the
-       Aggregation Hub's branding/trigger nested inside its border. ===== -->
-
-  <!-- ===== NATIONAL LIVE REPORT PIXEL MAP — Position 2, sits directly
-       BENEATH the Live Public Ledger pill. #usSilhouetteOutline's
-       'd' path this round was generated by running OpenCV contour
-       detection (findContours + approxPolyDP, 52 vertices) against the
-       reference US-silhouette screenshot attached this round, then scaled
-       into this SVG's 800x440 viewBox — a traced approximation of that
-       reference image, not a precise cartographic/geodetic projection
-       (same "stylized, not geographic" convention already documented for
-       the Aggregation Hub's own markers). Reused once via <use> both as
-       the clip-path for the dim Fresh Mint grid and as a crisp, visible
-       coastline stroke (.pixel-map-outline) on top of it, so the two can
-       never drift out of sync. Grid pixels light progressively, one every
-       150ms, and per this round's item 5 each lit dot/revealed node
-       STICKS permanently — the fill is cumulative and never resets (see
-       runPixelMapCumulativeFill() below) — so the map interior gradually
-       fills up toward full national aggregate coverage, carrying only
-       Emerald Green city nodes throughout — no cyan/blue nodes.
-       Coordinates are fixed; nothing here pans, floats, or zooms. Purely
-       decorative; it draws no real per-city report data, unlike the
-       Aggregation Hub's live-tagged La Crosse marker.
-       The title reads "CROWD SAVE AMERICA™" (explicit spaces, not a
-       compound word), centered horizontally as a normal-flow header above
-       the SVG graphic (styled to match the "MORE FEATURES" header's own
-       type treatment) rather than an overlay on top of it, with the
-       card's own padding widened so neither the header nor the graphic
-       ever crowd the frame. The "View Map ↗" trigger
-       (#aggregationMapGatewayBtn) lives in a normal-flow
-       .pixel-map-action-row below the SVG, anchored to the bottom-right
-       corner, so it can never overlap the silhouette (including the
-       Florida/East Coast region). Same trigger id and click handler
-       throughout every round's restyling, so no JS wiring has ever
-       changed here — only position/markup. ===== -->
-  <section class="pixel-map-section">
-    <div class="pixel-map-card" id="national-pixel-map" data-export-context="the Crowd Save America™ national report map">
-      <button type="button" class="pixel-map-brand" id="csaTitleTrigger" aria-haspopup="dialog" aria-controls="csaNarrativeModal">CROWD SAVE AMERICA<sup class="tm-symbol">™</sup></button>
-      <svg class="pixel-map-svg" id="csaMapGraphic" viewBox="0 0 800 440" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false" role="button" tabindex="0" aria-label="Open the Crowd Save America Aggregation Hub map">
-        <defs>
-          <path id="usSilhouetteOutline" d="M760.0,60.1 L738.9,21.8 L722.8,20.4 L711.9,67.1 L653.5,82.4 L640.7,116.4 L569.9,161.2 L555.7,152.5 L563.7,118.5 L548.7,123.6 L552.4,99.2 L533.4,90.4 L509.3,162.7 L503.5,100.7 L527.9,82.4 L552.0,85.0 L496.5,75.1 L499.5,61.2 L448.7,78.0 L473.2,57.6 L415.1,33.9 L302.7,42.6 L69.9,31.3 L68.1,58.0 L45.1,41.5 L45.4,207.2 L62.6,246.3 L126.1,309.4 L208.6,330.2 L264.8,321.1 L304.6,369.3 L333.0,360.9 L372.4,415.6 L391.8,419.3 L387.8,387.9 L404.6,365.6 L441.8,348.5 L490.0,358.7 L479.0,344.1 L507.1,332.8 L568.1,341.5 L617.7,417.1 L626.1,394.8 L597.6,330.9 L603.8,312.0 L681.6,229.9 L655.3,198.1 L664.8,174.4 L678.3,185.7 L682.3,145.9 L732.3,126.2 L717.3,99.2 Z"/>
-          <clipPath id="usSilhouetteClip">
-            <use href="#usSilhouetteOutline"/>
-          </clipPath>
-        </defs>
-        <g id="pixelMapGrid" clip-path="url(#usSilhouetteClip)"></g>
-        <use href="#usSilhouetteOutline" class="pixel-map-outline"/>
-        <g id="pixelMapNodes"></g>
-      </svg>
-      <div class="pixel-map-action-row">
-        <button id="aggregationMapGatewayBtn" type="button" class="pixel-map-view-trigger">View Map ↗</button>
-      </div>
+  <!-- ===== INTERACTIVE OPTION GRID — this round's item 7, the same real
+       FEATURES/SAFETY/SECURITY 3-tile grid an earlier round called the
+       "3x3 Mega-Theme" section, moved here to sit directly under the
+       Civic Intelligence Stack per this round's Main Feed Sequence. Same
+       ids/behavior (toggleCitixenFeatureAccordion(), modalData.ciFeatures/
+       ciSafety/ciSecurity), only its position and two of its three icons
+       changed — the generic lightning-bolt (Features) and padlock
+       (Security) glyphs are replaced with original 1px Laser Mint
+       line-art per this round's "Zero System Icons" spec; Safety keeps the
+       real brand shield, already original. ===== -->
+  <section class="citixen-feature-section" id="citixenFeatureSection">
+    <div class="citixen-feature-grid" role="list" aria-label="Platform feature categories">
+      <button type="button" class="citixen-feature-tile" id="citixenTileFeatures" role="listitem" aria-expanded="false" aria-controls="citixenFeatureAccordion">
+        <span class="citixen-feature-tile-icon">
+          <!-- Custom sliders/toggles line-art (this round's "Zero System
+               Icons" spec — replaces a generic lightning-bolt glyph). -->
+          <svg viewBox="0 0 24 24" width="22" height="22" stroke="#00E699" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><circle cx="9" cy="7" r="2" fill="#00E699" stroke="none"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2" fill="#00E699" stroke="none"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="11" cy="17" r="2" fill="#00E699" stroke="none"/></svg>
+        </span>
+        <span class="citixen-feature-tile-label">Features ↓</span>
+      </button>
+      <button type="button" class="citixen-feature-tile" id="citixenTileSafety" role="listitem" aria-expanded="false" aria-controls="citixenFeatureAccordion">
+        <span class="citixen-feature-tile-icon">
+          <svg viewBox="0 0 24 24" width="22" height="22" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </span>
+        <span class="citixen-feature-tile-label">Safety ↓</span>
+      </button>
+      <button type="button" class="citixen-feature-tile" id="citixenTileSecurity" role="listitem" aria-expanded="false" aria-controls="citixenFeatureAccordion">
+        <span class="citixen-feature-tile-icon">
+          <!-- Custom verified-hexagon line-art (this round's "Zero System
+               Icons" spec — replaces a generic padlock glyph; distinct from
+               the Safety tile's brand shield above). -->
+          <svg viewBox="0 0 24 24" width="22" height="22" stroke="#00E699" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 3 20 7.5 20 16.5 12 21 4 16.5 4 7.5 12 3"/><path d="m8.5 12 2.5 2.5 5-5"/></svg>
+        </span>
+        <span class="citixen-feature-tile-label">Security ↓</span>
+      </button>
     </div>
+    <div class="citixen-feature-accordion" id="citixenFeatureAccordion" role="region" aria-live="polite"></div>
   </section>
+
+  <!-- ===== CITIXEN UX™ NARRATIVE LINK — this round's item 8, split out of
+       the old combined feature section into its own row: the same real
+       brand shield + "CITIXEN UX™" title, left-aligned, with "Learn More ↗"
+       right-aligned on the same baseline (same #citixenFeatureLearnMoreBtn
+       id/handler — opens the real Anonymity Whitepaper modal, unchanged). ===== -->
+  <div class="citixen-narrative-link">
+    <span class="citixen-narrative-link-title">
+      <svg viewBox="0 0 24 24" width="18" height="18" stroke="#00E699" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span>CITIXEN UX<sup class="tm-symbol">™</sup></span>
+    </span>
+    <button type="button" id="citixenFeatureLearnMoreBtn" class="citixen-feature-learn-more">Learn More ↗</button>
+  </div>
+
+  <!-- ===== ZERO-KNOWLEDGE PRIVACY CARD — this round's item 9, the same
+       real trust badge split out of the old combined feature section into
+       its own standalone card, unchanged content/markup. ===== -->
+  <div class="citixen-trust-badge">
+    <svg viewBox="0 0 24 24" width="20" height="20" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+    <div>
+      <div class="citixen-trust-badge-title">Zero-Knowledge &amp; EXIF-Scrubbed — 100% Anonymous Civic Proof</div>
+      <div class="citixen-trust-badge-sub">No personal data is retained. Photo metadata is scrubbed at the device before it ever reaches the public ledger.</div>
+    </div>
+  </div>
+
+  <!-- ===== The "Crowd Save America™" national pixel-map card that used to
+       sit here (directly beneath the Live Public Ledger pill) was moved
+       this round into the Analytics deep-dive panel (#deepdiveAnalytics)
+       as a "National Map & Block Heatmaps" subsection, per this round's
+       item 3.1 and its Main Feed Sequence, which no longer lists it as a
+       homepage section. Its markup, ids, and every real JS handler
+       (openHeatMapModal(), #csaTitleTrigger, #aggregationMapGatewayBtn,
+       #csaMapGraphic, the #csaNarrativeModal breakout, runPixelMapCumulativeFill())
+       moved with it unchanged — only its container's position in the DOM
+       changed. See #deepdiveAnalytics below. ===== -->
 
   <!-- ===== CROWD SAVE AMERICA™ NARRATIVE BREAKOUT MODAL — opened only by
        tapping the "CROWD SAVE AMERICA™" title above (#csaTitleTrigger).
@@ -1591,69 +1630,6 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        than left orphaned. ===== -->
 
 
-  <!-- ===== CITIXEN UX™ INTERACTIVE 3x3 MEGA-THEME SECTION (renamed this
-       round from "Interactive Feature & Security Section" — same section,
-       same visible "CITIXEN UX™" header; "3x3" describes its shape: 3
-       header icons, each expanding a 3-subtheme accordion drawer) —
-       Position 9 in the vertical stacking order, directly below the
-       button stack. The header carries the same shield mark used in the
-       top nav's brand lockup (one real logo, not a second invented icon).
-       The section runs icon grid, then an inline accordion, then the
-       Flagship Security Anchor Card, then the Launch/App-Download CTAs
-       that already follow this section — replacing an older tap-opens-a-
-       modal behavior with a real inline accordion (#citixenFeatureAccordion)
-       that slides open directly below the icon row, carrying the same
-       exact content the modals did (modalData.ciFeatures/ciSafety/
-       ciSecurity), no pitch-deck link anywhere in it, only the
-       presentation changed. The Flagship Trust Anchor Card restates the
-       same real, already-established privacy facts (no accounts, EXIF
-       scrubbed on-device — see the Anonymity Whitepaper) rather than
-       asserting a new, unverified "hashed at the edge" claim; "scrubbed"
-       here — and the ciSecurity drawer's "On-Device Metadata Scrubbing"
-       bullet, this round's honest stand-in for the spec's "On-Device
-       Metadata Hashing" title — matches what
-       fallbackJurisdictionStack()/modalData.anonymity already describe
-       this build actually doing. The "Learn More ↗" trigger still opens
-       the real Anonymity Whitepaper modal the header's Privacy Shield
-       badge already carries. ===== -->
-  <section class="citixen-feature-section" id="citixenFeatureSection">
-    <h3 class="citixen-feature-heading">
-      <svg viewBox="0 0 24 24" width="20" height="20" stroke="#00E699" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-3z"/></svg>
-      <span>CITIXEN UX<sup class="tm-symbol">™</sup></span>
-    </h3>
-    <div style="text-align:center;margin-bottom:14px;">
-      <button type="button" id="citixenFeatureLearnMoreBtn" class="citixen-feature-learn-more">Learn More ↗</button>
-    </div>
-    <div class="citixen-feature-grid" role="list" aria-label="Platform feature categories">
-      <button type="button" class="citixen-feature-tile" id="citixenTileFeatures" role="listitem" aria-expanded="false" aria-controls="citixenFeatureAccordion">
-        <span class="citixen-feature-tile-icon">
-          <svg viewBox="0 0 24 24" width="22" height="22" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        </span>
-        <span class="citixen-feature-tile-label">Features ↓</span>
-      </button>
-      <button type="button" class="citixen-feature-tile" id="citixenTileSafety" role="listitem" aria-expanded="false" aria-controls="citixenFeatureAccordion">
-        <span class="citixen-feature-tile-icon">
-          <svg viewBox="0 0 24 24" width="22" height="22" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        </span>
-        <span class="citixen-feature-tile-label">Safety ↓</span>
-      </button>
-      <button type="button" class="citixen-feature-tile" id="citixenTileSecurity" role="listitem" aria-expanded="false" aria-controls="citixenFeatureAccordion">
-        <span class="citixen-feature-tile-icon">
-          <svg viewBox="0 0 24 24" width="22" height="22" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-        </span>
-        <span class="citixen-feature-tile-label">Security ↓</span>
-      </button>
-    </div>
-    <div class="citixen-feature-accordion" id="citixenFeatureAccordion" role="region" aria-live="polite"></div>
-    <div class="citixen-trust-badge">
-      <svg viewBox="0 0 24 24" width="20" height="20" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-      <div>
-        <div class="citixen-trust-badge-title">Zero-Knowledge &amp; EXIF-Scrubbed — 100% Anonymous Civic Proof</div>
-        <div class="citixen-trust-badge-sub">No personal data is retained. Photo metadata is scrubbed at the device before it ever reaches the public ledger.</div>
-      </div>
-    </div>
-  </section>
-
   <!-- ===== PRIMARY LAUNCH ROW + NATIVE APP STORE ROW ===== -->
   <div class="launch-row">
     <a class="btn btn-primary btn-hero" href="/app" target="_blank" rel="noopener noreferrer">Launch Mobile Reporter</a>
@@ -1700,6 +1676,19 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   <div class="modal-overlay" id="nationalHeatMapModal">
     <div class="modal-box" style="max-width:1100px;width:96vw;padding:0;overflow:hidden;">
       <button class="modal-close" id="heatMapCloseBtn" style="z-index:2">✕</button>
+      <!-- ===== CROWD SAVE AMERICA™ ENTRY HUB BANNER — this round's item 2.1.
+           This same real modal now doubles as the first-visit welcome
+           experience: it auto-launches once per browser
+           (citixen_welcome_seen, see the DOMContentLoaded wiring below),
+           showing the real map below (genuine micro-vector brand-shield
+           markers via mintMarkerIcon(), not a decorative stand-in) plus this
+           short movement-story summary and a direct dismiss action. The
+           banner stays in the markup on every open (not just the first),
+           since it's real, honest context either way. ===== -->
+      <div class="agg-hub-welcome-banner">
+        <p>Restoring ground-truth transparency across all 50 states. Crowd Save America<sup class="tm-symbol">™</sup> turns everyday observations into verified, on-device scrubbed records — an undeniable, real-time audit of American infrastructure.</p>
+        <button type="button" class="btn btn-primary" id="csaEnterDashboardBtn" style="justify-content:center;">Enter Local Dashboard ↗</button>
+      </div>
       <div class="frontier-map-head" style="padding:18px 20px 10px;">
         <div class="frontier-search-bar">
           <div class="label agg-hub-heading" style="justify-content:center;margin-bottom:2px">Crowd Source America<sup class="tm-symbol">™</sup> — Aggregation Hub</div>
@@ -1750,6 +1739,42 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       <p class="bridge-slogan">One report gets a pothole filled. A thousand reports cover a city. A million reports Crowd Source America<sup class="tm-symbol">™</sup>.</p>
       <button class="btn btn-outline" id="btnViewHeatMapFromAnalytics" type="button">Crowd Source America<sup class="tm-symbol">™</sup> — View Aggregation Hub ↗</button>
     </div>
+
+    <!-- ===== NATIONAL MAP & BLOCK HEATMAPS — this round's item 3.1
+         ("Analytics... Houses national map tab & block heatmaps"). This is
+         the real "Crowd Save America™" national pixel-map card that used to
+         sit inline on the homepage directly beneath the Live Public Ledger
+         pill; it moved here wholesale this round since the homepage's Main
+         Feed Sequence no longer lists it as a standalone section. Every id
+         and real JS handler moved with it unchanged: #csaTitleTrigger still
+         opens #csaNarrativeModal, #csaMapGraphic and
+         #aggregationMapGatewayBtn still open the real Leaflet Aggregation
+         Hub via openHeatMapModal(), and runPixelMapCumulativeFill() still
+         drives the same cumulative grid-fill animation — only the
+         container's position in the DOM changed. #usSilhouetteOutline's
+         'd' path is the same OpenCV-traced US-silhouette approximation
+         documented where this card was first built (not a precise
+         cartographic/geodetic projection). ===== -->
+    <section class="pixel-map-section" style="margin:0 auto 16px;">
+      <div class="pixel-map-card" id="national-pixel-map" data-export-context="the Crowd Save America™ national report map">
+        <button type="button" class="pixel-map-brand" id="csaTitleTrigger" aria-haspopup="dialog" aria-controls="csaNarrativeModal">CROWD SAVE AMERICA<sup class="tm-symbol">™</sup></button>
+        <svg class="pixel-map-svg" id="csaMapGraphic" viewBox="0 0 800 440" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false" role="button" tabindex="0" aria-label="Open the Crowd Save America Aggregation Hub map">
+          <defs>
+            <path id="usSilhouetteOutline" d="M760.0,60.1 L738.9,21.8 L722.8,20.4 L711.9,67.1 L653.5,82.4 L640.7,116.4 L569.9,161.2 L555.7,152.5 L563.7,118.5 L548.7,123.6 L552.4,99.2 L533.4,90.4 L509.3,162.7 L503.5,100.7 L527.9,82.4 L552.0,85.0 L496.5,75.1 L499.5,61.2 L448.7,78.0 L473.2,57.6 L415.1,33.9 L302.7,42.6 L69.9,31.3 L68.1,58.0 L45.1,41.5 L45.4,207.2 L62.6,246.3 L126.1,309.4 L208.6,330.2 L264.8,321.1 L304.6,369.3 L333.0,360.9 L372.4,415.6 L391.8,419.3 L387.8,387.9 L404.6,365.6 L441.8,348.5 L490.0,358.7 L479.0,344.1 L507.1,332.8 L568.1,341.5 L617.7,417.1 L626.1,394.8 L597.6,330.9 L603.8,312.0 L681.6,229.9 L655.3,198.1 L664.8,174.4 L678.3,185.7 L682.3,145.9 L732.3,126.2 L717.3,99.2 Z"/>
+            <clipPath id="usSilhouetteClip">
+              <use href="#usSilhouetteOutline"/>
+            </clipPath>
+          </defs>
+          <g id="pixelMapGrid" clip-path="url(#usSilhouetteClip)"></g>
+          <use href="#usSilhouetteOutline" class="pixel-map-outline"/>
+          <g id="pixelMapNodes"></g>
+        </svg>
+        <div class="pixel-map-action-row">
+          <button id="aggregationMapGatewayBtn" type="button" class="pixel-map-view-trigger">View Map ↗</button>
+        </div>
+      </div>
+    </section>
+
     <!-- ===== WARD COVERAGE TRACKER (this round's Module 1 request) — the
          spec asks for an "11M Census Block Tracker" breaking a jurisdiction
          into Unmapped / In Audit / Fully Surveyed cells. This build's real
@@ -2874,12 +2899,19 @@ function flyAggregationMapTo(query){
     resultEl.textContent = 'No seeded jurisdiction matches that yet — try "La Crosse", "54601", "Chicago", or "Austin".';
   }
 }
+// Crowd Save America™ Entry Hub — this round's item 2.1 repurposes this
+// same real Aggregation Hub modal as the first-visit welcome experience
+// (see the DOMContentLoaded auto-launch below), so closing it by any path
+// (✕, outside-click, or the banner's own "Enter Local Dashboard ↗" button)
+// marks the real localStorage flag that gates that one-time auto-launch.
+const CITIXEN_WELCOME_SEEN_KEY = 'citixen_welcome_seen';
 function openHeatMapModal(){
   document.getElementById('nationalHeatMapModal').classList.add('open');
   initAggregationMap();
 }
 function closeHeatMapModal(){
   document.getElementById('nationalHeatMapModal').classList.remove('open');
+  try { localStorage.setItem(CITIXEN_WELCOME_SEEN_KEY, '1'); } catch (e) {}
 }
 // Heat map access lives on the top-level Aggregation Map Gateway button and
 // inside the Analytics drawer — the old Operations-drawer launchers
@@ -2897,6 +2929,7 @@ document.getElementById('heatMapCloseBtn').addEventListener('click', closeHeatMa
 document.getElementById('nationalHeatMapModal').addEventListener('click', (e) => {
   if (e.target.id === 'nationalHeatMapModal') closeHeatMapModal();
 });
+document.getElementById('csaEnterDashboardBtn').addEventListener('click', closeHeatMapModal);
 const geoHatchSearchBtn = document.getElementById('geoHatchSearchBtn');
 const geoHatchSearchInput = document.getElementById('geoHatchSearchInput');
 if (geoHatchSearchBtn && geoHatchSearchInput) {
@@ -4506,14 +4539,17 @@ window.addEventListener('DOMContentLoaded',()=>{
   // this round's spec; downloadWardHealthPdf() itself is kept (real, working
   // jsPDF generation) in case a future round re-wires it to a control.
 
-  // Streamlined onboarding — auto-launch the "How Your Report Moves" modal
-  // on a genuine first visit only, gated on the real localStorage flag
-  // (never re-fires once set); a short delay lets the rest of the page
-  // finish laying out first. The footer's "How Your Report Moves" link
-  // remains available to reopen it any time regardless of this flag.
+  // Crowd Save America™ Entry Hub — this round's item 2.1 replaces the
+  // previous round's "How Your Report Moves" auto-launch with the real
+  // Aggregation Hub modal (genuine micro-vector brand-shield markers, not a
+  // decorative stand-in), gated on its own citixen_welcome_seen flag so it
+  // fires once per browser; a short delay lets the rest of the page finish
+  // laying out first. "How Your Report Moves" is not deleted — it stays
+  // fully intact and reachable any time via the footer's link, just no
+  // longer auto-launched on load.
   try {
-    if (!localStorage.getItem(CITIXEN_TOUR_SEEN_KEY)) {
-      setTimeout(openReportMovesModal, 1200);
+    if (!localStorage.getItem(CITIXEN_WELCOME_SEEN_KEY)) {
+      setTimeout(openHeatMapModal, 1200);
     }
   } catch (e) {}
 
