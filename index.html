@@ -390,7 +390,12 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   font-size:.72rem;font-weight:800;letter-spacing:.04em;margin-bottom:12px;text-align:center}
 .telemetry-scorecard-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center}
 .telemetry-scorecard-col{padding:6px 2px}
-.telemetry-scorecard-val{font-size:1.15rem;font-weight:900;color:#FFFFFF}
+/* This round's item 2.3 "Scorecard Typography": primary metric values move
+   from plain white to Laser Mint at 800 weight, and equal-width columns get
+   a 1px subtle vertical divider between them (rgba(0,230,153,.2)) — the
+   grid itself was already 1fr 1fr 1fr from an earlier round. */
+.telemetry-scorecard-col:not(:first-child){border-left:1px solid rgba(0,230,153,.2)}
+.telemetry-scorecard-val{font-size:1.15rem;font-weight:800;color:#00E699}
 .telemetry-scorecard-lbl{font-size:.64rem;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.03em}
 
 /* ===== "HOW YOUR REPORT MOVES" RADIAL NUCLEUS CARD — replaces an earlier
@@ -525,7 +530,8 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
    .frontier-map-section itself (the bottom-of-homepage search bar) was
    removed with its markup per the homepage-declutter spec. ===== */
 /* Crowd Save America™ Entry Hub welcome banner — sits at the top of the
-   real Aggregation Hub modal (this round's item 2.1). */
+   dedicated #csaWelcomeModal, above its static Gridded US Vector Map
+   graphic (this round's item 2.1 "Strict Graphic Asset Lock"). */
 .agg-hub-welcome-banner{padding:18px 20px 4px;text-align:center;border-bottom:1px solid rgba(0,230,153,.15)}
 .agg-hub-welcome-banner p{color:var(--muted);font-size:.82rem;line-height:1.5;max-width:640px;margin:0 auto 14px}
 .frontier-map-head{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
@@ -967,9 +973,15 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   filter:drop-shadow(0 0 2px rgba(0,230,153,.6))}
 .pixel-map-outline{fill:none;stroke:#00E699;stroke-width:1.5;opacity:.55;transition:opacity .3s,filter .3s}
 .pixel-map-outline-pulse{opacity:1;filter:drop-shadow(0 0 6px rgba(0,230,153,.9)) drop-shadow(0 0 10px rgba(0,230,153,.5))}
-.pixel-map-node-core{opacity:0}
+/* This round's item 2.1 "Strict Graphic Asset Lock" also doubles as the
+   Section 1 "map nodes" shield-parity requirement: each node was a plain
+   filled circle, now it's the exact same proprietary brand-shield path
+   used everywhere else on the page (drawn at micro scale, see
+   buildPixelMapNodesMarkup()), with its own pulse-ring circle kept behind
+   it for the existing breathing glow. */
+.pixel-map-node-shield{opacity:0}
 .pixel-map-node-pulse{opacity:0}
-.pixel-map-node-emerald .pixel-map-node-core{fill:#00E699}
+.pixel-map-node-emerald .pixel-map-node-shield{fill:rgba(0,230,153,.28);stroke:#00E699;stroke-width:2}
 .pixel-map-node-emerald .pixel-map-node-pulse{fill:#00E699}
 /* ===== INTEGRATED MAP CARD BRANDING — the brand title is a normal-flow
    header centered across the top of the card frame (matching the
@@ -994,7 +1006,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   font-size:.72rem;font-weight:700;padding:6px 14px;border-radius:9999px;
   cursor:pointer;font-family:inherit;transition:filter .15s}
 .pixel-map-view-trigger:hover{filter:brightness(1.25)}
-.pixel-map-node-core{animation:staticPulse 2.4s ease-in-out infinite}
+.pixel-map-node-shield{animation:staticPulse 2.4s ease-in-out infinite}
 .pixel-map-node-pulse{animation:staticPulse 2.4s ease-in-out infinite reverse}
 @keyframes staticPulse{
   0%{opacity:.9}
@@ -1006,7 +1018,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
    the map visually and cumulatively "fills up" with data points over
    time rather than showing a fixed set of already-visible dots. Once a
    node's wrapper is revealed it stays revealed for good; its child
-   .pixel-map-node-core/-pulse keep breathing via the existing
+   .pixel-map-node-shield/-pulse keep breathing via the existing
    staticPulse animation underneath. */
 .pixel-map-node-emerald{opacity:0;transition:opacity .6s ease}
 .pixel-map-node-emerald.revealed{opacity:1}
@@ -1656,6 +1668,43 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     <a class="btn btn-outline" href="mailto:contact@citizenux.com?subject=CITIXEN%20UX%20—%20Municipality%20Inquiry">For Municipalities</a>
   </section>
 
+  <!-- ===== FIRST-VISIT WELCOME MODAL (Crowd Save America™ Entry Hub) — this
+       round's item 2.1 "Strict Graphic Asset Lock" splits the previous
+       round's approach into two separate modals: this dedicated, lightweight
+       modal auto-launches once per browser (citixen_welcome_seen) and embeds
+       ONLY the stylized Gridded US Vector Map (#welcomeMapGraphic, a static
+       snapshot of the exact same real asset as #national-pixel-map in the
+       Analytics drawer — see renderWelcomeMapGraphic()) with micro-shield
+       matrix nodes — never the interactive Leaflet/MapLibre Aggregation Hub
+       map, its zoom controls, or its search bar. Those live on in the
+       separate #nationalHeatMapModal below, reachable anytime via the
+       Analytics drawer's own trigger, just no longer auto-launched. The CTA
+       sits directly above the graphic card per this round's spec. ===== -->
+  <div class="modal-overlay" id="csaWelcomeModal">
+    <div class="modal-box" style="max-width:640px;width:92vw;">
+      <button class="modal-close" id="csaWelcomeCloseBtn">✕</button>
+      <div class="agg-hub-welcome-banner">
+        <p>Restoring ground-truth transparency across all 50 states. Crowd Save America<sup class="tm-symbol">™</sup> turns everyday observations into verified, on-device scrubbed records — an undeniable, real-time audit of American infrastructure.</p>
+        <button type="button" class="btn btn-primary" id="csaEnterDashboardBtn" style="justify-content:center;">Enter Local Dashboard ↗</button>
+      </div>
+      <section class="pixel-map-section" style="margin:0 auto 18px;padding:0 18px;max-width:none;">
+        <div class="pixel-map-card" style="padding:16px 16px 14px;">
+          <svg class="pixel-map-svg" id="welcomeMapGraphic" viewBox="0 0 800 440" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+            <defs>
+              <path id="welcomeSilhouetteOutline" d="M760.0,60.1 L738.9,21.8 L722.8,20.4 L711.9,67.1 L653.5,82.4 L640.7,116.4 L569.9,161.2 L555.7,152.5 L563.7,118.5 L548.7,123.6 L552.4,99.2 L533.4,90.4 L509.3,162.7 L503.5,100.7 L527.9,82.4 L552.0,85.0 L496.5,75.1 L499.5,61.2 L448.7,78.0 L473.2,57.6 L415.1,33.9 L302.7,42.6 L69.9,31.3 L68.1,58.0 L45.1,41.5 L45.4,207.2 L62.6,246.3 L126.1,309.4 L208.6,330.2 L264.8,321.1 L304.6,369.3 L333.0,360.9 L372.4,415.6 L391.8,419.3 L387.8,387.9 L404.6,365.6 L441.8,348.5 L490.0,358.7 L479.0,344.1 L507.1,332.8 L568.1,341.5 L617.7,417.1 L626.1,394.8 L597.6,330.9 L603.8,312.0 L681.6,229.9 L655.3,198.1 L664.8,174.4 L678.3,185.7 L682.3,145.9 L732.3,126.2 L717.3,99.2 Z"/>
+              <clipPath id="welcomeSilhouetteClip">
+                <use href="#welcomeSilhouetteOutline"/>
+              </clipPath>
+            </defs>
+            <g id="welcomeMapGrid" clip-path="url(#welcomeSilhouetteClip)"></g>
+            <use href="#welcomeSilhouetteOutline" class="pixel-map-outline"/>
+            <g id="welcomeMapNodes"></g>
+          </svg>
+        </div>
+      </section>
+    </div>
+  </div>
+
   <!-- ===== FULL-SCREEN CROWD SOURCE AMERICA™ AGGREGATION HUB MODAL — a
        real Leaflet map (#aggregation-map-container), not a CSS/SVG-drawn
        canvas. Loads plain OpenStreetMap raster tiles — Carto's Dark
@@ -1672,23 +1721,13 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        the dark canvas background and mint markers still render (see
        initAggregationMap()'s tileerror handler below) rather than a
        blank/broken map. Separate Leaflet instance from the field-dispatch
-       map inside the Analytics deep-dive. ===== -->
+       map inside the Analytics deep-dive. This modal is no longer the
+       first-visit auto-launch target (see #csaWelcomeModal above, per this
+       round's item 2.1) — it stays fully intact and reachable via the
+       Analytics drawer's own trigger. ===== -->
   <div class="modal-overlay" id="nationalHeatMapModal">
     <div class="modal-box" style="max-width:1100px;width:96vw;padding:0;overflow:hidden;">
       <button class="modal-close" id="heatMapCloseBtn" style="z-index:2">✕</button>
-      <!-- ===== CROWD SAVE AMERICA™ ENTRY HUB BANNER — this round's item 2.1.
-           This same real modal now doubles as the first-visit welcome
-           experience: it auto-launches once per browser
-           (citixen_welcome_seen, see the DOMContentLoaded wiring below),
-           showing the real map below (genuine micro-vector brand-shield
-           markers via mintMarkerIcon(), not a decorative stand-in) plus this
-           short movement-story summary and a direct dismiss action. The
-           banner stays in the markup on every open (not just the first),
-           since it's real, honest context either way. ===== -->
-      <div class="agg-hub-welcome-banner">
-        <p>Restoring ground-truth transparency across all 50 states. Crowd Save America<sup class="tm-symbol">™</sup> turns everyday observations into verified, on-device scrubbed records — an undeniable, real-time audit of American infrastructure.</p>
-        <button type="button" class="btn btn-primary" id="csaEnterDashboardBtn" style="justify-content:center;">Enter Local Dashboard ↗</button>
-      </div>
       <div class="frontier-map-head" style="padding:18px 20px 10px;">
         <div class="frontier-search-bar">
           <div class="label agg-hub-heading" style="justify-content:center;margin-bottom:2px">Crowd Source America<sup class="tm-symbol">™</sup> — Aggregation Hub</div>
@@ -1766,7 +1805,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
             </clipPath>
           </defs>
           <g id="pixelMapGrid" clip-path="url(#usSilhouetteClip)"></g>
-          <use href="#usSilhouetteOutline" class="pixel-map-outline"/>
+          <use href="#usSilhouetteOutline" id="pixelMapOutline" class="pixel-map-outline"/>
           <g id="pixelMapNodes"></g>
         </svg>
         <div class="pixel-map-action-row">
@@ -2899,11 +2938,13 @@ function flyAggregationMapTo(query){
     resultEl.textContent = 'No seeded jurisdiction matches that yet — try "La Crosse", "54601", "Chicago", or "Austin".';
   }
 }
-// Crowd Save America™ Entry Hub — this round's item 2.1 repurposes this
-// same real Aggregation Hub modal as the first-visit welcome experience
-// (see the DOMContentLoaded auto-launch below), so closing it by any path
-// (✕, outside-click, or the banner's own "Enter Local Dashboard ↗" button)
-// marks the real localStorage flag that gates that one-time auto-launch.
+// Crowd Save America™ Entry Hub — this round's item 2.1 splits the
+// first-visit welcome experience into its own dedicated #csaWelcomeModal
+// (static Gridded US Vector Map, no Leaflet/zoom/search — see
+// renderWelcomeMapGraphic() above), gated on the same localStorage flag.
+// This #nationalHeatMapModal (the real interactive Leaflet Aggregation
+// Hub) is no longer the auto-launch target and no longer touches that
+// flag — it's a plain, manually-triggered modal again.
 const CITIXEN_WELCOME_SEEN_KEY = 'citixen_welcome_seen';
 function openHeatMapModal(){
   document.getElementById('nationalHeatMapModal').classList.add('open');
@@ -2911,8 +2952,19 @@ function openHeatMapModal(){
 }
 function closeHeatMapModal(){
   document.getElementById('nationalHeatMapModal').classList.remove('open');
+}
+function openCsaWelcomeModal(){
+  document.getElementById('csaWelcomeModal').classList.add('open');
+}
+function closeCsaWelcomeModal(){
+  document.getElementById('csaWelcomeModal').classList.remove('open');
   try { localStorage.setItem(CITIXEN_WELCOME_SEEN_KEY, '1'); } catch (e) {}
 }
+document.getElementById('csaWelcomeCloseBtn').addEventListener('click', closeCsaWelcomeModal);
+document.getElementById('csaEnterDashboardBtn').addEventListener('click', closeCsaWelcomeModal);
+document.getElementById('csaWelcomeModal').addEventListener('click', (e) => {
+  if (e.target.id === 'csaWelcomeModal') closeCsaWelcomeModal();
+});
 // Heat map access lives on the top-level Aggregation Map Gateway button and
 // inside the Analytics drawer — the old Operations-drawer launchers
 // (radarSweepFromStack, btnViewHeatMapFromStack) were removed in an earlier
@@ -2929,7 +2981,6 @@ document.getElementById('heatMapCloseBtn').addEventListener('click', closeHeatMa
 document.getElementById('nationalHeatMapModal').addEventListener('click', (e) => {
   if (e.target.id === 'nationalHeatMapModal') closeHeatMapModal();
 });
-document.getElementById('csaEnterDashboardBtn').addEventListener('click', closeHeatMapModal);
 const geoHatchSearchBtn = document.getElementById('geoHatchSearchBtn');
 const geoHatchSearchInput = document.getElementById('geoHatchSearchInput');
 if (geoHatchSearchBtn && geoHatchSearchInput) {
@@ -3615,66 +3666,100 @@ function renderAnalyticsMatrix(data){
    Hub's own marker layout). Node positions are stationary: they pulse in
    place (@keyframes staticPulse) and lit pixels never pan, float, or zoom.
    ===================================================================== */
+const PIXEL_MAP_COLS = 56, PIXEL_MAP_ROWS = 30;
+// Approximate pixel-space positions for each node, hand-placed within the
+// OpenCV-traced silhouette's clip-path (re-checked point-by-point against
+// the current #usSilhouetteOutline/#welcomeSilhouetteOutline polygon so
+// every node lands inside the coastline, not derived from real
+// latitude/longitude). Fixed, stationary coordinates: nodes never pan,
+// float, or move — only their opacity fades in/pulses (see
+// .pixel-map-node-emerald.revealed and @keyframes staticPulse). Per this
+// round's map-density spec (30-50 dynamic points), the original 6 real
+// seeded jurisdictions (La Crosse/Chicago/Austin/New York/Los
+// Angeles/Miami — the same cities the Aggregation Hub uses) are kept and
+// named; the other 34 points fill out the count to 40 total. They are
+// deliberately left unnamed — they are NOT additional real jurisdictions
+// or report locations (this project only has real live data for La
+// Crosse), just decorative filler points confirmed inside the silhouette
+// polygon by a point-in-polygon check against the same outline path,
+// spread out to avoid clumping. Shared by both the Analytics-drawer
+// instance and the first-visit welcome modal's static instance (this
+// round's item 2.1) so the two never drift out of sync.
+const PIXEL_MAP_NODES = [
+  { name: 'La Crosse',  x: 420, y: 140 },
+  { name: 'Chicago',    x: 455, y: 160 },
+  { name: 'Austin',     x: 330, y: 320 },
+  { name: 'New York',   x: 650, y: 150 },
+  { name: 'Los Angeles',x: 110, y: 230 },
+  { name: 'Miami',      x: 385, y: 405 },
+  // 34 unnamed decorative fill points (see comment above).
+  { x: 249.8, y: 120.9 }, { x: 568.2, y: 295.5 }, { x: 351.1, y: 46.5 },
+  { x: 210.9, y: 229.6 }, { x: 78.3,  y: 111.6 }, { x: 508.4, y: 244.8 },
+  { x: 294.8, y: 94.9 },  { x: 124.0, y: 72.2 },  { x: 644.8, y: 267.4 },
+  { x: 321.2, y: 247.5 }, { x: 217.2, y: 146.4 }, { x: 115.1, y: 124.6 },
+  { x: 498.6, y: 175.5 }, { x: 178.1, y: 315.7 }, { x: 172.7, y: 181.1 },
+  { x: 444.3, y: 298.6 }, { x: 218.0, y: 47.4 },  { x: 335.6, y: 119.4 },
+  { x: 135.7, y: 276.6 }, { x: 606.5, y: 197.5 }, { x: 103.8, y: 181.9 },
+  { x: 244.1, y: 281.8 }, { x: 137.0, y: 202.4 }, { x: 405.4, y: 103.8 },
+  { x: 480.2, y: 93.8 },  { x: 586.1, y: 242.7 }, { x: 60.4,  y: 159.8 },
+  { x: 272.2, y: 57.3 },  { x: 387.9, y: 246.7 }, { x: 207.8, y: 85.9 },
+  { x: 386.1, y: 337.1 }, { x: 352.3, y: 214.8 }, { x: 739.1, y: 72.9 },
+  { x: 337.8, y: 165.6 }
+];
+function buildPixelMapDotsMarkup(){
+  const cell = 800 / PIXEL_MAP_COLS;
+  let dots = '';
+  for (let r = 0; r < PIXEL_MAP_ROWS; r++) {
+    for (let c = 0; c < PIXEL_MAP_COLS; c++) {
+      const x = c * cell, y = r * (440 / PIXEL_MAP_ROWS);
+      dots += '<rect class="pixel-map-dot" x="' + (x + 1) + '" y="' + (y + 1) + '" width="' + (cell - 2) + '" height="' + ((440 / PIXEL_MAP_ROWS) - 2) + '" fill="#00E699"></rect>';
+    }
+  }
+  return dots;
+}
+// This round's item 1 shield-parity + item 2.1 "micro-shield matrix
+// nodes": each node renders the exact same proprietary brand-shield path
+// used by the nav logo/Privacy Engine badge/footer badge/Aggregation Hub
+// markers (M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z), scaled down and
+// centered on the node's coordinate, with the existing pulse-ring circle
+// kept behind it. `revealedByDefault` skips the reveal-on-a-timer
+// treatment for the static welcome-modal instance, which shows every
+// node already visible (see renderWelcomeMapGraphic()).
+function buildPixelMapNodesMarkup(revealedByDefault){
+  return PIXEL_MAP_NODES.map(n =>
+    '<g class="pixel-map-node-emerald' + (revealedByDefault ? ' revealed' : '') + '">' +
+      '<circle class="pixel-map-node-pulse" cx="' + n.x + '" cy="' + n.y + '" r="10"></circle>' +
+      '<path class="pixel-map-node-shield" transform="translate(' + (n.x - 6) + ',' + (n.y - 6) + ') scale(0.5)" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>' +
+    '</g>'
+  ).join('');
+}
 function renderNationalPixelMap(){
   const grid = document.getElementById('pixelMapGrid');
   const nodesLayer = document.getElementById('pixelMapNodes');
   if (!grid || !nodesLayer) return;
-  const cols = 56, rows = 30, cell = 800 / cols;
-  let dots = '';
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      const x = c * cell, y = r * (440 / rows);
-      dots += '<rect class="pixel-map-dot" x="' + (x + 1) + '" y="' + (y + 1) + '" width="' + (cell - 2) + '" height="' + ((440 / rows) - 2) + '" fill="#00E699"></rect>';
-    }
-  }
-  grid.innerHTML = dots;
-
-  // Approximate pixel-space positions for each node, hand-placed within
-  // the OpenCV-traced silhouette's clip-path (re-checked point-by-point
-  // against the current #usSilhouetteOutline polygon so every node lands
-  // inside the coastline, not derived from real latitude/longitude).
-  // Fixed, stationary coordinates: nodes never pan, float, or move — only
-  // their opacity fades in/pulses (see .pixel-map-node-emerald.revealed and
-  // @keyframes staticPulse). All Emerald Green. Per this round's map-density
-  // spec (30-50 dynamic points), the original 6 real seeded jurisdictions
-  // (La Crosse/Chicago/Austin/New York/Los Angeles/Miami — the same cities
-  // the Aggregation Hub uses) are kept and named; the other 34 points fill
-  // out the count to 40 total. They are deliberately left unnamed — they
-  // are NOT additional real jurisdictions or report locations (this
-  // project only has real live data for La Crosse), just decorative
-  // filler points confirmed inside the silhouette polygon by a
-  // point-in-polygon check against the same #usSilhouetteOutline path,
-  // spread out to avoid clumping.
-  const nodes = [
-    { name: 'La Crosse',  x: 420, y: 140 },
-    { name: 'Chicago',    x: 455, y: 160 },
-    { name: 'Austin',     x: 330, y: 320 },
-    { name: 'New York',   x: 650, y: 150 },
-    { name: 'Los Angeles',x: 110, y: 230 },
-    { name: 'Miami',      x: 385, y: 405 },
-    // 34 unnamed decorative fill points (see comment above).
-    { x: 249.8, y: 120.9 }, { x: 568.2, y: 295.5 }, { x: 351.1, y: 46.5 },
-    { x: 210.9, y: 229.6 }, { x: 78.3,  y: 111.6 }, { x: 508.4, y: 244.8 },
-    { x: 294.8, y: 94.9 },  { x: 124.0, y: 72.2 },  { x: 644.8, y: 267.4 },
-    { x: 321.2, y: 247.5 }, { x: 217.2, y: 146.4 }, { x: 115.1, y: 124.6 },
-    { x: 498.6, y: 175.5 }, { x: 178.1, y: 315.7 }, { x: 172.7, y: 181.1 },
-    { x: 444.3, y: 298.6 }, { x: 218.0, y: 47.4 },  { x: 335.6, y: 119.4 },
-    { x: 135.7, y: 276.6 }, { x: 606.5, y: 197.5 }, { x: 103.8, y: 181.9 },
-    { x: 244.1, y: 281.8 }, { x: 137.0, y: 202.4 }, { x: 405.4, y: 103.8 },
-    { x: 480.2, y: 93.8 },  { x: 586.1, y: 242.7 }, { x: 60.4,  y: 159.8 },
-    { x: 272.2, y: 57.3 },  { x: 387.9, y: 246.7 }, { x: 207.8, y: 85.9 },
-    { x: 386.1, y: 337.1 }, { x: 352.3, y: 214.8 }, { x: 739.1, y: 72.9 },
-    { x: 337.8, y: 165.6 }
-  ];
-  nodesLayer.innerHTML = nodes.map(n =>
-    '<g class="pixel-map-node-emerald">' +
-      '<circle class="pixel-map-node-pulse" cx="' + n.x + '" cy="' + n.y + '" r="10"></circle>' +
-      '<circle class="pixel-map-node-core" cx="' + n.x + '" cy="' + n.y + '" r="4"></circle>' +
-    '</g>'
-  ).join('');
-
+  grid.innerHTML = buildPixelMapDotsMarkup();
+  nodesLayer.innerHTML = buildPixelMapNodesMarkup(false);
   applyStoredGridActivations(Array.prototype.slice.call(nodesLayer.querySelectorAll('.pixel-map-node-emerald')));
   runPixelMapCumulativeFill();
+}
+// ===== FIRST-VISIT WELCOME MODAL GRAPHIC — this round's item 2.1 "Strict
+// Graphic Asset Lock": the auto-launch modal must embed this same real
+// Gridded US Vector Map asset, populated with micro-shield matrix nodes,
+// and must NOT load the interactive Leaflet/MapLibre Aggregation Hub map,
+// its zoom controls, or its search bar. Reuses the exact same silhouette
+// geometry and node coordinates as renderNationalPixelMap() above (see
+// #welcomeMapGrid/#welcomeMapNodes/#welcomeSilhouetteOutline in the
+// #csaWelcomeModal markup — separate ids from the Analytics-drawer
+// instance so both can render independently without id collisions), but
+// as a fully-populated, static snapshot: no cumulative-fill timers, no
+// click-to-open-Leaflet triggers, nothing that pans or zooms — a one-time
+// marketing moment, not the live Analytics instance.
+function renderWelcomeMapGraphic(){
+  const grid = document.getElementById('welcomeMapGrid');
+  const nodesLayer = document.getElementById('welcomeMapNodes');
+  if (!grid || !nodesLayer) return;
+  grid.innerHTML = buildPixelMapDotsMarkup();
+  nodesLayer.innerHTML = buildPixelMapNodesMarkup(true);
 }
 
 // ===== GEOSPATIAL GRID HASHING & STATE SYNC — per this round's item 6.
@@ -3749,7 +3834,10 @@ function runPixelMapCumulativeFill(){
     const unlit = dots.filter(d => !d.classList.contains('pixel-map-dot-lit'));
     if (!unlit.length) {
       clearInterval(pixelMapFillTimer); pixelMapFillTimer = null;
-      const outline = document.querySelector('.pixel-map-outline');
+      // Scoped by id (not the shared .pixel-map-outline class) since this
+      // round's static welcome-modal instance carries the same class on its
+      // own <use> — a bare class query would risk pulsing the wrong outline.
+      const outline = document.getElementById('pixelMapOutline');
       if (outline) {
         outline.classList.add('pixel-map-outline-pulse');
         setTimeout(() => outline.classList.remove('pixel-map-outline-pulse'), 900);
@@ -4534,22 +4622,23 @@ window.addEventListener('DOMContentLoaded',()=>{
   loadBig3();
   renderNationalCoverageTicker();
   renderNationalPixelMap();
+  renderWelcomeMapGraphic();
   updateTelemetryScorecard();
   // The "Download Ward Health Summary PDF" button was removed outright per
   // this round's spec; downloadWardHealthPdf() itself is kept (real, working
   // jsPDF generation) in case a future round re-wires it to a control.
 
-  // Crowd Save America™ Entry Hub — this round's item 2.1 replaces the
-  // previous round's "How Your Report Moves" auto-launch with the real
-  // Aggregation Hub modal (genuine micro-vector brand-shield markers, not a
-  // decorative stand-in), gated on its own citixen_welcome_seen flag so it
+  // Crowd Save America™ Entry Hub — this round's item 2.1's "Strict Graphic
+  // Asset Lock" auto-launches the dedicated #csaWelcomeModal (static
+  // Gridded US Vector Map, no Leaflet/zoom/search) instead of the real
+  // Aggregation Hub modal, gated on its own citixen_welcome_seen flag so it
   // fires once per browser; a short delay lets the rest of the page finish
-  // laying out first. "How Your Report Moves" is not deleted — it stays
-  // fully intact and reachable any time via the footer's link, just no
-  // longer auto-launched on load.
+  // laying out first. "How Your Report Moves" and the Aggregation Hub modal
+  // are not deleted — both stay fully intact and reachable any time via
+  // their existing triggers, just not auto-launched on load.
   try {
     if (!localStorage.getItem(CITIXEN_WELCOME_SEEN_KEY)) {
-      setTimeout(openHeatMapModal, 1200);
+      setTimeout(openCsaWelcomeModal, 1200);
     }
   } catch (e) {}
 
