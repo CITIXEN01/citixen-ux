@@ -42,17 +42,18 @@
   --brand-amber:#ffbb00 !important;
   --brand-red:#ff4444 !important;
   /* Global canvas pivoted from the prior Deep Slate Obsidian (#0B132B/
-     #0F172A — read by this round as still "blue/navy") to ultra-dark pitch
-     obsidian per this round's item 1: #030712 body, with card/glass
-     surfaces given their own explicit rgba(15,23,42,.75) + Fresh Mint hairline
-     (#00E699, cyan fully retired this round) + blur(16px) treatment (see
-     .modal-box, .hub-card, .pw-panel,
-     .ledger-drawer-panel below) rather than a flat
-     var(--card) fill, since "frosted glass" needs the alpha + blur, not
-     just a darker hex. --bg-card stays as a solid opaque fallback (same
-     #111827 hex the frosted rgba resolves to at full opacity) for the
-     handful of non-glass elements that still reference var(--card) as a
-     plain background. */
+     #0F172A) to ultra-dark pitch obsidian (#030712 body). An earlier round
+     gave card/glass surfaces their own explicit rgba(15,23,42,.75) +
+     Fresh Mint hairline + blur(16px) treatment; a later round's "absolute
+     blue purge" retired that intermediate slate-tinted glass fill too
+     (still a navy/slate hex under the alpha), so card/pill/modal/map-frame
+     surfaces (.modal-box, .hub-card, .pw-panel, .ledger-drawer-panel,
+     .pixel-map-card, below) now share one flat #030712 fill with a Fresh
+     Mint hairline border and a soft mint glow (box-shadow) instead.
+     --bg-card stays as a solid opaque fallback (same #111827 hex the old
+     frosted rgba resolved to at full opacity) for the handful of
+     non-glass elements that still reference var(--card) as a plain
+     background. */
   --bg-obsidian:#030712 !important;
   --bg-card:#111827 !important;
   --border-muted:rgba(255,255,255,0.08) !important;
@@ -209,17 +210,19 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .store-badge-big{font-size:.92rem;font-weight:700}
 
 /* ===== EXPLORE MORE DATA — full-width vertical stack of horizontal gateway-
-   style pills (Analytics / Expenditures / Operations), now positioned
-   directly below the national map card per this round's item 6. Same pill
-   shell language as the top .gateway-pill buttons: width 100%, pill-radius,
-   frosted-slate glass, Fresh Mint hairline border. Bottom margin widened
-   from 10px to 12px this round for clean, un-crunched breathing room
-   between pills, per this round's explicit literal spec. ===== */
+   style pills (Analytics / Expenditures / Operations), positioned directly
+   below the national map card. Same pill shell language as the top
+   .gateway-pill buttons: width 100%, pill-radius, flat obsidian fill,
+   Fresh Mint hairline border (frosted-slate glass retired along with the
+   rest of the canvas in a later "absolute blue purge" round). Bottom
+   margin widened again this round from 12px to 14px for clean,
+   un-crunched breathing room between pills, per this round's explicit
+   literal spec. ===== */
 .hub-row{display:flex;flex-direction:column;max-width:920px;margin:0 auto 26px;padding:0 16px;box-sizing:border-box}
 .hub-card{position:relative;display:flex;align-items:center;justify-content:space-between;width:100%;
-  background:rgba(15,23,42,.75);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border:1px solid rgba(0,230,153,.3);border-radius:9999px;padding:12px 18px;
-  margin-bottom:12px;box-sizing:border-box;cursor:pointer;color:var(--text);text-align:left;
+  background:#030712;box-shadow:0 0 12px rgba(0,230,153,.08);
+  border:1px solid rgba(0,230,153,.35);border-radius:9999px;padding:12px 18px;
+  margin-bottom:14px;box-sizing:border-box;cursor:pointer;color:var(--text);text-align:left;
   transition:border-color .15s;font-family:inherit;min-width:0;gap:10px}
 .hub-card:last-child{margin-bottom:0}
 .hub-card-main{display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 auto}
@@ -455,14 +458,16 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .leaflet-popup-tip{background:#12141c;border:1px solid #00E699}
 .leaflet-popup-close-button{color:#ffffff !important}
 
-/* ===== MODAL — deep obsidian frosted glass per this round's item 1
-   (rgba(15,23,42,.75) + Fresh Mint hairline + backdrop-filter: blur(16px)), over
-   the same dark overlay backdrop as before. ===== */
+/* ===== MODAL — flat obsidian (#030712) with a Fresh Mint hairline border
+   and soft mint glow per this round's "absolute blue purge" item 3
+   (earlier rounds used a translucent rgba(15,23,42,.75) frosted-glass
+   fill here; that slate-tinted glass is retired along with the rest of
+   the canvas), over the same dark overlay backdrop as before. ===== */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:3000;display:none;
   align-items:center;justify-content:center;padding:20px}
 .modal-overlay.open{display:flex}
-.modal-box{background:rgba(15,23,42,.75);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border:1px solid rgba(0,230,153,.3);border-radius:14px;padding:24px;
+.modal-box{background:#030712;box-shadow:0 0 12px rgba(0,230,153,.08);
+  border:1px solid rgba(0,230,153,.35);border-radius:14px;padding:24px;
   max-width:480px;width:100%;max-height:80vh;overflow-y:auto}
 .modal-box h3{font-size:1.05rem;margin-bottom:14px;color:var(--mint2)}
 .modal-box h4{font-size:.82rem;margin:14px 0 4px;color:var(--text)}
@@ -504,10 +509,12 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   border-radius:8px;padding:9px 4px;font-size:.7rem;font-weight:700;text-align:center}
 .loc-select-row select:focus{border-color:#00E699}
 
-/* ===== CITIXEN PAPERWORK FILE DRAWER ===== */
+/* ===== CITIXEN PAPERWORK FILE DRAWER — flat obsidian per the "absolute
+   blue purge" (retires the earlier rgba(15,23,42,.75) frosted-glass
+   fill). ===== */
 .pw-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:3200;display:none}
 .pw-overlay.open{display:flex;justify-content:flex-end}
-.pw-panel{width:min(480px,100vw);height:100%;background:rgba(15,23,42,.75);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-left:1px solid rgba(0,230,153,.3);
+.pw-panel{width:min(480px,100vw);height:100%;background:#030712;box-shadow:0 0 12px rgba(0,230,153,.08);border-left:1px solid rgba(0,230,153,.35);
   overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
 .pw-head{display:flex;justify-content:space-between;align-items:center}
 .pw-head h3{color:var(--mint2);font-size:1.05rem}
@@ -623,10 +630,11 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 .codex-doc-row .codex-doc-title{font-weight:700;font-size:.82rem;margin-bottom:3px}
 .codex-doc-row .codex-doc-desc{font-size:.72rem;color:var(--muted);line-height:1.4}
 
-/* ===== LIVE PUBLIC LEDGER DRAWER ===== */
+/* ===== LIVE PUBLIC LEDGER DRAWER — flat obsidian per the "absolute blue
+   purge" (retires the earlier rgba(15,23,42,.75) frosted-glass fill). ===== */
 .ledger-drawer{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:2800;display:none}
 .ledger-drawer.open{display:flex;justify-content:flex-end}
-.ledger-drawer-panel{width:min(520px,100vw);height:100%;background:rgba(15,23,42,.75);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-left:1px solid rgba(0,230,153,.3);
+.ledger-drawer-panel{width:min(520px,100vw);height:100%;background:#030712;box-shadow:0 0 12px rgba(0,230,153,.08);border-left:1px solid rgba(0,230,153,.35);
   display:flex;flex-direction:column}
 .ledger-drawer-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--border)}
 .ledger-drawer-body{flex:1;overflow-y:auto;padding:16px 18px 32px}
@@ -691,11 +699,14 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   min-height:52px;box-sizing:border-box;padding:14px 20px;border-radius:9999px;
   cursor:pointer;font-family:inherit;text-decoration:none;
   transition:filter .15s}
-.gateway-pill-left{display:inline-flex;align-items:center;gap:6px;flex-shrink:0;font-size:.75rem}
-.gateway-pill-center{flex:1 1 auto;min-width:0;text-align:center;font-weight:700;font-size:.8rem;
+.gateway-pill-left{display:inline-flex;align-items:center;gap:6px;flex-shrink:0;font-size:.75rem;font-weight:700}
+/* Typographic hierarchy per this round's item 1: "PUBLIC LEDGER" is the
+   pill's visual focal point (1.1rem/800), sized well above the LIVE badge
+   and the View Now action on either side of it. */
+.gateway-pill-center{flex:1 1 auto;flex-grow:1;min-width:0;text-align:center;font-weight:800;font-size:1.1rem;
   letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   padding:0 8px}
-.gateway-pill-right{flex-shrink:0;text-align:right;font-size:.75rem;font-weight:600;color:#00E699;
+.gateway-pill-right{flex-shrink:0;text-align:right;font-size:.8rem;font-weight:600;color:#00E699;
   white-space:nowrap}
 .gateway-pill:hover{filter:brightness(1.2)}
 .pulsing-dot{position:relative;width:8px;height:8px;border-radius:50%;background:#00E699;flex-shrink:0;
@@ -740,8 +751,11 @@ audio.pw-audio-el{width:100%;margin-top:4px}
    for the "View Map ↗" trigger — instead of one flat height with the
    button absolutely overlaid on the graphic, so the button can no longer
    cover the Florida/East Coast region of the silhouette. */
-.pixel-map-card{position:relative;display:flex;flex-direction:column;background:#030712;border:1px solid rgba(0,230,153,.35);border-radius:16px;overflow:hidden}
-.pixel-map-svg{width:100%;height:210px;display:block;flex-shrink:0}
+.pixel-map-card{position:relative;display:flex;flex-direction:column;background:#030712;border:1px solid rgba(0,230,153,.35);border-radius:16px;overflow:hidden;box-shadow:0 0 12px rgba(0,230,153,.08)}
+/* Per this round's item 2, the SVG graphic is pushed down (margin-top)
+   below the now top-left-anchored title so the northern US border never
+   overlaps the title text. */
+.pixel-map-svg{width:100%;height:210px;display:block;flex-shrink:0;margin-top:28px}
 .pixel-map-dot{opacity:.2;transition:fill .25s,opacity .4s}
 /* Grid fills pivoted from Emerald Green (#00E699) to Fresh Mint (#00E699)
    per this round's item 18. */
@@ -753,15 +767,17 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 .pixel-map-node-pulse{opacity:0}
 .pixel-map-node-emerald .pixel-map-node-core{fill:#00E699}
 .pixel-map-node-emerald .pixel-map-node-pulse{fill:#00E699}
-/* ===== INTEGRATED MAP CARD BRANDING — the brand title is centered
-   horizontally as an overlay across the TOP of the SVG graphic area
+/* ===== INTEGRATED MAP CARD BRANDING — per this round's item 2, the brand
+   title is anchored in the TOP-LEFT corner of the card frame (rather than
+   centered across the top) as an overlay above the SVG graphic area
    (z-index:2 keeps it above the grid/nodes without touching the SVG's own
-   z-ordering); the "View Map ↗" trigger now sits in a normal-flow action
-   row BELOW the graphic (.pixel-map-action-row), not overlaid on top of
-   it, so it can no longer cover the Florida/East Coast region per this
-   round's sizing spec. ===== */
-.pixel-map-brand{position:absolute;top:12px;left:0;right:0;z-index:2;
-  text-align:center;color:#00E699;font-weight:700;font-size:.95rem;pointer-events:none}
+   z-ordering); .pixel-map-svg's margin-top pushes the graphic itself down
+   so the northern US border never sits under the title text. The
+   "View Map ↗" trigger stays in a normal-flow action row BELOW the
+   graphic (.pixel-map-action-row), anchored to the bottom-right corner of
+   the same card frame, so neither label ever overlaps the map. ===== */
+.pixel-map-brand{position:absolute;top:16px;left:16px;z-index:2;
+  color:#00E699;font-weight:700;font-size:.88rem;letter-spacing:.05em;pointer-events:none}
 .pixel-map-action-row{display:flex;justify-content:flex-end;align-items:center;
   flex-shrink:0;padding:10px 14px 12px}
 .pixel-map-view-trigger{display:inline-flex;align-items:center;gap:6px;
@@ -785,29 +801,12 @@ audio.pw-audio-el{width:100%;margin-top:4px}
    staticPulse animation underneath the fade-in. */
 .pixel-map-node-emerald{opacity:0;transition:opacity .6s ease}
 .pixel-map-node-emerald.revealed{opacity:1}
-/* ===== LEARN MORE ACCORDION — re-added per this round's item 2, sitting
-   directly below the map card and centered above the "Explore More Data"
-   header. Reuses the real Snap/Track/Audit workflow-row copy and the
-   CITIXEN UX / "hold the receipt" / Civic Intelligence paragraphs that
-   were deleted along with the old .hero-qa-* treatment in an earlier
-   round; new class names are used throughout since that CSS was fully
-   retired, while the #btnLearnMoreToggle/#learnMoreDrawer ids are reused
-   since nothing else claims them. ===== */
-.learn-more-section{max-width:640px;margin:0 auto 20px;padding:0 24px;text-align:center}
-.learn-more-toggle{display:inline-flex;align-items:center;gap:8px;background:rgba(0,230,153,.08);
-  border:1px solid #00E699;color:#00E699;font-size:.78rem;font-weight:700;letter-spacing:.04em;
-  text-transform:uppercase;padding:8px 20px;border-radius:9999px;cursor:pointer;
-  font-family:inherit;transition:filter .15s}
-.learn-more-toggle:hover{filter:brightness(1.25)}
-.learn-more-chevron{display:inline-block;font-size:.85rem;transition:transform .2s ease}
-.learn-more-toggle[aria-expanded="true"] .learn-more-chevron{transform:rotate(180deg)}
-.learn-more-drawer{margin-top:16px;padding:20px;text-align:left;background:rgba(15,23,42,.75);
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border:1px solid rgba(0,230,153,.3);border-radius:16px}
-.learn-more-workflow-row{display:flex;align-items:center;justify-content:center;gap:10px;
-  flex-wrap:wrap;color:var(--text);font-size:.85rem;font-weight:600;margin-bottom:16px}
-.learn-more-body{color:var(--muted);font-size:.85rem;line-height:1.55;margin:0 0 10px}
-.learn-more-body:last-child{margin-bottom:0}
+/* ===== LEARN MORE ACCORDION — removed entirely per this round's item 5
+   (a previous round had re-added it below the map card, reusing the real
+   Snap/Track/Audit workflow-row copy and the CITIXEN UX / "hold the
+   receipt" / Civic Intelligence paragraphs). Its .learn-more-* CSS is
+   removed with it rather than left orphaned, and its toggle JS below is
+   removed as well. ===== */
 /* ===== CITY SNAPSHOT (LA CROSSE, WI — Active Hazards bar / Fix Speed
    dial / Completion Rate donut) was removed entirely per this round's
    item 5, along with the "Learn More ▾" toggle. Its CSS
@@ -1110,7 +1109,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        before, so no JS wiring changed — only its position/markup moved. ===== -->
   <section class="pixel-map-section">
     <div class="pixel-map-card" id="national-pixel-map">
-      <div class="pixel-map-brand">Crowd Save America</div>
+      <div class="pixel-map-brand">CrowdSaveAmerica<sup class="tm-symbol">™</sup></div>
       <svg class="pixel-map-svg" viewBox="0 0 800 440" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
         <defs>
           <path id="usSilhouetteOutline" d="M760.0,60.1 L738.9,21.8 L722.8,20.4 L711.9,67.1 L653.5,82.4 L640.7,116.4 L569.9,161.2 L555.7,152.5 L563.7,118.5 L548.7,123.6 L552.4,99.2 L533.4,90.4 L509.3,162.7 L503.5,100.7 L527.9,82.4 L552.0,85.0 L496.5,75.1 L499.5,61.2 L448.7,78.0 L473.2,57.6 L415.1,33.9 L302.7,42.6 L69.9,31.3 L68.1,58.0 L45.1,41.5 L45.4,207.2 L62.6,246.3 L126.1,309.4 L208.6,330.2 L264.8,321.1 L304.6,369.3 L333.0,360.9 L372.4,415.6 L391.8,419.3 L387.8,387.9 L404.6,365.6 L441.8,348.5 L490.0,358.7 L479.0,344.1 L507.1,332.8 L568.1,341.5 L617.7,417.1 L626.1,394.8 L597.6,330.9 L603.8,312.0 L681.6,229.9 L655.3,198.1 L664.8,174.4 L678.3,185.7 L682.3,145.9 L732.3,126.2 L717.3,99.2 Z"/>
@@ -1196,42 +1195,12 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        click handler now lives on #footerExportRecordLink in the footer
        instead. ===== -->
 
-  <!-- ===== LEARN MORE ACCORDION — re-added per this round's spec, sitting
-       directly below the national map card and centered above the
-       "Explore More Data" header. Same real, non-fabricated copy the
-       previous "Learn More ▾" disclosure carried (workflow row + the 3
-       CITIXEN UX / receipt / Civic Intelligence lines) before it was
-       removed in an earlier round — reused rather than invented, since it
-       was genuine descriptive product copy, not data. New class names
-       (.learn-more-*) since the old .hero-qa-* CSS was deleted along with
-       that earlier removal; #btnLearnMoreToggle/#learnMoreDrawer ids are
-       reused since nothing else in the file claims them. Chevron flips via
-       aria-expanded rather than swapping the glyph, so no extra JS string
-       logic is needed beyond toggling one attribute + the [hidden]
-       attribute. ===== -->
-  <section class="learn-more-section">
-    <button id="btnLearnMoreToggle" type="button" class="learn-more-toggle" aria-expanded="false" aria-controls="learnMoreDrawer">
-      Learn More <span class="learn-more-chevron" aria-hidden="true">&#8744;</span>
-    </button>
-    <div id="learnMoreDrawer" class="learn-more-drawer" hidden>
-      <div class="learn-more-workflow-row">
-        <span style="display:inline-flex; align-items:center; gap:6px;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Snap
-        </span>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00E699" stroke-width="2" opacity="0.6"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        <span style="display:inline-flex; align-items:center; gap:6px;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Track
-        </span>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00E699" stroke-width="2" opacity="0.6"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        <span style="display:inline-flex; align-items:center; gap:6px;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Audit
-        </span>
-      </div>
-      <p class="learn-more-body"><span style="color:#FFFFFF; font-weight:bold;">CITIXEN</span> <span style="color:#00E699; font-weight:bold;">UX</span><sup class="tm-symbol">™</sup> combines real-time resident reporting with direct city department tracking and transparent budget auditing.</p>
-      <p class="learn-more-body">Create an uneditable public record and <span style="color:#00E699; font-weight:bold;">hold the receipt</span> to ensure your tax dollars actively protect and improve your neighborhood.</p>
-      <p class="learn-more-body" style="font-weight:500;">Welcome to the era of <span style="color:#00E699; font-weight:bold;">Civic Intelligence (C.I.)</span>.</p>
-    </div>
-  </section>
+  <!-- ===== LEARN MORE ACCORDION — removed entirely per this round's item 5
+       (a previous round had re-added it: the Snap/Track/Audit workflow row
+       and the CITIXEN UX / "hold the receipt" / Civic Intelligence
+       paragraphs, behind the #btnLearnMoreToggle/#learnMoreDrawer toggle).
+       Its .learn-more-* CSS and toggle JS are removed with it below rather
+       than left orphaned. ===== -->
 
   <!-- ===== CITY SNAPSHOT (the geolocated Active Hazards / Fix Speed /
        Completion Rate gauge card that used to live here) was removed
@@ -3333,19 +3302,10 @@ function closeLedgerDrawer(){
 }
 document.getElementById('liveLedgerBanner').addEventListener('click', () => openLedgerDrawer());
 
-// LEARN MORE ACCORDION — re-added per this round's item 2, sitting below
-// the map card. Toggles the drawer's [hidden] attribute and mirrors the
-// open/closed state onto aria-expanded (which also drives the chevron's
-// flip animation in CSS).
-const btnLearnMoreToggleEl = document.getElementById('btnLearnMoreToggle');
-const learnMoreDrawerEl = document.getElementById('learnMoreDrawer');
-if (btnLearnMoreToggleEl && learnMoreDrawerEl) {
-  btnLearnMoreToggleEl.addEventListener('click', () => {
-    const isOpen = btnLearnMoreToggleEl.getAttribute('aria-expanded') === 'true';
-    btnLearnMoreToggleEl.setAttribute('aria-expanded', String(!isOpen));
-    learnMoreDrawerEl.hidden = isOpen;
-  });
-}
+// The LEARN MORE ACCORDION (workflow row + CITIXEN UX/receipt/Civic
+// Intelligence copy behind a toggle) was removed entirely per this
+// round's item 5 — #btnLearnMoreToggle and #learnMoreDrawer no longer
+// exist in the markup, so this show/hide wiring is removed with them.
 const btnViewItemizedLedgerEl = document.getElementById('btnViewItemizedLedger');
 if (btnViewItemizedLedgerEl) btnViewItemizedLedgerEl.addEventListener('click', () => openLedgerDrawer());
 document.getElementById('ledgerCloseBtn').addEventListener('click', closeLedgerDrawer);

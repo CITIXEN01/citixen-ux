@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>CITIXEN UX™</title>
-<meta name="theme-color" content="#00ff88">
+<meta name="theme-color" content="#00E699">
 <meta name="referrer" content="no-referrer">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -19,13 +19,18 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{
-  --brand-mint:#00ff88 !important;
-  --brand-mint-hover:#00e077 !important;
-  --brand-mint-dim:rgba(0,255,136,0.12) !important;
+  /* Green unification + obsidian canvas brought in line with index.html
+     this round: the app used to run its own slightly different "Emerald
+     Green" (#00ff88/#00e077) and a dark-green-tinted canvas (#080c0a/
+     #0f1713); both now match the dashboard's Fresh Mint (#00E699) and
+     pitch obsidian (#030712) tokens exactly. */
+  --brand-mint:#00E699 !important;
+  --brand-mint-hover:#00E699 !important;
+  --brand-mint-dim:rgba(0,230,153,0.12) !important;
   --brand-amber:#ffbb00 !important;
   --brand-red:#ff4444 !important;
-  --bg-obsidian:#080c0a !important;
-  --bg-card:#0f1713 !important;
+  --bg-obsidian:#030712 !important;
+  --bg-card:#111827 !important;
   --border-muted:rgba(255,255,255,0.08) !important;
   --fow-amber:#FFB800 !important;
   /* legacy aliases — every existing var(--mint)/var(--card)/etc. usage below inherits
@@ -48,7 +53,7 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
 .brand-white{color:#ffffff}
 .brand-lime{color:var(--brand-mint)}
 .brand-tm{font-size:.55em;opacity:.4;margin-left:1px}
-.badge{font-size:.62rem;background:rgba(0,255,136,.12);color:var(--mint2);border:1px solid rgba(0,255,136,.4);
+.badge{font-size:.62rem;background:rgba(0,230,153,.12);color:var(--mint2);border:1px solid rgba(0,230,153,.4);
   padding:4px 10px;border-radius:20px;font-weight:700;letter-spacing:.4px;display:flex;align-items:center;gap:6px}
 .badge-dot{width:6px;height:6px;border-radius:50%;background:var(--mint2)}
 
@@ -61,8 +66,8 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
   display:flex;flex-direction:column}
 .app-drawer-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--border)}
 .app-drawer-body{flex:1;overflow-y:auto;padding:16px 18px 32px}
-.bridge-banner{background:linear-gradient(160deg,rgba(0,255,136,.16),rgba(0,255,136,.04));
-  border:1px solid rgba(0,255,136,.4);border-radius:14px;padding:16px}
+.bridge-banner{background:linear-gradient(160deg,rgba(0,230,153,.16),rgba(0,230,153,.04));
+  border:1px solid rgba(0,230,153,.4);border-radius:14px;padding:16px}
 .bridge-banner-text{font-size:.84rem;font-weight:700;line-height:1.5;margin-bottom:14px}
 
 .main{padding:14px;display:flex;flex-direction:column;gap:12px;flex:1}
@@ -76,7 +81,7 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
   border-radius:8px;display:inline-flex;align-items:center;gap:5px;flex-shrink:0}
 
 .privacy-note{display:flex;align-items:center;gap:8px;font-size:.7rem;color:var(--muted);
-  background:rgba(0,255,136,.05);border:1px solid var(--border);border-radius:10px;padding:8px 12px}
+  background:rgba(0,230,153,.05);border:1px solid var(--border);border-radius:10px;padding:8px 12px}
 .privacy-note svg{color:var(--mint2);flex-shrink:0}
 
 .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px}
@@ -87,12 +92,12 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
 .chip{background:rgba(7,12,14,.6);border:1px solid var(--border);color:var(--text);padding:13px 12px;
   border-radius:12px;font-size:.76rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:9px;
   transition:border-color .15s,background .15s}
-.chip.active{border-color:var(--mint2);background:rgba(0,255,136,.12);color:var(--mint2)}
+.chip.active{border-color:var(--mint2);background:rgba(0,230,153,.12);color:var(--mint2)}
 .chip svg{width:17px;height:17px;flex-shrink:0}
 .chip-other-row{display:flex;justify-content:center;margin-bottom:14px}
 .chip-other{min-width:150px;justify-content:center}
 
-.btn-camera{width:100%;background:rgba(0,255,136,.04);border:1px dashed var(--mint2);color:var(--text);padding:13px;
+.btn-camera{width:100%;background:rgba(0,230,153,.04);border:1px dashed var(--mint2);color:var(--text);padding:13px;
   border-radius:12px;font-weight:800;font-size:.8rem;letter-spacing:.3px;cursor:pointer;display:flex;
   align-items:center;justify-content:center;gap:8px;margin-bottom:12px}
 .btn-camera svg{color:var(--mint2)}
@@ -115,9 +120,13 @@ textarea.input{resize:none;line-height:1.4}
 .navtab.active{color:var(--mint2)}
 .navtab svg{width:19px;height:19px}
 
-#map{height:220px;width:100%;border-radius:12px;border:1px solid var(--border);background:#0d1518;overflow:hidden}
+/* Map frame brought to the same flat obsidian + Fresh Mint treatment as
+   every other card/pill/modal frame per this round's "absolute blue
+   purge" item 3 (previously a dark teal #0d1518 with a plain muted
+   border). */
+#map{height:220px;width:100%;border-radius:12px;border:1px solid rgba(0,230,153,.35);background:#030712;box-shadow:0 0 12px rgba(0,230,153,.08);overflow:hidden}
 .dark-tiles{filter:invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);}
-.leaflet-container{background:#0d1518}
+.leaflet-container{background:#030712}
 .leaflet-div-icon{background:transparent;border:none}
 
 /* ===== MAP BEACONS (CartoDB Dark Matter basemap) ===== */
@@ -127,16 +136,17 @@ textarea.input{resize:none;line-height:1.4}
 .beacon-incident .beacon-core{position:absolute;inset:5px;border-radius:50%;background:var(--beacon-color);
   border:2px solid #fff;box-shadow:0 0 6px var(--beacon-color)}
 .beacon-user{position:relative;width:100%;height:100%}
-.beacon-user .beacon-pulse{position:absolute;inset:-8px;border-radius:50%;background:#00ff88;
+.beacon-user .beacon-pulse{position:absolute;inset:-8px;border-radius:50%;background:#00E699;
   opacity:.4;animation:beaconPulse 1.6s ease-out infinite}
 .beacon-user .beacon-core{position:absolute;inset:9px;border-radius:50%;background:#fff;
-  border:2px solid #00ff88;box-shadow:0 0 8px #00ff88}
+  border:2px solid #00E699;box-shadow:0 0 8px #00E699}
 @keyframes beaconPulse{0%{transform:scale(.6);opacity:.55}100%{transform:scale(2.1);opacity:0}}
 
-/* ===== DARK POPUPS ===== */
-.leaflet-popup-content-wrapper{background:#12141c;border:1px solid #00ff88;border-radius:10px;color:#ffffff}
+/* ===== DARK POPUPS — flat obsidian per this round's "absolute blue
+   purge" (previously a dark teal #12141c). ===== */
+.leaflet-popup-content-wrapper{background:#030712;border:1px solid #00E699;border-radius:10px;color:#ffffff}
 .leaflet-popup-content{color:#ffffff;margin:10px 12px}
-.leaflet-popup-tip{background:#12141c;border:1px solid #00ff88}
+.leaflet-popup-tip{background:#030712;border:1px solid #00E699}
 .leaflet-popup-close-button{color:#ffffff !important}
 .feed-item{background:rgba(7,12,14,.6);border:1px solid var(--border);border-radius:10px;padding:12px;
   margin-bottom:8px;cursor:pointer}
@@ -146,7 +156,7 @@ textarea.input{resize:none;line-height:1.4}
 .pill{padding:2px 7px;border-radius:5px;font-size:.62rem;font-weight:700;text-transform:uppercase;flex-shrink:0}
 .pill-crit{background:rgba(239,68,68,.2);color:#fca5a5}
 .pill-warn{background:rgba(245,158,11,.2);color:#fde68a}
-.pill-ok{background:rgba(0,255,136,.2);color:#a7f3d0}
+.pill-ok{background:rgba(0,230,153,.2);color:#a7f3d0}
 .stat-big{font-size:2.2rem;font-weight:900;color:var(--mint2)}
 
 /* ===== TRIAGE STATUS GAUGE (Map & feed) — Open / Tagged to Project / Resolved ===== */
@@ -161,7 +171,7 @@ textarea.input{resize:none;line-height:1.4}
 .scope-toggle{position:relative;display:grid;grid-template-columns:repeat(3,1fr);background:rgba(255,255,255,.05);
   border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:4px;margin-bottom:14px}
 .scope-thumb{position:absolute;top:4px;bottom:4px;left:4px;background:var(--mint);border-radius:10px;z-index:1;
-  box-shadow:0 0 14px rgba(0,255,136,.5);transition:transform .32s cubic-bezier(.4,0,.2,1),width .32s cubic-bezier(.4,0,.2,1)}
+  box-shadow:0 0 14px rgba(0,230,153,.5);transition:transform .32s cubic-bezier(.4,0,.2,1),width .32s cubic-bezier(.4,0,.2,1)}
 .scope-btn{position:relative;z-index:2;background:none;border:none;color:rgba(255,255,255,.6);font-size:.66rem;
   font-weight:800;letter-spacing:.01em;padding:11px 2px;border-radius:10px;cursor:pointer;text-align:center;
   white-space:nowrap;transition:color .3s ease}
@@ -195,7 +205,7 @@ textarea.input{resize:none;line-height:1.4}
 /* ===== ZERO-PII DEVICE TOKEN NOTE (My Impact) ===== */
 .zero-pii-note .row{align-items:flex-start;gap:10px}
 .zero-pii-note svg{flex-shrink:0;margin-top:1px}
-.zero-pii-note code{background:rgba(0,255,136,.1);color:var(--mint2);padding:1px 6px;border-radius:6px;font-size:.66rem;word-break:break-all}
+.zero-pii-note code{background:rgba(0,230,153,.1);color:var(--mint2);padding:1px 6px;border-radius:6px;font-size:.66rem;word-break:break-all}
 
 /* ===== NATIONAL MUNICIPALITY CARD GRID (legacy, kept for reference) ===== */
 .muni-grid{display:flex;flex-direction:column;gap:10px}
@@ -209,14 +219,14 @@ textarea.input{resize:none;line-height:1.4}
 .muni-row{background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);
   padding:10px 2px;cursor:pointer;text-align:left;font-family:inherit;width:100%}
 .muni-row:last-child{border-bottom:none}
-.muni-row:hover,.muni-row:focus{background:rgba(0,255,136,.05)}
+.muni-row:hover,.muni-row:focus{background:rgba(0,230,153,.05)}
 .muni-row .mr-top{display:flex;justify-content:space-between;font-size:.8rem;font-weight:800}
 .muni-row .mr-pct{color:var(--mint2)}
 .muni-row .mr-detail{display:flex;justify-content:space-between;font-size:.68rem;color:var(--muted);margin-top:3px}
 .muni-row .mr-capex{color:#fff;font-weight:800}
 
 .radius-tag{display:inline-flex;align-items:center;gap:5px;font-size:.6rem;font-weight:800;letter-spacing:.4px;
-  text-transform:uppercase;color:var(--mint2);background:rgba(0,255,136,.08);border:1px solid var(--border);
+  text-transform:uppercase;color:var(--mint2);background:rgba(0,230,153,.08);border:1px solid var(--border);
   border-radius:20px;padding:4px 10px;margin-bottom:10px}
 .coverage-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px;flex-wrap:wrap;gap:8px}
 .coverage-ticker{font-size:1.6rem;font-weight:900;color:var(--mint2)}
@@ -224,13 +234,13 @@ textarea.input{resize:none;line-height:1.4}
 .cov-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-bottom:10px}
 .cov-cell{aspect-ratio:1;border-radius:3px;background:rgba(255,255,255,.06);cursor:pointer;border:none;padding:0;
   transition:transform .12s ease,box-shadow .3s ease,background .3s ease}
-.cov-cell.covered{background:var(--mint2);box-shadow:0 0 6px rgba(0,255,136,.7)}
+.cov-cell.covered{background:var(--mint2);box-shadow:0 0 6px rgba(0,230,153,.7)}
 .cov-cell.pending{background:var(--fow-amber);box-shadow:0 0 6px rgba(255,184,0,.6)}
-.cov-cell.you{box-shadow:0 0 0 1.5px #fff,0 0 6px rgba(0,255,136,.7)}
+.cov-cell.you{box-shadow:0 0 0 1.5px #fff,0 0 6px rgba(0,230,153,.7)}
 .cov-cell:active{transform:scale(.82)}
 .cov-legend{display:flex;justify-content:space-between;font-size:.62rem;color:var(--muted);margin-bottom:4px;flex-wrap:wrap;gap:6px 12px}
 .cov-legend .dot{width:7px;height:7px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:middle}
-.cov-toast{display:none;background:rgba(0,255,136,.08);border:1px solid var(--border);border-radius:10px;
+.cov-toast{display:none;background:rgba(0,230,153,.08);border:1px solid var(--border);border-radius:10px;
   padding:10px 12px;font-size:.74rem;margin-top:4px;align-items:center;justify-content:space-between;gap:8px;color:var(--text)}
 .cov-toast.show{display:flex}
 .cov-toast .ct-cta{background:var(--mint);color:#051311;border:none;padding:6px 10px;border-radius:8px;
@@ -242,7 +252,7 @@ textarea.input{resize:none;line-height:1.4}
 .drawer{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:2000;display:none;flex-direction:column;padding:18px}
 .drawer.open{display:flex}
 .icon-btn{background:none;border:none;color:#fff;cursor:pointer;display:flex;padding:4px}
-.toast{display:none;background:rgba(0,255,136,.2);border:1px solid var(--mint2);color:var(--mint2);
+.toast{display:none;background:rgba(0,230,153,.2);border:1px solid var(--mint2);color:var(--mint2);
   padding:10px 14px;border-radius:10px;font-size:.76rem;font-weight:700;text-align:center;margin-bottom:10px}
 
 /* ===== SPLASH SCREEN — primary launch state on app initialization ===== */
@@ -250,12 +260,12 @@ textarea.input{resize:none;line-height:1.4}
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
   transition:opacity .5s ease,visibility .5s ease}
 .splash-screen.hide{opacity:0;visibility:hidden;pointer-events:none}
-.splash-logo{width:64px;height:64px;stroke:var(--brand-mint);filter:drop-shadow(0 0 16px rgba(0,255,136,.55))}
+.splash-logo{width:64px;height:64px;stroke:var(--brand-mint);filter:drop-shadow(0 0 16px rgba(0,230,153,.55))}
 .splash-word{font-weight:900;font-size:1.6rem;letter-spacing:.3px;text-align:center}
 .splash-tag{font-size:.86rem;font-weight:700;color:var(--mint2);text-align:center;padding:0 24px}
 
 /* ===== SMART LOCATION HEADER (persistent, always visible) ===== */
-.location-banner{display:flex;align-items:center;gap:8px;background:rgba(0,255,136,.06);border:1px solid var(--border);
+.location-banner{display:flex;align-items:center;gap:8px;background:rgba(0,230,153,.06);border:1px solid var(--border);
   border-radius:12px;padding:9px 12px;font-size:.72rem;font-weight:700;color:var(--text)}
 .location-banner svg{flex-shrink:0;color:var(--mint2)}
 .location-banner .lb-text{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -275,7 +285,7 @@ textarea.input{resize:none;line-height:1.4}
 .tier-toggle{display:flex;gap:6px;margin-bottom:10px}
 .tier-btn{flex:1;background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--muted);
   font-size:.64rem;font-weight:800;padding:7px 4px;border-radius:8px;cursor:pointer;text-align:center}
-.tier-btn.active{border-color:var(--mint2);background:rgba(0,255,136,.14);color:var(--mint2)}
+.tier-btn.active{border-color:var(--mint2);background:rgba(0,230,153,.14);color:var(--mint2)}
 #tierCanvas{width:100%;display:block;border-radius:8px;background:rgba(255,255,255,.02);margin-bottom:8px}
 
 /* ===== LIVE PUBLIC LEDGER DRAWER ===== */
@@ -290,7 +300,7 @@ textarea.input{resize:none;line-height:1.4}
 .ledger-filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
 .ledger-chip{background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--muted);
   font-size:.64rem;font-weight:700;padding:5px 10px;border-radius:20px;cursor:pointer}
-.ledger-chip.active{border-color:var(--mint2);background:rgba(0,255,136,.14);color:var(--mint2)}
+.ledger-chip.active{border-color:var(--mint2);background:rgba(0,230,153,.14);color:var(--mint2)}
 .ledger-select{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);
   border-radius:8px;padding:6px 8px;font-size:.68rem;font-weight:700}
 .ledger-report-card{background:rgba(7,12,14,.6);border:1px solid var(--border);border-radius:10px;padding:12px;
@@ -310,35 +320,34 @@ textarea.input{resize:none;line-height:1.4}
 .intercept-project{font-size:1rem;font-weight:900;margin-bottom:6px}
 .intercept-meta{font-size:.76rem;color:var(--muted);margin-bottom:4px;line-height:1.45}
 .intercept-actions{display:flex;flex-direction:column;gap:10px;margin-top:18px}
-.btn-intercept-cancel{width:100%;background:rgba(0,255,136,.12);color:var(--mint2);border:1px solid var(--mint2);
+.btn-intercept-cancel{width:100%;background:rgba(0,230,153,.12);color:var(--mint2);border:1px solid var(--mint2);
   padding:13px;border-radius:12px;font-weight:800;font-size:.8rem;cursor:pointer}
 .btn-intercept-override{width:100%;background:rgba(255,68,68,.12);color:#fca5a5;border:1px solid var(--danger);
   padding:13px;border-radius:12px;font-weight:800;font-size:.8rem;cursor:pointer}
 
-/* ===== POST-PHOTO SUBMISSION CONFIRMATION MODAL — same overlay/card chrome
-   as .intercept-drawer/.intercept-card above, mint-bordered instead of
-   amber since this isn't itself a warning state. ===== */
+/* ===== POST-PHOTO SUBMISSION CONFIRMATION MODAL — streamlined per this
+   round's item 7 into a lean dialog: photo preview, the single public
+   right-of-way confirmation checkbox, and the two action buttons. The
+   Privacy Engine box, Demo indicator note, Ward location pill, and
+   Emergency Notice 911 box (.confirm-privacy-tag/-note,
+   .confirm-location-tag, .confirm-emergency) were removed entirely along
+   with their now-unused CSS below — see openPostPhotoConfirm() for the
+   corresponding JS cleanup. Card chrome brought to flat obsidian per this
+   round's "absolute blue purge" (previously var(--card)/#111827 glass). ===== */
 .confirm-drawer{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:2750;display:none;
   align-items:center;justify-content:center;padding:18px;overflow-y:auto}
 .confirm-drawer.open{display:flex}
-.confirm-card{background:var(--card);border:1px solid var(--mint2);border-radius:16px;padding:20px;
+.confirm-card{background:#030712;box-shadow:0 0 12px rgba(0,230,153,.08);border:1px solid var(--mint2);border-radius:16px;padding:20px;
   max-width:440px;width:100%;max-height:90vh;overflow-y:auto}
 .confirm-title{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;
   color:var(--mint2);margin-bottom:12px}
 .confirm-photo-wrap{position:relative;margin-bottom:10px}
 .confirm-photo-wrap img{width:100%;max-height:200px;object-fit:cover;border-radius:10px;border:1px solid var(--mint2);display:block}
-.confirm-privacy-tag{display:flex;align-items:center;gap:6px;background:rgba(0,255,136,.1);border:1px solid var(--mint2);
-  color:var(--mint2);border-radius:8px;padding:8px 10px;font-size:.7rem;font-weight:700;margin-top:8px}
-.confirm-privacy-note{font-size:.64rem;color:var(--muted);margin-top:4px;line-height:1.4}
-.confirm-location-tag{font-size:.78rem;color:var(--text);background:rgba(255,255,255,.04);border:1px solid var(--border);
-  border-radius:8px;padding:8px 10px;margin-top:10px;display:flex;align-items:center;gap:6px}
 .confirm-row-check{display:flex;align-items:flex-start;gap:10px;margin-top:16px;font-size:.78rem;line-height:1.4;cursor:pointer}
 .confirm-row-check input{margin-top:2px;flex-shrink:0;width:16px;height:16px;accent-color:var(--brand-mint)}
-.confirm-emergency{background:rgba(255,68,68,.12);border:1px solid var(--danger);border-radius:10px;
-  padding:12px;margin-top:14px;font-size:.74rem;color:#fca5a5;line-height:1.5;font-weight:600}
 .confirm-actions{display:flex;flex-direction:column;gap:10px;margin-top:18px}
-.btn-confirm-lock{width:100%;background:var(--mint);color:#051311;border:none;padding:14px;border-radius:12px;
-  font-weight:800;font-size:.84rem;cursor:pointer}
+.btn-confirm-lock{width:100%;background:#00E699;color:#030712;border:none;padding:14px;border-radius:9999px;
+  font-weight:800;font-size:.84rem;text-transform:uppercase;cursor:pointer}
 .btn-confirm-lock:disabled{opacity:.4;cursor:not-allowed}
 .btn-confirm-cancel{width:100%;background:transparent;color:var(--muted);border:1px solid var(--border);
   padding:13px;border-radius:12px;font-weight:700;font-size:.8rem;cursor:pointer}
@@ -348,7 +357,7 @@ textarea.input{resize:none;line-height:1.4}
 .ci-compare{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
 .ci-col{border-radius:12px;padding:14px;border:1px solid var(--border)}
 .ci-col.legacy{background:rgba(239,68,68,.06)}
-.ci-col.citixen{background:rgba(0,255,136,.06);border-color:rgba(0,255,136,.3)}
+.ci-col.citixen{background:rgba(0,230,153,.06);border-color:rgba(0,230,153,.3)}
 .ci-col h4{font-size:.78rem;margin-bottom:8px}
 .ci-col.legacy h4{color:#fca5a5}
 .ci-col.citixen h4{color:var(--mint2)}
@@ -419,7 +428,7 @@ textarea.input{resize:none;line-height:1.4}
       </div>
       <div class="app-drawer-body">
         <div class="bridge-banner">
-          <div class="bridge-banner-text">🏛️ CIVIC INTELLIGENCE™ DASHBOARD — Tap to access full ward analytics, CapEx budget ledgers, and the CITIXEN Codex.</div>
+          <div class="bridge-banner-text">CIVIC INTELLIGENCE™ DASHBOARD — Tap to access full ward analytics, CapEx budget ledgers, and the CITIXEN Codex.</div>
           <!-- Same-site relative link (index.html), consistent with every other
                cross-page link in this app — "citixenux.com" elsewhere in this
                codebase already refers to this same site, not a different
@@ -488,7 +497,7 @@ textarea.input{resize:none;line-height:1.4}
         </button>
         <div id="photoBox" style="display:none;margin-bottom:12px;text-align:center;">
           <img id="photoImg" style="display:none;width:100%;max-height:220px;object-fit:cover;border-radius:10px;border:1px solid var(--mint2);">
-          <div id="photoIconFallback" style="background:rgba(0,255,136,.06);border:1px solid var(--mint2);border-radius:10px;padding:22px;">
+          <div id="photoIconFallback" style="background:rgba(0,230,153,.06);border:1px solid var(--mint2);border-radius:10px;padding:22px;">
             <svg viewBox="0 0 24 24" width="34" height="34" stroke="var(--mint2)" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
           </div>
           <div class="small" style="color:var(--mint2);margin-top:6px;">✓ Captured — device ID and GPS tags scrubbed from EXIF before upload</div>
@@ -715,20 +724,10 @@ textarea.input{resize:none;line-height:1.4}
        by this — different element, different trigger. ===== -->
   <div id="postPhotoConfirmModal" class="confirm-drawer">
     <div class="confirm-card">
-      <div class="confirm-title">Confirm before publishing</div>
+      <div class="confirm-title">Confirm Before Publishing</div>
 
       <div class="confirm-photo-wrap">
         <img id="confirmPhotoImg" alt="Captured hazard photo preview">
-        <div class="confirm-privacy-tag">
-          <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-          🔒 Privacy Engine: Auto-Face &amp; License Plate Blur Active
-        </div>
-        <div class="confirm-privacy-note">Demo indicator — this build scrubs device ID and GPS EXIF metadata from every photo today; automatic visual face/plate blurring is on the roadmap and not yet running on this preview.</div>
-      </div>
-
-      <div class="confirm-location-tag">
-        <svg viewBox="0 0 24 24" width="14" height="14" stroke="var(--mint2)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span id="confirmLocationTag">Local District</span>
       </div>
 
       <label class="confirm-row-check">
@@ -736,12 +735,8 @@ textarea.input{resize:none;line-height:1.4}
         <span>I confirm this hazard is in the public right-of-way (road, sidewalk, utility, park).</span>
       </label>
 
-      <div class="confirm-emergency">
-        ⚠️ EMERGENCY NOTICE: If this is an active life-safety threat, gas leak, or downed power line, please call 911 or your local emergency utility immediately. CITIXEN UX™ is an asynchronous audit engine.
-      </div>
-
       <div class="confirm-actions">
-        <button type="button" class="btn-confirm-lock" id="btnConfirmLock" disabled>🟢 Lock in Civic Memory™</button>
+        <button type="button" class="btn-confirm-lock" id="btnConfirmLock" disabled>Submit to Ledger</button>
         <button type="button" class="btn-confirm-cancel" id="btnConfirmCancel">Cancel / Retake Photo</button>
       </div>
     </div>
@@ -1181,7 +1176,7 @@ function drawTierCanvas(tier){
   for (let i = 0; i < total; i++) {
     const col = i % cfg.cols, row = Math.floor(i / cfg.cols);
     const x = col * cellW + cfg.gap / 2, y = row * cellH + cfg.gap / 2;
-    ctx.fillStyle = coveredSet.has(i) ? 'rgba(0,255,136,0.85)' : 'rgba(255,255,255,0.07)';
+    ctx.fillStyle = coveredSet.has(i) ? 'rgba(0,230,153,0.85)' : 'rgba(255,255,255,0.07)';
     ctx.fillRect(x, y, cellW - cfg.gap, cellH - cfg.gap);
   }
   const caption = document.getElementById('tierCanvasCaption');
@@ -2061,7 +2056,7 @@ function initMap(){
 }
 
 function statusColor(status){
-  return status==='Critical' ? '#ff4444' : status==='Warning' ? '#ffbb00' : '#00ff88';
+  return status==='Critical' ? '#ff4444' : status==='Warning' ? '#ffbb00' : '#00E699';
 }
 function statusPill(status){
   return status==='Critical' ? 'pill-crit' : status==='Warning' ? 'pill-warn' : 'pill-ok';
@@ -2077,7 +2072,7 @@ function statusPill(status){
 function categoryColor(item){
   if (item.status === 'Critical') return '#ff4444';
   const t = (item.title || '').toLowerCase();
-  if (/pothole|road|pavement/.test(t)) return '#00ff88';
+  if (/pothole|road|pavement/.test(t)) return '#00E699';
   if (/light/.test(t)) return '#ffbb00';
   return statusColor(item.status);
 }
@@ -2153,7 +2148,7 @@ function renderGeoHatchOverlay(){
       L.rectangle(bounds, hasActive ? {
         color: '#ffbb00', weight: 1.5, fillColor: 'url(#geoHatchAmberPattern)', fillOpacity: 1, className: 'geo-hatch-cell geo-hatch-active'
       } : {
-        color: '#00ff88', weight: 1.5, fillColor: '#00ff88', fillOpacity: 0.22, className: 'geo-hatch-cell geo-hatch-resolved'
+        color: '#00E699', weight: 1.5, fillColor: '#00E699', fillOpacity: 0.22, className: 'geo-hatch-cell geo-hatch-resolved'
       }).addTo(geoHatchLayerGroup);
     }
   }
@@ -2193,7 +2188,7 @@ function triageBucket(item){
 function slaAgeColor(ageMin){
   if (ageMin >= 120) return '#ff4444';
   if (ageMin >= 30) return '#ffbb00';
-  return '#00ff88';
+  return '#00E699';
 }
 
 function renderTriageGauge(){
@@ -2487,16 +2482,11 @@ function openPostPhotoConfirm(opts){
     confirmImg.style.display = 'none';
   }
 
-  // Auto-detected location tag: the same resolved ward/location this report
-  // will actually submit with (currentWardMeta when the coverage grid has
-  // resolved one, falling back to whatever the citizen has in the location
-  // field) — not a second, separate guess.
-  const locField = document.getElementById('repLoc');
-  const wardLabel = (typeof currentWardMeta !== 'undefined' && currentWardMeta && currentWardMeta.isGpsMatch)
-    ? currentWardMeta.wardName + ', ' + currentWardMeta.cityName
-    : (locField ? locField.value.trim() : '') || 'Local District';
-  document.getElementById('confirmLocationTag').textContent = wardLabel;
-
+  // The ward/location pill that used to sit here (auto-detected from
+  // currentWardMeta / the location field) was removed per this round's
+  // confirmation-modal overhaul — the report still submits with the
+  // real resolved ward/location value elsewhere in finalizeSubmitReport(),
+  // this modal just no longer displays it.
   const checkbox = document.getElementById('confirmRowCheckbox');
   const lockBtn = document.getElementById('btnConfirmLock');
   checkbox.checked = false;
