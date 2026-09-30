@@ -135,6 +135,16 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .hero-qa-heading{font-size:1.2rem;font-weight:900;color:#fff;margin:0 0 8px}
 .hero-qa-body{color:var(--muted);font-size:.9rem;line-height:1.6;max-width:640px;margin:0 auto}
 .hero-qa-accent{color:#00FF87;font-weight:700}
+/* ===== WORKFLOW ICONOGRAPHY ROW (Snap -> Track -> Audit) — sits between
+   paragraphs 1 and 2 of the "What is CITIXEN UX™?" block, scaled up and
+   given generous vertical spacing this round so it reads as its own
+   header-adjacent visual beat rather than a trailing line of paragraph
+   1. Icons keep the same 24x24 viewBox / stroke-width:2 / round caps
+   family used across the Analytics and Operations components, just
+   rendered larger (22px) here; the connecting arrows stay slightly
+   smaller/dimmer as secondary marks. ===== */
+.hero-qa-workflow-row{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;
+  margin:18px 0;color:#00FF87;font-weight:700;font-size:1.2rem}
 
 /* ===== CROWD SOURCE AMERICA™ NARRATIVE BLOCK (Position 3 of the
    alternating section cadence) — plain centered text, no card/box. The
@@ -914,24 +924,23 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   <section class="hero-qa-section">
     <div class="hero-qa-block">
       <h2 class="hero-qa-heading">What is <span style="color:#00FF87;">CITIXEN UX<sup class="tm-symbol tm-symbol-flush">™</sup></span>?</h2>
-      <p style="margin-bottom: 1.25rem;">
-        <span style="color:#00FF87; font-weight:bold;">CITIXEN UX<sup class="tm-symbol tm-symbol-flush">™</sup></span> is the modern standard for resident-first municipal engagement.<br>
-        <span style="color:#00FF87; font-weight:bold; display: inline-flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 0.95rem;">
-          <span style="display:inline-flex; align-items:center; gap:4px;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00FF87" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Snap
-          </span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00FF87" stroke-width="2" opacity="0.6"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          <span style="display:inline-flex; align-items:center; gap:4px;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00FF87" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Track
-          </span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00FF87" stroke-width="2" opacity="0.6"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          <span style="display:inline-flex; align-items:center; gap:4px;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00FF87" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Audit
-          </span>
+      <p style="margin-bottom: 0.75rem;"><span style="color:#00FF87; font-weight:bold;">CITIXEN UX<sup class="tm-symbol tm-symbol-flush">™</sup></span> is the modern standard for resident-first municipal engagement.</p>
+      <div class="hero-qa-workflow-row">
+        <span style="display:inline-flex; align-items:center; gap:6px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00FF87" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Snap
         </span>
-      </p>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00FF87" stroke-width="2" opacity="0.6"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        <span style="display:inline-flex; align-items:center; gap:6px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00FF87" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Track
+        </span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00FF87" stroke-width="2" opacity="0.6"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        <span style="display:inline-flex; align-items:center; gap:6px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00FF87" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Audit
+        </span>
+      </div>
       <p style="margin-bottom: 1.25rem;"><span style="color:#00FF87; font-weight:bold;">CITIXEN UX<sup class="tm-symbol tm-symbol-flush">™</sup></span> combines real-time resident reporting with direct city department tracking and transparent project budget auditing.</p>
-      <p style="margin-bottom: 1.5rem;"><span style="color:#00FF87; font-weight:bold;">Creating an uneditable public record, you hold the receipt</span> to ensure your tax dollars actively protect and improve your neighborhood. <span style="color:#00FF87; font-weight:bold;">Welcome to the era of Civic Intelligence (C.I.).</span></p>
+      <p style="margin-bottom: 1rem;"><span style="color:#00FF87; font-weight:bold;">Creating an uneditable public record, you hold the receipt</span> to ensure your tax dollars actively protect and improve your neighborhood.</p>
+      <p style="margin-top: 1rem; color: #FFFFFF; font-weight: 500;">Welcome to the era of <span style="color:#00FF87; font-weight:bold;">Civic Intelligence (C.I.)</span>.</p>
     </div>
   </section>
 
