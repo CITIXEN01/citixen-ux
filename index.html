@@ -165,9 +165,9 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 /* ===== NATIVE APP STORE ROW + PRIMARY LAUNCH ROW (below hub navigation) ===== */
 .launch-row{text-align:center;margin:6px auto 4px}
 .app-store-row{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:14px auto 4px;max-width:520px;padding:0 24px}
-.store-badge{display:flex;align-items:center;gap:8px;background:#000;border:1px solid var(--border);border-radius:10px;
+.store-badge{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid #FFFFFF;border-radius:10px;
   padding:8px 16px;color:#fff;cursor:pointer;min-width:170px}
-.store-badge:hover{border-color:var(--mint2)}
+.store-badge:hover{border-color:#0EA5E9}
 .store-badge-icon{font-size:1.4rem;line-height:1}
 .store-badge-text{display:flex;flex-direction:column;align-items:flex-start;text-align:left}
 .store-badge-small{font-size:.58rem;color:#c9c9c9;text-transform:uppercase;letter-spacing:.3px}
@@ -177,11 +177,15 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
    the homepage-declutter spec; cards shrink their padding/icon/font size
    on narrow screens instead of stacking to a single column. ===== */
 .hub-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:920px;margin:0 auto 26px;padding:0 24px}
-.hub-card{display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--card);
-  border:1px solid var(--border);border-radius:14px;padding:16px 12px;cursor:pointer;color:var(--text);
+.hub-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--card);
+  border:1px solid #0EA5E9;border-radius:14px;padding:16px 12px;cursor:pointer;color:var(--text);
   text-align:center;transition:border-color .15s,transform .15s;font-family:inherit;min-width:0}
-.hub-card:hover{border-color:var(--mint2);transform:translateY(-2px)}
-.hub-card svg{stroke:var(--brand-mint);flex-shrink:0}
+.hub-card-info{position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;
+  border:1px solid #0EA5E9;color:#0EA5E9;font-size:.66rem;font-weight:700;font-style:italic;font-family:Georgia,serif;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(14,165,233,.08)}
+.hub-card-info:hover{background:rgba(14,165,233,.22)}
+.hub-card:hover{border-color:#0EA5E9;transform:translateY(-2px)}
+.hub-card svg{stroke:#0EA5E9;flex-shrink:0}
 .hub-card span{font-size:.74rem;font-weight:700;line-height:1.3}
 .hub-card-sub{font-size:.62rem !important;font-weight:500 !important;color:var(--muted);margin-top:-4px}
 @media (max-width:640px){
@@ -346,7 +350,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 /* ===== DEEP-DIVE PANELS — hidden until a drill-down hub is clicked, per
    "keep the top-level page light" refactor. Same accordion-reveal idea as
    .tier-detail above, just applied at the section level. ===== */
-.deepdive-panel{display:none;max-width:1100px;margin:0 auto;padding:28px 24px 8px;border-top:1px solid var(--border)}
+.deepdive-panel{display:none;max-width:1100px;margin:0 auto;padding:28px 24px 8px;border-top:1px solid #0EA5E9}
 .deepdive-panel.open{display:block}
 .deepdive-panel-head{display:flex;justify-content:space-between;align-items:center;max-width:900px;margin:0 auto 18px}
 .deepdive-panel-head h3{font-size:1.05rem;font-weight:900}
@@ -412,6 +416,30 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .modal-box h4{font-size:.82rem;margin:14px 0 4px;color:var(--text)}
 .modal-box p{font-size:.78rem;color:var(--muted);line-height:1.55}
 .modal-close{float:right;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem}
+
+/* ===== EXPORT CIVIC RECORD MODAL — a real preview built from the same
+   loadBig3()/ledgerTickets data already on screen (see
+   buildExportRecordHtml() below), not fabricated figures. Printed via the
+   body.export-record-print-mode @media print rule further down, which
+   isolates just this card for a clean black-on-white PDF/paper export. ===== */
+.export-record-box{max-width:640px;width:100%;max-height:86vh;overflow-y:auto;background:#050505;
+  border:1px solid #0EA5E9;border-radius:14px;padding:26px}
+.export-record-head{text-align:center;border-bottom:1px solid rgba(14,165,233,.3);padding-bottom:14px;margin-bottom:18px}
+.export-record-head h3{color:#0EA5E9;font-size:1rem;letter-spacing:.04em;margin-bottom:6px}
+.export-record-meta{font-size:.7rem;color:var(--muted);font-family:var(--mono)}
+.export-record-section-label{color:#0EA5E9;font-size:.72rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:.05em;margin:18px 0 10px}
+.export-record-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.export-record-tile{border:1px solid rgba(14,165,233,.3);border-radius:10px;padding:12px;text-align:center}
+.export-record-tile-val{font-size:1.3rem;font-weight:800;color:#00FF87}
+.export-record-tile-lbl{font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin-top:2px}
+.export-record-table{width:100%;border-collapse:collapse;font-size:.72rem}
+.export-record-table th{text-align:left;color:#0EA5E9;font-size:.62rem;text-transform:uppercase;
+  letter-spacing:.03em;padding:6px 8px;border-bottom:1px solid rgba(14,165,233,.3)}
+.export-record-table td{padding:7px 8px;border-bottom:1px solid rgba(255,255,255,.06);color:var(--text)}
+.export-record-foot{text-align:center;margin-top:20px;padding-top:14px;border-top:1px solid rgba(14,165,233,.3);
+  font-size:.7rem;color:var(--muted)}
+.export-record-actions{display:flex;gap:10px;justify-content:center;margin-top:18px}
 
 /* ===== LOCATION INTAKE MODAL ===== */
 .loc-modal-box{max-width:420px;text-align:center}
@@ -636,8 +664,9 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 .pixel-map-section{max-width:720px;margin:0 auto 20px;padding:0 24px}
 .pixel-map-card{position:relative;height:190px;background:#050505;border:1px solid #0284C7;border-radius:16px;overflow:hidden}
 .pixel-map-svg{width:100%;height:100%;display:block}
-.pixel-map-dot{opacity:.2;transition:fill .2s}
-.pixel-map-dot-active{fill:#00FF87 !important;opacity:.95;animation:staticPulse 1.1s ease-out}
+.pixel-map-dot{opacity:.2;transition:fill .25s,opacity .4s}
+.pixel-map-dot-lit{fill:rgba(0,255,135,0.4) !important;stroke:#00FF87;stroke-width:.75;opacity:.95;
+  filter:drop-shadow(0 0 2px rgba(0,255,135,.6))}
 .pixel-map-outline{fill:none;stroke:#0EA5E9;stroke-width:1.5;opacity:.55}
 .pixel-map-node-core{opacity:0}
 .pixel-map-node-pulse{opacity:0}
@@ -667,12 +696,35 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   border-radius:16px;padding:20px;text-align:center}
 .ticker-value{font-size:2.2rem;font-weight:900;color:var(--mint2);margin:8px 0}
 
-/* The Report Generator card (and its dedicated #reportGenerator-only
-   @media print isolation rule) was removed outright this round — see the
-   "Complete Removal of Report Generator" spec. Both EXPORT/PRINT CIVIC
-   RECORD gateway pills now trigger a plain, unscoped window.print() of
-   the page as currently shown — the honest "standard printable view"
-   the spec asks for, now that there's no single card to isolate. */
+/* The old Report Generator card (and its dedicated #reportGenerator-only
+   @media print isolation rule) was removed outright in an earlier round —
+   see the "Complete Removal of Report Generator" spec. This round replaces
+   the plain, unscoped window.print() that briefly stood in for it with a
+   real "Export Civic Record" modal preview (#exportRecordOverlay, built by
+   buildExportRecordHtml() from the same live big3/ledger data already on
+   screen), and this @media print rule isolates just that modal for a
+   clean black-on-white export — toggled via body.export-record-print-mode
+   only while the modal is actually open, so an ordinary Ctrl+P/Cmd+P print
+   of the page itself is untouched. */
+@media print {
+  body.export-record-print-mode * { visibility: hidden; }
+  body.export-record-print-mode #exportRecordOverlay,
+  body.export-record-print-mode #exportRecordOverlay * { visibility: visible; }
+  body.export-record-print-mode #exportRecordOverlay {
+    position: absolute; inset: 0; background: #FFFFFF !important; padding: 0; display: block;
+  }
+  body.export-record-print-mode .export-record-box {
+    max-width: 100%; max-height: none; overflow: visible; border: none; background: #FFFFFF !important; color: #000000;
+  }
+  body.export-record-print-mode .export-record-box * { color: #000000 !important; }
+  body.export-record-print-mode .export-record-head,
+  body.export-record-print-mode .export-record-foot { border-color: #000000 !important; }
+  body.export-record-print-mode .export-record-tile { border-color: #000000 !important; }
+  body.export-record-print-mode .export-record-table th,
+  body.export-record-print-mode .export-record-table td { border-color: #000000 !important; }
+  body.export-record-print-mode .export-record-actions,
+  body.export-record-print-mode .modal-close { display: none !important; }
+}
 </style>
 </head>
 <body>
@@ -863,11 +915,11 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        hardcoded literally — a fabricated static count would misrepresent
        real ledger data, so the live-updating span id is kept. ===== -->
   <section class="ledger-banner-section">
-    <button id="liveLedgerBanner" class="gateway-pill" type="button" style="display: flex; align-items: center; justify-content: space-between; padding: 6px 14px; border: 1px solid #0EA5E9; background: rgba(14, 165, 233, 0.05); border-radius: 9999px;">
-      <span style="display: inline-flex; align-items: center; gap: 6px; color: #00FF87; font-weight: 700; font-size: 0.75rem;"><span class="pulsing-dot"></span>LIVE</span>
-      <span style="color: rgba(0, 255, 135, 0.3);">|</span>
-      <span style="color: #FFFFFF; font-weight: 600; font-size: 0.8rem;">PUBLIC LEDGER / CIVIC MEMORY</span>
-      <span style="color: rgba(255,255,255,0.6); font-size: 0.72rem;" id="ledgerBannerCount">Syncing…</span>
+    <button id="liveLedgerBanner" class="gateway-pill" type="button" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 22px; border: 1px solid #0EA5E9; background: rgba(14, 165, 233, 0.05); border-radius: 9999px;">
+      <span style="display: inline-flex; align-items: center; gap: 6px; margin-left: 2px; color: #00FF87; font-weight: 700; font-size: 0.75rem; flex-shrink: 0;"><span class="pulsing-dot"></span>LIVE</span>
+      <span style="color: rgba(0, 255, 135, 0.3); flex-shrink: 0;">|</span>
+      <span style="flex: 1; text-align: center; color: #FFFFFF; font-weight: 700; font-size: 0.9rem;">PUBLIC LEDGER</span>
+      <span style="color: rgba(255,255,255,0.6); font-size: 0.72rem; flex-shrink: 0;" id="ledgerBannerCount">Syncing…</span>
     </button>
   </section>
 
@@ -894,8 +946,8 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   <section class="hero-qa-section">
     <div class="hero-qa-block">
       <p style="margin-bottom: 0.75rem; font-size: 1.05rem; text-align: center;"><span style="color:#00FF87; font-weight:bold;">CITIXEN UX<sup class="tm-symbol tm-symbol-flush">™</sup></span> is the modern standard for resident-first municipal engagement.</p>
-      <button id="btnLearnMoreToggle" type="button" style="background: transparent; border: 1px solid #0EA5E9; color: #0EA5E9; padding: 4px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; display: block; margin: 0 auto 12px auto;">Learn More ▾</button>
-      <div id="learnMoreDrawer" hidden>
+      <button id="btnLearnMoreToggle" type="button" style="background: transparent; border: 1px solid #00FF87; color: #00FF87; padding: 4px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; display: block; margin: 0 auto 12px auto;">Learn More ▾</button>
+      <div id="learnMoreDrawer" hidden style="margin-top: 18px; margin-bottom: 22px; font-size: 0.85rem; color: #94A3B8;">
         <div class="hero-qa-workflow-row">
           <span style="display:inline-flex; align-items:center; gap:6px;">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Snap
@@ -911,7 +963,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         </div>
         <p style="margin-bottom: 1.25rem;"><span style="color:#00FF87; font-weight:bold;">CITIXEN UX<sup class="tm-symbol tm-symbol-flush">™</sup></span> combines real-time resident reporting with direct city department tracking and transparent budget auditing.</p>
         <p style="margin-bottom: 1rem;">Create an uneditable public record and hold the receipt to ensure your tax dollars actively protect and improve your neighborhood.</p>
-        <p style="margin-top: 1rem; color: #FFFFFF; font-weight: 500;">Welcome to the era of <span style="color:#00FF87; font-weight:bold;">Civic Intelligence (C.I.)</span>.</p>
+        <p style="margin-top: 1rem; font-weight: 500;">Welcome to the era of <span style="color:#00FF87; font-weight:bold;">Civic Intelligence (C.I.)</span>.</p>
       </div>
     </div>
   </section>
@@ -924,11 +976,11 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        trigger opens — not a duplicate modal. Sits directly above the
        pixel map. ===== -->
   <section class="ledger-banner-section">
-    <button id="aggregationMapGatewayBtn" class="gateway-pill" type="button" style="display: flex; align-items: center; justify-content: space-between; padding: 6px 14px; border: 1px solid #0EA5E9; background: rgba(14, 165, 233, 0.05); border-radius: 9999px;">
-      <span style="display: inline-flex; align-items: center; gap: 6px; color: #00FF87; font-weight: 700; font-size: 0.75rem;"><span class="pulsing-dot"></span>LIVE</span>
-      <span style="color: rgba(0, 255, 135, 0.3);">|</span>
-      <span style="color: #FFFFFF; font-weight: 600; font-size: 0.8rem;">CROWD SOURCE AMERICA<sup class="tm-symbol">™</sup> / AGGREGATION HUB</span>
-      <span style="color: #0EA5E9; font-size: 0.72rem;">View Map ↗</span>
+    <button id="aggregationMapGatewayBtn" class="gateway-pill" type="button" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 22px; border: 1px solid #0EA5E9; background: rgba(14, 165, 233, 0.05); border-radius: 9999px;">
+      <span style="display: inline-flex; align-items: center; gap: 6px; margin-left: 2px; color: #00FF87; font-weight: 700; font-size: 0.75rem; flex-shrink: 0;"><span class="pulsing-dot"></span>LIVE</span>
+      <span style="color: rgba(0, 255, 135, 0.3); flex-shrink: 0;">|</span>
+      <span style="flex: 1; text-align: center; color: #FFFFFF; font-weight: 700; font-size: 0.9rem;">AGGREGATION HUB</span>
+      <span style="color: #0EA5E9; font-size: 0.72rem; flex-shrink: 0;">View Map ↗</span>
     </button>
   </section>
 
@@ -943,11 +995,12 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        the Aggregation Hub's own markers). Reused once via <use> both as
        the clip-path for the dim cyan grid and as a crisp, visible
        coastline stroke (.pixel-map-outline) on top of it, so the two can
-       never drift out of sync. Grid pixels flash Emerald Green at
-       randomized intervals (igniteRandomPixel(), see below) and the map
-       interior carries only Emerald Green city nodes — no cyan/blue
-       nodes. Everything here is stationary — fixed coordinates,
-       opacity-only staticPulse animation, no panning/floating/zooming.
+       never drift out of sync. Grid pixels light progressively and stay lit,
+       one every 1.5-2.5s (lightNextRandomPixel(), see below), resetting
+       after 80% coverage, and the map interior carries only Emerald Green
+       city nodes — no cyan/blue nodes. Everything here is stationary —
+       fixed coordinates, opacity-only staticPulse node animation, no
+       panning/floating/zooming.
        Purely decorative; it draws no real per-city report data, unlike
        the Aggregation Hub's live-tagged La Crosse marker. ===== -->
   <section class="pixel-map-section">
@@ -1027,23 +1080,27 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        stays a real addEventListener (see below), not an inline onclick=,
        to keep this file's CSP-safe-JS convention. ===== -->
   <section class="csa-print-gateway-section">
-    <button id="btnCsaExportPrint" class="gateway-pill" type="button" style="display: flex; align-items: center; justify-content: space-between; padding: 6px 14px; border: 1px solid #FFFFFF; background: rgba(255, 255, 255, 0.05); border-radius: 9999px;">
-      <span style="display: inline-flex; align-items: center; gap: 6px; color: #00FF87; font-weight: 700; font-size: 0.75rem;"><span class="pulsing-dot"></span>LIVE</span>
-      <span style="color: rgba(255, 255, 255, 0.3);">|</span>
-      <span style="color: #FFFFFF; font-weight: 600; font-size: 0.8rem;">EXPORT / PRINT CIVIC RECORD</span>
-      <span style="color: #FFFFFF; font-size: 0.72rem;">Print Record 🖨️</span>
+    <button id="btnCsaExportPrint" class="gateway-pill" type="button" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 22px; border: 1px solid #FFFFFF; background: rgba(255, 255, 255, 0.05); border-radius: 9999px;">
+      <span style="display: inline-flex; align-items: center; gap: 6px; margin-left: 2px; color: #00FF87; font-weight: 700; font-size: 0.75rem; flex-shrink: 0;"><span class="pulsing-dot"></span>LIVE</span>
+      <span style="color: rgba(255, 255, 255, 0.3); flex-shrink: 0;">|</span>
+      <span style="flex: 1; text-align: center; color: #FFFFFF; font-weight: 700; font-size: 0.9rem;">EXPORT CIVIC RECORD</span>
+      <span style="color: #0EA5E9; font-weight: 600; font-size: 0.8rem; flex-shrink: 0;">Export Record ↗</span>
     </button>
   </section>
 
   <!-- ===== CITY SNAPSHOT — a single geolocated dashboard for the visitor's
-       own jurisdiction. #snapshot-city-name starts as "Detecting
-       location…" and is filled in by the SAME real geolocation/
-       jurisdiction system the frozen header's location bar already uses
-       (detectJurisdictionGuess() -> navigator.geolocation.getCurrentPosition()
-       -> ipapi.co IP fallback -> applyJurisdiction() ->
-       syncDashboardToJurisdiction(), below) — no second, parallel
-       detection system — falling back to "LA CROSSE, WI — CITY SNAPSHOT"
-       if geolocation is denied/blocked/unsupported or times out, same
+       own jurisdiction. #snapshot-city-name starts pre-filled with the
+       honest default, "La Crosse, WI", rather than a "Detecting
+       location…" placeholder that could get stuck if every detection
+       step fails or hangs — it is then quietly upgraded in place by the
+       SAME real jurisdiction system the frozen header's location bar
+       already uses (detectJurisdictionGuess(): ipapi.co IP lookup ->
+       ip-api.com IP lookup -> navigator.geolocation.getCurrentPosition()
+       -> default, each step bounded by its own timeout — see
+       detectJurisdictionGuess() below — then applyJurisdiction() ->
+       syncDashboardToJurisdiction()) — no second, parallel detection
+       system — falling back to "LA CROSSE, WI — CITY SNAPSHOT"
+       if every step is denied/blocked/unsupported or times out, same
        default as the rest of the page. Label uppercased and reworded to
        "— CITY SNAPSHOT" this round; "Ward Health Index"/"Ward Performance
        Metrics" renamed to "City Health Index"/"City Performance Metrics"
@@ -1057,11 +1114,11 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        "Explore More Data" header in its place. ===== -->
   <section class="matrix-summary-section" id="matrixSummarySection">
     <div class="analytics-matrix-card" id="analyticsMatrix">
-      <div class="label" style="justify-content:center;text-transform:uppercase" id="citySnapshotLabel"><span id="snapshot-city-name">Detecting location…</span> — City Snapshot</div>
+      <div class="label" style="justify-content:center;text-transform:uppercase" id="citySnapshotLabel"><span id="snapshot-city-name">La Crosse, WI</span> — City Snapshot</div>
       <div class="matrix-grid" id="matrixGrid"></div>
-      <div class="small" style="text-align:center;margin-top:10px;color:var(--muted)">Live City Performance Metrics — refreshed automatically from field dispatch data. Tap a metric tile for its full breakdown.</div>
+      <div class="small" style="text-align:center;margin-top:10px;color:var(--muted)">Live City Performance Metrics — Aggregated from verified field dispatch logs and real-time resident submissions. Tap a metric tile for its full breakdown.</div>
     </div>
-    <h3 style="color: #0EA5E9; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; margin: 20px 0 10px 0; text-align: center;">Explore More Data</h3>
+    <h3 style="color: #0EA5E9; font-size: 1.15rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin: 36px 0 24px 0; text-align: center;">Explore More Data</h3>
   </section>
 
   <!-- ===== THREE DRILL-DOWN ACTION HUBS — sit directly below City Snapshot
@@ -1075,16 +1132,19 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        scrolled to civicStackAdminCard). ===== -->
   <div class="hub-row" role="navigation" aria-label="Deep-dive sections">
     <button class="hub-card" id="hubCoverageBtn" type="button" aria-expanded="false" aria-controls="deepdiveAnalytics">
+      <span class="hub-card-info" id="hubCoverageInfoBtn" role="button" tabindex="0" aria-label="What the Analytics section covers">i</span>
       <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><rect x="6" y="10" width="3" height="9"/><rect x="11" y="6" width="3" height="13"/><rect x="16" y="13" width="3" height="6"/></svg>
       <span>Analytics</span>
       <span class="hub-card-sub">Data and reports</span>
     </button>
     <button class="hub-card" id="hubSlaBtn" type="button" aria-expanded="false" aria-controls="civicStackSection">
-      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7V5a2 2 0 0 1 2-2h8"/><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M2 11h20"/><circle cx="17" cy="15" r="1.3" fill="#00FF87" stroke="none"/></svg>
+      <span class="hub-card-info" id="hubSlaInfoBtn" role="button" tabindex="0" aria-label="What the Expenditures section covers">i</span>
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7V5a2 2 0 0 1 2-2h8"/><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M2 11h20"/><circle cx="17" cy="15" r="1.3" fill="#0EA5E9" stroke="none"/></svg>
       <span>Expenditures</span>
       <span class="hub-card-sub">Budget and projects</span>
     </button>
     <button class="hub-card" id="hubStackBtn" type="button" aria-expanded="false" aria-controls="civicStackSection">
+      <span class="hub-card-info" id="hubStackInfoBtn" role="button" tabindex="0" aria-label="What the Operations section covers">i</span>
       <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 21 8 12 13 3 8 12 3"/><polyline points="3 13 12 18 21 13"/><polyline points="3 18 12 23 21 18"/></svg>
       <span>Operations</span>
       <span class="hub-card-sub">Civic Stack &amp; integration</span>
@@ -1340,6 +1400,18 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       <button class="modal-close" id="modalClose">✕</button>
       <div id="modalContent"></div>
     </div>
+  </div>
+
+  <!-- ===== EXPORT CIVIC RECORD MODAL — opened by the "EXPORT CIVIC RECORD"
+       gateway pill (#btnCsaExportPrint). Content is built entirely from the
+       same real, already-on-screen data (loadBig3()'s matrixData/
+       currentWardHealth for the 2x2 metrics grid, ledgerTickets for the
+       report log) by buildExportRecordHtml() — nothing here is fabricated.
+       The "Print / Save PDF" action triggers window.print() with
+       body.export-record-print-mode set, which the @media print rule above
+       uses to isolate just this card. ===== -->
+  <div class="modal-overlay" id="exportRecordOverlay">
+    <div class="export-record-box" id="exportRecordContent"></div>
   </div>
 
   <!-- ===== CENTERED MINIMAL FOOTER — the old 4-column sitemap link block
@@ -1640,6 +1712,30 @@ document.querySelectorAll('.ledger-filter').forEach(btn=>{
 });
 
 const modalData={
+  submoduleAnalytics:{
+    title:'Analytics — What This Section Covers',
+    body:[
+      ['SLA Performance','How quickly reports are routed and resolved against each ward\'s published response-time commitment.'],
+      ['Hazard Category Frequency','Which hazard categories (roads, lighting, sanitation, etc.) are reported most often, ward by ward.'],
+      ['Response Time Trends','How resolution speed is moving over time, drawn from the same dispatch data field crews see.']
+    ]
+  },
+  submoduleExpenditures:{
+    title:'Expenditures — What This Section Covers',
+    body:[
+      ['Capital Improvement Allocations','How budgeted capital-improvement dollars are distributed across active repair categories.'],
+      ['Ward-by-Ward Resource Spend','Itemized, per-ward spend estimates drawn from resolved-case categories in the Civic Memory ledger.'],
+      ['Repair ROI','A rough return-on-investment read on completed repairs — cost against the hazard volume it resolved.']
+    ]
+  },
+  submoduleOperations:{
+    title:'Operations — What This Section Covers',
+    body:[
+      ['Department Dispatch Logs','The routing trail a report takes once it reaches a city department, end to end.'],
+      ['Civic Stack Integrations','Which backend systems and department tools this platform connects to for live status.'],
+      ['Field Unit Routing','How open cases are assigned and routed to field crews for resolution.']
+    ]
+  },
   constitution:{
     title:'Founding Constitution',
     body:[
@@ -1725,6 +1821,25 @@ document.getElementById('hubSlaBtn').addEventListener('click', (e) => {
 });
 document.getElementById('hubStackBtn').addEventListener('click', (e) => {
   openDeepdivePanel('civicStackSection', 'civicStackAdminCard', e.currentTarget);
+});
+
+// SUB-MODULE FOCUS-AREA PREVIEWS — the small "i" badge on each of the 3
+// hub-cards opens a quick modal naming what that section covers (this
+// round's spec copy), without triggering the card's own real expand-to-
+// deep-dive-panel behavior above — stopPropagation keeps the two
+// interactions from firing together on the same click.
+const hubInfoBindings = [
+  ['hubCoverageInfoBtn', 'submoduleAnalytics'],
+  ['hubSlaInfoBtn', 'submoduleExpenditures'],
+  ['hubStackInfoBtn', 'submoduleOperations']
+];
+hubInfoBindings.forEach(([id, key]) => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('click', (e) => { e.stopPropagation(); openModal(key); });
+  el.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); openModal(key); }
+  });
 });
 document.querySelectorAll('[data-close-panel]').forEach(btn => {
   btn.addEventListener('click', () => closeDeepdivePanel(btn.dataset.closePanel));
@@ -1886,15 +2001,17 @@ document.getElementById('modalOverlay').addEventListener('click',(e)=>{
 /* =====================================================================
    GEOGRAPHIC LOCATION INTAKE — jurisdiction detection & persistence
    -----------------------------------------------------------------
-   On first load, this tries the browser Geolocation API and matches the
-   coordinates against CITIXEN's seeded municipalities (nearest by
+   On first load, this tries two free IP-geolocation lookups in order
+   (ipapi.co, then ip-api.com on failure — no key required for either),
+   then the browser Geolocation API if both IP lookups fail, then the
+   honest default jurisdiction — each step bounded by its own timeout so a
+   hung request can't get the intake stuck. Every step matches the
+   resolved lat/lng against CITIXEN's seeded municipalities (nearest by
    straight-line distance — the only "reverse geocoding" this demo can back
-   with real data); if geolocation is denied/unavailable, it falls back to
-   a free IP-geolocation lookup (ipapi.co, no key required) for a city/
-   region guess, matched the same way. Either way the result is only ever
-   a *suggestion* — the citizen confirms or picks a different jurisdiction
-   explicitly, and nothing is sent anywhere as part of this: the match
-   happens entirely in the browser against the public /directory payload.
+   with real data). Either way the result is only ever a *suggestion* — the
+   citizen confirms or picks a different jurisdiction explicitly, and
+   nothing is sent anywhere as part of this: the match happens entirely in
+   the browser against the public /directory payload.
    ===================================================================== */
 const JURISDICTION_KEY = 'CITIXEN_JURISDICTION';
 const DEFAULT_JURISDICTION = { state:'wi', city:'la-crosse', ward:'ward-4' };
@@ -1935,8 +2052,29 @@ function nearestCityKey(lat, lng){
   return best;
 }
 
+// Fetches an IP-geolocation JSON endpoint with its own abort timeout, so a
+// hung request (offline, blocked by an ad blocker, CORS failure, or a
+// stalled connection that never resolves OR rejects) can never leave the
+// detection chain — and therefore the "Detecting location…" state — stuck
+// indefinitely. Returns { latitude, longitude } or null; never throws.
+async function fetchIpGeoJson(url, timeoutMs){
+  try {
+    const controller = new AbortController();
+    const abortTimer = setTimeout(() => controller.abort(), timeoutMs);
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(abortTimer);
+    if (!res.ok) return null;
+    const data = await res.json();
+    // ip-api.com uses `lat`/`lon`; ipapi.co uses `latitude`/`longitude` —
+    // normalize both shapes here so the caller only deals with one.
+    const latitude = typeof data.latitude === 'number' ? data.latitude : data.lat;
+    const longitude = typeof data.longitude === 'number' ? data.longitude : data.lon;
+    if (typeof latitude === 'number' && typeof longitude === 'number') return { latitude, longitude };
+    return null;
+  } catch (e) { return null; } // offline, blocked, aborted, or malformed — fall through
+}
+
 async function detectJurisdictionGuess(dir){
-  // 1) Browser geolocation, matched to the nearest seeded city.
   const fromCoords = (lat, lng, source) => {
     const key = nearestCityKey(lat, lng);
     const [state, city] = key.split('/');
@@ -1948,19 +2086,41 @@ async function detectJurisdictionGuess(dir){
     // Real device GPS (never the coarser IP-based fallback) is kept on the
     // result so the map can drop a "you are here" beacon at the actual
     // coordinate — this never gets sent anywhere, it's a client-side pin only.
-    if (source !== 'IP address (approximate)') { out._deviceLat = lat; out._deviceLng = lng; }
+    if (source === 'device location') { out._deviceLat = lat; out._deviceLng = lng; }
     return out;
   };
 
-  // A browser permission prompt the person never answers can leave
-  // getCurrentPosition's own `timeout` option from ever counting down (it
-  // only starts once a permission decision has been made), so this is
-  // raced against an independent timer rather than trusting that option
-  // alone — otherwise an ignored prompt would leave the intake modal
-  // stuck on "Locating…" indefinitely instead of falling through to IP/
-  // default. Fast-fallback timeout tightened to 2.5s this round so a
-  // blocked/slow GPS prompt falls through to the IP lookup quickly
-  // instead of stalling the header/snapshot/report sync.
+  // Reliable fallback chain, this round's explicit order: (1) ipapi.co,
+  // (2) ip-api.com on ipapi.co's CORS/adblock/timeout failure, (3) browser
+  // navigator.geolocation, (4) the honest default jurisdiction — each step
+  // bounded by its own timeout so a hung request always falls through
+  // rather than leaving the City Snapshot / Smart Location header stuck on
+  // "Detecting location…".
+
+  // 1) ipapi.co (HTTPS, no key required).
+  const ipapiCoResult = await fetchIpGeoJson('https://ipapi.co/json/', 4000);
+  if (ipapiCoResult) {
+    const guess = fromCoords(ipapiCoResult.latitude, ipapiCoResult.longitude, 'IP address (approximate)');
+    if (guess) return guess;
+  }
+
+  // 2) ip-api.com fallback (plain HTTP per its free tier — browsers block
+  //    this as mixed content on an HTTPS page, which fetch() surfaces as a
+  //    normal rejection caught inside fetchIpGeoJson(), so this step simply
+  //    falls through to geolocation in that case rather than hanging).
+  const ipApiComResult = await fetchIpGeoJson('http://ip-api.com/json/', 4000);
+  if (ipApiComResult) {
+    const guess = fromCoords(ipApiComResult.latitude, ipApiComResult.longitude, 'IP address (approximate)');
+    if (guess) return guess;
+  }
+
+  // 3) Browser geolocation, matched to the nearest seeded city. A browser
+  //    permission prompt the person never answers can leave
+  //    getCurrentPosition's own `timeout` option from ever counting down (it
+  //    only starts once a permission decision has been made), so this is
+  //    raced against an independent timer rather than trusting that option
+  //    alone — otherwise an ignored prompt would leave detection stuck
+  //    instead of falling through to the default.
   const geoWithHardTimeout = new Promise(resolve => {
     if (!navigator.geolocation) return resolve(null);
     navigator.geolocation.getCurrentPosition(
@@ -1973,25 +2133,9 @@ async function detectJurisdictionGuess(dir){
   const geo = await Promise.race([geoWithHardTimeout, hardTimeout]);
   if (geo) return geo;
 
-  // 2) IP-based fallback (no key required); best-effort, may fail silently
-  //    (offline, blocked by an extension, or the free quota is exhausted).
-  //    Bounded by its own abort timeout for the same reason as above — a
-  //    hung request must not leave the intake modal stuck.
-  try {
-    const controller = new AbortController();
-    const abortTimer = setTimeout(() => controller.abort(), 4000);
-    const res = await fetch('https://ipapi.co/json/', { signal: controller.signal });
-    clearTimeout(abortTimer);
-    if (res.ok) {
-      const data = await res.json();
-      if (typeof data.latitude === 'number' && typeof data.longitude === 'number') {
-        const guess = fromCoords(data.latitude, data.longitude, 'IP address (approximate)');
-        if (guess) return guess;
-      }
-    }
-  } catch (e) { /* offline or blocked — fall through to default */ }
-
-  // 3) Default seed jurisdiction.
+  // 4) Default seed jurisdiction — "LA CROSSE, WI", displayed immediately
+  //    (see #snapshot-city-name's pre-filled markup) rather than left on a
+  //    "Detecting location…" placeholder while this chain runs.
   const s = dir.states.find(s => s.slug === DEFAULT_JURISDICTION.state);
   const c = s && s.cities.find(c => c.slug === DEFAULT_JURISDICTION.city);
   const w = c && c.wards.find(w => w.slug === DEFAULT_JURISDICTION.ward);
@@ -2002,7 +2146,14 @@ let jurisdictionDirectory = null;
 
 async function fetchJurisdictionDirectory(){
   try {
-    const res = await fetch('/api/coverage/directory');
+    // Bounded by its own abort timeout — same reasoning as the IP-geo
+    // fetches in detectJurisdictionGuess() below: a hung request here
+    // would block every step after it, leaving the City Snapshot stuck on
+    // its placeholder before detection even starts.
+    const controller = new AbortController();
+    const abortTimer = setTimeout(() => controller.abort(), 4000);
+    const res = await fetch('/api/coverage/directory', { signal: controller.signal });
+    clearTimeout(abortTimer);
     if (!res.ok) throw new Error('directory ' + res.status);
     return await res.json();
   } catch (e) {
@@ -2645,18 +2796,21 @@ document.getElementById('matrixGrid').addEventListener('click', (e) => {
 
 /* =====================================================================
    NATIONAL LIVE REPORT PIXEL MAP — draws the dense dim cyan-tinted pixel
-   grid inside the hand-authored #usSilhouetteClip SVG clip-path, then
+   grid inside the OpenCV-traced #usSilhouetteClip SVG clip-path, then
    overlays six bright, pulsing Emerald Green (#00FF87) city nodes — no
-   cyan/blue nodes, per this round's spec. igniteRandomPixel() then
-   randomly flashes individual grid squares Emerald Green at randomized
-   intervals to simulate live aggregated reporting. This is purely
-   decorative — it draws no real per-city report data, unlike the
-   Aggregation Hub's live-tagged La Crosse marker elsewhere on this page
-   — and the silhouette itself is a stylized approximation, not a precise
-   cartographic projection (same convention documented on the
-   Aggregation Hub's own marker layout). Everything here is stationary:
-   nodes and flashed pixels only fade opacity in place (@keyframes
-   staticPulse) — nothing pans, floats, or zooms.
+   cyan/blue nodes. lightNextRandomPixel() then progressively lights
+   individual unlit grid squares, one every 1.5-2.5s (soft cyan/emerald
+   fill + emerald stroke, per this round's spec), and — unlike the earlier
+   flash-and-fade behavior — each lit square STAYS lit to simulate
+   accumulating "block-by-block" national data aggregation, resetting the
+   whole grid back to unlit once 80% coverage is reached and starting the
+   next aggregation pass. This is purely decorative — it draws no real
+   per-city report data, unlike the Aggregation Hub's live-tagged La
+   Crosse marker elsewhere on this page — and the silhouette itself is a
+   stylized approximation, not a precise cartographic projection (same
+   convention documented on the Aggregation Hub's own marker layout).
+   Everything here is stationary: nodes pulse in place (@keyframes
+   staticPulse) and lit pixels never pan, float, or zoom.
    ===================================================================== */
 function renderNationalPixelMap(){
   const grid = document.getElementById('pixelMapGrid');
@@ -2693,33 +2847,42 @@ function renderNationalPixelMap(){
     '</g>'
   ).join('');
 
-  scheduleNextPixelIgnite();
+  scheduleNextPixelLight();
 }
 
-// Flashes a small cluster of random grid pixels Emerald Green for one
-// staticPulse cycle each (opacity-only, no scale/transform, fixed
-// position), then hands off to a randomized-delay setTimeout for the
-// next flash — so illuminations arrive at randomized intervals across
-// scattered fixed positions (matching the reference screenshot's dense,
-// many-lit-at-once look) rather than a single fixed-tick dot, with no
-// zooming, moving, or floating canvas movement.
-function igniteRandomPixel(){
+// Lights one random still-unlit grid square per tick (soft cyan/emerald
+// fill + emerald stroke, via .pixel-map-dot-lit), fixed in place and
+// staying lit — no flash-and-fade — so coverage visibly accumulates
+// block-by-block, simulating real-time national data aggregation. Once
+// 80% of the grid is lit, the whole grid resets back to unlit (after a
+// brief pause so the near-full-coverage moment is visible) and the
+// aggregation pass starts again from zero.
+const PIXEL_MAP_RESET_COVERAGE = 0.8;
+let pixelMapResetPending = false;
+function lightNextRandomPixel(){
   const grid = document.getElementById('pixelMapGrid');
-  if (!grid) return;
+  if (!grid || pixelMapResetPending) return;
   const dots = grid.querySelectorAll('.pixel-map-dot');
   if (!dots.length) return;
-  const burst = 2 + Math.floor(Math.random() * 4); // 2-5 pixels per tick
-  for (let i = 0; i < burst; i++) {
-    const dot = dots[Math.floor(Math.random() * dots.length)];
-    dot.classList.add('pixel-map-dot-active');
-    setTimeout(() => dot.classList.remove('pixel-map-dot-active'), 900 + Math.random() * 500);
+  const unlit = Array.prototype.filter.call(dots, d => !d.classList.contains('pixel-map-dot-lit'));
+  if (unlit.length) {
+    const dot = unlit[Math.floor(Math.random() * unlit.length)];
+    dot.classList.add('pixel-map-dot-lit');
+  }
+  const litCount = dots.length - unlit.length + (unlit.length ? 1 : 0);
+  if (litCount / dots.length >= PIXEL_MAP_RESET_COVERAGE) {
+    pixelMapResetPending = true;
+    setTimeout(() => {
+      dots.forEach(d => d.classList.remove('pixel-map-dot-lit'));
+      pixelMapResetPending = false;
+    }, 1200);
   }
 }
-function scheduleNextPixelIgnite(){
-  const delay = 200 + Math.random() * 700;
+function scheduleNextPixelLight(){
+  const delay = 1500 + Math.random() * 1000; // 1.5s-2.5s, per this round's spec
   setTimeout(() => {
-    igniteRandomPixel();
-    scheduleNextPixelIgnite();
+    lightNextRandomPixel();
+    scheduleNextPixelLight();
   }, delay);
 }
 
@@ -2746,13 +2909,113 @@ function renderNationalCoverageTicker(){
 
 // The Report Generator section (timeframe/format dropdowns, Public
 // Official checkbox, raw-text preview box, and its #btnExportPrintReport
-// button) was removed outright this round, per the explicit "Complete
+// button) was removed outright in an earlier round, per the "Complete
 // Removal of Report Generator" spec — renderReportOutput()/
 // REPORT_DEPT_ROWS and their listeners went with it, not left as dead
 // code. #btnCsaExportPrint (the unified gateway pill above City Snapshot)
-// remains the one print entry point: a plain, direct window.print().
+// now opens a real Export Civic Record modal preview (below) instead of
+// firing window.print() directly, per this round's spec.
+
+// Lightweight, deterministic (NOT cryptographic) content fingerprint for
+// the record — reflects this record's actual on-screen data so the same
+// data always produces the same hash, but it is not a blockchain entry or
+// a notarized signature, and the modal footer says so honestly.
+function simpleRecordHash(str){
+  let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+  for (let i = 0; i < str.length; i++) {
+    const ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (h1 >>> 0).toString(16).padStart(8, '0') + (h2 >>> 0).toString(16).padStart(8, '0');
+}
+
+// Builds and opens the Export Civic Record modal from the SAME real data
+// already on screen: matrixData/currentWardHealth (set by loadBig3() /
+// renderAnalyticsMatrix()) for the 2x2 metrics grid, and ledgerTickets
+// (the same data openLedgerDrawer() shows) for the report log — nothing
+// here is invented for the export.
+async function openExportRecordModal(){
+  if (!ledgerTickets.length) ledgerTickets = await fetchLedgerTickets();
+
+  const j = activeJurisdiction();
+  const jurisdictionText = j ? jurisdictionLabel(j) : 'La Crosse, WI — Ward 4';
+  const now = new Date();
+  const timestamp = now.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'medium' });
+
+  const activeHazards = matrixData && matrixData.activeCount != null ? String(matrixData.activeCount) : 'N/A';
+  const fixSpeed = matrixData && matrixData.avgResolutionHours != null ? matrixData.avgResolutionHours + 'h' : 'N/A';
+  const completionRate = matrixData && matrixData.verificationRatePct != null ? matrixData.verificationRatePct + '%' : 'N/A';
+  const cityHealthIndex = currentWardHealth != null ? String(currentWardHealth) : 'N/A';
+
+  // Verified/resolved entries first, capped to a readable page length.
+  const recentReports = ledgerTickets.slice()
+    .sort((a, b) => (a.stage === 'resolved' ? 0 : 1) - (b.stage === 'resolved' ? 0 : 1))
+    .slice(0, 8);
+
+  const rowsHtml = recentReports.length
+    ? recentReports.map(t => `<tr>
+        <td>${esc(t.category)}</td>
+        <td>${esc(t.loc)}</td>
+        <td>${esc(t.stage.charAt(0).toUpperCase() + t.stage.slice(1))}</td>
+        <td>${esc(t.submittedAgo || 'N/A')}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="4" style="text-align:center;color:var(--muted)">No ledger entries loaded.</td></tr>';
+
+  const hashInput = JSON.stringify({
+    j: jurisdictionText, m: matrixData, w: currentWardHealth,
+    t: recentReports.map(t => t.reportId), minute: Math.floor(now.getTime() / 60000)
+  });
+  const recordHash = simpleRecordHash(hashInput);
+
+  document.getElementById('exportRecordContent').innerHTML = `
+    <div class="export-record-head">
+      <h3>CITIXEN UX<sup class="tm-symbol">™</sup> | OFFICIAL CIVIC RECORD</h3>
+      <div class="export-record-meta">${esc(jurisdictionText)}<br>Generated ${esc(timestamp)}<br>Ledger Verification Hash: ${recordHash}</div>
+    </div>
+    <div class="export-record-section-label">City Snapshot Metrics</div>
+    <div class="export-record-grid">
+      <div class="export-record-tile"><div class="export-record-tile-val">${esc(activeHazards)}</div><div class="export-record-tile-lbl">Active Hazards</div></div>
+      <div class="export-record-tile"><div class="export-record-tile-val">${esc(fixSpeed)}</div><div class="export-record-tile-lbl">Fix Speed</div></div>
+      <div class="export-record-tile"><div class="export-record-tile-val">${esc(completionRate)}</div><div class="export-record-tile-lbl">Completion Rate</div></div>
+      <div class="export-record-tile"><div class="export-record-tile-val">${esc(cityHealthIndex)}</div><div class="export-record-tile-lbl">City Health Index</div></div>
+    </div>
+    <div class="export-record-section-label">Recent Verified Field Reports</div>
+    <table class="export-record-table">
+      <thead><tr><th>Category</th><th>Street</th><th>Status</th><th>Timestamp</th></tr></thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>
+    <div class="export-record-foot">
+      Verified via Civic Intelligence Ledger — Uneditable Public Record.<br>
+      <span style="font-size:.62rem">Hash is a deterministic content fingerprint of this record, not a blockchain or notarized signature.</span>
+    </div>
+    <div class="export-record-actions">
+      <button type="button" class="btn btn-outline" id="exportRecordCloseBtn">Close</button>
+      <button type="button" class="btn btn-primary" id="exportRecordPrintBtn">Print / Save PDF</button>
+    </div>`;
+
+  document.getElementById('exportRecordOverlay').classList.add('open');
+  document.getElementById('exportRecordCloseBtn').addEventListener('click', closeExportRecordModal);
+  document.getElementById('exportRecordPrintBtn').addEventListener('click', () => {
+    document.body.classList.add('export-record-print-mode');
+    window.print();
+  });
+}
+function closeExportRecordModal(){
+  document.getElementById('exportRecordOverlay').classList.remove('open');
+}
+// Printing (or cancelling the print dialog) both fire 'afterprint' — clear
+// the isolation class either way so a later, ordinary page print isn't
+// accidentally scoped to this modal.
+window.addEventListener('afterprint', () => document.body.classList.remove('export-record-print-mode'));
+document.getElementById('exportRecordOverlay').addEventListener('click', (e) => {
+  if (e.target.id === 'exportRecordOverlay') closeExportRecordModal();
+});
+
 const csaExportPrintBtn = document.getElementById('btnCsaExportPrint');
-if (csaExportPrintBtn) csaExportPrintBtn.addEventListener('click', () => window.print());
+if (csaExportPrintBtn) csaExportPrintBtn.addEventListener('click', () => openExportRecordModal());
 
 /* =====================================================================
    WARD HEALTH SUMMARY — ONE-CLICK PDF EXPORT (client-side, via jsPDF)
