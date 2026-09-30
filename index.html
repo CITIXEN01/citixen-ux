@@ -264,17 +264,21 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .hub-card-arrow{font-size:.8rem;font-weight:600;color:#00E699;flex-shrink:0}
 .hub-card:hover{border-color:#00E699}
 
-/* ===== CITIXEN UX™ INTERACTIVE FEATURE & SECURITY SECTION — rebuilt this
-   round (item 4) from a static 3-column bullet grid into a tappable
-   3-icon grid with a Hero Trust Anchor Badge above it. Same glass card
-   surface token as every other container. ===== */
+/* ===== CITIXEN UX™ INTERACTIVE FEATURE & SECURITY SECTION — rebuilt in an
+   earlier round (item 4) from a static 3-column bullet grid into a
+   tappable 3-icon grid. This round reorders it (grid, then an inline
+   accordion, then the Flagship Trust Anchor Card) and replaces the old
+   tap-opens-a-modal interaction with a real inline accordion that slides
+   open directly below the icon row (.citixen-feature-accordion,
+   max-height transition rather than display:none/block, so it animates).
+   Same glass card surface token as every other container. ===== */
 .citixen-feature-section{max-width:920px;margin:0 auto 26px;padding:0 16px}
 .citixen-feature-heading{display:flex;align-items:center;justify-content:center;gap:8px;
   color:#00E699;font-weight:800;font-size:1.1rem;letter-spacing:.08em;text-transform:uppercase;
   margin:20px 0 6px;text-align:center}
 .citixen-feature-learn-more{display:inline-block;background:none;border:none;padding:0;font:inherit;
   color:#00E699;font-size:.8rem;font-weight:700;cursor:pointer;text-decoration:underline}
-.citixen-trust-badge{display:flex;align-items:flex-start;gap:12px;max-width:640px;margin:0 auto 18px;
+.citixen-trust-badge{display:flex;align-items:flex-start;gap:12px;max-width:640px;margin:18px auto 0;
   background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);
   border-radius:12px;padding:14px 16px}
 .citixen-trust-badge svg{flex-shrink:0;margin-top:2px}
@@ -284,12 +288,20 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .citixen-feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .citixen-feature-tile{background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);
   border-radius:12px;padding:20px 10px;display:flex;flex-direction:column;align-items:center;gap:10px;
-  cursor:pointer;font-family:inherit;transition:border-color .15s,filter .15s}
+  cursor:pointer;font-family:inherit;transition:border-color .15s,filter .15s,background .15s}
 .citixen-feature-tile:hover{border-color:#00E699;filter:brightness(1.08)}
+.citixen-feature-tile.active{border-color:#00E699;background:rgba(0,230,153,.08)}
 .citixen-feature-tile-icon{width:44px;height:44px;border-radius:50%;background:rgba(0,230,153,.1);
   display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .citixen-feature-tile-label{color:var(--text);font-weight:700;font-size:.78rem;text-transform:uppercase;
   letter-spacing:.05em}
+.citixen-feature-accordion{max-width:100%;max-height:0;overflow:hidden;opacity:0;
+  background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);
+  border-radius:12px;transition:max-height .3s ease,opacity .25s ease,margin .3s ease;margin-top:0}
+.citixen-feature-accordion.open{max-height:600px;opacity:1;margin-top:12px;padding:16px 18px}
+.citixen-feature-accordion h4{color:var(--text);font-size:.82rem;margin:12px 0 4px}
+.citixen-feature-accordion h4:first-child{margin-top:0}
+.citixen-feature-accordion p{color:var(--muted);font-size:.78rem;line-height:1.55}
 @media (max-width:640px){
   .citixen-trust-badge{flex-direction:column;align-items:center;text-align:center}
   .citixen-feature-grid{gap:8px}
@@ -1002,6 +1014,9 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   font-weight:700;cursor:pointer;padding:6px 2px}
 .tour-tooltip-actions .tour-next-btn{color:#00E699}
 .tour-tooltip-actions button:disabled{opacity:.35;cursor:default}
+.tour-dots{display:flex;align-items:center;gap:6px}
+.tour-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);transition:background .2s,transform .2s}
+.tour-dot.active{background:#00E699;transform:scale(1.35)}
 
 /* The old Report Generator card (and its dedicated #reportGenerator-only
    @media print isolation rule) was removed outright in an earlier round —
@@ -1383,13 +1398,17 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        prior top-down tree with a radial hub-and-spoke layout: a glowing
        CITIXEN UX™ nucleus badge at the center, with three equal-length,
        bi-directional vector spokes radiating out to the same 3 real leaf
-       nodes at 120° apart. Each leaf node name is a real, reachable part
-       of this build, not an invented pipeline: "Resident Field Unit" is
-       the mobile reporting flow (app.html) — and doubles as this page's
-       AI Civic Guide tour Step 1 target (#reportTreeNodeResident) —
-       "Public Ledger" is the real #ledgerDrawer every submitted report
-       becomes visible in, and "Municipal Portal" is the Municipal engine
-       button's Work Orders & SLA Tracker panel below. ===== -->
+       nodes at 120° apart. This round's fix trims each spoke's endpoints
+       via vector math to the nucleus (r=32) and leaf (r=26) circle edges
+       along each spoke's own direction unit vector, rather than drawing
+       center-to-center, so no line segment runs into either circle's
+       icon. Each leaf node name is a real, reachable part of this build,
+       not an invented pipeline: "Resident Field Unit" is the mobile
+       reporting flow (app.html) — and doubles as this page's AI Civic
+       Guide tour target (#reportTreeNodeResident) — "Public Ledger" is
+       the real #ledgerDrawer every submitted report becomes visible in,
+       and "Municipal Portal" is the Municipal engine button's Work
+       Orders & SLA Tracker panel below. ===== -->
   <section class="civic-triad-section">
     <div class="civic-triad-card">
       <div class="civic-triad-header">How Your Report Moves</div>
@@ -1399,9 +1418,13 @@ audio.pw-audio-el{width:100%;margin-top:4px}
             <path d="M0 0L10 5L0 10z" fill="#00E699"/>
           </marker>
         </defs>
-        <line x1="160" y1="175" x2="160" y2="80" class="civic-triad-spoke" marker-start="url(#triadSpokeArrow)" marker-end="url(#triadSpokeArrow)"/>
-        <line x1="160" y1="175" x2="78" y2="223" class="civic-triad-spoke" marker-start="url(#triadSpokeArrow)" marker-end="url(#triadSpokeArrow)"/>
-        <line x1="160" y1="175" x2="242" y2="223" class="civic-triad-spoke" marker-start="url(#triadSpokeArrow)" marker-end="url(#triadSpokeArrow)"/>
+        <!-- Spokes are trimmed via vector math to the nucleus (r=32) and
+             leaf (r=26) circle edges along each direction unit vector,
+             rather than drawn center-to-center, so no line segment runs
+             into either circle's icon (this round's item 3 fix). -->
+        <line x1="160" y1="143" x2="160" y2="106" class="civic-triad-spoke" marker-start="url(#triadSpokeArrow)" marker-end="url(#triadSpokeArrow)"/>
+        <line x1="132.4" y1="191.2" x2="100.4" y2="209.9" class="civic-triad-spoke" marker-start="url(#triadSpokeArrow)" marker-end="url(#triadSpokeArrow)"/>
+        <line x1="187.6" y1="191.2" x2="219.6" y2="209.9" class="civic-triad-spoke" marker-start="url(#triadSpokeArrow)" marker-end="url(#triadSpokeArrow)"/>
         <g id="reportTreeNucleus">
           <circle cx="160" cy="175" r="48" class="civic-triad-nucleus-halo"/>
           <text x="160" y="118" class="civic-triad-root-label">CITIXEN UX<tspan baseline-shift="super" font-size="7">™</tspan></text>
@@ -1518,6 +1541,11 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        below, label only), sitting directly below the "How Your Report
        Moves" tree card, immediately followed by the button stack it
        introduces. ===== -->
+  <!-- civic-stack-container wraps the header through all 4 buttons below
+       as one unit — added this round so the AI Civic Guide tour's Step 4
+       can spotlight the entire Civic Intelligence Stack section, not just
+       its header, without hand-picking two separate bounding boxes. -->
+  <div id="civic-stack-container">
   <section class="matrix-summary-section" id="matrixSummarySection">
     <h3 style="color: #00E699; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin: 20px 0 16px; text-align: center;">Civic Intelligence Stack<sup class="tm-symbol">™</sup></h3>
   </section>
@@ -1576,23 +1604,28 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       </span>
     </button>
   </div>
+  </div><!-- /#civic-stack-container -->
 
   <!-- ===== CITIXEN UX™ INTERACTIVE FEATURE &amp; SECURITY SECTION —
        Position 9 in the vertical stacking order, directly below the
-       button stack. Rebuilt this round from static bullet columns into a
-       tappable 3-icon grid (item 4): the header now carries the same
-       shield mark used in the top nav's brand lockup (one real logo, not
-       a second invented icon), and the Hero Trust Anchor Badge restates
-       the same real, already-established privacy facts (no accounts, EXIF
-       scrubbed on-device — see the Anonymity Whitepaper) rather than
-       asserting a new, unverified "hashed at the edge" claim; "scrubbed"
-       here matches what fallbackJurisdictionStack()/modalData.anonymity
-       already describe this build actually doing. Tapping a tile opens
-       the same real openModal(key) drawer every other info trigger on
-       this page uses, with the exact content the old static bullet lists
-       carried — no content was dropped, only its presentation. The
-       "Learn More ↗" trigger still opens the real Anonymity Whitepaper
-       modal the header's Privacy Shield badge already carries. ===== -->
+       button stack. The header carries the same shield mark used in the
+       top nav's brand lockup (one real logo, not a second invented icon).
+       This round reorders the section per the revised vertical layout
+       spec (icon grid, then an inline accordion, then the Flagship
+       Security Anchor Card, then the Launch/App-Download CTAs that already
+       follow this section) and replaces the old tap-opens-a-modal behavior
+       with a real inline accordion (#citixenFeatureAccordion) that slides
+       open directly below the icon row — same exact content the modals
+       carried (modalData.ciFeatures/ciSafety/ciSecurity), no pitch-deck
+       link anywhere in it, only the presentation changed again. The Hero/
+       Flagship Trust Anchor Card restates the same real, already-
+       established privacy facts (no accounts, EXIF scrubbed on-device —
+       see the Anonymity Whitepaper) rather than asserting a new,
+       unverified "hashed at the edge" claim; "scrubbed" here matches what
+       fallbackJurisdictionStack()/modalData.anonymity already describe
+       this build actually doing. The "Learn More ↗" trigger still opens
+       the real Anonymity Whitepaper modal the header's Privacy Shield
+       badge already carries. ===== -->
   <section class="citixen-feature-section" id="citixenFeatureSection">
     <h3 class="citixen-feature-heading">
       <svg viewBox="0 0 24 24" width="20" height="20" stroke="#00E699" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-3z"/></svg>
@@ -1601,32 +1634,33 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     <div style="text-align:center;margin-bottom:14px;">
       <button type="button" id="citixenFeatureLearnMoreBtn" class="citixen-feature-learn-more">Learn More ↗</button>
     </div>
+    <div class="citixen-feature-grid" role="list" aria-label="Platform feature categories">
+      <button type="button" class="citixen-feature-tile" id="citixenTileFeatures" role="listitem" aria-expanded="false" aria-controls="citixenFeatureAccordion">
+        <span class="citixen-feature-tile-icon">
+          <svg viewBox="0 0 24 24" width="22" height="22" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </span>
+        <span class="citixen-feature-tile-label">Features ↓</span>
+      </button>
+      <button type="button" class="citixen-feature-tile" id="citixenTileSafety" role="listitem" aria-expanded="false" aria-controls="citixenFeatureAccordion">
+        <span class="citixen-feature-tile-icon">
+          <svg viewBox="0 0 24 24" width="22" height="22" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </span>
+        <span class="citixen-feature-tile-label">Safety ↓</span>
+      </button>
+      <button type="button" class="citixen-feature-tile" id="citixenTileSecurity" role="listitem" aria-expanded="false" aria-controls="citixenFeatureAccordion">
+        <span class="citixen-feature-tile-icon">
+          <svg viewBox="0 0 24 24" width="22" height="22" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        </span>
+        <span class="citixen-feature-tile-label">Security ↓</span>
+      </button>
+    </div>
+    <div class="citixen-feature-accordion" id="citixenFeatureAccordion" role="region" aria-live="polite"></div>
     <div class="citixen-trust-badge">
       <svg viewBox="0 0 24 24" width="20" height="20" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
       <div>
         <div class="citixen-trust-badge-title">Zero-Knowledge &amp; EXIF-Scrubbed — 100% Anonymous Civic Proof</div>
         <div class="citixen-trust-badge-sub">No personal data is retained. Photo metadata is scrubbed at the device before it ever reaches the public ledger.</div>
       </div>
-    </div>
-    <div class="citixen-feature-grid" role="list" aria-label="Platform feature categories">
-      <button type="button" class="citixen-feature-tile" id="citixenTileFeatures" role="listitem">
-        <span class="citixen-feature-tile-icon">
-          <svg viewBox="0 0 24 24" width="22" height="22" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        </span>
-        <span class="citixen-feature-tile-label">Features</span>
-      </button>
-      <button type="button" class="citixen-feature-tile" id="citixenTileSafety" role="listitem">
-        <span class="citixen-feature-tile-icon">
-          <svg viewBox="0 0 24 24" width="22" height="22" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        </span>
-        <span class="citixen-feature-tile-label">Safety</span>
-      </button>
-      <button type="button" class="citixen-feature-tile" id="citixenTileSecurity" role="listitem">
-        <span class="citixen-feature-tile-icon">
-          <svg viewBox="0 0 24 24" width="22" height="22" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-        </span>
-        <span class="citixen-feature-tile-label">Security</span>
-      </button>
     </div>
   </section>
 
@@ -1894,6 +1928,29 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         <button class="btn btn-outline" id="municipalRequestAccessBtn" type="button">Request Access</button>
       </div>
     </div>
+
+    <!-- ===== MUNICIPAL OUTREACH & ONBOARDING — this round's item 5 addition
+         ("municipal outreach specs, city council onboarding materials, and
+         the official pitch deck download link"). Rather than invent three
+         new documents this build has no real content for, this reuses two
+         genuinely real, already-reachable parts of the page (the elected-
+         official/municipality contact channels below, and the Civic
+         Memory™ Architecture & Charter drawer covering privacy/spatial-
+         hashing architecture a council would review) and links out to the
+         one real standalone asset that already exists in this repo — the
+         actual CITIXEN_UX_Executive_Deck.pptx checked into the project
+         root (see vercel.json's rewrite exception carving it out of the
+         SPA catch-all so the direct download link resolves to the file
+         itself, not back to this page). ===== -->
+    <div class="card" style="max-width:640px;width:100%;margin:0 auto 20px;text-align:center;">
+      <div class="label" style="justify-content:center">Municipal Outreach &amp; Onboarding</div>
+      <div class="small" style="margin-bottom:14px;">Resources for elected officials and city staff evaluating this platform.</div>
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:stretch;">
+        <a class="btn btn-outline" href="#institutionalAccessSection" id="municipalOutreachContactLink" style="justify-content:center;">Municipal Outreach Contact</a>
+        <button class="btn btn-outline" id="municipalCouncilOnboardingBtn" type="button" style="justify-content:center;">City Council Onboarding — Architecture &amp; Privacy Charter</button>
+        <a class="btn btn-primary" href="/CITIXEN_UX_Executive_Deck.pptx" download style="justify-content:center;">Download Official Pitch Deck (.pptx)</a>
+      </div>
+    </div>
   </section>
 
   <!-- ===== The National Audit Teaser Card and its radar-sweep visual
@@ -1932,17 +1989,21 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   </button>
 
   <!-- ===== AI CIVIC GUIDE — WELCOME MODAL. Reuses the shared .modal-box
-       shell; "Take 60s Guided Tour" starts the spotlight walkthrough,
-       "Explore Dashboard" just dismisses it — both mark the tour seen so
-       it never auto-fires again on this browser. ===== -->
+       shell. This round splits the headline into two standalone lines
+       (two-tone "Welcome to CITIXEN " / "UX™" wordmark, then a muted
+       "Home of Civic Intelligence" subheader) and drops to a single
+       primary CTA — the old "Explore Dashboard" button is removed as
+       dead UI now that the spec calls for one action; the ✕ close button
+       remains the dismiss path. Either dismissing or starting the tour
+       marks it seen so it never auto-fires again on this browser. ===== -->
   <div class="modal-overlay" id="tourWelcomeOverlay">
     <div class="modal-box" style="max-width:420px;text-align:center">
       <button class="modal-close" id="tourWelcomeCloseBtn">✕</button>
-      <h3>Welcome to CITIXEN UX<sup class="tm-symbol">™</sup> — Home of Civic Intelligence</h3>
-      <p>A completely free, zero-knowledge platform connecting real-time resident field reports directly to municipal action and public accountability.</p>
+      <h3 style="margin-bottom:2px;"><span style="color:#FFFFFF">Welcome to CITIXEN </span><span style="color:#00E699">UX<sup class="tm-symbol">™</sup></span></h3>
+      <div style="color:#94A3B8;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:14px;">Home of Civic Intelligence</div>
+      <p>A completely free, zero-tracking platform connecting your real-time observations directly to civic accountability.</p>
       <div class="tour-welcome-actions">
-        <button type="button" class="btn btn-primary btn-hero" id="tourStartBtn" style="margin:0">Take 60s Guided Tour</button>
-        <button type="button" class="btn btn-outline btn-hero" id="tourExploreBtn" style="margin:0">Explore Dashboard</button>
+        <button type="button" class="btn btn-primary btn-hero" id="tourStartBtn" style="margin:0">Take 30-Second Guided Tour</button>
       </div>
     </div>
   </div>
@@ -1950,7 +2011,11 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   <!-- ===== AI CIVIC GUIDE — SPOTLIGHT TOUR OVERLAY. #tourSpotlightRing and
        #tourTooltip are repositioned in JS from each step's real target
        element's getBoundingClientRect() (see startTour()/showTourStep()
-       below) — never a hardcoded coordinate. ===== -->
+       below) — never a hardcoded coordinate. This round adds a 4-dot
+       pagination row (#tourDots, built once from TOUR_STEPS.length) in
+       the middle of the bottom nav, between Skip and Prev/Next, per the
+       revised "[ Skip ] | ● ● ● ● | [ ← Prev ] [ Next → / Finish ]"
+       layout. ===== -->
   <div class="tour-spotlight-overlay" id="tourSpotlightOverlay">
     <div class="tour-spotlight-ring" id="tourSpotlightRing"></div>
     <div class="tour-tooltip" id="tourTooltip">
@@ -1959,6 +2024,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       <div class="tour-tooltip-desc" id="tourTooltipDesc"></div>
       <div class="tour-tooltip-actions">
         <button type="button" id="tourSkipBtn">Skip</button>
+        <div class="tour-dots" id="tourDots"></div>
         <div>
           <button type="button" id="tourPrevBtn">← Prev</button>
           <button type="button" id="tourNextBtn" class="tour-next-btn">Next →</button>
@@ -2544,19 +2610,48 @@ document.getElementById('charterTabConstitution').addEventListener('click', () =
 document.getElementById('charterTabSpatial').addEventListener('click', () => renderCharterTrack('spatial'));
 document.getElementById('charterTabPrivacy').addEventListener('click', () => renderCharterTrack('privacy'));
 
+// Municipal panel's "City Council Onboarding" button (this round's item 5)
+// opens the same real Civic Memory™ Architecture & Charter drawer as the
+// Civic Intelligence Stack's own "Civic Memory™" button — the honest,
+// already-built home for the state-constitution/spatial-hashing/privacy
+// content a council would actually review, rather than a new page.
+document.getElementById('municipalCouncilOnboardingBtn').addEventListener('click', () => openCivicCharterDrawer());
+
 // CITIXEN UX™ Feature & Security section's "Learn More ↗" trigger opens
 // the same real Anonymity Whitepaper modal as the header's Privacy Shield
 // badge — the honest existing content for "Security Protocols" rather
 // than a duplicate write-up.
 document.getElementById('citixenFeatureLearnMoreBtn').addEventListener('click', () => openModal('anonymity'));
 
-// 3-Icon Interactive Grid (Features / Safety / Security) — each tile opens
-// the same obsidian-glass modal pattern used throughout the page, carrying
-// the exact real content the old static bullet lists held (nothing dropped,
-// only the presentation changed from a plain list to a tappable tile).
-document.getElementById('citixenTileFeatures').addEventListener('click', () => openModal('ciFeatures'));
-document.getElementById('citixenTileSafety').addEventListener('click', () => openModal('ciSafety'));
-document.getElementById('citixenTileSecurity').addEventListener('click', () => openModal('ciSecurity'));
+// 3-Icon Interactive Grid (Features / Safety / Security) — this round
+// replaces the tap-opens-a-modal interaction with a real inline accordion
+// that slides open directly below the icon row, reusing the exact same
+// content the modals carried (modalData.ciFeatures/ciSafety/ciSecurity —
+// nothing dropped, only the presentation changed again) with no pitch-
+// deck link anywhere in it. A second tap on the already-open tile closes
+// the accordion rather than re-opening it.
+function toggleCitixenFeatureAccordion(key, tileId){
+  const acc = document.getElementById('citixenFeatureAccordion');
+  const tileIds = ['citixenTileFeatures', 'citixenTileSafety', 'citixenTileSecurity'];
+  const wasOpenForThisTile = acc.classList.contains('open') && acc.dataset.activeTile === tileId;
+  tileIds.forEach(id => {
+    const isTarget = id === tileId && !wasOpenForThisTile;
+    document.getElementById(id).classList.toggle('active', isTarget);
+    document.getElementById(id).setAttribute('aria-expanded', String(isTarget));
+  });
+  if (wasOpenForThisTile) {
+    acc.classList.remove('open');
+    acc.dataset.activeTile = '';
+    return;
+  }
+  const d = modalData[key];
+  acc.innerHTML = d.body.map(([h, p]) => `<h4>${h}</h4><p>${p}</p>`).join('');
+  acc.classList.add('open');
+  acc.dataset.activeTile = tileId;
+}
+document.getElementById('citixenTileFeatures').addEventListener('click', () => toggleCitixenFeatureAccordion('ciFeatures', 'citixenTileFeatures'));
+document.getElementById('citixenTileSafety').addEventListener('click', () => toggleCitixenFeatureAccordion('ciSafety', 'citixenTileSafety'));
+document.getElementById('citixenTileSecurity').addEventListener('click', () => toggleCitixenFeatureAccordion('ciSecurity', 'citixenTileSecurity'));
 
 // SUB-MODULE FOCUS-AREA PREVIEWS — the circled "(i)" badge that used to
 // carry this trigger was removed per this round's spec (it visually
@@ -4128,22 +4223,29 @@ document.getElementById('ledgerDeepAnalyticsLink').addEventListener('click', () 
    AI CIVIC GUIDE ONBOARDING TOUR (this round)
    -----------------------------------------------------------------
    Each step below targets a real element id already on this page — the
-   Resident Field Unit node in the "How Your Report Moves" diagram, the
-   real pulsing Live Public Ledger pill, the real Crowd Save America map
-   card, and the real Civic Intelligence Stack section — never an
-   invented flow. The Crowd Save America step's copy is careful to
-   describe today's real ward-tier grid rather than claim the roadmap-only
-   H3 hexagonal mesh already ships (see the Civic Memory™ Architecture &
-   Charter drawer's own "Spatial Hashing" tab for that same disclosure).
-   ===================================================================== */
+   real pulsing Live Public Ledger pill, the Resident Field Unit node in
+   the "How Your Report Moves" diagram, the real Crowd Save America map
+   card, and #civic-stack-container (the real Civic Intelligence Stack
+   header + all 4 buttons, wrapped as one unit this round specifically so
+   this step can spotlight the whole section) — never an invented flow.
+   Reordered this round to open on the Ledger (dot 1) before the Resident
+   Field Unit node (dot 2), per the revised spec. The Crowd Save America
+   step's copy is careful to describe today's real ward-tier grid rather
+   than claim the roadmap-only H3 hexagonal mesh already ships (see the
+   Civic Memory™ Architecture & Charter drawer's own "Spatial Hashing" tab
+   for that same disclosure). ===================================================================== */
 const CITIXEN_TOUR_SEEN_KEY = 'citixen_tour_seen';
 const TOUR_STEPS = [
-  { targetId: 'reportTreeNodeResident', title: 'Resident Field Unit', desc: 'Ground-truth, EXIF-scrubbed reporting — every report starts here, with photo metadata stripped on-device before it ever leaves the reporter\'s phone.' },
-  { targetId: 'liveLedgerBanner', title: 'Live Public Ledger', desc: 'This pulsing, glowing pill opens the real-time public ledger — every report on file, searchable by area and radius.' },
-  { targetId: 'national-pixel-map', title: 'Crowd Save America™', desc: 'Cities light up in Fresh Mint nationwide as reports get filed. Today\'s grid is ward-tier; H3 hexagonal spatial hashing is this architecture\'s roadmap target, not yet shipped.' },
-  { targetId: 'matrixSummarySection', title: 'Civic Intelligence Stack™', desc: 'Analytics, Expenditures, Municipal, and Civic Memory™ — four real dashboards, each one tap away below.' }
+  { targetId: 'liveLedgerBanner', title: 'The Public Ledger', desc: 'The heart of Civic Intelligence. Every report, status update, and municipal action is etched into a live, unalterable record for complete community transparency.' },
+  { targetId: 'reportTreeNodeResident', title: 'Zero-Tracking Field Capture', desc: 'How reports enter the ledger. Photos and location data are stripped of all personal metadata on-device before submission — 100% anonymous proof.' },
+  { targetId: 'national-pixel-map', title: 'Crowd Save America™ Campaign', desc: 'The nationwide initiative powering real-time civic grid awareness. As residents log field reports in their hometowns, local cells light up across the national map. (Today\'s grid is ward-tier; H3 hexagonal spatial hashing is this architecture\'s roadmap target, not yet shipped.)' },
+  { targetId: 'civic-stack-container', title: 'Civic Intelligence Stack™', desc: 'Analytics, Expenditures, Municipal, and Civic Memory™ — four real dashboards, each one tap away.' }
 ];
 let tourStepIndex = 0;
+function renderTourDots(i){
+  const dotsEl = document.getElementById('tourDots');
+  dotsEl.innerHTML = TOUR_STEPS.map((_, di) => '<span class="tour-dot' + (di === i ? ' active' : '') + '"></span>').join('');
+}
 function positionTourStep(i){
   const step = TOUR_STEPS[i];
   const el = document.getElementById(step.targetId);
@@ -4161,6 +4263,7 @@ function positionTourStep(i){
   document.getElementById('tourTooltipDesc').textContent = step.desc;
   document.getElementById('tourPrevBtn').disabled = (i === 0);
   document.getElementById('tourNextBtn').textContent = (i === TOUR_STEPS.length - 1) ? 'Finish' : 'Next →';
+  renderTourDots(i);
   // Place the tooltip below the target when there's room, otherwise above —
   // clamped so it never runs off either edge of the viewport.
   const spaceBelow = window.innerHeight - rect.bottom;
@@ -4197,7 +4300,6 @@ document.getElementById('tourWelcomeCloseBtn').addEventListener('click', closeTo
 document.getElementById('tourWelcomeOverlay').addEventListener('click', (e) => {
   if (e.target.id === 'tourWelcomeOverlay') closeTourWelcome();
 });
-document.getElementById('tourExploreBtn').addEventListener('click', closeTourWelcome);
 document.getElementById('tourStartBtn').addEventListener('click', () => {
   closeTourWelcome();
   startTour();
