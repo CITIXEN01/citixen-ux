@@ -545,15 +545,12 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 /* ===== Shared by the aggregate heat-map modal's search header (below) —
    .frontier-map-section itself (the bottom-of-homepage search bar) was
    removed with its markup per the homepage-declutter spec. ===== */
-/* Crowd Save America™ Entry Hub welcome banner — sits at the top of the
-   dedicated #csaWelcomeModal, above its static Gridded US Vector Map
-   graphic. Bold title header, followed by exactly one concise
-   single-sentence subtitle ("Single-Sentence Subtitle Lock") — no longer
-   a multi-sentence mission paragraph. */
-.agg-hub-welcome-banner{padding:18px 20px 4px;text-align:center;border-bottom:1px solid rgba(0,230,153,.15)}
-.agg-hub-welcome-title{color:#00E699;font-weight:800;font-size:1.15rem;letter-spacing:.04em;
-  text-transform:uppercase;margin-bottom:8px}
-.agg-hub-welcome-banner p{color:var(--muted);font-size:.82rem;line-height:1.5;max-width:640px;margin:0 auto 14px}
+/* The #csaWelcomeModal title/subtitle banner (.agg-hub-welcome-banner,
+   .agg-hub-welcome-title) a previous round added above the map graphic is
+   removed per this round's spec, which drops back to the plain
+   "Visual Asset Lock" layout (CTA above the map card, View Map trigger
+   restored inside it) with no title or subtitle banner — see the
+   #csaWelcomeModal markup comment below. */
 .frontier-map-head{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
 .frontier-search-bar{flex:1;min-width:240px;position:relative}
 .frontier-search-bar input{width:100%;background:rgba(7,12,14,.8);border:1px solid var(--border);color:var(--text);
@@ -1735,25 +1732,21 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        as #national-pixel-map in the Analytics drawer — see
        renderWelcomeMapGraphic()) with micro-shield matrix nodes — never the
        interactive Leaflet/MapLibre Aggregation Hub map, its zoom controls,
-       or its search bar. A prior round's "Strict Hierarchy Shift" added a
-       big bold "CROWD SAVE AMERICA™" title (#csaWelcomeTitle) above the
-       subtitle, removed the "View Map ↗" trigger a previous round had
-       added to the bottom-right of the graphic card outright (that trigger
-       still exists on the Analytics-drawer instance of this same graphic —
-       only the welcome pop-up's copy loses it), and moved the single CTA
-       button to its own row directly BELOW the graphic card, renamed
-       "Enter CITIXEN Dashboard ↗". This round's "Single-Sentence Subtitle
-       Lock" replaces the old multi-sentence mission paragraph directly
-       below the title with exactly one concise sentence: "Restoring civic
-       trust, one snap at a time." ===== -->
+       or its search bar. This round's spec drops the big title/subtitle
+       banner a previous round had added and reverts to the earlier
+       "Visual Asset Lock" layout: the single CTA button
+       (#csaEnterDashboardBtn, renamed back to "Enter Local Dashboard ↗")
+       sits directly ABOVE the map graphic card, and the "View Map ↗"
+       trigger (#welcomeMapViewTrigger) is restored inside the card itself,
+       reusing the exact same .pixel-map-action-row/.pixel-map-view-trigger
+       markup and openHeatMapModal() handler as the Analytics-drawer
+       instance (#aggregationMapGatewayBtn) — clicking it jumps straight
+       into the real Aggregation Hub map, same as that instance. ===== -->
   <div class="modal-overlay" id="csaWelcomeModal">
     <div class="modal-box" style="max-width:640px;width:92vw;">
       <button class="modal-close" id="csaWelcomeCloseBtn">✕</button>
-      <div class="agg-hub-welcome-banner">
-        <div class="agg-hub-welcome-title" id="csaWelcomeTitle">Crowd Save America<sup class="tm-symbol">™</sup></div>
-        <p>Restoring civic trust, one snap at a time.</p>
-      </div>
-      <section class="pixel-map-section" style="margin:0 auto 18px;padding:0 18px;max-width:none;">
+      <button type="button" class="btn btn-primary" id="csaEnterDashboardBtn" style="justify-content:center;width:calc(100% - 36px);margin:20px 18px 0;">Enter Local Dashboard ↗</button>
+      <section class="pixel-map-section" style="margin:16px auto 18px;padding:0 18px;max-width:none;">
         <div class="pixel-map-card" style="padding:16px;">
           <svg class="pixel-map-svg" id="welcomeMapGraphic" viewBox="0 0 800 440" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
             <defs>
@@ -1766,9 +1759,11 @@ audio.pw-audio-el{width:100%;margin-top:4px}
             <use href="#welcomeSilhouetteOutline" class="pixel-map-outline"/>
             <g id="welcomeMapNodes"></g>
           </svg>
+          <div class="pixel-map-action-row">
+            <button id="welcomeMapViewTrigger" type="button" class="pixel-map-view-trigger">View Map ↗</button>
+          </div>
         </div>
       </section>
-      <button type="button" class="btn btn-primary" id="csaEnterDashboardBtn" style="justify-content:center;width:calc(100% - 36px);margin:0 18px 18px;">Enter CITIXEN Dashboard ↗</button>
     </div>
   </div>
 
@@ -3120,13 +3115,13 @@ document.getElementById('csaEnterDashboardBtn').addEventListener('click', closeC
 document.getElementById('csaWelcomeModal').addEventListener('click', (e) => {
   if (e.target.id === 'csaWelcomeModal') closeCsaWelcomeModal();
 });
-// This round's "Remove Floating Trigger" spec strips the welcome modal's
-// own "View Map ↗" button outright (a previous round's
-// #welcomeMapViewTrigger and its click handler are both gone) — the
-// welcome pop-up's single action is now the "Enter CITIXEN Dashboard ↗"
-// button above, wired to closeCsaWelcomeModal() only. The Analytics-drawer
-// instance of this same graphic (#national-pixel-map) keeps its own real
-// "View Map ↗" trigger unchanged.
+// This round's spec restores the welcome modal's own "View Map ↗" trigger
+// (#welcomeMapViewTrigger) — a previous round had stripped it outright —
+// wired to the same real openHeatMapModal() handler as the
+// Analytics-drawer instance's #aggregationMapGatewayBtn, so tapping it
+// jumps straight into the real Aggregation Hub map, same as that instance.
+const welcomeMapViewTrigger = document.getElementById('welcomeMapViewTrigger');
+if (welcomeMapViewTrigger) welcomeMapViewTrigger.addEventListener('click', openHeatMapModal);
 // Heat map access lives on the top-level Aggregation Map Gateway button and
 // inside the Analytics drawer — the old Operations-drawer launchers
 // (radarSweepFromStack, btnViewHeatMapFromStack) were removed in an earlier
