@@ -915,6 +915,42 @@ audio.pw-audio-el{width:100%;margin-top:4px}
    that used to stack beneath it was relocated (see .pixel-map-brand /
    .pixel-map-view-trigger, nested inside the map card itself). */
 .gateway-pill-stacked{margin-bottom:16px}
+/* ===== SYSTEM INTERCONNECTIVITY DIAGRAM — this round's item 2 "Interactive
+   Ecosystem Schematic": a calm, static Deep Midnight Navy card (per this
+   round's item 1, the breathing glow stays exclusive to the Live Public
+   Ledger pill) with a uniform 12px corner radius, matching this page's
+   other calm cards. Nodes stack vertically with a thin Laser Mint
+   connector between each pair; a small dot fades down each connector on a
+   loop as a purely decorative "data flow" cue. ===== */
+.system-diagram-section{max-width:640px;margin:0 auto 18px;padding:0 16px}
+.system-diagram-card{background:var(--surface-card-bg);backdrop-filter:blur(12px);
+  border:var(--surface-card-border);border-radius:12px;padding:18px 20px}
+.system-diagram-head{color:#00E699;font-weight:800;font-size:.86rem;letter-spacing:.06em;
+  text-transform:uppercase;text-align:center}
+.system-diagram-sub{color:var(--muted);font-size:.72rem;text-align:center;margin:4px 0 16px}
+.system-diagram-flow{display:flex;flex-direction:column;align-items:center}
+.system-diagram-node{display:flex;align-items:center;gap:10px;width:100%;max-width:380px;
+  padding:9px 14px;border:1px solid rgba(0,230,153,.25);border-radius:10px;
+  background:rgba(0,230,153,.04);box-sizing:border-box}
+.system-diagram-node-icon{flex-shrink:0;display:flex}
+.system-diagram-node-label{color:#FFFFFF;font-size:.76rem;font-weight:700;letter-spacing:.01em}
+.system-diagram-connector{position:relative;width:1px;height:26px;background:rgba(0,230,153,.4);
+  margin:2px 0;flex-shrink:0}
+.system-diagram-connector::after{content:'';position:absolute;left:50%;bottom:-4px;
+  transform:translateX(-50%);border-left:4px solid transparent;border-right:4px solid transparent;
+  border-top:5px solid rgba(0,230,153,.6)}
+.system-diagram-connector-dot{position:absolute;left:50%;top:0;width:5px;height:5px;border-radius:50%;
+  background:#00E699;box-shadow:0 0 6px rgba(0,230,153,.8);transform:translateX(-50%);opacity:0;
+  animation:systemDiagramFlow 1.8s ease-in-out infinite}
+@keyframes systemDiagramFlow{
+  0%{top:0;opacity:0}
+  15%{opacity:1}
+  85%{opacity:1}
+  100%{top:100%;opacity:0}
+}
+@media (prefers-reduced-motion:reduce){
+  .system-diagram-connector-dot{animation:none;opacity:.7;top:50%}
+}
 .gateway-pill{display:flex;justify-content:space-between;align-items:center;width:100%;
   min-height:52px;box-sizing:border-box;padding:14px 20px;border-radius:12px;
   cursor:pointer;font-family:inherit;text-decoration:none;
@@ -1428,8 +1464,57 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </button>
   </section>
 
+  <!-- ===== SYSTEM INTERCONNECTIVITY DIAGRAM — this round's item 2's
+       "Interactive Ecosystem Schematic": positioned directly below the
+       Live Public Ledger pill per this round's Main Feed Sequence item 6.
+       Depicts this project's real four-stage pipeline — Community
+       Reporting -> Zero-Knowledge Proof Scrubbing -> Municipal Work Order
+       Conversion -> Civic Memory Public Ledger — in custom 1px Laser Mint
+       vector line art on a calm, static Deep Midnight Navy card (no
+       breathing glow — that stays exclusive to the Live Public Ledger pill
+       per this round's item 1). Three of the four node icons are the exact
+       same real icons used elsewhere for these same concepts (Zero-
+       Knowledge: the brand shield + checkmark from the Privacy Card below;
+       Municipal Work Order Conversion: the Municipal Portal stack icon;
+       Civic Memory Public Ledger: the Civic Memory™ stack icon) rather
+       than inventing redundant glyphs for things this page already has
+       icons for. Community Reporting gets one new custom camera icon,
+       since nothing else on the page represents that stage yet. The small
+       dot animating down each connector is a purely decorative
+       illustration of "data flow" through these real pipeline stages —
+       it does not represent an actual live event count or throughput
+       number this project doesn't have. ===== -->
+  <section class="system-diagram-section" id="systemInterconnectivitySection">
+    <div class="system-diagram-card">
+      <div class="system-diagram-head">System Interconnectivity</div>
+      <div class="system-diagram-sub">How a report becomes a verified public record</div>
+      <div class="system-diagram-flow">
+        <div class="system-diagram-node">
+          <span class="system-diagram-node-icon"><svg viewBox="0 0 24 24" width="20" height="20" stroke="#00E699" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7l1.5-2.5h5L16 7"/><circle cx="12" cy="13.5" r="3.5"/></svg></span>
+          <span class="system-diagram-node-label">Community Reporting</span>
+        </div>
+        <div class="system-diagram-connector" aria-hidden="true"><span class="system-diagram-connector-dot"></span></div>
+        <div class="system-diagram-node">
+          <span class="system-diagram-node-icon"><svg viewBox="0 0 24 24" width="20" height="20" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></span>
+          <span class="system-diagram-node-label">Zero-Knowledge Proof Scrubbing</span>
+        </div>
+        <div class="system-diagram-connector" aria-hidden="true"><span class="system-diagram-connector-dot" style="animation-delay:.6s"></span></div>
+        <div class="system-diagram-node">
+          <span class="system-diagram-node-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#00E699" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V9l8-5 8 5v12"/><path d="M9 21v-6h6v6"/><path d="M4 21h16"/></svg></span>
+          <span class="system-diagram-node-label">Municipal Work Order Conversion</span>
+        </div>
+        <div class="system-diagram-connector" aria-hidden="true"><span class="system-diagram-connector-dot" style="animation-delay:1.2s"></span></div>
+        <div class="system-diagram-node">
+          <span class="system-diagram-node-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#00E699" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 3 21 8 12 13 3 8 12 3"/><polyline points="3 13 12 18 21 13"/><polyline points="3 18 12 23 21 18"/></svg></span>
+          <span class="system-diagram-node-label">Civic Memory<sup class="tm-symbol">™</sup> Public Ledger</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== CIVIC INTELLIGENCE STACK™ — sits directly beneath the Live
-       Public Ledger pill. This round's "Rule of Three" spec drops the
+       Public Ledger pill and, as of this round, the System Interconnectivity
+       diagram above. An earlier round's "Rule of Three" spec drops the
        "YOUR" prefix from the section title and each card title, and
        reduces the stack from 4 tiles to 3 — Analytics, Municipal Portal,
        Civic Memory™ — dropping the standalone Expenditures/Projects &
