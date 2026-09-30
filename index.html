@@ -138,12 +138,13 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 
 /* ===== CROWD SOURCE AMERICA™ NARRATIVE BLOCK (Position 3 of the
    alternating section cadence) — plain centered text, no card/box. The
-   heading itself now carries the Civic Gold (#FFB800) accent per this
-   round's explicit copy spec (the separate small eyebrow label from the
-   prior round was folded into this one heading). ===== */
+   heading itself now carries the Electric Cyan (#0EA5E9) accent — the
+   prior Civic Gold treatment was fully retired this round in favor of
+   the cyan/midnight-blue palette (see the .ledger-banner-cyan and
+   .agg-hub-heading recolors below). ===== */
 .csa-banner-section{max-width:640px;margin:0 auto 8px;padding:0 24px}
 .csa-banner-card{text-align:center;padding:6px 0 18px}
-.csa-banner-heading{font-size:1.4rem;font-weight:900;color:#FFB800;margin-bottom:8px}
+.csa-banner-heading{font-size:1.4rem;font-weight:900;color:#0EA5E9;margin-bottom:8px}
 .csa-banner-body{font-size:.85rem;color:#94A3B8;line-height:1.6;max-width:520px;margin:0 auto}
 
 /* ===== INSTITUTIONAL GATEWAY BUTTONS — sits between the App Download
@@ -306,27 +307,27 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .dispatch-mapwrap{height:220px;margin-bottom:12px}
 
 /* ===== CROWD SOURCE AMERICA™ AGGREGATION HUB — a real Leaflet map
-   (#aggregation-map-container) with Civic Gold (#FFB800) markers, per
-   this round's map-engine and color-breakup spec. .agg-hub-heading/
-   .agg-hub-ticker recolor this modal's two ".label"/ticker headers gold
-   without touching the shared .label class used elsewhere on the page.
-   .tiles-degraded keeps the dark canvas background visible if the OSM
-   tile layer fails to load (see initAggregationMap()'s tileerror
-   handler). ===== */
+   (#aggregation-map-container) with Electric Cyan (#0EA5E9) markers, per
+   this round's color-palette-swap spec (Civic Gold #FFB800 is fully
+   retired). .agg-hub-heading/.agg-hub-ticker recolor this modal's two
+   ".label"/ticker headers cyan without touching the shared .label class
+   used elsewhere on the page. .tiles-degraded keeps the dark canvas
+   background visible if the OSM tile layer fails to load (see
+   initAggregationMap()'s tileerror handler). ===== */
 .geo-hatch-search-row{display:flex;gap:8px;margin-top:8px}
 .geo-hatch-search-row input{flex:1;min-width:0;background:rgba(7,12,14,.8);border:1px solid var(--border);
   color:var(--text);padding:10px 14px;border-radius:10px;font-size:.8rem;outline:none}
 .geo-hatch-search-row input:focus{border-color:var(--mint2)}
-.agg-hub-heading{color:#FFB800}
-.agg-hub-ticker{color:#FFB800}
+.agg-hub-heading{color:#0EA5E9}
+.agg-hub-ticker{color:#0EA5E9}
 .aggregation-map-wrap{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--border);background:var(--bg-obsidian)}
-.aggregation-map-wrap.tiles-degraded{background:radial-gradient(circle at 50% 40%,rgba(255,184,0,.08),var(--bg-obsidian) 72%)}
+.aggregation-map-wrap.tiles-degraded{background:radial-gradient(circle at 50% 40%,rgba(14,165,233,.08),var(--bg-obsidian) 72%)}
 #aggregation-map-container{position:absolute;inset:0;background:var(--bg-obsidian)}
 .agg-marker-beacon{position:relative;width:100%;height:100%}
-.agg-marker-beacon .agg-marker-pulse{position:absolute;inset:-6px;border-radius:50%;background:#FFB800;
+.agg-marker-beacon .agg-marker-pulse{position:absolute;inset:-6px;border-radius:50%;background:#0EA5E9;
   opacity:.45;animation:beaconPulse 2s ease-out infinite}
-.agg-marker-beacon .agg-marker-core{position:absolute;inset:4px;border-radius:50%;background:#FFB800;
-  border:2px solid #fff;box-shadow:0 0 8px #FFB800}
+.agg-marker-beacon .agg-marker-core{position:absolute;inset:4px;border-radius:50%;background:#0EA5E9;
+  border:2px solid #fff;box-shadow:0 0 8px #0EA5E9}
 .geo-hatch-legend{position:absolute;left:16px;bottom:12px;display:flex;gap:16px;flex-wrap:wrap;z-index:1000;pointer-events:none}
 .geo-hatch-legend span{display:flex;align-items:center;gap:6px;font-size:.62rem;color:var(--muted)}
 .geo-legend-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
@@ -584,19 +585,58 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 .ledger-banner-count{font-size:.68rem;color:var(--muted);font-weight:700;flex-shrink:0}
 @media (max-width:560px){ .ledger-banner{flex-wrap:wrap} .ledger-banner-label{flex-basis:100%} }
 
-/* ===== CIVIC GOLD VARIANT — the Crowd Source America™ Aggregation Hub
-   Gateway button reuses the .ledger-banner layout but in Civic Gold
-   (#FFB800) rather than Emerald, per this round's color-breakup spec:
-   Emerald stays reserved for CITIXEN UX™ platform status (Live Public
-   Ledger, C.I. tags, verified receipts). ===== */
-.ledger-banner-gold{background:rgba(255,184,0,.08);border-color:rgba(255,184,0,.4)}
-.ledger-banner-gold:hover{border-color:#FFB800}
-.ledger-banner-gold .ledger-banner-pulse{background:#FFB800;box-shadow:0 0 6px #FFB800}
-.ledger-banner-gold .ledger-banner-pulse::after{border-color:#FFB800;animation-name:pulseGold}
-.ledger-banner-gold .ledger-banner-label{color:#FFB800}
-@keyframes pulseGold{
+/* ===== ELECTRIC CYAN VARIANT — the Crowd Source America™ Aggregation Hub
+   Gateway button reuses the .ledger-banner layout but in Electric Cyan /
+   Sky Blue (#0EA5E9 / #38BDF8) over a midnight-blue tint background
+   (#0369A1 at ~20% opacity), rather than Emerald, per this round's
+   color-palette-swap spec (Civic Gold #FFB800 is fully retired). Emerald
+   stays reserved for CITIXEN UX™ platform status (Live Public Ledger,
+   C.I. tags, verified receipts). ===== */
+.ledger-banner-cyan{background:rgba(3,105,161,.2);border-color:rgba(14,165,233,.4)}
+.ledger-banner-cyan:hover{border-color:#38BDF8}
+.ledger-banner-cyan .ledger-banner-pulse{background:#0EA5E9;box-shadow:0 0 6px #0EA5E9}
+.ledger-banner-cyan .ledger-banner-pulse::after{border-color:#0EA5E9;animation-name:pulseCyan}
+.ledger-banner-cyan .ledger-banner-label{color:#38BDF8}
+@keyframes pulseCyan{
   0%{transform:scale(.6);opacity:.9}
   100%{transform:scale(2.2);opacity:0}
+}
+/* Mobile: keep "AGGREGATION HUB" from wrapping so "HUB" is never orphaned
+   on its own line, per this round's mobile-wrapping spec. */
+@media (max-width:640px){
+  #aggregationMapGatewayBtn{flex-wrap:wrap}
+  #aggregationMapGatewayBtn .ledger-banner-label{flex-basis:100%;font-size:.85rem;letter-spacing:.1px;line-height:1.3}
+}
+.nowrap-pair{white-space:nowrap}
+
+/* ===== TRADEMARK (™) TYPOGRAPHY — lightweight superscript treatment
+   applied via <sup class="tm-symbol"> across headings/copy this round,
+   distinct from the two pre-existing frozen <sup class="brand-tm"> ™
+   lockups inside the topbar wordmark and hero title (left untouched
+   per the section-freeze rule). ===== */
+.tm-symbol{font-weight:300 !important;font-size:.55em !important;margin-left:3px !important;opacity:.8;vertical-align:super}
+
+/* ===== NATIONAL LIVE REPORT PIXEL MAP — decorative, stylized US
+   silhouette rendered as a dense grid of dim pixels with bright,
+   pulsing city nodes. Purely decorative (see renderNationalPixelMap());
+   the silhouette is a hand-authored approximation, not a precise
+   cartographic projection — same convention as the Aggregation Hub's
+   own stylized marker layout. ===== */
+.pixel-map-section{max-width:720px;margin:0 auto 20px;padding:0 24px}
+.pixel-map-card{position:relative;height:190px;background:#000;border:1px solid #0284C7;border-radius:16px;overflow:hidden}
+.pixel-map-svg{width:100%;height:100%;display:block}
+.pixel-map-dot{opacity:.2}
+.pixel-map-node-core{opacity:0}
+.pixel-map-node-pulse{opacity:0;transform-origin:center}
+.pixel-map-node-emerald .pixel-map-node-core{fill:#00FF87}
+.pixel-map-node-emerald .pixel-map-node-pulse{fill:#00FF87}
+.pixel-map-node-cyan .pixel-map-node-core{fill:#0EA5E9}
+.pixel-map-node-cyan .pixel-map-node-pulse{fill:#0EA5E9}
+.pixel-map-node-core,.pixel-map-node-pulse{animation:pixelPulse 2.4s ease-in-out infinite}
+@keyframes pixelPulse{
+  0%{opacity:.9;transform:scale(1)}
+  50%{opacity:.35;transform:scale(1.8)}
+  100%{opacity:.9;transform:scale(1)}
 }
 .analytics-matrix-card{max-width:720px;margin:0 auto 40px;background:var(--card);border:1px solid var(--border);
   border-radius:16px;padding:20px}
@@ -827,42 +867,74 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </button>
   </section>
 
-  <!-- ===== ALTERNATING SECTION CADENCE (per this round's spec):
-       Position 1 — consolidated "What is CITIXEN UX™?" explanation (the
-       two separate hero Q&A blocks from earlier rounds are merged into
-       one heading/body here, same accent-span copy, just consolidated).
-       Position 2 — the Civic Gold Aggregation Hub gateway button.
+  <!-- ===== ALTERNATING SECTION CADENCE:
+       Position 1 — "What is CITIXEN UX™?" explanation, now 3 separate
+       lines/paragraphs per this round's spec (was one merged paragraph).
+       Embedded Live Report Pixel Map — sits directly beneath Position 1
+       and above Position 2, per this round's spec.
+       Position 2 — the Aggregation Hub gateway button, now in the
+       Electric Cyan variant (.ledger-banner-cyan) — Civic Gold is fully
+       retired this round, see the color-breakup notes below.
        Position 3 — the Crowd Source America™ campaign title/narrative.
        ===== -->
   <section class="hero-qa-section">
     <div class="hero-qa-block">
-      <h2 class="hero-qa-heading">What is CITIXEN UX™?</h2>
-      <p class="hero-qa-body">CITIXEN UX™ is the modern standard for resident-first municipal engagement. Powered by <span class="hero-qa-accent">Civic Intelligence (C.I.)</span>, it combines real-time resident reporting with direct city department tracking and transparent project budget auditing—creating an uneditable public record where <span class="hero-qa-accent">you hold the receipt</span> to ensure your tax dollars actively protect and improve your neighborhood.</p>
+      <h2 class="hero-qa-heading">What is CITIXEN UX<sup class="tm-symbol">™</sup>?</h2>
+      <p class="hero-qa-body">CITIXEN UX<sup class="tm-symbol">™</sup> is the modern standard for resident-first municipal engagement.</p>
+      <p class="hero-qa-body">Powered by <span class="hero-qa-accent">Civic Intelligence (C.I.)</span>, it combines real-time resident reporting with direct city department tracking and transparent project budget auditing—creating an uneditable public record.</p>
+      <p class="hero-qa-body"><span class="hero-qa-accent">You hold the receipt</span> to ensure your tax dollars actively protect and improve your neighborhood.</p>
+    </div>
+  </section>
+
+  <!-- ===== NATIONAL LIVE REPORT PIXEL MAP — a decorative, stylized US
+       silhouette (an approximate polygon used only as an SVG clip-path —
+       same "stylized layout, not a geographic projection" convention as
+       the Aggregation Hub's own markers) rendered as a dense grid of dim
+       pixels, with five bright, pulsing city nodes (La Crosse, Chicago,
+       Austin, New York, Los Angeles) alternating Emerald/Cyan. Purely
+       decorative — see renderNationalPixelMap() below; it draws no real
+       per-city report data, unlike the Aggregation Hub's live-tagged
+       La Crosse marker. ===== -->
+  <section class="pixel-map-section">
+    <div class="pixel-map-card" id="national-pixel-map">
+      <svg class="pixel-map-svg" viewBox="0 0 800 440" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+        <defs>
+          <clipPath id="usSilhouetteClip">
+            <path d="M150,40 L620,40 L620,90 L560,70 L600,120 L650,90 L700,60 L740,100 L700,150 L720,190 L690,230 L670,280 L690,320 L660,360 L680,390 L720,430 L680,400 L630,390 L560,400 L500,390 L460,420 L400,400 L350,440 L320,400 L270,380 L220,360 L180,330 L150,360 L130,320 L110,260 L120,200 L100,140 L110,90 Z"/>
+          </clipPath>
+        </defs>
+        <g id="pixelMapGrid" clip-path="url(#usSilhouetteClip)"></g>
+        <g id="pixelMapNodes"></g>
+      </svg>
     </div>
   </section>
 
   <!-- ===== AGGREGATION MAP GATEWAY BUTTON — Position 2. Same .ledger-banner
-       layout as the Live Public Ledger banner, but in the Civic Gold
-       variant (.ledger-banner-gold) per the color-breakup spec, so the
-       national Crowd Source America™ campaign reads as visually distinct
-       from CITIXEN UX™'s emerald platform elements. Opens the same real
-       #nationalHeatMapModal (a real Leaflet instance — see below) that the
-       Analytics drawer's own trigger opens — not a duplicate modal. ===== -->
+       layout as the Live Public Ledger banner, now in the Electric Cyan
+       variant (.ledger-banner-cyan — Civic Gold is retired this round,
+       see the color-breakup notes near .ledger-banner-cyan's CSS), so the
+       national Crowd Source America™ campaign still reads as visually
+       distinct from CITIXEN UX™'s emerald platform elements. "AGGREGATION
+       HUB" is wrapped in a no-wrap span so "HUB" never orphans onto its
+       own line on narrow viewports (see the max-width:640px rule below).
+       Opens the same real #nationalHeatMapModal (a real Leaflet instance
+       — see below) that the Analytics drawer's own trigger opens — not a
+       duplicate modal. ===== -->
   <section class="ledger-banner-section">
-    <button class="ledger-banner ledger-banner-gold" id="aggregationMapGatewayBtn" type="button">
+    <button class="ledger-banner ledger-banner-cyan" id="aggregationMapGatewayBtn" type="button">
       <span class="ledger-banner-pulse" aria-hidden="true"></span>
-      <span class="ledger-banner-label">CROWD SOURCE AMERICA™ — AGGREGATION HUB</span>
+      <span class="ledger-banner-label">CROWD SOURCE AMERICA<sup class="tm-symbol">™</sup> — <span class="nowrap-pair">AGGREGATION HUB</span></span>
       <span class="ledger-banner-count">View Map ↗</span>
     </button>
   </section>
 
   <!-- ===== CROWD SOURCE AMERICA™ NARRATIVE BLOCK — Position 3. Plain
-       centered text, no card/box (per the earlier color-breakup spec);
-       the heading carries the Civic Gold accent. ===== -->
+       centered text, no card/box; the heading now carries the Electric
+       Cyan accent (Civic Gold retired this round). ===== -->
   <section class="csa-banner-section">
     <div class="csa-banner-card">
-      <h2 class="csa-banner-heading">Crowd Source America™</h2>
-      <p class="csa-banner-body">Every CITIXEN UX™ report feeds into one unified national ledger—turning individual local fixes into a live, block-by-block picture of civic conditions across the country.</p>
+      <h2 class="csa-banner-heading">Crowd Source America<sup class="tm-symbol">™</sup></h2>
+      <p class="csa-banner-body">Every CITIXEN UX<sup class="tm-symbol">™</sup> report feeds into one unified national ledger—turning individual local fixes into a live, block-by-block picture of civic conditions across the country.</p>
     </div>
   </section>
 
@@ -1000,7 +1072,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </button>
   </div>
   <div class="small" style="text-align:center;color:var(--muted)" id="installStatus">Waiting for install availability on this browser…</div>
-  <div class="small" style="text-align:center;color:var(--muted);max-width:460px;margin:4px auto 20px;">Installs the CITIXEN UX™ Progressive Web App directly to your home screen.</div>
+  <div class="small" style="text-align:center;color:var(--muted);max-width:460px;margin:4px auto 20px;">Installs the CITIXEN UX<sup class="tm-symbol">™</sup> Progressive Web App directly to your home screen.</div>
 
   <!-- ===== INSTITUTIONAL GATEWAY BUTTONS — sits between the App Download
        section and the footer, per this round's homepage-scroll-sequence
@@ -1018,13 +1090,13 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        "API KEY REQUIRED" watermark, so this round swapped to OSM, same
        fix already applied to the field-dispatch map's tiles (see
        addBaseLayer() and the global .leaflet-tile-pane filter, which
-       dark-themes these OSM tiles the same way, automatically). Gold
-       (#FFB800) markers for each seeded jurisdiction, sized from real
-       numbers where a live backend exists (La Crosse — this project's
-       only live ward data, via loadBig3()) and clearly tagged
+       dark-themes these OSM tiles the same way, automatically). Electric
+       Cyan (#0EA5E9) markers for each seeded jurisdiction, sized from
+       real numbers where a live backend exists (La Crosse — this
+       project's only live ward data, via loadBig3()) and clearly tagged
        (Illustrative) where a jurisdiction is still static demo config
        (Austin/Chicago — see the `cities` object). If tiles fail to load,
-       the dark canvas background and gold markers still render (see
+       the dark canvas background and cyan markers still render (see
        initAggregationMap()'s tileerror handler below) rather than a
        blank/broken map. Separate Leaflet instance from the field-dispatch
        map inside the Analytics deep-dive. ===== -->
@@ -1033,8 +1105,8 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       <button class="modal-close" id="heatMapCloseBtn" style="z-index:2">✕</button>
       <div class="frontier-map-head" style="padding:18px 20px 10px;">
         <div class="frontier-search-bar">
-          <div class="label agg-hub-heading" style="justify-content:center;margin-bottom:2px">Crowd Source America™ — Aggregation Hub</div>
-          <div class="frontier-search-note">Gold marker = a seeded jurisdiction. Search a city or ZIP below to fly to it.</div>
+          <div class="label agg-hub-heading" style="justify-content:center;margin-bottom:2px">Crowd Source America<sup class="tm-symbol">™</sup> — Aggregation Hub</div>
+          <div class="frontier-search-note">Cyan marker = a seeded jurisdiction. Search a city or ZIP below to fly to it.</div>
           <div class="geo-hatch-search-row">
             <input type="text" id="geoHatchSearchInput" placeholder="Search city or ZIP (e.g. La Crosse, Austin, 54601)" aria-label="Search city or ZIP" autocomplete="off">
             <button class="btn btn-outline" id="geoHatchSearchBtn" type="button">Search</button>
@@ -1050,8 +1122,8 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       <div class="aggregation-map-wrap" id="aggregationMapWrap" style="height:480px;margin:0 20px 20px;">
         <div id="aggregation-map-container"></div>
         <div class="geo-hatch-legend">
-          <span><span class="geo-legend-dot" style="background:#FFB800"></span>Live backend (La Crosse)</span>
-          <span><span class="geo-legend-dot" style="background:rgba(255,184,0,.35)"></span>Illustrative — pending onboarding</span>
+          <span><span class="geo-legend-dot" style="background:#0EA5E9"></span>Live backend (La Crosse)</span>
+          <span><span class="geo-legend-dot" style="background:rgba(14,165,233,.35)"></span>Illustrative — pending onboarding</span>
         </div>
       </div>
     </div>
@@ -1072,8 +1144,8 @@ audio.pw-audio-el{width:100%;margin-top:4px}
          card. The Operations drawer's old duplicate launcher (and its
          Backend Data Pipeline diagram) were removed outright. ===== -->
     <div style="text-align:center;margin-bottom:14px;">
-      <p class="bridge-slogan">One report gets a pothole filled. A thousand reports cover a city. A million reports Crowd Source America™.</p>
-      <button class="btn btn-outline" id="btnViewHeatMapFromAnalytics" type="button">Crowd Source America™ — View Aggregation Hub ↗</button>
+      <p class="bridge-slogan">One report gets a pothole filled. A thousand reports cover a city. A million reports Crowd Source America<sup class="tm-symbol">™</sup>.</p>
+      <button class="btn btn-outline" id="btnViewHeatMapFromAnalytics" type="button">Crowd Source America<sup class="tm-symbol">™</sup> — View Aggregation Hub ↗</button>
     </div>
     <div class="deepdive-cols">
       <div class="card" id="coverageGridCard">
@@ -1250,11 +1322,11 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        verified (this project already removed an unverified "Patents
        Pending" claim earlier in this session on the same grounds). ===== -->
   <footer class="site-footer sitemap-footer">
-    <div class="footer-slogan-callout">CITIXEN UX™ — Crowd Source America™. Built for residents, designed for modern civic trust.</div>
+    <div class="footer-slogan-callout">CITIXEN UX<sup class="tm-symbol">™</sup> — Crowd Source America<sup class="tm-symbol">™</sup>. Built for residents, designed for modern civic trust.</div>
     <div class="sitemap-bottom">
       <button type="button" id="footerCodexLink" class="footer-staff-link" style="background:none;border:none;padding:0;font:inherit;cursor:pointer">Statutory Governance &amp; Precedent ↗</button>
     </div>
-    <div class="trademark-disclosure">CITIXEN UX™ and Crowd Source America™ are protected trademarks. Civic Intelligence, Civic Memory, Geo-Hatch, City Snapshot, and Civic Stack are proprietary marks. Protected under U.S. and international trademark laws. All other trademarks, product names, and logos are the property of their respective owners.</div>
+    <div class="trademark-disclosure">CITIXEN UX<sup class="tm-symbol">™</sup> and Crowd Source America<sup class="tm-symbol">™</sup> are protected trademarks. Civic Intelligence, Civic Memory, Geo-Hatch, City Snapshot, and Civic Stack are proprietary marks. Protected under U.S. and international trademark laws. All other trademarks, product names, and logos are the property of their respective owners.</div>
   </footer>
 
 <script>
@@ -1629,7 +1701,7 @@ document.querySelectorAll('[data-close-panel]').forEach(btn => {
    map's tiles; see addBaseLayer() below and the global .leaflet-tile-pane
    CSS filter, which dark-themes OSM's tiles for both map instances). If
    tile fetching fails (offline, CDN blocked), the container's own dark
-   background (see .aggregation-map-wrap CSS) plus the three gold markers
+   background (see .aggregation-map-wrap CSS) plus the three cyan markers
    below still render, so the view degrades to "dark canvas with markers"
    rather than a blank/broken map. Separate Leaflet map instance from the
    field-dispatch `map` used in the Analytics deep-dive — this never
@@ -1651,7 +1723,7 @@ const AGGREGATION_MAP_CITIES = {
     match: ['austin','texas','tx','ward 2','78701'] }
 };
 
-function goldMarkerIcon(){
+function cyanMarkerIcon(){
   return L.divIcon({
     className: '',
     html: '<div class="agg-marker-beacon"><span class="agg-marker-pulse"></span><span class="agg-marker-core"></span></div>',
@@ -1700,7 +1772,7 @@ function initAggregationMap(){
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     });
     tiles.on('tileerror', () => {
-      // A real tile-load failure — keep the dark canvas background and gold
+      // A real tile-load failure — keep the dark canvas background and cyan
       // markers rather than showing a broken/blank map underneath them.
       if (aggregationMapTilesFailed) return;
       aggregationMapTilesFailed = true;
@@ -1710,7 +1782,7 @@ function initAggregationMap(){
     tiles.addTo(aggregationMap);
     Object.keys(AGGREGATION_MAP_CITIES).forEach(key => {
       const c = AGGREGATION_MAP_CITIES[key];
-      const marker = L.marker([c.lat, c.lng], { icon: goldMarkerIcon() }).addTo(aggregationMap);
+      const marker = L.marker([c.lat, c.lng], { icon: cyanMarkerIcon() }).addTo(aggregationMap);
       marker.bindTooltip(aggregationMarkerLabel(key), { direction: 'top', offset: [0, -10] });
       aggregationMapMarkers[key] = marker;
     });
@@ -1750,7 +1822,7 @@ function closeHeatMapModal(){
 const viewHeatMapFromAnalyticsBtn = document.getElementById('btnViewHeatMapFromAnalytics');
 if (viewHeatMapFromAnalyticsBtn) viewHeatMapFromAnalyticsBtn.addEventListener('click', openHeatMapModal);
 // Top-level "Crowd Source America™ — Aggregation Hub" gateway button
-// (Civic Gold .ledger-banner-gold variant) opens the same real
+// (Electric Cyan .ledger-banner-cyan variant) opens the same real
 // #nationalHeatMapModal, not a duplicate modal.
 const aggregationMapGatewayBtnEl = document.getElementById('aggregationMapGatewayBtn');
 if (aggregationMapGatewayBtnEl) aggregationMapGatewayBtnEl.addEventListener('click', openHeatMapModal);
@@ -2501,6 +2573,50 @@ document.getElementById('matrixGrid').addEventListener('click', (e) => {
 });
 
 /* =====================================================================
+   NATIONAL LIVE REPORT PIXEL MAP — draws the dense dim-pixel grid inside
+   the hand-authored #usSilhouetteClip SVG clip-path, then overlays five
+   bright, pulsing city nodes (La Crosse, Chicago, Austin, New York, Los
+   Angeles) alternating Emerald (#00FF87) and Electric Cyan (#0EA5E9).
+   This is purely decorative — it draws no real per-city report data,
+   unlike the Aggregation Hub's live-tagged La Crosse marker elsewhere on
+   this page — and the silhouette itself is a stylized approximation, not
+   a precise cartographic projection (same convention documented on the
+   Aggregation Hub's own marker layout).
+   ===================================================================== */
+function renderNationalPixelMap(){
+  const grid = document.getElementById('pixelMapGrid');
+  const nodesLayer = document.getElementById('pixelMapNodes');
+  if (!grid || !nodesLayer) return;
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const cols = 40, rows = 22, cell = 800 / cols;
+  let dots = '';
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const x = c * cell, y = r * (440 / rows);
+      dots += '<rect class="pixel-map-dot" x="' + (x + 1) + '" y="' + (y + 1) + '" width="' + (cell - 2) + '" height="' + ((440 / rows) - 2) + '" fill="#0EA5E9"></rect>';
+    }
+  }
+  grid.innerHTML = dots;
+
+  // Approximate pixel-space positions for each node, hand-placed within
+  // the silhouette clip-path — not derived from real latitude/longitude.
+  const nodes = [
+    { name: 'La Crosse', x: 470, y: 150, color: 'emerald' },
+    { name: 'Chicago',    x: 520, y: 165, color: 'cyan' },
+    { name: 'Austin',     x: 430, y: 300, color: 'emerald' },
+    { name: 'New York',   x: 660, y: 150, color: 'cyan' },
+    { name: 'Los Angeles',x: 190, y: 250, color: 'emerald' }
+  ];
+  nodesLayer.innerHTML = nodes.map(n => {
+    const cls = 'pixel-map-node-' + n.color;
+    return '<g class="' + cls + '">' +
+      '<circle class="pixel-map-node-pulse" cx="' + n.x + '" cy="' + n.y + '" r="10"></circle>' +
+      '<circle class="pixel-map-node-core" cx="' + n.x + '" cy="' + n.y + '" r="4"></circle>' +
+      '</g>';
+  }).join('');
+}
+
+/* =====================================================================
    NATIONAL GEO-HATCH COVERAGE TICKER — averages the real, already-seeded
    `cities` health-index values used elsewhere on this page (La Crosse,
    Austin, Chicago). It's a genuine average of real demo numbers, labeled
@@ -2877,6 +2993,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   updateTelemetry(cities.lacrosse);
   loadBig3();
   renderNationalCoverageTicker();
+  renderNationalPixelMap();
   // The "Download Ward Health Summary PDF" button was removed outright per
   // this round's spec; downloadWardHealthPdf() itself is kept (real, working
   // jsPDF generation) in case a future round re-wires it to a control.
