@@ -547,8 +547,9 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
    removed with its markup per the homepage-declutter spec. ===== */
 /* Crowd Save America™ Entry Hub welcome banner — sits at the top of the
    dedicated #csaWelcomeModal, above its static Gridded US Vector Map
-   graphic. This round's "Big Title Header" adds a bold title above the
-   mission body text. */
+   graphic. Bold title header, followed by exactly one concise
+   single-sentence subtitle ("Single-Sentence Subtitle Lock") — no longer
+   a multi-sentence mission paragraph. */
 .agg-hub-welcome-banner{padding:18px 20px 4px;text-align:center;border-bottom:1px solid rgba(0,230,153,.15)}
 .agg-hub-welcome-title{color:#00E699;font-weight:800;font-size:1.15rem;letter-spacing:.04em;
   text-transform:uppercase;margin-bottom:8px}
@@ -1734,20 +1735,23 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        as #national-pixel-map in the Analytics drawer — see
        renderWelcomeMapGraphic()) with micro-shield matrix nodes — never the
        interactive Leaflet/MapLibre Aggregation Hub map, its zoom controls,
-       or its search bar. This round's "Strict Hierarchy Shift" adds a big
-       bold "CROWD SAVE AMERICA™" title above the mission body text
-       (#csaWelcomeTitle), removes the "View Map ↗" trigger a previous round
+       or its search bar. A prior round's "Strict Hierarchy Shift" added a
+       big bold "CROWD SAVE AMERICA™" title (#csaWelcomeTitle) above the
+       subtitle, removed the "View Map ↗" trigger a previous round had
        added to the bottom-right of the graphic card outright (that trigger
        still exists on the Analytics-drawer instance of this same graphic —
-       only the welcome pop-up's copy loses it), and moves the single CTA
+       only the welcome pop-up's copy loses it), and moved the single CTA
        button to its own row directly BELOW the graphic card, renamed
-       "Enter CITIXEN Dashboard ↗". ===== -->
+       "Enter CITIXEN Dashboard ↗". This round's "Single-Sentence Subtitle
+       Lock" replaces the old multi-sentence mission paragraph directly
+       below the title with exactly one concise sentence: "Restoring civic
+       trust, one snap at a time." ===== -->
   <div class="modal-overlay" id="csaWelcomeModal">
     <div class="modal-box" style="max-width:640px;width:92vw;">
       <button class="modal-close" id="csaWelcomeCloseBtn">✕</button>
       <div class="agg-hub-welcome-banner">
         <div class="agg-hub-welcome-title" id="csaWelcomeTitle">Crowd Save America<sup class="tm-symbol">™</sup></div>
-        <p>Restoring ground-truth transparency across all 50 states. Crowd Save America<sup class="tm-symbol">™</sup> turns everyday observations into verified, on-device scrubbed records — an undeniable, real-time audit of American infrastructure.</p>
+        <p>Restoring civic trust, one snap at a time.</p>
       </div>
       <section class="pixel-map-section" style="margin:0 auto 18px;padding:0 18px;max-width:none;">
         <div class="pixel-map-card" style="padding:16px;">
