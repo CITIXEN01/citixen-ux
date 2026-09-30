@@ -57,6 +57,19 @@
   --bg-obsidian:#030712 !important;
   --bg-card:#111827 !important;
   --border-muted:rgba(255,255,255,0.08) !important;
+  /* ===== STANDARDIZED SURFACE TOKENS — per this round's item 1 ("Absolute
+     Color Purge & Canvas Matching"), every card/panel/drawer surface on
+     this page (and app.html's, kept in sync) now draws from these two
+     tokens instead of each component hardcoding its own flat-obsidian +
+     hairline-border rule: a translucent glass card fill (with blur, so the
+     page's own obsidian canvas shows faintly through) and a matching
+     Fresh Mint hairline. Replaces the flat #030712 + rgba(0,230,153,.25)
+     border treatment introduced in an earlier round's "absolute blue
+     purge" — same intent (no navy/slate glass), refined fill. */
+  --surface-card-bg:rgba(11,15,25,0.85) !important;
+  --surface-card-border:1px solid rgba(0,230,153,0.22) !important;
+  --surface-input-bg:rgba(3,7,18,0.95) !important;
+  --surface-input-border:1px solid rgba(255,255,255,0.08) !important;
   /* legacy aliases — every existing var(--mint)/var(--card)/etc. usage below inherits
      the brand tokens above unchanged, so there is one source of truth for color. */
   --bg:var(--bg-obsidian); --card:var(--bg-card); --border:var(--border-muted); --hover:#162529;
@@ -74,6 +87,16 @@ button,select,input{font-family:inherit}
 header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);backdrop-filter:blur(12px);
   border-bottom:1px solid var(--border);padding:max(12px, env(safe-area-inset-top)) 22px max(12px, env(safe-area-inset-bottom));
   display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+/* Desktop: Privacy Shield badge floats top-right of the nav bar (its
+   natural position as the header's second flex child with
+   justify-content:space-between above). Mobile: per this round's item 2,
+   the badge instead centers directly beneath the nav row — the header
+   already wraps (flex-wrap:wrap) once "brand" and the badge can no
+   longer share one row, so this just re-centers the wrapped badge
+   instead of leaving it flush right. */
+@media (max-width:640px){
+  header.topbar .nav-privacy-badge{width:100%;justify-content:center;margin-top:2px}
+}
 .brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
 /* ===== UNIFIED LOGO LOCKUP (identical markup/classes across index.html, dispatch.html, app.html)
    Seal-to-text proportional ratios per this round's item 1: shield sized in
@@ -220,8 +243,8 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
    literal spec. ===== */
 .hub-row{display:flex;flex-direction:column;max-width:920px;margin:0 auto 26px;padding:0 16px;box-sizing:border-box}
 .hub-card{position:relative;display:flex;align-items:center;justify-content:space-between;width:100%;
-  background:#030712;box-shadow:0 0 12px rgba(0,230,153,.08);
-  border:1px solid rgba(0,230,153,.25);border-radius:9999px;padding:12px 18px;
+  background:var(--surface-card-bg);backdrop-filter:blur(12px);box-shadow:0 0 12px rgba(0,230,153,.08);
+  border:var(--surface-card-border);border-radius:9999px;padding:12px 18px;
   margin-bottom:14px;box-sizing:border-box;cursor:pointer;color:var(--text);text-align:left;
   transition:border-color .15s;font-family:inherit;min-width:0;gap:10px}
 .hub-card:last-child{margin-bottom:0}
@@ -240,6 +263,25 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .hub-card-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .hub-card-arrow{font-size:.8rem;font-weight:600;color:#00E699;flex-shrink:0}
 .hub-card:hover{border-color:#00E699}
+
+/* ===== CITIXEN UX™ FEATURE & SECURITY SECTION — per this round's item 4,
+   a static 3-column feature grid directly below the engine stack. Same
+   glass card surface token as every other container this round. ===== */
+.citixen-feature-section{max-width:920px;margin:0 auto 26px;padding:0 16px}
+.citixen-feature-learn-more{display:inline-block;background:none;border:none;padding:0;font:inherit;
+  color:#00E699;font-size:.8rem;font-weight:700;cursor:pointer;text-decoration:underline}
+.citixen-feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.citixen-feature-col{background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);
+  border-radius:12px;padding:16px}
+.citixen-feature-col-head{color:#00E699;font-weight:800;font-size:.74rem;text-transform:uppercase;
+  letter-spacing:.05em;margin-bottom:10px}
+.citixen-feature-col ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.citixen-feature-col li{font-size:.76rem;color:var(--text);line-height:1.4;padding-left:14px;position:relative}
+.citixen-feature-col li::before{content:'';position:absolute;left:0;top:.5em;width:6px;height:6px;
+  border-radius:50%;background:#00E699}
+@media (max-width:720px){
+  .citixen-feature-grid{grid-template-columns:1fr}
+}
 @media (max-width:640px){
   .hub-row{padding:0 14px}
   .hub-card{padding:10px 14px}
@@ -278,17 +320,28 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   transition:border-color .15s,filter .15s}
 .nav-jurisdiction-badge:hover{border-color:#00E699;filter:brightness(1.15)}
 
-/* ===== CIVIC MEMORY™ CONCEPT CARD — per this round's item 2, sits
-   directly beneath the relocated jurisdiction pill, explaining the
-   overarching framework connecting the Public Ledger, Projects and
-   Budgets. Same flat obsidian + subtle Fresh Mint border treatment as
-   every other app container card. ===== */
-.civic-memory-card-section{max-width:640px;margin:0 auto 20px;padding:0 24px}
-.civic-memory-card{background:#030712;border:1px solid rgba(0,230,153,.25);border-radius:12px;
-  padding:16px;text-align:center}
-.civic-memory-card-header{color:#00E699;font-weight:800;font-size:.9rem;letter-spacing:.06em;
-  text-transform:uppercase;margin-bottom:10px}
-.civic-memory-card-narrative{color:#94A3B8;font-size:.85rem;line-height:1.45}
+/* ===== CIVIC TRIAD DIAGRAM CARD — replaces this round's now-superseded
+   standalone "Civic Memory™" concept card (its narrative text is not
+   deleted — it now opens as the first thing a visitor reads inside the
+   Civic Memory™ engine button's "View Charter" modal below, a more
+   honest home for architecture/framework prose than a passive card
+   sitting mid-scroll). This card instead gives the same idea a visual:
+   a 3-node connected vector diagram (Resident Field Unit <-> Public
+   Ledger <-> Municipal Portal) showing how a report actually moves
+   through the real system — each node name matches a real, reachable
+   part of this build (report flow / #ledgerDrawer / the Municipal
+   engine button below), not an invented pipeline. Same glass card
+   surface token as every other container this round. ===== */
+.civic-triad-section{max-width:640px;margin:0 auto 20px;padding:0 24px}
+.civic-triad-card{background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);border-radius:12px;
+  padding:18px 16px;text-align:center}
+.civic-triad-header{color:#00E699;font-weight:800;font-size:.9rem;letter-spacing:.06em;
+  text-transform:uppercase;margin-bottom:14px}
+.civic-triad-svg{width:100%;height:auto;max-width:480px;margin:0 auto;display:block}
+.civic-triad-node-label{fill:#f8fafc;font-size:10.5px;font-weight:700;text-anchor:middle}
+.civic-triad-node-sub{fill:#94A3B8;font-size:8px;text-anchor:middle}
+.civic-triad-link{stroke:#00E699;stroke-width:1.5;stroke-dasharray:4 3;opacity:.65}
+.civic-triad-node-circle{fill:rgba(0,230,153,.1);stroke:#00E699;stroke-width:1.5}
 
 /* ===== BENTO DECK ===== */
 /* #dashboard is now a column wrapper (tab bar + one active view); the row
@@ -299,7 +352,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 #dashboardLiveView.active{min-height:560px}
 .sidebar{width:380px;flex-shrink:0;min-height:0;padding:20px;display:flex;flex-direction:column;gap:16px;
   border-right:1px solid var(--border);overflow-y:auto;max-height:calc(100vh - 64px);position:relative;z-index:1}
-.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
+.card{background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);border-radius:12px;padding:16px}
 .label{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);
   margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
 .stat-big{font-size:2.2rem;font-weight:900;color:var(--mint2)}
@@ -389,7 +442,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   padding:12px 16px;border-radius:10px;font-size:.84rem;outline:none}
 .frontier-search-bar input:focus{border-color:var(--mint2)}
 .frontier-search-note{font-size:.66rem;color:var(--muted);margin-top:6px}
-.frontier-ticker-inline{background:var(--card);border:1px solid var(--border);border-radius:12px;
+.frontier-ticker-inline{background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);border-radius:12px;
   padding:10px 18px;text-align:center;min-width:170px}
 .frontier-ticker-inline .ticker-value{font-size:1.5rem;margin:2px 0}
 .frontier-mapwrap{position:relative;height:460px;border-radius:16px;overflow:hidden;border:1px solid var(--border)}
@@ -491,8 +544,8 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:3000;display:none;
   align-items:center;justify-content:center;padding:20px}
 .modal-overlay.open{display:flex}
-.modal-box{background:#030712;box-shadow:0 0 12px rgba(0,230,153,.08);
-  border:1px solid rgba(0,230,153,.25);border-radius:14px;padding:24px;
+.modal-box{background:var(--surface-card-bg);backdrop-filter:blur(12px);box-shadow:0 0 12px rgba(0,230,153,.08);
+  border:var(--surface-card-border);border-radius:12px;padding:24px;
   max-width:480px;width:100%;max-height:80vh;overflow-y:auto}
 .modal-box h3{font-size:1.05rem;margin-bottom:14px;color:var(--mint2)}
 .modal-box h4{font-size:.82rem;margin:14px 0 4px;color:var(--text)}
@@ -539,7 +592,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
    fill). ===== */
 .pw-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:3200;display:none}
 .pw-overlay.open{display:flex;justify-content:flex-end}
-.pw-panel{width:min(480px,100vw);height:100%;background:#030712;box-shadow:0 0 12px rgba(0,230,153,.08);border-left:1px solid rgba(0,230,153,.25);
+.pw-panel{width:min(480px,100vw);height:100%;background:var(--surface-card-bg);backdrop-filter:blur(12px);box-shadow:0 0 12px rgba(0,230,153,.08);border-left:var(--surface-card-border);
   overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
 .pw-head{display:flex;justify-content:space-between;align-items:center}
 .pw-head h3{color:var(--mint2);font-size:1.05rem}
@@ -658,7 +711,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
    purge" (retires the earlier rgba(15,23,42,.75) frosted-glass fill). ===== */
 .ledger-drawer{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:2800;display:none}
 .ledger-drawer.open{display:flex;justify-content:flex-end}
-.ledger-drawer-panel{width:min(520px,100vw);height:100%;background:#030712;box-shadow:0 0 12px rgba(0,230,153,.08);border-left:1px solid rgba(0,230,153,.25);
+.ledger-drawer-panel{width:min(520px,100vw);height:100%;background:var(--surface-card-bg);backdrop-filter:blur(12px);box-shadow:0 0 12px rgba(0,230,153,.08);border-left:var(--surface-card-border);
   display:flex;flex-direction:column}
 .ledger-drawer-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--border)}
 .ledger-drawer-body{flex:1;overflow-y:auto;padding:16px 18px 32px}
@@ -791,7 +844,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
    silhouette. Padding widened this round (20px top/sides) so the header
    and graphic both sit comfortably inside the frame with clear breathing
    room rather than crowding it. */
-.pixel-map-card{position:relative;display:flex;flex-direction:column;background:#030712;border:1px solid rgba(0,230,153,.25);border-radius:16px;overflow:hidden;box-shadow:0 0 12px rgba(0,230,153,.08);padding:20px 20px 0}
+.pixel-map-card{position:relative;display:flex;flex-direction:column;background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);border-radius:16px;overflow:hidden;box-shadow:0 0 12px rgba(0,230,153,.08);padding:20px 20px 0}
 .pixel-map-svg{width:100%;height:210px;display:block;flex-shrink:0;margin:0 auto}
 .pixel-map-dot{opacity:.2;transition:fill .25s,opacity .4s}
 /* Grid fills pivoted from Emerald Green (#00E699) to Fresh Mint (#00E699)
@@ -1054,7 +1107,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
           <input type="text" id="ledgerScopeInput" class="ledger-search" style="margin:0" placeholder="Enter street address or ZIP code...">
           <button type="button" id="ledgerScopePrintBtn" class="ledger-print-cta">Print Location Report</button>
         </div>
-        <button type="button" id="ledgerDeepAnalyticsLink" class="ledger-deep-analytics-link">Go Deeper into Analytics ↗</button>
+        <button type="button" id="ledgerDeepAnalyticsLink" class="ledger-deep-analytics-link">Go Deeper Into Analytics and Reporting ↗</button>
         <div id="ledgerResults"></div>
       </div>
     </div>
@@ -1084,6 +1137,48 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </div>
   </div>
 
+  <!-- ===== CIVIC MEMORY™ — ARCHITECTURE & CHARTER DRAWER — new this round,
+       opened by the Civic Memory™ engine button (repointed from the Live
+       Public Ledger drawer, which keeps its own dedicated top-level entry
+       point above the national map). Three tabs: the state-constitution
+       reference already carried in the CITIXEN Codex above (Track A),
+       shown here in its own honest "representative summary, not verbatim
+       statutory text" framing; an honest before/after description of this
+       platform's real ward-tier spatial model versus H3 hexagonal spatial
+       hashing as the roadmap target (H3 itself is not implemented in this
+       build); and a link into the existing, real Anonymity Whitepaper
+       rather than a duplicate privacy write-up. ===== -->
+  <div class="ledger-drawer" id="civicCharterDrawer">
+    <div class="ledger-drawer-panel">
+      <div class="ledger-drawer-head">
+        <strong style="color:var(--mint2)">Civic Memory™ — Architecture &amp; Charter</strong>
+        <button class="modal-close" id="civicCharterCloseBtn">✕</button>
+      </div>
+      <div class="ledger-drawer-body">
+        <div class="codex-tabs" role="tablist" aria-label="Charter section">
+          <button class="codex-tab active" id="charterTabConstitution" type="button" role="tab" aria-selected="true">State Constitution</button>
+          <button class="codex-tab" id="charterTabSpatial" type="button" role="tab" aria-selected="false">Spatial Hashing</button>
+          <button class="codex-tab" id="charterTabPrivacy" type="button" role="tab" aria-selected="false">Privacy Protocols</button>
+        </div>
+        <div id="charterDocList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== JURISDICTION STATUS PILL — per this round's item 2 vertical
+       stacking order, position 2 (directly under the header's Privacy
+       Shield badge, directly above the "Citixen Dashboard" title). Same
+       "● City, ST • Active" real resolved-jurisdiction text and "Change
+       Location" trigger as before (see updateSmartLocationBanner()/
+       openLocationPicker() below) — only its position moved again this
+       round, from beneath the national map to here. ===== -->
+  <section class="geo-pill-section">
+    <button type="button" class="nav-jurisdiction-badge" id="navJurisdictionBadge" aria-label="Change your jurisdiction">
+      <span class="pulsing-dot"></span>
+      <span id="navJurisdictionText">La Crosse, WI • Active</span>
+    </button>
+  </section>
+
   <!-- ===== The SECTION-FREEZE hero block that used to sit here (second
        shield SVG + giant two-tone "CITIXEN UX™" heading + "Upgrade Your
        Civic Experience" kicker + "Citizen Dashboard" subtitle) has been
@@ -1092,11 +1187,12 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        was eating the primary mobile viewport. The nav header is now the
        page's one brand mark. In its place: a lightweight "CITIXEN
        DASHBOARD" sub-header (brand spelling per a later round) directly
-       under the green jurisdiction bar, then the tagline, then straight
-       into the Live Public Ledger pill — no second branding block between
-       the jurisdiction bar and the real content. ===== -->
+       under the green jurisdiction bar, then the tagline (trimmed this
+       round to drop "for your local area" per the spec's literal text),
+       then straight into the Live Public Ledger pill — no second branding
+       block between the jurisdiction bar and the real content. ===== -->
   <p class="citizen-dashboard-subheader"><span class="cds-white">Citixen</span> <span class="cds-mint">Dashboard</span></p>
-  <p class="hero-tagline-subtle">Real-time community reporting and municipal tracking for your local area.</p>
+  <p class="hero-tagline-subtle">Real-time community reporting and municipal tracking.</p>
 
   <!-- ===== LIVE PUBLIC LEDGER BANNER — sits directly beneath the Citixen
        Dashboard sub-header/tagline above, and directly ABOVE the
@@ -1184,22 +1280,45 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </div>
   </section>
 
-  <!-- ===== JURISDICTION STATUS PILL — relocated here per this round's item 2
-       (previously the top nav's right-side badge, now replaced there by the
-       Privacy Shield badge — see the header comment above). ===== -->
-  <section class="geo-pill-section">
-    <button type="button" class="nav-jurisdiction-badge" id="navJurisdictionBadge" aria-label="Change your jurisdiction">
-      <span class="pulsing-dot"></span>
-      <span id="navJurisdictionText">La Crosse, WI • Active</span>
-    </button>
-  </section>
-
-  <!-- ===== CIVIC MEMORY™ CONCEPT CARD — inserted per this round's item 2,
-       directly beneath the relocated jurisdiction pill. ===== -->
-  <section class="civic-memory-card-section">
-    <div class="civic-memory-card">
-      <div class="civic-memory-card-header">CITIXEN UX™ — CIVIC INTELLIGENCE PLATFORM</div>
-      <p class="civic-memory-card-narrative">Civic Memory™ is the overarching municipal architectural framework connecting real-time resident field reports (Public Ledger) directly to active infrastructure work (Projects) and tax expenditure audits (Budgets).</p>
+  <!-- ===== CIVIC TRIAD DIAGRAM CARD — Position 7 in this round's vertical
+       stacking order, directly beneath the national map card. The
+       jurisdiction pill and the old standalone "Civic Memory™" concept
+       card that used to sit here were both relocated/retired this round
+       (pill now sits above the "Citixen Dashboard" title; the concept
+       card's narrative now opens the Civic Memory™ engine button's "View
+       Charter" drawer below instead of a passive scroll-past card). Each
+       node name is a real, reachable part of this build, not an invented
+       pipeline: "Resident Field Unit" is the mobile reporting flow
+       (app.html), "Public Ledger" is the real #ledgerDrawer every
+       submitted report becomes visible in, and "Municipal Portal" is the
+       Municipal engine button's Work Orders & SLA Tracker panel below. ===== -->
+  <section class="civic-triad-section">
+    <div class="civic-triad-card">
+      <div class="civic-triad-header">Civic Triad — How A Report Moves</div>
+      <svg class="civic-triad-svg" viewBox="0 0 480 150" role="img" aria-label="Diagram: Resident Field Unit connects to Public Ledger connects to Municipal Portal">
+        <line x1="98" y1="46" x2="212" y2="46" class="civic-triad-link"/>
+        <line x1="268" y1="46" x2="382" y2="46" class="civic-triad-link"/>
+        <g>
+          <circle cx="70" cy="46" r="28" class="civic-triad-node-circle"/>
+          <path d="M70 34a6 6 0 1 0 0.001 0z" fill="none" stroke="#00E699" stroke-width="1.6"/>
+          <path d="M58 60c2-7 7-11 12-11s10 4 12 11" fill="none" stroke="#00E699" stroke-width="1.6" stroke-linecap="round"/>
+          <text x="70" y="96" class="civic-triad-node-label">Resident Field Unit</text>
+          <text x="70" y="110" class="civic-triad-node-sub">Mobile report capture</text>
+        </g>
+        <g>
+          <circle cx="240" cy="46" r="28" class="civic-triad-node-circle"/>
+          <path d="M228 34h24M228 42h24M228 50h16" fill="none" stroke="#00E699" stroke-width="1.6" stroke-linecap="round"/>
+          <text x="240" y="96" class="civic-triad-node-label">Public Ledger</text>
+          <text x="240" y="110" class="civic-triad-node-sub">Live, searchable record</text>
+        </g>
+        <g>
+          <circle cx="410" cy="46" r="28" class="civic-triad-node-circle"/>
+          <path d="M398 58v-14l12-8 12 8v14z" fill="none" stroke="#00E699" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M404 58v-8h12v8" fill="none" stroke="#00E699" stroke-width="1.6"/>
+          <text x="410" y="96" class="civic-triad-node-label">Municipal Portal</text>
+          <text x="410" y="110" class="civic-triad-node-sub">Work orders &amp; SLA</text>
+        </g>
+      </svg>
     </div>
   </section>
 
@@ -1281,33 +1400,31 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   <!-- ===== CITY SNAPSHOT (the geolocated Active Hazards / Fix Speed /
        Completion Rate gauge card that used to live here) was removed
        entirely per an earlier round — see the JS/CSS removal notes near
-       renderAnalyticsMatrix()/.gauge-card above. Only its "Explore More
-       Data" header survives, sitting directly below the national map card
-       (the Learn More accordion that used to sit between them has since
-       been removed again), immediately followed by the same 3-pill
-       hub-row it always introduced. ===== -->
+       renderAnalyticsMatrix()/.gauge-card above. Its header text is
+       renamed this round from "More Features" to "CIVIC INTELLIGENCE
+       ENGINE™" per item 3, sitting directly below the new Civic Triad
+       diagram card, immediately followed by the 4-button engine stack it
+       introduces. ===== -->
   <section class="matrix-summary-section" id="matrixSummarySection">
-    <h3 style="color: #00E699; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin: 20px 0 16px; text-align: center;">More Features</h3>
+    <h3 style="color: #00E699; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin: 20px 0 16px; text-align: center;">Civic Intelligence Engine<sup class="tm-symbol">™</sup></h3>
   </section>
 
-  <!-- ===== THREE DRILL-DOWN ACTION HUBS — sit directly below the "More
-       Features" header, which now sits directly below the Civic Memory™
-       concept card per this round's item 6. Each pill keeps its 14px
-       bottom margin (.hub-card) and now shows an explicit action label
-       next to its arrow instead of a bare "↗". Analytics and Expenditures
-       still reveal their existing real deep-dive panels: Analytics ->
-       Health Index, Live dispatch feed/Geo-Hatch map, Bridge Slogan, and
-       response metrics (deepdiveAnalytics); Expenditures -> itemized
-       Civic Memory ledger entries & cost estimates (civicStackSection,
-       scrolled to ledgerCard). The third pill is relabeled "Civic
-       Memory™ — Public Ledger Framework" per this round's spec, so its
-       real trigger is repointed from the old "Operations" deep-dive
-       (civicStackSection scrolled to civicStackAdminCard) to the actual
-       Live Public Ledger drawer (openLedgerDrawer()) — a more honest
-       match for its new label. The Civic Stack/Operations content this
-       pill used to scroll to is not deleted: it's the same
-       civicStackSection panel the Expenditures pill still opens, just no
-       longer auto-scrolled-to directly. ===== -->
+  <!-- ===== CIVIC INTELLIGENCE ENGINE™ 4-BUTTON STACK — grown from three
+       pills to four per this round's item 3, adding a real "Municipal"
+       button (see renderMunicipalPanel()/#municipalPanel below — no
+       fabricated citywide asset inventory; its coverage/risk figures are
+       honest proxies computed from the same real ledger tickets and
+       jurisdiction directory the rest of the page already uses). Analytics
+       and Expenditures still reveal their existing real deep-dive panels
+       (deepdiveAnalytics; civicStackSection scrolled to ledgerCard) with
+       this round's relabeled action text. Civic Memory™ is relabeled
+       "Architecture & Charter" and its real trigger is repointed again,
+       this round from the Live Public Ledger drawer to the new
+       #civicCharterDrawer (State Constitution / Spatial Hashing / Privacy
+       Protocols tabs) — a more honest match for the new "Charter" label.
+       The Live Public Ledger itself is not orphaned by this: it keeps its
+       own dedicated top-level entry point, the "LIVE PUBLIC LEDGER" pill
+       directly above the national map. ===== -->
   <div class="hub-row" role="navigation" aria-label="Deep-dive sections">
     <button class="hub-card" id="hubCoverageBtn" type="button" aria-expanded="false" aria-controls="deepdiveAnalytics">
       <span class="hub-card-main">
@@ -1315,28 +1432,80 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         <span class="hub-card-text"><span class="hub-card-title">Analytics</span><span class="hub-card-sub" id="hubCoverageInfoBtn" role="button" tabindex="0" aria-label="What the Analytics section covers">— Data &amp; Reports</span></span>
       </span>
       <span class="hub-card-actions">
-        <span class="hub-card-arrow">View Report ↗</span>
+        <span class="hub-card-arrow">View Analytics ↗</span>
       </span>
     </button>
     <button class="hub-card" id="hubSlaBtn" type="button" aria-expanded="false" aria-controls="civicStackSection">
       <span class="hub-card-main">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7V5a2 2 0 0 1 2-2h8"/><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M2 11h20"/><circle cx="17" cy="15" r="1.3" fill="#00E699" stroke="none"/></svg>
-        <span class="hub-card-text"><span class="hub-card-title">Expenditures</span><span class="hub-card-sub" id="hubSlaInfoBtn" role="button" tabindex="0" aria-label="What the Expenditures section covers">— Budget &amp; Projects</span></span>
+        <span class="hub-card-text"><span class="hub-card-title">Expenditures</span><span class="hub-card-sub" id="hubSlaInfoBtn" role="button" tabindex="0" aria-label="What the Expenditures section covers">— Budget &amp; Public Works</span></span>
       </span>
       <span class="hub-card-actions">
-        <span class="hub-card-arrow">Export Report ↗</span>
+        <span class="hub-card-arrow">Export Audit ↗</span>
       </span>
     </button>
-    <button class="hub-card" id="hubStackBtn" type="button" aria-expanded="false" aria-controls="ledgerDrawer">
+    <button class="hub-card" id="hubMunicipalBtn" type="button" aria-expanded="false" aria-controls="municipalPanel">
       <span class="hub-card-main">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 21 8 12 13 3 8 12 3"/><polyline points="3 13 12 18 21 13"/><polyline points="3 18 12 23 21 18"/></svg>
-        <span class="hub-card-text"><span class="hub-card-title">Civic Memory™</span><span class="hub-card-sub" id="hubStackInfoBtn" role="button" tabindex="0" aria-label="What the Civic Memory framework covers">— Public Ledger Framework</span></span>
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9l8-5 8 5v12"/><path d="M9 21v-6h6v6"/><path d="M4 21h16"/></svg>
+        <span class="hub-card-text"><span class="hub-card-title">Municipal</span><span class="hub-card-sub" id="hubMunicipalInfoBtn" role="button" tabindex="0" aria-label="What the Municipal section covers">— Work Orders &amp; SLA Tracker</span></span>
       </span>
       <span class="hub-card-actions">
-        <span class="hub-card-arrow">Learn More ↗</span>
+        <span class="hub-card-arrow">View Portal ↗</span>
+      </span>
+    </button>
+    <button class="hub-card" id="hubStackBtn" type="button" aria-expanded="false" aria-controls="civicCharterDrawer">
+      <span class="hub-card-main">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 21 8 12 13 3 8 12 3"/><polyline points="3 13 12 18 21 13"/><polyline points="3 18 12 23 21 18"/></svg>
+        <span class="hub-card-text"><span class="hub-card-title">Civic Memory™</span><span class="hub-card-sub" id="hubStackInfoBtn" role="button" tabindex="0" aria-label="What the Civic Memory framework covers">— Architecture &amp; Charter</span></span>
+      </span>
+      <span class="hub-card-actions">
+        <span class="hub-card-arrow">View Charter ↗</span>
       </span>
     </button>
   </div>
+
+  <!-- ===== CITIXEN UX™ FEATURE &amp; SECURITY SECTION — Position 9 in this
+       round's vertical stacking order, directly below the engine stack.
+       Header typography matches the "Civic Intelligence Engine™" header
+       above (same style attributes) per this round's item 4. The
+       "Learn More ↗" trigger opens the same real Anonymity Whitepaper
+       modal (openModal('anonymity')) the header's Privacy Shield badge
+       already carries — the honest existing content for "Security
+       Protocols" rather than a duplicate write-up. The three feature
+       columns are static descriptive copy (no numbers asserted), same
+       register as the rest of this page's plain-text sections. ===== -->
+  <section class="citixen-feature-section" id="citixenFeatureSection">
+    <h3 style="color: #00E699; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin: 20px 0 6px; text-align: center;">CITIXEN UX<sup class="tm-symbol">™</sup></h3>
+    <div style="text-align:center;margin-bottom:16px;">
+      <button type="button" id="citixenFeatureLearnMoreBtn" class="citixen-feature-learn-more">Learn More ↗</button>
+    </div>
+    <div class="citixen-feature-grid">
+      <div class="citixen-feature-col">
+        <div class="citixen-feature-col-head">Platform Features</div>
+        <ul>
+          <li>Real-time spatial tracking</li>
+          <li>Hazard verification</li>
+          <li>Automated SLA logging</li>
+        </ul>
+      </div>
+      <div class="citixen-feature-col">
+        <div class="citixen-feature-col-head">Safety Standards</div>
+        <ul>
+          <li>Ground-truth civic verification</li>
+          <li>Incident priority ranking</li>
+          <li>Hazard prevention metrics</li>
+        </ul>
+      </div>
+      <div class="citixen-feature-col">
+        <div class="citixen-feature-col-head">Security Protocols</div>
+        <ul>
+          <li>Zero-knowledge privacy engine</li>
+          <li>Metadata hashing</li>
+          <li>Immutable public records</li>
+        </ul>
+      </div>
+    </div>
+  </section>
 
   <!-- ===== PRIMARY LAUNCH ROW + NATIVE APP STORE ROW ===== -->
   <div class="launch-row">
@@ -1560,6 +1729,47 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     <div class="card" id="civicStackAdminCard" style="max-width:640px;width:100%;margin:0 auto 20px;">
       <div class="label" style="justify-content:center">Civic Stack Integrations &amp; Administrative Data</div>
       <div class="small" style="margin:8px 0;">ERP webhook dispatch (Tyler Tech / Accela), PII-blur, and 911-redirect configuration for onboarding a new jurisdiction is not currently exposed anywhere in this build — the client-side wizard that used to demonstrate it was removed this round along with its only entry point.</div>
+    </div>
+  </section>
+
+  <!-- ===== DEEP-DIVE: MUNICIPAL — WORK ORDERS & SLA TRACKER (hidden until
+       hubMunicipalBtn is clicked) — new this round. This dataset has no
+       citywide physical-asset inventory (road miles, streetlight counts,
+       etc.), so rather than assert a fabricated "$X spend, Y% coverage"
+       figure, every number here is computed live from the same real
+       ledger tickets and jurisdictionDirectory ward list the rest of the
+       page already uses (see renderMunicipalPanel() below), with an
+       honest disclosure on each proxy metric. "Ward 4" below is a real
+       ward already present in this dataset's La Crosse jurisdiction
+       (see fallbackLedgerTickets()'s WARD_TICKETS), not an invented
+       example. ===== -->
+  <section class="deepdive-panel civic-stack-section" id="municipalPanel">
+    <div class="deepdive-panel-head">
+      <h3>Municipal — Work Orders &amp; SLA Tracker</h3>
+      <button class="deepdive-close" data-close-panel="municipalPanel" type="button">Close ✕</button>
+    </div>
+    <p class="statement-sub">Citywide asset coverage and per-ward case metrics for <span id="municipalCityLabel">La Crosse</span>, built from the same real reports the Live Public Ledger reads — not a connected municipal GIS asset system.</p>
+
+    <div class="card" id="municipalCoverageCard" style="max-width:640px;width:100%;margin:0 auto 16px;">
+      <div class="label"><span>Citywide Asset Coverage</span><span id="municipalCoveragePct" style="color:var(--mint2)">—</span></div>
+      <div class="small" id="municipalCoverageNote">Locating jurisdiction…</div>
+      <div class="small" style="margin-top:8px;color:var(--muted);">"Coverage" here means wards with at least one logged report on file, not a survey of physical municipal assets — this platform tracks resident-submitted hazard reports, not a GIS asset ledger.</div>
+    </div>
+
+    <div class="card" id="municipalWardCard" style="max-width:640px;width:100%;margin:0 auto 16px;">
+      <div class="label"><span><span id="municipalWardLabel">Ward</span> — Cataloged Reports</span><span id="municipalWardTotal" style="color:var(--mint2)">0</span></div>
+      <div class="row" style="margin-bottom:6px;"><span>Resolved</span><span id="municipalWardResolved" style="color:var(--mint2)">0</span></div>
+      <div class="row"><span>Unmapped Risk Gap</span><span id="municipalRiskGapPct" style="color:var(--warn)">—</span></div>
+      <div class="small" style="margin-top:10px;">"Unmapped Risk Gap" is a real, disclosed proxy — the share of this ward's own logged reports still open (submitted or dispatched, not yet resolved) — not a survey of un-inventoried physical infrastructure, which this build has no data source for.</div>
+    </div>
+
+    <div class="card" style="max-width:640px;width:100%;margin:0 auto 20px;text-align:center;">
+      <div class="label" style="justify-content:center">Verify Jurisdiction / Request Access</div>
+      <div class="small" style="margin-bottom:12px;">Confirm the jurisdiction this portal is scoped to, or request municipal staff access to the full Civic Stack.</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+        <button class="btn btn-outline" id="municipalVerifyJurisdictionBtn" type="button">Verify Jurisdiction</button>
+        <button class="btn btn-outline" id="municipalRequestAccessBtn" type="button">Request Access</button>
+      </div>
     </div>
   </section>
 
@@ -1924,6 +2134,23 @@ const modalData={
       ['Field Unit Routing','How open cases are assigned and routed to field crews for resolution.']
     ]
   },
+  submoduleMunicipal:{
+    title:'Municipal — What This Section Covers',
+    body:[
+      ['Citywide Asset Coverage','Which wards on file have at least one logged report, versus this jurisdiction\'s known ward directory.'],
+      ['Per-Ward Case Metrics','Total and resolved report counts for a given ward, drawn from the same records the Live Public Ledger reads.'],
+      ['Unmapped Risk Gap','A disclosed proxy — the share of a ward\'s logged reports still open — not a physical-asset survey this build has no data source for.'],
+      ['Jurisdiction Verification & Access','Confirming the active jurisdiction, and how elected officials or municipal staff can request platform access.']
+    ]
+  },
+  submoduleCivicMemory:{
+    title:'Civic Memory™ — What This Section Covers',
+    body:[
+      ['State Constitution Reference','A representative-summary pointer to this jurisdiction\'s state constitution, the same reference already carried in the CITIXEN Codex.'],
+      ['Spatial Hashing Architecture','How this platform buckets reports by location today (ward-tier), and the H3 hexagonal-grid model targeted as its roadmap replacement.'],
+      ['Privacy Protocols','Links to the full, real Anonymity Whitepaper covering on-device scrubbing, no-accounts, and no-referrer policy.']
+    ]
+  },
   constitution:{
     title:'Founding Constitution',
     body:[
@@ -2007,19 +2234,129 @@ document.getElementById('hubCoverageBtn').addEventListener('click', (e) => {
 document.getElementById('hubSlaBtn').addEventListener('click', (e) => {
   openDeepdivePanel('civicStackSection', 'ledgerCard', e.currentTarget);
 });
-document.getElementById('hubStackBtn').addEventListener('click', (e) => {
-  // Civic Memory™ pill now opens the real Live Public Ledger drawer
-  // (a more honest match for its "Public Ledger Framework" label) instead
-  // of the old Civic Stack/Operations admin-card deep-dive panel — that
-  // panel's content remains reachable via the Expenditures pill above,
-  // so nothing real is orphaned by this rewiring.
+document.getElementById('hubMunicipalBtn').addEventListener('click', async (e) => {
   e.currentTarget.setAttribute('aria-expanded', 'true');
-  openLedgerDrawer();
+  if (!ledgerTickets.length) ledgerTickets = await fetchLedgerTickets();
+  openDeepdivePanel('municipalPanel', 'municipalPanel', e.currentTarget);
+  renderMunicipalPanel();
 });
-document.getElementById('ledgerCloseBtn').addEventListener('click', () => {
+document.getElementById('hubStackBtn').addEventListener('click', (e) => {
+  // Civic Memory™ pill is repointed again this round, from the Live
+  // Public Ledger drawer to the new Architecture & Charter drawer — a
+  // more honest match for its new "View Charter" label. The Live Public
+  // Ledger is not orphaned by this: it keeps its own dedicated top-level
+  // entry point, the "LIVE PUBLIC LEDGER" pill directly above the
+  // national map (see #liveLedgerBanner below).
+  e.currentTarget.setAttribute('aria-expanded', 'true');
+  openCivicCharterDrawer();
+});
+document.getElementById('civicCharterCloseBtn').addEventListener('click', () => {
   document.getElementById('hubStackBtn').setAttribute('aria-expanded', 'false');
-  closeLedgerDrawer();
+  closeCivicCharterDrawer();
 });
+document.getElementById('civicCharterDrawer').addEventListener('click', (e) => {
+  if (e.target.id === 'civicCharterDrawer') {
+    document.getElementById('hubStackBtn').setAttribute('aria-expanded', 'false');
+    closeCivicCharterDrawer();
+  }
+});
+
+/* =====================================================================
+   MUNICIPAL — WORK ORDERS & SLA TRACKER (#municipalPanel)
+   -----------------------------------------------------------------
+   Every figure below is computed live from real data already on this
+   page: jurisdictionDirectory (the same ward directory the location
+   picker uses) and ledgerTickets (the same records the Live Public
+   Ledger reads). This build has no municipal GIS asset inventory, so
+   "coverage" and "risk gap" are both disclosed proxies built from real
+   report counts — never an invented dollar figure or coverage percent.
+   ===================================================================== */
+function renderMunicipalPanel(){
+  const j = activeJurisdiction();
+  const cityLabelEl = document.getElementById('municipalCityLabel');
+  if (cityLabelEl) cityLabelEl.textContent = j ? j.cityName : 'Citywide';
+
+  let knownWards = [];
+  if (j && jurisdictionDirectory) {
+    const st = jurisdictionDirectory.states.find(s => s.slug === j.state);
+    const c = st && st.cities.find(c => c.slug === j.city);
+    knownWards = c ? c.wards : [];
+  }
+  const cityTickets = j ? ledgerTickets.filter(t => t.city === j.city && t.state === j.state) : [];
+  const loggedWardSlugs = new Set(cityTickets.map(t => t.ward));
+  const coveragePct = knownWards.length ? Math.round((loggedWardSlugs.size / knownWards.length) * 100) : null;
+  document.getElementById('municipalCoveragePct').textContent = coveragePct != null ? coveragePct + '%' : 'N/A';
+  document.getElementById('municipalCoverageNote').textContent = knownWards.length
+    ? loggedWardSlugs.size + ' of ' + knownWards.length + ' known ward' + (knownWards.length === 1 ? '' : 's') + ' in ' + (j ? j.cityName : 'this jurisdiction') + ' have at least one logged report on file.'
+    : 'No ward directory on file yet for this jurisdiction.';
+
+  const wardTickets = j ? ledgerTickets.filter(t => t.ward === j.ward) : [];
+  const wardResolved = wardTickets.filter(t => t.stage === 'resolved').length;
+  document.getElementById('municipalWardLabel').textContent = (j && j.wardName ? j.wardName : 'Ward') + ' — Cataloged Reports';
+  document.getElementById('municipalWardTotal').textContent = wardTickets.length;
+  document.getElementById('municipalWardResolved').textContent = wardResolved;
+  const riskGapPct = wardTickets.length ? Math.round(((wardTickets.length - wardResolved) / wardTickets.length) * 100) : null;
+  document.getElementById('municipalRiskGapPct').textContent = riskGapPct != null ? riskGapPct + '%' : 'N/A';
+}
+document.getElementById('municipalVerifyJurisdictionBtn').addEventListener('click', () => openLocationPicker());
+document.getElementById('municipalRequestAccessBtn').addEventListener('click', () => {
+  const el = document.getElementById('institutionalAccessSection');
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
+
+/* =====================================================================
+   CIVIC MEMORY™ — ARCHITECTURE & CHARTER DRAWER (#civicCharterDrawer)
+   -----------------------------------------------------------------
+   Same tabbed-drawer pattern as the CITIXEN Codex above (renderCodexTrack/
+   openCodexDrawer), three tabs instead of two. "State Constitution" reuses
+   the real WI State Constitution reference entry already carried in
+   CODEX_TRACKS.a rather than duplicating it. "Spatial Hashing" honestly
+   separates what this build actually does today (ward-tier bucketing)
+   from H3 hexagonal hashing as a roadmap target, not a shipped feature.
+   "Privacy Protocols" links into the real Anonymity Whitepaper modal
+   instead of restating its content a second time. ===== */
+const CIVIC_CHARTER_TRACKS = {
+  constitution: [
+    { title: 'Wisconsin Constitution — Article I (Declaration of Rights)', desc: 'Article I is Wisconsin\'s Declaration of Rights — due process, equality, and the right to petition government — the constitutional grounding this platform\'s open civic-reporting model draws on for the demo jurisdiction. Representative summary, not the verbatim statutory text (see the same reference in the CITIXEN Codex, Track A).' }
+  ],
+  spatial: [
+    { title: 'Current Model — Ward-Tier Grid', desc: 'Every report on this platform is bucketed by its resolved ward (e.g. Ward 4, Ward 7) — the same real grid the Live Public Ledger\'s radius pills, the Municipal panel above, and this jurisdiction\'s CapEx ledger all use today.' },
+    { title: 'H3 Spatial Hashing — Roadmap Target', desc: 'The roadmap architecture replaces ward-tier buckets with Uber\'s open-source H3 hexagonal hierarchical index, so nearby reports hash to the same fine-grained cell regardless of ward boundaries. Not yet implemented anywhere in this build.' }
+  ],
+  privacy: [
+    { title: 'Zero-Knowledge Privacy Engine', desc: 'No accounts, no device fingerprinting, on-device EXIF/GPS scrubbing before upload, no-referrer by default — open the full Anonymity Whitepaper below for the complete list.' }
+  ]
+};
+function renderCharterTrack(track){
+  ['constitution', 'spatial', 'privacy'].forEach(t => {
+    const tab = document.getElementById('charterTab' + t.charAt(0).toUpperCase() + t.slice(1));
+    if (tab) { tab.classList.toggle('active', t === track); tab.setAttribute('aria-selected', String(t === track)); }
+  });
+  const list = document.getElementById('charterDocList');
+  list.innerHTML = CIVIC_CHARTER_TRACKS[track].map(d =>
+    `<div class="codex-doc-row"><div class="codex-doc-title">${esc(d.title)}</div><div class="codex-doc-desc">${esc(d.desc)}</div></div>`
+  ).join('');
+  if (track === 'privacy') {
+    list.innerHTML += '<button type="button" class="btn btn-outline" id="charterOpenAnonymityBtn" style="width:100%;justify-content:center;margin-top:4px;">Open Full Anonymity Whitepaper ↗</button>';
+    document.getElementById('charterOpenAnonymityBtn').addEventListener('click', () => openModal('anonymity'));
+  }
+}
+function openCivicCharterDrawer(){
+  renderCharterTrack('constitution');
+  document.getElementById('civicCharterDrawer').classList.add('open');
+}
+function closeCivicCharterDrawer(){
+  document.getElementById('civicCharterDrawer').classList.remove('open');
+}
+document.getElementById('charterTabConstitution').addEventListener('click', () => renderCharterTrack('constitution'));
+document.getElementById('charterTabSpatial').addEventListener('click', () => renderCharterTrack('spatial'));
+document.getElementById('charterTabPrivacy').addEventListener('click', () => renderCharterTrack('privacy'));
+
+// CITIXEN UX™ Feature & Security section's "Learn More ↗" trigger opens
+// the same real Anonymity Whitepaper modal as the header's Privacy Shield
+// badge — the honest existing content for "Security Protocols" rather
+// than a duplicate write-up.
+document.getElementById('citixenFeatureLearnMoreBtn').addEventListener('click', () => openModal('anonymity'));
 
 // SUB-MODULE FOCUS-AREA PREVIEWS — the circled "(i)" badge that used to
 // carry this trigger was removed per this round's spec (it visually
@@ -2031,7 +2368,8 @@ document.getElementById('ledgerCloseBtn').addEventListener('click', () => {
 const hubInfoBindings = [
   ['hubCoverageInfoBtn', 'submoduleAnalytics'],
   ['hubSlaInfoBtn', 'submoduleExpenditures'],
-  ['hubStackInfoBtn', 'submoduleOperations']
+  ['hubMunicipalInfoBtn', 'submoduleMunicipal'],
+  ['hubStackInfoBtn', 'submoduleCivicMemory']
 ];
 hubInfoBindings.forEach(([id, key]) => {
   const el = document.getElementById(id);
@@ -2928,7 +3266,30 @@ function renderNationalPixelMap(){
     '</g>'
   ).join('');
 
+  applyStoredGridActivations(Array.prototype.slice.call(nodesLayer.querySelectorAll('.pixel-map-node-emerald')));
   runPixelMapCumulativeFill();
+}
+
+// ===== GEOSPATIAL GRID HASHING & STATE SYNC — per this round's item 6.
+// Reads the same real, same-origin localStorage key app.html's
+// markGridCellLit() writes to on an actual report submission, and keeps
+// that city's node permanently lit here — a genuine cross-page-load sync
+// (this project's static pages share one origin), not a simulated one.
+// Only the 6 named/real jurisdictions in `nodes` above (indices 0-5) have
+// a node to bubble activation up to; the other 34 decorative fill points
+// carry no city code and are never targeted by this. =====
+const CITIXEN_GRID_STORAGE_KEY = 'citixen_lit_grid_cities';
+const GRID_CITY_NODE_INDEX = { 'la-crosse': 0, 'chicago': 1, 'austin': 2, 'new-york': 3, 'los-angeles': 4, 'miami': 5 };
+function applyStoredGridActivations(nodeGroups){
+  let lit = [];
+  try {
+    const raw = localStorage.getItem(CITIXEN_GRID_STORAGE_KEY);
+    lit = raw ? JSON.parse(raw) : [];
+  } catch (e) { lit = []; }
+  lit.forEach(cityCode => {
+    const idx = GRID_CITY_NODE_INDEX[cityCode];
+    if (idx != null && nodeGroups[idx]) nodeGroups[idx].classList.add('revealed');
+  });
 }
 
 function pixelMapFindNearestDot(dots, targetX, targetY){

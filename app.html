@@ -33,6 +33,15 @@
   --bg-card:#111827 !important;
   --border-muted:rgba(255,255,255,0.08) !important;
   --fow-amber:#FFB800 !important;
+  /* ===== STANDARDIZED SURFACE TOKENS — synchronized with index.html per
+     this round's item 1: every card wrapper and category block below
+     draws from the same translucent glass fill + Fresh Mint hairline, and
+     every input/inset box from the same near-black input fill, instead of
+     each hardcoding its own #111827/rgba(7,12,14,...) value. ===== */
+  --surface-card-bg:rgba(11,15,25,0.85) !important;
+  --surface-card-border:1px solid rgba(0,230,153,0.22) !important;
+  --surface-input-bg:rgba(3,7,18,0.95) !important;
+  --surface-input-border:1px solid rgba(255,255,255,0.08) !important;
   /* legacy aliases — every existing var(--mint)/var(--card)/etc. usage below inherits
      the brand tokens above unchanged, so there is one source of truth for color. */
   --bg:var(--bg-obsidian); --card:var(--bg-card); --border:var(--border-muted); --hover:#162529;
@@ -62,7 +71,7 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
   border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .app-drawer{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:2800;display:none}
 .app-drawer.open{display:flex;justify-content:flex-end}
-.app-drawer-panel{width:min(400px,86vw);height:100%;background:var(--card);border-left:1px solid var(--border);
+.app-drawer-panel{width:min(400px,86vw);height:100%;background:var(--surface-card-bg);backdrop-filter:blur(12px);border-left:var(--surface-card-border);
   display:flex;flex-direction:column}
 .app-drawer-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--border)}
 .app-drawer-body{flex:1;overflow-y:auto;padding:16px 18px 32px}
@@ -84,12 +93,12 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
   background:rgba(0,230,153,.05);border:1px solid var(--border);border-radius:10px;padding:8px 12px}
 .privacy-note svg{color:var(--mint2);flex-shrink:0}
 
-.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px}
+.card{background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);border-radius:12px;padding:16px}
 .label{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);
   margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
 
 .chip-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
-.chip{background:rgba(7,12,14,.6);border:1px solid var(--border);color:var(--text);padding:13px 12px;
+.chip{background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);color:var(--text);padding:13px 12px;
   border-radius:12px;font-size:.76rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:9px;
   transition:border-color .15s,background .15s}
 .chip.active{border-color:var(--mint2);background:rgba(0,230,153,.12);color:var(--mint2)}
@@ -102,7 +111,7 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
   align-items:center;justify-content:center;gap:8px;margin-bottom:12px}
 .btn-camera svg{color:var(--mint2)}
 
-.input{width:100%;padding:11px 13px;background:rgba(7,12,14,.8);border:1px solid var(--border);color:var(--text);
+.input{width:100%;padding:11px 13px;background:var(--surface-input-bg);border:var(--surface-input-border);color:var(--text);
   border-radius:10px;font-size:.8rem;margin-bottom:10px;outline:none;transition:border-color .15s}
 .input:focus{border-color:var(--mint2)}
 textarea.input{resize:none;line-height:1.4}
@@ -275,7 +284,7 @@ textarea.input{resize:none;line-height:1.4}
 
 /* ===== BIG 3 STAT ROW (reusable across app.html/index.html) ===== */
 .big3-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.big3-tile{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center}
+.big3-tile{background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);border-radius:12px;padding:12px 8px;text-align:center}
 .big3-val{font-size:1.2rem;font-weight:900;color:var(--mint2)}
 .big3-lbl{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-top:3px;line-height:1.3}
 .big3-note{font-size:.66rem;color:var(--muted);margin-top:8px;text-align:center}
@@ -288,21 +297,38 @@ textarea.input{resize:none;line-height:1.4}
 .tier-btn.active{border-color:var(--mint2);background:rgba(0,230,153,.14);color:var(--mint2)}
 #tierCanvas{width:100%;display:block;border-radius:8px;background:rgba(255,255,255,.02);margin-bottom:8px}
 
-/* ===== LIVE PUBLIC LEDGER DRAWER ===== */
+/* ===== LIVE PUBLIC LEDGER DRAWER — header hierarchy, geo badge, radius
+   pills, scope bar/print action and deep-analytics link synchronized with
+   index.html's modal per this round's item 5. The .ledger-select rule this
+   drawer's now-removed ward dropdown used is retired along with it. ===== */
 .ledger-drawer{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:2500;display:none;flex-direction:column}
 .ledger-drawer.open{display:flex}
 .ledger-drawer-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;
   border-bottom:1px solid var(--border);flex-shrink:0}
 .ledger-drawer-body{flex:1;overflow-y:auto;padding:14px 16px 32px}
-.ledger-search{width:100%;padding:10px 13px;background:rgba(7,12,14,.8);border:1px solid var(--border);color:var(--text);
+.ledger-live-badge{color:#00E699;font-weight:800;font-size:.92rem;margin-right:7px;display:inline-block;
+  animation:ledgerLivePulse 2s ease-in-out infinite}
+@keyframes ledgerLivePulse{0%,100%{opacity:1}50%{opacity:.35}}
+.ledger-main-title{color:#FFFFFF;font-weight:900;font-size:1rem;letter-spacing:.06em;text-transform:uppercase}
+.ledger-geo-badge{display:flex;align-items:center;gap:6px;color:var(--mint2);font-size:.72rem;
+  font-weight:700;margin-bottom:10px}
+.ledger-geo-badge svg{flex-shrink:0}
+.ledger-search{width:100%;padding:10px 13px;background:var(--surface-input-bg);border:var(--surface-input-border);color:var(--text);
   border-radius:10px;font-size:.8rem;margin-bottom:10px;outline:none}
 .ledger-search:focus{border-color:var(--mint2)}
 .ledger-filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
 .ledger-chip{background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--muted);
   font-size:.64rem;font-weight:700;padding:5px 10px;border-radius:20px;cursor:pointer}
 .ledger-chip.active{border-color:var(--mint2);background:rgba(0,230,153,.14);color:var(--mint2)}
-.ledger-select{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);
-  border-radius:8px;padding:6px 8px;font-size:.68rem;font-weight:700}
+.ledger-scope-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.ledger-scope-bar .ledger-search{flex:1;min-width:0}
+.ledger-print-cta{background:var(--bg-obsidian);border:1px solid #00E699;color:#00E699;font-weight:700;
+  font-size:.7rem;padding:10px 14px;border-radius:9999px;white-space:nowrap;cursor:pointer;
+  font-family:inherit;transition:filter .15s}
+.ledger-print-cta:hover{filter:brightness(1.25)}
+.ledger-deep-analytics-link{display:block;background:none;border:none;padding:0;font:inherit;
+  color:#00E699;font-size:.74rem;font-weight:700;cursor:pointer;text-decoration:underline;
+  margin-bottom:12px}
 .ledger-report-card{background:rgba(7,12,14,.6);border:1px solid var(--border);border-radius:10px;padding:12px;
   margin-bottom:8px;text-decoration:none;color:var(--text);display:block}
 .ledger-report-card:hover{border-color:var(--mint2)}
@@ -313,7 +339,7 @@ textarea.input{resize:none;line-height:1.4}
 .intercept-drawer{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:2700;display:none;
   align-items:center;justify-content:center;padding:18px}
 .intercept-drawer.open{display:flex}
-.intercept-card{background:var(--card);border:1px solid var(--brand-amber);border-radius:16px;padding:20px;
+.intercept-card{background:var(--surface-card-bg);backdrop-filter:blur(12px);border:1px solid var(--brand-amber);border-radius:16px;padding:20px;
   max-width:440px;width:100%}
 .intercept-title{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;
   color:var(--brand-amber);display:flex;align-items:center;gap:6px;margin-bottom:12px}
@@ -678,23 +704,44 @@ textarea.input{resize:none;line-height:1.4}
     </button>
   </div>
 
-  <!-- ===== LIVE CIVIC MEMORY DRAWER (formerly "Live Public Ledger") ===== -->
+  <!-- ===== LIVE PUBLIC LEDGER DRAWER — modal architecture synchronized with
+       index.html per this round's item 5: uppercase "● LIVE" / "PUBLIC
+       LEDGER" header hierarchy, a detected-location badge (clean inline
+       SVG pin, no OS emoji), the same honest ward/city-tier radius-pill
+       proxy for distance (this dataset has no per-report GPS coordinates —
+       see ledgerTicketWithinRadius() below, identical convention to
+       index.html's), a street/ZIP scope input with a native Print Location
+       Report action, and a "Go Deeper Into Analytics and Reporting ↗" link
+       routing into this app's own Analytics tab. The ward dropdown this
+       drawer used is retired — its real filtering is superseded by the
+       radius pills, same as index.html's earlier round. ===== -->
   <div id="ledgerDrawer" class="ledger-drawer">
     <div class="ledger-drawer-head">
-      <strong style="color:var(--mint2)">Live Civic Memory™</strong>
+      <div>
+        <span class="ledger-live-badge">● LIVE</span><span class="ledger-main-title">Public Ledger</span>
+      </div>
       <button class="icon-btn" id="btnCloseLedger">
         <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
       </button>
     </div>
     <div class="ledger-drawer-body">
+      <div class="ledger-geo-badge">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>Current Area: <span id="ledgerGeoBadgeText">La Crosse, WI</span></span>
+      </div>
       <input class="ledger-search" id="ledgerSearchInput" placeholder="Search title, location, category…">
-      <div class="ledger-filter-row">
-        <select class="ledger-select" id="ledgerWardSelect">
-          <option value="">All wards</option>
-        </select>
+      <div class="ledger-filter-row" id="ledgerRadiusChips">
+        <button type="button" class="ledger-chip" data-radius="1">1 Mile</button>
+        <button type="button" class="ledger-chip" data-radius="5">5 Miles</button>
+        <button type="button" class="ledger-chip active" data-radius="10">10 Miles</button>
       </div>
       <div class="ledger-filter-row" id="ledgerCategoryChips"></div>
       <div class="ledger-filter-row" id="ledgerStatusChips"></div>
+      <div class="ledger-scope-bar">
+        <input type="text" id="ledgerScopeInput" class="ledger-search" style="margin:0" placeholder="Enter street address or ZIP code...">
+        <button type="button" id="ledgerScopePrintBtn" class="ledger-print-cta">Print Location Report</button>
+      </div>
+      <button type="button" id="ledgerDeepAnalyticsLink" class="ledger-deep-analytics-link">Go Deeper Into Analytics and Reporting ↗</button>
       <div id="ledgerResults"></div>
     </div>
   </div>
@@ -1222,7 +1269,25 @@ function initTierToggle(){
 const LEDGER_CATEGORIES = ['Pothole', 'Streetlight', 'Signage', 'Sidewalk', 'Drainage'];
 const LEDGER_STAGES = ['submitted', 'dispatched', 'resolved'];
 let ledgerTickets = [];
-let ledgerFilters = { ward: '', category: '', status: '', q: '' };
+let ledgerFilters = { radius: 10, category: '', status: '', q: '' };
+
+// Real ward/city-tier proxy for the "distance" pills — same honest
+// convention as index.html's identical function: this dataset has no
+// per-report GPS coordinates to compute a true mile radius against, so
+// rather than fabricate one, it matches against the visitor's real
+// resolved ward/city (currentWardMeta) the rest of this app already uses.
+function ledgerTicketWithinRadius(t, radiusMiles){
+  if (radiusMiles >= 10) return true;
+  const j = currentWardMeta;
+  if (!j) return true;
+  if (radiusMiles <= 1) return t.ward === j.ward;
+  return t.city === j.city && t.state === j.state;
+}
+function updateLedgerGeoBadge(){
+  const el = document.getElementById('ledgerGeoBadgeText');
+  const j = currentWardMeta;
+  if (el && j) el.textContent = j.cityName + ', ' + j.state.toUpperCase();
+}
 
 function fallbackLedgerTickets(){
   // Mirrors api/_lib/store.js's WARD_TICKETS + makeReportId exactly — same
@@ -1282,11 +1347,15 @@ async function fetchLedgerTickets(){
 }
 
 function renderLedgerFilters(){
-  const wardSel = document.getElementById('ledgerWardSelect');
-  const seenWards = [];
-  ledgerTickets.forEach(t => { if (!seenWards.some(w => w.slug === t.ward)) seenWards.push({ slug: t.ward, name: t.wardName }); });
-  wardSel.innerHTML = '<option value="">All wards</option>' + seenWards.map(w => `<option value="${esc(w.slug)}">${esc(w.name)}</option>`).join('');
-  wardSel.addEventListener('change', () => { ledgerFilters.ward = wardSel.value; renderLedgerResults(); });
+  const radiusRow = document.getElementById('ledgerRadiusChips');
+  radiusRow.querySelectorAll('.ledger-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      radiusRow.querySelectorAll('.ledger-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      ledgerFilters.radius = Number(chip.dataset.radius);
+      renderLedgerResults();
+    });
+  });
 
   const catRow = document.getElementById('ledgerCategoryChips');
   catRow.innerHTML = ['All'].concat(LEDGER_CATEGORIES).map(c => `<button type="button" class="ledger-chip${c === 'All' ? ' active' : ''}" data-cat="${c === 'All' ? '' : esc(c)}">${esc(c)}</button>`).join('');
@@ -1316,7 +1385,7 @@ function renderLedgerResults(){
   if (!container) return;
   const q = ledgerFilters.q.toLowerCase();
   const filtered = ledgerTickets.filter(t => {
-    if (ledgerFilters.ward && t.ward !== ledgerFilters.ward) return false;
+    if (!ledgerTicketWithinRadius(t, ledgerFilters.radius)) return false;
     if (ledgerFilters.category && t.category !== ledgerFilters.category) return false;
     if (ledgerFilters.status && t.stage !== ledgerFilters.status) return false;
     if (q && !((t.title || '').toLowerCase().includes(q) || (t.loc || '').toLowerCase().includes(q) || (t.category || '').toLowerCase().includes(q))) return false;
@@ -1343,6 +1412,7 @@ function renderLedgerResults(){
 
 async function openLedgerDrawer(){
   document.getElementById('ledgerDrawer').classList.add('open');
+  updateLedgerGeoBadge();
   if (!ledgerTickets.length) {
     ledgerTickets = await fetchLedgerTickets();
     renderLedgerFilters();
@@ -1352,6 +1422,101 @@ async function openLedgerDrawer(){
 function closeLedgerDrawer(){
   document.getElementById('ledgerDrawer').classList.remove('open');
 }
+
+// ===== STREET / ZIP SCOPE BAR + REPORT GENERATOR — ported from
+// index.html's identical control (same jsPDF library already loaded on
+// this page). A street-address entry real-filters against the ticket's
+// `loc` field; a 5-digit ZIP has no matching field anywhere in this
+// dataset, so rather than fabricate ZIP-level data, it falls back to the
+// same currently-filtered inventory with an honest note in the generated
+// PDF, exactly matching index.html's convention. =====
+function ledgerCurrentlyFilteredTickets(){
+  const q = (ledgerFilters.q || '').toLowerCase();
+  return ledgerTickets.filter(t => {
+    if (!ledgerTicketWithinRadius(t, ledgerFilters.radius)) return false;
+    if (ledgerFilters.category && t.category !== ledgerFilters.category) return false;
+    if (ledgerFilters.status && t.stage !== ledgerFilters.status) return false;
+    if (q && !((t.title || '').toLowerCase().includes(q) || (t.loc || '').toLowerCase().includes(q) || (t.category || '').toLowerCase().includes(q) || (t.reportId || '').toLowerCase().includes(q))) return false;
+    return true;
+  });
+}
+async function printLedgerLocationReport(){
+  if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) {
+    alert('PDF library failed to load (check your connection) — could not generate the Location Report.');
+    return;
+  }
+  const scopeInput = document.getElementById('ledgerScopeInput');
+  const raw = scopeInput ? scopeInput.value.trim() : '';
+  const isZip = /^\d{5}$/.test(raw);
+  let title, rows, scopeNote;
+  if (isZip) {
+    title = 'District Report: ZIP ' + raw;
+    rows = ledgerCurrentlyFilteredTickets();
+    scopeNote = 'This build\'s ticket records are not tagged with ZIP codes, so this report shows the ' +
+      'currently filtered public-inventory view (search/radius/category/status), not a true ZIP-scoped result.';
+  } else if (raw) {
+    title = 'Civic Audit: ' + raw + ' Corridor';
+    const needle = raw.toLowerCase();
+    rows = ledgerTickets.filter(t => (t.loc || '').toLowerCase().includes(needle));
+    scopeNote = 'Filtered to reports whose location string contains "' + raw + '" — a real substring match ' +
+      'against the live ledger\'s location field.';
+  } else {
+    title = 'Public Ledger Inventory';
+    rows = ledgerCurrentlyFilteredTickets();
+    scopeNote = 'Shows the ledger\'s currently filtered view (search/radius/category/status) exactly as displayed.';
+  }
+
+  const printBtn = document.getElementById('ledgerScopePrintBtn');
+  const originalLabel = printBtn ? printBtn.textContent : null;
+  if (printBtn) { printBtn.disabled = true; printBtn.textContent = 'Generating…'; }
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+    let y = 56;
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(18);
+    doc.text('CITIXEN UX — ' + title, 40, y); y += 22;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
+    doc.text('Generated: ' + new Date().toLocaleString(), 40, y); y += 14;
+    doc.setFont('helvetica', 'italic'); doc.setFontSize(9);
+    const noteLines = doc.splitTextToSize(scopeNote, 500);
+    noteLines.forEach(line => { doc.text(line, 40, y); y += 12; });
+    y += 14;
+
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
+    doc.text('Matching reports: ' + rows.length, 40, y); y += 20;
+    doc.setFontSize(10);
+    if (!rows.length) {
+      doc.setFont('helvetica', 'normal');
+      doc.text('No reports match this scope.', 48, y); y += 16;
+    }
+    rows.forEach(t => {
+      if (y > 720) { doc.addPage(); y = 56; }
+      doc.setFont('helvetica', 'bold'); doc.text(t.reportId + '  —  ' + t.stage.toUpperCase(), 48, y); y += 13;
+      doc.setFont('helvetica', 'normal');
+      doc.text(t.title, 48, y); y += 13;
+      doc.text(t.loc + '  •  ' + t.wardName + '  •  ' + t.category, 48, y); y += 18;
+    });
+
+    doc.save('citixen-location-report-' + (isZip ? 'zip-' + raw : raw ? raw.toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'filtered') + '.pdf');
+  } catch (err) {
+    console.error('Location Report PDF generation failed', err);
+    alert('Could not generate the Location Report PDF — please try again.');
+  } finally {
+    if (printBtn) { printBtn.disabled = false; if (originalLabel !== null) printBtn.textContent = originalLabel; }
+  }
+}
+const ledgerScopePrintBtnEl = document.getElementById('ledgerScopePrintBtn');
+if (ledgerScopePrintBtnEl) ledgerScopePrintBtnEl.addEventListener('click', printLedgerLocationReport);
+
+// "Go Deeper Into Analytics and Reporting ↗" routes into this app's own
+// real Analytics tab, via the same switchTab() the bottom nav's own
+// Analytics button calls — not a fabricated destination.
+const ledgerDeepAnalyticsLinkEl = document.getElementById('ledgerDeepAnalyticsLink');
+if (ledgerDeepAnalyticsLinkEl) ledgerDeepAnalyticsLinkEl.addEventListener('click', () => {
+  closeLedgerDrawer();
+  const analyticsTabBtn = document.querySelector('.navtab[data-target="tab-analytics"]');
+  switchTab('tab-analytics', analyticsTabBtn);
+});
 
 /* =====================================================================
    MUNICIPAL & WARD GEOGRAPHIC ARCHITECTURE
@@ -2516,6 +2681,26 @@ document.getElementById('btnConfirmCancel').addEventListener('click', () => {
   document.getElementById('photoBox').style.display = 'none';
 });
 
+// ===== GEOSPATIAL GRID HASHING & STATE SYNC — real cross-page-load
+// persistence via same-origin localStorage (index.html and app.html are
+// served from the same origin), not a simulated/fake sync: a city code
+// written here by an actual submitted report is read back by
+// applyStoredGridActivations() in index.html and keeps that city's node
+// permanently lit on the national map, independent of and in addition to
+// that map's own decorative fill animation. =====
+const CITIXEN_GRID_STORAGE_KEY = 'citixen_lit_grid_cities';
+function markGridCellLit(cityCode){
+  if (!cityCode) return;
+  try {
+    const raw = localStorage.getItem(CITIXEN_GRID_STORAGE_KEY);
+    const lit = raw ? JSON.parse(raw) : [];
+    if (!lit.includes(cityCode)) {
+      lit.push(cityCode);
+      localStorage.setItem(CITIXEN_GRID_STORAGE_KEY, JSON.stringify(lit));
+    }
+  } catch (e) { /* storage blocked (private mode, etc.) — index.html's map simply shows no stored activation yet */ }
+}
+
 // The actual publish flow (unchanged from the original submitReport()),
 // factored out so both the normal path and the "Flag Urgent Safety Hazard"
 // intercept override call it. `opts.urgentOverride` + `opts.matchedProject`
@@ -2558,6 +2743,16 @@ async function finalizeSubmitReport(opts){
   const ward = currentWardMeta ? currentWardMeta.ward : 'ward-4';
   const wardState = currentWardMeta ? currentWardMeta.state : 'wi';
   const wardCity = currentWardMeta ? currentWardMeta.city : 'la-crosse';
+  // GEOSPATIAL GRID HASHING & STATE SYNC — per this round's item 6, this
+  // real report submittal assigns a local spatial grid ID (today, that's
+  // this platform's real ward-tier bucket — see the Civic Memory™ Charter
+  // drawer's "Spatial Hashing" tab on index.html for the honest ward-tier-
+  // today / H3-roadmap distinction) and permanently lights that cell,
+  // bubbling activation up to the matching parent city node on index.html's
+  // national CROWD SAVE AMERICA™ map. Same-origin localStorage is real,
+  // persisted cross-page-load state (not a simulated animation) — see
+  // markGridCellLit() below and applyStoredGridActivations() in index.html.
+  markGridCellLit(wardCity);
   const payload = {
     category: cat, location: rawLoc, description: rawDesc, urgentOverride,
     matchedProjectId: (urgentOverride && opts.matchedProject) ? opts.matchedProject.id : null,
