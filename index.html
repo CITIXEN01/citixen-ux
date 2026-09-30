@@ -264,23 +264,39 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .hub-card-arrow{font-size:.8rem;font-weight:600;color:#00E699;flex-shrink:0}
 .hub-card:hover{border-color:#00E699}
 
-/* ===== CITIXEN UX™ FEATURE & SECURITY SECTION — per this round's item 4,
-   a static 3-column feature grid directly below the engine stack. Same
-   glass card surface token as every other container this round. ===== */
+/* ===== CITIXEN UX™ INTERACTIVE FEATURE & SECURITY SECTION — rebuilt this
+   round (item 4) from a static 3-column bullet grid into a tappable
+   3-icon grid with a Hero Trust Anchor Badge above it. Same glass card
+   surface token as every other container. ===== */
 .citixen-feature-section{max-width:920px;margin:0 auto 26px;padding:0 16px}
+.citixen-feature-heading{display:flex;align-items:center;justify-content:center;gap:8px;
+  color:#00E699;font-weight:800;font-size:1.1rem;letter-spacing:.08em;text-transform:uppercase;
+  margin:20px 0 6px;text-align:center}
 .citixen-feature-learn-more{display:inline-block;background:none;border:none;padding:0;font:inherit;
   color:#00E699;font-size:.8rem;font-weight:700;cursor:pointer;text-decoration:underline}
+.citixen-trust-badge{display:flex;align-items:flex-start;gap:12px;max-width:640px;margin:0 auto 18px;
+  background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);
+  border-radius:12px;padding:14px 16px}
+.citixen-trust-badge svg{flex-shrink:0;margin-top:2px}
+.citixen-trust-badge-title{color:#00E699;font-weight:800;font-size:.78rem;letter-spacing:.02em;
+  text-transform:uppercase;line-height:1.4;margin-bottom:4px}
+.citixen-trust-badge-sub{color:var(--muted);font-size:.76rem;line-height:1.45}
 .citixen-feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.citixen-feature-col{background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);
-  border-radius:12px;padding:16px}
-.citixen-feature-col-head{color:#00E699;font-weight:800;font-size:.74rem;text-transform:uppercase;
-  letter-spacing:.05em;margin-bottom:10px}
-.citixen-feature-col ul{list-style:none;display:flex;flex-direction:column;gap:8px}
-.citixen-feature-col li{font-size:.76rem;color:var(--text);line-height:1.4;padding-left:14px;position:relative}
-.citixen-feature-col li::before{content:'';position:absolute;left:0;top:.5em;width:6px;height:6px;
-  border-radius:50%;background:#00E699}
-@media (max-width:720px){
-  .citixen-feature-grid{grid-template-columns:1fr}
+.citixen-feature-tile{background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);
+  border-radius:12px;padding:20px 10px;display:flex;flex-direction:column;align-items:center;gap:10px;
+  cursor:pointer;font-family:inherit;transition:border-color .15s,filter .15s}
+.citixen-feature-tile:hover{border-color:#00E699;filter:brightness(1.08)}
+.citixen-feature-tile-icon{width:44px;height:44px;border-radius:50%;background:rgba(0,230,153,.1);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.citixen-feature-tile-label{color:var(--text);font-weight:700;font-size:.78rem;text-transform:uppercase;
+  letter-spacing:.05em}
+@media (max-width:640px){
+  .citixen-trust-badge{flex-direction:column;align-items:center;text-align:center}
+  .citixen-feature-grid{gap:8px}
+  .citixen-feature-tile{padding:14px 6px}
+  .citixen-feature-tile-icon{width:36px;height:36px}
+  .citixen-feature-tile-icon svg{width:18px;height:18px}
+  .citixen-feature-tile-label{font-size:.66rem}
 }
 @media (max-width:640px){
   .hub-row{padding:0 14px}
@@ -320,28 +336,34 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   transition:border-color .15s,filter .15s}
 .nav-jurisdiction-badge:hover{border-color:#00E699;filter:brightness(1.15)}
 
-/* ===== CIVIC TRIAD DIAGRAM CARD — replaces this round's now-superseded
-   standalone "Civic Memory™" concept card (its narrative text is not
-   deleted — it now opens as the first thing a visitor reads inside the
-   Civic Memory™ engine button's "View Charter" modal below, a more
-   honest home for architecture/framework prose than a passive card
-   sitting mid-scroll). This card instead gives the same idea a visual:
-   a 3-node connected vector diagram (Resident Field Unit <-> Public
-   Ledger <-> Municipal Portal) showing how a report actually moves
-   through the real system — each node name matches a real, reachable
-   part of this build (report flow / #ledgerDrawer / the Municipal
-   engine button below), not an invented pipeline. Same glass card
+/* ===== "HOW YOUR REPORT MOVES" TREE CARD — replaces this round's
+   now-superseded standalone "Civic Memory™" concept card (its narrative
+   text is not deleted — it now opens as the first thing a visitor reads
+   inside the Civic Memory™ engine button's "View Charter" modal below, a
+   more honest home for architecture/framework prose than a passive card
+   sitting mid-scroll). Renamed this round from a horizontal "Civic
+   Triad" row into a top-down architectural tree: CITIXEN UX™'s own
+   shield badge sits at the root (the same brand mark used in the nav and
+   the platform section below — no separate logo asset invented),
+   branching down to the same 3 real leaf nodes as before (Resident Field
+   Unit / Public Ledger / Municipal Portal) — each node name matches a
+   real, reachable part of this build (report flow / #ledgerDrawer / the
+   Municipal engine button below), not an invented pipeline. Class/id
+   names kept as `civic-triad-*` since nothing outside this section
+   references them and renaming risked an unrelated diff. Same glass card
    surface token as every other container this round. ===== */
 .civic-triad-section{max-width:640px;margin:0 auto 20px;padding:0 24px}
 .civic-triad-card{background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);border-radius:12px;
   padding:18px 16px;text-align:center}
 .civic-triad-header{color:#00E699;font-weight:800;font-size:.9rem;letter-spacing:.06em;
   text-transform:uppercase;margin-bottom:14px}
-.civic-triad-svg{width:100%;height:auto;max-width:480px;margin:0 auto;display:block}
+.civic-triad-svg{width:100%;height:auto;max-width:340px;margin:0 auto;display:block}
 .civic-triad-node-label{fill:#f8fafc;font-size:10.5px;font-weight:700;text-anchor:middle}
 .civic-triad-node-sub{fill:#94A3B8;font-size:8px;text-anchor:middle}
 .civic-triad-link{stroke:#00E699;stroke-width:1.5;stroke-dasharray:4 3;opacity:.65}
 .civic-triad-node-circle{fill:rgba(0,230,153,.1);stroke:#00E699;stroke-width:1.5}
+.civic-triad-root-circle{fill:rgba(0,230,153,.16);stroke:#00E699;stroke-width:1.8}
+.civic-triad-root-label{fill:#00E699;font-size:10.5px;font-weight:800;text-anchor:middle;letter-spacing:.03em}
 
 /* ===== BENTO DECK ===== */
 /* #dashboard is now a column wrapper (tab bar + one active view); the row
@@ -808,6 +830,16 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   0%{transform:scale(.6);opacity:.9}
   100%{transform:scale(2.2);opacity:0}
 }
+/* LIVE PUBLIC LEDGER glowing pill (this round's item 2) — a Fresh Mint
+   box-shadow glow with a slow breathing pulse, layered on top of the
+   shared .gateway-pill shell via this dedicated class rather than an
+   unwieldy inline `animation` property. */
+.ledger-pill-glow{border:1px solid rgba(0,230,153,.25);background:#030712;
+  animation:ledgerPillGlow 2.5s ease-in-out infinite}
+@keyframes ledgerPillGlow{
+  0%,100%{box-shadow:0 0 14px rgba(0,230,153,.55),inset 0 0 6px rgba(0,230,153,.2)}
+  50%{box-shadow:0 0 22px rgba(0,230,153,.85),inset 0 0 10px rgba(0,230,153,.35)}
+}
 
 
 /* ===== TRADEMARK (™) TYPOGRAPHY — lightweight superscript treatment
@@ -1208,9 +1240,13 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        genuine (bound to /api/coverage/big3 via loadBig3()), but the spec
        calls for a plain call-to-action here instead, so the now-unused
        #ledgerBannerCount span and its loadBig3() binding are removed
-       rather than left as dead markup. ===== -->
+       rather than left as dead markup. This round's item 2 adds an
+       animated Fresh Mint glow with a slow breathing pulse via the new
+       .ledger-pill-glow class (moved out of the inline style attribute
+       into a dedicated class + @keyframes, since an inline `animation`
+       property would be unwieldy here). ===== -->
   <section class="ledger-banner-section gateway-pill-stacked">
-    <button id="liveLedgerBanner" class="gateway-pill" type="button" style="border: 1px solid rgba(0, 230, 153, 0.25); background: #030712; border-radius: 9999px; box-shadow: 0 0 12px rgba(0, 230, 153, 0.08);">
+    <button id="liveLedgerBanner" class="gateway-pill ledger-pill-glow" type="button" style="border-radius: 9999px;">
       <span class="gateway-pill-left" style="color: #00E699;"><span class="pulsing-dot"></span>LIVE</span>
       <span class="gateway-pill-center" style="color: #FFFFFF;">PUBLIC LEDGER</span>
       <span class="gateway-pill-right">View Now ↗</span>
@@ -1280,13 +1316,16 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </div>
   </section>
 
-  <!-- ===== CIVIC TRIAD DIAGRAM CARD — Position 7 in this round's vertical
-       stacking order, directly beneath the national map card. The
+  <!-- ===== "HOW YOUR REPORT MOVES" TREE CARD — Position 7 in this round's
+       vertical stacking order, directly beneath the national map card. The
        jurisdiction pill and the old standalone "Civic Memory™" concept
-       card that used to sit here were both relocated/retired this round
-       (pill now sits above the "Citixen Dashboard" title; the concept
-       card's narrative now opens the Civic Memory™ engine button's "View
-       Charter" drawer below instead of a passive scroll-past card). Each
+       card that used to sit here were both relocated/retired in an earlier
+       round (pill now sits above the "Citixen Dashboard" title; the
+       concept card's narrative now opens the Civic Memory™ engine button's
+       "View Charter" drawer below instead of a passive scroll-past card).
+       Renamed this round from a horizontal 3-node row ("Civic Triad") into
+       a top-down architectural tree: CITIXEN UX™'s own shield badge sits
+       at the root, branching down to the same 3 real leaf nodes. Each leaf
        node name is a real, reachable part of this build, not an invented
        pipeline: "Resident Field Unit" is the mobile reporting flow
        (app.html), "Public Ledger" is the real #ledgerDrawer every
@@ -1294,29 +1333,37 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        Municipal engine button's Work Orders & SLA Tracker panel below. ===== -->
   <section class="civic-triad-section">
     <div class="civic-triad-card">
-      <div class="civic-triad-header">Civic Triad — How A Report Moves</div>
-      <svg class="civic-triad-svg" viewBox="0 0 480 150" role="img" aria-label="Diagram: Resident Field Unit connects to Public Ledger connects to Municipal Portal">
-        <line x1="98" y1="46" x2="212" y2="46" class="civic-triad-link"/>
-        <line x1="268" y1="46" x2="382" y2="46" class="civic-triad-link"/>
+      <div class="civic-triad-header">How Your Report Moves</div>
+      <svg class="civic-triad-svg" viewBox="0 0 320 260" role="img" aria-label="Diagram: CITIXEN UX branches down to Resident Field Unit, Public Ledger, and Municipal Portal">
+        <line x1="160" y1="70" x2="55" y2="164" class="civic-triad-link"/>
+        <line x1="160" y1="70" x2="160" y2="164" class="civic-triad-link"/>
+        <line x1="160" y1="70" x2="265" y2="164" class="civic-triad-link"/>
         <g>
-          <circle cx="70" cy="46" r="28" class="civic-triad-node-circle"/>
-          <path d="M70 34a6 6 0 1 0 0.001 0z" fill="none" stroke="#00E699" stroke-width="1.6"/>
-          <path d="M58 60c2-7 7-11 12-11s10 4 12 11" fill="none" stroke="#00E699" stroke-width="1.6" stroke-linecap="round"/>
-          <text x="70" y="96" class="civic-triad-node-label">Resident Field Unit</text>
-          <text x="70" y="110" class="civic-triad-node-sub">Mobile report capture</text>
+          <text x="160" y="10" class="civic-triad-root-label">CITIXEN UX<tspan baseline-shift="super" font-size="7">™</tspan></text>
+          <circle cx="160" cy="42" r="28" class="civic-triad-root-circle"/>
+          <g transform="translate(147.4,29.4) scale(1.05)">
+            <path d="M12 2L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-3z" fill="none" stroke="#00E699" stroke-width="2" stroke-linejoin="round"/>
+          </g>
         </g>
         <g>
-          <circle cx="240" cy="46" r="28" class="civic-triad-node-circle"/>
-          <path d="M228 34h24M228 42h24M228 50h16" fill="none" stroke="#00E699" stroke-width="1.6" stroke-linecap="round"/>
-          <text x="240" y="96" class="civic-triad-node-label">Public Ledger</text>
-          <text x="240" y="110" class="civic-triad-node-sub">Live, searchable record</text>
+          <circle cx="55" cy="190" r="26" class="civic-triad-node-circle"/>
+          <path d="M55 178a6 6 0 1 0 0.001 0z" fill="none" stroke="#00E699" stroke-width="1.6"/>
+          <path d="M43 204c2-7 7-11 12-11s10 4 12 11" fill="none" stroke="#00E699" stroke-width="1.6" stroke-linecap="round"/>
+          <text x="55" y="240" class="civic-triad-node-label">Resident Field Unit</text>
+          <text x="55" y="254" class="civic-triad-node-sub">Mobile report capture</text>
         </g>
         <g>
-          <circle cx="410" cy="46" r="28" class="civic-triad-node-circle"/>
-          <path d="M398 58v-14l12-8 12 8v14z" fill="none" stroke="#00E699" stroke-width="1.6" stroke-linejoin="round"/>
-          <path d="M404 58v-8h12v8" fill="none" stroke="#00E699" stroke-width="1.6"/>
-          <text x="410" y="96" class="civic-triad-node-label">Municipal Portal</text>
-          <text x="410" y="110" class="civic-triad-node-sub">Work orders &amp; SLA</text>
+          <circle cx="160" cy="190" r="26" class="civic-triad-node-circle"/>
+          <path d="M148 178h24M148 186h24M148 194h16" fill="none" stroke="#00E699" stroke-width="1.6" stroke-linecap="round"/>
+          <text x="160" y="240" class="civic-triad-node-label">Public Ledger</text>
+          <text x="160" y="254" class="civic-triad-node-sub">Live, searchable record</text>
+        </g>
+        <g>
+          <circle cx="265" cy="190" r="26" class="civic-triad-node-circle"/>
+          <path d="M253 202v-14l12-8 12 8v14z" fill="none" stroke="#00E699" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M259 202v-8h12v8" fill="none" stroke="#00E699" stroke-width="1.6"/>
+          <text x="265" y="240" class="civic-triad-node-label">Municipal Portal</text>
+          <text x="265" y="254" class="civic-triad-node-sub">Work orders &amp; SLA</text>
         </g>
       </svg>
     </div>
@@ -1401,16 +1448,17 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        Completion Rate gauge card that used to live here) was removed
        entirely per an earlier round — see the JS/CSS removal notes near
        renderAnalyticsMatrix()/.gauge-card above. Its header text is
-       renamed this round from "More Features" to "CIVIC INTELLIGENCE
-       ENGINE™" per item 3, sitting directly below the new Civic Triad
-       diagram card, immediately followed by the 4-button engine stack it
+       renamed again this round from "Civic Intelligence Engine™" to
+       "CIVIC INTELLIGENCE STACK™" per item 3 (same 4-button behavior
+       below, label only), sitting directly below the "How Your Report
+       Moves" tree card, immediately followed by the button stack it
        introduces. ===== -->
   <section class="matrix-summary-section" id="matrixSummarySection">
-    <h3 style="color: #00E699; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin: 20px 0 16px; text-align: center;">Civic Intelligence Engine<sup class="tm-symbol">™</sup></h3>
+    <h3 style="color: #00E699; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin: 20px 0 16px; text-align: center;">Civic Intelligence Stack<sup class="tm-symbol">™</sup></h3>
   </section>
 
-  <!-- ===== CIVIC INTELLIGENCE ENGINE™ 4-BUTTON STACK — grown from three
-       pills to four per this round's item 3, adding a real "Municipal"
+  <!-- ===== CIVIC INTELLIGENCE STACK™ 4-BUTTON STACK — grown from three
+       pills to four in an earlier round, adding a real "Municipal"
        button (see renderMunicipalPanel()/#municipalPanel below — no
        fabricated citywide asset inventory; its coverage/risk figures are
        honest proxies computed from the same real ledger tickets and
@@ -1464,46 +1512,56 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </button>
   </div>
 
-  <!-- ===== CITIXEN UX™ FEATURE &amp; SECURITY SECTION — Position 9 in this
-       round's vertical stacking order, directly below the engine stack.
-       Header typography matches the "Civic Intelligence Engine™" header
-       above (same style attributes) per this round's item 4. The
-       "Learn More ↗" trigger opens the same real Anonymity Whitepaper
-       modal (openModal('anonymity')) the header's Privacy Shield badge
-       already carries — the honest existing content for "Security
-       Protocols" rather than a duplicate write-up. The three feature
-       columns are static descriptive copy (no numbers asserted), same
-       register as the rest of this page's plain-text sections. ===== -->
+  <!-- ===== CITIXEN UX™ INTERACTIVE FEATURE &amp; SECURITY SECTION —
+       Position 9 in the vertical stacking order, directly below the
+       button stack. Rebuilt this round from static bullet columns into a
+       tappable 3-icon grid (item 4): the header now carries the same
+       shield mark used in the top nav's brand lockup (one real logo, not
+       a second invented icon), and the Hero Trust Anchor Badge restates
+       the same real, already-established privacy facts (no accounts, EXIF
+       scrubbed on-device — see the Anonymity Whitepaper) rather than
+       asserting a new, unverified "hashed at the edge" claim; "scrubbed"
+       here matches what fallbackJurisdictionStack()/modalData.anonymity
+       already describe this build actually doing. Tapping a tile opens
+       the same real openModal(key) drawer every other info trigger on
+       this page uses, with the exact content the old static bullet lists
+       carried — no content was dropped, only its presentation. The
+       "Learn More ↗" trigger still opens the real Anonymity Whitepaper
+       modal the header's Privacy Shield badge already carries. ===== -->
   <section class="citixen-feature-section" id="citixenFeatureSection">
-    <h3 style="color: #00E699; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin: 20px 0 6px; text-align: center;">CITIXEN UX<sup class="tm-symbol">™</sup></h3>
-    <div style="text-align:center;margin-bottom:16px;">
+    <h3 class="citixen-feature-heading">
+      <svg viewBox="0 0 24 24" width="20" height="20" stroke="#00E699" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-3z"/></svg>
+      <span>CITIXEN UX<sup class="tm-symbol">™</sup></span>
+    </h3>
+    <div style="text-align:center;margin-bottom:14px;">
       <button type="button" id="citixenFeatureLearnMoreBtn" class="citixen-feature-learn-more">Learn More ↗</button>
     </div>
-    <div class="citixen-feature-grid">
-      <div class="citixen-feature-col">
-        <div class="citixen-feature-col-head">Platform Features</div>
-        <ul>
-          <li>Real-time spatial tracking</li>
-          <li>Hazard verification</li>
-          <li>Automated SLA logging</li>
-        </ul>
+    <div class="citixen-trust-badge">
+      <svg viewBox="0 0 24 24" width="20" height="20" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+      <div>
+        <div class="citixen-trust-badge-title">Zero-Knowledge &amp; EXIF-Scrubbed — 100% Anonymous Civic Proof</div>
+        <div class="citixen-trust-badge-sub">No personal data is retained. Photo metadata is scrubbed at the device before it ever reaches the public ledger.</div>
       </div>
-      <div class="citixen-feature-col">
-        <div class="citixen-feature-col-head">Safety Standards</div>
-        <ul>
-          <li>Ground-truth civic verification</li>
-          <li>Incident priority ranking</li>
-          <li>Hazard prevention metrics</li>
-        </ul>
-      </div>
-      <div class="citixen-feature-col">
-        <div class="citixen-feature-col-head">Security Protocols</div>
-        <ul>
-          <li>Zero-knowledge privacy engine</li>
-          <li>Metadata hashing</li>
-          <li>Immutable public records</li>
-        </ul>
-      </div>
+    </div>
+    <div class="citixen-feature-grid" role="list" aria-label="Platform feature categories">
+      <button type="button" class="citixen-feature-tile" id="citixenTileFeatures" role="listitem">
+        <span class="citixen-feature-tile-icon">
+          <svg viewBox="0 0 24 24" width="22" height="22" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </span>
+        <span class="citixen-feature-tile-label">Features</span>
+      </button>
+      <button type="button" class="citixen-feature-tile" id="citixenTileSafety" role="listitem">
+        <span class="citixen-feature-tile-icon">
+          <svg viewBox="0 0 24 24" width="22" height="22" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </span>
+        <span class="citixen-feature-tile-label">Safety</span>
+      </button>
+      <button type="button" class="citixen-feature-tile" id="citixenTileSecurity" role="listitem">
+        <span class="citixen-feature-tile-icon">
+          <svg viewBox="0 0 24 24" width="22" height="22" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        </span>
+        <span class="citixen-feature-tile-label">Security</span>
+      </button>
     </div>
   </section>
 
@@ -2191,6 +2249,30 @@ const modalData={
       ['Auditable by Design','Each resolved entry in the Civic Memory Stream carries a timestamp and a verification hash, so the sequence of resolutions can be checked for tampering without exposing reporter identity.'],
       ['Open Data, Estimated Costs','Expenditure figures are AI-clustered estimates derived from resolved-case categories, published for transparency — not a substitute for the city\'s official finance office records.']
     ]
+  },
+  ciFeatures:{
+    title:'Features',
+    body:[
+      ['Real-Time Spatial Tracking','Reports are placed on the live national map and this jurisdiction\'s own dispatch view the moment they are filed.'],
+      ['Automated SLA Logging','Every report is timestamped against its ward\'s published response-time commitment automatically — no manual entry.'],
+      ['Ward Heatmaps','Hazard density and resolution-speed views broken out ward by ward, drawn from the same records dispatchers see.']
+    ]
+  },
+  ciSafety:{
+    title:'Safety',
+    body:[
+      ['Ground-Truth Civic Verification','Reports are tied to a real ward and jurisdiction, not a self-reported location, so the public record reflects where a hazard actually is.'],
+      ['Incident Priority Ranking','Open hazards can be ranked by category so limited repair budget goes to the highest-need items first.'],
+      ['Hazard Prevention Metrics','Resolution-time and reopen-rate trends surface recurring hazard patterns before they become repeat incidents.']
+    ]
+  },
+  ciSecurity:{
+    title:'Security',
+    body:[
+      ['Zero-Knowledge Privacy Engine','No accounts, no login, and no device fingerprinting anywhere in this system — see the full Anonymity Whitepaper.'],
+      ['EXIF Scrubbing','Photo metadata, including embedded GPS coordinates and device identifiers, is stripped on-device before a photo ever leaves the reporter\'s phone.'],
+      ['Immutable Public Records','Each resolved ledger entry carries a timestamp and verification hash so the resolution sequence can be audited without exposing reporter identity.']
+    ]
   }
 };
 function openModal(key){
@@ -2357,6 +2439,14 @@ document.getElementById('charterTabPrivacy').addEventListener('click', () => ren
 // badge — the honest existing content for "Security Protocols" rather
 // than a duplicate write-up.
 document.getElementById('citixenFeatureLearnMoreBtn').addEventListener('click', () => openModal('anonymity'));
+
+// 3-Icon Interactive Grid (Features / Safety / Security) — each tile opens
+// the same obsidian-glass modal pattern used throughout the page, carrying
+// the exact real content the old static bullet lists held (nothing dropped,
+// only the presentation changed from a plain list to a tappable tile).
+document.getElementById('citixenTileFeatures').addEventListener('click', () => openModal('ciFeatures'));
+document.getElementById('citixenTileSafety').addEventListener('click', () => openModal('ciSafety'));
+document.getElementById('citixenTileSecurity').addEventListener('click', () => openModal('ciSecurity'));
 
 // SUB-MODULE FOCUS-AREA PREVIEWS — the circled "(i)" badge that used to
 // carry this trigger was removed per this round's spec (it visually
