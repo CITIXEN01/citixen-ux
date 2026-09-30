@@ -136,15 +136,16 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .hero-qa-body{color:var(--muted);font-size:.9rem;line-height:1.6;max-width:640px;margin:0 auto}
 .hero-qa-accent{color:#00FF87;font-weight:700}
 
-/* ===== CROWD SOURCE AMERICA™ HERO BANNER — a centered callout card
-   introducing the nationwide aggregation engine, sitting between the two
-   hero Q&A blocks. ===== */
+/* ===== CROWD SOURCE AMERICA™ NARRATIVE BLOCK — plain centered text, no
+   card/box, per this round's color-breakup spec ("clean white body text,
+   no heavy green box"). Only the small eyebrow label carries the Civic
+   Gold (#FFB800) accent that distinguishes the national campaign from the
+   emerald CITIXEN UX™ platform elements. ===== */
 .csa-banner-section{max-width:640px;margin:0 auto 8px;padding:0 24px}
-.csa-banner-card{text-align:center;background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.35);
-  border-radius:14px;padding:22px 20px}
-.csa-banner-eyebrow{font-size:.62rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.csa-banner-heading{font-size:1.4rem;font-weight:900;color:#00FF87;margin-bottom:8px}
-.csa-banner-body{font-size:.85rem;color:var(--muted);line-height:1.6;max-width:520px;margin:0 auto}
+.csa-banner-card{text-align:center;padding:6px 0 18px}
+.csa-banner-eyebrow{font-size:.62rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#FFB800;margin-bottom:6px}
+.csa-banner-heading{font-size:1.4rem;font-weight:900;color:#FFFFFF;margin-bottom:8px}
+.csa-banner-body{font-size:.85rem;color:#94A3B8;line-height:1.6;max-width:520px;margin:0 auto}
 
 /* ===== INSTITUTIONAL GATEWAY BUTTONS — sits between the App Download
    section and the footer. Plain mailto CTAs, side-by-side. ===== */
@@ -305,39 +306,32 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 @media (max-width:640px){ .frontier-mapwrap{height:360px} }
 .dispatch-mapwrap{height:220px;margin-bottom:12px}
 
-/* ===== AGGREGATE NATIONAL GEO-HATCH™ HEAT MAP — a dedicated stylized
-   canvas (grid + radar sweep + glowing cluster nodes), deliberately NOT
-   the Leaflet field-dispatch map above. Cluster positions are a stylized
-   layout, not a geographic projection. ===== */
+/* ===== CROWD SOURCE AMERICA™ AGGREGATION HUB — a real Leaflet map
+   (#aggregation-map-container) with Civic Gold (#FFB800) markers, per
+   this round's map-engine and color-breakup spec. .agg-hub-heading/
+   .agg-hub-ticker recolor this modal's two ".label"/ticker headers gold
+   without touching the shared .label class used elsewhere on the page.
+   .tiles-degraded keeps the dark canvas background visible if the Carto
+   tile layer fails to load (see initAggregationMap()'s tileerror
+   handler). ===== */
 .geo-hatch-search-row{display:flex;gap:8px;margin-top:8px}
 .geo-hatch-search-row input{flex:1;min-width:0;background:rgba(7,12,14,.8);border:1px solid var(--border);
   color:var(--text);padding:10px 14px;border-radius:10px;font-size:.8rem;outline:none}
 .geo-hatch-search-row input:focus{border-color:var(--mint2)}
-.geo-hatch-canvas{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--border);
-  background:radial-gradient(circle at 50% 40%,rgba(0,255,136,.08),var(--bg-obsidian) 72%)}
-.geo-hatch-grid{position:absolute;inset:0;
-  background-image:linear-gradient(rgba(0,255,136,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,.14) 1px,transparent 1px);
-  background-size:32px 32px}
-.geo-hatch-sweep{position:absolute;top:50%;left:50%;width:140%;padding-bottom:140%;transform:translate(-50%,-50%);
-  border-radius:50%;background:conic-gradient(from 0deg,rgba(0,255,136,.16),transparent 40%);
-  animation:teaserRadarSpin 6s linear infinite}
-.geo-cluster{position:absolute;display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);z-index:2}
-#geoClusterLacrosse{top:32%;left:28%}
-#geoClusterAustin{top:68%;left:46%}
-#geoClusterChicago{top:38%;left:64%}
-.geo-cluster-dot{width:14px;height:14px;border-radius:50%;background:#00FF87;box-shadow:0 0 14px 4px rgba(0,255,135,.7)}
-.geo-cluster-pulse{position:absolute;width:14px;height:14px;border-radius:50%;background:rgba(0,255,135,.6);
-  animation:pulseEmerald 2.2s ease-out infinite}
-.geo-cluster.is-dim .geo-cluster-dot{background:rgba(0,255,135,.35);box-shadow:0 0 8px 2px rgba(0,255,135,.25)}
-.geo-cluster.is-dim .geo-cluster-pulse{display:none}
-.geo-cluster.is-highlight .geo-cluster-dot{box-shadow:0 0 22px 8px rgba(0,255,135,.9)}
-.geo-cluster-label{margin-top:8px;font-size:.66rem;font-weight:700;color:var(--text);text-align:center;
-  background:rgba(5,9,10,.75);padding:4px 8px;border-radius:6px;white-space:nowrap}
-.geo-cluster-metric{display:block;font-size:.6rem;font-weight:600;color:var(--mint2);margin-top:1px}
-.geo-hatch-legend{position:absolute;left:16px;bottom:12px;display:flex;gap:16px;flex-wrap:wrap;z-index:2}
+.agg-hub-heading{color:#FFB800}
+.agg-hub-ticker{color:#FFB800}
+.aggregation-map-wrap{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--border);background:var(--bg-obsidian)}
+.aggregation-map-wrap.tiles-degraded{background:radial-gradient(circle at 50% 40%,rgba(255,184,0,.08),var(--bg-obsidian) 72%)}
+#aggregation-map-container{position:absolute;inset:0;background:var(--bg-obsidian)}
+.agg-marker-beacon{position:relative;width:100%;height:100%}
+.agg-marker-beacon .agg-marker-pulse{position:absolute;inset:-6px;border-radius:50%;background:#FFB800;
+  opacity:.45;animation:beaconPulse 2s ease-out infinite}
+.agg-marker-beacon .agg-marker-core{position:absolute;inset:4px;border-radius:50%;background:#FFB800;
+  border:2px solid #fff;box-shadow:0 0 8px #FFB800}
+.geo-hatch-legend{position:absolute;left:16px;bottom:12px;display:flex;gap:16px;flex-wrap:wrap;z-index:1000;pointer-events:none}
 .geo-hatch-legend span{display:flex;align-items:center;gap:6px;font-size:.62rem;color:var(--muted)}
 .geo-legend-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
-@media (max-width:640px){ .geo-hatch-canvas{height:380px !important} .geo-cluster-label{font-size:.6rem} }
+@media (max-width:640px){ .aggregation-map-wrap{height:380px !important} }
 
 /* ===== DEEP-DIVE PANELS — hidden until a drill-down hub is clicked, per
    "keep the top-level page light" refactor. Same accordion-reveal idea as
@@ -372,11 +366,11 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 @media (max-width:560px){ .pipeline-visual{flex-direction:column} .pipeline-arrow{transform:rotate(90deg)} }
 
 /* ===== .radar-sweep-launcher/.teaser-radar-* (the Operations drawer's old
-   radar-sweep heat-map launcher) were removed with their markup — heat map
-   access is now exclusively in the Analytics drawer. @keyframes
-   teaserRadarSpin is kept: the aggregate heat-map modal's .geo-hatch-sweep
-   still uses it. ===== */
-@keyframes teaserRadarSpin{to{transform:rotate(360deg)}}
+   radar-sweep heat-map launcher) were removed with their markup in an
+   earlier round — heat map access is now the Aggregation Map Gateway
+   button and the Analytics drawer trigger. @keyframes teaserRadarSpin,
+   which only the old CSS-drawn .geo-hatch-sweep used, was removed this
+   round along with it — the Aggregation Hub is now a real Leaflet map. ===== */
 
 
 /* ===== MAP BEACONS (CartoDB Dark Matter basemap) ===== */
@@ -408,48 +402,6 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .modal-box h4{font-size:.82rem;margin:14px 0 4px;color:var(--text)}
 .modal-box p{font-size:.78rem;color:var(--muted);line-height:1.55}
 .modal-close{float:right;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem}
-
-/* ===== MUNICIPAL ONBOARDING WIZARD — same overlay pattern as .modal-overlay
-   above, wider box to fit form fields across 5 steps. Every "integration"
-   here (boundary lookup, ERP link, webhook ping) is simulated client-side —
-   this codebase has no real municipal-boundary API, ERP connector, or
-   webhook receiver — and each step says so, same honesty convention as
-   the rest of this page. ===== */
-.wizard-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:26px;
-  max-width:560px;width:100%;max-height:88vh;overflow-y:auto}
-.wizard-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
-.wizard-head h3{font-size:1.1rem;color:var(--mint2)}
-.wizard-steps{display:flex;gap:6px;margin:16px 0 22px}
-.wizard-step-dot{flex:1;height:4px;border-radius:4px;background:rgba(255,255,255,.1)}
-.wizard-step-dot.done{background:var(--mint2)}
-.wizard-step-dot.current{background:var(--brand-amber)}
-.wizard-step-label{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:14px}
-.wizard-panel{display:none}
-.wizard-panel.active{display:block}
-.wizard-field{margin-bottom:14px}
-.wizard-field label{display:block;font-size:.72rem;font-weight:700;color:var(--text);margin-bottom:6px}
-.wizard-field input,.wizard-field select{width:100%;background:rgba(7,12,14,.8);border:1px solid var(--border);
-  color:var(--text);padding:10px 12px;border-radius:10px;font-size:.82rem;outline:none;font-family:inherit}
-.wizard-field input:focus,.wizard-field select:focus{border-color:var(--mint2)}
-.wizard-sim-indicator{display:flex;align-items:center;gap:8px;font-size:.72rem;color:var(--muted);margin-top:8px}
-.wizard-sim-dot{width:8px;height:8px;border-radius:50%;background:var(--brand-amber);flex-shrink:0}
-.wizard-sim-dot.ok{background:var(--brand-mint)}
-.wizard-toggle-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
-.wizard-toggle-row:last-child{border-bottom:none}
-.wizard-toggle-row .wt-label{font-size:.82rem;font-weight:700}
-.wizard-toggle-row .wt-desc{font-size:.68rem;color:var(--muted);margin-top:2px}
-.wizard-switch{position:relative;width:40px;height:22px;flex-shrink:0}
-.wizard-switch input{opacity:0;width:100%;height:100%;margin:0;position:absolute;cursor:pointer;z-index:1}
-.wizard-switch .track{position:absolute;inset:0;background:rgba(255,255,255,.12);border-radius:20px;transition:background .15s}
-.wizard-switch .knob{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .15s}
-.wizard-switch input:checked + .track{background:var(--brand-mint)}
-.wizard-switch input:checked ~ .knob{transform:translateX(18px)}
-.wizard-nav{display:flex;gap:10px;margin-top:22px}
-.wizard-summary{background:rgba(0,255,136,.08);border:1px solid var(--mint2);border-radius:12px;padding:16px;margin-top:10px}
-.wizard-summary-row{display:flex;justify-content:space-between;font-size:.76rem;padding:5px 0;border-bottom:1px dashed var(--border)}
-.wizard-summary-row:last-child{border-bottom:none}
-.wizard-deploy-progress{display:none;text-align:center;padding:20px 0}
-.wizard-deploy-progress.active{display:block}
 
 /* ===== LOCATION INTAKE MODAL ===== */
 .loc-modal-box{max-width:420px;text-align:center}
@@ -632,9 +584,24 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 .ledger-banner-label{flex:1;font-size:.74rem;font-weight:800;letter-spacing:.3px;color:#00FF87}
 .ledger-banner-count{font-size:.68rem;color:var(--muted);font-weight:700;flex-shrink:0}
 @media (max-width:560px){ .ledger-banner{flex-wrap:wrap} .ledger-banner-label{flex-basis:100%} }
+
+/* ===== CIVIC GOLD VARIANT — the Crowd Source America™ Aggregation Hub
+   Gateway button reuses the .ledger-banner layout but in Civic Gold
+   (#FFB800) rather than Emerald, per this round's color-breakup spec:
+   Emerald stays reserved for CITIXEN UX™ platform status (Live Public
+   Ledger, C.I. tags, verified receipts). ===== */
+.ledger-banner-gold{background:rgba(255,184,0,.08);border-color:rgba(255,184,0,.4)}
+.ledger-banner-gold:hover{border-color:#FFB800}
+.ledger-banner-gold .ledger-banner-pulse{background:#FFB800;box-shadow:0 0 6px #FFB800}
+.ledger-banner-gold .ledger-banner-pulse::after{border-color:#FFB800;animation-name:pulseGold}
+.ledger-banner-gold .ledger-banner-label{color:#FFB800}
+@keyframes pulseGold{
+  0%{transform:scale(.6);opacity:.9}
+  100%{transform:scale(2.2);opacity:0}
+}
 .analytics-matrix-card{max-width:720px;margin:0 auto 40px;background:var(--card);border:1px solid var(--border);
   border-radius:16px;padding:20px}
-.matrix-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+.matrix-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-top:14px}
 .matrix-cell{text-align:center;background:rgba(7,12,14,.5);border:1px solid var(--border);border-radius:12px;padding:14px 10px}
 .matrix-cell-viz{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:34px;margin-top:8px}
 .matrix-cell-val{font-size:1.3rem;font-weight:900}
@@ -891,13 +858,15 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </div>
   </section>
 
-  <!-- ===== AGGREGATION MAP GATEWAY BUTTON — styled identically to the Live
-       Public Ledger banner below (same .ledger-banner classes), opens the
-       same real #nationalHeatMapModal (the dedicated stylized Geo-Hatch
-       canvas) that the Analytics drawer's own trigger opens — not a
-       duplicate modal. ===== -->
+  <!-- ===== AGGREGATION MAP GATEWAY BUTTON — same .ledger-banner layout as
+       the Live Public Ledger banner, but in the Civic Gold variant
+       (.ledger-banner-gold) per this round's color-breakup spec, so the
+       national Crowd Source America™ campaign reads as visually distinct
+       from CITIXEN UX™'s emerald platform elements. Opens the same real
+       #nationalHeatMapModal (now a real Leaflet instance — see below) that
+       the Analytics drawer's own trigger opens — not a duplicate modal. ===== -->
   <section class="ledger-banner-section">
-    <button class="ledger-banner" id="aggregationMapGatewayBtn" type="button">
+    <button class="ledger-banner ledger-banner-gold" id="aggregationMapGatewayBtn" type="button">
       <span class="ledger-banner-pulse" aria-hidden="true"></span>
       <span class="ledger-banner-label">CROWD SOURCE AMERICA™ — AGGREGATION HUB</span>
       <span class="ledger-banner-count">View Map ↗</span>
@@ -943,14 +912,24 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        (see it just below the SECTION FREEZE boundary above), ahead of the
        Q&A blocks. ===== -->
 
-  <!-- ===== CITY SNAPSHOT — SUMMARY VIEW (formerly "3x3 Analytics Matrix") —
-       now sits directly beneath the Aggregation Map Gateway button, ahead
-       of the Report Generator, per this round's scroll-sequence spec. ===== -->
+  <!-- ===== CITY SNAPSHOT — now a single geolocated dashboard for the
+       visitor's own jurisdiction, per this round's spec. The label
+       (#citySnapshotLabel) is driven by the SAME real geolocation/
+       jurisdiction system the frozen header's location bar already uses
+       (detectJurisdictionGuess() -> applyJurisdiction() ->
+       syncDashboardToJurisdiction(), below) — no second, parallel
+       detection system — and defaults to "La Crosse, WI Snapshot" while
+       that's pending or if it's denied, same default as the rest of the
+       page. Active Hazards / Fix Speed / Completion Rate remain the one
+       real live dataset this project has (/api/coverage/big3 — see
+       loadBig3()); the 4th tile, Ward Health Index, is the same
+       cities{} seed value already shown in the Analytics deep-dive's
+       Citywide Health Index card, not a new number. ===== -->
   <section class="matrix-summary-section" id="matrixSummarySection">
     <div class="analytics-matrix-card" id="analyticsMatrix">
-      <div class="label" style="justify-content:center">City Snapshot</div>
+      <div class="label" style="justify-content:center" id="citySnapshotLabel">La Crosse, WI Snapshot</div>
       <div class="matrix-grid" id="matrixGrid"></div>
-      <div class="small" style="text-align:center;margin-top:10px;color:var(--muted)">Live Ward Performance Metrics — refreshed automatically from field dispatch data. Tap a tile for its full breakdown.</div>
+      <div class="small" style="text-align:center;margin-top:10px;color:var(--muted)">Live Ward Performance Metrics — refreshed automatically from field dispatch data. Tap a metric tile for its full breakdown.</div>
     </div>
   </section>
 
@@ -969,13 +948,13 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       </button>
       <div class="report-gen-row">
         <select id="reportTimeframe" aria-label="Timeframe">
-          <option value="week">This Week</option>
-          <option value="month">This Month</option>
+          <option value="30d">30 Days</option>
+          <option value="90d">90 Days</option>
           <option value="ytd">YTD</option>
         </select>
-        <select id="reportFormat" aria-label="Format">
-          <option value="matrix">3×3 Visual Summary</option>
-          <option value="ledger">Raw Audit Ledger</option>
+        <select id="reportFormat" aria-label="View Mode">
+          <option value="matrix">Visual Summary</option>
+          <option value="ledger">Raw SHA-256 Audit Ledger</option>
         </select>
       </div>
       <label class="report-gen-toggle">
@@ -1039,57 +1018,42 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     <a class="btn btn-outline" href="mailto:contact@citizenux.com?subject=CITIXEN%20UX%20—%20Municipality%20Inquiry">For Municipalities</a>
   </section>
 
-  <!-- ===== FULL-SCREEN AGGREGATE NATIONAL GEO-HATCH™ HEAT MAP MODAL — a
-       dedicated stylized visualization, NOT the Leaflet field-dispatch map
-       (that instance now lives only inside the Analytics deep-dive's Live
-       dispatch feed card, see #deepdiveAnalytics below). This is a
-       CSS/SVG-drawn obsidian canvas with a grid, a rotating radar sweep,
-       and glowing emerald cluster nodes for each seeded jurisdiction, sized
+  <!-- ===== FULL-SCREEN CROWD SOURCE AMERICA™ AGGREGATION HUB MODAL — a
+       real Leaflet map (#aggregation-map-container), not a CSS/SVG-drawn
+       canvas, per this round's map-engine spec. Loads Carto Dark Matter
+       tiles; gold (#FFB800) markers for each seeded jurisdiction, sized
        from real numbers where a live backend exists (La Crosse — this
        project's only live ward data, via loadBig3()) and clearly tagged
        (Illustrative) where a jurisdiction is still static demo config
-       (Austin/Chicago — see the `cities` object). Node positions are a
-       stylized layout, not a geographic projection. ===== -->
+       (Austin/Chicago — see the `cities` object). If tiles fail to load,
+       the dark canvas background and gold markers still render (see
+       initAggregationMap()'s tileerror handler below) rather than a
+       blank/broken map. Separate Leaflet instance from the field-dispatch
+       map inside the Analytics deep-dive. ===== -->
   <div class="modal-overlay" id="nationalHeatMapModal">
     <div class="modal-box" style="max-width:1100px;width:96vw;padding:0;overflow:hidden;">
       <button class="modal-close" id="heatMapCloseBtn" style="z-index:2">✕</button>
       <div class="frontier-map-head" style="padding:18px 20px 10px;">
         <div class="frontier-search-bar">
-          <div class="label" style="justify-content:center;margin-bottom:2px">Crowd Source America™ — Aggregation Hub</div>
-          <div class="frontier-search-note">Emerald glow = reporting density for that jurisdiction. Search a ZIP or ward below to highlight it.</div>
+          <div class="label agg-hub-heading" style="justify-content:center;margin-bottom:2px">Crowd Source America™ — Aggregation Hub</div>
+          <div class="frontier-search-note">Gold marker = a seeded jurisdiction. Search a city or ZIP below to fly to it.</div>
           <div class="geo-hatch-search-row">
-            <input type="text" id="geoHatchSearchInput" placeholder="Search ZIP or ward (e.g. Ward 4, Austin, 54601)" aria-label="Search ZIP or ward" autocomplete="off">
+            <input type="text" id="geoHatchSearchInput" placeholder="Search city or ZIP (e.g. La Crosse, Austin, 54601)" aria-label="Search city or ZIP" autocomplete="off">
             <button class="btn btn-outline" id="geoHatchSearchBtn" type="button">Search</button>
           </div>
           <div class="small" id="geoHatchSearchResult" style="color:var(--muted);margin-top:6px;min-height:14px;"></div>
         </div>
         <div class="frontier-ticker-inline">
-          <div class="label" style="justify-content:center;margin-bottom:2px">National Geo-Hatch Ticker</div>
-          <div class="ticker-value" id="nationalCoverageTicker">0%</div>
+          <div class="label agg-hub-heading" style="justify-content:center;margin-bottom:2px">National Geo-Hatch Ticker</div>
+          <div class="ticker-value agg-hub-ticker" id="nationalCoverageTicker">0%</div>
           <div class="small" style="color:var(--muted)">Avg. block coverage</div>
         </div>
       </div>
-      <div class="geo-hatch-canvas" id="geoHatchCanvas" style="height:480px;margin:0 20px 20px;">
-        <div class="geo-hatch-grid" aria-hidden="true"></div>
-        <div class="geo-hatch-sweep" aria-hidden="true"></div>
-        <div class="geo-cluster" id="geoClusterLacrosse" data-jurisdiction="lacrosse" data-match="la crosse,lacrosse,wisconsin,wi,ward 4,ward 7,ward 12,ward 3,ward-4,ward-7,ward-12,ward-3,54601">
-          <span class="geo-cluster-pulse"></span>
-          <span class="geo-cluster-dot"></span>
-          <span class="geo-cluster-label">La Crosse, WI<br><span class="geo-cluster-metric" id="geoClusterLacrosseMetric">Loading…</span></span>
-        </div>
-        <div class="geo-cluster" id="geoClusterAustin" data-jurisdiction="austin" data-match="austin,texas,tx,ward 2,78701">
-          <span class="geo-cluster-pulse"></span>
-          <span class="geo-cluster-dot"></span>
-          <span class="geo-cluster-label">Austin, TX<br><span class="geo-cluster-metric" id="geoClusterAustinMetric">—</span></span>
-        </div>
-        <div class="geo-cluster" id="geoClusterChicago" data-jurisdiction="chicago" data-match="chicago,illinois,il,district 7,60601">
-          <span class="geo-cluster-pulse"></span>
-          <span class="geo-cluster-dot"></span>
-          <span class="geo-cluster-label">Chicago, IL<br><span class="geo-cluster-metric" id="geoClusterChicagoMetric">—</span></span>
-        </div>
+      <div class="aggregation-map-wrap" id="aggregationMapWrap" style="height:480px;margin:0 20px 20px;">
+        <div id="aggregation-map-container"></div>
         <div class="geo-hatch-legend">
-          <span><span class="geo-legend-dot" style="background:#00FF87"></span>Live backend (La Crosse)</span>
-          <span><span class="geo-legend-dot" style="background:rgba(0,255,135,.35)"></span>Illustrative — pending onboarding</span>
+          <span><span class="geo-legend-dot" style="background:#FFB800"></span>Live backend (La Crosse)</span>
+          <span><span class="geo-legend-dot" style="background:rgba(255,184,0,.35)"></span>Illustrative — pending onboarding</span>
         </div>
       </div>
     </div>
@@ -1231,18 +1195,16 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       <div class="small" style="margin-top:8px;color:var(--muted);">Per-project supporting-document attachments — coming soon.</div>
     </div>
 
-    <!-- ===== CIVIC STACK INTEGRATIONS & ADMINISTRATIVE DATA — replaces the
-         removed Backend Data Pipeline diagram card and Download Ward
-         Health Summary PDF button (both removed outright per this round's
-         spec). Points to the one genuinely administrative/integration
-         control this codebase has: the Municipal Onboarding Portal's
-         webhook token, PII-blur, 911-redirect, and ROW-filtering config
-         (see #wizardOverlay), rather than inventing new fabricated admin
-         views. ===== -->
+    <!-- ===== CIVIC STACK INTEGRATIONS & ADMINISTRATIVE DATA — the Municipal
+         Onboarding Portal wizard this card used to link to was removed
+         entirely this round (per this round's explicit Operations-drawer
+         cleanup instruction: button, modal markup, and its JS all
+         deleted — see the JS section below for what that took with it).
+         This card is left as a plain, honest status statement rather than
+         pointing at a control that no longer exists. ===== -->
     <div class="card" id="civicStackAdminCard" style="max-width:640px;width:100%;margin:0 auto 20px;">
       <div class="label" style="justify-content:center">Civic Stack Integrations &amp; Administrative Data</div>
-      <div class="small" style="margin:8px 0;">ERP webhook dispatch (Tyler Tech / Accela), PII-blur, and 911-redirect settings are configured per jurisdiction in the Municipal Onboarding Portal below — the same real client-side configuration screen this project uses, not a separate simulated admin view.</div>
-      <button class="btn btn-outline" id="btnOpenOnboardingFromOps" type="button" style="width:100%;justify-content:center;">Open Municipal Onboarding Portal ↗</button>
+      <div class="small" style="margin:8px 0;">ERP webhook dispatch (Tyler Tech / Accela), PII-blur, and 911-redirect configuration for onboarding a new jurisdiction is not currently exposed anywhere in this build — the client-side wizard that used to demonstrate it was removed this round along with its only entry point.</div>
     </div>
   </section>
 
@@ -1272,105 +1234,16 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </div>
   </div>
 
-  <!-- ===== MUNICIPAL ONBOARDING WIZARD — a lightweight, entirely
-       client-side simulation of provisioning a new municipality onto
-       CITIXEN UX™. No real backend exists for any of this yet: there is
-       no municipal-boundary lookup service, no ERP connector, and no
-       webhook receiver anywhere in this codebase (api/_lib/store.js is
-       the only "backend," and it's an in-memory demo seed as documented
-       throughout this page). Every "indicator" in this wizard says so
-       plainly rather than implying a live integration that isn't there. ===== -->
-  <div class="modal-overlay" id="wizardOverlay">
-    <div class="wizard-box">
-      <button class="modal-close" id="wizardCloseBtn">✕</button>
-      <div class="wizard-head"><h3>Provision Your Municipality in 5 Clicks</h3></div>
-      <div class="wizard-steps" id="wizardStepDots"></div>
-      <div class="wizard-step-label" id="wizardStepLabel"></div>
-
-      <div class="wizard-panel active" data-step="1">
-        <div class="wizard-field">
-          <label for="wizJurisdictionName">City / County Name</label>
-          <input type="text" id="wizJurisdictionName" placeholder="e.g. La Crosse, WI">
-        </div>
-        <div class="wizard-field">
-          <label for="wizZip">ZIP Code</label>
-          <input type="text" id="wizZip" inputmode="numeric" placeholder="e.g. 54601">
-        </div>
-        <div class="wizard-sim-indicator" id="wizBoundaryIndicator">
-          <span class="wizard-sim-dot"></span>
-          <span>Enter a name and ZIP to run the boundary lookup.</span>
-        </div>
-        <div class="small" style="color:var(--muted);margin-top:6px">Boundary preview, estimated from what you typed.</div>
-      </div>
-
-      <div class="wizard-panel" data-step="2">
-        <div class="wizard-field">
-          <label for="wizErpVendor">Legacy ERP / Work-Order Vendor</label>
-          <select id="wizErpVendor">
-            <option value="">Select a vendor…</option>
-            <option value="tyler">Tyler Technologies</option>
-            <option value="accela">Accela</option>
-            <option value="cityworks">Cityworks</option>
-            <option value="cartegraph">Cartegraph</option>
-            <option value="standalone">Standalone (no ERP)</option>
-          </select>
-        </div>
-        <div class="small" style="color:var(--muted);margin-top:6px" id="wizErpNote">Selection recorded for your provisioning summary.</div>
-      </div>
-
-      <div class="wizard-panel" data-step="3">
-        <div class="wizard-field">
-          <label for="wizApiToken">API Webhook Token</label>
-          <input type="text" id="wizApiToken" placeholder="Paste or generate a token…" autocomplete="off">
-        </div>
-        <button class="btn btn-outline" id="wizTestPingBtn" type="button" style="width:100%;justify-content:center;">Test bi-directional ping</button>
-        <div class="wizard-sim-indicator" id="wizPingIndicator">
-          <span class="wizard-sim-dot"></span>
-          <span>Not tested yet.</span>
-        </div>
-        <div class="small" style="color:var(--muted);margin-top:6px">Preview ping — confirms token format only.</div>
-      </div>
-
-      <div class="wizard-panel" data-step="4">
-        <div class="wizard-toggle-row">
-          <div><div class="wt-label">Auto-PII Blur</div><div class="wt-desc">Strip EXIF device/GPS tags from every submitted photo.</div></div>
-          <label class="wizard-switch"><input type="checkbox" id="wizToggleBlur" checked><span class="track"></span><span class="knob"></span></label>
-        </div>
-        <div class="wizard-toggle-row">
-          <div><div class="wt-label">911 Emergency Redirect</div><div class="wt-desc">Show the life-safety emergency notice on every report submission.</div></div>
-          <label class="wizard-switch"><input type="checkbox" id="wizToggle911" checked><span class="track"></span><span class="knob"></span></label>
-        </div>
-        <div class="wizard-toggle-row">
-          <div><div class="wt-label">ROW Filtering</div><div class="wt-desc">Require the public right-of-way confirmation before any report locks in.</div></div>
-          <label class="wizard-switch"><input type="checkbox" id="wizToggleRow" checked><span class="track"></span><span class="knob"></span></label>
-        </div>
-      </div>
-
-      <div class="wizard-panel" data-step="5">
-        <p style="font-size:.82rem;color:var(--muted);margin-bottom:12px">Review your configuration, then deploy your Geo-Hatch grid.</p>
-        <div class="wizard-deploy-progress" id="wizDeployProgress">
-          <div class="wizard-sim-indicator" style="justify-content:center;font-size:.8rem;" id="wizDeployStatus"><span class="wizard-sim-dot"></span><span>Provisioning Geo-Hatch grid…</span></div>
-        </div>
-        <div class="wizard-summary" id="wizSummary" style="display:none;"></div>
-        <button class="btn btn-emerald-glow" id="wizDeployBtn" type="button" style="width:100%;justify-content:center;margin-top:16px;">Deploy CITIXEN Stack</button>
-      </div>
-
-      <div class="wizard-nav">
-        <button class="btn btn-outline" id="wizBackBtn" type="button" style="flex:1;justify-content:center;">Back</button>
-        <button class="btn btn-primary" id="wizNextBtn" type="button" style="flex:1;justify-content:center;">Next</button>
-      </div>
-    </div>
-  </div>
-
   <!-- ===== CENTERED MINIMAL FOOTER — the old 4-column sitemap link block
        and the "PROPRIETARY INFRASTRUCTURE PLATFORM — PATENTS PENDING"
-       block stay removed per earlier rounds. This round: "Municipal
-       Onboarding Portal" and "Emergency 911" were also removed from the
-       public footer per this round's explicit cleanup instruction — the
-       Onboarding Portal remains fully reachable via the Operations
-       drawer's "Open Municipal Onboarding Portal ↗" button
-       (#btnOpenOnboardingFromOps), and its openOnboardingWizard() JS is
-       unchanged, so nothing here is orphaned. "Dispatch Command Center"
+       block stay removed per earlier rounds; "Municipal Onboarding
+       Portal" and "Emergency 911" were removed from the public footer in
+       the prior round. This round: the Municipal Onboarding Portal
+       feature was removed ENTIRELY (its Operations-drawer button, the
+       #wizardOverlay modal markup, and the wizard JS — step-navigation,
+       validation, and simulated-deploy logic) per this round's explicit
+       cleanup instruction, since the footer button that used to be its
+       only other entry point was already gone. "Dispatch Command Center"
        and "Representative Login" remain removed from earlier rounds. Only
        the CITIXEN Codex (Governance Vault) drawer link
        (#footerCodexLink) remains in the footer's link row. The legal
@@ -1383,7 +1256,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     <div class="sitemap-bottom">
       <button type="button" id="footerCodexLink" class="footer-staff-link" style="background:none;border:none;padding:0;font:inherit;cursor:pointer">Statutory Governance &amp; Precedent ↗</button>
     </div>
-    <div class="trademark-disclosure">CITIXEN UX™ and Crowd Source America™ are protected trademarks. Civic Intelligence, Civic Memory, Geo-Hatch, City Snapshot, and Civic Stack are proprietary marks. Protected under U.S. and international trademark law. All other trademarks, product names, and logos are the property of their respective owners.</div>
+    <div class="trademark-disclosure">CITIXEN UX™ and Crowd Source America™ are protected trademarks. Civic Intelligence, Civic Memory, Geo-Hatch, City Snapshot, and Civic Stack are proprietary marks. Protected under U.S. and international trademark laws. All other trademarks, product names, and logos are the property of their respective owners.</div>
   </footer>
 
 <script>
@@ -1749,69 +1622,126 @@ document.querySelectorAll('[data-close-panel]').forEach(btn => {
   btn.addEventListener('click', () => closeDeepdivePanel(btn.dataset.closePanel));
 });
 
-/* ===== AGGREGATE NATIONAL GEO-HATCH™ HEAT MAP MODAL — a dedicated
-   stylized canvas (see #geoHatchCanvas markup/CSS), deliberately separate
-   from the Leaflet field-dispatch map (which now lives only inside the
-   Analytics deep-dive's Live dispatch feed card). Wired to the launcher
-   buttons inside the Analytics and Civic Stack Operations panels. ===== */
-function renderGeoHatchClusters(){
-  // La Crosse is this project's one live-backend jurisdiction — reuse the
-  // same matrixData national payload loadBig3() already fetched (never a
-  // second request), so this never invents a number. Austin/Chicago have
-  // no live backend yet, so they render dimmed and tagged (Illustrative)
-  // using their static demo config from the `cities` object.
-  const lcMetric = document.getElementById('geoClusterLacrosseMetric');
-  if (lcMetric) {
-    lcMetric.textContent = matrixData && matrixData.activeCount != null
+/* =====================================================================
+   CROWD SOURCE AMERICA™ AGGREGATION HUB MODAL — a real Leaflet instance
+   (#aggregation-map-container), not a CSS/SVG-drawn canvas, per this
+   round's map-engine spec. Loads CORS-compliant Carto Dark Matter tiles;
+   if tile fetching fails (offline, CDN blocked, CORS), the container's
+   own dark background (see .aggregation-map-wrap CSS) plus the three gold
+   markers below still render, so the view degrades to "dark canvas with
+   markers" rather than a blank/broken map. Separate Leaflet map instance
+   from the field-dispatch `map` used in the Analytics deep-dive — this
+   never touches that instance or its markers. ===== */
+let aggregationMap = null;
+const aggregationMapMarkers = {};
+let aggregationMapTilesFailed = false;
+
+// Coordinates as given in this round's spec. La Crosse is this project's
+// one live-backend jurisdiction (see matrixData/loadBig3()); Austin and
+// Chicago have no live backend yet and are tagged (Illustrative), same
+// honesty convention as the rest of this page.
+const AGGREGATION_MAP_CITIES = {
+  lacrosse: { name: 'La Crosse, WI', lat: 43.8138, lng: -91.2396, live: true,
+    match: ['la crosse','lacrosse','wisconsin','wi','ward 4','ward 7','ward 12','ward 3','54601'] },
+  chicago:  { name: 'Chicago, IL', lat: 41.8781, lng: -87.6298, live: false,
+    match: ['chicago','illinois','il','district 7','60601'] },
+  austin:   { name: 'Austin, TX', lat: 30.2672, lng: -97.7431, live: false,
+    match: ['austin','texas','tx','ward 2','78701'] }
+};
+
+function goldMarkerIcon(){
+  return L.divIcon({
+    className: '',
+    html: '<div class="agg-marker-beacon"><span class="agg-marker-pulse"></span><span class="agg-marker-core"></span></div>',
+    iconSize: [18, 18],
+    iconAnchor: [9, 9]
+  });
+}
+
+function aggregationMarkerLabel(key){
+  const c = AGGREGATION_MAP_CITIES[key];
+  if (key === 'lacrosse') {
+    const metric = matrixData && matrixData.activeCount != null
       ? matrixData.activeCount + ' active / ' + (matrixData.totalTickets != null ? matrixData.totalTickets : '—') + ' total'
       : 'Loading…';
+    return c.name + ' — ' + metric;
   }
-  const auMetric = document.getElementById('geoClusterAustinMetric');
-  if (auMetric) auMetric.textContent = cities.austin.health + '/100 health (Illustrative)';
-  const chMetric = document.getElementById('geoClusterChicagoMetric');
-  if (chMetric) chMetric.textContent = cities.chicago.health + '/100 health (Illustrative)';
-  const austinNode = document.getElementById('geoClusterAustin');
-  const chicagoNode = document.getElementById('geoClusterChicago');
-  if (austinNode) austinNode.classList.add('is-dim');
-  if (chicagoNode) chicagoNode.classList.add('is-dim');
-  document.querySelectorAll('.geo-cluster').forEach(n => n.classList.remove('is-highlight'));
+  return c.name + ' — ' + (cities[key] ? cities[key].health + '/100 health (Illustrative)' : 'Illustrative — pending onboarding');
+}
+
+function initAggregationMap(){
   const resultEl = document.getElementById('geoHatchSearchResult');
   if (resultEl) resultEl.textContent = '';
   const searchInput = document.getElementById('geoHatchSearchInput');
   if (searchInput) searchInput.value = '';
+
+  if (aggregationMap) {
+    // Already initialized — just refresh the La Crosse tooltip (its metric
+    // can change between opens) and re-measure the now-visible container.
+    if (aggregationMapMarkers.lacrosse) aggregationMapMarkers.lacrosse.setTooltipContent(aggregationMarkerLabel('lacrosse'));
+    setTimeout(() => aggregationMap.invalidateSize(), 150);
+    return;
+  }
+  if (typeof L === 'undefined') return; // Leaflet CDN unreachable — legend/markers still degrade gracefully below
+  try {
+    aggregationMap = L.map('aggregation-map-container', { attributionControl: false, scrollWheelZoom: false })
+      .setView([39.8283, -98.5795], 4);
+    const tiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      subdomains: 'abcd', maxZoom: 19
+    });
+    tiles.on('tileerror', () => {
+      // A real tile-load failure — keep the dark canvas background and gold
+      // markers rather than showing a broken/blank map underneath them.
+      if (aggregationMapTilesFailed) return;
+      aggregationMapTilesFailed = true;
+      const wrap = document.getElementById('aggregationMapWrap');
+      if (wrap) wrap.classList.add('tiles-degraded');
+    });
+    tiles.addTo(aggregationMap);
+    Object.keys(AGGREGATION_MAP_CITIES).forEach(key => {
+      const c = AGGREGATION_MAP_CITIES[key];
+      const marker = L.marker([c.lat, c.lng], { icon: goldMarkerIcon() }).addTo(aggregationMap);
+      marker.bindTooltip(aggregationMarkerLabel(key), { direction: 'top', offset: [0, -10] });
+      aggregationMapMarkers[key] = marker;
+    });
+    setTimeout(() => aggregationMap.invalidateSize(), 150);
+  } catch (err) { /* map unavailable — legend/markers below still degrade gracefully */ }
 }
-function highlightGeoCluster(query){
+
+function flyAggregationMapTo(query){
   const resultEl = document.getElementById('geoHatchSearchResult');
   const q = (query || '').trim().toLowerCase();
-  document.querySelectorAll('.geo-cluster').forEach(n => n.classList.remove('is-highlight'));
   if (!q) { if (resultEl) resultEl.textContent = ''; return; }
-  const match = Array.from(document.querySelectorAll('.geo-cluster')).find(n =>
-    (n.dataset.match || '').split(',').some(token => token && (q.includes(token) || token.includes(q)))
+  if (!aggregationMap) { if (resultEl) resultEl.textContent = 'Map unavailable right now — try again in a moment.'; return; }
+  const matchKey = Object.keys(AGGREGATION_MAP_CITIES).find(key =>
+    AGGREGATION_MAP_CITIES[key].match.some(token => q.includes(token) || token.includes(q))
   );
-  if (match) {
-    match.classList.add('is-highlight');
-    match.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
-    if (resultEl) resultEl.textContent = 'Highlighted: ' + match.querySelector('.geo-cluster-label').firstChild.textContent.trim();
+  if (matchKey) {
+    const c = AGGREGATION_MAP_CITIES[matchKey];
+    aggregationMap.flyTo([c.lat, c.lng], 11, { duration: 1.3 });
+    const marker = aggregationMapMarkers[matchKey];
+    if (marker) marker.openTooltip();
+    if (resultEl) resultEl.textContent = 'Flew to: ' + c.name;
   } else if (resultEl) {
-    resultEl.textContent = 'No seeded jurisdiction matches that yet — try "La Crosse", "Austin", "Chicago", or a La Crosse ward (e.g. Ward 4).';
+    resultEl.textContent = 'No seeded jurisdiction matches that yet — try "La Crosse", "54601", "Chicago", or "Austin".';
   }
 }
 function openHeatMapModal(){
   document.getElementById('nationalHeatMapModal').classList.add('open');
-  renderGeoHatchClusters();
+  initAggregationMap();
 }
 function closeHeatMapModal(){
   document.getElementById('nationalHeatMapModal').classList.remove('open');
 }
-// Heat map access is strictly inside the Analytics drawer now (per the
-// buried-data-architecture spec) — the old Operations-drawer launchers
-// (radarSweepFromStack, btnViewHeatMapFromStack) were removed with their
-// markup, so only this one trigger remains.
+// Heat map access lives on the top-level Aggregation Map Gateway button and
+// inside the Analytics drawer — the old Operations-drawer launchers
+// (radarSweepFromStack, btnViewHeatMapFromStack) were removed in an earlier
+// round with their markup, so only these two triggers remain.
 const viewHeatMapFromAnalyticsBtn = document.getElementById('btnViewHeatMapFromAnalytics');
 if (viewHeatMapFromAnalyticsBtn) viewHeatMapFromAnalyticsBtn.addEventListener('click', openHeatMapModal);
 // Top-level "Crowd Source America™ — Aggregation Hub" gateway button
-// (styled identically to the Live Public Ledger banner) opens the same
-// real #nationalHeatMapModal, not a duplicate modal.
+// (Civic Gold .ledger-banner-gold variant) opens the same real
+// #nationalHeatMapModal, not a duplicate modal.
 const aggregationMapGatewayBtnEl = document.getElementById('aggregationMapGatewayBtn');
 if (aggregationMapGatewayBtnEl) aggregationMapGatewayBtnEl.addEventListener('click', openHeatMapModal);
 document.getElementById('heatMapCloseBtn').addEventListener('click', closeHeatMapModal);
@@ -1821,9 +1751,9 @@ document.getElementById('nationalHeatMapModal').addEventListener('click', (e) =>
 const geoHatchSearchBtn = document.getElementById('geoHatchSearchBtn');
 const geoHatchSearchInput = document.getElementById('geoHatchSearchInput');
 if (geoHatchSearchBtn && geoHatchSearchInput) {
-  geoHatchSearchBtn.addEventListener('click', () => highlightGeoCluster(geoHatchSearchInput.value));
+  geoHatchSearchBtn.addEventListener('click', () => flyAggregationMapTo(geoHatchSearchInput.value));
   geoHatchSearchInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); highlightGeoCluster(geoHatchSearchInput.value); }
+    if (e.key === 'Enter') { e.preventDefault(); flyAggregationMapTo(geoHatchSearchInput.value); }
   });
 }
 
@@ -2114,6 +2044,7 @@ const JURISDICTION_TO_CITY_KEY = { 'wi/la-crosse': 'lacrosse', 'il/chicago': 'ch
 function syncDashboardToJurisdiction(j){
   const key = JURISDICTION_TO_CITY_KEY[j.state + '/' + j.city];
   const gridSel = document.getElementById('gridSelect');
+  const snapshotLabelEl = document.getElementById('citySnapshotLabel');
   if (key && cities[key]) {
     if (gridSel) gridSel.value = key;
     const c = cities[key];
@@ -2124,9 +2055,20 @@ function syncDashboardToJurisdiction(j){
     setLedger(c);
     updateTelemetry(c);
     if (map) map.flyTo([c.lat, c.lng], c.zoom, { duration: 1.3 });
+    // Geolocated City Snapshot (#matrixSummarySection) — same resolved
+    // jurisdiction, same cities{} seed value, per this round's spec.
+    currentWardHealth = c.health;
+    if (snapshotLabelEl) snapshotLabelEl.textContent = c.label + ' Snapshot';
+    if (matrixData) renderMatrixView();
   } else {
     document.getElementById('healthCity').textContent = j.cityName || 'Citywide';
     document.getElementById('ledgerTitle').textContent = 'CITYWIDE MUNICIPAL EXPENDITURE & ALLOCATION';
+    // No cities{} entry for this resolved jurisdiction (e.g. Milwaukee) —
+    // label the City Snapshot with the real detected jurisdiction name
+    // rather than silently keeping a mismatched previous label, but keep
+    // the Ward Health Index tile on its last known/default value since
+    // there's no seed data for this jurisdiction.
+    if (snapshotLabelEl) snapshotLabelEl.textContent = (j.cityName ? jurisdictionLabel(j) : 'Citywide') + ' Snapshot';
   }
 }
 
@@ -2399,6 +2341,11 @@ async function loadBig3(){
    ===================================================================== */
 let matrixData = null;
 const SLA_TARGET_HOURS = 24;
+// Ward Health Index tile on the geolocated City Snapshot — the same
+// cities{} seed value the Analytics deep-dive's Citywide Health Index
+// card already shows (see syncDashboardToJurisdiction() below), not a
+// second number. Defaults to La Crosse's while jurisdiction is pending.
+let currentWardHealth = cities.lacrosse.health;
 
 function sparkline(points, color){
   const vals = (points || []).filter(v => v != null);
@@ -2457,7 +2404,7 @@ function renderMatrixView(){
   const grid = document.getElementById('matrixGrid');
   if (!grid || !matrixData) return;
 
-  grid.innerHTML = MATRIX_METRIC_DEFS.map(m => {
+  const metricCells = MATRIX_METRIC_DEFS.map(m => {
     const val = matrixData[m.key];
     const display = val == null ? 'N/A' : (val + m.unit);
     let body;
@@ -2474,6 +2421,20 @@ function renderMatrixView(){
       <div class="matrix-cell-viz">${body}</div>
     </button>`;
   }).join('');
+
+  // Ward Health Index — 4th tile, sourced from the cities{} seed value
+  // (currentWardHealth, kept in sync with the resolved jurisdiction by
+  // syncDashboardToJurisdiction()), not from the matrixData/big3 payload.
+  // A plain div, not a .matrix-cell button, so it stays outside the
+  // #matrixGrid click-delegated deep-dive modal below (which expects a
+  // matrixData[key] + trend that this tile doesn't have).
+  const healthCell = `<div class="matrix-cell">
+    <div class="matrix-cell-val" style="color:#00ff88">${currentWardHealth != null ? esc(String(currentWardHealth)) : 'N/A'}</div>
+    <div class="matrix-cell-lbl">Ward Health Index</div>
+    <div class="matrix-cell-viz">${progressMeter(currentWardHealth, '#00ff88')}</div>
+  </div>`;
+
+  grid.innerHTML = metricCells + healthCell;
 }
 
 /* ===== MATRIX CELL DEEP-DIVE MODAL — "clicking any individual cell opens
@@ -2543,17 +2504,18 @@ function renderReportOutput(){
   const officialEl = document.getElementById('reportOfficialMode');
   if (!out || !tfEl || !fmtEl || !officialEl || !matrixData) return;
 
-  const tfLabel = { week: 'This Week', month: 'This Month', ytd: 'Year to Date' }[tfEl.value] || tfEl.value;
+  const tfLabel = { '30d': '30 Days', '90d': '90 Days', ytd: 'Year to Date' }[tfEl.value] || tfEl.value;
   const format = fmtEl.value;
   const officialMode = officialEl.checked;
 
-  let html = `<div class="report-meta">${esc(tfLabel)} · ${format === 'matrix' ? '3×3 Visual Summary' : 'Raw Audit Ledger'}</div>`;
+  let html = `<div class="report-meta">${esc(tfLabel)} · ${format === 'matrix' ? 'Visual Summary' : 'Raw SHA-256 Audit Ledger'}</div>`;
 
   if (format === 'matrix') {
     html += `<div class="report-matrix-summary">
       <div>Active Hazards: <strong style="color:#ffbb00">${matrixData.activeCount != null ? matrixData.activeCount : 'N/A'}</strong></div>
       <div>Fix Speed: <strong style="color:#00ff88">${matrixData.avgResolutionHours != null ? matrixData.avgResolutionHours + 'h' : 'N/A'}</strong></div>
       <div>Completion Rate: <strong style="color:#00ff88">${matrixData.verificationRatePct != null ? matrixData.verificationRatePct + '%' : 'N/A'}</strong></div>
+      <div>Ward Health Index: <strong style="color:#00ff88">${currentWardHealth != null ? currentWardHealth + ' / 100' : 'N/A'}</strong></div>
     </div>`;
   } else {
     html += `<table class="report-ledger-table"><tbody>` + REPORT_DEPT_ROWS.map(row => {
@@ -2863,193 +2825,12 @@ if (ledgerSearchInputEl) ledgerSearchInputEl.addEventListener('input', () => {
   renderLedgerResults();
 });
 
-/* ===================================================================
-   MUNICIPAL ONBOARDING WIZARD (index.html)
-   -------------------------------------------------------------------
-   Every "integration" here (boundary lookup, ERP link, webhook ping) is
-   simulated client-side — this codebase has no real municipal-boundary
-   API, ERP connector, or webhook receiver anywhere in this codebase
-   (api/_lib/store.js is the only "backend," and it's an in-memory demo
-   seed as documented throughout this page). Every indicator in this
-   wizard says so plainly rather than implying a live integration that
-   isn't there. Nothing here writes to store.js or provisions a real
-   jurisdiction; "Deploy" only renders a client-side summary.
-   =================================================================== */
-const WIZARD_TOTAL_STEPS = 5;
-let wizardCurrentStep = 1;
-let wizardPingOk = false;
-let wizardDeployed = false;
-
-function renderWizardStepDots(){
-  const dotsEl = document.getElementById('wizardStepDots');
-  if (!dotsEl) return;
-  let html = '';
-  for (let i = 1; i <= WIZARD_TOTAL_STEPS; i++) {
-    let cls = 'wizard-step-dot';
-    if (i < wizardCurrentStep) cls += ' done';
-    else if (i === wizardCurrentStep) cls += ' current';
-    html += `<span class="${cls}"></span>`;
-  }
-  dotsEl.innerHTML = html;
-  const labels = {
-    1: 'Step 1 of 5 — Jurisdiction',
-    2: 'Step 2 of 5 — ERP Integration',
-    3: 'Step 3 of 5 — API Webhook',
-    4: 'Step 4 of 5 — Guardrail Configuration',
-    5: 'Step 5 of 5 — Deployment'
-  };
-  const labelEl = document.getElementById('wizardStepLabel');
-  if (labelEl) labelEl.textContent = labels[wizardCurrentStep] || '';
-}
-
-function showWizardStep(step){
-  wizardCurrentStep = Math.max(1, Math.min(WIZARD_TOTAL_STEPS, step));
-  document.querySelectorAll('.wizard-panel').forEach(panel => {
-    panel.classList.toggle('active', Number(panel.dataset.step) === wizardCurrentStep);
-  });
-  renderWizardStepDots();
-  const backBtn = document.getElementById('wizBackBtn');
-  const nextBtn = document.getElementById('wizNextBtn');
-  if (backBtn) backBtn.style.visibility = wizardCurrentStep === 1 ? 'hidden' : 'visible';
-  if (nextBtn) nextBtn.textContent = wizardCurrentStep === WIZARD_TOTAL_STEPS ? 'Finish' : 'Next';
-}
-
-function openOnboardingWizard(){
-  wizardCurrentStep = 1;
-  wizardPingOk = false;
-  wizardDeployed = false;
-  const jn = document.getElementById('wizJurisdictionName'); if (jn) jn.value = '';
-  const zp = document.getElementById('wizZip'); if (zp) zp.value = '';
-  const boundaryEl = document.getElementById('wizBoundaryIndicator');
-  if (boundaryEl) boundaryEl.innerHTML = '<span class="wizard-sim-dot"></span><span>Enter a name and ZIP to run the boundary lookup.</span>';
-  const erpSel = document.getElementById('wizErpVendor'); if (erpSel) erpSel.value = '';
-  const erpNote = document.getElementById('wizErpNote');
-  if (erpNote) erpNote.textContent = 'Selection recorded for your provisioning summary.';
-  const tokenEl = document.getElementById('wizApiToken'); if (tokenEl) tokenEl.value = '';
-  const pingEl = document.getElementById('wizPingIndicator');
-  if (pingEl) pingEl.innerHTML = '<span class="wizard-sim-dot"></span><span>Not tested yet.</span>';
-  ['wizToggleBlur','wizToggle911','wizToggleRow'].forEach(id => { const t = document.getElementById(id); if (t) t.checked = true; });
-  const deployProgress = document.getElementById('wizDeployProgress'); if (deployProgress) deployProgress.classList.remove('active');
-  const summaryEl = document.getElementById('wizSummary'); if (summaryEl) { summaryEl.style.display = 'none'; summaryEl.innerHTML = ''; }
-  const deployBtn = document.getElementById('wizDeployBtn'); if (deployBtn) { deployBtn.disabled = false; deployBtn.textContent = 'Deploy CITIXEN Stack'; }
-  showWizardStep(1);
-  document.getElementById('wizardOverlay').classList.add('open');
-}
-function closeOnboardingWizard(){
-  document.getElementById('wizardOverlay').classList.remove('open');
-}
-// The footer's "Municipal Onboarding Portal" button was removed outright
-// per this round's footer-cleanup spec; its wiring is removed with it.
-// Operations drawer's "Civic Stack Integrations & Administrative Data"
-// card opens the same real onboarding-config screen, not a separate one.
-const btnOpenOnboardingFromOpsEl = document.getElementById('btnOpenOnboardingFromOps');
-if (btnOpenOnboardingFromOpsEl) btnOpenOnboardingFromOpsEl.addEventListener('click', openOnboardingWizard);
-const wizardCloseBtnEl = document.getElementById('wizardCloseBtn');
-if (wizardCloseBtnEl) wizardCloseBtnEl.addEventListener('click', closeOnboardingWizard);
-const wizardOverlayEl = document.getElementById('wizardOverlay');
-if (wizardOverlayEl) wizardOverlayEl.addEventListener('click', (e) => { if (e.target.id === 'wizardOverlay') closeOnboardingWizard(); });
-
-/* Step 1 — simulated boundary lookup: purely derived from what was typed,
-   no geocoding service is called. */
-function updateWizardBoundaryIndicator(){
-  const nameEl = document.getElementById('wizJurisdictionName');
-  const zipEl = document.getElementById('wizZip');
-  const boundaryEl = document.getElementById('wizBoundaryIndicator');
-  if (!nameEl || !zipEl || !boundaryEl) return;
-  const name = nameEl.value.trim();
-  const zip = zipEl.value.trim();
-  if (name.length > 1 && /^\d{5}$/.test(zip)) {
-    boundaryEl.innerHTML = '<span class="wizard-sim-dot ok"></span><span>Boundary estimated for <strong>' + name.replace(/</g,'&lt;') + '</strong> (ZIP ' + zip + ') — demo shape only, not a real municipal-boundary lookup.</span>';
-  } else if (name.length > 1 || zip.length > 0) {
-    boundaryEl.innerHTML = '<span class="wizard-sim-dot"></span><span>Keep typing a full name and 5-digit ZIP to estimate a boundary…</span>';
-  } else {
-    boundaryEl.innerHTML = '<span class="wizard-sim-dot"></span><span>Enter a name and ZIP to run the boundary lookup.</span>';
-  }
-}
-const wizJurisdictionNameEl = document.getElementById('wizJurisdictionName');
-if (wizJurisdictionNameEl) wizJurisdictionNameEl.addEventListener('input', updateWizardBoundaryIndicator);
-const wizZipEl = document.getElementById('wizZip');
-if (wizZipEl) wizZipEl.addEventListener('input', updateWizardBoundaryIndicator);
-
-/* Step 2 — ERP vendor note updates per selection, still no live connector. */
-const wizErpVendorEl = document.getElementById('wizErpVendor');
-if (wizErpVendorEl) wizErpVendorEl.addEventListener('change', () => {
-  const noteEl = document.getElementById('wizErpNote');
-  if (!noteEl) return;
-  const label = wizErpVendorEl.options[wizErpVendorEl.selectedIndex] ? wizErpVendorEl.options[wizErpVendorEl.selectedIndex].text : '';
-  if (!wizErpVendorEl.value) {
-    noteEl.textContent = 'Selection recorded for your provisioning summary.';
-  } else if (wizErpVendorEl.value === 'standalone') {
-    noteEl.textContent = 'Standalone mode selected — CITIXEN UX™ will not attempt to hand off work orders to any external ERP.';
-  } else {
-    noteEl.textContent = 'No live ' + label + ' connector exists in this codebase yet — this records your selection for the provisioning summary only.';
-  }
-});
-
-/* Step 3 — simulated bi-directional ping test, no network round trip. */
-const wizTestPingBtnEl = document.getElementById('wizTestPingBtn');
-if (wizTestPingBtnEl) wizTestPingBtnEl.addEventListener('click', () => {
-  const pingEl = document.getElementById('wizPingIndicator');
-  const tokenEl = document.getElementById('wizApiToken');
-  if (!pingEl) return;
-  const hasToken = tokenEl && tokenEl.value.trim().length > 0;
-  pingEl.innerHTML = '<span class="wizard-sim-dot"></span><span>Pinging…</span>';
-  setTimeout(() => {
-    if (hasToken) {
-      wizardPingOk = true;
-      pingEl.innerHTML = '<span class="wizard-sim-dot ok"></span><span>Simulated ping OK — no real webhook receiver exists behind this token.</span>';
-    } else {
-      wizardPingOk = false;
-      pingEl.innerHTML = '<span class="wizard-sim-dot"></span><span>Enter a token first — nothing to ping yet.</span>';
-    }
-  }, 700);
-});
-
-/* Step navigation */
-const wizBackBtnEl = document.getElementById('wizBackBtn');
-if (wizBackBtnEl) wizBackBtnEl.addEventListener('click', () => { if (wizardCurrentStep > 1) showWizardStep(wizardCurrentStep - 1); });
-const wizNextBtnEl = document.getElementById('wizNextBtn');
-if (wizNextBtnEl) wizNextBtnEl.addEventListener('click', () => {
-  if (wizardCurrentStep < WIZARD_TOTAL_STEPS) { showWizardStep(wizardCurrentStep + 1); return; }
-  closeOnboardingWizard();
-});
-
-/* Step 5 — simulated deploy: builds a client-side summary only. */
-const wizDeployBtnEl = document.getElementById('wizDeployBtn');
-if (wizDeployBtnEl) wizDeployBtnEl.addEventListener('click', () => {
-  if (wizardDeployed) return;
-  wizardDeployed = true;
-  wizDeployBtnEl.disabled = true;
-  const progressEl = document.getElementById('wizDeployProgress');
-  const statusEl = document.getElementById('wizDeployStatus');
-  const summaryEl = document.getElementById('wizSummary');
-  if (progressEl) progressEl.classList.add('active');
-  if (statusEl) statusEl.innerHTML = '<span class="wizard-sim-dot"></span><span>Provisioning Geo-Hatch grid…</span>';
-  setTimeout(() => {
-    if (statusEl) statusEl.innerHTML = '<span class="wizard-sim-dot ok"></span><span>Geo-Hatch grid provisioned (simulated) — no live jurisdiction was created.</span>';
-    const name = (document.getElementById('wizJurisdictionName') || {}).value || 'Unnamed jurisdiction';
-    const zip = (document.getElementById('wizZip') || {}).value || '—';
-    const erpSel = document.getElementById('wizErpVendor');
-    const erpLabel = erpSel && erpSel.value ? erpSel.options[erpSel.selectedIndex].text : 'Not selected';
-    const tokenEl = document.getElementById('wizApiToken');
-    const tokenState = tokenEl && tokenEl.value.trim() ? (wizardPingOk ? 'Provided — simulated ping OK' : 'Provided — not pinged') : 'Not provided';
-    const blurOn = document.getElementById('wizToggleBlur').checked;
-    const redirectOn = document.getElementById('wizToggle911').checked;
-    const rowOn = document.getElementById('wizToggleRow').checked;
-    if (summaryEl) {
-      summaryEl.style.display = 'block';
-      summaryEl.innerHTML =
-        '<div class="wizard-summary-row"><span>Jurisdiction</span><strong>' + String(name).replace(/</g,'&lt;') + ' (' + String(zip).replace(/</g,'&lt;') + ')</strong></div>' +
-        '<div class="wizard-summary-row"><span>ERP Vendor</span><strong>' + erpLabel + '</strong></div>' +
-        '<div class="wizard-summary-row"><span>API Webhook Token</span><strong>' + tokenState + '</strong></div>' +
-        '<div class="wizard-summary-row"><span>Auto-PII Blur</span><strong>' + (blurOn ? 'On' : 'Off') + '</strong></div>' +
-        '<div class="wizard-summary-row"><span>911 Emergency Redirect</span><strong>' + (redirectOn ? 'On' : 'Off') + '</strong></div>' +
-        '<div class="wizard-summary-row"><span>ROW Filtering</span><strong>' + (rowOn ? 'On' : 'Off') + '</strong></div>' +
-        '<div class="small" style="color:var(--muted);margin-top:10px">Demo summary only — this does not create a live jurisdiction, connect an ERP, or register a webhook. api/_lib/store.js remains this project\'s only backend, and it is still an in-memory demo seed.</div>';
-    }
-    if (wizDeployBtnEl) wizDeployBtnEl.textContent = '✓ Deployed (Preview)';
-  }, 1400);
-});
+// ===== The Municipal Onboarding Wizard (previously ~190 lines here: step
+// navigation, boundary/ERP/webhook-ping simulation, and deploy-summary
+// rendering) was removed entirely per this round's Operations-drawer
+// cleanup instruction — its #wizardOverlay modal markup and its
+// Operations-drawer trigger button were removed with it, so no dead
+// wiring remains.
 
 window.addEventListener('DOMContentLoaded',()=>{
   renderFeed();
