@@ -341,14 +341,6 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   .hub-card-title{font-size:.72rem}
   .hub-card-sub{font-size:.64rem !important}
 }
-/* Below ~400px the "UPDATED MM/DD/YY • H:MM AM/PM TZ" caveat is too wide to
-   share a row with the centered jurisdiction title without colliding, so it
-   drops out of the top-right corner and stacks underneath instead. */
-@media (max-width:420px){
-  .telemetry-scorecard-head{flex-direction:column;padding-right:0}
-  .telemetry-scorecard-timestamp{position:static;margin-top:4px}
-}
-
 .hud-grid{display:grid;grid-template-columns:0.8fr 1.2fr;gap:16px;max-width:980px;margin:0 auto 40px;padding:0 24px}
 .hud-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;text-align:left}
 .hud-card .label{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:14px}
@@ -381,27 +373,25 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 /* Dual side-by-side status pills (this round's item 3.3) — both pills
    share the same .nav-jurisdiction-badge look; this row just lays them out
    side by side and lets them wrap/shrink gracefully on narrow screens. */
-/* ===== GEOTAGGED LOCAL TELEMETRY SCORECARD (this round's item 4) — a
-   single full-width card replacing an earlier round's dual pill row, using
-   the same Deep Midnight Navy glass + Laser Mint keyline surface tokens as
-   every other card on the page. Its header doubles as the real
-   jurisdiction/Change-Location trigger. This round's "Zero Neon Bloom" +
-   "Calm Base, Centered Title" spec retires the breathing telemetryGlow
-   animation and centers the now-plain, dot-free header text; the card's
-   corner radius is standardized to 12px alongside the Live Public Ledger
-   pill and the Civic Intelligence Stack buttons. ===== */
+/* ===== GEOTAGGED LOCAL TELEMETRY SCORECARD — a single full-width card
+   replacing an earlier round's dual pill row. Its header doubles as the
+   real jurisdiction/Change-Location trigger. This round's item 2.3
+   "Command Banner Keyline" gives this one card its own explicit opaque
+   Deep Midnight Navy fill and a stronger 0.4-opacity Laser Mint keyline
+   (rgba(0,230,153,.4)) instead of the shared translucent glass surface
+   tokens every other card uses — an intentionally more "executive" frame
+   for the header metric. Corner radius stays the standardized 12px shared
+   with the Live Public Ledger pill and the Civic Intelligence Stack
+   buttons. ===== */
 .telemetry-scorecard-card{display:block;width:100%;max-width:640px;text-align:left;
-  background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);
+  background:#090D16;border:1px solid rgba(0,230,153,.4);
   border-radius:12px;padding:14px 18px;cursor:pointer;font-family:inherit;color:var(--text)}
-.telemetry-scorecard-head{position:relative;display:flex;align-items:center;justify-content:center;color:var(--mint2);
-  font-size:.72rem;font-weight:800;letter-spacing:.04em;margin-bottom:12px;text-align:center;padding-right:54px}
-/* This round's item 2.3 "Real-Time Timestamp Caveat" — a small muted
-   freshness readout pinned to the top-right corner of the header
-   container, reflecting the real local time updateTelemetryScorecard()
-   last ran (see renderScorecardTimestamp() below), not a fabricated
-   "live" claim. */
-.telemetry-scorecard-timestamp{position:absolute;top:0;right:0;color:#94A3B8;
-  font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.02em;white-space:nowrap}
+/* This round's item 2.3 "Clean Header": plain centered Bright White title,
+   no absolute-positioned or overlaid elements of any kind in this row —
+   the timestamp caveat moved out to its own centered row below the metric
+   grid instead (see .telemetry-scorecard-timestamp further down). */
+.telemetry-scorecard-head{display:flex;align-items:center;justify-content:center;color:#FFFFFF;
+  font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:12px;text-align:center}
 .telemetry-scorecard-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center}
 /* This round's item 2.3 "full 2D flex/grid centering" — each column is its
    own flex column so a metric value and its label stay centered both
@@ -415,6 +405,14 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .telemetry-scorecard-col:not(:first-child){border-left:1px solid rgba(0,230,153,.2)}
 .telemetry-scorecard-val{font-size:1.15rem;font-weight:800;color:#00E699}
 .telemetry-scorecard-lbl{font-size:.64rem;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.03em}
+/* This round's item 2.3 "Bottom Centered Timestamp" — the freshness
+   caveat moves out of the header (now header-clean, no overlaid text) to
+   its own centered row directly beneath the metric columns, inside the
+   same card container. Real local wall-clock reading of when
+   updateTelemetryScorecard() last ran (see renderScorecardTimestamp()),
+   not a fabricated live-feed claim. */
+.telemetry-scorecard-timestamp{display:block;width:100%;text-align:center;padding-top:10px;
+  color:#94A3B8;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.02em}
 
 /* ===== "HOW YOUR REPORT MOVES" RADIAL NUCLEUS CARD — replaces an earlier
    round's now-superseded standalone "Civic Memory™" concept card (its
@@ -1367,18 +1365,21 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        * Avg City Response (renamed this round from "Avg SLA Response" for
          plain-English clarity) — average resolutionHours across this
          city's resolved tickets, converted to days.
-       This round's item 2.3 adds a "Real-Time Timestamp Caveat"
-       (#scorecardTimestamp) pinned to the header's top-right corner — a
-       real local wall-clock readout (see renderScorecardTimestamp()),
-       refreshed whenever updateTelemetryScorecard() runs and on its own
-       ticking interval, honestly captioning these metrics as
-       last-updated-at-this-moment rather than implying a live data feed
-       this dataset doesn't have. ===== -->
+       This round's item 2.3 "Command Banner Keyline + Centered Bottom
+       Timestamp" moves the "Real-Time Timestamp Caveat"
+       (#scorecardTimestamp) out of the header — which must now stay a
+       clean, plain centered title with no overlaid or absolute-positioned
+       elements — down to its own centered row directly beneath the metric
+       grid, still inside the same card. Real local wall-clock readout (see
+       renderScorecardTimestamp()), refreshed whenever
+       updateTelemetryScorecard() runs and on its own ticking interval,
+       honestly captioning these metrics as last-updated-at-this-moment
+       rather than implying a live data feed this dataset doesn't have.
+       ===== -->
   <section class="geo-pill-section" style="padding-top:8px;">
     <button type="button" class="telemetry-scorecard-card" id="navJurisdictionBadge" aria-label="Change your jurisdiction">
       <div class="telemetry-scorecard-head">
         <span id="navJurisdictionText">LA CROSSE, WI SCORECARD</span>
-        <span class="telemetry-scorecard-timestamp" id="scorecardTimestamp" aria-hidden="true"></span>
       </div>
       <div class="telemetry-scorecard-grid">
         <div class="telemetry-scorecard-col">
@@ -1394,6 +1395,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
           <div class="telemetry-scorecard-lbl">Avg City Response</div>
         </div>
       </div>
+      <span class="telemetry-scorecard-timestamp" id="scorecardTimestamp" aria-hidden="true"></span>
     </button>
   </section>
 
