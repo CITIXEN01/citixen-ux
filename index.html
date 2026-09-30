@@ -547,8 +547,11 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
    removed with its markup per the homepage-declutter spec. ===== */
 /* Crowd Save America™ Entry Hub welcome banner — sits at the top of the
    dedicated #csaWelcomeModal, above its static Gridded US Vector Map
-   graphic (this round's item 2.1 "Strict Graphic Asset Lock"). */
+   graphic. This round's "Big Title Header" adds a bold title above the
+   mission body text. */
 .agg-hub-welcome-banner{padding:18px 20px 4px;text-align:center;border-bottom:1px solid rgba(0,230,153,.15)}
+.agg-hub-welcome-title{color:#00E699;font-weight:800;font-size:1.15rem;letter-spacing:.04em;
+  text-transform:uppercase;margin-bottom:8px}
 .agg-hub-welcome-banner p{color:var(--muted);font-size:.82rem;line-height:1.5;max-width:640px;margin:0 auto 14px}
 .frontier-map-head{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
 .frontier-search-bar{flex:1;min-width:240px;position:relative}
@@ -1723,32 +1726,31 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   </section>
 
   <!-- ===== MANDATORY PAGE-LOAD POP-UP MODAL (Crowd Save America™ Grid Map)
-       — this round's "Immediate Execution" spec retires the previous
-       rounds' once-per-browser localStorage gate: this dedicated,
-       lightweight modal now auto-launches on EVERY page load (see the
-       unconditional setTimeout(openCsaWelcomeModal, ...) in
-       DOMContentLoaded below — no citixen_welcome_seen flag, read or
-       written, anywhere anymore), and embeds ONLY the stylized Gridded US
-       Vector Matrix Map (#welcomeMapGraphic, a static snapshot of the
-       exact same real asset as #national-pixel-map in the Analytics
-       drawer — see renderWelcomeMapGraphic()) with micro-shield matrix
-       nodes, plus its own "View Map ↗" trigger card (matching the
-       Analytics instance's real .pixel-map-view-trigger) — never the
+       — auto-launches on EVERY page load (see the unconditional
+       setTimeout(openCsaWelcomeModal, ...) in DOMContentLoaded below — no
+       citixen_welcome_seen flag, read or written, anywhere anymore), and
+       embeds ONLY the stylized Gridded US Vector Matrix Map
+       (#welcomeMapGraphic, a static snapshot of the exact same real asset
+       as #national-pixel-map in the Analytics drawer — see
+       renderWelcomeMapGraphic()) with micro-shield matrix nodes — never the
        interactive Leaflet/MapLibre Aggregation Hub map, its zoom controls,
-       or its search bar embedded directly in this popup. Clicking "View
-       Map ↗" here dismisses this modal and opens that real Aggregation Hub
-       as its own separate modal (#nationalHeatMapModal below), same as
-       every other real entry point into it. The CTA sits directly above
-       the graphic card per this round's spec. ===== -->
+       or its search bar. This round's "Strict Hierarchy Shift" adds a big
+       bold "CROWD SAVE AMERICA™" title above the mission body text
+       (#csaWelcomeTitle), removes the "View Map ↗" trigger a previous round
+       added to the bottom-right of the graphic card outright (that trigger
+       still exists on the Analytics-drawer instance of this same graphic —
+       only the welcome pop-up's copy loses it), and moves the single CTA
+       button to its own row directly BELOW the graphic card, renamed
+       "Enter CITIXEN Dashboard ↗". ===== -->
   <div class="modal-overlay" id="csaWelcomeModal">
     <div class="modal-box" style="max-width:640px;width:92vw;">
       <button class="modal-close" id="csaWelcomeCloseBtn">✕</button>
       <div class="agg-hub-welcome-banner">
+        <div class="agg-hub-welcome-title" id="csaWelcomeTitle">Crowd Save America<sup class="tm-symbol">™</sup></div>
         <p>Restoring ground-truth transparency across all 50 states. Crowd Save America<sup class="tm-symbol">™</sup> turns everyday observations into verified, on-device scrubbed records — an undeniable, real-time audit of American infrastructure.</p>
-        <button type="button" class="btn btn-primary" id="csaEnterDashboardBtn" style="justify-content:center;">Enter Local Dashboard ↗</button>
       </div>
       <section class="pixel-map-section" style="margin:0 auto 18px;padding:0 18px;max-width:none;">
-        <div class="pixel-map-card" style="padding:16px 16px 0;">
+        <div class="pixel-map-card" style="padding:16px;">
           <svg class="pixel-map-svg" id="welcomeMapGraphic" viewBox="0 0 800 440" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
             <defs>
               <path id="welcomeSilhouetteOutline" d="M760.0,60.1 L738.9,21.8 L722.8,20.4 L711.9,67.1 L653.5,82.4 L640.7,116.4 L569.9,161.2 L555.7,152.5 L563.7,118.5 L548.7,123.6 L552.4,99.2 L533.4,90.4 L509.3,162.7 L503.5,100.7 L527.9,82.4 L552.0,85.0 L496.5,75.1 L499.5,61.2 L448.7,78.0 L473.2,57.6 L415.1,33.9 L302.7,42.6 L69.9,31.3 L68.1,58.0 L45.1,41.5 L45.4,207.2 L62.6,246.3 L126.1,309.4 L208.6,330.2 L264.8,321.1 L304.6,369.3 L333.0,360.9 L372.4,415.6 L391.8,419.3 L387.8,387.9 L404.6,365.6 L441.8,348.5 L490.0,358.7 L479.0,344.1 L507.1,332.8 L568.1,341.5 L617.7,417.1 L626.1,394.8 L597.6,330.9 L603.8,312.0 L681.6,229.9 L655.3,198.1 L664.8,174.4 L678.3,185.7 L682.3,145.9 L732.3,126.2 L717.3,99.2 Z"/>
@@ -1760,11 +1762,9 @@ audio.pw-audio-el{width:100%;margin-top:4px}
             <use href="#welcomeSilhouetteOutline" class="pixel-map-outline"/>
             <g id="welcomeMapNodes"></g>
           </svg>
-          <div class="pixel-map-action-row">
-            <button id="welcomeMapViewTrigger" type="button" class="pixel-map-view-trigger">View Map ↗</button>
-          </div>
         </div>
       </section>
+      <button type="button" class="btn btn-primary" id="csaEnterDashboardBtn" style="justify-content:center;width:calc(100% - 36px);margin:0 18px 18px;">Enter CITIXEN Dashboard ↗</button>
     </div>
   </div>
 
@@ -3116,19 +3116,17 @@ document.getElementById('csaEnterDashboardBtn').addEventListener('click', closeC
 document.getElementById('csaWelcomeModal').addEventListener('click', (e) => {
   if (e.target.id === 'csaWelcomeModal') closeCsaWelcomeModal();
 });
-// This round's "View Map ↗" trigger card inside the welcome modal's own
-// graphic — dismisses the welcome modal (marking it seen, same as any
-// other dismiss path) and opens the real Aggregation Hub, rather than
-// embedding any interactive map inside the welcome popup itself.
-document.getElementById('welcomeMapViewTrigger').addEventListener('click', () => {
-  closeCsaWelcomeModal();
-  openHeatMapModal();
-});
-// Heat map access lives on the top-level Aggregation Map Gateway button, the
-// welcome modal's own "View Map ↗" trigger above, and inside the Analytics
-// drawer — the old Operations-drawer launchers (radarSweepFromStack,
-// btnViewHeatMapFromStack) were removed in an earlier round with their
-// markup, so only these three triggers remain.
+// This round's "Remove Floating Trigger" spec strips the welcome modal's
+// own "View Map ↗" button outright (a previous round's
+// #welcomeMapViewTrigger and its click handler are both gone) — the
+// welcome pop-up's single action is now the "Enter CITIXEN Dashboard ↗"
+// button above, wired to closeCsaWelcomeModal() only. The Analytics-drawer
+// instance of this same graphic (#national-pixel-map) keeps its own real
+// "View Map ↗" trigger unchanged.
+// Heat map access lives on the top-level Aggregation Map Gateway button and
+// inside the Analytics drawer — the old Operations-drawer launchers
+// (radarSweepFromStack, btnViewHeatMapFromStack) were removed in an earlier
+// round with their markup, so only these two triggers remain.
 const viewHeatMapFromAnalyticsBtn = document.getElementById('btnViewHeatMapFromAnalytics');
 if (viewHeatMapFromAnalyticsBtn) viewHeatMapFromAnalyticsBtn.addEventListener('click', openHeatMapModal);
 // "Crowd Source America™ — Aggregation Hub" trigger (now a
