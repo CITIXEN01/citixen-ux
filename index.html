@@ -375,7 +375,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .civic-triad-svg{width:100%;height:auto;max-width:320px;margin:0 auto;display:block}
 .civic-triad-node-label{fill:#f8fafc;font-size:10.5px;font-weight:700;text-anchor:middle}
 .civic-triad-node-sub{fill:#94A3B8;font-size:8px;text-anchor:middle}
-.civic-triad-spoke{stroke:#00E699;stroke-width:1.6;opacity:.75}
+.civic-triad-spoke{stroke:#00E699;stroke-width:1.6;opacity:.75;stroke-dasharray:4,4}
 .civic-triad-node-circle{fill:rgba(0,230,153,.1);stroke:#00E699;stroke-width:1.5}
 .civic-triad-root-circle{fill:rgba(0,230,153,.16);stroke:#00E699;stroke-width:1.8}
 /* Static second ring (this round's "double-ringed" nucleus requirement) —
@@ -539,6 +539,10 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .deepdive-close{background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;
   padding:6px 12px;font-size:.72rem;font-weight:700;cursor:pointer}
 .deepdive-close:hover{border-color:var(--mint2);color:var(--mint2)}
+.deepdive-head-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.deepdive-export-btn{background:none;border:1px solid rgba(0,230,153,.4);color:#00E699;border-radius:8px;
+  padding:6px 12px;font-size:.72rem;font-weight:700;cursor:pointer}
+.deepdive-export-btn:hover{border-color:#00E699;filter:brightness(1.15)}
 .deepdive-cols{display:flex;gap:16px;max-width:900px;margin:0 auto;align-items:flex-start;flex-wrap:wrap}
 .deepdive-cols>*{flex:1;min-width:320px}
 .bridge-slogan{color:var(--muted);font-size:.82rem;font-style:italic;max-width:480px;margin:0 auto 12px;line-height:1.5}
@@ -603,6 +607,10 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .modal-box h4{font-size:.82rem;margin:14px 0 4px;color:var(--text)}
 .modal-box p{font-size:.78rem;color:var(--muted);line-height:1.55}
 .modal-close{float:right;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem}
+/* Welcome modal: dedicated close-button placement so it can't skew the
+   centered headline group (float:right on .modal-close wraps text asymmetrically). */
+#tourWelcomeOverlay .modal-box{position:relative}
+.tour-welcome-close{position:absolute;top:1rem;right:1.2rem;margin:0;float:none}
 
 /* ===== EXPORT CIVIC RECORD MODAL — a real preview built from the same
    loadBig3()/ledgerTickets data already on screen (see
@@ -982,7 +990,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
    also auto-launches once per browser via localStorage 'citixen_tour_seen'
    (see the DOMContentLoaded handler below). "Take 60s Guided Tour" starts
    a 4-step spotlight walkthrough over real, already-on-screen elements —
-   the Resident Field Unit node in the report-flow diagram above, the Live
+   the Resident node in the report-flow diagram above, the Live
    Public Ledger pill, the Crowd Save America map, and the Civic
    Intelligence Stack — nothing here is a fabricated flow. The sparkle
    glyph in the spec's trigger-pill copy is drawn as a clean inline SVG
@@ -1012,7 +1020,6 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 .tour-tooltip{position:absolute;max-width:280px;background:var(--surface-card-bg);backdrop-filter:blur(12px);
   border:var(--surface-card-border);border-radius:12px;padding:16px 18px;box-shadow:0 0 16px rgba(0,230,153,.25);
   transition:top .3s ease,left .3s ease}
-.tour-tooltip-step{color:#00E699;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
 .tour-tooltip-title{color:var(--text);font-size:.9rem;font-weight:800;margin-bottom:6px}
 .tour-tooltip-desc{color:var(--muted);font-size:.76rem;line-height:1.5;margin-bottom:14px}
 .tour-tooltip-actions{display:flex;justify-content:space-between;align-items:center;gap:8px}
@@ -1021,8 +1028,17 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 .tour-tooltip-actions .tour-next-btn{color:#00E699}
 .tour-tooltip-actions button:disabled{opacity:.35;cursor:default}
 .tour-dots{display:flex;align-items:center;gap:6px}
-.tour-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);transition:background .2s,transform .2s}
-.tour-dot.active{background:#00E699;transform:scale(1.35)}
+/* ● ○ ○ ○ pagination: the active dot reads solid/filled, inactive dots
+   render as hollow outlined rings (transparent fill, visible border) —
+   this replaces the plain "Step X of Y" text header this round removes. */
+.tour-dot{width:6px;height:6px;border-radius:50%;background:transparent;border:1.4px solid rgba(255,255,255,.35);
+  box-sizing:border-box;transition:background .2s,transform .2s,border-color .2s}
+.tour-dot.active{background:#00E699;border-color:#00E699;transform:scale(1.35)}
+/* Elevates the real spotlighted target element (not just the decorative
+   ring) above the dark backdrop overlay with a brightened glass fill, per
+   this round's "Target Elevation & Brightness" spec. Added/removed on the
+   real DOM target in positionTourStep()/endTour(). */
+.tour-target-elevated{position:relative;z-index:10001;background:rgba(0,230,153,.15)!important;border-radius:14px}
 
 /* The old Report Generator card (and its dedicated #reportGenerator-only
    @media print isolation rule) was removed outright in an earlier round —
@@ -1261,7 +1277,10 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     <div class="ledger-drawer-panel">
       <div class="ledger-drawer-head">
         <strong style="color:var(--mint2)">Civic Memory™ — Architecture &amp; Charter</strong>
-        <button class="modal-close" id="civicCharterCloseBtn">✕</button>
+        <div class="deepdive-head-actions">
+          <button class="deepdive-export-btn" data-export-context="the Civic Memory™ Architecture &amp; Charter" type="button">Export ↗</button>
+          <button class="modal-close" id="civicCharterCloseBtn">✕</button>
+        </div>
       </div>
       <div class="ledger-drawer-body">
         <div class="codex-tabs" role="tablist" aria-label="Charter section">
@@ -1406,36 +1425,33 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        outer halo, a static outer ring, and a solid inner circle, with the
        shield icon and the "CITIXEN UX™" wordmark both set directly inside
        the inner circle this round, rather than as a separate label
-       floating above it), with three equal-length, bi-directional vector
-       spokes radiating out to the same 3 real leaf nodes at 120° apart.
-       Each spoke's endpoints are trimmed via vector math to the nucleus's
-       outer ring (r=36) and each leaf's circle (r=26) edges along its own
-       direction unit vector, rather than drawn center-to-center, so no
-       line segment runs into either circle's
-       icon. Each leaf node name is a real, reachable part of this build,
-       not an invented pipeline: "Resident Field Unit" is the mobile
-       reporting flow (app.html) — and doubles as this page's AI Civic
-       Guide tour target (#reportTreeNodeResident) — "Public Ledger" is
-       the real #ledgerDrawer every submitted report becomes visible in,
-       and "Municipal Portal" is the Municipal engine button's Work
-       Orders & SLA Tracker panel below. ===== -->
+       floating above it), with three equal-length dashed vector spokes
+       radiating out to the same 3 real leaf nodes at 120° apart. Each
+       spoke's endpoints are trimmed via vector math to sit strictly 12px
+       outside both the nucleus's outer ring (r=36) and each leaf's circle
+       (r=26) along its own direction unit vector, rather than drawn
+       center-to-center or flush against either edge, so no dash segment
+       pokes into either circle's icon or labels (this replaces the
+       previous round's flush-to-edge solid arrow markers, now removed —
+       the spec no longer calls for arrowheads, just crisp dashed lines).
+       Each leaf node name is a real, reachable part of this build, not an
+       invented pipeline: "Resident" is the mobile reporting flow
+       (app.html) — and doubles as this page's AI Civic Guide tour target
+       (#reportTreeNodeResident) — "Public Ledger" is the real
+       #ledgerDrawer every submitted report becomes visible in, and
+       "Municipal Portal" is the Municipal engine button's Work Orders &
+       SLA Tracker panel below. ===== -->
   <section class="civic-triad-section">
     <div class="civic-triad-card">
       <div class="civic-triad-header">How Your Report Moves</div>
-      <svg class="civic-triad-svg" viewBox="0 0 320 310" role="img" aria-label="Diagram: a central CITIXEN UX nucleus radiates equally to Resident Field Unit, Public Ledger, and Municipal Portal">
-        <defs>
-          <marker id="triadSpokeArrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-            <path d="M0 0L10 5L0 10z" fill="#00E699"/>
-          </marker>
-        </defs>
-        <!-- Spokes are trimmed via vector math to the nucleus's OUTER ring
-             (r=36, this round's new double-ring edge) and each leaf's
-             circle (r=26) along each spoke's own direction unit vector,
-             rather than drawn center-to-center, so no line segment runs
-             into either circle's icon. -->
-        <line x1="160" y1="139" x2="160" y2="106" class="civic-triad-spoke" marker-start="url(#triadSpokeArrow)" marker-end="url(#triadSpokeArrow)"/>
-        <line x1="128.9" y1="193.2" x2="100.4" y2="209.9" class="civic-triad-spoke" marker-start="url(#triadSpokeArrow)" marker-end="url(#triadSpokeArrow)"/>
-        <line x1="191.1" y1="193.2" x2="219.6" y2="209.9" class="civic-triad-spoke" marker-start="url(#triadSpokeArrow)" marker-end="url(#triadSpokeArrow)"/>
+      <svg class="civic-triad-svg" viewBox="0 0 320 310" role="img" aria-label="Diagram: a central CITIXEN UX nucleus radiates equally to Resident, Public Ledger, and Municipal Portal">
+        <!-- Spokes: dashed (stroke-dasharray set on .civic-triad-spoke), each
+             trimmed 12px outside the nucleus's outer ring (r=36) and 12px
+             outside the leaf's circle (r=26) along the spoke's direction
+             unit vector, per this round's "strict boundary math" spec. -->
+        <line x1="160" y1="127" x2="160" y2="118" class="civic-triad-spoke"/>
+        <line x1="118.59" y1="199.24" x2="110.79" y2="203.81" class="civic-triad-spoke"/>
+        <line x1="201.41" y1="199.24" x2="209.21" y2="203.81" class="civic-triad-spoke"/>
         <!-- Double-ringed nucleus badge (this round's fix): a pulsing outer
              halo, a static outer ring (r=36) and the solid inner circle
              (r=32) together read as "double-ringed", with the shield icon
@@ -1455,7 +1471,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
           <circle cx="160" cy="80" r="26" class="civic-triad-node-circle"/>
           <path d="M160 68a6 6 0 1 0 0.001 0z" fill="none" stroke="#00E699" stroke-width="1.6"/>
           <path d="M148 94c2-7 7-11 12-11s10 4 12 11" fill="none" stroke="#00E699" stroke-width="1.6" stroke-linecap="round"/>
-          <text x="160" y="30" class="civic-triad-node-label">Resident Field Unit</text>
+          <text x="160" y="30" class="civic-triad-node-label">Resident</text>
           <text x="160" y="16" class="civic-triad-node-sub">Mobile report capture</text>
         </g>
         <g id="reportTreeNodeLedger">
@@ -1591,7 +1607,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         <span class="hub-card-text"><span class="hub-card-title">Analytics</span><span class="hub-card-sub" id="hubCoverageInfoBtn" role="button" tabindex="0" aria-label="What the Analytics section covers">— Data &amp; Reports</span></span>
       </span>
       <span class="hub-card-actions">
-        <span class="hub-card-arrow">View Analytics ↗</span>
+        <span class="hub-card-arrow">View / Export ↗</span>
       </span>
     </button>
     <button class="hub-card" id="hubSlaBtn" type="button" aria-expanded="false" aria-controls="civicStackSection">
@@ -1600,7 +1616,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         <span class="hub-card-text"><span class="hub-card-title">Expenditures</span><span class="hub-card-sub" id="hubSlaInfoBtn" role="button" tabindex="0" aria-label="What the Expenditures section covers">— Budget &amp; Public Works</span></span>
       </span>
       <span class="hub-card-actions">
-        <span class="hub-card-arrow">Export Audit ↗</span>
+        <span class="hub-card-arrow">View / Export ↗</span>
       </span>
     </button>
     <button class="hub-card" id="hubMunicipalBtn" type="button" aria-expanded="false" aria-controls="municipalPanel">
@@ -1609,7 +1625,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         <span class="hub-card-text"><span class="hub-card-title">Municipal</span><span class="hub-card-sub" id="hubMunicipalInfoBtn" role="button" tabindex="0" aria-label="What the Municipal section covers">— Work Orders &amp; SLA Tracker</span></span>
       </span>
       <span class="hub-card-actions">
-        <span class="hub-card-arrow">View Portal ↗</span>
+        <span class="hub-card-arrow">View / Export ↗</span>
       </span>
     </button>
     <button class="hub-card" id="hubStackBtn" type="button" aria-expanded="false" aria-controls="civicCharterDrawer">
@@ -1618,7 +1634,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         <span class="hub-card-text"><span class="hub-card-title">Civic Memory™</span><span class="hub-card-sub" id="hubStackInfoBtn" role="button" tabindex="0" aria-label="What the Civic Memory framework covers">— Architecture &amp; Charter</span></span>
       </span>
       <span class="hub-card-actions">
-        <span class="hub-card-arrow">View Charter ↗</span>
+        <span class="hub-card-arrow">View / Export ↗</span>
       </span>
     </button>
   </div>
@@ -1769,7 +1785,10 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   <section class="deepdive-panel" id="deepdiveAnalytics">
     <div class="deepdive-panel-head">
       <h3>Analytics &amp; Reporting</h3>
-      <button class="deepdive-close" data-close-panel="deepdiveAnalytics" type="button">Close ✕</button>
+      <div class="deepdive-head-actions">
+        <button class="deepdive-export-btn" data-export-context="Analytics &amp; Reporting" type="button">Export ↗</button>
+        <button class="deepdive-close" data-close-panel="deepdiveAnalytics" type="button">Close ✕</button>
+      </div>
     </div>
     <!-- ===== "COVER AMERICA" GEO-HATCH LAUNCHER + BRIDGE SLOGAN — per the
          buried-data-architecture spec, the heat map trigger lives strictly
@@ -1859,7 +1878,10 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   <section class="deepdive-panel civic-stack-section" id="civicStackSection">
     <div class="deepdive-panel-head">
       <h3>Expenditures &amp; Operations</h3>
-      <button class="deepdive-close" data-close-panel="civicStackSection" type="button">Close ✕</button>
+      <div class="deepdive-head-actions">
+        <button class="deepdive-export-btn" data-export-context="the CapEx Audit Ledger" type="button">Export ↗</button>
+        <button class="deepdive-close" data-close-panel="civicStackSection" type="button">Close ✕</button>
+      </div>
     </div>
     <p class="statement-sub">Municipal Expenditure Allocation, the CapEx Audit Ledger, and the Civic Stack integrations behind every verified fix.</p>
 
@@ -1926,7 +1948,10 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   <section class="deepdive-panel civic-stack-section" id="municipalPanel">
     <div class="deepdive-panel-head">
       <h3>Municipal — Work Orders &amp; SLA Tracker</h3>
-      <button class="deepdive-close" data-close-panel="municipalPanel" type="button">Close ✕</button>
+      <div class="deepdive-head-actions">
+        <button class="deepdive-export-btn" data-export-context="the Municipal Work Orders &amp; SLA Tracker" type="button">Export ↗</button>
+        <button class="deepdive-close" data-close-panel="municipalPanel" type="button">Close ✕</button>
+      </div>
     </div>
     <p class="statement-sub">Citywide asset coverage and per-ward case metrics for <span id="municipalCityLabel">La Crosse</span>, built from the same real reports the Live Public Ledger reads — not a connected municipal GIS asset system.</p>
 
@@ -2013,18 +2038,21 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 
   <!-- ===== AI CIVIC GUIDE — WELCOME MODAL. Reuses the shared .modal-box
        shell, with the two-tone "Welcome to CITIXEN " / "UX™" wordmark and
-       muted "Home of Civic Intelligence" subheader introduced last round.
-       This round restores a secondary "Explore Dashboard" CTA alongside
-       the primary "Take 30-Second Guided Tour" button (removed then
-       re-added across rounds as the spec's own button count changed) —
-       both, plus the ✕ close button, dismiss the modal and mark the tour
+       muted "HOME OF CIVIC INTELLIGENCE" subheader. The close button uses
+       a dedicated .tour-welcome-close (position:absolute, see CSS above)
+       instead of the shared .modal-close's float:right, which used to wrap
+       the h3 headline asymmetrically and skew the whole header group off
+       center. This round restores a secondary "Explore Dashboard" CTA
+       alongside the primary "Take 30-Second Guided Tour" button (removed
+       then re-added across rounds as the spec's own button count changed)
+       — both, plus the ✕ close button, dismiss the modal and mark the tour
        seen so it never auto-fires again on this browser; only the primary
        button also starts the spotlight walkthrough. ===== -->
   <div class="modal-overlay" id="tourWelcomeOverlay">
     <div class="modal-box" style="max-width:420px;text-align:center">
-      <button class="modal-close" id="tourWelcomeCloseBtn">✕</button>
+      <button class="modal-close tour-welcome-close" id="tourWelcomeCloseBtn">✕</button>
       <h3 style="margin-bottom:2px;"><span style="color:#FFFFFF">Welcome to CITIXEN </span><span style="color:#00E699">UX<sup class="tm-symbol">™</sup></span></h3>
-      <div style="color:#94A3B8;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:14px;">Home of Civic Intelligence</div>
+      <div style="color:#94A3B8;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;">HOME OF CIVIC INTELLIGENCE</div>
       <p>A completely free, zero-tracking platform connecting your real-time observations directly to civic accountability.</p>
       <div class="tour-welcome-actions">
         <button type="button" class="btn btn-primary btn-hero" id="tourStartBtn" style="margin:0">Take 30-Second Guided Tour</button>
@@ -2036,15 +2064,17 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   <!-- ===== AI CIVIC GUIDE — SPOTLIGHT TOUR OVERLAY. #tourSpotlightRing and
        #tourTooltip are repositioned in JS from each step's real target
        element's getBoundingClientRect() (see startTour()/showTourStep()
-       below) — never a hardcoded coordinate. This round adds a 4-dot
-       pagination row (#tourDots, built once from TOUR_STEPS.length) in
-       the middle of the bottom nav, between Skip and Prev/Next, per the
-       revised "[ Skip ] | ● ● ● ● | [ ← Prev ] [ Next → / Finish ]"
-       layout. ===== -->
+       below) — never a hardcoded coordinate. The "Step X of Y" text header
+       is removed per this round's spec; step progress is communicated
+       solely by the ● ○ ○ ○ pagination row (#tourDots, built once from
+       TOUR_STEPS.length) in the middle of the bottom nav, between Skip and
+       Prev/Next, per the "[ Skip ] | ● ○ ○ ○ | [ ← Prev ] [ Next → /
+       Finish ]" layout. The spotlighted target element itself (not just
+       this decorative ring) is elevated via .tour-target-elevated, added
+       in positionTourStep() and removed in endTour(). ===== -->
   <div class="tour-spotlight-overlay" id="tourSpotlightOverlay">
     <div class="tour-spotlight-ring" id="tourSpotlightRing"></div>
     <div class="tour-tooltip" id="tourTooltip">
-      <div class="tour-tooltip-step" id="tourTooltipStep">Step 1 of 4</div>
       <div class="tour-tooltip-title" id="tourTooltipTitle"></div>
       <div class="tour-tooltip-desc" id="tourTooltipDesc"></div>
       <div class="tour-tooltip-actions">
@@ -2068,6 +2098,45 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        uses to isolate just this card. ===== -->
   <div class="modal-overlay" id="exportRecordOverlay">
     <div class="export-record-box" id="exportRecordContent"></div>
+  </div>
+
+  <!-- ===== INTEGRATED SHARE &amp; EXPORT HUB (this round's item 5) — one
+       shared modal reachable from the new "Export ↗" button inside each of
+       the 4 Civic Intelligence Stack deep-dive panels (Analytics,
+       Expenditures, Municipal, Civic Memory). Every action is a real,
+       working capability rather than a fabricated one:
+       - "Print / Save to PDF" reuses the exact same real, already-built
+         Export Civic Record flow (openExportRecordModal()) instead of a
+         second print implementation.
+       - "Native System Share" calls the real Web Share API
+         (navigator.share) when the browser supports it, and says plainly
+         when it doesn't rather than pretending to share.
+       - X/Reddit/Facebook use real, standard public share-intent URLs.
+         Nextdoor has no such public web intent, so its button honestly
+         routes through the same native share sheet (where Nextdoor's own
+         app is one of the choices on a phone that has it installed)
+         rather than linking to a fabricated "share" endpoint.
+       - "Copy Permalink" copies this page's own real, current URL via
+         navigator.clipboard — not an invented per-record link scheme this
+         build doesn't have. ===== -->
+  <div class="modal-overlay" id="exportHubModal">
+    <div class="modal-box" style="max-width:420px;">
+      <button class="modal-close" id="exportHubCloseBtn">✕</button>
+      <h3>Share &amp; Export</h3>
+      <p id="exportHubContextLabel" style="margin-bottom:14px;">Share or export this record.</p>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <button type="button" class="btn btn-outline" id="exportHubPrintBtn" style="justify-content:center;">Print / Save to PDF</button>
+        <button type="button" class="btn btn-outline" id="exportHubShareBtn" style="justify-content:center;">Native System Share</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+          <a class="btn btn-outline" id="exportHubShareX" href="#" target="_blank" rel="noopener noreferrer" style="flex:1;min-width:120px;justify-content:center;">Share to X</a>
+          <a class="btn btn-outline" id="exportHubShareReddit" href="#" target="_blank" rel="noopener noreferrer" style="flex:1;min-width:120px;justify-content:center;">Share to Reddit</a>
+          <a class="btn btn-outline" id="exportHubShareFacebook" href="#" target="_blank" rel="noopener noreferrer" style="flex:1;min-width:120px;justify-content:center;">Share to Facebook</a>
+          <button type="button" class="btn btn-outline" id="exportHubShareNextdoor" style="flex:1;min-width:120px;justify-content:center;">Share to Nextdoor</button>
+        </div>
+        <button type="button" class="btn btn-primary" id="exportHubCopyLinkBtn" style="justify-content:center;">Copy Immutable Ledger Permalink</button>
+      </div>
+      <div class="small" id="exportHubStatus" style="margin-top:10px;text-align:center;color:var(--muted);min-height:14px;"></div>
+    </div>
   </div>
 
   <!-- ===== CENTERED MINIMAL FOOTER — the old 4-column sitemap link block
@@ -3826,6 +3895,60 @@ const csaExportPrintBtn = document.getElementById('footerExportRecordLink');
 if (csaExportPrintBtn) csaExportPrintBtn.addEventListener('click', () => openExportRecordModal());
 
 /* =====================================================================
+   INTEGRATED SHARE & EXPORT HUB (this round's item 5) — see the markup
+   comment on #exportHubModal for what each action really does and why.
+   ===================================================================== */
+function openExportHub(contextLabel){
+  document.getElementById('exportHubContextLabel').textContent = contextLabel ? ('Share or export ' + contextLabel + '.') : 'Share or export this record.';
+  const url = location.href;
+  document.getElementById('exportHubShareX').href = 'https://twitter.com/intent/tweet?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent('CITIXEN UX™ — real-time civic accountability');
+  document.getElementById('exportHubShareReddit').href = 'https://www.reddit.com/submit?url=' + encodeURIComponent(url) + '&title=' + encodeURIComponent('CITIXEN UX Civic Intelligence Platform');
+  document.getElementById('exportHubShareFacebook').href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
+  document.getElementById('exportHubStatus').textContent = '';
+  document.getElementById('exportHubModal').classList.add('open');
+}
+function closeExportHub(){
+  document.getElementById('exportHubModal').classList.remove('open');
+}
+document.querySelectorAll('.deepdive-export-btn').forEach(btn => {
+  btn.addEventListener('click', () => openExportHub(btn.dataset.exportContext));
+});
+document.getElementById('exportHubCloseBtn').addEventListener('click', closeExportHub);
+document.getElementById('exportHubModal').addEventListener('click', (e) => {
+  if (e.target.id === 'exportHubModal') closeExportHub();
+});
+document.getElementById('exportHubPrintBtn').addEventListener('click', () => {
+  closeExportHub();
+  openExportRecordModal();
+});
+async function shareViaWebShareApi(){
+  if (!navigator.share) return false;
+  try {
+    await navigator.share({ title: 'CITIXEN UX™ — Civic Intelligence', text: 'Real-time civic accountability, verified.', url: location.href });
+  } catch (err) { /* user cancelled the native share sheet — not an error */ }
+  return true;
+}
+document.getElementById('exportHubShareBtn').addEventListener('click', async () => {
+  const shared = await shareViaWebShareApi();
+  if (!shared) document.getElementById('exportHubStatus').textContent = 'Native share isn\'t supported in this browser — try Copy Permalink instead.';
+});
+document.getElementById('exportHubShareNextdoor').addEventListener('click', async () => {
+  const shared = await shareViaWebShareApi();
+  if (!shared) {
+    window.open('https://nextdoor.com', '_blank', 'noopener,noreferrer');
+    document.getElementById('exportHubStatus').textContent = 'Nextdoor has no direct share link on this browser — opened nextdoor.com instead.';
+  }
+});
+document.getElementById('exportHubCopyLinkBtn').addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(location.href);
+    document.getElementById('exportHubStatus').textContent = '✓ Link copied to clipboard.';
+  } catch (err) {
+    document.getElementById('exportHubStatus').textContent = 'Could not copy automatically — copy the link from your address bar.';
+  }
+});
+
+/* =====================================================================
    WARD HEALTH SUMMARY — ONE-CLICK PDF EXPORT (client-side, via jsPDF)
    -----------------------------------------------------------------
    Every figure in this export is pulled from the exact same sources this
@@ -4257,7 +4380,7 @@ document.getElementById('ledgerDeepAnalyticsLink').addEventListener('click', () 
    AI CIVIC GUIDE ONBOARDING TOUR (this round)
    -----------------------------------------------------------------
    Each step below targets a real element id already on this page — the
-   real pulsing Live Public Ledger pill, the Resident Field Unit node in
+   real pulsing Live Public Ledger pill, the Resident node in
    the "How Your Report Moves" diagram, the real Crowd Save America map
    card, and #civic-stack-container (the real Civic Intelligence Stack
    header + all 4 buttons, wrapped as one unit this round specifically so
@@ -4269,13 +4392,17 @@ document.getElementById('ledgerDeepAnalyticsLink').addEventListener('click', () 
    Civic Memory™ Architecture & Charter drawer's own "Spatial Hashing" tab
    for that same disclosure). ===================================================================== */
 const CITIXEN_TOUR_SEEN_KEY = 'citixen_tour_seen';
+// Step bodies use inline <span style="color:#00E699"> emphasis spans per this
+// round's spec, so positionTourStep() below renders .desc via innerHTML
+// (safe: every string here is author-authored, never user input).
 const TOUR_STEPS = [
-  { targetId: 'liveLedgerBanner', title: 'The Public Ledger', desc: 'The heart of Civic Intelligence. Every report, status update, and municipal action is etched into a live, unalterable record for complete community transparency.' },
-  { targetId: 'reportTreeNodeResident', title: 'Zero-Tracking Field Capture', desc: 'How reports enter the ledger. Photos and location data are stripped of all personal metadata on-device before submission — 100% anonymous proof.' },
-  { targetId: 'national-pixel-map', title: 'Crowd Save America™ Campaign', desc: 'The nationwide initiative powering real-time civic grid awareness. As residents log field reports in their hometowns, local cells light up across the national map. (Today\'s grid is ward-tier; H3 hexagonal spatial hashing is this architecture\'s roadmap target, not yet shipped.)' },
-  { targetId: 'civic-stack-container', title: 'Civic Intelligence Stack™', desc: 'Analytics, Expenditures, Municipal, and Civic Memory™ — four real dashboards, each one tap away.' }
+  { targetId: 'liveLedgerBanner', title: 'The Public Ledger', desc: '<span style="color:#00E699;">The heart of Civic Intelligence.</span> Every report, status update, and municipal action is etched into a live, unalterable record for complete community transparency.' },
+  { targetId: 'reportTreeNodeResident', title: 'Zero-Tracking Field Capture', desc: '<span style="color:#00E699;">How reports enter the ledger.</span> Photos and location data are stripped of all personal metadata on-device before submission — <span style="color:#00E699;">100% anonymous proof.</span>' },
+  { targetId: 'national-pixel-map', title: 'Crowd Save America™ Campaign', desc: '<span style="color:#00E699;">Taking back control of our communities.</span> Millions of Americans now share a live, unvarnished view of our national infrastructure. As citizens log local reports, active cells light up nationwide — turning local observation into <span style="color:#00E699;">unanimous civic power.</span> (Today\'s grid is ward-tier; H3 hexagonal spatial hashing is this architecture\'s roadmap target, not yet shipped.)' },
+  { targetId: 'civic-stack-container', title: 'Civic Intelligence Stack™', desc: '<span style="color:#00E699;">Four real dashboards, each one tap away.</span> Interconnected through CITIXEN UX™ to turn raw community data into an unstoppable tool for local accountability and civic action.' }
 ];
 let tourStepIndex = 0;
+let tourElevatedEl = null; // the real spotlighted DOM target currently carrying .tour-target-elevated
 function renderTourDots(i){
   const dotsEl = document.getElementById('tourDots');
   dotsEl.innerHTML = TOUR_STEPS.map((_, di) => '<span class="tour-dot' + (di === i ? ' active' : '') + '"></span>').join('');
@@ -4292,12 +4419,16 @@ function positionTourStep(i){
   ring.style.left = (rect.left - pad) + 'px';
   ring.style.width = (rect.width + pad * 2) + 'px';
   ring.style.height = (rect.height + pad * 2) + 'px';
-  document.getElementById('tourTooltipStep').textContent = 'Step ' + (i + 1) + ' of ' + TOUR_STEPS.length;
   document.getElementById('tourTooltipTitle').textContent = step.title;
-  document.getElementById('tourTooltipDesc').textContent = step.desc;
+  document.getElementById('tourTooltipDesc').innerHTML = step.desc;
   document.getElementById('tourPrevBtn').disabled = (i === 0);
   document.getElementById('tourNextBtn').textContent = (i === TOUR_STEPS.length - 1) ? 'Finish' : 'Next →';
   renderTourDots(i);
+  // Elevate the real spotlighted target element itself (not just the
+  // decorative ring) above the dark backdrop with a brightened glass fill.
+  if (tourElevatedEl && tourElevatedEl !== el) tourElevatedEl.classList.remove('tour-target-elevated');
+  el.classList.add('tour-target-elevated');
+  tourElevatedEl = el;
   // Place the tooltip below the target when there's room, otherwise above —
   // clamped so it never runs off either edge of the viewport.
   const spaceBelow = window.innerHeight - rect.bottom;
@@ -4322,6 +4453,7 @@ function startTour(){
 }
 function endTour(){
   document.getElementById('tourSpotlightOverlay').classList.remove('open');
+  if (tourElevatedEl) { tourElevatedEl.classList.remove('tour-target-elevated'); tourElevatedEl = null; }
 }
 function closeTourWelcome(){
   document.getElementById('tourWelcomeOverlay').classList.remove('open');
