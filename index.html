@@ -263,6 +263,22 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .hub-card-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .hub-card-arrow{font-size:.8rem;font-weight:600;color:#00E699;flex-shrink:0}
 .hub-card:hover{border-color:#00E699}
+/* ===== "LIVING TELEMETRY" TILE STYLE — layered on top of the shared
+   .hub-card shell, matching the Live Public Ledger pill's own dark glass +
+   breathing mint glow (see .ledger-pill-glow above) rather than the plain
+   translucent card surface the rest of the page uses. Dual-ring outline =
+   the mint border plus a second inset ring via box-shadow, both breathing
+   together in telemetryGlow. */
+.telemetry-card{background:rgba(3,7,18,.85);border:1px solid rgba(0,230,153,.35);
+  border-radius:14px;animation:telemetryGlow 3s ease-in-out infinite}
+@keyframes telemetryGlow{
+  0%,100%{box-shadow:0 0 14px rgba(0,230,153,.35),inset 0 0 0 1px rgba(0,230,153,.12)}
+  50%{box-shadow:0 0 20px rgba(0,230,153,.55),inset 0 0 0 1px rgba(0,230,153,.22)}
+}
+.telemetry-pulse-dot{position:relative;width:7px;height:7px;border-radius:50%;background:#00E699;
+  flex-shrink:0;box-shadow:0 0 6px #00E699;display:inline-block}
+.telemetry-pulse-dot::after{content:'';position:absolute;inset:-4px;border-radius:50%;
+  border:2px solid #00E699;animation:pulseEmerald 1.8s ease-out infinite}
 
 /* ===== CITIXEN UX™ INTERACTIVE FEATURE & SECURITY SECTION — rebuilt in an
    earlier round (item 4) from a static 3-column bullet grid into a
@@ -373,8 +389,8 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .civic-triad-header{color:#00E699;font-weight:800;font-size:.9rem;letter-spacing:.06em;
   text-transform:uppercase;margin-bottom:14px}
 .civic-triad-svg{width:100%;height:auto;max-width:320px;margin:0 auto;display:block}
-.civic-triad-node-label{fill:#f8fafc;font-size:10.5px;font-weight:700;text-anchor:middle}
-.civic-triad-node-sub{fill:#94A3B8;font-size:8px;text-anchor:middle}
+.civic-triad-node-label{fill:#FFFFFF;font-size:10.5px;font-weight:700;text-anchor:middle}
+.civic-triad-node-sub{fill:#9CA3AF;font-size:8px;text-anchor:middle}
 .civic-triad-spoke{stroke:#00E699;stroke-width:1.6;opacity:.75;stroke-dasharray:4,4}
 .civic-triad-node-circle{fill:rgba(0,230,153,.1);stroke:#00E699;stroke-width:1.5}
 .civic-triad-root-circle{fill:rgba(0,230,153,.16);stroke:#00E699;stroke-width:1.8}
@@ -915,7 +931,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
    and graphic both sit comfortably inside the frame with clear breathing
    room rather than crowding it. */
 .pixel-map-card{position:relative;display:flex;flex-direction:column;background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);border-radius:16px;overflow:hidden;box-shadow:0 0 12px rgba(0,230,153,.08);padding:20px 20px 0}
-.pixel-map-svg{width:100%;height:210px;display:block;flex-shrink:0;margin:0 auto}
+.pixel-map-svg{width:100%;height:210px;display:block;flex-shrink:0;margin:0 auto;cursor:pointer}
 .pixel-map-dot{opacity:.2;transition:fill .25s,opacity .4s}
 /* Grid fills pivoted from Emerald Green (#00E699) to Fresh Mint (#00E699)
    per this round's item 18. */
@@ -935,8 +951,14 @@ audio.pw-audio-el{width:100%;margin-top:4px}
    map. The "View Map ↗" trigger stays in a normal-flow action row BELOW
    the graphic (.pixel-map-action-row), anchored to the bottom-right
    corner of the same card frame. ===== */
-.pixel-map-brand{color:#00E699;font-weight:800;font-size:1.1rem;letter-spacing:.08em;
-  text-transform:uppercase;text-align:center;width:100%;margin-bottom:16px}
+.pixel-map-brand{color:#00E699;font-weight:800;font-size:1.4rem;letter-spacing:.08em;
+  text-transform:uppercase;text-align:center;width:100%;margin-bottom:16px;
+  background:none;border:none;font-family:inherit;cursor:pointer;padding:4px 0;
+  animation:csaTitlePulseGlow 3s ease-in-out infinite}
+@keyframes csaTitlePulseGlow{
+  0%,100%{text-shadow:0 0 6px rgba(0,230,153,.35)}
+  50%{text-shadow:0 0 18px rgba(0,230,153,.95),0 0 30px rgba(0,230,153,.5)}
+}
 .pixel-map-action-row{display:flex;justify-content:flex-end;align-items:center;
   flex-shrink:0;padding:14px 0 16px}
 .pixel-map-view-trigger{display:inline-flex;align-items:center;gap:6px;
@@ -985,27 +1007,17 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   border-radius:16px;padding:20px;text-align:center}
 .ticker-value{font-size:2.2rem;font-weight:900;color:var(--mint2);margin:8px 0}
 
-/* ===== AI CIVIC GUIDE ONBOARDING TOUR (this round) — a floating trigger
-   pill (bottom-right, always available) opens the same welcome modal that
-   also auto-launches once per browser via localStorage 'citixen_tour_seen'
-   (see the DOMContentLoaded handler below). "Take 60s Guided Tour" starts
-   a 4-step spotlight walkthrough over real, already-on-screen elements —
-   the Resident node in the report-flow diagram above, the Live
-   Public Ledger pill, the Crowd Save America map, and the Civic
-   Intelligence Stack — nothing here is a fabricated flow. The sparkle
-   glyph in the spec's trigger-pill copy is drawn as a clean inline SVG
-   per this session's standing no-OS-emoji rule rather than a pictographic
-   character. ===== */
-.ai-tour-pill{position:fixed;bottom:20px;right:20px;z-index:2400;display:inline-flex;align-items:center;gap:7px;
-  background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);
-  border-radius:9999px;padding:11px 18px;color:#00E699;font-family:inherit;font-weight:800;font-size:.76rem;
-  letter-spacing:.02em;cursor:pointer;box-shadow:0 0 14px rgba(0,230,153,.3);transition:filter .15s}
-.ai-tour-pill:hover{filter:brightness(1.18)}
-.ai-tour-pill svg{flex-shrink:0}
-.ai-tour-pill-divider{color:var(--muted);font-weight:400;margin:0 1px}
-@media (max-width:640px){
-  .ai-tour-pill{right:14px;bottom:14px;padding:9px 14px;font-size:.7rem}
-}
+/* ===== AI CIVIC GUIDE ONBOARDING TOUR — the standing floating trigger
+   pill this section used to style (.ai-tour-pill) was permanently removed
+   per this round's "Onboarding Tour Purge" item. The welcome modal now
+   only ever opens via a single first-visit auto-launch, gated on
+   localStorage 'citixen_tour_seen' (see the DOMContentLoaded handler
+   below) — there is no standing button left to reopen it. "Take 30-Second
+   Guided Tour" (once launched) still starts the same real 4-step
+   spotlight walkthrough over real, already-on-screen elements — the
+   Resident node in the report-flow diagram, the Live Public Ledger pill,
+   the Crowd Save America map, and the Civic Intelligence Stack — nothing
+   here is a fabricated flow. ===== */
 .tour-welcome-actions{display:flex;flex-direction:column;gap:10px;margin-top:18px}
 .tour-welcome-actions .btn{width:100%;justify-content:center}
 /* ===== SPOTLIGHT TOUR OVERLAY — a dark backdrop with a moving "cutout"
@@ -1349,6 +1361,73 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </button>
   </section>
 
+  <!-- ===== CIVIC INTELLIGENCE STACK™ — moved this round from below the
+       "How Your Report Moves" diagram to directly beneath the Live Public
+       Ledger pill (see the new HOMEPAGE SCROLL ORDER note above the pill),
+       and restyled from plain translucent hub-cards into "Living
+       Telemetry" tiles matching the Live Public Ledger pill's own dark
+       glass + breathing mint glow treatment (.telemetry-card below). Each
+       tile's own static "View / Export ↗" side-button is gone — clicking
+       the tile still opens its real deep-dive panel exactly as before
+       (aria-controls unchanged), and exporting that panel is now reached
+       via the universal long-press / right-click / Cmd+P (or Ctrl+P)
+       shortcut wired to every data card in attachCardExportShortcuts()
+       below, rather than a dedicated on-card button crowding the UI. ===== -->
+  <div id="civic-stack-container">
+  <section class="matrix-summary-section" id="matrixSummarySection">
+    <h3 style="color: #00E699; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin: 20px 0 6px; text-align: center;">Your Civic Intelligence Stack<sup class="tm-symbol">™</sup></h3>
+    <p style="color:var(--muted);font-size:.78rem;text-align:center;font-style:italic;margin:0 0 16px;">Click on any live module below for a deeper dive.</p>
+  </section>
+
+  <!-- ===== "LIVING TELEMETRY" 4-TILE STACK — grown from three pills to
+       four in an earlier round, adding a real "Municipal" button (see
+       renderMunicipalPanel()/#municipalPanel below — no fabricated
+       citywide asset inventory; its coverage/risk figures are honest
+       proxies computed from the same real ledger tickets and jurisdiction
+       directory the rest of the page already uses). Analytics and
+       Expenditures still reveal their existing real deep-dive panels
+       (deepdiveAnalytics; civicStackSection scrolled to ledgerCard). Civic
+       Memory™ is relabeled "Architecture & Charter" and its real trigger
+       is repointed to #civicCharterDrawer (State Constitution / Spatial
+       Hashing / Privacy Protocols tabs). The Live Public Ledger itself is
+       not orphaned by this: it keeps its own dedicated top-level entry
+       point, the "LIVE PUBLIC LEDGER" pill directly above this stack. ===== -->
+  <div class="hub-row" role="navigation" aria-label="Deep-dive sections">
+    <button class="hub-card telemetry-card" id="hubCoverageBtn" type="button" aria-expanded="false" aria-controls="deepdiveAnalytics" data-export-context="Analytics &amp; Reporting">
+      <span class="hub-card-main">
+        <span class="telemetry-pulse-dot" aria-hidden="true"></span>
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><rect x="6" y="10" width="3" height="9"/><rect x="11" y="6" width="3" height="13"/><rect x="16" y="13" width="3" height="6"/></svg>
+        <span class="hub-card-text"><span class="hub-card-title">Your Analytics</span><span class="hub-card-sub" id="hubCoverageInfoBtn" role="button" tabindex="0" aria-label="What the Analytics section covers">— Data &amp; Reports</span></span>
+      </span>
+      <span class="hub-card-actions"><span class="hub-card-arrow">↗</span></span>
+    </button>
+    <button class="hub-card telemetry-card" id="hubSlaBtn" type="button" aria-expanded="false" aria-controls="civicStackSection" data-export-context="the CapEx Audit Ledger">
+      <span class="hub-card-main">
+        <span class="telemetry-pulse-dot" aria-hidden="true"></span>
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7V5a2 2 0 0 1 2-2h8"/><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M2 11h20"/><circle cx="17" cy="15" r="1.3" fill="#00E699" stroke="none"/></svg>
+        <span class="hub-card-text"><span class="hub-card-title">Your Expenditures</span><span class="hub-card-sub" id="hubSlaInfoBtn" role="button" tabindex="0" aria-label="What the Expenditures section covers">— Budget &amp; Public Works</span></span>
+      </span>
+      <span class="hub-card-actions"><span class="hub-card-arrow">↗</span></span>
+    </button>
+    <button class="hub-card telemetry-card" id="hubMunicipalBtn" type="button" aria-expanded="false" aria-controls="municipalPanel" data-export-context="the Municipal Work Orders &amp; SLA Tracker">
+      <span class="hub-card-main">
+        <span class="telemetry-pulse-dot" aria-hidden="true"></span>
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9l8-5 8 5v12"/><path d="M9 21v-6h6v6"/><path d="M4 21h16"/></svg>
+        <span class="hub-card-text"><span class="hub-card-title">Your Municipal Portal</span><span class="hub-card-sub" id="hubMunicipalInfoBtn" role="button" tabindex="0" aria-label="What the Municipal section covers">— Work Orders &amp; SLA Tracker</span></span>
+      </span>
+      <span class="hub-card-actions"><span class="hub-card-arrow">↗</span></span>
+    </button>
+    <button class="hub-card telemetry-card" id="hubStackBtn" type="button" aria-expanded="false" aria-controls="civicCharterDrawer" data-export-context="the Civic Memory™ Architecture &amp; Charter">
+      <span class="hub-card-main">
+        <span class="telemetry-pulse-dot" aria-hidden="true"></span>
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 21 8 12 13 3 8 12 3"/><polyline points="3 13 12 18 21 13"/><polyline points="3 18 12 23 21 18"/></svg>
+        <span class="hub-card-text"><span class="hub-card-title">Your Civic Memory™</span><span class="hub-card-sub" id="hubStackInfoBtn" role="button" tabindex="0" aria-label="What the Civic Memory framework covers">— Architecture &amp; Charter</span></span>
+      </span>
+      <span class="hub-card-actions"><span class="hub-card-arrow">↗</span></span>
+    </button>
+  </div>
+  </div><!-- /#civic-stack-container -->
+
   <!-- ===== ALTERNATING SECTION CADENCE (updated across recent rounds):
        the Live Public Ledger pill is the only pill directly above the map.
        The Aggregation Hub's real trigger (openHeatMapModal(), a genuine
@@ -1393,9 +1472,9 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        throughout every round's restyling, so no JS wiring has ever
        changed here — only position/markup. ===== -->
   <section class="pixel-map-section">
-    <div class="pixel-map-card" id="national-pixel-map">
-      <div class="pixel-map-brand">CROWD SAVE AMERICA<sup class="tm-symbol">™</sup></div>
-      <svg class="pixel-map-svg" viewBox="0 0 800 440" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+    <div class="pixel-map-card" id="national-pixel-map" data-export-context="the Crowd Save America™ national report map">
+      <button type="button" class="pixel-map-brand" id="csaTitleTrigger" aria-haspopup="dialog" aria-controls="csaNarrativeModal">CROWD SAVE AMERICA<sup class="tm-symbol">™</sup></button>
+      <svg class="pixel-map-svg" id="csaMapGraphic" viewBox="0 0 800 440" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false" role="button" tabindex="0" aria-label="Open the Crowd Save America Aggregation Hub map">
         <defs>
           <path id="usSilhouetteOutline" d="M760.0,60.1 L738.9,21.8 L722.8,20.4 L711.9,67.1 L653.5,82.4 L640.7,116.4 L569.9,161.2 L555.7,152.5 L563.7,118.5 L548.7,123.6 L552.4,99.2 L533.4,90.4 L509.3,162.7 L503.5,100.7 L527.9,82.4 L552.0,85.0 L496.5,75.1 L499.5,61.2 L448.7,78.0 L473.2,57.6 L415.1,33.9 L302.7,42.6 L69.9,31.3 L68.1,58.0 L45.1,41.5 L45.4,207.2 L62.6,246.3 L126.1,309.4 L208.6,330.2 L264.8,321.1 L304.6,369.3 L333.0,360.9 L372.4,415.6 L391.8,419.3 L387.8,387.9 L404.6,365.6 L441.8,348.5 L490.0,358.7 L479.0,344.1 L507.1,332.8 L568.1,341.5 L617.7,417.1 L626.1,394.8 L597.6,330.9 L603.8,312.0 L681.6,229.9 L655.3,198.1 L664.8,174.4 L678.3,185.7 L682.3,145.9 L732.3,126.2 L717.3,99.2 Z"/>
           <clipPath id="usSilhouetteClip">
@@ -1412,7 +1491,40 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </div>
   </section>
 
-  <!-- ===== "HOW YOUR REPORT MOVES" RADIAL NUCLEUS CARD — Position 7 in
+  <!-- ===== CROWD SAVE AMERICA™ NARRATIVE BREAKOUT MODAL — opened only by
+       tapping the "CROWD SAVE AMERICA™" title above (#csaTitleTrigger).
+       Clicking the map graphic itself or the "View Map ↗" trigger both
+       bypass this narrative modal entirely and jump straight into the real
+       Aggregation Hub map (openHeatMapModal(), same handler as always —
+       see #csaMapGraphic's and #aggregationMapGatewayBtn's listeners
+       below). "Explore National Grid" inside this modal opens that same
+       real Aggregation Hub; "Share Movement" reuses the same honest
+       native-Web-Share-first pattern as the Export & Share Hub's own
+       "Native System Share" action (falling back to a clipboard copy with
+       an on-screen status line when the Web Share API isn't available),
+       rather than inventing a second share mechanism. ===== -->
+  <div class="modal-overlay" id="csaNarrativeModal">
+    <div class="modal-box" style="max-width:440px;text-align:center">
+      <button class="modal-close" id="csaNarrativeCloseBtn">✕</button>
+      <h3>CROWD SAVE AMERICA<sup class="tm-symbol">™</sup></h3>
+      <div style="color:#00E699;font-weight:800;font-size:.95rem;letter-spacing:.04em;margin-bottom:12px;">ONE MILLION AMERICAN AUDITORS</div>
+      <p style="text-align:left;">Restoring ground-truth transparency across all 50 states. Crowd Save America™ is a non-partisan, nationwide initiative mobilizing citizens to reclaim local accountability. By turning everyday observations into verified, on-device scrubbed records, we are building an undeniable, real-time audit of American infrastructure.</p>
+      <p style="text-align:left;">When one million citizens audit their streets, local negligence and bureaucratic waste have nowhere left to hide.</p>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px;">
+        <button type="button" class="btn btn-primary" id="csaExploreGridBtn" style="justify-content:center;gap:8px;">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+          Explore National Grid
+        </button>
+        <button type="button" class="btn btn-outline" id="csaShareMovementBtn" style="justify-content:center;gap:8px;">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.6" x2="15.4" y2="6.4"/><line x1="8.6" y1="13.4" x2="15.4" y2="17.6"/></svg>
+          Share Movement
+        </button>
+      </div>
+      <div class="small" id="csaNarrativeShareStatus" style="margin-top:10px;color:var(--muted);min-height:14px;"></div>
+    </div>
+  </div>
+
+  <!-- ===== "HOW YOUR REPORT MOVES" RADIAL NUCLEUS CARD — Position 7
        this round's vertical stacking order, directly beneath the national
        map card. The jurisdiction pill and the old standalone "Civic
        Memory™" concept card that used to sit here were both
@@ -1566,79 +1678,6 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        Its .learn-more-* CSS and toggle JS are removed with it below rather
        than left orphaned. ===== -->
 
-  <!-- ===== CITY SNAPSHOT (the geolocated Active Hazards / Fix Speed /
-       Completion Rate gauge card that used to live here) was removed
-       entirely per an earlier round — see the JS/CSS removal notes near
-       renderAnalyticsMatrix()/.gauge-card above. Its header text is
-       renamed again this round from "Civic Intelligence Engine™" to
-       "CIVIC INTELLIGENCE STACK™" per item 3 (same 4-button behavior
-       below, label only), sitting directly below the "How Your Report
-       Moves" tree card, immediately followed by the button stack it
-       introduces. ===== -->
-  <!-- civic-stack-container wraps the header through all 4 buttons below
-       as one unit — added this round so the AI Civic Guide tour's Step 4
-       can spotlight the entire Civic Intelligence Stack section, not just
-       its header, without hand-picking two separate bounding boxes. -->
-  <div id="civic-stack-container">
-  <section class="matrix-summary-section" id="matrixSummarySection">
-    <h3 style="color: #00E699; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin: 20px 0 16px; text-align: center;">Civic Intelligence Stack<sup class="tm-symbol">™</sup></h3>
-  </section>
-
-  <!-- ===== CIVIC INTELLIGENCE STACK™ 4-BUTTON STACK — grown from three
-       pills to four in an earlier round, adding a real "Municipal"
-       button (see renderMunicipalPanel()/#municipalPanel below — no
-       fabricated citywide asset inventory; its coverage/risk figures are
-       honest proxies computed from the same real ledger tickets and
-       jurisdiction directory the rest of the page already uses). Analytics
-       and Expenditures still reveal their existing real deep-dive panels
-       (deepdiveAnalytics; civicStackSection scrolled to ledgerCard) with
-       this round's relabeled action text. Civic Memory™ is relabeled
-       "Architecture & Charter" and its real trigger is repointed again,
-       this round from the Live Public Ledger drawer to the new
-       #civicCharterDrawer (State Constitution / Spatial Hashing / Privacy
-       Protocols tabs) — a more honest match for the new "Charter" label.
-       The Live Public Ledger itself is not orphaned by this: it keeps its
-       own dedicated top-level entry point, the "LIVE PUBLIC LEDGER" pill
-       directly above the national map. ===== -->
-  <div class="hub-row" role="navigation" aria-label="Deep-dive sections">
-    <button class="hub-card" id="hubCoverageBtn" type="button" aria-expanded="false" aria-controls="deepdiveAnalytics">
-      <span class="hub-card-main">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><rect x="6" y="10" width="3" height="9"/><rect x="11" y="6" width="3" height="13"/><rect x="16" y="13" width="3" height="6"/></svg>
-        <span class="hub-card-text"><span class="hub-card-title">Analytics</span><span class="hub-card-sub" id="hubCoverageInfoBtn" role="button" tabindex="0" aria-label="What the Analytics section covers">— Data &amp; Reports</span></span>
-      </span>
-      <span class="hub-card-actions">
-        <span class="hub-card-arrow">View / Export ↗</span>
-      </span>
-    </button>
-    <button class="hub-card" id="hubSlaBtn" type="button" aria-expanded="false" aria-controls="civicStackSection">
-      <span class="hub-card-main">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7V5a2 2 0 0 1 2-2h8"/><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M2 11h20"/><circle cx="17" cy="15" r="1.3" fill="#00E699" stroke="none"/></svg>
-        <span class="hub-card-text"><span class="hub-card-title">Expenditures</span><span class="hub-card-sub" id="hubSlaInfoBtn" role="button" tabindex="0" aria-label="What the Expenditures section covers">— Budget &amp; Public Works</span></span>
-      </span>
-      <span class="hub-card-actions">
-        <span class="hub-card-arrow">View / Export ↗</span>
-      </span>
-    </button>
-    <button class="hub-card" id="hubMunicipalBtn" type="button" aria-expanded="false" aria-controls="municipalPanel">
-      <span class="hub-card-main">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9l8-5 8 5v12"/><path d="M9 21v-6h6v6"/><path d="M4 21h16"/></svg>
-        <span class="hub-card-text"><span class="hub-card-title">Municipal</span><span class="hub-card-sub" id="hubMunicipalInfoBtn" role="button" tabindex="0" aria-label="What the Municipal section covers">— Work Orders &amp; SLA Tracker</span></span>
-      </span>
-      <span class="hub-card-actions">
-        <span class="hub-card-arrow">View / Export ↗</span>
-      </span>
-    </button>
-    <button class="hub-card" id="hubStackBtn" type="button" aria-expanded="false" aria-controls="civicCharterDrawer">
-      <span class="hub-card-main">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 21 8 12 13 3 8 12 3"/><polyline points="3 13 12 18 21 13"/><polyline points="3 18 12 23 21 18"/></svg>
-        <span class="hub-card-text"><span class="hub-card-title">Civic Memory™</span><span class="hub-card-sub" id="hubStackInfoBtn" role="button" tabindex="0" aria-label="What the Civic Memory framework covers">— Architecture &amp; Charter</span></span>
-      </span>
-      <span class="hub-card-actions">
-        <span class="hub-card-arrow">View / Export ↗</span>
-      </span>
-    </button>
-  </div>
-  </div><!-- /#civic-stack-container -->
 
   <!-- ===== CITIXEN UX™ INTERACTIVE 3x3 MEGA-THEME SECTION (renamed this
        round from "Interactive Feature & Security Section" — same section,
@@ -2027,14 +2066,14 @@ audio.pw-audio-el{width:100%;margin-top:4px}
     </div>
   </div>
 
-  <!-- ===== AI CIVIC GUIDE — floating trigger pill, always available
-       bottom-right. Clicking it (or an automatic first-visit fire, gated
-       on the real localStorage 'citixen_tour_seen' flag so it only
-       auto-fires once per browser) opens the welcome modal below. ===== -->
-  <button type="button" id="aiTourTriggerPill" class="ai-tour-pill">
-    <svg viewBox="0 0 24 24" width="15" height="15" fill="#00E699" aria-hidden="true"><path d="M12 2l1.8 5.6L19.4 9.4 13.8 11.2 12 17 10.2 11.2 4.6 9.4 10.2 7.6z"/><path d="M19 14l.9 2.8L22.7 17.7 19.9 18.6 19 21.4 18.1 18.6 15.3 17.7 18.1 16.8z" opacity=".7"/></svg>
-    AI Civic Guide <span class="ai-tour-pill-divider">|</span> Take Tour ↗
-  </button>
+  <!-- ===== AI CIVIC GUIDE — the persistent floating "AI Civic Guide | Take
+       Tour ↗" bottom-right pill (#aiTourTriggerPill) is permanently
+       removed per this round's "Onboarding Tour Purge" item — its .ai-tour-
+       pill* CSS is removed below too rather than left as dead styling. The
+       welcome modal below now runs ONLY as a single first-visit
+       auto-launch, gated on the real localStorage 'citixen_tour_seen' flag
+       (see the DOMContentLoaded handler further down) — there is no
+       standing UI control left to re-open it once dismissed. ===== -->
 
   <!-- ===== AI CIVIC GUIDE — WELCOME MODAL. Reuses the shared .modal-box
        shell, with the two-tone "Welcome to CITIXEN " / "UX™" wordmark and
@@ -2682,7 +2721,9 @@ const CIVIC_CHARTER_TRACKS = {
   ],
   spatial: [
     { title: 'Current Model — Ward-Tier Grid', desc: 'Every report on this platform is bucketed by its resolved ward (e.g. Ward 4, Ward 7) — the same real grid the Live Public Ledger\'s radius pills, the Municipal panel above, and this jurisdiction\'s CapEx ledger all use today.' },
-    { title: 'H3 Spatial Hashing — Roadmap Target', desc: 'The roadmap architecture replaces ward-tier buckets with Uber\'s open-source H3 hexagonal hierarchical index, so nearby reports hash to the same fine-grained cell regardless of ward boundaries. Not yet implemented anywhere in this build.' }
+    { title: 'H3 Spatial Hashing — Roadmap Target', desc: 'The roadmap architecture replaces ward-tier buckets with Uber\'s open-source H3 hexagonal hierarchical index (Resolution 9), so nearby reports hash to the same fine-grained cell regardless of ward boundaries. Not yet implemented anywhere in this build.' },
+    { title: 'Mapping Stack — Roadmap Target', desc: 'The Aggregation Hub map you can open today runs on Leaflet with a small seeded set of jurisdiction markers. The roadmap swaps that for vector rendering via MapLibre GL JS, with PMTiles-delivered dark basemap tiles and H3 Resolution-9 cell keys for privacy-first, on-device spatial pinning at true census-block resolution — none of that stack is live in this build yet.' },
+    { title: 'Three-Prong Spatial Sync — Roadmap Target', desc: 'The end-state architecture links one spatial index across three tiers: a national Aggregation Hub view (macro, roadmap), the jurisdiction-level ward coverage stat in Your Analytics (municipal — already real and live today), and the mobile app\'s 150m Geo-Hatch capture grid (micro — already real and live today, see app.html\'s field-report map). Only the macro tier awaits the MapLibre/PMTiles/H3 rollout above; the other two already run on real data.' }
   ],
   privacy: [
     { title: 'Zero-Knowledge Privacy Engine', desc: 'No accounts, no device fingerprinting, on-device EXIF/GPS scrubbing before upload, no-referrer by default — open the full Anonymity Whitepaper below for the complete list.' }
@@ -3913,6 +3954,60 @@ function closeExportHub(){
 document.querySelectorAll('.deepdive-export-btn').forEach(btn => {
   btn.addEventListener('click', () => openExportHub(btn.dataset.exportContext));
 });
+
+/* =====================================================================
+   UNIVERSAL DATA-CARD EXPORT SHORTCUTS (this round's item 6) — long-press
+   (mobile), right-click, and Cmd+P / Ctrl+P all invoke the same real
+   Export & Share Hub (openExportHub()) directly from a data card
+   (data-export-context on the 4 Civic Intelligence Stack telemetry tiles
+   and the Crowd Save America map card), rather than a dedicated on-card
+   button crowding the UI. This is additive: the tiles' own click still
+   opens their real deep-dive panel exactly as before; this only adds the
+   export path. The Civic Intelligence Stack's four deep-dive PANELS keep
+   their own visible .deepdive-export-btn (added last round) since those
+   sit in a full-page reading view where a visible button doesn't crowd
+   anything — this generalizes the same real export flow one level up, to
+   the compact summary tiles that link to them. ===================================================================== */
+let hoveredExportCard = null;
+function attachCardExportShortcuts(cardEl){
+  if (!cardEl || !cardEl.dataset.exportContext) return;
+  const ctx = cardEl.dataset.exportContext;
+  const LONG_PRESS_MS = 550;
+  let pressTimer = null;
+  let longPressFired = false;
+  cardEl.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    openExportHub(ctx);
+  });
+  cardEl.addEventListener('touchstart', () => {
+    longPressFired = false;
+    pressTimer = setTimeout(() => {
+      longPressFired = true;
+      pressTimer = null;
+      if (navigator.vibrate) navigator.vibrate(12);
+      openExportHub(ctx);
+    }, LONG_PRESS_MS);
+  }, { passive: true });
+  ['touchend', 'touchmove', 'touchcancel'].forEach(evt => {
+    cardEl.addEventListener(evt, () => { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } });
+  });
+  // Swallow the click that follows a long-press so it doesn't also open
+  // the card's normal deep-dive-panel toggle behavior.
+  cardEl.addEventListener('click', (e) => {
+    if (longPressFired) { e.preventDefault(); e.stopPropagation(); longPressFired = false; }
+  }, true);
+  cardEl.addEventListener('mouseenter', () => { hoveredExportCard = cardEl; });
+  cardEl.addEventListener('mouseleave', () => { if (hoveredExportCard === cardEl) hoveredExportCard = null; });
+}
+document.querySelectorAll('.hub-card[data-export-context], #national-pixel-map[data-export-context]').forEach(attachCardExportShortcuts);
+document.addEventListener('keydown', (e) => {
+  const isPrintShortcut = (e.metaKey || e.ctrlKey) && (e.key === 'p' || e.key === 'P');
+  if (isPrintShortcut && hoveredExportCard) {
+    e.preventDefault();
+    openExportHub(hoveredExportCard.dataset.exportContext);
+  }
+});
+
 document.getElementById('exportHubCloseBtn').addEventListener('click', closeExportHub);
 document.getElementById('exportHubModal').addEventListener('click', (e) => {
   if (e.target.id === 'exportHubModal') closeExportHub();
@@ -3947,6 +4042,46 @@ document.getElementById('exportHubCopyLinkBtn').addEventListener('click', async 
     document.getElementById('exportHubStatus').textContent = 'Could not copy automatically — copy the link from your address bar.';
   }
 });
+
+// ===== CROWD SAVE AMERICA™ NARRATIVE BREAKOUT MODAL — the title trigger
+// opens it; the map graphic and "View Map ↗" both bypass it entirely and
+// go straight to the real Aggregation Hub (openHeatMapModal(), defined
+// above). "Share Movement" reuses the same shareViaWebShareApi() honest
+// fallback pattern as the Export & Share Hub rather than a second
+// implementation.
+function openCsaNarrativeModal(){
+  document.getElementById('csaNarrativeModal').classList.add('open');
+}
+function closeCsaNarrativeModal(){
+  document.getElementById('csaNarrativeModal').classList.remove('open');
+}
+document.getElementById('csaTitleTrigger').addEventListener('click', openCsaNarrativeModal);
+document.getElementById('csaNarrativeCloseBtn').addEventListener('click', closeCsaNarrativeModal);
+document.getElementById('csaNarrativeModal').addEventListener('click', (e) => {
+  if (e.target.id === 'csaNarrativeModal') closeCsaNarrativeModal();
+});
+document.getElementById('csaExploreGridBtn').addEventListener('click', () => {
+  closeCsaNarrativeModal();
+  openHeatMapModal();
+});
+document.getElementById('csaShareMovementBtn').addEventListener('click', async () => {
+  const shared = await shareViaWebShareApi();
+  if (!shared) {
+    try {
+      await navigator.clipboard.writeText(location.href);
+      document.getElementById('csaNarrativeShareStatus').textContent = '✓ Link copied to clipboard — native share isn\'t supported in this browser.';
+    } catch (err) {
+      document.getElementById('csaNarrativeShareStatus').textContent = 'Native share isn\'t supported in this browser — copy the link from your address bar.';
+    }
+  }
+});
+const csaMapGraphicEl = document.getElementById('csaMapGraphic');
+if (csaMapGraphicEl) {
+  csaMapGraphicEl.addEventListener('click', openHeatMapModal);
+  csaMapGraphicEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openHeatMapModal(); }
+  });
+}
 
 /* =====================================================================
    WARD HEALTH SUMMARY — ONE-CLICK PDF EXPORT (client-side, via jsPDF)
@@ -4459,9 +4594,6 @@ function closeTourWelcome(){
   document.getElementById('tourWelcomeOverlay').classList.remove('open');
   try { localStorage.setItem(CITIXEN_TOUR_SEEN_KEY, '1'); } catch (e) {}
 }
-document.getElementById('aiTourTriggerPill').addEventListener('click', () => {
-  document.getElementById('tourWelcomeOverlay').classList.add('open');
-});
 document.getElementById('tourWelcomeCloseBtn').addEventListener('click', closeTourWelcome);
 document.getElementById('tourWelcomeOverlay').addEventListener('click', (e) => {
   if (e.target.id === 'tourWelcomeOverlay') closeTourWelcome();
