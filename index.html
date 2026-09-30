@@ -378,7 +378,13 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .civic-triad-spoke{stroke:#00E699;stroke-width:1.6;opacity:.75}
 .civic-triad-node-circle{fill:rgba(0,230,153,.1);stroke:#00E699;stroke-width:1.5}
 .civic-triad-root-circle{fill:rgba(0,230,153,.16);stroke:#00E699;stroke-width:1.8}
-.civic-triad-root-label{fill:#00E699;font-size:10.5px;font-weight:800;text-anchor:middle;letter-spacing:.03em}
+/* Static second ring (this round's "double-ringed" nucleus requirement) —
+   sits between the pulsing halo and the solid inner circle. The old
+   .civic-triad-root-label (a separate line of text floating above the
+   nucleus) is retired along with this — the wordmark now lives inside the
+   nucleus itself, see .civic-triad-root-label-center below. */
+.civic-triad-outer-ring{fill:none;stroke:#00E699;stroke-width:1.2;opacity:.55}
+.civic-triad-root-label-center{fill:#00E699;font-size:6.2px;font-weight:800;text-anchor:middle;letter-spacing:.02em}
 /* Glowing pulse behind the central nucleus badge, this round's "radial
    nucleus layout" requirement — a translucent ring whose radius/opacity
    breathe via CSS, same slow-pulse idea as the LIVE PUBLIC LEDGER pill. */
@@ -1395,13 +1401,17 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        "Citixen Dashboard" title; the concept card's narrative now opens
        the Civic Memory™ engine button's "View Charter" drawer below
        instead of a passive scroll-past card). This round replaces the
-       prior top-down tree with a radial hub-and-spoke layout: a glowing
-       CITIXEN UX™ nucleus badge at the center, with three equal-length,
-       bi-directional vector spokes radiating out to the same 3 real leaf
-       nodes at 120° apart. This round's fix trims each spoke's endpoints
-       via vector math to the nucleus (r=32) and leaf (r=26) circle edges
-       along each spoke's own direction unit vector, rather than drawing
-       center-to-center, so no line segment runs into either circle's
+       prior top-down tree with a radial hub-and-spoke layout: a glowing,
+       double-ringed CITIXEN UX™ nucleus badge at the center (a pulsing
+       outer halo, a static outer ring, and a solid inner circle, with the
+       shield icon and the "CITIXEN UX™" wordmark both set directly inside
+       the inner circle this round, rather than as a separate label
+       floating above it), with three equal-length, bi-directional vector
+       spokes radiating out to the same 3 real leaf nodes at 120° apart.
+       Each spoke's endpoints are trimmed via vector math to the nucleus's
+       outer ring (r=36) and each leaf's circle (r=26) edges along its own
+       direction unit vector, rather than drawn center-to-center, so no
+       line segment runs into either circle's
        icon. Each leaf node name is a real, reachable part of this build,
        not an invented pipeline: "Resident Field Unit" is the mobile
        reporting flow (app.html) — and doubles as this page's AI Civic
@@ -1418,20 +1428,28 @@ audio.pw-audio-el{width:100%;margin-top:4px}
             <path d="M0 0L10 5L0 10z" fill="#00E699"/>
           </marker>
         </defs>
-        <!-- Spokes are trimmed via vector math to the nucleus (r=32) and
-             leaf (r=26) circle edges along each direction unit vector,
+        <!-- Spokes are trimmed via vector math to the nucleus's OUTER ring
+             (r=36, this round's new double-ring edge) and each leaf's
+             circle (r=26) along each spoke's own direction unit vector,
              rather than drawn center-to-center, so no line segment runs
-             into either circle's icon (this round's item 3 fix). -->
-        <line x1="160" y1="143" x2="160" y2="106" class="civic-triad-spoke" marker-start="url(#triadSpokeArrow)" marker-end="url(#triadSpokeArrow)"/>
-        <line x1="132.4" y1="191.2" x2="100.4" y2="209.9" class="civic-triad-spoke" marker-start="url(#triadSpokeArrow)" marker-end="url(#triadSpokeArrow)"/>
-        <line x1="187.6" y1="191.2" x2="219.6" y2="209.9" class="civic-triad-spoke" marker-start="url(#triadSpokeArrow)" marker-end="url(#triadSpokeArrow)"/>
+             into either circle's icon. -->
+        <line x1="160" y1="139" x2="160" y2="106" class="civic-triad-spoke" marker-start="url(#triadSpokeArrow)" marker-end="url(#triadSpokeArrow)"/>
+        <line x1="128.9" y1="193.2" x2="100.4" y2="209.9" class="civic-triad-spoke" marker-start="url(#triadSpokeArrow)" marker-end="url(#triadSpokeArrow)"/>
+        <line x1="191.1" y1="193.2" x2="219.6" y2="209.9" class="civic-triad-spoke" marker-start="url(#triadSpokeArrow)" marker-end="url(#triadSpokeArrow)"/>
+        <!-- Double-ringed nucleus badge (this round's fix): a pulsing outer
+             halo, a static outer ring (r=36) and the solid inner circle
+             (r=32) together read as "double-ringed", with the shield icon
+             and the "CITIXEN UX™" wordmark both placed directly inside the
+             inner circle rather than as a separate label floating above
+             it. -->
         <g id="reportTreeNucleus">
           <circle cx="160" cy="175" r="48" class="civic-triad-nucleus-halo"/>
-          <text x="160" y="118" class="civic-triad-root-label">CITIXEN UX<tspan baseline-shift="super" font-size="7">™</tspan></text>
+          <circle cx="160" cy="175" r="36" class="civic-triad-outer-ring"/>
           <circle cx="160" cy="175" r="32" class="civic-triad-root-circle"/>
-          <g transform="translate(146.2,161.2) scale(1.15)">
+          <g transform="translate(149.8,155.8) scale(0.85)">
             <path d="M12 2L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-3z" fill="none" stroke="#00E699" stroke-width="1.8" stroke-linejoin="round"/>
           </g>
+          <text x="160" y="192" class="civic-triad-root-label-center">CITIXEN UX<tspan baseline-shift="super" font-size="4.5">™</tspan></text>
         </g>
         <g id="reportTreeNodeResident">
           <circle cx="160" cy="80" r="26" class="civic-triad-node-circle"/>
@@ -1606,22 +1624,27 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   </div>
   </div><!-- /#civic-stack-container -->
 
-  <!-- ===== CITIXEN UX™ INTERACTIVE FEATURE &amp; SECURITY SECTION —
+  <!-- ===== CITIXEN UX™ INTERACTIVE 3x3 MEGA-THEME SECTION (renamed this
+       round from "Interactive Feature & Security Section" — same section,
+       same visible "CITIXEN UX™" header; "3x3" describes its shape: 3
+       header icons, each expanding a 3-subtheme accordion drawer) —
        Position 9 in the vertical stacking order, directly below the
        button stack. The header carries the same shield mark used in the
        top nav's brand lockup (one real logo, not a second invented icon).
-       This round reorders the section per the revised vertical layout
-       spec (icon grid, then an inline accordion, then the Flagship
-       Security Anchor Card, then the Launch/App-Download CTAs that already
-       follow this section) and replaces the old tap-opens-a-modal behavior
-       with a real inline accordion (#citixenFeatureAccordion) that slides
-       open directly below the icon row — same exact content the modals
-       carried (modalData.ciFeatures/ciSafety/ciSecurity), no pitch-deck
-       link anywhere in it, only the presentation changed again. The Hero/
-       Flagship Trust Anchor Card restates the same real, already-
-       established privacy facts (no accounts, EXIF scrubbed on-device —
-       see the Anonymity Whitepaper) rather than asserting a new,
-       unverified "hashed at the edge" claim; "scrubbed" here matches what
+       The section runs icon grid, then an inline accordion, then the
+       Flagship Security Anchor Card, then the Launch/App-Download CTAs
+       that already follow this section — replacing an older tap-opens-a-
+       modal behavior with a real inline accordion (#citixenFeatureAccordion)
+       that slides open directly below the icon row, carrying the same
+       exact content the modals did (modalData.ciFeatures/ciSafety/
+       ciSecurity), no pitch-deck link anywhere in it, only the
+       presentation changed. The Flagship Trust Anchor Card restates the
+       same real, already-established privacy facts (no accounts, EXIF
+       scrubbed on-device — see the Anonymity Whitepaper) rather than
+       asserting a new, unverified "hashed at the edge" claim; "scrubbed"
+       here — and the ciSecurity drawer's "On-Device Metadata Scrubbing"
+       bullet, this round's honest stand-in for the spec's "On-Device
+       Metadata Hashing" title — matches what
        fallbackJurisdictionStack()/modalData.anonymity already describe
        this build actually doing. The "Learn More ↗" trigger still opens
        the real Anonymity Whitepaper modal the header's Privacy Shield
@@ -1948,7 +1971,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       <div style="display:flex;flex-direction:column;gap:10px;align-items:stretch;">
         <a class="btn btn-outline" href="#institutionalAccessSection" id="municipalOutreachContactLink" style="justify-content:center;">Municipal Outreach Contact</a>
         <button class="btn btn-outline" id="municipalCouncilOnboardingBtn" type="button" style="justify-content:center;">City Council Onboarding — Architecture &amp; Privacy Charter</button>
-        <a class="btn btn-primary" href="/CITIXEN_UX_Executive_Deck.pptx" download style="justify-content:center;">Download Official Pitch Deck (.pptx)</a>
+        <a class="btn btn-primary" href="/CITIXEN_UX_Executive_Deck.pptx" download style="justify-content:center;">Download Official Municipal Pitch Deck (.pptx)</a>
       </div>
     </div>
   </section>
@@ -1989,13 +2012,14 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   </button>
 
   <!-- ===== AI CIVIC GUIDE — WELCOME MODAL. Reuses the shared .modal-box
-       shell. This round splits the headline into two standalone lines
-       (two-tone "Welcome to CITIXEN " / "UX™" wordmark, then a muted
-       "Home of Civic Intelligence" subheader) and drops to a single
-       primary CTA — the old "Explore Dashboard" button is removed as
-       dead UI now that the spec calls for one action; the ✕ close button
-       remains the dismiss path. Either dismissing or starting the tour
-       marks it seen so it never auto-fires again on this browser. ===== -->
+       shell, with the two-tone "Welcome to CITIXEN " / "UX™" wordmark and
+       muted "Home of Civic Intelligence" subheader introduced last round.
+       This round restores a secondary "Explore Dashboard" CTA alongside
+       the primary "Take 30-Second Guided Tour" button (removed then
+       re-added across rounds as the spec's own button count changed) —
+       both, plus the ✕ close button, dismiss the modal and mark the tour
+       seen so it never auto-fires again on this browser; only the primary
+       button also starts the spotlight walkthrough. ===== -->
   <div class="modal-overlay" id="tourWelcomeOverlay">
     <div class="modal-box" style="max-width:420px;text-align:center">
       <button class="modal-close" id="tourWelcomeCloseBtn">✕</button>
@@ -2004,6 +2028,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       <p>A completely free, zero-tracking platform connecting your real-time observations directly to civic accountability.</p>
       <div class="tour-welcome-actions">
         <button type="button" class="btn btn-primary btn-hero" id="tourStartBtn" style="margin:0">Take 30-Second Guided Tour</button>
+        <button type="button" class="btn btn-outline btn-hero" id="tourExploreBtn" style="margin:0">Explore Dashboard</button>
       </div>
     </div>
   </div>
@@ -2444,10 +2469,19 @@ const modalData={
   },
   ciSecurity:{
     title:'Security',
+    // This round's spec renames bullet 2 to "On-Device Metadata Hashing"
+    // and bullet 3 to "Immutable Public Ledger". Bullet 3 is a plain
+    // rename (same real ledger-entry-hash fact). Bullet 2's title is kept
+    // as "On-Device Metadata Scrubbing" rather than "...Hashing" — this
+    // build strips/removes EXIF metadata on-device, it does not
+    // cryptographically hash it, and asserting a hash here would repeat
+    // the same overstated claim already corrected in the Flagship Trust
+    // Anchor Card's micro-copy below (see the honesty-override convention
+    // this session has followed since the Hero Trust Anchor Badge item).
     body:[
       ['Zero-Knowledge Privacy Engine','No accounts, no login, and no device fingerprinting anywhere in this system — see the full Anonymity Whitepaper.'],
-      ['EXIF Scrubbing','Photo metadata, including embedded GPS coordinates and device identifiers, is stripped on-device before a photo ever leaves the reporter\'s phone.'],
-      ['Immutable Public Records','Each resolved ledger entry carries a timestamp and verification hash so the resolution sequence can be audited without exposing reporter identity.']
+      ['On-Device Metadata Scrubbing','Photo metadata, including embedded GPS coordinates and device identifiers, is stripped on-device before a photo ever leaves the reporter\'s phone.'],
+      ['Immutable Public Ledger','Each resolved ledger entry carries a timestamp and verification hash so the resolution sequence can be audited without exposing reporter identity.']
     ]
   }
 };
@@ -4304,6 +4338,7 @@ document.getElementById('tourStartBtn').addEventListener('click', () => {
   closeTourWelcome();
   startTour();
 });
+document.getElementById('tourExploreBtn').addEventListener('click', closeTourWelcome);
 document.getElementById('tourSkipBtn').addEventListener('click', endTour);
 document.getElementById('tourPrevBtn').addEventListener('click', () => showTourStep(tourStepIndex - 1));
 document.getElementById('tourNextBtn').addEventListener('click', () => {
