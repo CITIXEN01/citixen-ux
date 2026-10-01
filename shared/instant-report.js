@@ -174,6 +174,10 @@
   function stateRankText(r) { return r ? '#' + r.state + ' IN ' + String(r.stateName).toUpperCase() : 'N/A'; }
   function stateRankValue(r) { return r ? '#' + r.state : 'N/A'; }
   function stateRankSubtext(r) { return r ? r.stateAbbr : ''; }
+  // Card 3 header bar: the state postal code moves into the label itself
+  // (e.g. "WI STATE RANK") so the body can show just the rank, with no
+  // repeated abbreviation.
+  function stateRankHeaderLabel(r) { return (stateRankSubtext(r) ? stateRankSubtext(r) + ' ' : '') + 'State Rank'; }
 
   // ---------- state ----------
   var cfg = { getData: null, toast: null, onLedger: null };
@@ -406,7 +410,7 @@
           '<div class="cx-mcards">' +
             mcard(avgHoursText(d), 'Avg. Fix Speed') +
             mcard(resolutionRate(d), 'Resolution Rate') +
-            mcard(stateRankValue(r) + (stateRankSubtext(r) ? ' ' + stateRankSubtext(r) : ''), 'State Rank') +
+            mcard(stateRankValue(r), stateRankHeaderLabel(r)) +
           '</div></div>' +
         '<div class="cx-sec"><div class="cx-sec-title"><span>2</span>CAPITAL PROJECT TRACKER</div>' + cipThermHtml(d.cip) + '</div>' +
         '<div class="cx-sec"><div class="cx-sec-title"><span>3</span>COMMUNITY ACTION SNAPSHOT</div>' +
@@ -521,7 +525,7 @@
       cardGrid([
         { val: avgHoursText(d), lbl: 'Avg. Fix Speed' },
         { val: resolutionRate(d), lbl: 'Resolution Rate' },
-        { val: stateRankValue(d.ranks) + (stateRankSubtext(d.ranks) ? ' ' + stateRankSubtext(d.ranks) : ''), lbl: 'State Rank' }
+        { val: stateRankValue(d.ranks), lbl: stateRankHeaderLabel(d.ranks) }
       ], 3);
 
       // Capital Project Tracker: a qualitative progress bar per status tier
