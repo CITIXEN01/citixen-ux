@@ -420,6 +420,15 @@ textarea.input{resize:none;line-height:1.4}
 .btn-confirm-cancel{width:100%;background:transparent;color:var(--muted);border:1px solid var(--border);
   padding:13px;border-radius:12px;font-weight:700;font-size:.8rem;cursor:pointer}
 
+/* ===== "HOW DOES THIS WORK?" CTA — secondary outline button directly
+   beneath the Report tab's main action stack (category chips, camera,
+   Publish report). Opens the existing generic info-drawer system
+   (#appInfoModal, see APP_MODAL_DATA/openAppInfoModal()) with a 3-step
+   quick guide, so Dismiss (close icon + backdrop tap) is already wired. ===== */
+.btn-howitworks{display:block;width:100%;margin-top:12px;background:transparent;
+  border:1px solid rgba(255,255,255,.2);color:var(--brand-mint);font-size:13px;
+  border-radius:8px;padding:10px 16px;text-align:center;cursor:pointer}
+
 /* ===== "WHAT IS CIVIC INTELLIGENCE?" HERO (index.html only markup, shared styles) ===== */
 .ci-hero{padding:0}
 .ci-compare{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
@@ -708,6 +717,7 @@ textarea.input{resize:none;line-height:1.4}
           <svg viewBox="0 0 24 24" width="17" height="17" stroke="#051311" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           Publish report
         </button>
+        <button type="button" class="btn-howitworks" id="btnHowItWorks">How Does This Work? ↗</button>
       </div>
     </section>
 
@@ -2111,6 +2121,11 @@ const APP_MODAL_DATA = {
     ['State Constitution Reference','A representative-summary pointer to this jurisdiction\'s state constitution, the same reference carried in the full web dashboard\'s CITIXEN Codex.'],
     ['Spatial Hashing Architecture','How this platform buckets reports by location today (ward-tier), and the H3 hexagonal-grid model targeted as its roadmap replacement.'],
     ['Public Ledger & Standards','Tap the LIVE PUBLIC LEDGER button above to open the real, searchable public record — the same drawer this card\'s subtitle points to.']
+  ]},
+  howItWorks: { title: 'How Does This Work?', body: [
+    ['1. Spot & Snap','Geolocate your current position and tag the civic issue (potholes, streetlights, drainage).'],
+    ['2. Automated Dispatch','CITIXEN UX™ routes data directly to municipal teams and registers the entry to the Public Ledger.'],
+    ['3. Track Impact','Monitor neighborhood performance, resolution speeds, and active capital project timelines in real time.']
   ]}
 };
 function openAppInfoModal(key){
@@ -3478,6 +3493,7 @@ window.addEventListener('DOMContentLoaded',()=>{
     document.getElementById('appHubMunicipalBtn').setAttribute('aria-expanded', 'false');
   });
   document.getElementById('appHubMemoryBtn').addEventListener('click', () => openAppInfoModal('civicMemory'));
+  document.getElementById('btnHowItWorks').addEventListener('click', () => openAppInfoModal('howItWorks'));
 
   document.getElementById('appTileFeatures').addEventListener('click', () => toggleAppFeatureAccordion('ciFeatures', 'appTileFeatures'));
   document.getElementById('appTileSafety').addEventListener('click', () => toggleAppFeatureAccordion('ciSafety', 'appTileSafety'));
