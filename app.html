@@ -728,6 +728,15 @@ textarea.input{resize:none;line-height:1.4}
           Publish report
         </button>
       </div>
+
+      <!-- PERSISTENT FOOTER — same brand shield + verification seal as the
+           Dashboard tab's footer (and the Quick Help modal's), now repeated
+           at the end of every tab's scrollable content per this round's
+           request, so it isn't just a Dashboard-only element. -->
+      <div class="card" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:4px;">
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="#00E699" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <div class="small" style="color:var(--muted)">CITIXEN UX<sup class="tm-symbol">™</sup> — Privacy Engine: Verified</div>
+      </div>
     </section>
 
     <!-- MAP & FEED — two stacked field modules:
@@ -758,6 +767,15 @@ textarea.input{resize:none;line-height:1.4}
           </div>
         </div>
         <div id="feed"></div>
+      </div>
+
+      <!-- PERSISTENT FOOTER — same brand shield + verification seal as the
+           Dashboard tab's footer (and the Quick Help modal's), now repeated
+           at the end of every tab's scrollable content per this round's
+           request, so it isn't just a Dashboard-only element. -->
+      <div class="card" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:4px;">
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="#00E699" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <div class="small" style="color:var(--muted)">CITIXEN UX<sup class="tm-symbol">™</sup> — Privacy Engine: Verified</div>
       </div>
     </section>
 
@@ -945,9 +963,11 @@ textarea.input{resize:none;line-height:1.4}
 
       <!-- 11. PERSISTENT FOOTER — the app shell's bottom tab bar is fixed in
            place (unlike the web page's own scrolling footer), so a
-           same-content footer belongs at the end of this tab's scrollable
+           same-content footer belongs at the end of each tab's scrollable
            content instead of pinned under a fixed nav bar it would just
-           hide behind. Same real brand shield + verification seal copy as
+           hide behind. Repeated verbatim at the end of every tab (Report,
+           Map & Feed, Dashboard) and in the Quick Help modal, not just
+           here. Same real brand shield + verification seal copy as
            index.html's footer; the "modal re-trigger link" there (reopens
            the Crowd Save America™ entry pop-up) has no equivalent here —
            this app shell uses a splash screen, not that entry modal — so
@@ -2162,13 +2182,27 @@ const APP_MODAL_DATA = {
      with a single pared-down trust line — rather than drawing a new
      graphic or keeping two separate help entry points. */
   quickHelp: { title: 'Quick Help', html:
-    '<div style="margin-top:14px;">' + appTriadDiagramHtml('quickHelp') + '</div>' +
+    // Top trust strip — brand shield + "Anonymous & Secure", the same
+    // claim and icon as the Report tab's "No account required..." banner
+    // and the trust badge further down the Dashboard, so Quick Help opens
+    // on the same reassurance before anything else.
+    '<div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:14px;">' +
+      '<svg viewBox="0 0 24 24" width="18" height="18" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>' +
+      '<span style="color:#00E699;font-weight:800;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;">Anonymous &amp; Secure</span>' +
+    '</div>' +
+    appTriadDiagramHtml('quickHelp') +
     '<div style="margin-top:18px;">' +
       '<h4 style="color:#00E699">1. Spot &amp; Snap</h4><p>Geolocate your position and tag the issue (potholes, streetlights, drainage).</p>' +
       '<h4 style="color:#00E699">2. Automated Dispatch</h4><p><span class="brand-white">CITIXEN</span> <span class="brand-lime">UX</span><sup class="tm-symbol">™</sup> routes it to municipal teams and logs it to the Public Ledger.</p>' +
       '<h4 style="color:#00E699">3. Track Impact</h4><p>Monitor resolution speed and active capital project timelines in real time.</p>' +
     '</div>' +
-    '<p style="font-size:.78rem;color:var(--muted);line-height:1.55;padding:0 2px;">No account, device ID, or photo GPS/EXIF data ever leaves your phone.</p>' }
+    // Footer — verbatim reuse of the app shell's own persistent footer
+    // (same brand shield + "Privacy Engine: Verified" seal, centered
+    // column), not a paraphrased trust line, per this round's request.
+    '<div class="card" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:18px;">' +
+      '<svg viewBox="0 0 24 24" width="18" height="18" stroke="#00E699" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>' +
+      '<div class="small" style="color:var(--muted)">CITIXEN UX<sup class="tm-symbol">™</sup> — Privacy Engine: Verified</div>' +
+    '</div>' }
 };
 function openAppInfoModal(key){
   const d = APP_MODAL_DATA[key]; if (!d) return;
