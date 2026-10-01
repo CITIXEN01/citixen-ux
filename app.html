@@ -29,6 +29,8 @@
      index.html so the Dashboard renders from identical code on both. -->
 <link rel="stylesheet" href="/shared/instant-report.css">
 <script src="/shared/instant-report.js"></script>
+<script src="/shared/geo-hatch.js"></script>
+<script src="/shared/severity.js"></script>
 <style>
 :root{
   /* Green unification + obsidian canvas brought in line with index.html
@@ -160,6 +162,7 @@ textarea.input{resize:none;line-height:1.4}
 
 /* ===== MAP BEACONS (CartoDB Dark Matter basemap) ===== */
 .beacon-incident{position:relative;width:100%;height:100%}
+.beacon-incident.is-static .beacon-pulse{display:none}
 .beacon-incident .beacon-pulse{position:absolute;inset:-6px;border-radius:50%;background:var(--beacon-color);
   opacity:.4;animation:beaconPulse 1.8s ease-out infinite}
 /* This round's "Custom Pulse Markers" spec: 1px Midnight Navy (#090D16)
@@ -723,9 +726,10 @@ textarea.input{resize:none;line-height:1.4}
 
     <!-- MAP & FEED — pure triage stream, three field modules:
          1. Civic Dispatch Map (dark vector basemap, mint pulse markers)
-         2. Geo-Hatch Matrix & Triage Status (ward grid + triage HUD)
+         2. Local Ward Matrix & Triage Status (ward grid + triage HUD)
          3. Live Dispatch Feed (SLA age, project links, urgency badges)
-         Macro coverage tiers live under Dashboard → City Action Tracker.
+         The full Geo-Hatch Coverage Engine (all three scopes) lives on the
+         Dashboard, directly under the Scorecard.
          No 911/Emergency and no Live Public Ledger here. -->
     <section id="tab-map" class="tabpane">
       <div class="card">
@@ -736,7 +740,7 @@ textarea.input{resize:none;line-height:1.4}
       <div class="card" id="geoHatchCard">
         <div class="radius-tag">
           <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3l3.5 2v4L8 11 4.5 9V5z"/><path d="M15.5 3L19 5v4l-3.5 2L12 9V5z"/><path d="M11.75 10.5l3.5 2v4l-3.5 2-3.5-2v-4z"/></svg>
-          GEO-HATCH MATRIX &amp; TRIAGE STATUS
+          LOCAL WARD MATRIX &amp; TRIAGE STATUS
         </div>
         <div class="coverage-head">
           <div>
@@ -831,10 +835,17 @@ textarea.input{resize:none;line-height:1.4}
         </div>
       </section>
 
-      <!-- 5. TRUST INDICATOR SUBTITLE -->
+      <!-- 5. MIGRATED MACRO ANALYTICS ENGINE — GEO-HATCH COVERAGE. Rendered
+           by shared/geo-hatch.js (same component as index.html): Ward
+           (150m) / Municipal blocks / State–National toggles, Citywide
+           Asset Coverage %, and the block grid. Tapping an uncharted block
+           opens a ground-truth audit prompt that starts a report for it. -->
+      <div data-cx-geohatch></div>
+
+      <!-- 6. TRUST INDICATOR SUBTITLE -->
       <p class="ledger-trust-subtitle">free &amp; anonymous</p>
 
-      <!-- 6. PRIMARY LIVING GATEWAY — opens the same real Live Public Ledger
+      <!-- 7. PRIMARY LIVING GATEWAY — opens the same real Live Public Ledger
            drawer this tab already had (#ledgerDrawer / openLedgerDrawer()),
            just restyled to the shared .gateway-pill shell instead of the
            old plain "Live Civic Memory™" button. -->
@@ -846,7 +857,7 @@ textarea.input{resize:none;line-height:1.4}
         </button>
       </section>
 
-      <!-- 7. CIVIC INTELLIGENCE STACK™ — human-first labels: Capital
+      <!-- 8. CIVIC INTELLIGENCE STACK™ — human-first labels: Capital
            Projects / City Action Tracker / Community Archive. -->
       <section class="matrix-summary-section">
         <h3 style="color:#00E699;font-size:1.1rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin:4px 0 6px;text-align:center;">Civic Intelligence Stack<sup class="tm-symbol">™</sup></h3>
@@ -940,18 +951,6 @@ textarea.input{resize:none;line-height:1.4}
             <div class="big3-tile"><div class="big3-val" id="appMunicipalResolved">–</div><div class="big3-lbl">Resolved</div></div>
           </div>
           <div class="big3-note" id="appMunicipalCoverageNote">No ward directory on file yet for this jurisdiction.</div>
-        </div>
-        <!-- Macro coverage tiers (Municipal blocks / State–National), moved
-             here from Map & Feed so that tab stays a pure field-triage
-             stream. The ward-level Geo-Hatch grid stays on Map & Feed. -->
-        <div class="card">
-          <div class="label">Coverage beyond your ward</div>
-          <div class="tier-toggle" id="tierToggle">
-            <button class="tier-btn active" data-tier="municipal">Municipal blocks</button>
-            <button class="tier-btn" data-tier="national">State / National</button>
-          </div>
-          <canvas id="tierCanvas" width="600" height="240"></canvas>
-          <div class="small" id="tierCanvasCaption" style="text-align:center;margin-bottom:4px;"></div>
         </div>
         <button type="button" class="hub-deepdive-close" id="appMunicipalPanelCloseBtn">Close</button>
       </div>
@@ -1180,6 +1179,8 @@ const cases=[
   {id:'c2',title:'Streetlight Outage',loc:'Grand Ave & 7th St',lat:43.8180,lng:-91.2480,status:'Warning',time:'45m ago',ageMin:45,desc:'Dark corner, visibility issue.',projectId:'PRJ-1042'},
   {id:'c3',title:'Overfilled Trash Bin',loc:'Pine St Alley',lat:43.8100,lng:-91.2550,status:'Resolved',time:'2h ago',ageMin:120,desc:'Debris blocking access.'}
 ];
+// Seed data runs through the same 3-tier severity matrix as new reports.
+if (window.CitixenSeverity) window.CitixenSeverity.applyTo(cases);
 
 // Escape any user-supplied text before it is ever placed into innerHTML, to prevent stored-XSS
 // from a hazard description or location field containing HTML/script content.
@@ -1249,6 +1250,7 @@ async function initAnalytics(){
   nationalDataCache = lastNationalData;
   await loadBig3();
   await updateAppTelemetryScorecard(); // Dashboard tab's Geotagged Scorecard — real numbers, see above
+  if (window.CitixenGeoHatch) await window.CitixenGeoHatch.load(); // Geo-Hatch Coverage Engine under the Scorecard
 }
 
 /* =====================================================================
@@ -2710,6 +2712,7 @@ async function verifyReportedCell(cellId, category){
     cellEl.classList.add('covered', 'you');
     cellEl.setAttribute('aria-label', 'Verified — reported by you');
   });
+  if (verifiedCell && window.CitixenGeoHatch) window.CitixenGeoHatch.markCovered(cellId, verifiedCell.category);
   const fromPct = computeCoveragePctBefore(cellId);
   refreshCoverageStats();
   animateTicker(fromPct, computeCoveragePct(), 600);
@@ -2871,33 +2874,27 @@ function initMap(){
   }
 }
 
+// 3-tier severity matrix (shared/severity.js): Critical #FF3B30 (pulsing),
+// Warning #F59E0B, Standard/Resolved Laser Mint #00E699.
 function statusColor(status){
-  return status==='Critical' ? '#ff4444' : status==='Warning' ? '#ffbb00' : '#00E699';
+  if (window.CitixenSeverity) return window.CitixenSeverity.color(status);
+  return status==='Critical' ? '#FF3B30' : status==='Warning' ? '#F59E0B' : '#00E699';
 }
 function statusPill(status){
   return status==='Critical' ? 'pill-crit' : status==='Warning' ? 'pill-warn' : 'pill-ok';
 }
 
-// Category-coded incident color. This case data has no explicit `category`
-// field (unlike the public dashboard's cases), so the category is inferred
-// from the title text — a reported "pothole"/road hazard reads Lime, a
-// lighting hazard reads Amber. `status:'Critical'` always wins and reads Red
-// regardless of category, since urgency outranks category for triage color.
-// Anything that matches neither falls back to the existing status color
-// rather than guessing a category that isn't in the data.
+// Map pins are colored by severity tier, not category: red pulse =
+// Critical, amber pin = Warning, mint pin = Standard / Resolved.
 function categoryColor(item){
-  if (item.status === 'Critical') return '#ff4444';
-  const t = (item.title || '').toLowerCase();
-  if (/pothole|road|pavement/.test(t)) return '#00E699';
-  if (/light/.test(t)) return '#ffbb00';
   return statusColor(item.status);
 }
 
-function beaconIcon(color, size){
+function beaconIcon(color, size, pulse){
   const s = size || 26;
   return L.divIcon({
     className: '',
-    html: `<div class="beacon-incident" style="--beacon-color:${color}">
+    html: `<div class="beacon-incident${pulse === false ? ' is-static' : ''}" style="--beacon-color:${color}">
              <span class="beacon-pulse"></span>
              <span class="beacon-core"></span>
            </div>`,
@@ -2908,8 +2905,8 @@ function beaconIcon(color, size){
 
 function plotMarker(item){
   const col=categoryColor(item);
-  const icon=beaconIcon(col);
-  const m=L.marker([item.lat,item.lng],{icon}).addTo(map);
+  const icon=beaconIcon(col, 26, item.status === 'Critical');
+  const m=L.marker([item.lat,item.lng],{icon, zIndexOffset: item.status === 'Critical' ? 500 : 0}).addTo(map);
   m.bindPopup(`<strong>${esc(item.title)}</strong><br><span style="font-size:.7rem">${esc(item.loc)} • ${esc(item.time)}</span>`);
   markers[item.id]=m;
 }
@@ -3369,7 +3366,10 @@ async function finalizeSubmitReport(opts){
   const nc={
     id:'c'+Date.now(), title:cat, loc:rawLoc,
     lat:43.8150+(Math.random()-.5)*.01, lng:-91.2500+(Math.random()-.5)*.01,
-    status:'Critical', time:'Just now', ageMin:0,
+    status: window.CitixenSeverity
+      ? window.CitixenSeverity.classify({ category: cat, title: cat, desc: rawDesc, urgentOverride })
+      : (urgentOverride ? 'Critical' : 'Standard'),
+    time:'Just now', ageMin:0,
     desc: rawDesc + ' → Routed to ' + dept + overrideNote,
     urgentOverride
   };
@@ -3472,6 +3472,10 @@ function applyJurisdictionFromQueryString(){
   if (state && city && ward) {
     storeJurisdiction({ state, city, ward });
   }
+  // ?cell= comes from the web Dashboard's Geo-Hatch audit prompt: the next
+  // report published from this visit is tied to that block.
+  const cell = params.get('cell');
+  if (cell !== null && /^\d+$/.test(cell)) pendingReportCellId = Number(cell);
 }
 
 // CITIXEN UX™ splash — the primary launch state on app initialization.
@@ -3571,6 +3575,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   });
 
   initInstantReportAndQuickKeys();
+  initDashboardGeoHatch();
 });
 
 /* =====================================================================
@@ -3656,9 +3661,23 @@ function initInstantReportAndQuickKeys(){
     const { knownWards } = computeAppWardCoverage(currentWardMeta);
     IR.renderCipList(document.getElementById('appCipList'), await appJurisdictionCipProjects(knownWards));
   });
-  // City Action Tracker panel: draw the macro coverage tier on open
-  document.getElementById('appHubMunicipalBtn').addEventListener('click', () => {
-    setTimeout(() => drawTierCanvas(currentTier), 60);
+}
+
+/* Geo-Hatch Coverage Engine (Dashboard) — adapter for shared/geo-hatch.js.
+   Uses the same coverage endpoint and national rollup as this app's own
+   local ward grid; an audit tap starts a report tied to that block. */
+function initDashboardGeoHatch(){
+  if (!window.CitixenGeoHatch) { console.warn('shared/geo-hatch.js did not load — the Dashboard coverage engine is unavailable.'); return; }
+  window.CitixenGeoHatch.init({
+    getEndpoint: () => currentWardMeta ? COVERAGE_ENDPOINT : null,
+    getCityLabel: () => currentWardMeta ? (currentWardMeta.cityName + ', ' + currentWardMeta.state).toUpperCase() : null,
+    getNational: async () => lastNationalData || fallbackNational(),
+    onAuditBlock: (cellId) => {
+      pendingReportCellId = cellId;
+      switchTab('tab-report', document.querySelector('.navtab[data-target="tab-report"]'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      toast('Ground-truth audit started — capture a photo of this block and publish.');
+    }
   });
 }
 </script>

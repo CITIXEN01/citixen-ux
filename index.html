@@ -38,6 +38,8 @@
      styles and export modal from one file pair). -->
 <link rel="stylesheet" href="/shared/instant-report.css">
 <script src="/shared/instant-report.js"></script>
+<script src="/shared/geo-hatch.js"></script>
+<script src="/shared/severity.js"></script>
 <style>
 :root{
   /* Total green unification per this round's item 7: the second "Emerald
@@ -667,6 +669,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
    regression. The OSM+filter combination is the honest way to get a dark,
    high-contrast map without a paid/keyed tile service. ===== */
 .beacon-incident{position:relative;width:100%;height:100%}
+.beacon-incident.is-static .beacon-pulse{display:none}
 .beacon-incident .beacon-pulse{position:absolute;inset:-6px;border-radius:50%;background:var(--beacon-color);
   opacity:.4;animation:beaconPulse 1.8s ease-out infinite}
 /* This round's "Custom Pulse Markers" spec: 1px Midnight Navy (#090D16)
@@ -1455,6 +1458,14 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        every other card on the page (Scorecard, Stack, Privacy Card,
        Option Grid) stays calm and static — plus the centered, muted
        "free & anonymous" trust line directly above the pill. ===== -->
+  <!-- ===== MIGRATED MACRO ANALYTICS ENGINE — GEO-HATCH COVERAGE, directly
+       under the Scorecard. Rendered by shared/geo-hatch.js (identical to
+       app.html's Dashboard tab): Ward (150m) / Municipal blocks / State–
+       National toggles, Citywide Asset Coverage %, and the block grid.
+       Tapping an uncharted block opens a ground-truth audit prompt that
+       hands off to the mobile reporter with that block pre-selected. ===== -->
+  <div style="padding:0 16px"><div data-cx-geohatch></div></div>
+
   <p class="ledger-trust-subtitle">free &amp; anonymous</p>
   <section class="ledger-banner-section gateway-pill-stacked">
     <button id="liveLedgerBanner" class="gateway-pill ledger-pill-glow" type="button">
@@ -2312,10 +2323,17 @@ const cases=[
   {id:'c2',title:'Streetlight Outage',loc:'Grand Ave & 7th St',lat:43.8180,lng:-91.2480,status:'Warning',time:'45m ago',desc:'Dark corner, visibility issue.',category:'Lighting'},
   {id:'c3',title:'Overfilled Trash Bin',loc:'Pine St Alley',lat:43.8100,lng:-91.2550,status:'Resolved',time:'2h ago',desc:'Debris blocking access.',category:'Sanitation'}
 ];
+// Seed data runs through the same 3-tier severity matrix as the app.
+if (window.CitixenSeverity) window.CitixenSeverity.applyTo(cases);
 let statusFilter='All', categoryFilter=null;
 
 function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function statusColor(status){ return status==='Critical' ? '#ff4444' : status==='Warning' ? '#ffbb00' : '#00E699'; }
+// 3-tier severity matrix (shared/severity.js): Critical #FF3B30 (pulsing),
+// Warning #F59E0B, Standard/Resolved Laser Mint #00E699.
+function statusColor(status){
+  if (window.CitixenSeverity) return window.CitixenSeverity.color(status);
+  return status==='Critical' ? '#FF3B30' : status==='Warning' ? '#F59E0B' : '#00E699';
+}
 function statusPill(status){ return status==='Critical' ? 'pill-crit' : status==='Warning' ? 'pill-warn' : 'pill-ok'; }
 
 // ===== PUBLIC LEDGER LOCATION FUZZYING =====
@@ -2356,19 +2374,17 @@ function initMap(){
 // Amber, and a Critical status always reads Red regardless of category
 // (urgency outranks category for triage color). Anything else falls back
 // to the existing status color rather than inventing a category.
+// Map pins are colored by severity tier, not category: red pulse =
+// Critical, amber pin = Warning, mint pin = Standard / Resolved.
 function categoryColor(item){
-  if (item.status === 'Critical') return '#ff4444';
-  const cat = (item.category || '').toLowerCase();
-  if (cat === 'roads') return '#00E699';
-  if (cat === 'lighting') return '#ffbb00';
   return statusColor(item.status);
 }
 
-function beaconIcon(color, size){
+function beaconIcon(color, size, pulse){
   const s = size || 26;
   return L.divIcon({
     className: '',
-    html: `<div class="beacon-incident" style="--beacon-color:${color}">
+    html: `<div class="beacon-incident${pulse === false ? ' is-static' : ''}" style="--beacon-color:${color}">
              <span class="beacon-pulse"></span>
              <span class="beacon-core"></span>
            </div>`,
@@ -2396,9 +2412,9 @@ function plotUserLocationMarker(lat, lng){
 
 function plotMarker(item){
   const col=categoryColor(item);
-  const icon=beaconIcon(col);
+  const icon=beaconIcon(col, 26, item.status === 'Critical');
   const dLat=fuzzCoord(item.lat), dLng=fuzzCoord(item.lng);
-  const m=L.marker([dLat,dLng],{icon}).addTo(map);
+  const m=L.marker([dLat,dLng],{icon, zIndexOffset: item.status === 'Critical' ? 500 : 0}).addTo(map);
   m.bindPopup(`<strong>${esc(item.title)}</strong><br><span style="font-size:.7rem">${esc(item.loc)} • ${esc(item.time)}</span><br><span style="font-size:.68rem;color:#8e9fa8">${esc(item.category)} • ${esc(item.status)}</span>`);
   m._fuzzedLat=dLat; m._fuzzedLng=dLng;
   markers[item.id]=m;
@@ -2448,7 +2464,9 @@ function updateTelemetry(c){
 function renderFeed(){
   const c=document.getElementById('feed'); c.innerHTML='';
   let visible=cases;
-  if(statusFilter!=='All') visible=visible.filter(i=>i.status===statusFilter);
+  // "Green" covers both mint tiers: Standard (routine) and Resolved.
+  if(statusFilter==='Resolved') visible=visible.filter(i=>i.status==='Resolved'||i.status==='Standard');
+  else if(statusFilter!=='All') visible=visible.filter(i=>i.status===statusFilter);
   if(categoryFilter) visible=visible.filter(i=>i.category===categoryFilter);
   visible.forEach(item=>{
     const el=document.createElement('div');
@@ -3508,6 +3526,7 @@ function applyJurisdiction(j, opts){
   updateSmartLocationBanner(j);
   updateTelemetryScorecard();
   renderWardCoverageTracker();
+  if (window.CitixenGeoHatch) window.CitixenGeoHatch.reload(); // re-pull the Geo-Hatch grid for the new ward
   if (!(opts && opts.silent)) {
     // A citizen just actively confirmed/changed jurisdiction — refresh the
     // paperwork stack in place if the drawer happens to be open already.
@@ -4910,6 +4929,18 @@ async function webInstantReportData(){
   function start(){
     if (!window.CitixenInstantReport) { console.warn('shared/instant-report.js did not load — Instant Report is unavailable.'); return; }
     window.CitixenInstantReport.init({ getData: webInstantReportData });
+    if (window.CitixenGeoHatch) {
+      window.CitixenGeoHatch.init({
+        getEndpoint: () => { const j = activeJurisdiction(); return j ? '/api/coverage/' + j.state + '/' + j.city + '/' + j.ward : null; },
+        getCityLabel: () => { const j = activeJurisdiction(); return j ? (j.cityName + ', ' + j.state).toUpperCase() : null; },
+        onAuditBlock: (cellId) => {
+          const j = activeJurisdiction();
+          const qs = new URLSearchParams(j ? { state: j.state, city: j.city, ward: j.ward, cell: String(cellId) } : { cell: String(cellId) });
+          window.location.href = '/app?' + qs.toString();
+        }
+      });
+      window.CitixenGeoHatch.load();
+    }
     document.getElementById('hubCoverageBtn').addEventListener('click', async () => {
       const { knownWards } = computeWardCoverage(activeJurisdiction());
       window.CitixenInstantReport.renderCipList(document.getElementById('webCipList'), await webJurisdictionCipProjects(knownWards));

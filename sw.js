@@ -12,6 +12,8 @@ const SHELL = [
   '/manifest.json',
   '/shared/instant-report.css',
   '/shared/instant-report.js',
+  '/shared/geo-hatch.js',
+  '/shared/severity.js',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
   '/icons/apple-touch-icon.png'
