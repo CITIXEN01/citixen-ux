@@ -610,24 +610,29 @@
     if (tab === 'graphic') drawCard();
   }
 
-  // Tab 3 text: the brief in plain text, the direct link, and — when the
-  // audit toggle is on — the summary and audit trail rows.
+  // Tab 3 text: a short, scannable brief for pasting into a text message or
+  // DM. Condensed to 2 metric lines (dropping the per-record "Audit trail"
+  // list that used to print here — still available in the full PDF) plus,
+  // when the audit toggle is on, a 1-line Living Ledger summary. Every
+  // figure is still the same live adapter read as the rest of this file —
+  // shortening the copy never means freezing the numbers; see the file
+  // header note ("Nothing here invents a number").
   function plainTextExport() {
-    var d = data, hz = hazardIndex(d), lines = [
-      'FREE CIVIC REPORT — ' + cityStateLabel(d) + ' (' + shortDate(generatedAt) + ')',
-      'Civic Health: ' + civicHealthZoneLabel(hz.label) + ' · Reports filed: ' + d.total + ' · Open dispatches: ' + d.counts.dispatched,
-      'Avg fix speed: ' + avgHoursText(d) + ' · Resolution rate: ' + resolutionRate(d) + ' · ' + stateRankHeaderLabel(d.ranks) + ': ' + stateRankValue(d.ranks),
+    var d = data, hz = hazardIndex(d), score = healthScore(d);
+    var lines = [
+      'FREE CIVIC REPORT',
+      '• Reports Filed: ' + d.total + ' | Civic Health: ' + civicHealthZoneLabel(hz.label) + ' | Open Dispatches: ' + d.counts.dispatched,
+      '• Avg Fix Speed: ' + avgHoursText(d) + ' | Resolution Rate: ' + resolutionRate(d) + ' | ' + stateRankHeaderLabel(d.ranks) + ': ' + stateRankValue(d.ranks),
       ''
     ];
     if (appendLedgerSummary) {
-      lines.push('LIVING LEDGER™ AUDIT SUMMARY');
-      payloadText().split('\n').slice(0, -2).forEach(function (l) { lines.push(l); });
-      var rows = auditRows();
-      lines.push('', 'Audit trail (' + rows.length + ' records):');
-      rows.forEach(function (r) { lines.push('• ' + r.id + ' — ' + r.what + ' — ' + r.stage + ', submitted ' + r.submitted + (r.fix !== '—' ? ', fixed in ' + r.fix : '') + ', ' + r.verified); });
-      lines.push('');
+      lines.push(
+        'LIVING LEDGER™ AUDIT SUMMARY — ' + cityStateLabel(d) + (d.wardLabel ? ' ' + d.wardLabel : '') + ' Zone',
+        '• Zone Health Score: ' + (score != null ? score + '/10' : 'N/A') + ' | Resolved: ' + (d.total ? d.resolved + '/' + d.total : 'N/A') + ' | Coverage: ' + pctText(d.coveragePct),
+        ''
+      );
     }
-    lines.push('Audit your block — anonymous & sovereign. #CrowdSaveAmerica', auditUrl());
+    lines.push('View full live public ledger and active dispatches:', auditUrl());
     return lines.join('\n');
   }
 
