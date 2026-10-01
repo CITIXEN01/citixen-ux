@@ -5,11 +5,13 @@
    - Cross-origin requests (map tiles, Leaflet CDN, QR images) pass straight through:
      they are not cached here, so no third-party responses are stored on the device.
    Bump VERSION to roll out a new shell; old caches are deleted on activate. */
-const VERSION = 'citixen-v2';
+const VERSION = 'citixen-v3';
 const SHELL = [
   '/app',
   '/',
   '/manifest.json',
+  '/shared/instant-report.css',
+  '/shared/instant-report.js',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
   '/icons/apple-touch-icon.png'

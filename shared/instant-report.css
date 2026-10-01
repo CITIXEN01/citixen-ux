@@ -1,0 +1,136 @@
+/* =====================================================================
+   CITIXEN UX™ — INSTANT REPORT (shared by index.html and app.html)
+   ---------------------------------------------------------------------
+   One stylesheet + one script (shared/instant-report.js) so the web
+   Dashboard and the app's Dashboard tab render the Export & Share hero
+   module and the Instant Report modal from literally the same code.
+   Brand geometry: obsidian page, Midnight Navy (#090D16) surfaces,
+   Laser Mint (#00E699) accents, 12px radii, 1px borders.
+   ===================================================================== */
+.cx-export{max-width:640px;margin:0 auto 18px;padding:18px 18px 16px;box-sizing:border-box;
+  background:#090D16;border:1px solid rgba(0,230,153,.4);border-radius:12px;text-align:center}
+.cx-export-kicker{font-size:.62rem;font-weight:700;letter-spacing:.22em;color:#94A3B8;margin-bottom:6px}
+.cx-export-title{margin:0 0 6px;color:#00E699;font-weight:800;font-size:1.05rem;letter-spacing:.08em;text-transform:uppercase;text-wrap:balance}
+.cx-export-sub{margin:0 auto 14px;max-width:44ch;color:#94A3B8;font-size:.8rem;line-height:1.5}
+.cx-btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;
+  min-height:48px;padding:12px 16px;border:1px solid #00E699;border-radius:12px;
+  background:#00E699;color:#090D16;font:inherit;font-weight:800;font-size:.95rem;letter-spacing:.02em;cursor:pointer}
+.cx-btn-primary:hover{filter:brightness(1.08)}
+.cx-btn-primary[disabled]{opacity:.6;cursor:progress}
+.cx-btn-dashed{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;
+  min-height:46px;margin-top:10px;padding:11px 16px;border:1px dashed rgba(0,230,153,.7);border-radius:12px;
+  background:transparent;color:#E2E8F0;font:inherit;font-weight:700;font-size:.88rem;cursor:pointer}
+.cx-btn-dashed:hover{border-color:#00E699;color:#00E699}
+.cx-btn-primary:focus-visible,.cx-btn-dashed:focus-visible,.cx-tile:focus-visible,.cx-close:focus-visible,
+.cx-drawer-key:focus-visible{outline:2px solid #00E699;outline-offset:2px}
+.cx-icon{width:18px;height:18px;flex-shrink:0;stroke:#00E699;stroke-width:1;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.cx-btn-primary .cx-icon{stroke:#090D16;stroke-width:1.4}
+
+/* ---------- Modal shell ---------- */
+.cx-modal{position:fixed;inset:0;z-index:6000;display:none;align-items:flex-end;justify-content:center;
+  background:rgba(3,7,18,.86);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.cx-modal.open{display:flex}
+@media (min-width:640px){.cx-modal{align-items:center}}
+.cx-panel{width:100%;max-width:560px;max-height:92vh;max-height:92dvh;display:flex;flex-direction:column;box-sizing:border-box;
+  background:#090D16;border:1px solid rgba(0,230,153,.35);border-radius:12px 12px 0 0;color:#E2E8F0;
+  padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (min-width:640px){.cx-panel{border-radius:12px}}
+.cx-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
+.cx-head-text{flex:1;min-width:0}
+.cx-head-title{font-weight:800;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase;color:#FFFFFF}
+.cx-head-sub{font-size:.72rem;color:#94A3B8;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cx-close{width:36px;height:36px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:transparent;
+  color:#E2E8F0;font:inherit;font-size:1rem;cursor:pointer;flex-shrink:0}
+.cx-body{overflow-y:auto;padding:14px 16px 18px;-webkit-overflow-scrolling:touch}
+
+/* ---------- 3-tile selection grid ---------- */
+.cx-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.cx-tile{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:8px;min-width:0;
+  padding:12px 6px;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:#0B1120;
+  color:#CBD5E1;font:inherit;font-size:.62rem;font-weight:800;letter-spacing:.06em;line-height:1.3;text-transform:uppercase;cursor:pointer;text-align:center}
+.cx-tile .cx-icon{width:24px;height:24px}
+.cx-tile[aria-selected="true"]{border-color:#00E699;color:#00E699;background:rgba(0,230,153,.07)}
+.cx-tile-label{overflow-wrap:normal;word-break:normal;hyphens:none}
+
+/* ---------- Branch A: PDF brief preview (paper) ---------- */
+.cx-paper{background:#FFFFFF;color:#090D16;border-radius:12px;overflow:hidden;border:1px solid #E2E8F0}
+.cx-mast{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#090D16;color:#FFFFFF;border-bottom:2px solid #00E699}
+.cx-mast .cx-icon{width:26px;height:26px;stroke-width:1.2}
+.cx-mast-brand{font-weight:800;letter-spacing:.06em;font-size:.82rem}
+.cx-mast-brand b{color:#00E699}
+.cx-mast-label{font-size:.6rem;letter-spacing:.16em;color:#94A3B8;text-transform:uppercase;margin-top:2px}
+.cx-mast-time{margin-left:auto;text-align:right;font-size:.58rem;color:#94A3B8;line-height:1.4;font-variant-numeric:tabular-nums}
+.cx-paper-juris{padding:10px 14px 0;font-size:.72rem;font-weight:700;color:#334155}
+.cx-sec{padding:12px 14px;border-bottom:1px solid #E2E8F0}
+.cx-sec:last-of-type{border-bottom:none}
+.cx-sec-title{font-size:.62rem;font-weight:800;letter-spacing:.14em;color:#090D16;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.cx-sec-title span{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;
+  background:#090D16;color:#00E699;font-size:.58rem;letter-spacing:0}
+.cx-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cx-metric{border:1px solid #E2E8F0;border-radius:10px;padding:8px 6px;text-align:center}
+.cx-metric-val{font-size:1.05rem;font-weight:800;color:#047857;font-variant-numeric:tabular-nums}
+.cx-metric-lbl{font-size:.56rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748B;margin-top:2px}
+.cx-cip{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.cx-cip li{display:flex;align-items:center;gap:8px;font-size:.74rem;min-width:0}
+.cx-cip-name{flex:1;min-width:0;overflow-wrap:anywhere}
+.cx-cip-when{color:#64748B;font-size:.66rem;white-space:nowrap;font-variant-numeric:tabular-nums}
+.cx-pill{font-size:.58rem;font-weight:800;letter-spacing:.04em;padding:2px 8px;border-radius:999px;white-space:nowrap;flex-shrink:0}
+.cx-pill-ontime{background:#D1FAE5;color:#065F46}
+.cx-pill-progress{background:#E0F2FE;color:#075985}
+.cx-pill-delayed{background:#FEF3C7;color:#92400E}
+.cx-empty{font-size:.72rem;color:#64748B}
+.cx-note{padding:10px 14px 12px;font-size:.58rem;line-height:1.5;color:#64748B;background:#F8FAFC}
+
+/* Dark-surface variant of the CIP list (Capital Projects deep-dive panels) */
+.cx-cip-dark li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);color:#E2E8F0}
+.cx-cip-dark li:last-child{border-bottom:none}
+.cx-cip-dark .cx-cip-when{color:#94A3B8}
+.cx-cip-dark .cx-pill-ontime{background:rgba(0,230,153,.16);color:#00E699}
+.cx-cip-dark .cx-pill-progress{background:rgba(56,189,248,.14);color:#7DD3FC}
+.cx-cip-dark .cx-pill-delayed{background:rgba(245,158,11,.16);color:#FBBF24}
+.cx-cip-dark + .cx-empty,.cx-cip-dark .cx-empty{color:#94A3B8}
+
+/* ---------- Branch B: #CrowdSaveAmerica graphic ---------- */
+.cx-card-wrap{width:100%;max-width:420px;margin:0 auto;aspect-ratio:1/1;border-radius:12px;overflow:hidden;border:1px solid rgba(0,230,153,.35)}
+.cx-card-wrap canvas{display:block;width:100%;height:100%}
+
+/* ---------- Branch C: direct link payload ---------- */
+.cx-payload{width:100%;box-sizing:border-box;min-height:120px;resize:vertical;padding:12px;border-radius:12px;
+  border:1px solid rgba(0,230,153,.35);background:#030712;color:#E2E8F0;font:inherit;font-size:.8rem;line-height:1.5}
+.cx-payload-url{display:block;margin-top:10px;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.1);
+  background:#0B1120;color:#00E699;font-size:.76rem;overflow-wrap:anywhere;user-select:all;-webkit-user-select:all}
+.cx-hint{font-size:.7rem;color:#94A3B8;margin:10px 0 0;text-align:center;min-height:1em}
+.cx-actions{margin-top:14px}
+
+@media (prefers-reduced-motion:reduce){.cx-modal *{animation:none!important;transition:none!important}}
+
+/* ---------- Civic Intelligence Stack rows (both pages) ----------
+   The relabeled module titles + descriptions are longer than the old
+   one-word labels, so on phones the description drops under the title
+   instead of truncating it. */
+@media (max-width:540px){
+  .hub-card{flex-wrap:wrap;row-gap:4px}
+  .hub-card-actions{flex:1 1 100%;padding-left:32px;justify-content:space-between;box-sizing:border-box}
+  .hub-card-sub{white-space:normal}
+}
+.hub-card svg.cx-hub-icon{stroke:#00E699;stroke-width:1;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- App menu drawer: Quick Keys command center ---------- */
+.cx-drawer-section{margin:0 0 18px}
+.cx-drawer-heading{font-size:.6rem;font-weight:800;letter-spacing:.16em;color:#94A3B8;margin:0 0 8px;text-transform:uppercase}
+.cx-drawer-key{display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;min-height:52px;margin:0 0 8px;
+  padding:10px 12px;border:1px solid rgba(0,230,153,.22);border-radius:12px;background:#090D16;color:#E2E8F0;
+  font:inherit;text-align:left;cursor:pointer;text-decoration:none}
+.cx-drawer-key:hover{border-color:#00E699}
+.cx-drawer-key .cx-icon{width:22px;height:22px}
+.cx-drawer-key-text{flex:1;min-width:0}
+.cx-drawer-key-title{display:block;font-size:.74rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#FFFFFF}
+.cx-drawer-key-sub{display:block;font-size:.66rem;color:#94A3B8;margin-top:2px}
+.cx-drawer-key-arrow{color:#00E699;font-weight:700;flex-shrink:0}
+.cx-drawer-foot{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;padding:12px;
+  border-top:1px solid rgba(255,255,255,.08);font-size:.7rem;color:#94A3B8}
+
+.cx-toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:7000;
+  max-width:min(92vw,420px);padding:10px 14px;border-radius:12px;border:1px solid rgba(0,230,153,.4);background:#090D16;
+  color:#E2E8F0;font-size:.8rem;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.cx-toast.show{opacity:1}

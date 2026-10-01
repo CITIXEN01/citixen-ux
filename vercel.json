@@ -26,7 +26,7 @@
       "destination": "/report.html?id=:id"
     },
     {
-      "source": "/((?!api/|app$|dispatch$|admin$|rep$|icons/|manifest.json|sw.js|favicon.ico|CITIXEN_UX_Executive_Deck\\.pptx).*)",
+      "source": "/((?!api/|app$|dispatch$|admin$|rep$|icons/|shared/|manifest.json|sw.js|favicon.ico|CITIXEN_UX_Executive_Deck\\.pptx).*)",
       "destination": "/index.html"
     }
   ],

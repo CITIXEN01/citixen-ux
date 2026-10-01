@@ -34,6 +34,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <!-- Client-side PDF export for the Ward Health Summary — same CDN-script pattern as Leaflet above, no bundler/build step. -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- Instant Report — shared with app.html's Dashboard tab (same markup,
+     styles and export modal from one file pair). -->
+<link rel="stylesheet" href="/shared/instant-report.css">
+<script src="/shared/instant-report.js"></script>
 <style>
 :root{
   /* Total green unification per this round's item 7: the second "Emerald
@@ -931,7 +935,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
    (margin:16px auto keeps it horizontally centered too, since this is
    still a block-level element, not full-bleed). */
 .ledger-trust-subtitle{max-width:640px;margin:16px auto;padding:0;
-  text-align:center;color:#00E699;font-weight:700;font-size:14px;
+  text-align:center;color:#FFFFFF;font-weight:800;font-size:14px;
   text-transform:lowercase;letter-spacing:.05em}
 .ledger-banner-section{max-width:640px;margin:0 auto 24px;padding:0 24px}
 /* Gap below the Live Public Ledger pill before the national map box, per
@@ -1368,6 +1372,13 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   <p class="citizen-dashboard-subheader"><span class="cds-white">Citixen</span> <span class="cds-mint">Dashboard</span></p>
   <p class="hero-tagline-subtle">Real-time community reporting and municipal tracking.</p>
 
+  <!-- ===== ELEVATED PRIMARY HERO MODULE — [ EXPORT & SHARE ]. Rendered by
+       shared/instant-report.js, identical to app.html's Dashboard tab.
+       "Instant Report ↗" opens the 3-branch export modal (Official PDF
+       Brief / #CrowdSaveAmerica Graphic / Direct Link Payload) for the
+       detected jurisdiction; "Share CITIXEN UX™" calls navigator.share(). ===== -->
+  <div style="padding:0 16px"><div data-cx-export-module></div></div>
+
   <!-- ===== GEOTAGGED SCORECARD (this round's item 2.5 — "Calm Base,
        Centered Title"). The header itself IS the jurisdiction/Change
        Location trigger (same real openLocationPicker() flow the old
@@ -1409,15 +1420,15 @@ audio.pw-audio-el{width:100%;margin-top:4px}
       <div class="telemetry-scorecard-grid">
         <div class="telemetry-scorecard-col">
           <div class="telemetry-scorecard-val" id="scorecardResolved">—</div>
-          <div class="telemetry-scorecard-lbl">Reports Resolved</div>
+          <div class="telemetry-scorecard-lbl">Resolved</div>
         </div>
         <div class="telemetry-scorecard-col">
           <div class="telemetry-scorecard-val" id="scorecardCovered">—</div>
-          <div class="telemetry-scorecard-lbl">City Covered</div>
+          <div class="telemetry-scorecard-lbl">Covered</div>
         </div>
         <div class="telemetry-scorecard-col">
           <div class="telemetry-scorecard-val" id="scorecardSla">—</div>
-          <div class="telemetry-scorecard-lbl">Avg City Response</div>
+          <div class="telemetry-scorecard-lbl">Avg Response</div>
         </div>
       </div>
       <span class="telemetry-scorecard-timestamp" id="scorecardTimestamp" aria-hidden="true"></span>
@@ -1504,24 +1515,24 @@ audio.pw-audio-el{width:100%;margin-top:4px}
   <div class="hub-row" role="navigation" aria-label="Deep-dive sections">
     <button class="hub-card telemetry-card" id="hubCoverageBtn" type="button" aria-expanded="false" aria-controls="deepdiveAnalytics" data-export-context="Analytics &amp; Reporting">
       <span class="hub-card-main">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><rect x="6" y="10" width="3" height="9"/><rect x="11" y="6" width="3" height="13"/><rect x="16" y="13" width="3" height="6"/></svg>
-        <span class="hub-card-title">Analytics</span>
+        <svg class="cx-hub-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 20h16"/><path d="M6 20v-5h3v5M10.5 20v-9h3v9M15 20v-7h3v7"/><path d="M5 10l5-4 4 3 5-5"/><path d="M16 4h3v3"/></svg>
+        <span class="hub-card-title">Capital Projects</span>
       </span>
-      <span class="hub-card-actions"><span class="hub-card-sub" id="hubCoverageInfoBtn" role="button" tabindex="0" aria-label="What the Analytics section covers">Data &amp; Reports</span><span class="hub-card-arrow">↗</span></span>
+      <span class="hub-card-actions"><span class="hub-card-sub" id="hubCoverageInfoBtn" role="button" tabindex="0" aria-label="What the Capital Projects section covers">CIP Intercept &amp; Budget Tracking</span><span class="hub-card-arrow">↗</span></span>
     </button>
     <button class="hub-card telemetry-card" id="hubMunicipalBtn" type="button" aria-expanded="false" aria-controls="municipalPanel" data-export-context="the Municipal Work Orders &amp; Response Tracker">
       <span class="hub-card-main">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9l8-5 8 5v12"/><path d="M9 21v-6h6v6"/><path d="M4 21h16"/></svg>
-        <span class="hub-card-title">Municipal Portal</span>
+        <svg class="cx-hub-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M2 6h11v10H2z"/><path d="M13 9h4l4 4v3h-8z"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>
+        <span class="hub-card-title">City Action Tracker</span>
       </span>
-      <span class="hub-card-actions"><span class="hub-card-sub" id="hubMunicipalInfoBtn" role="button" tabindex="0" aria-label="What the Municipal section covers">Work Orders &amp; Response</span><span class="hub-card-arrow">↗</span></span>
+      <span class="hub-card-actions"><span class="hub-card-sub" id="hubMunicipalInfoBtn" role="button" tabindex="0" aria-label="What the City Action Tracker covers">Live Work Orders &amp; Response</span><span class="hub-card-arrow">↗</span></span>
     </button>
     <button class="hub-card telemetry-card" id="hubStackBtn" type="button" aria-expanded="false" aria-controls="civicCharterDrawer" data-export-context="the Civic Memory™ Public Ledger &amp; Standards">
       <span class="hub-card-main">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 21 8 12 13 3 8 12 3"/><polyline points="3 13 12 18 21 13"/><polyline points="3 18 12 23 21 18"/></svg>
-        <span class="hub-card-title">Civic Memory™</span>
+        <svg class="cx-hub-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 9l9-5 9 5"/><path d="M4 9h16"/><path d="M6 9v8M10 9v8M14 9v8M18 9v8"/><path d="M4 17h16M3 20h18"/></svg>
+        <span class="hub-card-title">Community Archive</span>
       </span>
-      <span class="hub-card-actions"><span class="hub-card-sub" id="hubStackInfoBtn" role="button" tabindex="0" aria-label="What the Civic Memory framework covers">Public Ledger &amp; Standards</span><span class="hub-card-arrow">↗</span></span>
+      <span class="hub-card-actions"><span class="hub-card-sub" id="hubStackInfoBtn" role="button" tabindex="0" aria-label="What the Community Archive covers">Public Ledger &amp; Civic Memory™</span><span class="hub-card-arrow">↗</span></span>
     </button>
   </div>
   </div><!-- /#civic-stack-container -->
@@ -1855,6 +1866,11 @@ audio.pw-audio-el{width:100%;margin-top:4px}
         <button class="deepdive-export-btn" data-export-context="Analytics &amp; Reporting" type="button">Export ↗</button>
         <button class="deepdive-close" data-close-panel="deepdiveAnalytics" type="button">Close ✕</button>
       </div>
+    </div>
+    <div class="card" style="max-width:640px;margin:0 auto 16px;">
+      <div class="label"><span>Capital projects (CIP)</span></div>
+      <div id="webCipList"><p class="cx-empty">Loading capital projects…</p></div>
+      <div class="small" style="color:var(--muted);margin-top:8px;">Scheduled capital work for this jurisdiction. Reports filed inside a project's area are intercepted before dispatch so a patch crew isn't sent for work already funded.</div>
     </div>
     <!-- ===== "COVER AMERICA" GEO-HATCH LAUNCHER + BRIDGE SLOGAN — per the
          buried-data-architecture spec, the heat map trigger lives strictly
@@ -4850,6 +4866,57 @@ window.addEventListener('DOMContentLoaded',()=>{
      =================================================================== */
   setInterval(loadBig3, 20000);
 });
+
+/* =====================================================================
+   INSTANT REPORT — data adapter for shared/instant-report.js (app.html
+   has its own adapter over currentWardMeta). Same real sources as the
+   Scorecard: ledger tickets, the jurisdiction directory, CAPEX_PROJECTS.
+   ===================================================================== */
+async function webJurisdictionCipProjects(knownWards){
+  let all;
+  try {
+    const res = await fetch('/api/coverage/big3');
+    if (!res.ok) throw new Error('big3 returned ' + res.status);
+    const json = await res.json();
+    all = Array.isArray(json.capExProjects) && json.capExProjects.length ? json.capExProjects : FALLBACK_CAPEX_PROJECTS;
+  } catch (err) {
+    all = FALLBACK_CAPEX_PROJECTS;
+  }
+  const slugs = (knownWards || []).map(w => (w && (w.slug || w.ward)) || w).filter(x => typeof x === 'string');
+  return slugs.length ? all.filter(p => !p.ward || slugs.includes(p.ward)) : all;
+}
+async function webInstantReportData(){
+  if (!jurisdictionDirectory) { try { jurisdictionDirectory = await fetchJurisdictionDirectory(); } catch (e) { /* coverage shows N/A */ } }
+  if (!ledgerTickets.length) { try { ledgerTickets = await fetchLedgerTickets(); } catch (e) { /* empty snapshot */ } }
+  const j = activeJurisdiction();
+  const cityTickets = j ? ledgerTickets.filter(t => t.city === j.city && t.state === j.state) : ledgerTickets;
+  const counts = { submitted: 0, dispatched: 0, resolved: 0 };
+  cityTickets.forEach(t => { if (Object.prototype.hasOwnProperty.call(counts, t.stage)) counts[t.stage]++; });
+  const { knownWards, pct } = computeWardCoverage(j);
+  return {
+    jurisdiction: j ? jurisdictionLabel(j) : 'Citywide (jurisdiction not confirmed)',
+    cityLabel: j ? (j.cityName + ', ' + j.state).toUpperCase() : 'CITYWIDE',
+    wardLabel: j && j.wardName ? String(j.wardName).toUpperCase() : null,
+    resolved: counts.resolved,
+    total: cityTickets.length,
+    coveragePct: knownWards.length ? (pct != null ? pct : 0) : null,
+    avgDays: computeAvgResolutionDays(cityTickets),
+    counts,
+    cip: await webJurisdictionCipProjects(knownWards),
+    nodes: cases.map(c => ({ lat: c.lat, lng: c.lng }))
+  };
+}
+(function initWebInstantReport(){
+  function start(){
+    if (!window.CitixenInstantReport) { console.warn('shared/instant-report.js did not load — Instant Report is unavailable.'); return; }
+    window.CitixenInstantReport.init({ getData: webInstantReportData });
+    document.getElementById('hubCoverageBtn').addEventListener('click', async () => {
+      const { knownWards } = computeWardCoverage(activeJurisdiction());
+      window.CitixenInstantReport.renderCipList(document.getElementById('webCipList'), await webJurisdictionCipProjects(knownWards));
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+})();
 </script>
 </body>
 </html>

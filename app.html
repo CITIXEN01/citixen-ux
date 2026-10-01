@@ -24,6 +24,11 @@
 <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.1.4/leaflet-maplibre-gl.js"></script>
 <!-- Client-side PDF export for the Ward Health Summary — same CDN-script pattern as Leaflet above, no bundler/build step. -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- Instant Report (Export & Share module, 3-branch export modal, Quick
+     Keys drawer styles) — one shared file pair used by both app.html and
+     index.html so the Dashboard renders from identical code on both. -->
+<link rel="stylesheet" href="/shared/instant-report.css">
+<script src="/shared/instant-report.js"></script>
 <style>
 :root{
   /* Green unification + obsidian canvas brought in line with index.html
@@ -84,7 +89,7 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
   border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .app-drawer{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:2800;display:none}
 .app-drawer.open{display:flex;justify-content:flex-end}
-.app-drawer-panel{width:min(400px,86vw);height:100%;background:var(--surface-card-bg);backdrop-filter:blur(12px);border-left:var(--surface-card-border);
+.app-drawer-panel{width:min(400px,86vw);height:100%;box-sizing:border-box;padding-top:env(safe-area-inset-top, 44px);background:var(--surface-card-bg);backdrop-filter:blur(12px);border-left:var(--surface-card-border);
   display:flex;flex-direction:column}
 .app-drawer-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--border)}
 .app-drawer-body{flex:1;overflow-y:auto;padding:16px 18px 32px}
@@ -478,7 +483,7 @@ textarea.input{resize:none;line-height:1.4}
 .telemetry-scorecard-timestamp{display:block;width:100%;text-align:center;padding:10px 0;
   color:#94A3B8;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.02em}
 .ledger-trust-subtitle{max-width:640px;margin:16px auto;padding:0;
-  text-align:center;color:#00E699;font-weight:700;font-size:14px;
+  text-align:center;color:#FFFFFF;font-weight:800;font-size:14px;
   text-transform:lowercase;letter-spacing:.05em}
 .ledger-banner-section{max-width:640px;margin:0 auto 24px;padding:0 24px}
 .gateway-pill-stacked{margin-bottom:16px}
@@ -611,29 +616,36 @@ textarea.input{resize:none;line-height:1.4}
     </div>
   </header>
 
-  <!-- ===== SLIDE-OUT PROFILE/MENU DRAWER — currently just the App-to-Web
-       Bridge banner (this app is zero-account, so there's no real profile
-       data to show here yet); more menu items can be added to
-       .app-drawer-body later without touching this wiring. ===== -->
+  <!-- ===== MENU DRAWER — QUICK KEYS COMMAND CENTER. Three sections of
+       quick keys, each bound to a real feature already on this page (the
+       Instant Report modal, the Dashboard's Civic Intelligence Stack
+       panels, the info modal and the Geo-Hatch grid). Icons are filled in
+       from shared/instant-report.js's 1px Laser Mint line-art set. ===== -->
   <div class="app-drawer" id="appDrawer">
-    <div class="app-drawer-panel">
+    <div class="app-drawer-panel" role="dialog" aria-modal="true" aria-label="Quick keys">
       <div class="app-drawer-head">
-        <strong>Menu</strong>
+        <strong>Quick Keys</strong>
         <button class="menu-btn" id="appDrawerCloseBtn" type="button" aria-label="Close menu">✕</button>
       </div>
       <div class="app-drawer-body">
-        <div class="bridge-banner">
-          <div class="bridge-banner-text">CIVIC INTELLIGENCE™ DASHBOARD — Tap to access full ward analytics, CapEx budget ledgers, and the CITIXEN Codex.</div>
-          <!-- Same-site relative link (index.html), consistent with every other
-               cross-page link in this app — "citixenux.com" elsewhere in this
-               codebase already refers to this same site, not a different
-               external domain. No #hash here on purpose: index.html's own
-               load-at-top fix lands this at the absolute top of the page
-               (anchor offset 0) rather than scrolled to any section. -->
-          <a class="btn-submit" href="index.html" style="text-decoration:none;display:block;text-align:center;">
-            Open Executive Dashboard ↗
-          </a>
+        <div class="cx-drawer-section">
+          <div class="cx-drawer-heading">Executive Actions &amp; Export Quick Keys</div>
+          <button type="button" class="cx-drawer-key" data-cx-key="pdf"><span data-cx-icon="doc"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">Instant Report</span><span class="cx-drawer-key-sub">PDF brief</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
+          <button type="button" class="cx-drawer-key" data-cx-key="graphic"><span data-cx-icon="phoneShare"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">#CrowdSaveAmerica Graphic Card</span><span class="cx-drawer-key-sub">1:1 share card</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
+          <button type="button" class="cx-drawer-key" data-cx-key="share"><span data-cx-icon="shareUp"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">Share CITIXEN UX™ Platform</span><span class="cx-drawer-key-sub">Native share sheet</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
         </div>
+        <div class="cx-drawer-section">
+          <div class="cx-drawer-heading">Civic Intelligence Stack™ Direct Binds</div>
+          <button type="button" class="cx-drawer-key" data-cx-key="capital"><span data-cx-icon="capital"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">Capital Projects</span><span class="cx-drawer-key-sub">CIP budget intercept</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
+          <button type="button" class="cx-drawer-key" data-cx-key="tracker"><span data-cx-icon="truck"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">City Action Tracker</span><span class="cx-drawer-key-sub">Live dispatch &amp; work orders</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
+          <button type="button" class="cx-drawer-key" data-cx-key="archive"><span data-cx-icon="archive"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">Community Archive</span><span class="cx-drawer-key-sub">Public ledger &amp; Civic Memory™</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
+        </div>
+        <div class="cx-drawer-section">
+          <div class="cx-drawer-heading">System Architecture &amp; Codex</div>
+          <button type="button" class="cx-drawer-key" data-cx-key="privacy"><span data-cx-icon="shield"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">Privacy Engine &amp; EXIF Scrubber Protocol</span><span class="cx-drawer-key-sub">How reports stay anonymous</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
+          <button type="button" class="cx-drawer-key" data-cx-key="grid"><span data-cx-icon="hexgrid"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">11M Block H3 Spatial Grid Matrix</span><span class="cx-drawer-key-sub">Geo-Hatch coverage grid</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
+        </div>
+        <div class="cx-drawer-foot"><span data-cx-icon="shieldPlain"></span>CITIXEN UX™ — Privacy Engine: Verified</div>
       </div>
     </div>
   </div>
@@ -709,32 +721,26 @@ textarea.input{resize:none;line-height:1.4}
       </div>
     </section>
 
-    <!-- No 911/Emergency and no Live Public Ledger in Map & Feed, per nav restructure. -->
+    <!-- MAP & FEED — pure triage stream, three field modules:
+         1. Civic Dispatch Map (dark vector basemap, mint pulse markers)
+         2. Geo-Hatch Matrix & Triage Status (ward grid + triage HUD)
+         3. Live Dispatch Feed (SLA age, project links, urgency badges)
+         Macro coverage tiers live under Dashboard → City Action Tracker.
+         No 911/Emergency and no Live Public Ledger here. -->
     <section id="tab-map" class="tabpane">
       <div class="card">
-        <div class="label"><span>Civic dispatch map</span><span id="mCount" style="color:var(--mint2)">3 active</span></div>
+        <div class="label"><span>Civic Dispatch Map</span><span id="mCount" style="color:var(--mint2)">3 active</span></div>
         <div id="map"></div>
       </div>
 
-      <!-- CITYWIDE ASSET COVERAGE (Geohash Coverage Grid Engine — 3 zoom tiers) —
-           moved here from Analytics, directly under the Civic dispatch map,
-           per nav restructure. Its init (fetchDirectory/applyWardMeta/
-           animateCoverage/initTierToggle) now runs on this tab via
-           initCoverageGrid(), called from switchTab('tab-map', ...) below,
-           instead of only when Analytics was opened. -->
-      <div class="card">
+      <div class="card" id="geoHatchCard">
         <div class="radius-tag">
-          <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-          GEO-HATCH COVERAGE ENGINE
-        </div>
-        <div class="tier-toggle" id="tierToggle">
-          <button class="tier-btn active" data-tier="ward">Ward (150m)</button>
-          <button class="tier-btn" data-tier="municipal">Municipal blocks</button>
-          <button class="tier-btn" data-tier="national">State / National</button>
+          <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3l3.5 2v4L8 11 4.5 9V5z"/><path d="M15.5 3L19 5v4l-3.5 2L12 9V5z"/><path d="M11.75 10.5l3.5 2v4l-3.5 2-3.5-2v-4z"/></svg>
+          GEO-HATCH MATRIX &amp; TRIAGE STATUS
         </div>
         <div class="coverage-head">
           <div>
-            <div class="label" style="margin-bottom:2px">Citywide asset coverage</div>
+            <div class="label" style="margin-bottom:2px">Ward block coverage</div>
             <div class="coverage-ticker" id="covTicker">0.0%</div>
           </div>
           <div style="text-align:right">
@@ -748,8 +754,6 @@ textarea.input{resize:none;line-height:1.4}
           <span><span class="dot" style="background:rgba(30,41,59,.3)"></span>Uncharted</span>
         </div>
         <div class="cov-grid" id="covGrid"></div>
-        <canvas id="tierCanvas" width="600" height="240" style="display:none;"></canvas>
-        <div class="small" id="tierCanvasCaption" style="display:none;text-align:center;margin-bottom:8px;"></div>
         <div class="cov-toast" id="covToast">
           <span id="covToastText"></span>
           <button class="ct-cta" id="covToastCta">Report it</button>
@@ -758,10 +762,7 @@ textarea.input{resize:none;line-height:1.4}
           <div class="num" id="covYouCount">0</div>
           <div class="lbl">blocks you've helped verify — tap any dark block to report it and light it up for everyone.</div>
         </div>
-      </div>
-
-      <div class="card">
-        <div class="label" style="justify-content:center">Triage status</div>
+        <div class="label" style="justify-content:center;margin-top:14px">Triage status</div>
         <div class="triage-gauge">
           <div class="triage-tile">
             <div class="triage-num" id="triageOpenCount" style="color:var(--brand-amber)">0</div>
@@ -777,8 +778,9 @@ textarea.input{resize:none;line-height:1.4}
           </div>
         </div>
       </div>
+
       <div class="card">
-        <div class="label">Live dispatch feed</div>
+        <div class="label">Live Dispatch Feed</div>
         <div id="feed"></div>
       </div>
     </section>
@@ -796,7 +798,13 @@ textarea.input{resize:none;line-height:1.4}
       <p class="citizen-dashboard-subheader"><span class="cds-white">Citixen</span> <span class="cds-mint">Dashboard</span></p>
       <p class="hero-tagline-subtle">Real-time community reporting and municipal tracking.</p>
 
-      <!-- 3. GEOTAGGED SCORECARD — real numbers computed from this app's own
+      <!-- 3. ELEVATED PRIMARY HERO MODULE — [ EXPORT & SHARE ]. Rendered by
+           shared/instant-report.js (same markup as index.html). "Instant
+           Report ↗" opens the 3-branch export modal for the detected
+           jurisdiction; "Share CITIXEN UX™" calls navigator.share(). -->
+      <div data-cx-export-module></div>
+
+      <!-- 4. GEOTAGGED SCORECARD — real numbers computed from this app's own
            coverageDirectory/currentWardMeta/ledgerTickets (see
            updateAppTelemetryScorecard() below), the same formulas
            index.html's Scorecard uses, not duplicated/divergent math. -->
@@ -808,25 +816,25 @@ textarea.input{resize:none;line-height:1.4}
           <div class="telemetry-scorecard-grid">
             <div class="telemetry-scorecard-col">
               <div class="telemetry-scorecard-val" id="appScorecardResolved">—</div>
-              <div class="telemetry-scorecard-lbl">Reports Resolved</div>
+              <div class="telemetry-scorecard-lbl">Resolved</div>
             </div>
             <div class="telemetry-scorecard-col">
               <div class="telemetry-scorecard-val" id="appScorecardCovered">—</div>
-              <div class="telemetry-scorecard-lbl">City Covered</div>
+              <div class="telemetry-scorecard-lbl">Covered</div>
             </div>
             <div class="telemetry-scorecard-col">
               <div class="telemetry-scorecard-val" id="appScorecardSla">—</div>
-              <div class="telemetry-scorecard-lbl">Avg City Response</div>
+              <div class="telemetry-scorecard-lbl">Avg Response</div>
             </div>
           </div>
           <span class="telemetry-scorecard-timestamp" id="appScorecardTimestamp" aria-hidden="true"></span>
         </div>
       </section>
 
-      <!-- 4. TRUST INDICATOR SUBTITLE -->
+      <!-- 5. TRUST INDICATOR SUBTITLE -->
       <p class="ledger-trust-subtitle">free &amp; anonymous</p>
 
-      <!-- 5. PRIMARY LIVING GATEWAY — opens the same real Live Public Ledger
+      <!-- 6. PRIMARY LIVING GATEWAY — opens the same real Live Public Ledger
            drawer this tab already had (#ledgerDrawer / openLedgerDrawer()),
            just restyled to the shared .gateway-pill shell instead of the
            old plain "Live Civic Memory™" button. -->
@@ -838,7 +846,8 @@ textarea.input{resize:none;line-height:1.4}
         </button>
       </section>
 
-      <!-- 6. CIVIC INTELLIGENCE STACK™ (Rule of Three) -->
+      <!-- 7. CIVIC INTELLIGENCE STACK™ — human-first labels: Capital
+           Projects / City Action Tracker / Community Archive. -->
       <section class="matrix-summary-section">
         <h3 style="color:#00E699;font-size:1.1rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin:4px 0 6px;text-align:center;">Civic Intelligence Stack<sup class="tm-symbol">™</sup></h3>
         <p style="color:var(--muted);font-size:.78rem;text-align:center;font-style:italic;margin:0 0 16px;">Click on any live module below for an instant report.</p>
@@ -846,24 +855,24 @@ textarea.input{resize:none;line-height:1.4}
       <div class="hub-row" role="navigation" aria-label="Deep-dive sections">
         <button class="hub-card telemetry-card" id="appHubAnalyticsBtn" type="button" aria-expanded="false" aria-controls="appDeepdiveAnalytics">
           <span class="hub-card-main">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><rect x="6" y="10" width="3" height="9"/><rect x="11" y="6" width="3" height="13"/><rect x="16" y="13" width="3" height="6"/></svg>
-            <span class="hub-card-title">Analytics</span>
+            <svg class="cx-hub-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 20h16"/><path d="M6 20v-5h3v5M10.5 20v-9h3v9M15 20v-7h3v7"/><path d="M5 10l5-4 4 3 5-5"/><path d="M16 4h3v3"/></svg>
+            <span class="hub-card-title">Capital Projects</span>
           </span>
-          <span class="hub-card-actions"><span class="hub-card-sub">Data &amp; Reports</span><span class="hub-card-arrow">↗</span></span>
+          <span class="hub-card-actions"><span class="hub-card-sub">CIP Intercept &amp; Budget Tracking</span><span class="hub-card-arrow">↗</span></span>
         </button>
         <button class="hub-card telemetry-card" id="appHubMunicipalBtn" type="button" aria-expanded="false" aria-controls="appMunicipalPanel">
           <span class="hub-card-main">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9l8-5 8 5v12"/><path d="M9 21v-6h6v6"/><path d="M4 21h16"/></svg>
-            <span class="hub-card-title">Municipal Portal</span>
+            <svg class="cx-hub-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M2 6h11v10H2z"/><path d="M13 9h4l4 4v3h-8z"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>
+            <span class="hub-card-title">City Action Tracker</span>
           </span>
-          <span class="hub-card-actions"><span class="hub-card-sub">Work Orders &amp; Response</span><span class="hub-card-arrow">↗</span></span>
+          <span class="hub-card-actions"><span class="hub-card-sub">Live Work Orders &amp; Response</span><span class="hub-card-arrow">↗</span></span>
         </button>
         <button class="hub-card telemetry-card" id="appHubMemoryBtn" type="button">
           <span class="hub-card-main">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 21 8 12 13 3 8 12 3"/><polyline points="3 13 12 18 21 13"/><polyline points="3 18 12 23 21 18"/></svg>
-            <span class="hub-card-title">Civic Memory™</span>
+            <svg class="cx-hub-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 9l9-5 9 5"/><path d="M4 9h16"/><path d="M6 9v8M10 9v8M14 9v8M18 9v8"/><path d="M4 17h16M3 20h18"/></svg>
+            <span class="hub-card-title">Community Archive</span>
           </span>
-          <span class="hub-card-actions"><span class="hub-card-sub">Public Ledger &amp; Standards</span><span class="hub-card-arrow">↗</span></span>
+          <span class="hub-card-actions"><span class="hub-card-sub">Public Ledger &amp; Civic Memory™</span><span class="hub-card-arrow">↗</span></span>
         </button>
       </div>
 
@@ -872,6 +881,11 @@ textarea.input{resize:none;line-height:1.4}
            Civic Intelligence Stack's "Analytics" card instead of always
            sitting open at the top of the tab. -->
       <div class="hub-deepdive-panel" id="appDeepdiveAnalytics">
+        <div class="card">
+          <div class="label">Capital projects (CIP)</div>
+          <div id="appCipList"><p class="cx-empty">Loading capital projects…</p></div>
+          <div class="big3-note">Scheduled capital work for this jurisdiction. Reports filed inside a project's area are intercepted before dispatch so a patch crew isn't sent for work already funded.</div>
+        </div>
         <div class="card">
           <div class="label">The Big 3 — public health metrics</div>
           <div class="big3-row">
@@ -927,6 +941,18 @@ textarea.input{resize:none;line-height:1.4}
           </div>
           <div class="big3-note" id="appMunicipalCoverageNote">No ward directory on file yet for this jurisdiction.</div>
         </div>
+        <!-- Macro coverage tiers (Municipal blocks / State–National), moved
+             here from Map & Feed so that tab stays a pure field-triage
+             stream. The ward-level Geo-Hatch grid stays on Map & Feed. -->
+        <div class="card">
+          <div class="label">Coverage beyond your ward</div>
+          <div class="tier-toggle" id="tierToggle">
+            <button class="tier-btn active" data-tier="municipal">Municipal blocks</button>
+            <button class="tier-btn" data-tier="national">State / National</button>
+          </div>
+          <canvas id="tierCanvas" width="600" height="240"></canvas>
+          <div class="small" id="tierCanvasCaption" style="text-align:center;margin-bottom:4px;"></div>
+        </div>
         <button type="button" class="hub-deepdive-close" id="appMunicipalPanelCloseBtn">Close</button>
       </div>
 
@@ -980,21 +1006,6 @@ textarea.input{resize:none;line-height:1.4}
         </div>
       </div>
 
-      <!-- 10. EXPORT ENGINE — "App Launcher & Download Triggers" is adapted
-           here: a mobile-app-store badge for the app you're already inside
-           of doesn't make sense, so this keeps the one part of item 10 that
-           does apply inside the app itself — the real PDF compiler
-           (downloadWardHealthPdf(), already wired to the Ledger drawer's
-           own Print/Export trigger) plus the same real navigator.share()
-           hook index.html's Export Hub uses (shareViaWebShareApi(), ported
-           verbatim below since it has no page-specific dependency). -->
-      <div class="card" style="text-align:center;">
-        <div class="label" style="justify-content:center;">Export &amp; Share</div>
-        <p style="font-size:.78rem;color:var(--muted);margin-bottom:12px;">Compile the current ward health snapshot into a PDF, or share this app natively.</p>
-        <button type="button" class="btn-submit" id="appExportPdfBtn" style="margin-bottom:10px;">Export Civic Report (PDF) ↗</button>
-        <button type="button" class="btn-camera" id="appShareBtn" style="width:100%;justify-content:center;">Share CITIXEN UX™</button>
-      </div>
-
       <!-- 11. PERSISTENT FOOTER — the app shell's bottom tab bar is fixed in
            place (unlike the web page's own scrolling footer), so a
            same-content footer belongs at the end of this tab's scrollable
@@ -1019,7 +1030,7 @@ textarea.input{resize:none;line-height:1.4}
     </button>
     <button class="navtab" data-target="tab-map">
       <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
-      <span>Map & feed</span>
+      <span>Map &amp; Feed</span>
     </button>
     <button class="navtab" data-target="tab-analytics">
       <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="20" x2="5" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="19" y1="20" x2="19" y2="15"/></svg>
@@ -1554,7 +1565,7 @@ function handleInterceptOverride(){
    National Network tiles (loadNationalTab/lastNationalData) rather than a
    second, invented data source.
    ===================================================================== */
-let currentTier = 'ward';
+let currentTier = 'municipal';
 let nationalDataCache = null;
 
 function aggregateTierPct(){
@@ -1595,24 +1606,12 @@ function drawTierCanvas(tier){
 }
 
 function switchTier(tier){
+  // Macro tiers only (Municipal blocks / State–National) — they live under
+  // Dashboard → City Action Tracker now. The ward-level Fog-of-War grid on
+  // Map & Feed is always shown and is no longer toggled from here.
   currentTier = tier;
   document.querySelectorAll('.tier-btn').forEach(b => b.classList.toggle('active', b.dataset.tier === tier));
-  const covGrid = document.getElementById('covGrid');
-  const canvas = document.getElementById('tierCanvas');
-  const caption = document.getElementById('tierCanvasCaption');
-  const impactRow = document.getElementById('yourImpactRow');
-  if (tier === 'ward') {
-    if (covGrid) covGrid.style.display = 'grid';
-    if (canvas) canvas.style.display = 'none';
-    if (caption) caption.style.display = 'none';
-    if (impactRow) impactRow.style.display = 'flex';
-  } else {
-    if (covGrid) covGrid.style.display = 'none';
-    if (canvas) canvas.style.display = 'block';
-    if (caption) caption.style.display = 'block';
-    if (impactRow) impactRow.style.display = 'none';
-    drawTierCanvas(tier);
-  }
+  drawTierCanvas(tier);
 }
 
 function initTierToggle(){
@@ -2174,6 +2173,16 @@ const APP_MODAL_DATA = {
     ['Zero-Knowledge Privacy Engine','No accounts, no login, and no device fingerprinting anywhere in this system — see the full Anonymity Whitepaper.'],
     ['On-Device Metadata Scrubbing','Photo metadata, including embedded GPS coordinates and device identifiers, is stripped on-device before a photo ever leaves the reporter\'s phone.'],
     ['Immutable Public Ledger','Each resolved ledger entry carries a timestamp and verification hash so the resolution sequence can be audited without exposing reporter identity.']
+  ]},
+  privacyEngine: { title: 'Privacy Engine & EXIF Scrubber Protocol', body: [
+    ['No account, no identity','Reporting needs no login, email or phone number, and the app does not fingerprint your device.'],
+    ['EXIF scrubbed on-device','Before a photo leaves your phone, its embedded GPS coordinates, device model and camera serial data are stripped. Only the image and the ward-level location you confirm are submitted.'],
+    ['What is kept','The public ledger stores the hazard category, ward, timestamps and resolution status, with no reporter-identifying field in the data model.']
+  ]},
+  spatialGrid: { title: '11M Block H3 Spatial Grid Matrix', body: [
+    ['Today: ward-tier Geo-Hatch','Reports are bucketed into 150 m Geo-Hatch cells per ward. That grid is live on Map & Feed, where each block shows as auditable, pending or uncharted.'],
+    ['Roadmap: H3 resolution 9','The target is a national matrix of roughly 11 million H3 hexagonal cells at census-block scale, keyed on-device for privacy. That nationwide index is not live in this build yet.'],
+    ['Why blocks, not addresses','Grouping reports into cells shows coverage and gaps without pinning any report to a household.']
   ]},
   civicMemory: { title: 'Civic Memory™ — What This Section Covers', body: [
     ['State Constitution Reference','A representative-summary pointer to this jurisdiction\'s state constitution, the same reference carried in the full web dashboard\'s CITIXEN Codex.'],
@@ -3561,13 +3570,97 @@ window.addEventListener('DOMContentLoaded',()=>{
     if (e.target.id === 'appInfoModal') closeAppInfoModal();
   });
 
-  const appExportPdfBtn = document.getElementById('appExportPdfBtn');
-  if (appExportPdfBtn) appExportPdfBtn.addEventListener('click', () => downloadWardHealthPdf(appExportPdfBtn));
-  document.getElementById('appShareBtn').addEventListener('click', async () => {
-    const shared = await shareViaWebShareApi();
-    if (!shared) toast('Native share isn\'t supported in this browser.');
-  });
+  initInstantReportAndQuickKeys();
 });
+
+/* =====================================================================
+   INSTANT REPORT + QUICK KEYS — data adapter for shared/instant-report.js
+   (index.html has its own adapter over its own jurisdiction state). Every
+   figure comes from this app's real ledger tickets, ward directory and
+   CAPEX_PROJECTS records — the same sources as the Scorecard above.
+   ===================================================================== */
+async function appInstantReportData(){
+  if (!coverageDirectory) { try { coverageDirectory = await fetchDirectory(); } catch (e) { /* coverage shows N/A */ } }
+  if (!currentWardMeta && typeof pickDefaultWardMeta === 'function') { try { applyWardMeta(pickDefaultWardMeta()); } catch (e) { /* citywide default */ } }
+  if (!ledgerTickets.length) { try { ledgerTickets = await fetchLedgerTickets(); } catch (e) { /* empty snapshot */ } }
+  const meta = currentWardMeta;
+  const cityTickets = meta ? ledgerTickets.filter(t => t.city === meta.city && t.state === meta.state) : ledgerTickets;
+  const counts = { submitted: 0, dispatched: 0, resolved: 0 };
+  cityTickets.forEach(t => { if (Object.prototype.hasOwnProperty.call(counts, t.stage)) counts[t.stage]++; });
+  const { knownWards, pct } = computeAppWardCoverage(meta);
+  return {
+    jurisdiction: meta ? (meta.cityName + ', ' + meta.state.toUpperCase() + (meta.isGpsMatch ? ' — ' + meta.wardName : ' (citywide)')) : 'Citywide (jurisdiction not confirmed)',
+    cityLabel: meta ? (meta.cityName + ', ' + meta.state).toUpperCase() : 'CITYWIDE',
+    wardLabel: meta && meta.isGpsMatch ? String(meta.wardName).toUpperCase() : null,
+    resolved: counts.resolved,
+    total: cityTickets.length,
+    coveragePct: knownWards.length ? (pct != null ? pct : 0) : null,
+    avgDays: computeAppAvgResolutionDays(cityTickets),
+    counts,
+    cip: await appJurisdictionCipProjects(knownWards),
+    nodes: cases.map(c => ({ lat: c.lat, lng: c.lng }))
+  };
+}
+// CIP projects inside this jurisdiction's known wards (all projects when no
+// ward directory is on file, rather than guessing which ones apply).
+async function appJurisdictionCipProjects(knownWards){
+  const all = await ensureCipProjects();
+  const slugs = (knownWards || []).map(w => (w && (w.slug || w.ward)) || w).filter(x => typeof x === 'string');
+  return slugs.length ? all.filter(p => slugs.includes(p.ward)) : all;
+}
+
+function goToDashboardPanel(hubBtnId){
+  closeAppDrawer();
+  switchTab('tab-analytics', document.querySelector('.navtab[data-target="tab-analytics"]'));
+  const btn = document.getElementById(hubBtnId);
+  if (!btn) return;
+  const panelId = btn.getAttribute('aria-controls');
+  const panel = panelId && document.getElementById(panelId);
+  if (panel && panel.classList.contains('open')) { panel.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+  btn.click();
+}
+
+function initInstantReportAndQuickKeys(){
+  if (!window.CitixenInstantReport) {
+    console.warn('shared/instant-report.js did not load — Instant Report and Quick Keys are unavailable.');
+    return;
+  }
+  const IR = window.CitixenInstantReport;
+  IR.init({ getData: appInstantReportData, toast });
+
+  document.querySelectorAll('#appDrawer [data-cx-icon]').forEach(el => { el.outerHTML = IR.icon(el.dataset.cxIcon); });
+  const actions = {
+    pdf: () => { closeAppDrawer(); IR.open('pdf'); },
+    graphic: () => { closeAppDrawer(); IR.open('graphic'); },
+    share: () => { closeAppDrawer(); IR.sharePlatform(); },
+    capital: () => goToDashboardPanel('appHubAnalyticsBtn'),
+    tracker: () => goToDashboardPanel('appHubMunicipalBtn'),
+    archive: () => goToDashboardPanel('appHubMemoryBtn'),
+    privacy: () => { closeAppDrawer(); openAppInfoModal('privacyEngine'); },
+    grid: () => {
+      closeAppDrawer();
+      switchTab('tab-map', document.querySelector('.navtab[data-target="tab-map"]'));
+      setTimeout(() => {
+        const card = document.getElementById('geoHatchCard');
+        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        openAppInfoModal('spatialGrid');
+      }, 250);
+    }
+  };
+  document.querySelectorAll('#appDrawer [data-cx-key]').forEach(btn => {
+    btn.addEventListener('click', () => { const fn = actions[btn.dataset.cxKey]; if (fn) fn(); });
+  });
+
+  // Capital Projects panel: real CIP list for this jurisdiction
+  document.getElementById('appHubAnalyticsBtn').addEventListener('click', async () => {
+    const { knownWards } = computeAppWardCoverage(currentWardMeta);
+    IR.renderCipList(document.getElementById('appCipList'), await appJurisdictionCipProjects(knownWards));
+  });
+  // City Action Tracker panel: draw the macro coverage tier on open
+  document.getElementById('appHubMunicipalBtn').addEventListener('click', () => {
+    setTimeout(() => drawTierCanvas(currentTier), 60);
+  });
+}
 </script>
 </body>
 </html>
