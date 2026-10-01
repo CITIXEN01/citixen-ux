@@ -491,6 +491,31 @@ function addTicket(input) {
   };
 }
 
+// Updates a real ticket's stage in place (submitted -> dispatched ->
+// resolved), looked up by its own shareable reportId — the same id the
+// Live Public Ledger, report.html's deep link and now the Operator Live
+// Triage Queue all already display. This mutates the one real WARD_TICKETS
+// record, not a copy, so every other reader (allTickets(), bigThree(),
+// the ledger) sees the change on its next read. Same honest limitation as
+// the rest of this module: in-memory only, this warm instance only.
+const VALID_TICKET_STAGES = ['submitted', 'dispatched', 'resolved'];
+function updateTicketStage(reportId, stage) {
+  if (!VALID_TICKET_STAGES.includes(stage)) return null;
+  for (const [wardSlug, tickets] of Object.entries(WARD_TICKETS)) {
+    for (const t of tickets) {
+      if (makeReportId(wardSlug, t.id, t.category, t.submittedAgo, t.hazardOverride) === reportId) {
+        t.stage = stage;
+        // A ticket moved to Resolved via the operator triage queue (rather
+        // than through a citizen's own verified proof-photo flow) has no
+        // real resolution-time measurement or verification photo on file,
+        // so neither field is backfilled with an invented number.
+        return Object.assign({}, t, { reportId, ward: wardSlug });
+      }
+    }
+  }
+  return null;
+}
+
 function getWard(state, city, ward) {
   const s = DB[state];
   if (!s) return null;
@@ -564,9 +589,21 @@ function allFeedbackSubmissions() {
   return FEEDBACK_SUBMISSIONS.slice().reverse(); // newest first
 }
 
+// Real alpha-feedback lifecycle, separate from a ticket's Open/Dispatched/
+// Resolved (a feedback submission isn't a civic hazard dispatch — it's a
+// bug/UI note an operator triages toward either a fix or the reject pile).
+const VALID_FEEDBACK_STATUSES = ['queued', 'in-review', 'resolved'];
+function updateFeedbackStatus(id, status) {
+  if (!VALID_FEEDBACK_STATUSES.includes(status)) return null;
+  const item = FEEDBACK_SUBMISSIONS.find(f => f.id === id);
+  if (!item) return null;
+  item.status = status;
+  return item;
+}
+
 module.exports = {
   DB, getWard, getCity, summarize, allWards, CATEGORIES,
-  allTickets, getTicketByReportId, makeReportId, addTicket,
+  allTickets, getTicketByReportId, makeReportId, addTicket, updateTicketStage,
   CAPEX_PROJECTS, capExAdherencePct, bigThree, bigThreeTrend, WARD_NAMES, WARD_JURISDICTION,
-  addFeedbackSubmission, allFeedbackSubmissions
+  addFeedbackSubmission, allFeedbackSubmissions, updateFeedbackStatus
 };
