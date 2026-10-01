@@ -89,6 +89,23 @@ html.citixen-gate-locked body{overflow:hidden}
   padding:9px;border-radius:8px;font-weight:700;font-size:.68rem;cursor:pointer;font-family:inherit}
 .btn-copy-prompt.copied{color:#34d399}
 .empty-note{font-size:.72rem;color:var(--muted);text-align:center;padding:10px 0}
+
+/* ===== LIVE FEEDBACK INGESTION FEED — real submissions from app.html's
+   Floating Alpha Feedback Widget, via GET /api/operator/feedback. ===== */
+.live-fb-header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.btn-refresh-live{background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);
+  font-size:.62rem;font-weight:700;padding:5px 10px;border-radius:8px;cursor:pointer;font-family:inherit}
+.live-fb-item{background:rgba(3,7,18,.6);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px}
+.live-fb-meta-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;font-size:.6rem;color:var(--muted)}
+.live-fb-meta-chip{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:3px 7px}
+.live-fb-tag-chip{font-weight:800;text-transform:uppercase;letter-spacing:.03em;border-radius:6px;padding:3px 7px;
+  background:rgba(0,230,153,.12);color:var(--mint2);border:1px solid rgba(0,230,153,.35)}
+.live-fb-note{font-size:.76rem;color:var(--text);line-height:1.4;margin-bottom:8px;white-space:pre-wrap}
+.live-fb-snapshot{width:100%;max-height:160px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,.1);
+  margin-bottom:8px;display:block}
+.btn-gen-prompt{width:100%;background:rgba(0,230,153,.1);border:1px solid rgba(0,230,153,.35);color:var(--mint2);
+  padding:9px;border-radius:8px;font-weight:700;font-size:.68rem;cursor:pointer;font-family:inherit}
+.btn-gen-prompt.done{color:#34d399;border-color:rgba(52,211,153,.6)}
 </style>
 </head>
 <body>
@@ -108,6 +125,19 @@ html.citixen-gate-locked body{overflow:hidden}
   <div class="op-header">
     <div class="op-brand">FEEDBACK INGESTION QUEUE</div>
     <a class="back-link" href="/operator">← Network Operator Control</a>
+  </div>
+
+  <!-- ===== LIVE FEEDBACK INGESTION FEED — real submissions from the
+       Floating Alpha Feedback Widget on app.html, via GET
+       /api/operator/feedback. Distinct from the manual Drop/Paste queue
+       below, which is for feedback an operator received elsewhere (SMS,
+       Slack) and is pasting in by hand. ===== -->
+  <div class="card">
+    <div class="live-fb-header-row">
+      <div class="label" style="margin-bottom:0">Live Feedback Ingestion Feed</div>
+      <button type="button" class="btn-refresh-live" id="btnRefreshLiveFeedback">Refresh</button>
+    </div>
+    <div id="liveFeedbackList"><div class="empty-note">Loading…</div></div>
   </div>
 
   <div class="card">
@@ -301,6 +331,96 @@ document.getElementById('btnSynthesize').addEventListener('click', () => {
   pendingImages = [];
   renderDropPreview();
 });
+
+// ===== LIVE FEEDBACK INGESTION FEED =====
+function formatLiveTimestamp(iso){
+  try {
+    return new Date(iso).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  } catch (e) { return iso || '—'; }
+}
+function synthesizeLivePrompt(item){
+  const divider = '================================================================';
+  const slug = (item.note || item.tag || 'feedback-item').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 40) || 'feedback-item';
+  return [
+    divider,
+    'CITIXEN UX — ALPHA FEEDBACK WIDGET TASK',
+    divider,
+    '',
+    'SOURCE: Floating Alpha Feedback Widget (live submission)',
+    'TIMESTAMP: ' + formatLiveTimestamp(item.timestamp),
+    'DEVICE: ' + (item.device || 'Unknown Device'),
+    'ROUTE: ' + (item.route || '/app'),
+    'TAG: ' + (item.tag || 'Bug'),
+    item.snapshot ? 'SNAPSHOT: attached (see queue item)' : 'SNAPSHOT: none attached',
+    '',
+    'RAW FEEDBACK:',
+    (item.note || '').trim() || '(no note provided — see route/tag/snapshot above)',
+    '',
+    'TASK:',
+    '1. Reproduce the issue at the route above (same tag/context the tester saw).',
+    '2. Implement the smallest concrete fix in citixen-ux.',
+    '3. Verify: syntax-check modified scripts, run a Playwright pass with zero console pageerrors.',
+    '4. Run exactly:',
+    '',
+    '   git add . && git commit -m "fix: ' + slug + '" && git push origin main',
+    '',
+    divider
+  ].join('\n');
+}
+async function loadLiveFeedback(){
+  const listEl = document.getElementById('liveFeedbackList');
+  try {
+    const res = await fetch('/api/operator/feedback');
+    if (!res.ok) throw new Error('bad status ' + res.status);
+    const data = await res.json();
+    const items = (data && data.items) || [];
+    if (!items.length) {
+      listEl.innerHTML = '<div class="empty-note">No submissions yet from the Floating Alpha Feedback Widget.</div>';
+      return;
+    }
+    listEl.innerHTML = items.map(item => {
+      return '<div class="live-fb-item" data-id="' + escapeHtml(item.id) + '">' +
+        '<div class="live-fb-meta-row">' +
+          '<span class="live-fb-meta-chip">' + escapeHtml(formatLiveTimestamp(item.timestamp)) + '</span>' +
+          '<span class="live-fb-meta-chip">' + escapeHtml(item.device || 'Unknown Device') + '</span>' +
+          '<span class="live-fb-meta-chip">' + escapeHtml(item.route || '/app') + '</span>' +
+          '<span class="live-fb-tag-chip">' + escapeHtml(item.tag || 'Bug') + '</span>' +
+        '</div>' +
+        (item.note ? '<div class="live-fb-note">' + escapeHtml(item.note) + '</div>' : '<div class="live-fb-note" style="color:var(--muted)">(no note text)</div>') +
+        (item.snapshot ? '<img class="live-fb-snapshot" src="' + item.snapshot + '" alt="Tester-attached UI snapshot">' : '') +
+        '<button type="button" class="btn-gen-prompt" data-gen="' + escapeHtml(item.id) + '">Generate Claude Fix Prompt</button>' +
+      '</div>';
+    }).join('');
+    listEl.querySelectorAll('[data-gen]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-gen');
+        const item = items.find(i => i.id === id);
+        if (!item) return;
+        const prompt = synthesizeLivePrompt(item);
+        queue.push({
+          id: 'fb-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7),
+          note: '[' + (item.tag || 'Bug') + '] ' + (item.route || '/app') + ' — ' + extractNote(item.note || item.tag || ''),
+          prompt,
+          status: 'queued',
+          images: item.snapshot ? [item.snapshot] : [],
+          createdAt: Date.now()
+        });
+        saveQueue();
+        renderQueue();
+        btn.textContent = 'Added to Queue ↓';
+        btn.classList.add('done');
+        btn.disabled = true;
+      });
+    });
+  } catch (e) {
+    listEl.innerHTML = '<div class="empty-note">Could not reach the feedback API — ' + escapeHtml(e && e.message ? e.message : 'network error') + '.</div>';
+  }
+}
+document.getElementById('btnRefreshLiveFeedback').addEventListener('click', loadLiveFeedback);
+loadLiveFeedback();
+// Light real-time polling while this page stays open — a tester submitting
+// from the app shows up here without a manual refresh.
+setInterval(loadLiveFeedback, 8000);
 
 loadQueue();
 renderQueue();

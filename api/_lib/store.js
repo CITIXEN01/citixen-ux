@@ -531,8 +531,42 @@ function allWards() {
   return out;
 }
 
+// ===== ALPHA FEEDBACK WIDGET SUBMISSIONS — backs the Floating Alpha Feedback
+// Widget (app.html) -> POST /api/operator/feedback -> the Live Feedback
+// Ingestion Feed (operator-feedback.html) -> GET /api/operator/feedback.
+// Pinned to globalThis exactly like WARD_TICKETS above, with the identical
+// honest limitation: this only persists within the current warm lambda
+// instance, not across cold starts or concurrent instances. A UI snapshot
+// (when the tester opted in) is stored as a data URL string, same
+// in-memory-only convention as everything else in this module — never
+// written to disk or a real object store.
+const FEEDBACK_SUBMISSIONS = globalThis.__CITIXEN_FEEDBACK__ || (globalThis.__CITIXEN_FEEDBACK__ = []);
+
+function addFeedbackSubmission(input) {
+  input = input || {};
+  const item = {
+    id: 'fb-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7),
+    timestamp: new Date().toISOString(),
+    route: typeof input.route === 'string' && input.route ? input.route.slice(0, 200) : '/app',
+    device: typeof input.device === 'string' && input.device ? input.device.slice(0, 200) : 'Unknown Device',
+    tag: ['Bug', 'UI / Styling', 'Feature Idea', 'Camera / AI'].includes(input.tag) ? input.tag : 'Bug',
+    note: typeof input.note === 'string' ? input.note.slice(0, 2000) : '',
+    // A data URL (image/png;base64,...) when the tester left "Attach UI
+    // Snapshot" checked; null otherwise. Size-capped so one submission can't
+    // blow out the in-memory array.
+    snapshot: typeof input.snapshot === 'string' && input.snapshot.length < 2_000_000 ? input.snapshot : null,
+    status: 'queued'
+  };
+  FEEDBACK_SUBMISSIONS.push(item);
+  return item;
+}
+function allFeedbackSubmissions() {
+  return FEEDBACK_SUBMISSIONS.slice().reverse(); // newest first
+}
+
 module.exports = {
   DB, getWard, getCity, summarize, allWards, CATEGORIES,
   allTickets, getTicketByReportId, makeReportId, addTicket,
-  CAPEX_PROJECTS, capExAdherencePct, bigThree, bigThreeTrend, WARD_NAMES, WARD_JURISDICTION
+  CAPEX_PROJECTS, capExAdherencePct, bigThree, bigThreeTrend, WARD_NAMES, WARD_JURISDICTION,
+  addFeedbackSubmission, allFeedbackSubmissions
 };

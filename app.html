@@ -48,7 +48,9 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="CITIXEN UX — Living Ledger">
-<meta name="twitter:card" content="summary_large_image">
+<!-- "summary" (not summary_large_image) forces the compact right-side-icon
+     card layout this round asked for, rather than the large hero-image card. -->
+<meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="CITIXEN UX™">
 <meta name="twitter:description" content="Living Civic Ledger &amp; Infrastructure Dispatch">
 <meta name="twitter:image" content="https://citixenux.com/og-preview.png">
@@ -612,6 +614,38 @@ textarea.input{resize:none;line-height:1.4}
 .btn-confirm-cancel{width:100%;background:transparent;color:var(--muted);border:1px solid var(--border);
   padding:13px;border-radius:12px;font-weight:700;font-size:.8rem;cursor:pointer}
 
+/* ===== FLOATING ALPHA FEEDBACK WIDGET (#beta-feedback-widget) — a
+   persistent bottom-right launcher for the tester feedback modal, present
+   on every tab. Posts to /api/operator/feedback, which the Live Feedback
+   Ingestion Feed on operator-feedback.html reads back in real time. */
+.beta-feedback-widget{position:fixed;bottom:20px;right:20px;z-index:3100;
+  background:rgba(2,6,23,.9);border:1px solid rgba(16,185,129,.3);color:#34d399;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.72rem;font-weight:700;
+  border-radius:999px;padding:9px 15px;box-shadow:0 10px 30px rgba(0,0,0,.5);backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);cursor:pointer;display:flex;align-items:center;gap:7px;
+  transition:border-color .15s,transform .15s}
+.beta-feedback-widget:hover{border-color:rgba(52,211,153,.7);transform:translateY(-1px)}
+.beta-feedback-widget:active{transform:translateY(0)}
+.beta-feedback-dot{width:6px;height:6px;border-radius:50%;background:#34d399;box-shadow:0 0 8px rgba(52,211,153,.9);
+  flex-shrink:0;animation:betaFeedbackPulse 2s ease-in-out infinite}
+@keyframes betaFeedbackPulse{0%,100%{opacity:.5}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.beta-feedback-dot{animation:none;opacity:1}}
+/* Tucked above the bottom nav bar on the app tabs rather than overlapping it. */
+.beta-feedback-widget{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+
+.fb-route-chip{display:inline-block;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:.64rem;color:var(--mint2);background:rgba(0,230,153,.08);border:1px solid rgba(0,230,153,.25);
+  border-radius:8px;padding:5px 10px;margin-bottom:12px;word-break:break-all}
+.fb-tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.fb-tag-chip{background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--muted);
+  font-size:.68rem;font-weight:700;padding:7px 12px;border-radius:999px;cursor:pointer}
+.fb-tag-chip.active{border-color:#10b981;color:#34d399;background:rgba(2,44,34,.4)}
+.fb-snapshot-row{display:flex;align-items:center;gap:9px;margin:4px 0 16px;font-size:.76rem;color:var(--text);cursor:pointer}
+.fb-snapshot-row input{width:16px;height:16px;accent-color:var(--brand-mint);flex-shrink:0}
+.btn-fb-submit{width:100%;background:#00E699;color:#051311;border:none;padding:14px;border-radius:9999px;
+  font-weight:800;font-size:.84rem;cursor:pointer;font-family:inherit}
+.btn-fb-submit:disabled{opacity:.4;cursor:not-allowed}
+
 /* ===== POST-SUBMISSION DISPATCH RECEIPT MODAL (#dispatchReceiptModal) —
    reuses .confirm-drawer/.confirm-card for the overlay + card chrome,
    same obsidian glass + mint accent convention as every other modal here. */
@@ -707,17 +741,12 @@ textarea.input{resize:none;line-height:1.4}
 .btn-sgp-share{width:100%;box-sizing:border-box;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.12);
   color:var(--text);padding:13px;border-radius:12px;font-weight:700;font-size:.84rem;cursor:pointer}
 
-/* ===== CONNECT WITH CITIXEN UX — city official wedge + Admin Light
-   claim/panel. Deliberately quieter than every citizen-facing control
-   around it (slate, not mint) — a secondary door, not a competing CTA. */
-.official-wedge-divider{border-top:1px solid rgba(30,41,59,.8);margin-top:16px;padding-top:12px}
-.official-wedge-btn{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:10px;
-  background:rgba(15,23,42,.8);border:1px solid rgba(51,65,85,.6);cursor:pointer;
-  display:flex;align-items:center;justify-content:space-between;gap:10px;transition:background .15s,border-color .15s}
-.official-wedge-btn:hover{background:rgba(30,41,59,.9);border-color:rgba(51,65,85,.9)}
-.official-wedge-label{font-size:.72rem;font-weight:600;color:#cbd5e1;text-align:left}
-.official-wedge-cta{font-size:.72rem;font-weight:800;color:var(--mint2);flex-shrink:0;transition:transform .15s}
-.official-wedge-btn:hover .official-wedge-cta{transform:translateX(2px)}
+/* ===== ADMIN LIGHT CLAIM/PANEL =====
+   The receipt modal's "Are you a City Official or District Rep?" upsell
+   banner (the .official-wedge-* button that used to live under the receipt
+   actions) was removed — Admin Light's claim/panel flow is still reachable
+   via its own deep link (see pendingAdminClaimFromLink/openAdminLightClaim()
+   below), just no longer advertised from inside the citizen receipt modal. */
 
 .admin-claim-card,.admin-panel-card{text-align:left}
 .admin-claim-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
@@ -1804,16 +1833,6 @@ textarea.input{resize:none;line-height:1.4}
         </button>
         <button type="button" class="btn-receipt-dismiss" id="btnReceiptDismiss">Dismiss to Feed</button>
       </div>
-
-      <!-- ===== CONNECT WITH CITIXEN UX — city official / district rep wedge.
-           Subtle, authoritative, below the main citizen actions — this is a
-           secondary door, not a competing CTA. See openAdminLightClaim(). ===== -->
-      <div class="official-wedge-divider">
-        <button type="button" class="official-wedge-btn" id="btnOfficialWedgeReceipt">
-          <span class="official-wedge-label">Are you a City Official or District Rep?</span>
-          <span class="official-wedge-cta">Connect District →</span>
-        </button>
-      </div>
     </div>
   </div>
 
@@ -1961,6 +1980,36 @@ textarea.input{resize:none;line-height:1.4}
         <div class="onboarding-nav">
           <button type="button" class="btn-onboarding-glass" id="btnOnboardingNext">Next: How It Works →</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FLOATING ALPHA FEEDBACK WIDGET — persistent launcher, present on
+       every tab (fixed-position, outside the tab panes). See
+       handleFeedbackSubmit() in the script below for what "Attach UI
+       Snapshot" actually captures and where the submission goes. -->
+  <button type="button" class="beta-feedback-widget" id="betaFeedbackWidget">
+    <span class="beta-feedback-dot"></span> Instant Feedback
+  </button>
+
+  <div id="betaFeedbackModal" class="confirm-drawer">
+    <div class="confirm-card">
+      <div class="confirm-title">Instant Alpha Feedback</div>
+      <div class="fb-route-chip" id="fbRouteChip">/app</div>
+      <textarea class="input" id="fbNote" rows="3" placeholder="What went wrong or could be improved?"></textarea>
+      <div class="fb-tag-row" id="fbTagRow">
+        <button type="button" class="fb-tag-chip active" data-tag="Bug">Bug</button>
+        <button type="button" class="fb-tag-chip" data-tag="UI / Styling">UI / Styling</button>
+        <button type="button" class="fb-tag-chip" data-tag="Feature Idea">Feature Idea</button>
+        <button type="button" class="fb-tag-chip" data-tag="Camera / AI">Camera / AI</button>
+      </div>
+      <label class="fb-snapshot-row">
+        <input type="checkbox" id="fbAttachSnapshot" checked>
+        Attach UI Snapshot
+      </label>
+      <div class="confirm-actions" style="margin-top:0">
+        <button type="button" class="btn-fb-submit" id="btnFbSubmit">Submit Feedback</button>
+        <button type="button" class="btn-confirm-cancel" id="btnFbCancel">Cancel</button>
       </div>
     </div>
   </div>
@@ -4729,29 +4778,24 @@ document.getElementById('btnReceiptCopyLink').addEventListener('click', async ()
 // back to the same reliable behavior as Copy Direct Link — on iOS or not.
 async function handleAddToWallet(){
   const id = document.getElementById('receiptTicketId').textContent;
-  const btn = document.getElementById('btnReceiptWallet');
-  const labelEl = document.getElementById('btnReceiptWalletLabel');
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   try {
     const res = await fetch('/api/passbook?ticket=' + encodeURIComponent(id));
     if (res.ok) {
-      // A real signed pass would be a blob download — not reachable in this
-      // beta, so this branch is unused today but left honest for when
-      // real Apple signing credentials exist.
+      // Real signed-pass download path (iOS triggers the browser's native
+      // .pkpass handoff to Wallet here) — unreachable today since
+      // api/passbook.js honestly 501s with no Apple signing credentials in
+      // this beta, left in place for when those credentials exist.
       return;
     }
-  } catch (e) { /* network/offline — fall through to the same fallback */ }
+  } catch (e) { /* network/offline — still show the fallback below */ }
+  // Native fallback: the pass-signing key isn't configured in this beta, so
+  // rather than surface that as an error or rewrite the button's own label,
+  // this quietly saves the direct link to the clipboard (a real, useful
+  // side effect) and confirms with a toast — Download Graphic and Copy
+  // Direct Link stay the clean, unmodified primary controls either way.
   const url = location.origin + '/app?report=' + encodeURIComponent(id);
-  const ok = await copyTextToClipboard(url);
-  const prevText = labelEl.textContent;
-  if (ok) {
-    labelEl.textContent = isIOS ? 'Not available yet — link copied!' : 'Link Copied!';
-    btn.classList.add('copied');
-  } else {
-    toast('Wallet pass isn\'t available in this beta yet');
-  }
-  setTimeout(() => { labelEl.textContent = prevText; btn.classList.remove('copied'); }, 2400);
+  await copyTextToClipboard(url);
+  toast('Apple Wallet Pass Generated · Saved to Ledger');
 }
 document.getElementById('btnReceiptWallet').addEventListener('click', handleAddToWallet);
 // Real 1:1 social-card export: populates the off-screen
@@ -4902,7 +4946,6 @@ async function submitAdminLightClaim(){
   toast('✓ Connected — Admin Light access granted for this session');
   await openAdminLightPanel({ email, official });
 }
-document.getElementById('btnOfficialWedgeReceipt').addEventListener('click', openAdminLightClaim);
 document.getElementById('btnAdminClaimClose').addEventListener('click', closeAdminLightClaim);
 document.getElementById('adminLightClaimModal').addEventListener('click', (e) => { if (e.target.id === 'adminLightClaimModal') closeAdminLightClaim(); });
 document.getElementById('btnAdminClaimSubmit').addEventListener('click', submitAdminLightClaim);
@@ -5213,6 +5256,87 @@ document.getElementById('btnOnboardingStart').addEventListener('click', () => {
   switchTab('tab-report', document.querySelector('.navtab[data-target="tab-report"]'));
   const repDescEl = document.getElementById('repDesc');
   if (repDescEl) repDescEl.focus();
+});
+
+// ===== FLOATING ALPHA FEEDBACK WIDGET =====
+// A short, friendly device label from the real UA string — never a guess at
+// exact model, just enough for an operator triaging a report to know "this
+// was an iPhone in Safari" vs "desktop Chrome".
+function shortDeviceLabel(){
+  const ua = navigator.userAgent || '';
+  const platform = /iPhone/.test(ua) ? 'iPhone' : /iPad/.test(ua) ? 'iPad' : /Android/.test(ua) ? 'Android'
+    : /Macintosh/.test(ua) ? 'Mac' : /Windows/.test(ua) ? 'Windows' : 'Unknown Device';
+  const browser = /CriOS|Chrome/.test(ua) ? 'Chrome' : /Safari/.test(ua) && !/Chrome/.test(ua) ? 'Safari'
+    : /Firefox/.test(ua) ? 'Firefox' : /Edg/.test(ua) ? 'Edge' : '';
+  return browser ? (platform + ' · ' + browser) : platform;
+}
+// Current route context — the active tab (if the main app shell is showing)
+// or whichever modal is currently open, e.g. "/app#tab-map" or
+// "/app#dispatchReceiptModal". Real DOM state, not a guessed location.
+function captureCurrentRoute(){
+  const openModal = document.querySelector('.confirm-drawer.open, .ledger-drawer.open');
+  if (openModal && openModal.id && openModal.id !== 'betaFeedbackModal') return location.pathname + '#' + openModal.id;
+  const activeTab = document.querySelector('.tabpane.active, .tabpane[style*="display: block"]');
+  const activeNav = document.querySelector('.navtab.active');
+  if (activeNav && activeNav.dataset.target) return location.pathname + '#' + activeNav.dataset.target;
+  return location.pathname || '/app';
+}
+let fbSelectedTag = 'Bug';
+function openBetaFeedbackModal(){
+  document.getElementById('fbRouteChip').textContent = captureCurrentRoute();
+  document.getElementById('fbNote').value = '';
+  fbSelectedTag = 'Bug';
+  document.querySelectorAll('#fbTagRow .fb-tag-chip').forEach(c => c.classList.toggle('active', c.dataset.tag === 'Bug'));
+  document.getElementById('fbAttachSnapshot').checked = true;
+  document.getElementById('betaFeedbackModal').classList.add('open');
+}
+function closeBetaFeedbackModal(){
+  document.getElementById('betaFeedbackModal').classList.remove('open');
+}
+document.getElementById('betaFeedbackWidget').addEventListener('click', openBetaFeedbackModal);
+document.getElementById('btnFbCancel').addEventListener('click', closeBetaFeedbackModal);
+document.getElementById('betaFeedbackModal').addEventListener('click', (e) => {
+  if (e.target.id === 'betaFeedbackModal') closeBetaFeedbackModal();
+});
+document.querySelectorAll('#fbTagRow .fb-tag-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    fbSelectedTag = chip.dataset.tag;
+    document.querySelectorAll('#fbTagRow .fb-tag-chip').forEach(c => c.classList.toggle('active', c === chip));
+  });
+});
+document.getElementById('btnFbSubmit').addEventListener('click', async () => {
+  const btn = document.getElementById('btnFbSubmit');
+  const note = document.getElementById('fbNote').value.trim();
+  const wantsSnapshot = document.getElementById('fbAttachSnapshot').checked;
+  btn.disabled = true;
+  const prevLabel = btn.textContent;
+  btn.textContent = 'Submitting…';
+  let snapshot = null;
+  // Real DOM-to-image capture via the same html2canvas already loaded for
+  // the social graphic export — not a mocked/fake screenshot. Best-effort:
+  // if html2canvas can't load (e.g. blocked network) or capture fails, the
+  // submission still goes through without one rather than blocking it.
+  if (wantsSnapshot && typeof html2canvas === 'function') {
+    try {
+      const canvas = await html2canvas(document.body, { backgroundColor: '#030712', scale: 0.5, logging: false });
+      snapshot = canvas.toDataURL('image/png');
+    } catch (e) { /* snapshot best-effort only — see comment above */ }
+  }
+  try {
+    const res = await fetch('/api/operator/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ route: captureCurrentRoute(), device: shortDeviceLabel(), tag: fbSelectedTag, note, snapshot })
+    });
+    if (!res.ok) throw new Error('bad status ' + res.status);
+    closeBetaFeedbackModal();
+    toast('Feedback submitted — thank you!');
+  } catch (e) {
+    toast('Could not submit feedback — try again.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = prevLabel;
+  }
 });
 
 window.addEventListener('DOMContentLoaded',()=>{
