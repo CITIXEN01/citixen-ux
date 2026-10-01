@@ -563,17 +563,18 @@ textarea.input{resize:none;line-height:1.4}
   color:var(--muted);cursor:pointer;transition:all .15s}
 .admin-panel-stage-btn.current{background:rgba(0,230,153,.14);border-color:rgba(0,230,153,.5);color:var(--mint2)}
 
-/* ===== FRONT DOOR ONBOARDING — "First Look" beta walkthrough
+/* ===== FRONT DOOR ONBOARDING — "Private Beta" 2-card notice
    (#frontDoorOnboardingModal). Obsidian Glass per spec: translucent
-   slate-950/60 fill + heavy blur + a slate-800/60 hairline, distinct from
+   slate-950/80 fill + heavy blur + a slate-800 hairline, distinct from
    the emerald-tinted glass the rest of this file uses elsewhere. ===== */
-.onboarding-card{background:rgba(2,6,23,.6);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-  border:1px solid rgba(30,41,59,.6);box-shadow:0 0 32px rgba(0,0,0,.5)}
+.onboarding-card{background:rgba(2,6,23,.8);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border:1px solid rgba(30,41,59,.85);box-shadow:0 0 32px rgba(0,0,0,.5)}
 .onboarding-header-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
 .onboarding-brand{font-weight:800;font-size:.8rem;letter-spacing:.3px;color:var(--mint2)}
 .onboarding-header-right{display:flex;align-items:center;gap:10px}
 .onboarding-badge{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.6rem;
   font-weight:700;letter-spacing:.06em;color:#94a3b8;text-transform:uppercase}
+.onboarding-badge.confidential{color:var(--mint2);letter-spacing:.08em}
 .onboarding-close{background:transparent;border:none;color:#94a3b8;font-size:1rem;line-height:1;
   cursor:pointer;padding:2px 4px;border-radius:6px}
 .onboarding-close:hover{color:var(--text)}
@@ -586,19 +587,19 @@ textarea.input{resize:none;line-height:1.4}
 .onboarding-headline{font-size:1.28rem;font-weight:900;line-height:1.25;color:var(--text);margin-bottom:10px}
 .onboarding-subtitle{font-size:.8rem;font-weight:700;color:var(--mint2);margin-bottom:12px}
 .onboarding-body{font-size:.84rem;line-height:1.55;color:var(--muted)}
-.onboarding-step{display:flex;gap:12px;align-items:flex-start;margin-bottom:16px}
-.onboarding-step:last-child{margin-bottom:0}
-.onboarding-step-num{flex-shrink:0;width:26px;height:26px;border-radius:50%;background:rgba(0,230,153,.12);
-  border:1px solid rgba(0,230,153,.4);color:var(--mint2);font-weight:800;font-size:.76rem;
-  display:flex;align-items:center;justify-content:center}
-.onboarding-step-text{display:flex;flex-direction:column;gap:3px}
-.onboarding-step-text b{font-size:.84rem;color:var(--text)}
-.onboarding-step-text span{font-size:.76rem;color:var(--muted);line-height:1.4}
-.onboarding-checklist{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
-.onboarding-checklist li{font-size:.82rem;color:var(--text);padding:10px 12px;background:rgba(255,255,255,.03);
-  border:1px solid rgba(255,255,255,.07);border-radius:10px;display:flex;align-items:center;gap:8px}
-.onboarding-checklist li::before{content:'';flex-shrink:0;width:16px;height:16px;border-radius:5px;
-  border:1.5px solid rgba(0,230,153,.5);background:rgba(0,230,153,.08)}
+.onboarding-warning{display:flex;gap:10px;align-items:flex-start;background:rgba(15,23,42,.9);
+  border:1px solid rgba(16,185,129,.3);border-radius:12px;padding:12px 14px;margin-bottom:14px}
+.onboarding-warning-icon{flex-shrink:0;font-size:.9rem;line-height:1}
+.onboarding-warning-text{font-size:.76rem;line-height:1.45;color:var(--muted);font-weight:600}
+.onboarding-grid{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.onboarding-grid-item{display:flex;gap:12px;align-items:flex-start;padding:12px;background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.07);border-radius:12px}
+.onboarding-grid-num{flex-shrink:0;width:28px;height:28px;border-radius:9px;background:rgba(0,230,153,.12);
+  border:1px solid rgba(0,230,153,.4);color:var(--mint2);font-weight:800;font-size:.72rem;
+  display:flex;align-items:center;justify-content:center;letter-spacing:.02em}
+.onboarding-grid-text{display:flex;flex-direction:column;gap:3px}
+.onboarding-grid-text b{font-size:.82rem;color:var(--text);letter-spacing:.02em}
+.onboarding-grid-text span{font-size:.76rem;color:var(--muted);line-height:1.4}
 .btn-onboarding-cta{width:100%;box-sizing:border-box;min-height:52px;background:var(--mint);color:#051311;
   border:none;padding:14px 16px;border-radius:12px;font-family:inherit;font-weight:700;font-size:16px;cursor:pointer}
 .onboarding-footer{display:flex;flex-direction:column;gap:16px;margin-top:20px}
@@ -1630,7 +1631,7 @@ textarea.input{resize:none;line-height:1.4}
     </div>
   </div>
 
-  <!-- ===== FRONT DOOR ONBOARDING — "First Look" 3-card walkthrough shown
+  <!-- ===== FRONT DOOR ONBOARDING — "Private Beta" 2-card notice shown
        once per device to the first-adopter beta cohort (gated by
        ONBOARDING_SEEN_KEY in localStorage, same per-device convention as
        markGridCellLit()'s lit-grid-cities key). Auto-opens shortly after
@@ -1642,43 +1643,39 @@ textarea.input{resize:none;line-height:1.4}
       <div class="onboarding-header-bar">
         <span class="onboarding-brand">CITIXEN UX<sup class="tm-symbol">™</sup></span>
         <div class="onboarding-header-right">
-          <span class="onboarding-badge">FIRST LOOK BETA</span>
+          <span class="onboarding-badge confidential">CONFIDENTIAL • PRIVATE ALPHA COHORT</span>
           <button type="button" class="onboarding-close" id="btnOnboardingClose" aria-label="Skip walkthrough">✕</button>
         </div>
       </div>
 
       <div class="onboarding-slides" id="onboardingSlides">
         <div class="onboarding-slide active" data-slide="0">
-          <div class="onboarding-eyebrow">Welcome to Citixen UX™</div>
-          <h2 class="onboarding-headline">Fixing Your Neighborhood Just Got Effortless.</h2>
-          <div class="onboarding-subtitle">No app downloads. No account required. 100% private.</div>
-          <p class="onboarding-body">You're getting an exclusive first look at Citixen. Help us make taking care of local issues—like potholes, broken streetlights, or overgrown parks—as fast and smooth as taking a photo.</p>
+          <h2 class="onboarding-headline">You Are 1 of 10 Beta Testers</h2>
+          <div class="onboarding-warning">
+            <span class="onboarding-warning-icon">🔒</span>
+            <span class="onboarding-warning-text">This access is strictly private. Please do not forward or share this link.</span>
+          </div>
+          <p class="onboarding-body">We are testing back-end data aggregation and routing speed. All you need to do is submit a test report and verify it hits the public ledger.</p>
         </div>
 
         <div class="onboarding-slide" data-slide="1">
-          <div class="onboarding-eyebrow">How It Works in 30 Seconds</div>
-          <div class="onboarding-step">
-            <div class="onboarding-step-num">1</div>
-            <div class="onboarding-step-text"><b>Choose a Category</b><span>Select an option or type a quick note. The system routes it automatically.</span></div>
+          <div class="onboarding-eyebrow">3-SECOND TEST PROCESS</div>
+          <h2 class="onboarding-headline" style="font-size:1.1rem">That's It. 3 Simple Actions:</h2>
+          <div class="onboarding-grid">
+            <div class="onboarding-grid-item">
+              <div class="onboarding-grid-num">1</div>
+              <div class="onboarding-grid-text"><b>SNAP</b><span>Tap the glowing green camera button to capture or upload any photo (even your desk).</span></div>
+            </div>
+            <div class="onboarding-grid-item">
+              <div class="onboarding-grid-num">2</div>
+              <div class="onboarding-grid-text"><b>REPORT</b><span>Tap "Publish Report." No logins, no forms, no friction.</span></div>
+            </div>
+            <div class="onboarding-grid-item">
+              <div class="onboarding-grid-num">3</div>
+              <div class="onboarding-grid-text"><b>FOLLOW LEDGER</b><span>Watch your report instantly land at the top of the live feed and check your receipt code.</span></div>
+            </div>
           </div>
-          <div class="onboarding-step">
-            <div class="onboarding-step-num">2</div>
-            <div class="onboarding-step-text"><b>Snap a Photo</b><span>Tap the glowing green camera button. Location and photo details are automatically anonymized.</span></div>
-          </div>
-          <div class="onboarding-step">
-            <div class="onboarding-step-num">3</div>
-            <div class="onboarding-step-text"><b>Get Your Confirmation</b><span>Hit "Publish Report" to instantly receive a receipt code to track progress or share.</span></div>
-          </div>
-        </div>
-
-        <div class="onboarding-slide" data-slide="2">
-          <div class="onboarding-eyebrow">Your Quick Start</div>
-          <ul class="onboarding-checklist">
-            <li>Is submitting taking under 30 seconds?</li>
-            <li>Are the buttons clear while walking around?</li>
-            <li>Does receiving your confirmation receipt feel satisfying?</li>
-          </ul>
-          <button type="button" class="btn-onboarding-cta" id="btnOnboardingStart">Start 30-Second Test Report</button>
+          <button type="button" class="btn-onboarding-cta" id="btnOnboardingStart">Start Test Report</button>
         </div>
       </div>
 
@@ -1686,11 +1683,9 @@ textarea.input{resize:none;line-height:1.4}
         <div class="onboarding-dots" id="onboardingDots" role="tablist" aria-label="Onboarding progress">
           <span class="onboarding-dot active" data-dot="0"></span>
           <span class="onboarding-dot" data-dot="1"></span>
-          <span class="onboarding-dot" data-dot="2"></span>
         </div>
         <div class="onboarding-nav">
-          <button type="button" class="btn-onboarding-outline" id="btnOnboardingBack">Back</button>
-          <button type="button" class="btn-onboarding-outline" id="btnOnboardingNext">Next</button>
+          <button type="button" class="btn-onboarding-outline" id="btnOnboardingNext">Next: How It Works →</button>
         </div>
       </div>
     </div>
@@ -4560,13 +4555,13 @@ function hideSplash(){
   if (splash) splash.classList.add('hide');
 }
 
-// ===== FRONT DOOR ONBOARDING — "First Look" 3-card beta walkthrough =====
+// ===== FRONT DOOR ONBOARDING — "Private Beta" 2-card notice =====
 // Gated per-device by localStorage, same convention as markGridCellLit()'s
 // lit-grid-cities key, so the 10 first-adopter beta testers see it once
 // and never again on return visits — not re-shown every session the way
 // the launch splash is.
 const ONBOARDING_SEEN_KEY = 'citixen_onboarding_seen_v1';
-const ONBOARDING_SLIDE_COUNT = 3;
+const ONBOARDING_SLIDE_COUNT = 2;
 let onboardingSlideIndex = 0;
 function renderOnboardingSlide(){
   document.querySelectorAll('.onboarding-slide').forEach(el => {
@@ -4575,8 +4570,9 @@ function renderOnboardingSlide(){
   document.querySelectorAll('.onboarding-dot').forEach(el => {
     el.classList.toggle('active', Number(el.dataset.dot) === onboardingSlideIndex);
   });
-  document.getElementById('btnOnboardingBack').disabled = onboardingSlideIndex === 0;
-  document.getElementById('btnOnboardingNext').style.display = (onboardingSlideIndex === ONBOARDING_SLIDE_COUNT - 1) ? 'none' : '';
+  // Card 2 has its own in-card "Start Test Report" CTA, so the shared nav
+  // row (just "Next: How It Works →") only shows on card 1.
+  document.querySelector('.onboarding-nav').style.display = (onboardingSlideIndex === ONBOARDING_SLIDE_COUNT - 1) ? 'none' : '';
 }
 function openFrontDoorOnboarding(){
   onboardingSlideIndex = 0;
@@ -4591,9 +4587,6 @@ function closeFrontDoorOnboarding(markSeen){
 }
 document.getElementById('btnOnboardingNext').addEventListener('click', () => {
   if (onboardingSlideIndex < ONBOARDING_SLIDE_COUNT - 1) { onboardingSlideIndex++; renderOnboardingSlide(); }
-});
-document.getElementById('btnOnboardingBack').addEventListener('click', () => {
-  if (onboardingSlideIndex > 0) { onboardingSlideIndex--; renderOnboardingSlide(); }
 });
 document.getElementById('btnOnboardingClose').addEventListener('click', () => closeFrontDoorOnboarding(true));
 document.getElementById('frontDoorOnboardingModal').addEventListener('click', (e) => {
