@@ -50,16 +50,24 @@
    drawer — still passes onLedger (opens #ledgerDrawer directly). Only one
    of the two ever renders, per the onStack/onLedger branch in
    renderModule(). */
+/* Obsidian glass (Global Hyper-Transparent Obsidian Glass System) — same
+   --surface-card-bg/--surface-blur tokens as every other card, with a
+   literal fallback for safety since this file is shared by both pages. */
 .cx-btn-tertiary{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;
   min-height:46px;padding:14px 16px;border:1px solid #1E293B;border-radius:12px;
-  background:#0B0E14;color:#FFFFFF;font:inherit;font-weight:700;font-size:.88rem;letter-spacing:.01em;cursor:pointer;
+  background:var(--surface-card-bg, rgba(5,11,20,.8));
+  -webkit-backdrop-filter:blur(var(--surface-blur, 16px));backdrop-filter:blur(var(--surface-blur, 16px));
+  color:#FFFFFF;font:inherit;font-weight:700;font-size:.88rem;letter-spacing:.01em;cursor:pointer;
   transition:transform .12s ease,background-color .15s ease,border-color .15s ease}
 .cx-btn-tertiary:hover{background:#111722;border-color:#2B3A52}
-/* Button 2 — View Living Public Ledger: dark fill, SOLID 1px Laser Mint
-   outline (no dashes), pulsing dot on the left, light-green label, no arrow. */
+/* Button 2 — View Living Public Ledger: obsidian glass fill, SOLID 1px
+   Laser Mint outline (no dashes), pulsing dot on the left, light-green
+   label, no arrow. */
 .cx-btn-ledger{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;box-sizing:border-box;
   position:relative;min-height:46px;padding:14px 44px;border:1px solid #00E699;border-radius:12px;
-  background:#0B0E14;color:#00E699;font:inherit;font-weight:700;font-size:.88rem;letter-spacing:.01em;cursor:pointer;
+  background:var(--surface-card-bg, rgba(5,11,20,.8));
+  -webkit-backdrop-filter:blur(var(--surface-blur, 16px));backdrop-filter:blur(var(--surface-blur, 16px));
+  color:#00E699;font:inherit;font-weight:700;font-size:.88rem;letter-spacing:.01em;cursor:pointer;
   transition:transform .12s ease,background-color .15s ease,box-shadow .18s ease}
 /* Live indicator pinned to the far left; the label stays centered. */
 .cx-btn-ledger .cx-ledger-pulse-dot{position:absolute;left:20px;top:50%;margin-top:-4px}

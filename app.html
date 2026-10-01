@@ -565,55 +565,16 @@ textarea.input{resize:none;line-height:1.4}
    drawer's "Community Archive" key, which calls openLedgerDrawer()
    directly. index.html keeps the original onLedger wiring since it has no
    drawer of its own. ===== */
-.matrix-summary-section{padding-top:12px}
-.hub-row{display:flex;flex-direction:column;max-width:920px;margin:0 auto 26px;padding:0;box-sizing:border-box}
-.hub-card{position:relative;display:flex;align-items:center;justify-content:space-between;width:100%;
-  background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));
-  border:var(--surface-card-border);border-radius:12px;padding:12px 18px;
-  margin-bottom:14px;box-sizing:border-box;cursor:pointer;color:var(--text);text-align:left;
-  transition:border-color .15s;font-family:inherit;min-width:0;gap:10px}
-.hub-card:last-child{margin-bottom:0}
-/* CITIXENSHIP™ narrative headline — neon green with a solid white, white-glow "X". */
-.cx-citixenship-title{text-align:center;margin:4px 0 6px;font-size:20px;font-weight:700;letter-spacing:.12em;color:#00E699;
-  text-shadow:0 0 10px rgba(0,230,153,.65),0 0 20px rgba(0,230,153,.3)}
-.cx-citixenship-title .cx-x{color:#FFFFFF;text-shadow:0 0 6px #FFFFFF,0 0 14px rgba(255,255,255,.85),0 0 26px rgba(255,255,255,.45)}
-.cx-citixenship-tm{font-size:.45em;font-weight:400;color:#94A3B8;text-shadow:none;margin-left:2px;letter-spacing:0}
-/* Narrative nodes: icon · title + wrapping description · arrow. */
-.hub-card.cx-node{justify-content:flex-start;gap:14px;padding:14px 16px;flex-wrap:nowrap !important}
-.cx-node .cx-hub-icon{flex-shrink:0}
-.cx-node-text{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1 1 0}
-.cx-node .hub-card-title{white-space:normal}
-.cx-node-desc{font-size:.74rem;font-weight:500;line-height:1.45;color:var(--muted)}
-.hub-card-main{display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 auto}
-.hub-card svg{stroke:#00E699;flex-shrink:0}
-.hub-card-title{font-size:.8rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#FFFFFF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.hub-card-sub{font-size:.72rem !important;font-weight:500 !important;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hub-card-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}
-.hub-card-arrow{font-size:.8rem;font-weight:600;color:#00E699;flex-shrink:0}
-.hub-card:hover{border-color:#00E699}
-.telemetry-card{background:rgba(3,7,18,.85);border:1px solid rgba(0,230,153,.35);
-  border-radius:12px}
-/* Scrolling system-architecture marquee + headline, directly above the
-   Features/Safety/Security grid. Pure CSS: two identical copies of the
-   track scroll left by exactly one copy-width (-50%) for a seamless loop. */
-.citixen-marquee{max-width:920px;margin:0 auto 14px;overflow:hidden;white-space:nowrap;
-  -webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
-  mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
-.citixen-marquee-track{display:inline-flex;animation:citixen-marquee-scroll 22s linear infinite}
-.citixen-marquee-track span{display:inline-block;flex-shrink:0;font-size:11px;font-weight:700;
-  text-transform:uppercase;letter-spacing:.22em;color:rgba(0,230,153,.7)}
-@keyframes citixen-marquee-scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-@media (prefers-reduced-motion:reduce){.citixen-marquee-track{animation:none}}
-.citixen-arch-header{max-width:920px;margin:0 auto 16px;text-align:center;padding:0}
-.citixen-arch-title{font-size:1.05rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#E2E8F0;margin:0}
-.citixen-arch-sub{font-size:12px;color:#94A3B8;margin:6px 0 0}
-.citixen-feature-section{max-width:920px;margin:0 auto 18px;padding:0}
-.citixen-narrative-link{max-width:920px;margin:0 auto 18px;padding:0;
-  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.citixen-narrative-link-title{display:flex;align-items:center;gap:8px;
-  color:#00E699;font-weight:800;font-size:1.1rem;letter-spacing:.08em;text-transform:uppercase}
-.citixen-feature-learn-more{display:inline-block;background:none;border:none;padding:0;font:inherit;
-  color:#00E699;font-size:.8rem;font-weight:700;cursor:pointer;text-decoration:underline;flex-shrink:0}
+/* The CITIXENSHIP™ narrative funnel's .matrix-summary-section/.hub-row/
+   .hub-card/.cx-node/.cx-citixenship-* styles were removed along with its
+   markup this round — those 3 links now live in the hamburger drawer's
+   "Explore CITIXEN UX™ Features" section, styled as plain .cx-drawer-key
+   rows like every other drawer item. */
+/* The scrolling marquee, the "System Architecture" headline, the
+   Features/Safety/Security option grid + accordion, and the old
+   narrative-link/Learn-More styles were all removed this round along
+   with their markup — that content now lives in the hamburger drawer's
+   "Explore CITIXEN UX™ Features" section. */
 .citixen-trust-badge{display:flex;align-items:flex-start;gap:12px;max-width:640px;width:100%;
   box-sizing:border-box;margin:0 auto 18px;
   background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));border:var(--surface-card-border);
@@ -622,23 +583,6 @@ textarea.input{resize:none;line-height:1.4}
 .citixen-trust-badge-title{color:#00E699;font-weight:800;font-size:.78rem;letter-spacing:.02em;
   text-transform:uppercase;line-height:1.4;margin-bottom:4px}
 .citixen-trust-badge-sub{color:var(--muted);font-size:.76rem;line-height:1.45}
-.citixen-feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.citixen-feature-tile{background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));border:var(--surface-card-border);
-  border-radius:12px;padding:20px 10px;display:flex;flex-direction:column;align-items:center;gap:10px;
-  cursor:pointer;font-family:inherit;transition:border-color .15s,filter .15s,background .15s}
-.citixen-feature-tile:hover{border-color:#00E699;filter:brightness(1.08)}
-.citixen-feature-tile.active{border-color:#00E699;background:rgba(0,230,153,.08)}
-.citixen-feature-tile-icon{width:44px;height:44px;border-radius:50%;background:rgba(0,230,153,.1);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.citixen-feature-tile-label{color:var(--text);font-weight:700;font-size:.78rem;text-transform:uppercase;
-  letter-spacing:.05em}
-.citixen-feature-accordion{max-width:100%;max-height:0;overflow:hidden;opacity:0;
-  background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));border:var(--surface-card-border);
-  border-radius:12px;transition:max-height .3s ease,opacity .25s ease,margin .3s ease;margin-top:0}
-.citixen-feature-accordion.open{max-height:600px;opacity:1;margin-top:12px;padding:16px 18px}
-.citixen-feature-accordion h4{color:var(--text);font-size:.82rem;margin:12px 0 4px}
-.citixen-feature-accordion h4:first-child{margin-top:0}
-.citixen-feature-accordion p{color:var(--muted);font-size:.78rem;line-height:1.55}
 /* ===== CROWD SAVE AMERICA™ MAP CARD (from the entry pop-up) ===== */
 .csa-map{display:block;width:100%;height:auto}
 .csa-dot{animation:csa-twinkle 4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
@@ -679,6 +623,18 @@ textarea.input{resize:none;line-height:1.4}
 .csa-hero-track .csap-fill{box-shadow:0 0 10px rgba(0,230,153,.75),0 0 22px rgba(0,230,153,.35)}
 .csa-hero-cta{margin-top:18px;box-shadow:0 0 0 1px rgba(0,230,153,.35),0 0 18px rgba(0,230,153,.45),0 0 38px rgba(0,230,153,.2)}
 .csa-hero:hover .csa-hero-cta{filter:brightness(1.06)}
+/* Civic Intelligence™ Stack — standalone beta-locked card below the CSA
+   map. Same obsidian glass as every other card; dimmed text + a small
+   "Unlocks post-beta" badge signal its locked state without hiding it. */
+.cx-stack-standalone{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;
+  max-width:640px;margin:0 auto 18px;box-sizing:border-box;padding:16px 18px;
+  background:var(--surface-card-bg);-webkit-backdrop-filter:blur(var(--surface-blur));backdrop-filter:blur(var(--surface-blur));
+  border:1px solid rgba(0,230,153,.2);border-radius:16px;color:#94A3B8;font:inherit;font-weight:700;
+  font-size:.88rem;letter-spacing:.01em;cursor:pointer;text-align:left}
+.cx-stack-standalone span:first-child{color:#E2E8F0}
+.cx-stack-standalone:hover{border-color:rgba(0,230,153,.4)}
+.cx-stack-standalone-badge{flex-shrink:0;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;
+  color:#94A3B8;background:rgba(148,163,184,.12);border:1px solid rgba(148,163,184,.3);border-radius:999px;padding:4px 10px}
 @media (max-width:420px){.csa-hero{padding:16px}.csa-hero-zone{font-size:12px}.csa-hero-map{padding:10px 4px}}
 /* ===== CROWD SAVE AMERICA™ PROGRESS MODAL ===== */
 #crowdsave-progress-modal{background:rgba(5,8,12,.97);backdrop-filter:blur(6px)}
@@ -830,10 +786,18 @@ textarea.input{resize:none;line-height:1.4}
           <button type="button" class="cx-drawer-key" data-cx-key="cityActionTracker"><span data-cx-icon="truck"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">City Action Tracker</span><span class="cx-drawer-key-sub">Live work orders &amp; response</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
         </div>
         <div class="cx-drawer-section">
-          <div class="cx-drawer-heading">Civic Intelligence<sup class="tm-symbol">™</sup> Stack</div>
-          <button type="button" class="cx-drawer-key" data-cx-key="civicMemory"><span data-cx-icon="archive"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">U.S. Citixenship™</span><span class="cx-drawer-key-sub">Constitutions, charters &amp; foundational rights</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
-          <button type="button" class="cx-drawer-key" data-cx-key="livingLedger"><span data-cx-icon="truck"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">Civic Memory™</span><span class="cx-drawer-key-sub">Living ledger, audits &amp; historical proof</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
-          <button type="button" class="cx-drawer-key" data-cx-key="protocol"><span data-cx-icon="nodes"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">CITIXEN UX™ Protocol</span><span class="cx-drawer-key-sub">Sovereign micro-capture architecture</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
+          <!-- Formerly this drawer's "Civic Intelligence™ Stack" section
+               and, before that, the Dashboard's own CITIXENSHIP™ narrative-
+               funnel cards + Features/Safety/Security tile grid — all real,
+               unlocked content, just relocated here rather than removed.
+               "Civic Intelligence™ Stack" the brand is now its own
+               standalone, beta-locked card on the Dashboard (see
+               #civicStackBtn), separate from this real navigation. -->
+          <div class="cx-drawer-heading">Explore CITIXEN UX<sup class="tm-symbol">™</sup> Features</div>
+          <button type="button" class="cx-drawer-key" data-cx-key="civicMemory"><span data-cx-icon="archive"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">U.S. Citixenship™ &amp; Rights</span><span class="cx-drawer-key-sub">Constitutions, charters &amp; foundational rights</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
+          <button type="button" class="cx-drawer-key" data-cx-key="livingLedger"><span data-cx-icon="truck"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">Civic Memory™ Ledger</span><span class="cx-drawer-key-sub">Living ledger, audits &amp; historical proof</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
+          <button type="button" class="cx-drawer-key" data-cx-key="protocol"><span data-cx-icon="nodes"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">Citixen UX™ Protocols</span><span class="cx-drawer-key-sub">Sovereign micro-capture architecture</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
+          <button type="button" class="cx-drawer-key" data-cx-key="infrastructure"><span data-cx-icon="shield"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">System Infrastructure, Safety &amp; Security</span><span class="cx-drawer-key-sub">Features, safety protocols &amp; the privacy engine</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
         </div>
         <div class="cx-drawer-section">
           <div class="cx-drawer-heading">System Architecture &amp; Security</div>
@@ -1023,6 +987,16 @@ textarea.input{resize:none;line-height:1.4}
         </div>
       </section>
 
+      <!-- Civic Intelligence™ Stack — relocated here (directly below the
+           Crowd Save America™ map) from the "Reports & Easy Share" hero
+           stack. Obsidian glass like every other card; locked for beta
+           (civicStackLocked()) — full visual rendering, no modal/drawer
+           breakout, just the toast. -->
+      <button type="button" class="cx-stack-standalone" id="civicStackBtn" aria-haspopup="false">
+        <span>Civic Intelligence<sup class="tm-symbol">™</sup> Stack</span>
+        <span class="cx-stack-standalone-badge">Unlocks post-beta</span>
+      </button>
+
       <!-- The #CrowdSaveAmerica Geo-Hatch Coverage card (City/State/Country
            scope tabs + Citywide Asset Coverage block grid, shared/geo-hatch.js)
            that used to sit directly under the Crowd Save America™ map card
@@ -1036,46 +1010,14 @@ textarea.input{resize:none;line-height:1.4}
            hero module above (item 3) as its 3rd stacked button, wired via
            CitixenInstantReport.init()'s onLedger option. -->
 
-      <!-- 7. CITIXENSHIP™ — Dashboard Narrative Funnel. Three nodes, each
-           opening a real feature:
-             Node 1 "The Power of U.S. Citixenship™" → openAppInfoModal('citixenship')
-               (foundational documents, citizen rights, civic empowerment).
-             Node 2 "Civic Memory™" → openLedgerDrawer() (the real, searchable
-               public ledger timeline / audit trail).
-             Node 3 "CITIXEN UX™ Protocol" → openAppInfoModal('citixenProtocol')
-               (zero-friction, sovereign micro-capture architecture).
-           Capital Projects and City Action Tracker live in the Quick Keys
-           drawer's "Civic Operations" section. -->
-      <section class="matrix-summary-section">
-        <h3 class="cx-citixenship-title">CITI<span class="cx-x">X</span>ENSHIP<sup class="cx-citixenship-tm">™</sup></h3>
-        <p style="color:var(--muted);font-size:.78rem;text-align:center;font-style:italic;margin:0 0 16px;">The power, the record, and the protocol behind every report.</p>
-      </section>
-      <div class="hub-row" role="navigation" aria-label="Citixenship">
-        <button class="hub-card telemetry-card cx-node" id="appNodeCodexBtn" type="button">
-          <svg class="cx-hub-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 9l9-5 9 5"/><path d="M4 9h16"/><path d="M6 9v8M10 9v8M14 9v8M18 9v8"/><path d="M4 17h16M3 20h18"/></svg>
-          <span class="cx-node-text">
-            <span class="hub-card-title">The Power of U.S. Citixenship<sup class="tm-symbol">™</sup></span>
-            <span class="cx-node-desc">Constitutions, charters &amp; foundational rights made accessible.</span>
-          </span>
-          <span class="hub-card-arrow">↗</span>
-        </button>
-        <button class="hub-card telemetry-card cx-node" id="appNodeLedgerBtn" type="button">
-          <svg class="cx-hub-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
-          <span class="cx-node-text">
-            <span class="hub-card-title">Civic Memory<sup class="tm-symbol">™</sup></span>
-            <span class="cx-node-desc">Our shared living ledger, transparent audits &amp; historical proof.</span>
-          </span>
-          <span class="hub-card-arrow">↗</span>
-        </button>
-        <button class="hub-card telemetry-card cx-node" id="appNodeProtocolBtn" type="button">
-          <svg class="cx-hub-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="6" cy="12" r="2.4"/><circle cx="18" cy="6" r="2.4"/><circle cx="18" cy="18" r="2.4"/><path d="M8.2 10.9l7.6-3.8M8.2 13.1l7.6 3.8"/></svg>
-          <span class="cx-node-text">
-            <span class="hub-card-title">CITIXEN UX<sup class="tm-symbol">™</sup> Protocol</span>
-            <span class="cx-node-desc">Zero-friction, sovereign micro-capture engine.</span>
-          </span>
-          <span class="hub-card-arrow">↗</span>
-        </button>
-      </div>
+      <!-- The CITIXENSHIP™ Dashboard Narrative Funnel (3 nodes: U.S.
+           Citixenship™, Civic Memory™, CITIXEN UX™ Protocol) was removed
+           from the main feed this round and relocated into the hamburger
+           drawer's "Explore CITIXEN UX™ Features" section — same real
+           destinations (openAppInfoModal('citixenship'), openLedgerDrawer(),
+           openAppInfoModal('citixenProtocol')), just reached from the menu
+           instead of a dashboard card grid. Capital Projects and City
+           Action Tracker remain in the drawer's "Civic Operations" section. -->
 
       <!-- Analytics deep-dive — the tab's existing real Big 3 + National
            Network content (same ids/data as before), now revealed from the
@@ -1145,45 +1087,13 @@ textarea.input{resize:none;line-height:1.4}
         <button type="button" class="hub-deepdive-close" id="appMunicipalPanelCloseBtn">Close</button>
       </div>
 
-      <!-- 6b. SYSTEM ARCHITECTURE MARQUEE + HEADLINE — decorative scrolling
-           ticker (aria-hidden, two duplicate copies for a seamless CSS
-           loop) plus the section headline, directly above the Features /
-           Safety / Security grid. -->
-      <div class="citixen-marquee" aria-hidden="true">
-        <div class="citixen-marquee-track">
-          <span>CITIXEN UX™ • APOLITICAL INFRASTRUCTURE • ZERO-KNOWLEDGE PROTOCOL • LIVING LEDGER™ • </span>
-          <span>CITIXEN UX™ • APOLITICAL INFRASTRUCTURE • ZERO-KNOWLEDGE PROTOCOL • LIVING LEDGER™ • </span>
-        </div>
-      </div>
-      <div class="citixen-arch-header">
-        <h2 class="citixen-arch-title">CITIXEN UX™ System Architecture</h2>
-        <p class="citixen-arch-sub">Mechanical, security, and privacy protocols engineered for public trust.</p>
-      </div>
-
-      <!-- 7. INTERACTIVE OPTION GRID -->
-      <section class="citixen-feature-section">
-        <div class="citixen-feature-grid" role="list" aria-label="Platform feature categories">
-          <button type="button" class="citixen-feature-tile" id="appTileFeatures" role="listitem" aria-expanded="false" aria-controls="appFeatureAccordion">
-            <span class="citixen-feature-tile-icon">
-              <svg viewBox="0 0 24 24" width="22" height="22" stroke="#00E699" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><circle cx="9" cy="7" r="2" fill="#00E699" stroke="none"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2" fill="#00E699" stroke="none"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="11" cy="17" r="2" fill="#00E699" stroke="none"/></svg>
-            </span>
-            <span class="citixen-feature-tile-label">Features ↓</span>
-          </button>
-          <button type="button" class="citixen-feature-tile" id="appTileSafety" role="listitem" aria-expanded="false" aria-controls="appFeatureAccordion">
-            <span class="citixen-feature-tile-icon">
-              <svg viewBox="0 0 24 24" width="22" height="22" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </span>
-            <span class="citixen-feature-tile-label">Safety ↓</span>
-          </button>
-          <button type="button" class="citixen-feature-tile" id="appTileSecurity" role="listitem" aria-expanded="false" aria-controls="appFeatureAccordion">
-            <span class="citixen-feature-tile-icon">
-              <svg viewBox="0 0 24 24" width="22" height="22" stroke="#00E699" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 3 20 7.5 20 16.5 12 21 4 16.5 4 7.5 12 3"/><path d="m8.5 12 2.5 2.5 5-5"/></svg>
-            </span>
-            <span class="citixen-feature-tile-label">Security ↓</span>
-          </button>
-        </div>
-        <div class="citixen-feature-accordion" id="appFeatureAccordion" role="region" aria-live="polite"></div>
-      </section>
+      <!-- The scrolling System Architecture marquee + headline and the
+           Features / Safety / Security option grid were both removed from
+           the main feed this round. The Features/Safety/Security content
+           now lives in the hamburger drawer's "Explore CITIXEN UX™
+           Features" section as a single "System Infrastructure, Safety &
+           Security" link (openAppInfoModal('systemInfrastructure') — same
+           copy, combined into one modal instead of three accordion tiles). -->
 
       <!-- The standalone "CITIXEN UX™ Learn More ↗" link + its deep-dive
            panel (the triad diagram + a one-paragraph description) were
@@ -1547,18 +1457,15 @@ function trackEvent(name, detail){
 }
 
 // ===== BETA LOCKDOWN — "Civic Intelligence™ Stack" dummy lock =====
-// Per the beta-readiness directive: the Civic Intelligence™ Stack content
-// (U.S. Citixenship™ / Civic Memory™ / CITIXEN UX™ Protocol — the
-// narrative-funnel cards, the hero stack's "Civic Intelligence™ Stack"
-// shortcut, and the Quick Keys drawer's matching quick-key section) stays
-// fully visible for design-polish purposes but no longer opens its
-// modal/drawer breakout during the beta window. Every other quick key
-// (Export/Share, Civic Operations, Security & Grid) — and every other path
-// to the real Public Ledger (the hero stack's "View Living Public Ledger"
-// button, the Map & Feed tab) — is untouched and stays fully live.
+// This round separated the "Civic Intelligence™ Stack" brand from the
+// narrative content it used to gate: U.S. Citixenship™ / Civic Memory™ /
+// CITIXEN UX™ Protocol are now real, unlocked links under "Explore
+// CITIXEN UX™ Features" in the hamburger drawer. "Civic Intelligence™
+// Stack" itself is now its own standalone card (#civicStackBtn) directly
+// below the Crowd Save America™ map — full visual rendering, no
+// modal/drawer breakout, just this toast.
 function civicStackLocked(){
-  if (typeof closeAppDrawer === 'function') closeAppDrawer();
-  toast('Civic Intelligence Stack features will unlock post-beta.');
+  toast('Civic Intelligence Stack features unlock post-beta.');
 }
 
 function switchTab(id,btn){
@@ -2636,20 +2543,20 @@ function appTriadDiagramHtml(idPrefix) {
    modalData (no live numbers here, so verbatim reuse is honest, unlike
    the Scorecard/Municipal figures above which are always computed). */
 const APP_MODAL_DATA = {
-  ciFeatures: { title: 'Features', body: [
-    ['Real-Time Spatial Tracking','Reports are placed on the live national map and this jurisdiction\'s own dispatch view the moment they are filed.'],
-    ['Automated SLA Logging','Every report is timestamped against its ward\'s published response-time commitment automatically — no manual entry.'],
-    ['Ward Heatmaps','Hazard density and resolution-speed views broken out ward by ward, drawn from the same records dispatchers see.']
-  ]},
-  ciSafety: { title: 'Safety', body: [
-    ['Ground-Truth Civic Verification','Reports are tied to a real ward and jurisdiction, not a self-reported location, so the public record reflects where a hazard actually is.'],
-    ['Incident Priority Ranking','Open hazards can be ranked by category so limited repair budget goes to the highest-need items first.'],
-    ['Hazard Prevention Metrics','Resolution-time and reopen-rate trends surface recurring hazard patterns before they become repeat incidents.']
-  ]},
-  ciSecurity: { title: 'Security', body: [
-    ['Zero-Knowledge Privacy Engine','No accounts, no login, and no device fingerprinting anywhere in this system — see the full Anonymity Whitepaper.'],
-    ['On-Device Metadata Scrubbing','Photo metadata, including embedded GPS coordinates and device identifiers, is stripped on-device before a photo ever leaves the reporter\'s phone.'],
-    ['Immutable Public Ledger','Each resolved ledger entry carries a timestamp and verification hash so the resolution sequence can be audited without exposing reporter identity.']
+  // Formerly 3 separate Features/Safety/Security accordion tiles on the
+  // Dashboard; combined into one modal (same copy, unchanged) now that
+  // it's reached as a single "System Infrastructure, Safety & Security"
+  // link in the hamburger drawer's "Explore CITIXEN UX™ Features" section.
+  systemInfrastructure: { title: 'System Infrastructure, Safety & Security', body: [
+    ['Features — Real-Time Spatial Tracking','Reports are placed on the live national map and this jurisdiction\'s own dispatch view the moment they are filed.'],
+    ['Features — Automated SLA Logging','Every report is timestamped against its ward\'s published response-time commitment automatically — no manual entry.'],
+    ['Features — Ward Heatmaps','Hazard density and resolution-speed views broken out ward by ward, drawn from the same records dispatchers see.'],
+    ['Safety — Ground-Truth Civic Verification','Reports are tied to a real ward and jurisdiction, not a self-reported location, so the public record reflects where a hazard actually is.'],
+    ['Safety — Incident Priority Ranking','Open hazards can be ranked by category so limited repair budget goes to the highest-need items first.'],
+    ['Safety — Hazard Prevention Metrics','Resolution-time and reopen-rate trends surface recurring hazard patterns before they become repeat incidents.'],
+    ['Security — Zero-Knowledge Privacy Engine','No accounts, no login, and no device fingerprinting anywhere in this system — see the full Anonymity Whitepaper.'],
+    ['Security — On-Device Metadata Scrubbing','Photo metadata, including embedded GPS coordinates and device identifiers, is stripped on-device before a photo ever leaves the reporter\'s phone.'],
+    ['Security — Immutable Public Ledger','Each resolved ledger entry carries a timestamp and verification hash so the resolution sequence can be audited without exposing reporter identity.']
   ]},
   privacyEngine: { title: 'Privacy Engine & EXIF Scrubber Protocol', body: [
     ['No account, no identity','Reporting needs no login, email or phone number, and the app does not fingerprint your device.'],
@@ -2730,25 +2637,10 @@ function openAppInfoModal(key){
 function closeAppInfoModal(){
   document.getElementById('appInfoModal').classList.remove('open');
 }
-function toggleAppFeatureAccordion(key, tileId){
-  const acc = document.getElementById('appFeatureAccordion');
-  const tileIds = ['appTileFeatures', 'appTileSafety', 'appTileSecurity'];
-  const wasOpenForThisTile = acc.classList.contains('open') && acc.dataset.activeTile === tileId;
-  tileIds.forEach(id => {
-    const isTarget = id === tileId && !wasOpenForThisTile;
-    document.getElementById(id).classList.toggle('active', isTarget);
-    document.getElementById(id).setAttribute('aria-expanded', String(isTarget));
-  });
-  if (wasOpenForThisTile) {
-    acc.classList.remove('open');
-    acc.dataset.activeTile = '';
-    return;
-  }
-  const d = APP_MODAL_DATA[key];
-  acc.innerHTML = d.body.map(([h, p]) => `<h4>${esc(h)}</h4><p>${esc(p)}</p>`).join('');
-  acc.classList.add('open');
-  acc.dataset.activeTile = tileId;
-}
+// toggleAppFeatureAccordion() was removed along with the Features/Safety/
+// Security tile grid — that same copy (ciFeatures/ciSafety/ciSecurity,
+// folded together) now opens as one modal via APP_MODAL_DATA.
+// systemInfrastructure / openAppInfoModal('systemInfrastructure').
 
 /* Deep-dive panel open/close for the Civic Intelligence Stack + Learn More
    link — same single-panel-open-at-a-time pattern as index.html's
@@ -4086,34 +3978,24 @@ window.addEventListener('DOMContentLoaded',()=>{
   if (pdfBtn) pdfBtn.addEventListener('click', () => downloadWardHealthPdf(pdfBtn));
 
   /* ===== DASHBOARD TAB (Screen 3) WIRING ===== */
-  // Civic Memory™ & Citizenship™ narrative funnel (replaces the old
-  // Capital Projects / City Action Tracker / Community Archive hub-row) —
-  // each node opens the same real, already-wired feature its equivalent
-  // Quick Keys drawer key opens (see the drawer's "Civic Intelligence™
-  // Stack" section below).
-  // Locked for beta (civicStackLocked(), see its definition near toast())
-  // — these three cards keep their full visual rendering but no longer
-  // open their modal/drawer breakout. Was: openAppInfoModal('citixenship'),
-  // openLedgerDrawer(), openAppInfoModal('citixenProtocol').
-  document.getElementById('appNodeCodexBtn').addEventListener('click', civicStackLocked);
-  document.getElementById('appNodeLedgerBtn').addEventListener('click', civicStackLocked);
-  document.getElementById('appNodeProtocolBtn').addEventListener('click', civicStackLocked);
+  // The CITIXENSHIP™ narrative funnel's 3 cards and the Features/Safety/
+  // Security tile grid were removed from this tab's markup this round —
+  // their real destinations now live as plain links in the hamburger
+  // drawer's "Explore CITIXEN UX™ Features" section (see the actions
+  // object below: civicMemory, livingLedger, protocol, infrastructure).
+  // "Civic Intelligence™ Stack" itself is now its own standalone,
+  // beta-locked card directly below the CSA map.
+  document.getElementById('civicStackBtn').addEventListener('click', civicStackLocked);
   // Capital Projects and City Action Tracker keep their full deep-dive
-  // panels and real data loads — they moved into the Quick Keys drawer's
-  // new "Civic Operations" section (data-cx-key="capitalProjects" /
-  // "cityActionTracker") rather than being removed, since the Dashboard's
-  // hub-row above was replaced by the narrative funnel, not the features
-  // themselves.
+  // panels and real data loads in the Quick Keys drawer's "Civic
+  // Operations" section (data-cx-key="capitalProjects" /
+  // "cityActionTracker").
   document.getElementById('appDeepdiveAnalyticsCloseBtn').addEventListener('click', () => {
     document.getElementById('appDeepdiveAnalytics').classList.remove('open');
   });
   document.getElementById('appMunicipalPanelCloseBtn').addEventListener('click', () => {
     document.getElementById('appMunicipalPanel').classList.remove('open');
   });
-
-  document.getElementById('appTileFeatures').addEventListener('click', () => toggleAppFeatureAccordion('ciFeatures', 'appTileFeatures'));
-  document.getElementById('appTileSafety').addEventListener('click', () => toggleAppFeatureAccordion('ciSafety', 'appTileSafety'));
-  document.getElementById('appTileSecurity').addEventListener('click', () => toggleAppFeatureAccordion('ciSecurity', 'appTileSecurity'));
 
   document.getElementById('appInfoModalCloseBtn').addEventListener('click', closeAppInfoModal);
   document.getElementById('appInfoModal').addEventListener('click', (e) => {
@@ -4187,19 +4069,18 @@ function initInstantReportAndQuickKeys(){
     return;
   }
   const IR = window.CitixenInstantReport;
-  // Hero stack, this round's "System Architecture & Drawer Taxonomy"
-  // layout: Button 1 = PDF (unchanged action), Button 2 = the real Ledger
-  // (ledgerAsSecondary moves it into the dashed slot that used to be
-  // "Share CITIXEN UX™" — Share itself is still reachable from the Export
-  // Quick Keys drawer section), Button 3 = "Civic Intelligence™ Stack" —
-  // locked for beta (civicStackLocked()) rather than opening the drawer;
-  // the drawer's own Export/Share, Civic Operations and Security sections
-  // stay reachable from the header's hamburger menu button directly.
+  // Hero stack — this round's "Reports & Easy Share" trim keeps only two
+  // buttons: Button 1 = PDF, Button 2 = the real Ledger (ledgerAsSecondary
+  // moves it into the dashed slot that used to be "Share CITIXEN UX™" —
+  // Share itself is still reachable from the Export Quick Keys drawer
+  // section). No onStack is passed, so renderModule() doesn't render a
+  // 3rd button at all — "Civic Intelligence™ Stack" is now its own
+  // standalone beta-locked card directly below the Crowd Save America™
+  // map (see #civicStackBtn below).
   IR.init({
     getData: appInstantReportData, toast, trackEvent,
     onLedger: openLedgerDrawer,
-    ledgerAsSecondary: true,
-    onStack: civicStackLocked
+    ledgerAsSecondary: true
   });
 
   // Crowd Save America™ hero — the whole card (header, counter, map,
@@ -4235,19 +4116,16 @@ function initInstantReportAndQuickKeys(){
       openLedgerReportModal();
     },
     share: () => { closeAppDrawer(); IR.sharePlatform(); },
-    // Civic Memory™ — the educational Governing Documents & Charters
-    // repository (State Constitution Reference, Spatial Hashing
-    // Architecture, Public Ledger & Standards), with its own real CTA
-    // into the Living Ledger below.
-    // Locked for beta (see civicStackLocked() above) — was:
-    // closeAppDrawer(); openAppInfoModal('citixenship');
-    civicMemory: civicStackLocked,
-    // Locked for beta — was: closeAppDrawer(); openLedgerDrawer();
-    // The real Public Ledger stays fully reachable elsewhere: the hero
-    // stack's "View Living Public Ledger" button and the Map & Feed tab.
-    livingLedger: civicStackLocked,
-    // Locked for beta — was: closeAppDrawer(); openAppInfoModal('citixenProtocol');
-    protocol: civicStackLocked,
+    // "Explore CITIXEN UX™ Features" — real, unlocked links (formerly the
+    // Dashboard's own CITIXENSHIP™ narrative-funnel cards, now reached
+    // from the hamburger menu instead). "Civic Intelligence™ Stack" the
+    // brand is locked separately as its own standalone card — these are not it.
+    civicMemory: () => { closeAppDrawer(); openAppInfoModal('citixenship'); },
+    livingLedger: () => { closeAppDrawer(); openLedgerDrawer(); },
+    protocol: () => { closeAppDrawer(); openAppInfoModal('citixenProtocol'); },
+    // Formerly the Dashboard's Features/Safety/Security tile grid +
+    // accordion — same copy, now one combined modal (see APP_MODAL_DATA.systemInfrastructure).
+    infrastructure: () => { closeAppDrawer(); openAppInfoModal('systemInfrastructure'); },
     security: () => { closeAppDrawer(); openAppInfoModal('privacyEngine'); },
     grid: () => {
       closeAppDrawer();
