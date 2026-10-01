@@ -6,17 +6,16 @@
    Dashboard and the app's Dashboard tab stay 1:1. Tapping "Generate Free
    Report" goes straight to the dark-mode on-screen Brief — no format-picker
    tabs or other upfront prompts — and the Civic Health needle runs a short
-   live calibration sweep before settling on the real reading. From there, one "Share & Export Brief"
-   button expands a drawer with everything the Brief can turn into:
-     • Download Official PDF Brief   — branded jsPDF download
-     • Share Graphic (1:1 Canvas)    — Living Ledger™ Snapshot + 3 metrics
-                                        + scannable QR, drawn on an off-screen
-                                        1080x1080 <canvas>; native share sheet
-                                        on phones, "Copy Link & Image to
-                                        Clipboard" on desktop browsers
-     • + Append Living Ledger™ Audit Summary — optional checkbox; appends
-                                        the real ward-score/rank summary
-                                        (payloadText()) as an extra PDF page
+   live calibration sweep before settling on the real reading.
+   "Share & Export Brief" first asks whether to append the Living Ledger™
+   Audit Summary (summary + public audit trail), then slides up an export
+   sheet with 3 tabs:
+     • Official PDF        — live PDF.js preview of the jsPDF brief +
+                             Download / Email Printable PDF
+     • 1:1 Social Graphic  — 1080x1080 canvas (FREE CIVIC REPORT, Snapshot,
+                             3 metrics, scannable QR) + Share to Social Apps
+                             (navigator.share; desktop copies link & image)
+     • Copy Text & Link    — plain-text preview + one-tap copy
 
    Each page supplies its own data adapter (getData) because the two pages
    keep their jurisdiction state differently (currentWardMeta in app.html,
@@ -294,7 +293,13 @@
     document.body.appendChild(modal);
     modal.querySelector('.cx-close').addEventListener('click', close);
     modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && modal.classList.contains('open')) close(); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape' || !modal.classList.contains('open')) return;
+      // Escape closes the top-most export sheet first, then the Brief.
+      var openSheet = modal.querySelector('.cx-sheet-overlay.open');
+      if (openSheet) { hideSheet(openSheet); return; }
+      close();
+    });
   }
 
   async function open(tab, trigger) {
@@ -322,6 +327,7 @@
 
   function close() {
     if (!modal) return;
+    modal.querySelectorAll('.cx-sheet-overlay').forEach(function (ov) { ov.classList.remove('open'); ov.hidden = true; });
     modal.classList.remove('open');
     document.documentElement.style.overflow = '';
     if (lastFocus && lastFocus.focus) lastFocus.focus();
@@ -348,7 +354,7 @@
   // uppercase, values Crisp White (color overridden only for the open-
   // dispatches crimson callout).
   function actionCard(val, lbl, color) {
-    return '<div class="cx-acard"><div class="cx-acard-lbl">' + esc(lbl) + '</div>' +
+    return '<div class="cx-acard"><div class="cx-acard-lbl"><span class="cx-led" aria-hidden="true"></span>' + esc(lbl) + '</div>' +
       '<div class="cx-acard-val"' + (color ? ' style="color:' + color + '"' : '') + '>' + esc(val) + '</div></div>';
   }
   // Hazard Index gauge: a 180°, 3-segment semicircular meter (green/amber/
@@ -383,7 +389,7 @@
   }
   function hazardGaugeCardHtml(hz) {
     var riskColor = hz.label === 'CRITICAL' ? '#EF4444' : hz.label === 'MODERATE' ? '#F59E0B' : '#00E699';
-    return '<div class="cx-acard cx-acard-gauge"><div class="cx-acard-lbl">Civic Health</div>' + hazardGaugeSvg(hz, 160, 92) +
+    return '<div class="cx-acard cx-acard-gauge"><div class="cx-acard-lbl"><span class="cx-led" aria-hidden="true"></span>Civic Health</div>' + hazardGaugeSvg(hz, 160, 92) +
       '<div class="cx-acard-risk-lbl" data-cx-risk-lbl data-cx-final="' + esc(civicHealthZoneLabel(hz.label)) + '" style="color:' + riskColor + '">' + esc(civicHealthZoneLabel(hz.label)) + '</div></div>';
   }
   // Live calibration sweep for the Civic Health needle: starts at 0°,
@@ -480,44 +486,202 @@
         '<div class="cx-footer-single">CITIXEN UX™ • Civic Intelligence™<div class="cx-verify-line">Verified via CITIXEN UX™ Protocol | Living Ledger™ Output</div></div>' +
         '</div>' +
       '</div>' +
-      // "Share & Export Brief" expands a streamlined drawer in place — no
-      // separate tab/screen — holding the PDF download, the #CrowdSaveAmerica
-      // share graphic (drawn on the hidden canvas below), and the optional
-      // Living Ledger™ Audit Summary append (the old "Public Link & Summary"
-      // tab's content, folded in here rather than kept as its own tab).
-      '<div class="cx-actions"><button type="button" class="cx-btn-primary" id="cxShareExportBtn" aria-expanded="false" aria-controls="cxExportDrawer">' + icon('shareUp') + 'Share &amp; Export Brief</button></div>' +
-      '<div class="cx-export-drawer" id="cxExportDrawer" hidden>' +
-        '<button type="button" class="cx-btn-dashed" id="cxPdfBtn">' + icon('doc') + 'Download Official PDF Brief</button>' +
-        '<button type="button" class="cx-btn-dashed" id="cxShareCardBtn">' + icon(canShareImageFiles() ? 'phoneShare' : 'copy') +
-          (canShareImageFiles() ? 'Share Graphic (1:1 Canvas)' : 'Copy Link &amp; Image to Clipboard') + '</button>' +
-        '<label class="cx-export-check"><input type="checkbox" id="cxAppendLedgerSummary">' +
-          '<span>+ Append Living Ledger<sup class="cx-tm">™</sup> Audit Summary</span>' +
-        '</label>' +
-      '</div>' +
-      '<canvas id="cxCardCanvas" width="1080" height="1080" style="display:none" aria-hidden="true"></canvas>' +
+      // "Share & Export Brief" → pre-export audit prompt → upward-sliding
+      // export sheet with 3 tabs (Official PDF / 1:1 Social Graphic / Copy
+      // Text & Link). Both overlays are built by buildExportSheets().
+      '<div class="cx-actions"><button type="button" class="cx-btn-primary" id="cxShareExportBtn" aria-haspopup="dialog">' + icon('shareUp') + 'Share &amp; Export Brief</button></div>' +
       '<p class="cx-hint" id="cxHint-pdf"></p>';
-    var exportBtn = el.querySelector('#cxShareExportBtn');
-    var exportDrawer = el.querySelector('#cxExportDrawer');
-    exportBtn.addEventListener('click', function () {
-      var willOpen = exportDrawer.hidden;
-      exportDrawer.hidden = !willOpen;
-      exportBtn.setAttribute('aria-expanded', String(willOpen));
-    });
-    el.querySelector('#cxPdfBtn').addEventListener('click', function (e) { downloadPdf(e.currentTarget); });
-    el.querySelector('#cxShareCardBtn').addEventListener('click', function (e) { drawCard(); shareCard(e.currentTarget); });
-    el.querySelector('#cxAppendLedgerSummary').addEventListener('change', function (e) { appendLedgerSummary = e.target.checked; });
+    buildExportSheets();
+    el.querySelector('#cxShareExportBtn').addEventListener('click', openPreExport);
     calibrateGaugeNeedle(el);
+  }
+
+  // ---------- Pre-export prompt + 3-tab export sheet ----------
+  var exportTab = 'pdf', pdfPreviewKey = null;
+  function buildExportSheets() {
+    modal.querySelectorAll('.cx-sheet-overlay').forEach(function (n) { n.remove(); });
+    var shareLbl = canShareImageFiles() ? 'Share to Social Apps' : 'Copy Link &amp; Image to Clipboard';
+    var wrap = document.createElement('div');
+    wrap.innerHTML =
+      // Step 1 — upfront audit toggle
+      '<div class="cx-sheet-overlay" id="cxPreExport" hidden>' +
+        '<div class="cx-sheet cx-sheet-sm" role="dialog" aria-modal="true" aria-labelledby="cxPreTitle">' +
+          '<div class="cx-sheet-grip" aria-hidden="true"></div>' +
+          '<div class="cx-pre-title" id="cxPreTitle">Append Living Ledger<sup class="cx-tm">™</sup> Audit Summary?</div>' +
+          '<label class="cx-export-check cx-pre-check"><input type="checkbox" id="cxAuditToggle" checked>' +
+            '<span>Include public audit trail &amp; verified dispatch timestamps in export.</span></label>' +
+          '<button type="button" class="cx-btn-primary" id="cxPreContinue">Continue to Export Options</button>' +
+          '<button type="button" class="cx-sheet-cancel" id="cxPreCancel">Cancel</button>' +
+        '</div>' +
+      '</div>' +
+      // Step 2 — export sheet
+      '<div class="cx-sheet-overlay" id="cxExportSheet" hidden>' +
+        '<div class="cx-sheet cx-sheet-lg" role="dialog" aria-modal="true" aria-labelledby="cxExpTitle">' +
+          '<div class="cx-sheet-grip" aria-hidden="true"></div>' +
+          '<div class="cx-sheet-head"><span class="cx-sheet-title" id="cxExpTitle">Export Brief</span>' +
+            '<button type="button" class="cx-close" id="cxExportClose" aria-label="Close export options">✕</button></div>' +
+          '<div class="cx-audit-status" id="cxAuditStatus"></div>' +
+          '<div class="cx-seg" role="tablist" aria-label="Export format">' +
+            '<button type="button" role="tab" class="cx-seg-btn" data-tab="pdf" id="cxTab-pdf" aria-controls="cxTabPane-pdf"><b>Official PDF</b><small>Print &amp; Email Ready</small></button>' +
+            '<button type="button" role="tab" class="cx-seg-btn" data-tab="graphic" id="cxTab-graphic" aria-controls="cxTabPane-graphic"><b>1:1 Social Graphic</b><small>High Brand Integrity</small></button>' +
+            '<button type="button" role="tab" class="cx-seg-btn" data-tab="text" id="cxTab-text" aria-controls="cxTabPane-text"><b>Copy Text &amp; Link</b><small>Direct Messaging</small></button>' +
+          '</div>' +
+          '<div class="cx-sheet-body">' +
+            '<div class="cx-tabpane" role="tabpanel" id="cxTabPane-pdf" aria-labelledby="cxTab-pdf">' +
+              '<div class="cx-pdf-preview" id="cxPdfPreview"><p class="cx-hint">Rendering preview…</p></div>' +
+              '<button type="button" class="cx-btn-primary" id="cxPdfBtn">' + icon('doc') + 'Download / Email Printable PDF</button>' +
+            '</div>' +
+            '<div class="cx-tabpane" role="tabpanel" id="cxTabPane-graphic" aria-labelledby="cxTab-graphic" hidden>' +
+              '<div class="cx-graphic-preview"><canvas id="cxCardCanvas" width="1080" height="1080" aria-label="1:1 social graphic preview"></canvas></div>' +
+              '<button type="button" class="cx-btn-primary" id="cxShareCardBtn">' + icon(canShareImageFiles() ? 'phoneShare' : 'copy') + shareLbl + '</button>' +
+            '</div>' +
+            '<div class="cx-tabpane" role="tabpanel" id="cxTabPane-text" aria-labelledby="cxTab-text" hidden>' +
+              '<textarea class="cx-text-preview" id="cxTextPreview" readonly rows="12" aria-label="Plain text preview"></textarea>' +
+              '<button type="button" class="cx-btn-primary" id="cxCopyTextBtn">' + icon('copy') + 'Copy Text &amp; Direct Link to Clipboard</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    while (wrap.firstChild) modal.appendChild(wrap.firstChild);
+
+    var pre = modal.querySelector('#cxPreExport'), sheet = modal.querySelector('#cxExportSheet');
+    modal.querySelector('#cxPreCancel').addEventListener('click', function () { hideSheet(pre); });
+    pre.addEventListener('click', function (e) { if (e.target === pre) hideSheet(pre); });
+    modal.querySelector('#cxPreContinue').addEventListener('click', function () {
+      appendLedgerSummary = modal.querySelector('#cxAuditToggle').checked;
+      hideSheet(pre);
+      openExportSheet();
+    });
+    modal.querySelector('#cxExportClose').addEventListener('click', function () { hideSheet(sheet); });
+    sheet.addEventListener('click', function (e) { if (e.target === sheet) hideSheet(sheet); });
+    modal.querySelectorAll('.cx-seg-btn').forEach(function (b) {
+      b.addEventListener('click', function () { selectExportTab(b.getAttribute('data-tab')); });
+    });
+    modal.querySelector('#cxPdfBtn').addEventListener('click', function (e) { downloadPdf(e.currentTarget); });
+    modal.querySelector('#cxShareCardBtn').addEventListener('click', function (e) { drawCard(); shareCard(e.currentTarget); });
+    modal.querySelector('#cxCopyTextBtn').addEventListener('click', async function () {
+      var ok = await copyText(modal.querySelector('#cxTextPreview').value);
+      if (ok) mintToast('Text & direct link copied to clipboard');
+      else { var ta = modal.querySelector('#cxTextPreview'); ta.focus(); ta.select(); toast('Copy is blocked here — the text is selected, copy it manually.'); }
+    });
+  }
+  function showSheet(ov) {
+    ov.hidden = false;
+    requestAnimationFrame(function () { requestAnimationFrame(function () { ov.classList.add('open'); }); });
+  }
+  function hideSheet(ov) {
+    ov.classList.remove('open');
+    setTimeout(function () { ov.hidden = true; }, 260);
+  }
+  function openPreExport() {
+    var pre = modal.querySelector('#cxPreExport');
+    modal.querySelector('#cxAuditToggle').checked = true;
+    showSheet(pre);
+    modal.querySelector('#cxPreContinue').focus();
+  }
+  function openExportSheet() {
+    var sheet = modal.querySelector('#cxExportSheet');
+    modal.querySelector('#cxAuditStatus').innerHTML = appendLedgerSummary
+      ? '<span class="cx-led" aria-hidden="true"></span>Living Ledger™ audit summary included'
+      : 'Living Ledger™ audit summary not included';
+    modal.querySelector('#cxTextPreview').value = plainTextExport();
+    pdfPreviewKey = null;
+    showSheet(sheet);
+    selectExportTab(exportTab);
+  }
+  function selectExportTab(tab) {
+    exportTab = tab;
+    modal.querySelectorAll('.cx-seg-btn').forEach(function (b) {
+      var on = b.getAttribute('data-tab') === tab;
+      b.classList.toggle('active', on); b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1;
+    });
+    ['pdf', 'graphic', 'text'].forEach(function (t) { modal.querySelector('#cxTabPane-' + t).hidden = t !== tab; });
+    if (tab === 'pdf') renderPdfPreview();
+    if (tab === 'graphic') drawCard();
+  }
+
+  // Tab 3 text: the brief in plain text, the direct link, and — when the
+  // audit toggle is on — the summary and audit trail rows.
+  function plainTextExport() {
+    var d = data, hz = hazardIndex(d), lines = [
+      'FREE CIVIC REPORT — ' + cityStateLabel(d) + ' (' + shortDate(generatedAt) + ')',
+      'Civic Health: ' + civicHealthZoneLabel(hz.label) + ' · Reports filed: ' + d.total + ' · Open dispatches: ' + d.counts.dispatched,
+      'Avg fix speed: ' + avgHoursText(d) + ' · Resolution rate: ' + resolutionRate(d) + ' · ' + stateRankHeaderLabel(d.ranks) + ': ' + stateRankValue(d.ranks),
+      ''
+    ];
+    if (appendLedgerSummary) {
+      lines.push('LIVING LEDGER™ AUDIT SUMMARY');
+      payloadText().split('\n').slice(0, -2).forEach(function (l) { lines.push(l); });
+      var rows = auditRows();
+      lines.push('', 'Audit trail (' + rows.length + ' records):');
+      rows.forEach(function (r) { lines.push('• ' + r.id + ' — ' + r.what + ' — ' + r.stage + ', submitted ' + r.submitted + (r.fix !== '—' ? ', fixed in ' + r.fix : '') + ', ' + r.verified); });
+      lines.push('');
+    }
+    lines.push('Audit your block — anonymous & sovereign. #CrowdSaveAmerica', auditUrl());
+    return lines.join('\n');
+  }
+
+  // Tab 1 preview: the real jsPDF output rendered page by page with PDF.js
+  // (lazy-loaded from cdnjs the first time). If PDF.js can't load, the
+  // download still works — only the preview is skipped.
+  var PDFJS_URL = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+  var PDFJS_WORKER = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  var pdfjsPromise = null;
+  function loadPdfJs() {
+    if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+    if (pdfjsPromise) return pdfjsPromise;
+    pdfjsPromise = new Promise(function (res, rej) {
+      var sc = document.createElement('script'); sc.src = PDFJS_URL; sc.async = true;
+      sc.onload = function () {
+        if (!window.pdfjsLib) { rej(new Error('pdfjsLib missing')); return; }
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS_WORKER;
+        res(window.pdfjsLib);
+      };
+      sc.onerror = function () { pdfjsPromise = null; rej(new Error('PDF.js failed to load')); };
+      document.head.appendChild(sc);
+    });
+    return pdfjsPromise;
+  }
+  async function renderPdfPreview() {
+    var box = modal.querySelector('#cxPdfPreview');
+    var key = String(appendLedgerSummary) + '|' + generatedAt;
+    if (pdfPreviewKey === key) return;
+    pdfPreviewKey = key;
+    box.innerHTML = '<p class="cx-hint">Rendering preview…</p>';
+    if (!window.jspdf || !window.jspdf.jsPDF) { box.innerHTML = '<p class="cx-hint">The PDF library did not load — check your connection.</p>'; return; }
+    var doc;
+    try { doc = buildPdfDoc(); } catch (e) { console.error(e); box.innerHTML = '<p class="cx-hint">Could not build the PDF.</p>'; return; }
+    var pages = doc.getNumberOfPages();
+    try {
+      var lib = await loadPdfJs();
+      var pdf = await lib.getDocument({ data: doc.output('arraybuffer') }).promise;
+      if (pdfPreviewKey !== key) return;
+      box.innerHTML = '<div class="cx-pdf-meta">' + pages + ' page' + (pages === 1 ? '' : 's') + ' · US Letter · ' + PDF_NAME + '</div>';
+      var cssW = Math.max(200, box.clientWidth - 2), dpr = Math.min(window.devicePixelRatio || 1, 2);
+      for (var i = 1; i <= pdf.numPages; i++) {
+        var page = await pdf.getPage(i);
+        var vp1 = page.getViewport({ scale: 1 }), scale = (cssW / vp1.width) * dpr, vp = page.getViewport({ scale: scale });
+        var c = document.createElement('canvas'); c.className = 'cx-pdf-page'; c.width = Math.floor(vp.width); c.height = Math.floor(vp.height);
+        c.setAttribute('aria-label', 'PDF page ' + i + ' of ' + pdf.numPages);
+        box.appendChild(c);
+        await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+        if (pdfPreviewKey !== key) return;
+      }
+    } catch (e) {
+      console.warn('PDF preview unavailable', e);
+      if (pdfPreviewKey === key) box.innerHTML = '<div class="cx-pdf-meta">' + pages + ' page' + (pages === 1 ? '' : 's') + ' · US Letter</div><p class="cx-hint">Preview unavailable on this connection — the PDF itself is ready to download.</p>';
+    }
   }
 
   function hexRgb(hex) {
     hex = String(hex).replace('#', '');
     return [parseInt(hex.substr(0, 2), 16), parseInt(hex.substr(2, 2), 16), parseInt(hex.substr(4, 2), 16)];
   }
-  async function downloadPdf(btn) {
-    if (!window.jspdf || !window.jspdf.jsPDF) { toast('The PDF library did not load — check your connection and try again.'); return; }
-    var d = data, hz = hazardIndex(d), label = btn.innerHTML;
-    btn.disabled = true; btn.textContent = 'Generating…';
-    try {
+  // Builds the Official PDF Brief (jsPDF doc) — shared by the Tab 1 preview
+  // and the Download / Email action, so both always show the same file.
+  function buildPdfDoc() {
+    var d = data, hz = hazardIndex(d);
+    {
       // Letter, portrait, 612x792pt = 8.5"x11" — explicit here (jsPDF
       // already defaults to portrait) since this is what actually
       // determines the generated PDF's page size and orientation; this
@@ -717,58 +881,105 @@
       doc.setTextColor(107, 114, 128); doc.setFontSize(7);
       doc.text('VERIFIED VIA CITIXEN UX™ PROTOCOL | LIVING LEDGER™ OUTPUT', W / 2, y + 21, { align: 'center' });
 
-      // Optional appendix page: "+ Append Living Ledger™ Audit Summary"
-      // checkbox in the Share & Export drawer. Same real figures as
-      // payloadText() (ward health score, resolution, ranks) — nothing
-      // invented for this appendix either.
+      // Optional appendix: Living Ledger™ Audit Summary (chosen in the
+      // pre-export prompt). The real ward-score/rank summary (payloadText())
+      // plus the public audit trail — every ledger ticket in this
+      // jurisdiction with its report ID, stage, verification and recorded
+      // dispatch/resolution timing (auditRows()). Nothing invented.
       if (appendLedgerSummary) {
         doc.addPage();
-        y = 70;
+        y = 64;
         doc.setTextColor(0, 0, 0); doc.setFont('helvetica', 'bold'); doc.setFontSize(13);
         doc.text('LIVING LEDGER™ AUDIT SUMMARY', W / 2, y, { align: 'center' });
         y += 10;
         doc.setDrawColor(226, 232, 240); doc.setLineWidth(0.75); doc.line(M, y, W - M, y);
-        y += 26;
-        doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(51, 65, 85);
+        y += 24;
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(51, 65, 85);
         payloadText().split('\n').forEach(function (line) {
-          doc.splitTextToSize(line, W - 2 * M).forEach(function (wline) {
-            ensureRoom(16);
-            doc.text(wline, M, y); y += 16;
-          });
-          y += 6;
+          doc.splitTextToSize(line, W - 2 * M).forEach(function (wline) { ensureRoom(15); doc.text(wline, M, y); y += 14; });
+          y += 4;
         });
+        y += 12;
+        var rows = auditRows();
+        ensureRoom(60);
+        doc.setTextColor(0, 0, 0); doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
+        doc.text('PUBLIC AUDIT TRAIL — ' + rows.length + ' LEDGER RECORD' + (rows.length === 1 ? '' : 'S'), M, y);
         y += 14;
-        ensureRoom(40);
-        doc.setDrawColor(226, 232, 240); doc.line(M, y, W - M, y);
-        y += 18;
-        doc.setTextColor(107, 114, 128); doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
+        var cols = [{ k: 'id', t: 'REPORT ID', w: 92 }, { k: 'what', t: 'HAZARD / LOCATION', w: 196 }, { k: 'stage', t: 'STAGE', w: 62 },
+          { k: 'submitted', t: 'SUBMITTED', w: 58 }, { k: 'fix', t: 'FIX TIME', w: 50 }, { k: 'verified', t: 'VERIFIED', w: 74 }];
+        function headerRow() {
+          doc.setFillColor(0, 0, 0); doc.rect(M, y - 9, W - 2 * M, 14, 'F');
+          doc.setTextColor(0, 230, 153); doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5);
+          var x = M + 4; cols.forEach(function (c) { doc.text(c.t, x, y); x += c.w; });
+          y += 14;
+        }
+        headerRow();
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
+        if (!rows.length) { doc.setTextColor(100, 116, 139); doc.text('No ledger records on file for this jurisdiction yet.', M + 4, y); y += 14; }
+        rows.forEach(function (r, i) {
+          if (y + 14 > 740) { doc.addPage(); y = 60; headerRow(); doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); }
+          if (i % 2) { doc.setFillColor(248, 250, 252); doc.rect(M, y - 9, W - 2 * M, 13, 'F'); }
+          doc.setTextColor(30, 41, 59);
+          var x = M + 4;
+          cols.forEach(function (c) { doc.text(doc.splitTextToSize(String(r[c.k]), c.w - 6)[0], x, y); x += c.w; });
+          y += 13;
+        });
+        y += 10;
+        ensureRoom(30);
+        doc.setTextColor(107, 114, 128); doc.setFontSize(6.5);
+        doc.text('Timing is as recorded in the public ledger (relative submit time; fix time = hours from submission to resolution).', M, y);
+        y += 14;
         doc.text('VERIFIED VIA CITIXEN UX™ PROTOCOL | LIVING LEDGER™ OUTPUT', W / 2, y, { align: 'center' });
       }
 
-      // Share as a real, named application/pdf File when the OS share sheet
-      // is available (iOS Mail/Messages/Notes otherwise show a bare "blob:"
-      // heading instead of the filename); fall back to a direct download
-      // everywhere else, or if the user's device can't share a file at all.
-      var fileName = 'citixen-ux-civic-intelligence-brief.pdf';
+      return doc;
+    }
+  }
+  var PDF_NAME = 'citixen-ux-civic-intelligence-brief.pdf';
+  // Download / Email Printable PDF: the OS share sheet (Mail, Messages,
+  // Files…) where it accepts a named PDF file, a direct download elsewhere.
+  async function downloadPdf(btn) {
+    if (!window.jspdf || !window.jspdf.jsPDF) { toast('The PDF library did not load — check your connection and try again.'); return; }
+    var label = btn.innerHTML;
+    btn.disabled = true; btn.textContent = 'Generating…';
+    try {
+      var doc = buildPdfDoc();
       var shared = false;
       if (navigator.share && navigator.canShare) {
         try {
-          var pdfFile = new File([doc.output('blob')], fileName, { type: 'application/pdf' });
+          var pdfFile = new File([doc.output('blob')], PDF_NAME, { type: 'application/pdf' });
           if (navigator.canShare({ files: [pdfFile] })) {
             await navigator.share({ title: 'CITIXEN UX™ Civic Intelligence™ Brief', text: 'CITIXEN UX™ Civic Intelligence Report', files: [pdfFile] });
             shared = true;
           }
         } catch (shareErr) {
-          if (shareErr && shareErr.name === 'AbortError') { shared = true; } // user dismissed the share sheet — not a failure
+          if (shareErr && shareErr.name === 'AbortError') { shared = true; } // share sheet dismissed — not a failure
         }
       }
-      if (!shared) { doc.save(fileName); toast('Official PDF brief downloaded.'); }
+      if (!shared) { doc.save(PDF_NAME); mintToast('Official PDF brief downloaded'); }
     } catch (err) {
       console.error('Official brief PDF failed', err);
       toast('Could not generate the PDF — please try again.');
     } finally {
       btn.disabled = false; btn.innerHTML = label;
     }
+  }
+
+  // Ledger records for this jurisdiction, as audit-trail rows.
+  function auditRows() {
+    var d = data, h = d.home, t = d.tickets || [];
+    var mine = h ? t.filter(function (x) { return x.state === h.state && x.city === h.city; }) : t;
+    var order = { submitted: 0, dispatched: 1, resolved: 2 };
+    return mine.slice().sort(function (a, b) { return (order[a.stage] || 0) - (order[b.stage] || 0); }).map(function (x) {
+      return {
+        id: x.reportId || x.id || '—',
+        what: (x.title || x.category || 'Report') + (x.loc ? ' — ' + x.loc : ''),
+        stage: x.stage ? x.stage.charAt(0).toUpperCase() + x.stage.slice(1) : '—',
+        submitted: x.submittedAgo || '—',
+        fix: typeof x.resolutionHours === 'number' ? x.resolutionHours + ' hrs' : '—',
+        verified: x.verified === true ? 'Verified' : x.verified === false ? 'Not verified' : 'Pending'
+      };
+    });
   }
 
   // ---------- Branch B: #CrowdSaveAmerica share graphic ----------
