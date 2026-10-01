@@ -44,16 +44,22 @@
 <meta property="og:url" content="https://citixenux.com/app">
 <meta property="og:title" content="CITIXEN UX™">
 <meta property="og:description" content="Improve Your Civic Experience">
-<meta property="og:image" content="https://citixenux.com/og-preview.png">
+<!-- Patch 4.10.1: a "?v=4.10.1" cache-busting query string on the image
+     URL — iMessage/Applebot and other link-preview crawlers cache an
+     og:image by URL, so a same-URL replacement (like 4.10's tagline swap)
+     can keep serving a stale cached render until the URL itself changes.
+     Bump this version string on any future og-preview.png content change. -->
+<meta property="og:image" content="https://citixenux.com/og-preview.png?v=4.10.1">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="CITIXEN UX — Improve Your Civic Experience">
+<meta property="og:image:alt" content="CITIXEN UX™ - Improve Your Civic Experience">
+<meta property="og:image:type" content="image/png">
 <!-- "summary" (not summary_large_image) forces the compact right-side-icon
      card layout this round asked for, rather than the large hero-image card. -->
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="CITIXEN UX™">
 <meta name="twitter:description" content="Improve Your Civic Experience">
-<meta name="twitter:image" content="https://citixenux.com/og-preview.png">
+<meta name="twitter:image" content="https://citixenux.com/og-preview.png?v=4.10.1">
 <meta name="theme-color" content="#00E699">
 <meta name="referrer" content="no-referrer">
 <meta name="apple-mobile-web-app-capable" content="yes">
