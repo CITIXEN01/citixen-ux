@@ -431,7 +431,7 @@
     hex = String(hex).replace('#', '');
     return [parseInt(hex.substr(0, 2), 16), parseInt(hex.substr(2, 2), 16), parseInt(hex.substr(4, 2), 16)];
   }
-  function downloadPdf(btn) {
+  async function downloadPdf(btn) {
     if (!window.jspdf || !window.jspdf.jsPDF) { toast('The PDF library did not load — check your connection and try again.'); return; }
     var d = data, hz = hazardIndex(d), label = btn.innerHTML;
     btn.disabled = true; btn.textContent = 'Generating…';
@@ -618,8 +618,24 @@
       doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
       doc.text('CITIXEN UX™ • Civic Intelligence™', W / 2, y + 8, { align: 'center' });
 
-      doc.save('citixen-free-report.pdf');
-      toast('Official PDF brief downloaded.');
+      // Share as a real, named application/pdf File when the OS share sheet
+      // is available (iOS Mail/Messages/Notes otherwise show a bare "blob:"
+      // heading instead of the filename); fall back to a direct download
+      // everywhere else, or if the user's device can't share a file at all.
+      var fileName = 'citixen-ux-free-report.pdf';
+      var shared = false;
+      if (navigator.share && navigator.canShare) {
+        try {
+          var pdfFile = new File([doc.output('blob')], fileName, { type: 'application/pdf' });
+          if (navigator.canShare({ files: [pdfFile] })) {
+            await navigator.share({ title: 'CITIXEN UX™ Free Report', text: 'CITIXEN UX™ Civic Intelligence Report', files: [pdfFile] });
+            shared = true;
+          }
+        } catch (shareErr) {
+          if (shareErr && shareErr.name === 'AbortError') { shared = true; } // user dismissed the share sheet — not a failure
+        }
+      }
+      if (!shared) { doc.save(fileName); toast('Official PDF brief downloaded.'); }
     } catch (err) {
       console.error('Official brief PDF failed', err);
       toast('Could not generate the PDF — please try again.');
