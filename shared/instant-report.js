@@ -159,7 +159,8 @@
           '<button type="button" class="cx-btn-primary" data-cx-open="pdf">Generate Free Report</button>' +
           '<button type="button" class="cx-btn-dashed" data-cx-share-platform>' +
             '<span style="color:#FFFFFF">Share CITIXEN</span>' +
-            '<span style="color:#00E699">UX™</span>' +
+            '<span style="color:#00E699">UX</span>' +
+            '<span style="color:#94A3B8;font-weight:400;font-size:.75em;vertical-align:super">™</span>' +
           '</button>' +
           (cfg.onLedger
             ? '<button type="button" class="cx-btn-ledger" data-cx-ledger>' +
