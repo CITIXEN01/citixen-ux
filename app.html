@@ -386,9 +386,8 @@ textarea.input{resize:none;line-height:1.4}
   font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;
   font-family:inherit;transition:filter .15s;margin-bottom:12px}
 .ledger-generate-report-cta:hover,.ledger-generate-report-cta:active{filter:brightness(1.08)}
-.ledger-deep-analytics-link{display:block;background:none;border:none;padding:0;font:inherit;
-  color:#00E699;font-size:.74rem;font-weight:700;cursor:pointer;text-decoration:underline;
-  margin-bottom:12px}
+/* Distance pills are the last control above the results list. */
+#ledgerRadiusChips{margin:4px 0 14px}
 .ledger-report-card{background:rgba(7,12,14,.6);border:1px solid var(--border);border-radius:10px;padding:12px;
   margin-bottom:8px;text-decoration:none;color:var(--text);display:block}
 .ledger-report-card:hover{border-color:var(--mint2)}
@@ -1135,8 +1134,8 @@ textarea.input{resize:none;line-height:1.4}
        see ledgerTicketWithinRadius() below, identical convention to
        index.html's), a single "Generate Ledger Report ↗" CTA that opens the
        #ledgerReportModal configuration overlay (location scope + report
-       type — see that modal below), and a "Go Deeper Into Analytics and
-       Reporting ↗" link routing into this app's own Analytics tab. The old
+       type — see that modal below), and the 1 / 5 / 10 Mile distance pills
+       as the last control above the results. The old
        inline street/ZIP scope bar + "Print Location Report" button are
        retired in favor of that overlay, and the ward dropdown this drawer
        used is retired too — its real filtering is superseded by the radius
@@ -1157,14 +1156,13 @@ textarea.input{resize:none;line-height:1.4}
       </div>
       <button type="button" id="ledgerGenerateReportBtn" class="ledger-generate-report-cta">Generate Ledger Report ↗</button>
       <input class="ledger-search" id="ledgerSearchInput" placeholder="Search title, location, category…">
+      <div class="ledger-filter-row" id="ledgerCategoryChips"></div>
+      <div class="ledger-filter-row" id="ledgerStatusChips"></div>
       <div class="ledger-filter-row" id="ledgerRadiusChips">
         <button type="button" class="ledger-chip" data-radius="1">1 Mile</button>
         <button type="button" class="ledger-chip" data-radius="5">5 Miles</button>
         <button type="button" class="ledger-chip active" data-radius="10">10 Miles</button>
       </div>
-      <div class="ledger-filter-row" id="ledgerCategoryChips"></div>
-      <div class="ledger-filter-row" id="ledgerStatusChips"></div>
-      <button type="button" id="ledgerDeepAnalyticsLink" class="ledger-deep-analytics-link">Go Deeper Into Analytics and Reporting ↗</button>
       <div id="ledgerResults"></div>
     </div>
   </div>
@@ -2084,16 +2082,6 @@ document.querySelectorAll('#ledgerReportRadiusChips .ledger-chip').forEach(chip 
 });
 const ledgerReportGenerateBtnEl = document.getElementById('ledgerReportGenerateBtn');
 if (ledgerReportGenerateBtnEl) ledgerReportGenerateBtnEl.addEventListener('click', generateLedgerReportPdf);
-
-// "Go Deeper Into Analytics and Reporting ↗" routes into this app's own
-// real Analytics tab, via the same switchTab() the bottom nav's own
-// Analytics button calls — not a fabricated destination.
-const ledgerDeepAnalyticsLinkEl = document.getElementById('ledgerDeepAnalyticsLink');
-if (ledgerDeepAnalyticsLinkEl) ledgerDeepAnalyticsLinkEl.addEventListener('click', () => {
-  closeLedgerDrawer();
-  const analyticsTabBtn = document.querySelector('.navtab[data-target="tab-analytics"]');
-  switchTab('tab-analytics', analyticsTabBtn);
-});
 
 /* =====================================================================
    MUNICIPAL & WARD GEOGRAPHIC ARCHITECTURE

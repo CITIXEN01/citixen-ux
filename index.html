@@ -898,18 +898,16 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 .ledger-chip{background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--muted);
   font-size:.66rem;font-weight:700;padding:5px 10px;border-radius:20px;cursor:pointer}
 .ledger-chip.active{border-color:var(--mint2);background:rgba(0,230,153,.14);color:var(--mint2)}
-/* Street/ZIP scope bar + Print Location Report CTA, and the Go Deeper
-   into Analytics link beneath it, sitting directly above the inventory
-   card list. */
+/* Street/ZIP scope bar + Print Location Report CTA, sitting above the
+   distance pills and the inventory card list. */
 .ledger-scope-bar{display:flex;gap:8px;align-items:center;margin-bottom:10px}
 .ledger-scope-bar .ledger-search{margin-bottom:0;flex:1 1 auto;min-width:0}
 .ledger-print-cta{background:#090D16;border:1px solid #00E699;color:#00E699;font-weight:700;
   font-size:.76rem;padding:10px 16px;border-radius:9999px;white-space:nowrap;cursor:pointer;
   font-family:inherit;transition:filter .15s}
 .ledger-print-cta:hover{filter:brightness(1.25)}
-.ledger-deep-analytics-link{display:block;background:none;border:none;padding:0;font:inherit;
-  color:#00E699;font-size:.78rem;font-weight:700;cursor:pointer;text-decoration:underline;
-  margin-bottom:14px}
+/* Distance pills are the last control above the results list. */
+#ledgerRadiusChips{margin:4px 0 14px}
 .ledger-report-card{background:rgba(7,12,14,.6);border:1px solid var(--border);border-radius:10px;padding:12px;
   margin-bottom:8px;text-decoration:none;color:var(--text);display:block}
 .ledger-report-card:hover{border-color:var(--mint2)}
@@ -1212,8 +1210,8 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        new radius pills below — see ledgerFilters.radius), and a real
        detected-location badge + concentric distance pills added ahead of
        the existing real street/ZIP scope + Print Location Report control.
-       A "Go Deeper into Analytics ↗" link now routes into the same real
-       Analytics deep-dive panel the ANALYTICS hub pill opens. ===== -->
+       The 1 / 5 / 10 Mile distance pills sit last, directly above the
+       results list. ===== -->
   <div class="ledger-drawer" id="ledgerDrawer">
     <div class="ledger-drawer-panel">
       <div class="ledger-drawer-head">
@@ -1238,11 +1236,6 @@ audio.pw-audio-el{width:100%;margin-top:4px}
           <span>Current Area: <span id="ledgerGeoBadgeText">La Crosse, WI</span></span>
         </div>
         <input class="ledger-search" id="ledgerSearchInput" placeholder="Search title, location, category, ticket ID…">
-        <div class="ledger-filter-row" id="ledgerRadiusChips">
-          <button type="button" class="ledger-chip" data-radius="1">1 Mile</button>
-          <button type="button" class="ledger-chip" data-radius="5">5 Miles</button>
-          <button type="button" class="ledger-chip active" data-radius="10">10 Miles</button>
-        </div>
         <div class="ledger-filter-row" id="ledgerCategoryChips"></div>
         <div class="ledger-filter-row" id="ledgerStatusChips"></div>
         <!-- ===== STREET / ZIP SCOPE BAR + REPORT GENERATOR — per an
@@ -1257,7 +1250,11 @@ audio.pw-audio-el{width:100%;margin-top:4px}
           <input type="text" id="ledgerScopeInput" class="ledger-search" style="margin:0" placeholder="Enter street address or ZIP code...">
           <button type="button" id="ledgerScopePrintBtn" class="ledger-print-cta">Print Location Report</button>
         </div>
-        <button type="button" id="ledgerDeepAnalyticsLink" class="ledger-deep-analytics-link">Go Deeper Into Analytics and Reporting ↗</button>
+        <div class="ledger-filter-row" id="ledgerRadiusChips">
+          <button type="button" class="ledger-chip" data-radius="1">1 Mile</button>
+          <button type="button" class="ledger-chip" data-radius="5">5 Miles</button>
+          <button type="button" class="ledger-chip active" data-radius="10">10 Miles</button>
+        </div>
         <div id="ledgerResults"></div>
       </div>
     </div>
@@ -4742,10 +4739,6 @@ if (ledgerScopePrintBtnEl) ledgerScopePrintBtnEl.addEventListener('click', print
 // Municipalities" section it scrolled to (#institutionalAccessSection) is
 // its own normal, independently-reachable part of the page flow further
 // down, so nothing real became unreachable by removing this shortcut.
-document.getElementById('ledgerDeepAnalyticsLink').addEventListener('click', () => {
-  closeLedgerDrawer();
-  document.getElementById('hubCoverageBtn').click();
-});
 
 // ===== The Municipal Onboarding Wizard (previously ~190 lines here: step
 // navigation, boundary/ERP/webhook-ping simulation, and deploy-summary
