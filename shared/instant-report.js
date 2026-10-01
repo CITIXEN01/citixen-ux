@@ -25,7 +25,12 @@
      avgDays: 0.8 | null,                      // avg resolution, days
      counts: { submitted, dispatched, resolved },
      cip: [{ name, status: 'on-time'|'on-track'|'delayed', scheduled }],
-     nodes: [{ lat, lng }]                     // live report pins for the card's map
+     nodes: [{ lat, lng }]                     // optional; not drawn by the
+                                                // #CrowdSaveAmerica graphic
+                                                // (see drawMapArea() — it
+                                                // always shows the national
+                                                // map), kept for callers that
+                                                // may still want the raw pins
    }
    ===================================================================== */
 (function () {
@@ -233,7 +238,6 @@
     }
     modal.querySelector('#cxJuris').textContent = data.jurisdiction + ' · ' + stamp(generatedAt);
     renderPdfPane(); renderGraphicPane(); renderLinkPane();
-    prepareMapSnapshot(data);
     select(current);
     modal.querySelector('.cx-close').focus();
   }
@@ -408,31 +412,30 @@
   }
 
   // ---------- Dark vector map for the share card ----------
-  var VECTOR_STYLE_URL = 'https://tiles.openfreemap.org/styles/dark';
-  var MAP_W = 912, MAP_H = 300;
-  // Public geographic centers for mapped cities/states (used to place
-  // nationwide nodes and frame the State view). Unknown places are skipped.
+  // Per this round's "replace the share card's old graphic with the real US
+  // map" fix: the card's centerpiece is now ALWAYS the CROWD SAVE AMERICA™
+  // US Vector Map (the same national outline + one glowing node per mapped
+  // city the popup Aggregation Hub draws at its Country tier) — never the
+  // old abstract "LIVE REPORT NODES" line-grid placeholder, and never a
+  // live OpenFreeMap/MapLibre tile fetch (that network+WebGL dependency,
+  // and its line-grid fallback for when it fails, are both removed outright
+  // rather than left as dead code). This also makes the card fully
+  // self-contained: no external tile request, so it renders identically
+  // offline or on a blocked network.
+  // Public geographic centers for mapped cities (used to place the
+  // nationwide nodes). Unknown places are skipped.
   var CITY_CENTERS = { 'wi/la-crosse': [43.8138, -91.2519], 'wi/milwaukee': [43.0389, -87.9065], 'il/chicago': [41.8781, -87.6298] };
-  var STATE_VIEW = { wi: { center: [-89.9, 44.6], zoom: 5.4 }, il: { center: [-89.2, 40.0], zoom: 5.2 } };
   // Stylized contiguous-U.S. outline, [lng, lat].
   var US_OUTLINE = [[-124.7,48.4],[-122.8,49.0],[-95.2,49.0],[-94.8,49.4],[-89.6,48.0],[-84.8,46.5],[-83.5,46.1],[-82.5,43.0],[-82.9,42.0],[-79.0,42.8],[-79.2,43.5],[-76.2,44.2],[-74.7,45.0],[-71.5,45.0],[-70.0,46.7],[-69.2,47.4],[-67.8,47.1],[-67.0,44.8],[-70.7,43.1],[-70.0,41.8],[-71.9,41.3],[-73.9,40.6],[-74.2,39.6],[-75.0,38.8],[-75.9,37.2],[-76.3,36.9],[-75.5,35.2],[-77.0,34.6],[-79.0,33.4],[-81.4,30.7],[-80.0,26.8],[-80.4,25.2],[-81.3,25.4],[-82.7,27.5],[-83.0,29.1],[-84.3,30.0],[-86.5,30.4],[-88.9,30.4],[-89.6,29.3],[-90.8,29.1],[-93.8,29.7],[-94.7,29.3],[-97.2,27.7],[-97.4,25.9],[-99.1,26.4],[-100.3,28.0],[-101.4,29.8],[-103.1,29.0],[-104.5,29.6],[-106.5,31.8],[-108.2,31.3],[-111.1,31.3],[-114.8,32.5],[-117.1,32.5],[-118.5,34.0],[-120.6,34.6],[-121.9,36.6],[-122.5,37.8],[-123.8,39.6],[-124.2,41.0],[-124.5,42.8],[-124.0,46.2],[-124.7,48.4]];
-  var mapShot = null, mapShotKey = null, styleCache = null;
 
-  function cardScope() {
-    return window.CitixenGeoHatch && window.CitixenGeoHatch.getScope ? window.CitixenGeoHatch.getScope() : 'city';
-  }
-  function sevColor(s) { return s === 'Critical' ? '#FF3B30' : s === 'Warning' ? '#F59E0B' : MINT; }
-  // City: live report pins. State / Country: one glowing node per mapped
-  // city, sized by its surveyed blocks.
-  function scopeNodes(d, scope) {
-    if (scope === 'city') {
-      return (d.nodes || []).filter(function (n) { return typeof n.lat === 'number' && typeof n.lng === 'number'; })
-        .map(function (n) { return { lat: n.lat, lng: n.lng, color: sevColor(n.status), r: 1 }; });
-    }
+  // One glowing node per mapped city nationwide, sized by its surveyed
+  // blocks — the same real Geo-Hatch ward data the popup Aggregation Hub's
+  // own Country tier uses (window.CitixenGeoHatch.wardSummaries()), not a
+  // second/fabricated node set.
+  function nationwideNodes() {
     var list = window.CitixenGeoHatch && window.CitixenGeoHatch.wardSummaries ? window.CitixenGeoHatch.wardSummaries() : [];
     var byCity = {};
     list.forEach(function (w) {
-      if (scope === 'state' && d.home && w.state !== d.home.state) return;
       var k = w.state + '/' + w.city, c = CITY_CENTERS[k];
       if (!c) return;
       byCity[k] = byCity[k] || { lat: c[0], lng: c[1], surveyed: 0 };
@@ -441,98 +444,6 @@
     var arr = Object.keys(byCity).map(function (k) { return byCity[k]; });
     var max = Math.max.apply(null, arr.map(function (n) { return n.surveyed; }).concat([1]));
     return arr.map(function (n) { return { lat: n.lat, lng: n.lng, color: MINT, r: 0.75 + 0.6 * n.surveyed / max }; });
-  }
-
-  function webglOk() {
-    try { var c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch (e) { return false; }
-  }
-  function recolorStyle(style) {
-    var C = { bg: '#030712', land: '#060b16', water: '#0a1726', park: '#071a14', building: '#0d1424', road: '#151d2b', roadMajor: '#1e2a3a', highway: '#2a2a1f', boundary: '#1f2937', label: '#6b7280' };
-    style.layers.forEach(function (l) {
-      var id = l.id.toLowerCase(), p = l.paint || (l.paint = {});
-      if (l.type === 'background') p['background-color'] = C.bg;
-      else if (l.type === 'fill') {
-        if (id.indexOf('water') !== -1) p['fill-color'] = C.water;
-        else if (/park|wood|grass|forest|landcover|green|cemetery|wetland/.test(id)) p['fill-color'] = C.park;
-        else if (id.indexOf('building') !== -1) p['fill-color'] = C.building;
-        else p['fill-color'] = C.land;
-      } else if (l.type === 'line') {
-        if (/water|river/.test(id)) p['line-color'] = C.water;
-        else if (/motorway|trunk/.test(id)) p['line-color'] = C.highway;
-        else if (/primary|secondary/.test(id)) p['line-color'] = C.roadMajor;
-        else if (/boundary|admin/.test(id)) p['line-color'] = C.boundary;
-        else if (/road|street|highway|minor|service|tertiary|path|bridge|tunnel|rail/.test(id)) p['line-color'] = C.road;
-      } else if (l.type === 'symbol') {
-        if (/poi/.test(id)) { l.layout = Object.assign({}, l.layout, { visibility: 'none' }); return; }
-        if (l.layout && l.layout['text-field']) { p['text-color'] = C.label; p['text-halo-color'] = C.bg; p['text-halo-width'] = 1.2; }
-      } else if (l.type === 'fill-extrusion') {
-        l.layout = Object.assign({}, l.layout, { visibility: 'none' });
-      }
-    });
-    return style;
-  }
-  function loadStyle() {
-    if (!styleCache) {
-      styleCache = fetch(VECTOR_STYLE_URL).then(function (r) { if (!r.ok) throw new Error('style ' + r.status); return r.json(); })
-        .then(recolorStyle).catch(function (e) { styleCache = null; throw e; });
-    }
-    return styleCache.then(function (s) { return JSON.parse(JSON.stringify(s)); });
-  }
-
-  // Renders the vector basemap off-screen once and keeps a bitmap plus the
-  // projected node positions; falls back (resolves null) without WebGL,
-  // MapLibre or network, or if tiles don't settle within 9 s.
-  function vectorSnapshot(scope, nodes, home) {
-    return new Promise(function (resolve) {
-      if (typeof maplibregl === 'undefined' || !webglOk()) return resolve(null);
-      loadStyle().then(function (style) {
-        var el = document.createElement('div');
-        el.style.cssText = 'position:fixed;left:-10000px;top:0;width:' + MAP_W + 'px;height:' + MAP_H + 'px;pointer-events:none';
-        document.body.appendChild(el);
-        var map = null, done = false;
-        function finish(result) {
-          if (done) return; done = true;
-          try { if (map) map.remove(); } catch (e) { /* already gone */ }
-          el.remove(); resolve(result);
-        }
-        var timer = setTimeout(function () { finish(null); }, 9000);
-        try {
-          var opts = { container: el, style: style, interactive: false, attributionControl: false, preserveDrawingBuffer: true, fadeDuration: 0, pixelRatio: 1 };
-          var sv = home && STATE_VIEW[home.state];
-          if (scope === 'state' && sv) { opts.center = sv.center; opts.zoom = sv.zoom; }
-          else if (nodes.length) { opts.center = [nodes[0].lng, nodes[0].lat]; opts.zoom = 13; }
-          else { clearTimeout(timer); return finish(null); }
-          map = new maplibregl.Map(opts);
-          if (scope === 'city' && nodes.length > 1) {
-            var b = new maplibregl.LngLatBounds();
-            nodes.forEach(function (n) { b.extend([n.lng, n.lat]); });
-            map.fitBounds(b, { padding: 60, maxZoom: 15, duration: 0 });
-          }
-        } catch (e) { clearTimeout(timer); return finish(null); }
-        map.once('idle', function () {
-          clearTimeout(timer);
-          try {
-            var c = document.createElement('canvas'); c.width = MAP_W; c.height = MAP_H;
-            c.getContext('2d').drawImage(map.getCanvas(), 0, 0, MAP_W, MAP_H);
-            var pts = nodes.map(function (n) { var p = map.project([n.lng, n.lat]); return Object.assign({}, n, { x: p.x, y: p.y }); });
-            finish({ image: c, points: pts });
-          } catch (e) { finish(null); }
-        });
-      }, function () { resolve(null); });
-    });
-  }
-
-  function prepareMapSnapshot(d) {
-    var scope = cardScope();
-    if (scope === 'country') { mapShot = null; mapShotKey = null; return; }
-    var nodes = scopeNodes(d, scope), keyStr = scope + '|' + (d.home ? d.home.state + '/' + d.home.city : '') + '|' + JSON.stringify(nodes);
-    if (mapShotKey === keyStr && mapShot) return;
-    mapShot = null; mapShotKey = keyStr;
-    vectorSnapshot(scope, nodes, d.home).then(function (shot) {
-      if (mapShotKey !== keyStr) return;
-      mapShot = shot;
-      if (modal && modal.classList.contains('open') && !rafId) drawCard(0.55);
-    });
   }
 
   function drawNodes(ctx, pts, phase) {
@@ -558,36 +469,11 @@
     drawNodes(ctx, nodes.map(function (n) { var q = proj(n.lng, n.lat); return Object.assign({}, n, { x: q[0], y: q[1] }); }), phase);
   }
 
-  function drawSchematic(ctx, mx, my, mw, mh, nodes, phase) {
-    ctx.fillStyle = '#0A1726';
-    ctx.beginPath(); ctx.moveTo(mx, my + mh * 0.15); ctx.bezierCurveTo(mx + 120, my + mh * 0.35, mx + 60, my + mh * 0.7, mx + 150, my + mh);
-    ctx.lineTo(mx, my + mh); ctx.closePath(); ctx.fill();
-    ctx.strokeStyle = 'rgba(148,163,184,0.09)'; ctx.lineWidth = 2;
-    for (var gx = mx + 190; gx < mx + mw; gx += 46) { ctx.beginPath(); ctx.moveTo(gx, my); ctx.lineTo(gx, my + mh); ctx.stroke(); }
-    for (var gy = my + 20; gy < my + mh; gy += 40) { ctx.beginPath(); ctx.moveTo(mx + 170, gy); ctx.lineTo(mx + mw, gy); ctx.stroke(); }
-    if (!nodes.length) return;
-    var lats = nodes.map(function (n) { return n.lat; }), lngs = nodes.map(function (n) { return n.lng; });
-    var minLat = Math.min.apply(null, lats), maxLat = Math.max.apply(null, lats), minLng = Math.min.apply(null, lngs), maxLng = Math.max.apply(null, lngs);
-    var spanLat = Math.max(maxLat - minLat, 0.004), spanLng = Math.max(maxLng - minLng, 0.004);
-    var ix = mx + 250, iy = my + 46, iw = mw - 320, ih = mh - 120;
-    drawNodes(ctx, nodes.map(function (n) {
-      return Object.assign({}, n, { x: ix + ((n.lng - minLng) / spanLng) * iw, y: iy + (1 - (n.lat - minLat) / spanLat) * ih });
-    }), phase);
-  }
-
   function drawMapArea(ctx, d, phase, mx, my, mw, mh) {
-    var scope = cardScope(), nodes = scopeNodes(d, scope), usedTiles = false;
+    var nodes = nationwideNodes();
     ctx.save(); rr(ctx, mx, my, mw, mh, 22); ctx.clip();
     ctx.fillStyle = '#060B16'; ctx.fillRect(mx, my, mw, mh);
-    if (scope === 'country') {
-      drawUsOutline(ctx, mx, my, mw, mh, nodes, phase);
-    } else if (mapShot) {
-      ctx.drawImage(mapShot.image, mx, my, mw, mh);
-      drawNodes(ctx, mapShot.points.map(function (n) { return Object.assign({}, n, { x: mx + n.x * mw / MAP_W, y: my + n.y * mh / MAP_H }); }), phase);
-      usedTiles = true;
-    } else {
-      drawSchematic(ctx, mx, my, mw, mh, nodes, phase);
-    }
+    drawUsOutline(ctx, mx, my, mw, mh, nodes, phase);
     if (!nodes.length) {
       ctx.textAlign = 'center'; ctx.font = font(600, 22); ctx.fillStyle = SLATE;
       ctx.fillText('No live report nodes yet', mx + mw / 2, my + mh / 2);
@@ -595,12 +481,7 @@
     ctx.restore();
     rr(ctx, mx, my, mw, mh, 22); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,230,153,0.25)'; ctx.stroke();
     ctx.textAlign = 'left'; ctx.font = font(700, 16); ctx.fillStyle = SLATE;
-    var where = scope === 'country' ? 'UNITED STATES' : scope === 'state' ? (d.home && d.home.stateName ? String(d.home.stateName).toUpperCase() : d.cityLabel) : d.cityLabel;
-    ctx.fillText((scope === 'city' ? 'LIVE REPORT NODES · ' : 'AUDIT NODES · ') + where, mx + 20, my + mh - 22);
-    if (usedTiles) {
-      ctx.textAlign = 'right'; ctx.font = font(600, 13); ctx.fillStyle = 'rgba(148,163,184,0.8)';
-      ctx.fillText('© OpenStreetMap contributors · OpenFreeMap', mx + mw - 16, my + mh - 22);
-    }
+    ctx.fillText('AUDIT NODES · UNITED STATES', mx + 20, my + mh - 22);
   }
 
   function drawCard(phase) {
@@ -662,8 +543,9 @@
       ctx.font = font(700, 18); ctx.fillStyle = SLATE; ctx.fillText(c[1], x + cw / 2, 570);
     });
 
-    // Dark vector map with pulsing report nodes (scope follows the
-    // #CrowdSaveAmerica grid: City / State vector basemap, Country = U.S. outline)
+    // CROWD SAVE AMERICA™ US Vector Map — always the national outline with
+    // pulsing per-city nodes (see drawMapArea() above), the same graphic
+    // the popup Aggregation Hub's Country tier draws.
     drawMapArea(ctx, d, phase, P, 626, W - 2 * P, 300);
 
     // Footer
