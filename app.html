@@ -9,7 +9,17 @@
      this same file, so anyone reading page source can see it) — it keeps
      casual link-sharing honest for a private beta, it is never real access
      control. See the #citixenGate markup and initCitixenGate() near the end
-     of <body> for the actual form/unlock logic. -->
+     of <body> for the actual form/unlock logic.
+     IMPORTANT for link previews: this gate is 100% client-side JS — it only
+     ever adds a CSS class after the page has already loaded. Applebot (the
+     crawler behind iMessage/SMS previews), facebookexternalhit, Twitterbot,
+     LinkedInBot, Slackbot and WhatsApp's link-preview fetchers all read the
+     raw HTML response directly and do not execute JavaScript, so every one
+     of them already sees the full <head> below — including the OG tags and
+     icons — on every request, gate or no gate. There is no server (no
+     middleware/edge function — this is a static HTML deploy with no
+     framework) sitting in front of that response to add a bot bypass to;
+     the bypass this would protect against doesn't exist here. -->
 <script>
 (function(){
   try {
@@ -20,33 +30,41 @@
 })();
 </script>
 <title>CITIXEN UX™</title>
-<meta name="description" content="Frictionless civic reporting sandbox.">
+<meta name="description" content="Living Civic Ledger &amp; Infrastructure Dispatch">
 <!-- Open Graph / Twitter preview card — fixes the gray-box fallback iMessage/
      SMS showed for citixenux.com/app. og-preview.png is a real pre-rendered
      1200x630 PNG (glowing emerald logo on Obsidian Glass #020617), not a
      generated-on-the-fly placeholder — see /tmp/.../og-source.html used to
-     render it. Absolute URLs throughout: relative og:image URLs are
+     render it. Absolute URLs throughout (the metadataBase equivalent for a
+     plain static site — there's no Next.js metadataBase config to set here,
+     so every URL below is just written out in full against
+     https://citixenux.com instead): relative og:image/icon URLs are
      unreliable for link-preview crawlers. -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://citixenux.com/app">
-<meta property="og:title" content="CITIXEN UX™ · Living Ledger">
-<meta property="og:description" content="Frictionless civic reporting sandbox.">
+<meta property="og:title" content="CITIXEN UX™">
+<meta property="og:description" content="Living Civic Ledger &amp; Infrastructure Dispatch">
 <meta property="og:image" content="https://citixenux.com/og-preview.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="CITIXEN UX — Living Ledger">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="CITIXEN UX™ · Living Ledger">
-<meta name="twitter:description" content="Frictionless civic reporting sandbox.">
+<meta name="twitter:title" content="CITIXEN UX™">
+<meta name="twitter:description" content="Living Civic Ledger &amp; Infrastructure Dispatch">
 <meta name="twitter:image" content="https://citixenux.com/og-preview.png">
 <meta name="theme-color" content="#00E699">
 <meta name="referrer" content="no-referrer">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="/manifest.json?v=5">
-<link rel="icon" type="image/x-icon" href="/favicon.ico?v=5">
+<link rel="icon" type="image/x-icon" href="https://citixenux.com/favicon.ico">
 <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png?v=5">
 <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png?v=5">
+<!-- Root-level, query-string-free apple-touch-icon — the green shield —
+     alongside the existing /icons/ copy (kept for the manifest/other icon
+     sizes); some clients only reliably pick up the conventional
+     /apple-touch-icon.png root path. -->
+<link rel="apple-touch-icon" href="https://citixenux.com/apple-touch-icon.png">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=5">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
