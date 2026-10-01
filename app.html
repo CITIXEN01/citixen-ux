@@ -81,7 +81,7 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
 .brand-wordmark{font-weight:800;font-size:1.05rem;letter-spacing:.3px}
 .brand-white{color:#ffffff}
 .brand-lime{color:var(--brand-mint)}
-.brand-tm{font-size:.55em;opacity:.4;margin-left:1px}
+.brand-tm{font-size:.55em;color:var(--brand-mint);opacity:.75;margin-left:1px}
 .badge{font-size:.62rem;background:rgba(0,230,153,.12);color:var(--mint2);border:1px solid rgba(0,230,153,.4);
   padding:4px 10px;border-radius:20px;font-weight:700;letter-spacing:.4px;display:flex;align-items:center;gap:6px;
   white-space:nowrap;overflow:hidden;min-width:0;max-width:150px}
@@ -582,7 +582,11 @@ textarea.input{resize:none;line-height:1.4}
   0%,100%{r:40px;opacity:.22}
   50%{r:50px;opacity:.5}
 }
-.tm-symbol{font-weight:300 !important;font-size:.55em !important;margin-left:3px !important;opacity:.8;vertical-align:super}
+.civic-flow-pulse{fill:#00E699;filter:drop-shadow(0 0 3px rgba(0,230,153,.9)) drop-shadow(0 0 7px rgba(0,230,153,.55))}
+@media (prefers-reduced-motion: reduce){
+  .civic-flow-pulse{display:none}
+}
+.tm-symbol{font-weight:300 !important;font-size:.55em !important;margin-left:3px !important;color:#00E699;opacity:.9;vertical-align:super}
 .hub-deepdive-panel{display:none;max-width:920px;margin:0 auto 18px;padding:0}
 .hub-deepdive-panel.open{display:block}
 .hub-deepdive-close{display:block;width:100%;background:none;border:1px solid var(--border);color:var(--muted);
@@ -2050,38 +2054,53 @@ function renderAppMunicipalPanel(){
 }
 
 /* "How Your Report Moves" tri-node schematic — same real geometry as
-   index.html's CIVIC_TRIAD_DIAGRAM_HTML, with its own node ids
-   (appTriad...) since this is a separate document, not shared DOM. */
-const APP_TRIAD_DIAGRAM_HTML = '<div class="civic-triad-section">' +
+   index.html's CIVIC_TRIAD_DIAGRAM_HTML. This is now a function (not a
+   fixed-id string constant) because the diagram is mounted twice at
+   once — the always-present Dashboard "Learn More" panel and, since the
+   Quick Help modal was added, a second live copy in #appInfoModalBody —
+   and fixed ids would collide in the DOM (breaking both the new
+   <mpath href="#..."> flow-pulse references and basic id-uniqueness).
+   idPrefix keeps each mounted copy's ids unique. */
+function appTriadDiagramHtml(idPrefix) {
+  return '<div class="civic-triad-section">' +
   '<div class="civic-triad-card">' +
     '<div class="civic-triad-header">How Your Report Moves</div>' +
     '<svg class="civic-triad-svg" viewBox="0 0 320 310" role="img" aria-label="Diagram: a central CITIXEN UX nucleus radiates equally to Resident, Public Ledger, and Municipal Portal">' +
-      '<line x1="160" y1="127" x2="160" y2="118" class="civic-triad-spoke"/>' +
-      '<line x1="118.59" y1="199.24" x2="110.79" y2="203.81" class="civic-triad-spoke"/>' +
-      '<line x1="201.41" y1="199.24" x2="209.21" y2="203.81" class="civic-triad-spoke"/>' +
-      '<g id="appTriadNucleus">' +
+      /* Connecting pathways (node edge to hub edge, same geometry/dash
+         style as the original stub lines, just extended to actually
+         span the gap) plus a small glowing pulse animated along each
+         one via native SMIL animateMotion — no JS/rAF loop needed, and
+         it pauses cleanly under prefers-reduced-motion (see .civic-flow-
+         pulse below) since that rule simply hides the traveling dot. */
+      '<path id="' + idPrefix + 'FlowResidentHub" d="M160,106 L160,127" class="civic-triad-spoke"/>' +
+      '<path id="' + idPrefix + 'FlowHubLedger" d="M118.59,199.24 L100.43,209.87" class="civic-triad-spoke"/>' +
+      '<path id="' + idPrefix + 'FlowHubMunicipal" d="M201.41,199.24 L219.57,209.87" class="civic-triad-spoke"/>' +
+      '<circle r="2.6" class="civic-flow-pulse"><animateMotion dur="1.3s" repeatCount="indefinite" begin="0s"><mpath href="#' + idPrefix + 'FlowResidentHub" xlink:href="#' + idPrefix + 'FlowResidentHub"/></animateMotion></circle>' +
+      '<circle r="2.6" class="civic-flow-pulse"><animateMotion dur="1.3s" repeatCount="indefinite" begin="0.65s"><mpath href="#' + idPrefix + 'FlowHubLedger" xlink:href="#' + idPrefix + 'FlowHubLedger"/></animateMotion></circle>' +
+      '<circle r="2.6" class="civic-flow-pulse"><animateMotion dur="1.3s" repeatCount="indefinite" begin="0.65s"><mpath href="#' + idPrefix + 'FlowHubMunicipal" xlink:href="#' + idPrefix + 'FlowHubMunicipal"/></animateMotion></circle>' +
+      '<g id="' + idPrefix + 'TriadNucleus">' +
         '<circle cx="160" cy="175" r="48" class="civic-triad-nucleus-halo"/>' +
         '<circle cx="160" cy="175" r="36" class="civic-triad-outer-ring"/>' +
         '<circle cx="160" cy="175" r="32" class="civic-triad-root-circle"/>' +
         '<g transform="translate(149.8,155.8) scale(0.85)">' +
           '<path d="M12 2L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-3z" fill="none" stroke="#00E699" stroke-width="1.8" stroke-linejoin="round"/>' +
         '</g>' +
-        '<text x="160" y="192" class="civic-triad-root-label-center">CITIXEN UX<tspan baseline-shift="super" font-size="4.5">™</tspan></text>' +
+        '<text x="160" y="192" class="civic-triad-root-label-center"><tspan style="fill:#FFFFFF">CITIXEN</tspan> <tspan style="fill:#00E699">UX</tspan><tspan baseline-shift="super" font-size="4.5" style="fill:#00E699">™</tspan></text>' +
       '</g>' +
-      '<g id="appTriadNodeResident">' +
+      '<g id="' + idPrefix + 'TriadNodeResident">' +
         '<circle cx="160" cy="80" r="26" class="civic-triad-node-circle"/>' +
         '<path d="M160 68a6 6 0 1 0 0.001 0z" fill="none" stroke="#00E699" stroke-width="1.6"/>' +
         '<path d="M148 94c2-7 7-11 12-11s10 4 12 11" fill="none" stroke="#00E699" stroke-width="1.6" stroke-linecap="round"/>' +
         '<text x="160" y="30" class="civic-triad-node-label">Resident</text>' +
         '<text x="160" y="16" class="civic-triad-node-sub">Mobile report capture</text>' +
       '</g>' +
-      '<g id="appTriadNodeLedger">' +
+      '<g id="' + idPrefix + 'TriadNodeLedger">' +
         '<circle cx="78" cy="223" r="26" class="civic-triad-node-circle"/>' +
         '<path d="M66 211h24M66 219h24M66 227h16" fill="none" stroke="#00E699" stroke-width="1.6" stroke-linecap="round"/>' +
         '<text x="78" y="273" class="civic-triad-node-label">Public Ledger</text>' +
         '<text x="78" y="287" class="civic-triad-node-sub">Live, searchable record</text>' +
       '</g>' +
-      '<g id="appTriadNodeMunicipal">' +
+      '<g id="' + idPrefix + 'TriadNodeMunicipal">' +
         '<circle cx="242" cy="223" r="26" class="civic-triad-node-circle"/>' +
         '<path d="M230 235v-14l12-8 12 8v14z" fill="none" stroke="#00E699" stroke-width="1.6" stroke-linejoin="round"/>' +
         '<path d="M236 235v-8h12v8" fill="none" stroke="#00E699" stroke-width="1.6"/>' +
@@ -2091,6 +2110,7 @@ const APP_TRIAD_DIAGRAM_HTML = '<div class="civic-triad-section">' +
     '</svg>' +
   '</div>' +
 '</div>';
+}
 
 /* Features/Safety/Security accordion copy + the Civic Memory/Anonymity
    info-modal bodies — same static marketing/trust copy as index.html's
@@ -2131,16 +2151,16 @@ const APP_MODAL_DATA = {
      the single home for "how does this work" content now that the
      standalone "How Does This Work?" CTA button has been removed (the "?"
      icon replaces it). Reapplies the existing "How Your Report Moves"
-     tri-node diagram (APP_TRIAD_DIAGRAM_HTML, defined above) verbatim,
+     tri-node diagram (appTriadDiagramHtml(), defined above) verbatim,
      folds in the former 3-step quick-guide copy underneath it, and closes
      with a single pared-down trust line — rather than drawing a new
      graphic or keeping two separate help entry points. */
   quickHelp: { title: 'Quick Help', html:
-    '<div style="margin-top:14px;">' + APP_TRIAD_DIAGRAM_HTML + '</div>' +
+    '<div style="margin-top:14px;">' + appTriadDiagramHtml('quickHelp') + '</div>' +
     '<div style="margin-top:18px;">' +
-      '<h4>1. Spot &amp; Snap</h4><p>Geolocate your position and tag the issue (potholes, streetlights, drainage).</p>' +
-      '<h4>2. Automated Dispatch</h4><p>CITIXEN UX™ routes it to municipal teams and logs it to the Public Ledger.</p>' +
-      '<h4>3. Track Impact</h4><p>Monitor resolution speed and active capital project timelines in real time.</p>' +
+      '<h4 style="color:#00E699">1. Spot &amp; Snap</h4><p>Geolocate your position and tag the issue (potholes, streetlights, drainage).</p>' +
+      '<h4 style="color:#00E699">2. Automated Dispatch</h4><p><span class="brand-white">CITIXEN</span> <span class="brand-lime">UX</span><sup class="tm-symbol">™</sup> routes it to municipal teams and logs it to the Public Ledger.</p>' +
+      '<h4 style="color:#00E699">3. Track Impact</h4><p>Monitor resolution speed and active capital project timelines in real time.</p>' +
     '</div>' +
     '<p style="font-size:.78rem;color:var(--muted);line-height:1.55;padding:0 2px;">No account, device ID, or photo GPS/EXIF data ever leaves your phone.</p>' }
 };
@@ -3517,7 +3537,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('appTileSafety').addEventListener('click', () => toggleAppFeatureAccordion('ciSafety', 'appTileSafety'));
   document.getElementById('appTileSecurity').addEventListener('click', () => toggleAppFeatureAccordion('ciSecurity', 'appTileSecurity'));
 
-  document.getElementById('appTriadDiagramMount').innerHTML = APP_TRIAD_DIAGRAM_HTML;
+  document.getElementById('appTriadDiagramMount').innerHTML = appTriadDiagramHtml('learnMore');
   document.getElementById('appLearnMoreBtn').addEventListener('click', (e) => {
     openAppDeepdivePanel('appLearnMorePanel', e.currentTarget);
   });
