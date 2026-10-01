@@ -83,8 +83,10 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
 .brand-lime{color:var(--brand-mint)}
 .brand-tm{font-size:.55em;opacity:.4;margin-left:1px}
 .badge{font-size:.62rem;background:rgba(0,230,153,.12);color:var(--mint2);border:1px solid rgba(0,230,153,.4);
-  padding:4px 10px;border-radius:20px;font-weight:700;letter-spacing:.4px;display:flex;align-items:center;gap:6px}
-.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--mint2)}
+  padding:4px 10px;border-radius:20px;font-weight:700;letter-spacing:.4px;display:flex;align-items:center;gap:6px;
+  white-space:nowrap;overflow:hidden;min-width:0;max-width:150px}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--mint2);flex-shrink:0}
+.badge span#headerWardLabel{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* ===== APP MENU BUTTON + SLIDE-OUT PROFILE DRAWER ===== */
 .menu-btn{background:transparent;border:1px solid var(--border);color:var(--text);width:34px;height:34px;
@@ -300,7 +302,8 @@ textarea.input{resize:none;line-height:1.4}
 .your-impact .num{font-size:1.3rem;font-weight:900;color:#fff;flex-shrink:0}
 .your-impact .lbl{font-size:.68rem;color:var(--muted);line-height:1.35}
 
-.drawer{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:2000;display:none;flex-direction:column;padding:18px}
+.drawer{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:2000;display:none;flex-direction:column;
+  padding:18px;padding-top:calc(18px + env(safe-area-inset-top, 0px))}
 .drawer.open{display:flex}
 .icon-btn{background:none;border:none;color:#fff;cursor:pointer;display:flex;padding:4px}
 .toast{display:none;background:rgba(0,230,153,.2);border:1px solid var(--mint2);color:var(--mint2);
@@ -428,17 +431,6 @@ textarea.input{resize:none;line-height:1.4}
 .btn-confirm-lock:disabled{opacity:.4;cursor:not-allowed}
 .btn-confirm-cancel{width:100%;background:transparent;color:var(--muted);border:1px solid var(--border);
   padding:13px;border-radius:12px;font-weight:700;font-size:.8rem;cursor:pointer}
-
-/* ===== "HOW DOES THIS WORK?" CTA — full-width solid primary button at the
-   top of the Report tab, directly beneath the 911 banner and above "1.
-   Category", styled to match .btn-submit ("Publish report"). Opens the
-   existing generic info-drawer system (#appInfoModal, see
-   APP_MODAL_DATA/openAppInfoModal()) with a 3-step quick guide, so Dismiss
-   (close icon + backdrop tap) is already wired. ===== */
-.btn-howitworks{display:flex;align-items:center;justify-content:center;width:100%;margin-bottom:14px;
-  background:#00E699;color:#000000;border:none;border-radius:12px;padding:15px 16px;
-  font-weight:800;font-size:.85rem;cursor:pointer;transition:filter .15s ease}
-.btn-howitworks:hover,.btn-howitworks:active{filter:brightness(1.08)}
 
 /* ===== "WHAT IS CIVIC INTELLIGENCE?" HERO (index.html only markup, shared styles) ===== */
 .ci-hero{padding:0}
@@ -617,8 +609,8 @@ textarea.input{resize:none;line-height:1.4}
         <svg viewBox="0 0 24 24" width="21" height="21" stroke="var(--brand-mint)" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         <span class="brand-wordmark"><span class="brand-white">CITIXEN</span> <span class="brand-lime">UX</span><sup class="brand-tm">™</sup></span>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <div class="badge"><span class="badge-dot"></span> <span id="headerWardLabel">Local District • Active</span></div>
+      <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+        <div class="badge"><span class="badge-dot"></span> <span id="headerWardLabel">Local District</span></div>
         <button class="menu-btn" id="appHelpBtn" type="button" aria-label="Quick help: how your report moves" aria-controls="appInfoModal" aria-expanded="false">
           <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         </button>
@@ -683,7 +675,6 @@ textarea.input{resize:none;line-height:1.4}
           911
         </a>
       </div>
-      <button type="button" class="btn-howitworks" id="btnHowItWorks">How Does This Work? ↗</button>
       <div class="card">
         <div class="label">1. Category</div>
         <div class="chip-grid">
@@ -2136,17 +2127,22 @@ const APP_MODAL_DATA = {
     ['Spatial Hashing Architecture','How this platform buckets reports by location today (ward-tier), and the H3 hexagonal-grid model targeted as its roadmap replacement.'],
     ['Public Ledger & Standards','Tap the LIVE PUBLIC LEDGER button above to open the real, searchable public record — the same drawer this card\'s subtitle points to.']
   ]},
-  howItWorks: { title: 'How Does This Work?', body: [
-    ['1. Spot & Snap','Geolocate your current position and tag the civic issue (potholes, streetlights, drainage).'],
-    ['2. Automated Dispatch','CITIXEN UX™ routes data directly to municipal teams and registers the entry to the Public Ledger.'],
-    ['3. Track Impact','Monitor neighborhood performance, resolution speeds, and active capital project timelines in real time.']
-  ]},
-  /* Quick Help (header "?" button, next to the hamburger menu) — reapplies
-     the same "How Your Report Moves" tri-node diagram (APP_TRIAD_DIAGRAM_HTML,
-     defined above) and its existing explanatory copy already used in the
-     Dashboard's "Learn More ↗" panel, rather than drawing a new graphic. */
-  quickHelp: { title: 'Quick Help', html: APP_TRIAD_DIAGRAM_HTML +
-    '<p style="font-size:.78rem;color:var(--muted);line-height:1.55;padding:0 2px;">CITIXEN UX<sup class="tm-symbol">™</sup> is the zero-knowledge shield hub between every resident report and the two places it needs to go: the public ledger (so the record is open) and the municipal portal (so the work order actually gets created). No account, no device ID, and no GPS/EXIF metadata ever leaves your phone attached to the photo.</p>' }
+  /* Quick Help (header "?" button, next to the hamburger menu) — this is
+     the single home for "how does this work" content now that the
+     standalone "How Does This Work?" CTA button has been removed (the "?"
+     icon replaces it). Reapplies the existing "How Your Report Moves"
+     tri-node diagram (APP_TRIAD_DIAGRAM_HTML, defined above) verbatim,
+     folds in the former 3-step quick-guide copy underneath it, and closes
+     with a single pared-down trust line — rather than drawing a new
+     graphic or keeping two separate help entry points. */
+  quickHelp: { title: 'Quick Help', html:
+    '<div style="margin-top:14px;">' + APP_TRIAD_DIAGRAM_HTML + '</div>' +
+    '<div style="margin-top:18px;">' +
+      '<h4>1. Spot &amp; Snap</h4><p>Geolocate your position and tag the issue (potholes, streetlights, drainage).</p>' +
+      '<h4>2. Automated Dispatch</h4><p>CITIXEN UX™ routes it to municipal teams and logs it to the Public Ledger.</p>' +
+      '<h4>3. Track Impact</h4><p>Monitor resolution speed and active capital project timelines in real time.</p>' +
+    '</div>' +
+    '<p style="font-size:.78rem;color:var(--muted);line-height:1.55;padding:0 2px;">No account, device ID, or photo GPS/EXIF data ever leaves your phone.</p>' }
 };
 function openAppInfoModal(key){
   const d = APP_MODAL_DATA[key]; if (!d) return;
@@ -2204,13 +2200,15 @@ async function shareViaWebShareApi(){
    HEADER GPS PILL + PAGE-WIDE RESOLVED LOCATION
    -----------------------------------------------------------------
    Shows the device's real, GPS-resolved city/state in the top-right
-   pill ("${city}, ${state_code} • Active"). If geolocation is denied,
-   unavailable, times out, or reverse-geocoding fails, the pill keeps the
-   honest, neutral "Local District" fallback rather than guessing a place —
-   there is no live ward-boundary geofencing in this build, so a specific
-   ward is never named unless a citizen explicitly picks one.
+   pill ("${city}, ${state_code}"), kept to a single line with the green
+   dot standing in for "active" so the pill never wraps or enlarges. If
+   geolocation is denied, unavailable, times out, or reverse-geocoding
+   fails, the pill keeps the honest, neutral "Local District" fallback
+   rather than guessing a place — there is no live ward-boundary
+   geofencing in this build, so a specific ward is never named unless a
+   citizen explicitly picks one.
    ===================================================================== */
-const DEFAULT_LOCATION_LABEL = 'Local District • Active';
+const DEFAULT_LOCATION_LABEL = 'Local District';
 const GEO_TIMEOUT_MS = 6000;
 window.CITIXEN_RESOLVED_LOCATION = null; // { city, stateCode, ward: null } once resolved
 
@@ -2292,7 +2290,7 @@ async function resolveDisplayLocation(){
     const city = data.city || data.locality;
     const stateCode = (data.principalSubdivisionCode || '').split('-').pop();
     if (city && stateCode) {
-      if (labelEl) labelEl.textContent = `${esc(city)}, ${esc(stateCode)} • Active`;
+      if (labelEl) labelEl.textContent = `${esc(city)}, ${esc(stateCode)}`;
       // lat/lng are the device's own real GPS coordinates (not a guess) — kept
       // here so the dispatch map can drop a "you are here" beacon; nothing
       // else about the resolved-location contract changes.
@@ -3514,7 +3512,6 @@ window.addEventListener('DOMContentLoaded',()=>{
     document.getElementById('appHubMunicipalBtn').setAttribute('aria-expanded', 'false');
   });
   document.getElementById('appHubMemoryBtn').addEventListener('click', () => openAppInfoModal('civicMemory'));
-  document.getElementById('btnHowItWorks').addEventListener('click', () => openAppInfoModal('howItWorks'));
 
   document.getElementById('appTileFeatures').addEventListener('click', () => toggleAppFeatureAccordion('ciFeatures', 'appTileFeatures'));
   document.getElementById('appTileSafety').addEventListener('click', () => toggleAppFeatureAccordion('ciSafety', 'appTileSafety'));
