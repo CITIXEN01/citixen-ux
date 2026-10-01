@@ -1107,24 +1107,33 @@
     rr(ctx, 30, 30, W - 60, W - 60, 36); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,230,153,0.55)'; ctx.stroke();
     ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
 
-    // ---- Brand header: CITIXEN UX™ + Civic Intelligence Protocol, above
-    // the glowing FREE CIVIC REPORT headline + location ----
-    ctx.font = font(900, 30); ctx.fillStyle = MINT;
-    ctx.fillText('CITIXEN UX™', W / 2, 52);
-    ctx.font = font(700, 17); ctx.fillStyle = SLATE;
-    ctx.fillText('CIVIC INTELLIGENCE PROTOCOL', W / 2, 80);
+    // ---- Header, restructured into a top meta row + centered title block
+    // (un-crunched from the previous 3-line-stack layout, which left only
+    // ~7px between the frame edge and the first line of text). Top row:
+    // brand mark left, jurisdiction + date right. Then the glowing
+    // headline + protocol subtitle, centered, with real breathing room
+    // from the outer frame above it. ----
+    var hdrPad = 70; // left/right inset, matches the Living Ledger panel below for alignment
+    ctx.textAlign = 'left';
+    ctx.font = font(800, 22); ctx.fillStyle = MINT;
+    ctx.fillText('CITIXEN UX™', hdrPad, 62);
+    ctx.textAlign = 'right';
+    ctx.font = font(600, 20); ctx.fillStyle = SLATE;
+    ctx.fillText(cityStateLabel(d).toUpperCase() + ' · ' + shortDate(generatedAt), W - hdrPad, 62);
+
+    ctx.textAlign = 'center';
     ctx.save();
     ctx.font = font(900, 46); ctx.fillStyle = MINT;
     ctx.shadowColor = 'rgba(0,230,153,0.65)'; ctx.shadowBlur = 20;
-    ctx.fillText('FREE CIVIC REPORT', W / 2, 128);
+    ctx.fillText('FREE CIVIC REPORT', W / 2, 116);
     ctx.shadowColor = 'rgba(0,230,153,0.3)'; ctx.shadowBlur = 40;
-    ctx.fillText('FREE CIVIC REPORT', W / 2, 128);
+    ctx.fillText('FREE CIVIC REPORT', W / 2, 116);
     ctx.restore();
-    ctx.font = font(700, 22); ctx.fillStyle = SLATE;
-    ctx.fillText(cityStateLabel(d).toUpperCase() + '  •  ' + shortDate(generatedAt), W / 2, 174);
+    ctx.font = font(700, 18); ctx.fillStyle = SLATE;
+    ctx.fillText('CIVIC INTELLIGENCE PROTOCOL', W / 2, 154);
 
     // ---- Living Ledger™ Snapshot panel ----
-    var px = 70, pw = W - 140, py = 208, ph = 352;
+    var px = 70, pw = W - 140, py = 184, ph = 352;
     rr(ctx, px, py, pw, ph, 26); ctx.fillStyle = '#000000'; ctx.fill();
     ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,230,153,0.35)'; ctx.stroke();
     ctx.font = font(800, 24); ctx.fillStyle = MINT;

@@ -422,11 +422,9 @@ textarea.input{resize:none;line-height:1.4}
 .ledger-report-card:hover{border-color:var(--mint2)}
 .ledger-report-id{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.62rem;color:var(--mint2)}
 .ledger-empty{text-align:center;color:var(--muted);font-size:.78rem;padding:24px 0}
-/* 3-stage chain-of-custody footer — see custodyFooter() */
-.cx-custody-footer{display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.08)}
-.cx-custody-step{font-size:.58rem;font-weight:700;letter-spacing:.02em;color:var(--muted);white-space:nowrap}
-.cx-custody-step.done{color:var(--mint2)}
-.cx-custody-arrow{font-size:.58rem;color:var(--muted);opacity:.5}
+/* Consolidated ledger-proof line — see ledgerCardMeta() */
+.ledger-proof-line{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.68rem;
+  color:#64748b;margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.08)}
 
 /* ===== GENERATE LEDGER REPORT OVERLAY — stacked above the Public Ledger
    drawer (higher z-index), same solid-background/safe-area/sticky-header
@@ -2221,34 +2219,30 @@ function renderLedgerResults(){
     const pillClass = t.stage === 'resolved' ? 'pill-ok' : t.stage === 'dispatched' ? 'pill-warn' : 'pill-crit';
     a.innerHTML = `<div class="row"><span class="ledger-report-id">${esc(t.reportId)}</span><span class="pill ${pillClass}">${esc(t.stage)}</span></div>
       <div style="font-weight:700;font-size:.82rem;margin:4px 0">${esc(t.title)}</div>
-      <div class="small">${esc(t.loc)} • ${esc(t.wardName)} • ${esc(t.category)}${t.stage === 'resolved' ? (t.verified ? ' • ✓ photo-verified' : ' • desk closure') : ''}</div>
-      ${custodyFooter(t)}`;
+      ${ledgerCardMeta(t)}`;
     container.appendChild(a);
   });
 }
 
-// 3-stage chain-of-custody footer — every real stage this ticket's own
-// `stage`/`verified` fields already carry, just rendered as a pipeline:
-//   1. EXIF Scrubbed   — true for every submission (stripped on-device
-//                        before upload, see Privacy Engine copy above).
-//   2. Routed          — once past 'submitted', to the real department
-//                        parseDepartment() would route this category to.
-//   3. Block Verified  — only once this ticket is resolved AND photo-
-//                        verified. The block number is this ticket's own
-//                        reportId hash segment (stable per ticket), never
-//                        a borrowed/invented counter.
-function custodyFooter(t){
+// Consolidated 2-line metadata block for a Public Ledger card — replaces
+// the old loc/ward/category line + a separate 3-stage emoji pipeline with
+// two clean text rows. "EXIF Scrubbed" is dropped here since it's already
+// stated once, universally, by the privacy card at the top of this view —
+// repeating it on every single card was redundant. The block number is
+// still this ticket's own reportId hash segment (never a borrowed/invented
+// counter), and the verification word is still the real `stage`/`verified`
+// state, not a blanket claim.
+function ledgerCardMeta(t){
   var blockNum = (t.reportId || '').split('-').pop() || '----';
   var dept = parseDepartment(t.category || t.title || '');
   var routed = t.stage === 'dispatched' || t.stage === 'resolved';
   var verified = t.stage === 'resolved' && t.verified === true;
-  return '<div class="cx-custody-footer">' +
-    '<span class="cx-custody-step done">🛡️ EXIF Scrubbed</span>' +
-    '<span class="cx-custody-arrow">➔</span>' +
-    '<span class="cx-custody-step' + (routed ? ' done' : '') + '">⚡ Routed to ' + esc(dept) + '</span>' +
-    '<span class="cx-custody-arrow">➔</span>' +
-    '<span class="cx-custody-step' + (verified ? ' done' : '') + '">🔗 Block #' + esc(blockNum) + (verified ? ' Verified' : ' Pending') + '</span>' +
-  '</div>';
+  var proofWord = verified ? 'Photo Verified'
+    : (t.stage === 'resolved') ? 'Desk Closure'
+    : routed ? 'Verification Pending'
+    : 'Awaiting Dispatch';
+  return '<div class="small">' + esc(t.wardName) + ' · ' + esc(t.category) + ' · Routed to ' + esc(dept) + '</div>' +
+    '<div class="ledger-proof-line">Ledger Block #' + esc(blockNum) + ' · ' + proofWord + '</div>';
 }
 
 async function openLedgerDrawer(){
