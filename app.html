@@ -828,7 +828,6 @@ textarea.input{resize:none;line-height:1.4}
 .onboarding-dots{display:flex;justify-content:center;gap:8px}
 .onboarding-dot{width:7px;height:7px;border-radius:50%;background:rgba(148,163,184,.3);transition:all .2s ease}
 .onboarding-dot.active{background:#34d399;box-shadow:0 0 8px rgba(52,211,153,.8);width:20px;border-radius:4px}
-.onboarding-nav{display:flex;gap:10px}
 .btn-onboarding-outline{flex:1;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.12);
   color:var(--text);padding:12px;border-radius:10px;font-weight:700;font-size:.8rem;cursor:pointer;
   transition:border-color .15s,background .15s}
@@ -1110,11 +1109,21 @@ textarea.input{resize:none;line-height:1.4}
   </form>
 </div>
 
+<!-- ===== STEP 3 OF 4 — WELCOME HERO (Patch 4.11 strict alpha entrance
+     sequencer). The shield below is this Hero's own inline-SVG rendering
+     of the exact same glowing green shield published as
+     /apple-touch-icon.png (see that file) — drawn inline rather than
+     embedding the PNG directly because that file bakes in its own square
+     dark background tile, which would show as a visible box against this
+     screen's own different background gradient; same shape and color,
+     just composited cleanly here instead. "Enter App" is the only way
+     through to Step 4 — see btnEnterApp's handler and hideSplash()'s own
+     comment for why there's no tap-anywhere-to-dismiss any more. ===== -->
 <div class="splash-screen" id="splashScreen">
   <svg class="splash-logo" viewBox="0 0 24 24" width="64" height="64" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
   <div class="splash-word"><span class="brand-white">CITIXEN</span> <span class="brand-lime">UX</span><sup class="brand-tm">™</sup></div>
-  <div class="splash-tag">Upgrade Your Civic Experience</div>
-  <button type="button" class="splash-cta" id="btnSplashLogIssue">+ Log Infrastructure Issue</button>
+  <div class="splash-tag">Improve Your Civic Experience</div>
+  <button type="button" class="splash-cta" id="btnEnterApp">Enter App</button>
 </div>
 
 <div class="shell">
@@ -1945,51 +1954,67 @@ textarea.input{resize:none;line-height:1.4}
     </div>
   </div>
 
-  <!-- ===== FRONT DOOR ONBOARDING — "Private Beta" 2-card notice shown
-       once per device to the first-adopter beta cohort (gated by
-       ONBOARDING_SEEN_KEY in localStorage, same per-device convention as
-       markGridCellLit()'s lit-grid-cities key). Auto-opens shortly after
-       the launch splash fades; the header "✕" and the final CTA both mark
-       it seen so a returning beta tester never has to sit through it
-       twice. See openFrontDoorOnboarding()/closeFrontDoorOnboarding(). ===== -->
+  <!-- ===== FRONT DOOR ONBOARDING — Step 2 of the Patch 4.11 strict 4-step
+       alpha entrance sequencer (Gate -> this carousel -> Welcome Hero ->
+       intake form), shown once per device to the first-adopter beta
+       cohort (gated by ONBOARDING_SEEN_KEY in localStorage, same
+       per-device convention as markGridCellLit()'s lit-grid-cities key).
+       Opens immediately on a fresh unlock — no auto-timer, see
+       startPostUnlockLanding() — and, per "enforce strict" sequencing,
+       has no skip path: no backdrop-dismiss, no dot-jump, no "✕" (all
+       removed this round). The only way through is slide A's "Continue"
+       and slide B's "Got it", each a deliberate, completion-gated step.
+       Slide A covers what to report and the real state of photo privacy;
+       slide B covers what the 10-person alpha cohort is expected to do.
+       See openFrontDoorOnboarding()/closeFrontDoorOnboarding(). ===== -->
   <div id="frontDoorOnboardingModal" class="confirm-drawer">
     <div class="confirm-card onboarding-card">
       <div class="onboarding-header-bar">
         <span class="onboarding-brand">CITIXEN UX<sup class="tm-symbol">™</sup></span>
-        <div class="onboarding-header-right">
-          <button type="button" class="onboarding-close" id="btnOnboardingClose" aria-label="Skip walkthrough">✕</button>
-        </div>
       </div>
 
       <div class="onboarding-slides" id="onboardingSlides">
+        <!-- Slide A — reporting guidance + the real, honest state of photo
+             privacy: EXIF/GPS scrubbing is real (same claim the privacy
+             card elsewhere in this app makes); automatic face/license-plate
+             blurring is NOT live in this beta (same honest "Not Yet
+             Implemented" status the Operator QA panel shows), so this
+             slide asks the citizen to avoid capturing bystanders directly
+             rather than claiming a blur pipeline that doesn't exist yet. -->
         <div class="onboarding-slide onboarding-centered active" data-slide="0">
-          <span class="onboarding-badge-pill">CONFIDENTIAL • PRIVATE ALPHA</span>
-          <h2 class="onboarding-headline onboarding-headline-xl">You Are a Beta Tester</h2>
+          <span class="onboarding-badge-pill">WHAT TO REPORT</span>
+          <h2 class="onboarding-headline onboarding-headline-xl">Report Real Infrastructure Hazards</h2>
+          <p class="onboarding-body">Potholes, dark streetlights, damaged signage, broken sidewalks, blocked drainage — anything that's an actual hazard in your neighborhood.</p>
           <div class="onboarding-warning">
             <svg class="onboarding-warning-icon" viewBox="0 0 24 24" width="16" height="16" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-            <span class="onboarding-warning-text">This access is strictly private. Please do not forward or share this link.</span>
+            <span class="onboarding-warning-text">Every photo is scrubbed of GPS &amp; file metadata before it reaches the public ledger. Automatic face &amp; license-plate blurring isn't live in this beta yet — please avoid capturing bystanders, faces, or plates directly.</span>
           </div>
-          <p class="onboarding-body">Quickly testing back-end data aggregation and routing speed. Just submit a test report and verify it hits the public ledger.</p>
+          <button type="button" class="btn-onboarding-cta" id="btnOnboardingNext">Continue</button>
         </div>
 
+        <!-- Slide B — expectations for the 10-person alpha cohort: the
+             confidentiality notice (moved here from the old slide A) plus
+             the real 3-step test process, now framed as what's expected
+             of each tester rather than a generic "how it works". -->
         <div class="onboarding-slide" data-slide="1">
-          <div class="onboarding-eyebrow">3-SECOND TEST PROCESS</div>
-          <h2 class="onboarding-headline" style="font-size:1.1rem">That's It. 3 Simple Actions:</h2>
+          <span class="onboarding-badge-pill">CONFIDENTIAL • PRIVATE ALPHA</span>
+          <h2 class="onboarding-headline" style="font-size:1.1rem">You're One of 10 Alpha Testers</h2>
+          <p class="onboarding-body" style="margin-top:0">This access is strictly private — please don't forward or share this link. As one of this beta's 10-person cohort, here's what we're asking of you:</p>
           <div class="onboarding-grid">
             <div class="onboarding-grid-item">
               <div class="onboarding-grid-num">1</div>
-              <div class="onboarding-grid-text"><b>SNAP</b><span>Tap the glowing green camera button to capture or upload any photo (even your desk).</span></div>
+              <div class="onboarding-grid-text"><b>SNAP</b><span>Tap the glowing green camera button to capture or upload a real photo.</span></div>
             </div>
             <div class="onboarding-grid-item">
               <div class="onboarding-grid-num">2</div>
-              <div class="onboarding-grid-text"><b>REPORT</b><span>Tap "Publish Report." No logins, no forms, no friction.</span></div>
+              <div class="onboarding-grid-text"><b>REPORT</b><span>Submit at least one test report — no logins, no forms, no friction.</span></div>
             </div>
             <div class="onboarding-grid-item">
               <div class="onboarding-grid-num">3</div>
-              <div class="onboarding-grid-text"><b>FOLLOW LEDGER</b><span>Watch your report instantly land at the top of the live feed and check your receipt code.</span></div>
+              <div class="onboarding-grid-text"><b>FLAG ISSUES</b><span>Use the floating feedback badge to flag any bugs, UX friction, or ideas as you go.</span></div>
             </div>
           </div>
-          <button type="button" class="btn-onboarding-cta" id="btnOnboardingStart">Start Test Report</button>
+          <button type="button" class="btn-onboarding-cta" id="btnOnboardingStart">Got it</button>
         </div>
       </div>
 
@@ -1997,9 +2022,6 @@ textarea.input{resize:none;line-height:1.4}
         <div class="onboarding-dots" id="onboardingDots" role="tablist" aria-label="Onboarding progress">
           <span class="onboarding-dot active" data-dot="0"></span>
           <span class="onboarding-dot" data-dot="1"></span>
-        </div>
-        <div class="onboarding-nav">
-          <button type="button" class="btn-onboarding-glass" id="btnOnboardingNext">Next: How It Works →</button>
         </div>
       </div>
     </div>
@@ -5298,13 +5320,14 @@ function applyJurisdictionFromQueryString(){
   if (params.get('claim') === 'admin') pendingAdminClaimFromLink = true;
 }
 
-// CITIXEN UX™ splash / Welcome Hero — the primary launch state on app
-// initialization, and (Patch 4.8) the state the citizen also lands back on
-// after dismissing the Front Door Onboarding deck. No timer ever
-// auto-hides it any more: it stays up until a tap (hideSplash, the
-// backdrop-dismiss path) or the CTA (handleSplashCta, a deliberate "go to
-// the form" action) — see startPostUnlockLanding()'s own comment for why
-// an automatic timer was removed in the first place.
+// CITIXEN UX™ Welcome Hero — Step 3 of the Patch 4.11 strict 4-step alpha
+// entrance sequencer (Step 1 Passcode Gate -> Step 2 Front Door Onboarding
+// carousel -> Step 3 this Hero -> Step 4 the intake form). It never shows
+// at the same time as Step 2, and never auto-advances on a timer: only an
+// explicit action moves the sequence forward (the onboarding deck's own
+// "Continue"/"Got it" buttons finish Step 2 and reveal this Hero; this
+// Hero's own "Enter App" CTA, handled below, is the only thing that
+// advances it into Step 4).
 function hideSplash(){
   const splash = document.getElementById('splashScreen');
   if (splash) splash.classList.add('hide');
@@ -5314,36 +5337,39 @@ function showWelcomeHero(){
   if (splash) splash.classList.remove('hide');
 }
 
-// Starts the splash/Welcome Hero (shown immediately, with no auto-hide
-// timer any more — see hideSplash()'s comment) and, separately, the Front
-// Door Onboarding auto-open timer. Called once — either immediately on
-// load if the passcode gate is already unlocked, or from
-// initCitixenGate()'s submit handler the moment CITIXEN01 is accepted —
-// so a gated visitor always lands squarely on the Welcome Hero on unlock,
-// and the onboarding deck (and, after Patch 4.8, the report form behind
-// it) never auto-opens and nothing auto-focuses, while the gate is still up.
+// Drives Steps 2 and 3 of the sequencer the moment Step 1 (the passcode
+// gate) succeeds — called once, either immediately on load if the gate was
+// already unlocked in an earlier visit, or from initCitixenGate()'s submit
+// handler the instant CITIXEN01 is accepted. No timers anywhere in this
+// function: Step 2 (if not yet seen on this device) opens immediately and
+// Step 3 only appears once Step 2 reports itself complete (see
+// closeFrontDoorOnboarding()) — the two screens are never shown together.
 let postUnlockLandingStarted = false;
 function startPostUnlockLanding(){
   if (postUnlockLandingStarted) return;
   postUnlockLandingStarted = true;
 
-  const splash = document.getElementById('splashScreen');
-  if (splash) splash.addEventListener('click', hideSplash);
-
-  // Front Door Onboarding opens shortly after unlock, on top of the
-  // Welcome Hero — once per device, never interrupting a returning beta
-  // tester. The Hero sits at a higher z-index than the onboarding deck (see
-  // .splash-screen/.confirm-drawer), so it's hidden for that one moment
-  // right as the deck opens, then restored (see closeFrontDoorOnboarding())
-  // once the citizen dismisses it, rather than jumping straight to the form.
   let onboardingSeen = false;
   try { onboardingSeen = localStorage.getItem(ONBOARDING_SEEN_KEY) === '1'; } catch (e) { /* storage blocked — treat as unseen */ }
-  // Arrived via report.html's "Connect District →" wedge (?claim=admin) —
-  // open the same Admin Light claim flow directly, skipping the citizen
-  // onboarding deck (an official clicking that link already knows what
-  // this app is; showing both at once would just be clutter).
-  if (pendingAdminClaimFromLink) setTimeout(() => { hideSplash(); openAdminLightClaim(); }, 1700);
-  else if (!onboardingSeen) setTimeout(() => { hideSplash(); openFrontDoorOnboarding(); }, 1700);
+
+  if (pendingAdminClaimFromLink) {
+    // Arrived via report.html's "Connect District →" wedge (?claim=admin)
+    // — open the Admin Light claim flow directly. This is a separate,
+    // staff-only entrance, not a step in the citizen alpha sequencer: an
+    // official clicking that link already knows what this app is, so the
+    // beta-tester onboarding/Hero steps would just be clutter for them.
+    hideSplash();
+    openAdminLightClaim();
+  } else if (!onboardingSeen) {
+    // Step 2: Front Door Onboarding carousel, shown immediately — the
+    // Hero (Step 3) is kept hidden until Step 2 reports completion.
+    hideSplash();
+    openFrontDoorOnboarding();
+  } else {
+    // Returning tester — Step 2 was already completed on this device, so
+    // the sequence resumes at Step 3.
+    showWelcomeHero();
+  }
 }
 
 // ===== FRONT DOOR ONBOARDING — "Private Beta" 2-card notice =====
@@ -5358,25 +5384,22 @@ function renderOnboardingSlide(){
   document.querySelectorAll('.onboarding-slide').forEach(el => {
     el.classList.toggle('active', Number(el.dataset.slide) === onboardingSlideIndex);
   });
+  // Dots are a pure progress indicator now (Patch 4.11 strict sequencer) —
+  // they no longer have click handlers to jump ahead or back.
   document.querySelectorAll('.onboarding-dot').forEach(el => {
     el.classList.toggle('active', Number(el.dataset.dot) === onboardingSlideIndex);
   });
-  // Card 2 has its own in-card "Start Test Report" CTA, so the shared nav
-  // row (just "Next: How It Works →") only shows on card 1.
-  document.querySelector('.onboarding-nav').style.display = (onboardingSlideIndex === ONBOARDING_SLIDE_COUNT - 1) ? 'none' : '';
 }
 function openFrontDoorOnboarding(){
   onboardingSlideIndex = 0;
   renderOnboardingSlide();
   document.getElementById('frontDoorOnboardingModal').classList.add('open');
 }
-// Patch 4.8: dismissing the onboarding deck (any path — Start Test Report,
-// the X, or tapping the backdrop) no longer jumps straight into the report
-// form. It lands back on the Welcome Hero (the splash screen, now
-// persistent — see showWelcomeHero()), with its own explicit "+ Log
-// Infrastructure Issue" CTA (handleSplashCta()) for the citizen to tap
-// when they're actually ready, rather than being auto-scrolled/auto-focused
-// into a form they may not have asked for yet.
+// Step 2 -> Step 3 of the Patch 4.11 sequencer: completing the onboarding
+// deck (its only exit — slide B's "Got it") marks it seen and reveals the
+// Welcome Hero. There is no other way to close this modal any more: no
+// "✕", no backdrop-dismiss, no dot-jump — see the markup's own comment for
+// why ("enforce strict" sequencing means completion-gated, not skippable).
 function closeFrontDoorOnboarding(markSeen){
   document.getElementById('frontDoorOnboardingModal').classList.remove('open');
   if (markSeen) {
@@ -5384,24 +5407,18 @@ function closeFrontDoorOnboarding(markSeen){
   }
   showWelcomeHero();
 }
+// Slide A's "Continue" — the only other id this button needs; slide B's
+// "Got it" (btnOnboardingStart below) is the deck's sole completion exit.
 document.getElementById('btnOnboardingNext').addEventListener('click', () => {
   if (onboardingSlideIndex < ONBOARDING_SLIDE_COUNT - 1) { onboardingSlideIndex++; renderOnboardingSlide(); }
-});
-document.getElementById('btnOnboardingClose').addEventListener('click', () => closeFrontDoorOnboarding(true));
-document.getElementById('frontDoorOnboardingModal').addEventListener('click', (e) => {
-  if (e.target.id === 'frontDoorOnboardingModal') closeFrontDoorOnboarding(true);
-});
-document.querySelectorAll('#onboardingDots .onboarding-dot').forEach(dot => {
-  dot.addEventListener('click', () => { onboardingSlideIndex = Number(dot.dataset.dot); renderOnboardingSlide(); });
 });
 document.getElementById('btnOnboardingStart').addEventListener('click', () => {
   closeFrontDoorOnboarding(true);
 });
-// Welcome Hero CTA — the one deliberate action that actually jumps to the
-// report form and focuses it; stopPropagation keeps the splash's own
-// tap-anywhere-to-dismiss handler from also firing on this same tap.
-document.getElementById('btnSplashLogIssue').addEventListener('click', (e) => {
-  e.stopPropagation();
+// Welcome Hero CTA (Step 3 -> Step 4) — "Enter App" is now the only way
+// off the Hero (Patch 4.11 removed the old tap-anywhere-to-dismiss
+// affordance to keep the sequencer strict/completion-gated throughout).
+document.getElementById('btnEnterApp').addEventListener('click', () => {
   hideSplash();
   switchTab('tab-report', document.querySelector('.navtab[data-target="tab-report"]'));
   const repDescEl = document.getElementById('repDesc');
