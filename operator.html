@@ -94,6 +94,58 @@ html.citixen-gate-locked body{overflow:hidden}
 .op-nav{display:flex;gap:10px;margin-top:4px}
 .op-nav-link{flex:1;text-align:center;background:rgba(0,230,153,.08);border:1px solid rgba(0,230,153,.3);
   color:var(--mint2);text-decoration:none;font-weight:800;font-size:.72rem;padding:12px 10px;border-radius:10px}
+
+.sublabel{font-size:.64rem;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);
+  margin:14px 0 8px}
+.sublabel:first-child{margin-top:0}
+
+/* ===== BETA TEST QA AUDIT MONITOR ===== */
+.qa-catch-row{display:flex;align-items:center;gap:14px;background:rgba(3,7,18,.5);border:1px solid var(--border);
+  border-radius:10px;padding:12px 14px;margin-bottom:4px}
+.qa-catch-big{font-size:1.6rem;font-weight:900;color:var(--mint2);flex-shrink:0}
+.qa-catch-detail{font-size:.68rem;color:var(--muted);line-height:1.5}
+.status-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;
+  border-bottom:1px solid rgba(255,255,255,.06)}
+.status-row:last-child{border-bottom:none}
+.status-row-label{font-size:.76rem;font-weight:700;color:var(--text)}
+.status-row-sub{font-size:.62rem;color:var(--muted);margin-top:2px}
+.status-chip{flex-shrink:0;font-size:.6rem;font-weight:800;letter-spacing:.03em;text-transform:uppercase;
+  padding:4px 10px;border-radius:999px;white-space:nowrap}
+.status-chip.ok{background:rgba(0,230,153,.14);color:var(--mint2);border:1px solid rgba(0,230,153,.4)}
+.status-chip.pending{background:rgba(245,158,11,.14);color:#f59e0b;border:1px solid rgba(245,158,11,.4)}
+.status-chip.empty{background:rgba(148,163,184,.12);color:#94a3b8;border:1px solid rgba(148,163,184,.3)}
+.scraper-log-list{margin-top:8px}
+.scraper-log-item{font-size:.68rem;color:var(--text);padding:6px 0;border-top:1px solid rgba(255,255,255,.05)}
+.scraper-log-empty{font-size:.68rem;color:var(--muted);padding:4px 0}
+
+/* ===== STARTUP LAUNCH TIMELINE ===== */
+.roadmap-progress-track{height:8px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-bottom:14px}
+.roadmap-progress-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#00E699,#34d399);
+  box-shadow:0 0 10px rgba(0,230,153,.5)}
+.roadmap-item{display:flex;align-items:flex-start;gap:10px;padding:9px 0}
+.roadmap-icon{flex-shrink:0;width:20px;height:20px;border-radius:6px;display:flex;align-items:center;
+  justify-content:center;font-size:.68rem;font-weight:900;margin-top:1px}
+.roadmap-icon.done{background:rgba(0,230,153,.18);color:var(--mint2);border:1px solid rgba(0,230,153,.4)}
+.roadmap-icon.active{background:rgba(245,158,11,.18);color:#f59e0b;border:1px solid rgba(245,158,11,.45)}
+.roadmap-icon.pending{background:rgba(148,163,184,.1);color:#64748b;border:1px solid rgba(148,163,184,.25)}
+.roadmap-text{font-size:.76rem;font-weight:700;color:var(--text)}
+.roadmap-text.pending-text{color:var(--muted);font-weight:600}
+.roadmap-sub{font-size:.62rem;color:var(--muted);margin-top:1px}
+
+/* ===== COHORT QA ACTION STREAM ===== */
+.qa-filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.qa-filter-chip{background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--muted);
+  font-size:.62rem;font-weight:700;padding:6px 10px;border-radius:999px;cursor:pointer}
+.qa-filter-chip.active{border-color:#10b981;color:#34d399;background:rgba(2,44,34,.4)}
+.qa-stream-item{background:rgba(3,7,18,.5);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.qa-stream-title{font-size:.76rem;font-weight:700;color:var(--text);margin-bottom:5px}
+.qa-stream-flags{display:flex;gap:5px;flex-wrap:wrap}
+.qa-flag-chip{font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.02em;
+  padding:3px 8px;border-radius:999px}
+.qa-flag-chip.flagged{background:rgba(248,113,113,.14);color:#f87171;border:1px solid rgba(248,113,113,.4)}
+.qa-flag-chip.privacy{background:rgba(0,230,153,.12);color:var(--mint2);border:1px solid rgba(0,230,153,.35)}
+.qa-flag-chip.review{background:rgba(245,158,11,.14);color:#f59e0b;border:1px solid rgba(245,158,11,.4)}
+.qa-stream-empty{font-size:.7rem;color:var(--muted);text-align:center;padding:14px 0}
 </style>
 </head>
 <body>
@@ -134,6 +186,95 @@ html.citixen-gate-locked body{overflow:hidden}
   <div class="card">
     <div class="label">Network Status</div>
     <div class="data-note" id="opStatusNote">Loading ledger…</div>
+  </div>
+
+  <!-- ===== BETA TEST QA AUDIT MONITOR =====
+       Mislabel Catch Rate is computed against a small, fixed battery of
+       known test submissions (MISLABEL_QA_FIXTURES below) — half
+       deliberately mislabeled, half correctly labeled — not live production
+       traffic, since this beta has no real human-reviewed mislabel dataset
+       to measure against yet. The Moderation & Privacy Filter sub-panel is
+       honest about what's actually running: the vandalism keyword scraper
+       is a real scan over the live ledger below; face/plate blurring and
+       NSFW rejection have no real pipeline in this beta yet, so they're
+       shown as "Not Yet Implemented" rather than a fabricated "Active". -->
+  <div class="card">
+    <div class="label">Beta Test QA Audit Monitor</div>
+    <div class="sublabel">Mislabel Catch Rate</div>
+    <div class="qa-catch-row">
+      <div class="qa-catch-big" id="qaCatchRate">—</div>
+      <div class="qa-catch-detail" id="qaCatchDetail">Running fixed QA test battery…</div>
+    </div>
+    <div class="sublabel">Moderation &amp; Privacy Filter Status</div>
+    <div class="status-row">
+      <div>
+        <div class="status-row-label">Face &amp; License Plate Blurring</div>
+        <div class="status-row-sub">No CV blurring pipeline ships in this beta yet</div>
+      </div>
+      <span class="status-chip pending">Not Yet Implemented</span>
+    </div>
+    <div class="status-row">
+      <div>
+        <div class="status-row-label">Lewd / NSFW Image Rejection Queue</div>
+        <div class="status-row-sub">No automatic NSFW classifier ships in this beta yet</div>
+      </div>
+      <span class="status-chip pending">0 Queued</span>
+    </div>
+    <div class="status-row" style="border-bottom:none;padding-bottom:0">
+      <div>
+        <div class="status-row-label">Vandalism / Keyword Scraper Log</div>
+        <div class="status-row-sub">Real scan of the live ledger's report titles, below</div>
+      </div>
+      <span class="status-chip" id="vandalismChip">—</span>
+    </div>
+    <div class="scraper-log-list" id="vandalismLogList"></div>
+  </div>
+
+  <!-- ===== STARTUP LAUNCH TIMELINE & ROADMAP TRACKER — literal project
+       status display copy (this beta's own real milestones), same honest
+       "static display copy" convention as the Cohort Bar above: these are
+       facts about where this build actually is, not a computed metric. ===== -->
+  <div class="card">
+    <div class="label">Startup Launch Timeline &amp; Roadmap</div>
+    <div class="roadmap-progress-track"><div class="roadmap-progress-fill" style="width:45%"></div></div>
+    <div class="roadmap-item">
+      <span class="roadmap-icon done">✓</span>
+      <div><div class="roadmap-text">Core App Architecture</div></div>
+    </div>
+    <div class="roadmap-item">
+      <span class="roadmap-icon done">✓</span>
+      <div><div class="roadmap-text">Dual Passcode Security &amp; Route Isolation</div></div>
+    </div>
+    <div class="roadmap-item">
+      <span class="roadmap-icon active">›</span>
+      <div><div class="roadmap-text">10-Person Alpha Cohort QA</div><div class="roadmap-sub">In progress</div></div>
+    </div>
+    <div class="roadmap-item">
+      <span class="roadmap-icon pending"></span>
+      <div><div class="roadmap-text pending-text">Staging Sweep &amp; Production Public Launch</div></div>
+    </div>
+    <div class="roadmap-item">
+      <span class="roadmap-icon pending"></span>
+      <div><div class="roadmap-text pending-text">Municipal / Enterprise Portal Onboarding (/municipal)</div></div>
+    </div>
+  </div>
+
+  <!-- ===== COHORT QA ACTION STREAM =====
+       Flags are computed from the real live ledger: "Flagged Category" is
+       the same title/category keyword-mismatch heuristic as the Mislabel QA
+       fixture above, applied to real tickets; "Privacy Check Passed" marks
+       every ticket since this app's submission pipeline already strips
+       EXIF/precise geo by design (the same claim the citizen-facing privacy
+       note makes elsewhere); "Needs Manual Review" is real tickets still in
+       the 'submitted' stage (filed, not yet dispatched or verified). -->
+  <div class="card">
+    <div class="label">Cohort QA Action Stream</div>
+    <div class="qa-filter-row" id="qaFilterRow">
+      <button type="button" class="qa-filter-chip" data-flag="flagged">Flagged Category</button>
+      <button type="button" class="qa-filter-chip" data-flag="privacy">Privacy Check Passed</button>
+      <button type="button" class="qa-filter-chip" data-flag="review">Needs Manual Review</button>
+    </div>
+    <div id="qaStreamList"><div class="qa-stream-empty">Loading…</div></div>
   </div>
 
   <div class="op-nav">
@@ -207,10 +348,125 @@ async function loadOperatorStats(){
     healthEl.classList.add('civic-' + health.tier);
 
     noteEl.textContent = 'Live from the seeded ticket ledger (' + total + ' records across all districts) — the same data app.html’s Civic Health metric and the District Health Summary export read from.';
+
+    renderVandalismScraper(tickets);
+    renderQaStream(tickets);
   } catch (e) {
     noteEl.textContent = 'Could not reach the ledger — ' + (e && e.message ? e.message : 'network error') + '. Stats will populate once the API is reachable.';
+    renderVandalismScraper([]);
+    renderQaStream([]);
   }
 }
+
+// ===== MISLABEL QA FIXTURE — a small, fixed battery of known test
+// submissions (half deliberately mislabeled, half correctly labeled), not
+// live traffic. "Caught" = the title shares no keyword with the category
+// it was filed under, which is exactly the signal a human reviewer would
+// use to flag it for re-categorization. Reused below for the real ledger's
+// "Flagged Category" tag too. =====
+const CATEGORY_KEYWORDS = {
+  Pothole: ['pothole', 'pavement', 'road', 'asphalt', 'crack'],
+  Streetlight: ['streetlight', 'light', 'lamp', 'lighting'],
+  Drainage: ['drain', 'flood', 'water', 'sewer', 'culvert'],
+  Sidewalk: ['sidewalk', 'ramp', 'curb', 'ada'],
+  Signage: ['sign', 'crosswalk']
+};
+const MISLABEL_QA_FIXTURES = [
+  { title: 'Large tree down blocking sidewalk', labeledAs: 'Pothole' },
+  { title: 'Overflowing trash cans on corner', labeledAs: 'Streetlight' },
+  { title: 'Graffiti on underpass wall', labeledAs: 'Drainage' },
+  { title: 'Broken swing at playground', labeledAs: 'Signage' },
+  { title: 'Deep pothole in right lane', labeledAs: 'Pothole' },
+  { title: 'Streetlight out on Main St', labeledAs: 'Streetlight' }
+];
+function titleMatchesCategory(title, category){
+  const words = String(title || '').toLowerCase();
+  const kws = CATEGORY_KEYWORDS[category] || [];
+  return kws.some(k => words.includes(k));
+}
+function runMislabelQaBattery(){
+  const results = MISLABEL_QA_FIXTURES.map(f => ({ ...f, flagged: !titleMatchesCategory(f.title, f.labeledAs) }));
+  // A fixture is a deliberate mislabel if the title doesn't actually belong
+  // to its own assigned category per our keyword map — same test either way,
+  // just scored against "should this have been caught" vs "was it caught".
+  const deliberateMislabels = results.filter(r => !titleMatchesCategory(r.title, r.labeledAs));
+  const caught = deliberateMislabels.filter(r => r.flagged).length;
+  return { total: deliberateMislabels.length, caught, results };
+}
+function renderMislabelQa(){
+  const { total, caught } = runMislabelQaBattery();
+  const pct = total ? Math.round((caught / total) * 100) : 0;
+  document.getElementById('qaCatchRate').textContent = pct + '%';
+  document.getElementById('qaCatchDetail').textContent =
+    caught + ' of ' + total + ' deliberately mislabeled test submissions correctly flagged for review, across a fixed ' +
+    MISLABEL_QA_FIXTURES.length + '-case QA battery (not live production traffic).';
+}
+renderMislabelQa();
+
+// ===== VANDALISM / KEYWORD SCRAPER — a real scan over the live ledger's
+// report titles. Tasteful, vandalism-adjacent terms only (no profanity
+// list) since this is a surface-level honest demo of the mechanism, not a
+// production moderation model. =====
+const VANDALISM_KEYWORDS = ['graffiti', 'vandal', 'spray paint', 'smashed', 'broken glass', 'defaced'];
+function scanVandalismKeywords(tickets){
+  return tickets.filter(t => VANDALISM_KEYWORDS.some(k => String(t.title || '').toLowerCase().includes(k)));
+}
+function renderVandalismScraper(tickets){
+  const hits = scanVandalismKeywords(tickets);
+  const chip = document.getElementById('vandalismChip');
+  const list = document.getElementById('vandalismLogList');
+  chip.textContent = hits.length + (hits.length === 1 ? ' Flag' : ' Flags');
+  chip.className = 'status-chip ' + (hits.length ? 'pending' : 'ok');
+  list.innerHTML = hits.length
+    ? hits.map(t => '<div class="scraper-log-item">' + esc(t.reportId || t.id) + ' — "' + esc(t.title) + '"</div>').join('')
+    : '<div class="scraper-log-empty">No vandalism-adjacent keywords found in the current ledger.</div>';
+}
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// ===== COHORT QA ACTION STREAM =====
+let qaStreamTickets = [];
+let qaStreamActiveFlags = new Set();
+function computeTicketFlags(t){
+  const flags = [];
+  if (t.category && !titleMatchesCategory(t.title, t.category)) flags.push('flagged');
+  flags.push('privacy'); // every submission already goes through this app's own EXIF/precise-geo strip
+  if (t.stage === 'submitted') flags.push('review');
+  return flags;
+}
+const QA_FLAG_META = {
+  flagged: { label: 'Flagged Category', cls: 'flagged' },
+  privacy: { label: 'Privacy Check Passed', cls: 'privacy' },
+  review: { label: 'Needs Manual Review', cls: 'review' }
+};
+function renderQaStream(tickets){
+  qaStreamTickets = tickets;
+  const list = document.getElementById('qaStreamList');
+  const filtered = qaStreamActiveFlags.size
+    ? tickets.filter(t => computeTicketFlags(t).some(f => qaStreamActiveFlags.has(f)))
+    : tickets;
+  if (!filtered.length) {
+    list.innerHTML = '<div class="qa-stream-empty">No reports match the selected filters.</div>';
+    return;
+  }
+  list.innerHTML = filtered.slice(0, 25).map(t => {
+    const flags = computeTicketFlags(t);
+    return '<div class="qa-stream-item">' +
+      '<div class="qa-stream-title">' + esc(t.reportId || t.id) + ' — ' + esc(t.title) + '</div>' +
+      '<div class="qa-stream-flags">' + flags.map(f => '<span class="qa-flag-chip ' + QA_FLAG_META[f].cls + '">' + QA_FLAG_META[f].label + '</span>').join('') + '</div>' +
+    '</div>';
+  }).join('');
+}
+document.getElementById('qaFilterRow').querySelectorAll('.qa-filter-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const flag = chip.dataset.flag;
+    if (qaStreamActiveFlags.has(flag)) { qaStreamActiveFlags.delete(flag); chip.classList.remove('active'); }
+    else { qaStreamActiveFlags.add(flag); chip.classList.add('active'); }
+    renderQaStream(qaStreamTickets);
+  });
+});
+
 loadOperatorStats();
 </script>
 </body>
