@@ -5,7 +5,7 @@
    - Cross-origin requests (map tiles, Leaflet CDN, QR images) pass straight through:
      they are not cached here, so no third-party responses are stored on the device.
    Bump VERSION to roll out a new shell; old caches are deleted on activate. */
-const VERSION = 'citixen-v5-master-release';
+const VERSION = 'citixen-v9-launch-candidate';
 const SHELL = [
   '/app',
   '/',

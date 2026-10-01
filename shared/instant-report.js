@@ -298,10 +298,14 @@
         '<div class="cx-body">' +
           '<div id="cxPane-pdf"></div>' +
         '</div>' +
+        '<div class="cx-scroll-hint" id="cxScrollHint" aria-hidden="true">' +
+          '<span class="cx-scroll-hint-text">↓ Scroll for Export &amp; Sharing Options</span>' +
+        '</div>' +
       '</div>';
     document.body.appendChild(modal);
     modal.querySelector('.cx-close').addEventListener('click', close);
     modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
+    modal.querySelector('.cx-body').addEventListener('scroll', updateScrollHint);
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'Escape' || !modal.classList.contains('open')) return;
       // Escape closes the top-most export sheet first, then the Brief.
@@ -332,6 +336,23 @@
     modal.querySelector('#cxJuris').textContent = cityStateLabel(data);
     renderPdfPane();
     modal.querySelector('.cx-close').focus();
+    updateScrollHint();
+    // Content height can still settle a tick later (fonts/layout), so check
+    // again once rendering has fully flushed rather than relying on a
+    // single synchronous read.
+    setTimeout(updateScrollHint, 60);
+  }
+
+  // Shows "↓ Scroll for Export & Sharing Options" while .cx-body has more
+  // content below the visible area, hides it once scrolled within 24px of
+  // the bottom (or if the content never overflowed in the first place) —
+  // a real scroll-position check, not a timed auto-hide.
+  function updateScrollHint() {
+    if (!modal) return;
+    var body = modal.querySelector('.cx-body'), hint = modal.querySelector('#cxScrollHint');
+    if (!body || !hint) return;
+    var hasMore = (body.scrollHeight - body.scrollTop - body.clientHeight) > 24;
+    hint.classList.toggle('visible', hasMore);
   }
 
   function close() {
@@ -532,7 +553,7 @@
           '<div class="cx-audit-status" id="cxAuditStatus"></div>' +
           '<div class="cx-seg" role="tablist" aria-label="Export format">' +
             '<button type="button" role="tab" class="cx-seg-btn" data-tab="pdf" id="cxTab-pdf" aria-controls="cxTabPane-pdf"><b>Official PDF</b><small>Print &amp; Email Ready</small></button>' +
-            '<button type="button" role="tab" class="cx-seg-btn" data-tab="graphic" id="cxTab-graphic" aria-controls="cxTabPane-graphic"><b>1:1 Social Graphic</b><small>High Brand Integrity</small></button>' +
+            '<button type="button" role="tab" class="cx-seg-btn" data-tab="graphic" id="cxTab-graphic" aria-controls="cxTabPane-graphic"><b>1:1 Social Graphic</b><small>Social Media Ready</small></button>' +
             '<button type="button" role="tab" class="cx-seg-btn" data-tab="text" id="cxTab-text" aria-controls="cxTabPane-text"><b>Copy Text &amp; Link</b><small>Direct Messaging</small></button>' +
           '</div>' +
           '<div class="cx-sheet-body">' +
@@ -627,7 +648,7 @@
     ];
     if (appendLedgerSummary) {
       lines.push(
-        'LIVING LEDGER™ AUDIT SUMMARY — ' + cityStateLabel(d) + (d.wardLabel ? ' ' + d.wardLabel : '') + ' Zone',
+        'LIVING LEDGER™ AUDIT SUMMARY — ' + cityStateLabel(d),
         '• Zone Health Score: ' + (score != null ? score + '/10' : 'N/A') + ' | Resolved: ' + (d.total ? d.resolved + '/' + d.total : 'N/A') + ' | Coverage: ' + pctText(d.coveragePct),
         ''
       );
@@ -1086,19 +1107,24 @@
     rr(ctx, 30, 30, W - 60, W - 60, 36); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,230,153,0.55)'; ctx.stroke();
     ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
 
-    // ---- Header: glowing FREE CIVIC REPORT + location ----
+    // ---- Brand header: CITIXEN UX™ + Civic Intelligence Protocol, above
+    // the glowing FREE CIVIC REPORT headline + location ----
+    ctx.font = font(900, 30); ctx.fillStyle = MINT;
+    ctx.fillText('CITIXEN UX™', W / 2, 52);
+    ctx.font = font(700, 17); ctx.fillStyle = SLATE;
+    ctx.fillText('CIVIC INTELLIGENCE PROTOCOL', W / 2, 80);
     ctx.save();
-    ctx.font = font(900, 52); ctx.fillStyle = MINT;
-    ctx.shadowColor = 'rgba(0,230,153,0.65)'; ctx.shadowBlur = 22;
-    ctx.fillText('FREE CIVIC REPORT', W / 2, 100);
-    ctx.shadowColor = 'rgba(0,230,153,0.3)'; ctx.shadowBlur = 44;
-    ctx.fillText('FREE CIVIC REPORT', W / 2, 100);
+    ctx.font = font(900, 46); ctx.fillStyle = MINT;
+    ctx.shadowColor = 'rgba(0,230,153,0.65)'; ctx.shadowBlur = 20;
+    ctx.fillText('FREE CIVIC REPORT', W / 2, 128);
+    ctx.shadowColor = 'rgba(0,230,153,0.3)'; ctx.shadowBlur = 40;
+    ctx.fillText('FREE CIVIC REPORT', W / 2, 128);
     ctx.restore();
     ctx.font = font(700, 22); ctx.fillStyle = SLATE;
-    ctx.fillText(cityStateLabel(d).toUpperCase() + '  •  ' + shortDate(generatedAt), W / 2, 148);
+    ctx.fillText(cityStateLabel(d).toUpperCase() + '  •  ' + shortDate(generatedAt), W / 2, 174);
 
     // ---- Living Ledger™ Snapshot panel ----
-    var px = 70, pw = W - 140, py = 190, ph = 360;
+    var px = 70, pw = W - 140, py = 208, ph = 352;
     rr(ctx, px, py, pw, ph, 26); ctx.fillStyle = '#000000'; ctx.fill();
     ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,230,153,0.35)'; ctx.stroke();
     ctx.font = font(800, 24); ctx.fillStyle = MINT;
@@ -1255,6 +1281,18 @@
     open: open,
     sharePlatform: sharePlatform,
     icon: icon,
-    renderCipList: function (el, projects) { if (el) el.innerHTML = cipListHtml(projects || [], true); }
+    renderCipList: function (el, projects) { if (el) el.innerHTML = cipListHtml(projects || [], true); },
+    // Exposes the exact Avg Fix Speed / Resolution Rate / State Rank figures
+    // the Civic Brief's "Civic Performance Metrics" row shows, for any other
+    // live-metrics display (e.g. app.html's dashboard ticker) to mirror
+    // without re-deriving the formulas a second time.
+    metricsFor: function (d) {
+      return {
+        avgFixSpeed: avgHoursText(d),
+        resolutionRate: resolutionRate(d),
+        stateRankValue: stateRankValue(d.ranks),
+        stateRankLabel: stateRankHeaderLabel(d.ranks).toUpperCase()
+      };
+    }
   };
 })();

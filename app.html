@@ -223,6 +223,11 @@ textarea.input{resize:none;line-height:1.4}
 .metrics-ticker-row{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;font-size:.66rem;font-weight:700;color:#FFFFFF;text-transform:uppercase;letter-spacing:.04em;font-variant-numeric:tabular-nums}
 .metrics-ticker-row b{color:#00E699;font-size:.86rem;font-weight:800}
 .metrics-ticker-sep{color:#334155}
+.metrics-ticker-row-3col{flex-wrap:nowrap;align-items:stretch}
+.metrics-ticker-col{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center}
+.metrics-ticker-col b{font-size:.92rem}
+.metrics-ticker-col span{font-size:.54rem;font-weight:700;letter-spacing:.06em;color:#94A3B8;white-space:normal}
+.metrics-ticker-divider{width:1px;align-self:stretch;background:rgba(255,255,255,.14);margin:0 10px}
 @media (prefers-reduced-motion:reduce){.metrics-ticker-dot{animation:none}}
 .feed-cat{display:inline-block;font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94A3B8;
   border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:1px 8px;margin-bottom:4px}
@@ -547,7 +552,7 @@ textarea.input{resize:none;line-height:1.4}
 .citizen-dashboard-subheader .cds-white{color:#FFFFFF}
 /* Glow matches .csap-title (CROWD SAVE AMERICA™'s own heading) 1:1 —
    same mint, same text-shadow spread. */
-.citizen-dashboard-subheader .cds-mint{color:#00E699;text-shadow:0 0 14px rgba(0,230,153,.4)}
+.citizen-dashboard-subheader .cds-mint{color:#00E699;text-shadow:0 0 12px rgba(52,211,153,.8),0 0 24px rgba(52,211,153,.4)}
 .hero-tagline-subtle{text-align:center;color:#94A3B8;font-size:.88rem;
   max-width:520px;margin:0 auto 20px;padding:0 24px}
 .telemetry-scorecard-card{display:block;width:100%;max-width:640px;text-align:left;
@@ -587,14 +592,19 @@ textarea.input{resize:none;line-height:1.4}
    narrative-link/Learn-More styles were all removed this round along
    with their markup — that content now lives in the hamburger drawer's
    "Explore CITIXEN UX™ Features" section. */
-.citixen-trust-badge{display:flex;align-items:flex-start;gap:12px;max-width:640px;width:100%;
+.citixen-trust-badge{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;gap:12px;max-width:640px;width:100%;
   box-sizing:border-box;margin:0 auto 18px;
   background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));border:var(--surface-card-border);
   border-radius:12px;padding:14px 16px}
+.citixen-trust-badge-head{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;text-align:center;width:100%}
+@media (min-width:640px){.citixen-trust-badge-head{flex-direction:row}}
 .citixen-trust-badge svg{flex-shrink:0;margin-top:2px}
 .citixen-trust-badge-title{color:#00E699;font-weight:800;font-size:.78rem;letter-spacing:.02em;
-  text-transform:uppercase;line-height:1.4;margin-bottom:4px}
-.citixen-trust-badge-sub{color:var(--muted);font-size:.76rem;line-height:1.45}
+  text-transform:uppercase;line-height:1.4;margin-bottom:4px;text-align:center}
+.citixen-trust-badge-sub{color:var(--muted);font-size:.76rem;line-height:1.45;
+  text-align:center;max-width:480px;margin:0 auto}
 /* ===== CROWD SAVE AMERICA™ MAP CARD (from the entry pop-up) ===== */
 .csa-map{display:block;width:100%;height:auto}
 .csa-dot{animation:csa-twinkle 4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
@@ -923,12 +933,16 @@ textarea.input{resize:none;line-height:1.4}
         <div class="label">Live Dispatch Feed</div>
         <div class="metrics-ticker" id="appScorecardCard" aria-live="polite">
           <div class="metrics-ticker-head"><span class="metrics-ticker-dot" aria-hidden="true"></span><span id="appScorecardLabel">CITYWIDE LIVE METRICS</span></div>
-          <div class="metrics-ticker-row">
-            <span><b id="appScorecardTotal">—</b> Reports Filed</span>
-            <span class="metrics-ticker-sep" aria-hidden="true">•</span>
-            <span><b id="appScorecardRate">—</b> Resolved</span>
-            <span class="metrics-ticker-sep" aria-hidden="true">•</span>
-            <span><b id="appScorecardOpen">—</b> Open Dispatches</span>
+          <!-- 3-part layout mirrors the Civic Brief's own "Civic Performance
+               Metrics" row 1:1 (same avgHoursText()/resolutionRate()/
+               stateRankValue() figures, via CitixenInstantReport.metricsFor()
+               — never a second formula). -->
+          <div class="metrics-ticker-row metrics-ticker-row-3col">
+            <div class="metrics-ticker-col"><b id="appScorecardAvgFix">—</b><span>AVG. FIX SPEED</span></div>
+            <span class="metrics-ticker-divider" aria-hidden="true"></span>
+            <div class="metrics-ticker-col"><b id="appScorecardResRate">—</b><span>RESOLUTION RATE</span></div>
+            <span class="metrics-ticker-divider" aria-hidden="true"></span>
+            <div class="metrics-ticker-col"><b id="appScorecardRank">—</b><span id="appScorecardRankLbl">STATE RANK</span></div>
           </div>
         </div>
         <div id="feed"></div>
@@ -954,7 +968,7 @@ textarea.input{resize:none;line-height:1.4}
     <section id="tab-analytics" class="tabpane">
 
       <!-- 2. HERO HEADER -->
-      <p class="citizen-dashboard-subheader"><span class="cds-white">Citixen</span> <span class="cds-mint">Dashboard</span></p>
+      <p class="citizen-dashboard-subheader"><span class="cds-white">Citixen</span> <span class="cds-mint" style="text-shadow:0 0 12px rgba(52,211,153,.8),0 0 24px rgba(52,211,153,.4)">Dashboard</span></p>
 
       <!-- 3. ELEVATED PRIMARY HERO MODULE — [ EXPORT & SHARE ]. Rendered by
            shared/instant-report.js (same markup as index.html). "Instant
@@ -1117,11 +1131,11 @@ textarea.input{resize:none;line-height:1.4}
 
       <!-- 9. ZERO-KNOWLEDGE PRIVACY CARD -->
       <div class="citixen-trust-badge">
-        <svg viewBox="0 0 24 24" width="20" height="20" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-        <div>
+        <div class="citixen-trust-badge-head">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
           <div class="citixen-trust-badge-title">Zero-Knowledge &amp; EXIF-Scrubbed — 100% Anonymous Civic Proof</div>
-          <div class="citixen-trust-badge-sub">No personal data is retained. Photo metadata is scrubbed at the device before it ever reaches the public ledger.</div>
         </div>
+        <div class="citixen-trust-badge-sub">No personal data is retained. Photo metadata is scrubbed at the device before it ever reaches the public ledger.</div>
       </div>
 
       <!-- 11. PERSISTENT FOOTER — the app shell's bottom tab bar is fixed in
@@ -2498,28 +2512,45 @@ function renderAppScorecardTimestamp(){
   const el = document.getElementById('appScorecardTimestamp');
   if (el) el.textContent = formatAppScorecardTimestamp(new Date());
 }
-async function updateAppTelemetryScorecard(){
-  const labelEl = document.getElementById('appScorecardLabel');
-  const totalEl = document.getElementById('appScorecardTotal');
-  const rateEl = document.getElementById('appScorecardRate');
-  const openEl = document.getElementById('appScorecardOpen');
-  if (!totalEl || !rateEl || !openEl) return;
+// Real Reports Filed / Resolved / Open Dispatches counts for this app's
+// jurisdiction — split out on its own so both the Live Metrics ticker's
+// label and the CSA modal's "Your District" tiles can each get the real
+// figures they need without one reading the other's rendered DOM text.
+async function cityTicketCounts(){
   if (!ledgerTickets.length) {
-    try { ledgerTickets = await fetchLedgerTickets(); } catch (e) { /* leave the placeholder dashes if this fails */ }
+    try { ledgerTickets = await fetchLedgerTickets(); } catch (e) { /* leave empty on failure */ }
   }
   const meta = currentWardMeta;
-  if (labelEl) labelEl.textContent = meta ? (meta.cityName.toUpperCase() + ', ' + meta.state.toUpperCase() + ' LIVE METRICS') : 'CITYWIDE LIVE METRICS';
   const cityTickets = meta ? ledgerTickets.filter(t => t.city === meta.city && t.state === meta.state) : ledgerTickets;
-  // Reports Filed / Resolved % / Open Dispatches — the same real counts and
-  // rounding as the official report's Community Action Snapshot
-  // (d.total / resolutionRate() / d.counts.dispatched in
-  // shared/instant-report.js), so this ticker never drifts from the PDF
-  // brief's numbers for the same jurisdiction.
-  const resolvedCount = cityTickets.filter(t => t.stage === 'resolved').length;
-  const openCount = cityTickets.filter(t => t.stage === 'dispatched').length;
-  totalEl.textContent = cityTickets.length ? String(cityTickets.length) : '—';
-  rateEl.textContent = cityTickets.length ? Math.round((resolvedCount / cityTickets.length) * 100) + '%' : 'N/A';
-  openEl.textContent = cityTickets.length ? String(openCount) : '—';
+  return {
+    total: cityTickets.length,
+    resolved: cityTickets.filter(t => t.stage === 'resolved').length,
+    open: cityTickets.filter(t => t.stage === 'dispatched').length
+  };
+}
+async function updateAppTelemetryScorecard(){
+  const labelEl = document.getElementById('appScorecardLabel');
+  const avgEl = document.getElementById('appScorecardAvgFix');
+  const rateEl = document.getElementById('appScorecardResRate');
+  const rankEl = document.getElementById('appScorecardRank');
+  const rankLblEl = document.getElementById('appScorecardRankLbl');
+  if (!avgEl || !rateEl || !rankEl) return;
+  const meta = currentWardMeta;
+  if (labelEl) labelEl.textContent = meta ? (meta.cityName.toUpperCase() + ', ' + meta.state.toUpperCase() + ' LIVE METRICS') : 'CITYWIDE LIVE METRICS';
+  // Avg Fix Speed / Resolution Rate / State Rank — the exact same figures
+  // and formulas as the Civic Brief's own "Civic Performance Metrics" row
+  // (CitixenInstantReport.metricsFor(), which wraps avgHoursText()/
+  // resolutionRate()/stateRankValue() in shared/instant-report.js), so this
+  // ticker never drifts from the PDF brief's numbers for the same
+  // jurisdiction.
+  try {
+    const d = await appInstantReportData();
+    const m = window.CitixenInstantReport.metricsFor(d);
+    avgEl.textContent = m.avgFixSpeed;
+    rateEl.textContent = m.resolutionRate;
+    rankEl.textContent = m.stateRankValue;
+    if (rankLblEl) rankLblEl.textContent = m.stateRankLabel;
+  } catch (e) { /* leave the placeholder dashes if this fails */ }
   renderAppScorecardTimestamp();
 }
 
@@ -4302,13 +4333,16 @@ function initCsaDashTicker(){
     });
   }, { threshold: 0.4 }).observe(root);
 }
-// Same live ward figures the Map & Feed ticker shows (#appScorecard*),
-// copied in at open time — never re-derived or invented here.
-function fillCsaWardMetrics(){
-  const pick = (id) => { const el = document.getElementById(id); return el ? el.textContent.trim() : '—'; };
-  document.getElementById('csapWardReports').textContent = pick('appScorecardTotal');
-  document.getElementById('csapWardResolved').textContent = pick('appScorecardRate');
-  document.getElementById('csapWardOpen').textContent = pick('appScorecardOpen');
+// Real Reports Filed / Resolved / Open Dispatches for this jurisdiction —
+// via the same cityTicketCounts() helper the Live Metrics ticker's own
+// counts used to come from, computed independently rather than read off
+// that ticker's rendered text (which now shows Avg Fix Speed/Resolution
+// Rate/State Rank instead of these counts).
+async function fillCsaWardMetrics(){
+  const counts = await cityTicketCounts();
+  document.getElementById('csapWardReports').textContent = counts.total ? String(counts.total) : '—';
+  document.getElementById('csapWardResolved').textContent = counts.total ? String(counts.resolved) : '—';
+  document.getElementById('csapWardOpen').textContent = counts.total ? String(counts.open) : '—';
   if (typeof refreshCoverageStats === 'function') { try { refreshCoverageStats(); } catch (e) {} }
 }
 function openCrowdSaveProgress(){

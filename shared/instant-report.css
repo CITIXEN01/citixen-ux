@@ -103,7 +103,7 @@
 @media (min-width:640px){.cx-modal{align-items:center}}
 .cx-panel{width:100%;max-width:560px;max-height:92vh;max-height:92dvh;display:flex;flex-direction:column;box-sizing:border-box;
   background:#090D16;border:1px solid rgba(0,230,153,.35);border-radius:12px 12px 0 0;color:#E2E8F0;
-  padding-bottom:env(safe-area-inset-bottom,0px)}
+  padding-bottom:env(safe-area-inset-bottom,0px);position:relative}
 @media (min-width:640px){.cx-panel{border-radius:12px}}
 /* FREE REPORT centered in the breakout header, city/state tag beneath it
    (never a ward number, no timestamp — the PDF brief has its own). */
@@ -114,6 +114,22 @@
 .cx-close{width:36px;height:36px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:transparent;
   color:#E2E8F0;font:inherit;font-size:1rem;cursor:pointer;flex-shrink:0}
 .cx-body{overflow-y:auto;padding:14px 16px 18px;-webkit-overflow-scrolling:touch}
+
+/* Scroll-discovery chevron — tells a person there's more below the fold
+   (the Share & Export drawer) before they've scrolled. Pinned to the
+   bottom of .cx-panel (not .cx-body), so it overlays the scrollable
+   content rather than scrolling away with it; JS (see showScrollHint())
+   shows/hides it based on .cx-body's real scroll position and hides it
+   outright when the content doesn't overflow in the first place. */
+.cx-scroll-hint{position:absolute;left:0;right:0;bottom:env(safe-area-inset-bottom,0px);
+  display:flex;align-items:flex-end;justify-content:center;padding:28px 16px 10px;
+  background:linear-gradient(to top,#090D16 35%,rgba(9,13,22,0));
+  pointer-events:none;opacity:0;transition:opacity .25s ease;z-index:1}
+.cx-scroll-hint.visible{opacity:1}
+.cx-scroll-hint-text{font-size:.66rem;font-weight:800;letter-spacing:.04em;color:#00E699;
+  display:flex;align-items:center;gap:6px;animation:cxScrollBounce 1.6s ease-in-out infinite}
+@keyframes cxScrollBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+@media (prefers-reduced-motion:reduce){.cx-scroll-hint-text{animation:none}}
 
 /* The old 3-tile PDF/Graphic/Link format-picker bar (.cx-tiles/.cx-tile) was
    removed this round — the Brief is now the only pane (digital-first flow,
