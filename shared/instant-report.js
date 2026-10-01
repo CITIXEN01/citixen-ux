@@ -196,7 +196,7 @@
           '<div class="cx-tiles" role="tablist" aria-label="Export format">' +
             tile('pdf', 'doc', 'Official PDF Brief ↓') +
             tile('graphic', 'nodes', '#CrowdSave<wbr>America Graphic ↓') +
-            tile('link', 'link', 'Direct Link Payload ↓') +
+            tile('link', 'link', 'Public Link & Summary ↓') +
           '</div>' +
           '<div id="cxPane-pdf" role="tabpanel" aria-labelledby="cxTab-pdf"></div>' +
           '<div id="cxPane-graphic" role="tabpanel" aria-labelledby="cxTab-graphic" hidden></div>' +
@@ -612,18 +612,18 @@
       '<label for="cxPayload" class="cx-hint" style="display:block;text-align:left;margin:0 0 6px">Ready to paste into email, text or a council comment form</label>' +
       '<textarea id="cxPayload" class="cx-payload" readonly></textarea>' +
       '<span class="cx-payload-url">' + esc(siteUrl()) + '</span>' +
-      '<div class="cx-actions"><button type="button" class="cx-btn-primary" id="cxCopyPayloadBtn">' + icon('copy') + 'Copy Link Payload</button>' +
+      '<div class="cx-actions"><button type="button" class="cx-btn-primary" id="cxCopyPayloadBtn">' + icon('copy') + 'Copy Summary & Link</button>' +
       '<button type="button" class="cx-btn-dashed" id="cxSharePayloadBtn">' + icon('shareUp') + 'Share Link</button></div>' +
       '<p class="cx-hint" id="cxHint-link"></p>';
     var ta = el.querySelector('#cxPayload');
     ta.value = payloadText();
     el.querySelector('#cxCopyPayloadBtn').addEventListener('click', async function () {
-      if (await copyText(ta.value)) toast('Link payload copied.');
+      if (await copyText(ta.value)) toast('Summary & link copied.');
       else { ta.focus(); ta.select(); toast('Press and hold to copy the selected text.'); }
     });
     el.querySelector('#cxSharePayloadBtn').addEventListener('click', async function () {
       if (!navigator.share) {
-        if (await copyText(ta.value)) toast('Sharing is not available here, so the payload was copied instead.');
+        if (await copyText(ta.value)) toast('Sharing is not available here, so the summary & link were copied instead.');
         else { ta.focus(); ta.select(); toast('Sharing is not available here — copy the selected text instead.'); }
         return;
       }
