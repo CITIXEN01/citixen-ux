@@ -3,7 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Passcode gate — earliest possible check, before anything else parses, so
+     a locked-out visitor never sees a flash of the real app shell first. This
+     is a lightweight, client-side-only tester gate (the passcode lives in
+     this same file, so anyone reading page source can see it) — it keeps
+     casual link-sharing honest for a private beta, it is never real access
+     control. See the #citixenGate markup and initCitixenGate() near the end
+     of <body> for the actual form/unlock logic. -->
+<script>
+(function(){
+  try {
+    if (localStorage.getItem('citixen_auth_token') !== '1') {
+      document.documentElement.classList.add('citixen-gate-locked');
+    }
+  } catch (e) { /* storage blocked — fails open; see note above, this was never real security */ }
+})();
+</script>
 <title>CITIXEN UX™</title>
+<meta name="description" content="Frictionless civic reporting sandbox.">
+<!-- Open Graph / Twitter preview card — fixes the gray-box fallback iMessage/
+     SMS showed for citixenux.com/app. og-preview.png is a real pre-rendered
+     1200x630 PNG (glowing emerald logo on Obsidian Glass #020617), not a
+     generated-on-the-fly placeholder — see /tmp/.../og-source.html used to
+     render it. Absolute URLs throughout: relative og:image URLs are
+     unreliable for link-preview crawlers. -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://citixenux.com/app">
+<meta property="og:title" content="CITIXEN UX™ · Living Ledger">
+<meta property="og:description" content="Frictionless civic reporting sandbox.">
+<meta property="og:image" content="https://citixenux.com/og-preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="CITIXEN UX — Living Ledger">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="CITIXEN UX™ · Living Ledger">
+<meta name="twitter:description" content="Frictionless civic reporting sandbox.">
+<meta name="twitter:image" content="https://citixenux.com/og-preview.png">
 <meta name="theme-color" content="#00E699">
 <meta name="referrer" content="no-referrer">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -35,6 +70,29 @@
 <script src="/shared/instant-report.js?v=master-release"></script>
 <script src="/shared/severity.js?v=master-release"></script>
 <style>
+/* ===== PASSCODE GATE — full-page Obsidian Glass blur blocking every route
+   until the tester enters citixen_01. Locked by default; the <head> script
+   above only ever REMOVES the html.citixen-gate-locked class (never adds it
+   after load), so this stays hidden the instant localStorage already has a
+   valid token, with no flash of the gate for a returning tester. See
+   initCitixenGate() near the end of <body>. ===== */
+.citixen-gate{display:none;position:fixed;inset:0;z-index:99999;align-items:center;justify-content:center;
+  background:rgba(2,6,23,.92);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+  padding:24px;box-sizing:border-box}
+html.citixen-gate-locked .citixen-gate{display:flex}
+html.citixen-gate-locked body{overflow:hidden}
+.citixen-gate-card{width:100%;max-width:360px;background:rgba(2,6,23,.8);border:1px solid rgba(30,41,59,.85);
+  border-radius:18px;padding:32px 26px;text-align:center;box-shadow:0 0 40px rgba(0,0,0,.6);box-sizing:border-box}
+.citixen-gate-brand{font-weight:800;font-size:.9rem;letter-spacing:.3px;color:#00E699;margin-bottom:20px}
+.citixen-gate-label{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;
+  color:#94a3b8;margin-bottom:14px}
+.citixen-gate-input{width:100%;box-sizing:border-box;background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#f1f5f9;padding:14px 16px;font-size:1rem;
+  text-align:center;letter-spacing:.1em;margin-bottom:12px;font-family:inherit}
+.citixen-gate-input:focus{outline:none;border-color:rgba(0,230,153,.5)}
+.citixen-gate-error{font-size:.7rem;color:#f87171;font-weight:700;margin-bottom:10px;min-height:14px}
+.citixen-gate-btn{width:100%;box-sizing:border-box;background:#00E699;color:#051311;border:none;padding:13px;
+  border-radius:10px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit}
 :root{
   /* Green unification + obsidian canvas brought in line with index.html
      this round: the app used to run its own slightly different "Emerald
@@ -240,21 +298,32 @@ textarea.input{resize:none;line-height:1.4}
 .civic-health-poor{color:#f87171 !important}
 .civic-health-unknown{color:#94a3b8 !important}
 
-/* ===== MAP GEOFENCE CLUSTER INFO TOOLTIP — tap-to-reveal explainer for the
-   amber/mint Geo-Hatch squares drawn on the Civic Dispatch Map (see
-   renderGeoHatchOverlay()). Tap-based rather than hover-only so it works
-   the same on mobile, where this app is mostly used. ===== */
-.map-count-wrap{display:flex;align-items:center;gap:6px}
-.map-info-btn{width:16px;height:16px;border-radius:50%;background:rgba(148,163,184,.14);
-  border:1px solid rgba(148,163,184,.4);color:#94a3b8;font-size:.6rem;font-weight:800;font-style:italic;
-  font-family:Georgia,'Times New Roman',serif;line-height:1;cursor:pointer;display:flex;align-items:center;
-  justify-content:center;padding:0;flex-shrink:0;transition:border-color .15s,color .15s}
-.map-info-btn:hover,.map-info-btn[aria-expanded="true"]{border-color:rgba(0,230,153,.5);color:var(--mint2)}
-.map-cluster-tooltip{display:none;font-size:.68rem;line-height:1.45;font-weight:600;color:var(--muted);
-  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;
-  padding:9px 11px;margin:-6px 0 10px}
-.map-cluster-tooltip.open{display:block;animation:onboardingFadeIn .15s ease}
-@media (prefers-reduced-motion:reduce){.metrics-ticker-dot{animation:none}}
+/* ===== MAP PIN RESOLUTION BURST — plays once at a pin's own coordinates
+   when resolveMapCase() retires it (see that function and
+   cycleAdminTicketStage()): a brief expanding emerald ring, then the pin
+   itself unmounts from the map entirely. Declutter pass per this round also
+   removed the old Geo-Hatch square overlay (renderGeoHatchOverlay()) and its
+   "square boxes" tooltip outright — pins are now plain glowing dots only. */
+.pin-resolve-burst{position:relative;width:70px;height:70px;pointer-events:none}
+.pin-resolve-burst::before,.pin-resolve-burst::after{content:'';position:absolute;inset:0;margin:auto;
+  border-radius:50%;border:2px solid #10b981;width:14px;height:14px;opacity:1;
+  animation:pinResolveBurst .6s ease-out forwards}
+.pin-resolve-burst::after{animation-delay:.08s}
+@keyframes pinResolveBurst{
+  0%{width:14px;height:14px;opacity:1;border-width:3px}
+  100%{width:70px;height:70px;opacity:0;border-width:1px}
+}
+.resolved-today-badge{display:flex;align-items:center;gap:5px;font-size:.58rem;font-weight:800;
+  letter-spacing:.04em;color:#94a3b8;text-transform:uppercase}
+.resolved-today-badge b{color:#10b981;font-size:.8rem;display:inline-block;
+  transition:transform .18s ease,opacity .18s ease}
+.resolved-today-badge b.rolling-out{transform:translateY(-8px);opacity:0}
+.resolved-today-badge b.rolling-in{animation:resolvedRollIn .26s ease}
+@keyframes resolvedRollIn{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}
+@media (prefers-reduced-motion:reduce){
+  .metrics-ticker-dot{animation:none}
+  .pin-resolve-burst::before,.pin-resolve-burst::after{animation:none;opacity:0}
+}
 .feed-cat{display:inline-block;font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94A3B8;
   border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:1px 8px;margin-bottom:4px}
 .feed-project-link{display:inline-block;margin-top:6px;font-size:.68rem;font-weight:800;color:var(--mint2);text-decoration:none}
@@ -643,7 +712,7 @@ textarea.input{resize:none;line-height:1.4}
    slate-950/80 fill + heavy blur + a slate-800 hairline, distinct from
    the emerald-tinted glass the rest of this file uses elsewhere. ===== */
 .onboarding-card{background:rgba(2,6,23,.8);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-  border:1px solid rgba(30,41,59,.85);box-shadow:0 0 32px rgba(0,0,0,.5)}
+  border:1px solid rgba(30,41,59,.85);box-shadow:0 0 32px rgba(0,0,0,.5);padding:24px 32px}
 .onboarding-header-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
 .onboarding-brand{font-weight:800;font-size:.8rem;letter-spacing:.3px;color:var(--mint2)}
 .onboarding-header-right{display:flex;align-items:center;gap:10px}
@@ -656,15 +725,29 @@ textarea.input{resize:none;line-height:1.4}
 .onboarding-slides{min-height:260px}
 .onboarding-slide{display:none}
 .onboarding-slide.active{display:block;animation:onboardingFadeIn .25s ease}
+/* Centered single-column layout for Card 1 (the private-beta notice) — a
+   consistent space-y-6-style 24px gap between every block instead of each
+   element's own margin-bottom, per this round's polish pass. Card 2's grid
+   layout is untouched and keeps its own left-aligned classes below. */
+.onboarding-slide.onboarding-centered.active{display:flex;flex-direction:column;align-items:center;
+  text-align:center;gap:24px}
+.onboarding-badge-pill{display:inline-block;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:.62rem;font-weight:800;letter-spacing:.08em;color:var(--mint2);text-transform:uppercase;
+  background:rgba(0,230,153,.1);border:1px solid rgba(0,230,153,.35);border-radius:9999px;padding:5px 14px}
 @keyframes onboardingFadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 .onboarding-eyebrow{font-size:.64rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;
   color:var(--mint2);margin-bottom:10px}
 .onboarding-headline{font-size:1.28rem;font-weight:900;line-height:1.25;color:var(--text);margin-bottom:10px}
+.onboarding-centered .onboarding-headline{margin-bottom:0}
+.onboarding-headline-xl{font-size:1.5rem;font-weight:800;color:#f1f5f9}
 .onboarding-subtitle{font-size:.8rem;font-weight:700;color:var(--mint2);margin-bottom:12px}
 .onboarding-body{font-size:.84rem;line-height:1.55;color:var(--muted)}
+.onboarding-centered .onboarding-body{margin-bottom:0;font-size:.875rem;color:#cbd5e1;line-height:1.6}
 .onboarding-warning{display:flex;gap:10px;align-items:flex-start;background:rgba(15,23,42,.9);
   border:1px solid rgba(16,185,129,.3);border-radius:12px;padding:12px 14px;margin-bottom:14px}
-.onboarding-warning-icon{flex-shrink:0;font-size:.9rem;line-height:1}
+.onboarding-centered .onboarding-warning{align-items:center;justify-content:center;margin-bottom:0;width:100%;
+  box-sizing:border-box}
+.onboarding-warning-icon{flex-shrink:0;font-size:.9rem;line-height:1;display:flex;align-items:center}
 .onboarding-warning-text{font-size:.76rem;line-height:1.45;color:var(--muted);font-weight:600}
 .onboarding-grid{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
 .onboarding-grid-item{display:flex;gap:12px;align-items:flex-start;padding:12px;background:rgba(255,255,255,.03);
@@ -687,6 +770,10 @@ textarea.input{resize:none;line-height:1.4}
   transition:border-color .15s,background .15s}
 .btn-onboarding-outline:hover{border-color:rgba(0,230,153,.4);background:rgba(0,230,153,.04)}
 .btn-onboarding-outline:disabled{opacity:0;pointer-events:none}
+.btn-onboarding-glass{flex:1;background:#0f172a;border:1px solid #334155;color:#e2e8f0;padding:13px 12px;
+  border-radius:10px;font-weight:700;font-size:.82rem;cursor:pointer;font-family:inherit;
+  transition:background .15s,border-color .15s}
+.btn-onboarding-glass:hover{background:#1e293b;border-color:#475569}
 
 /* ===== "WHAT IS CIVIC INTELLIGENCE?" HERO (index.html only markup, shared styles) ===== */
 .ci-hero{padding:0}
@@ -944,6 +1031,20 @@ textarea.input{resize:none;line-height:1.4}
 </head>
 <body>
 
+<!-- ===== PASSCODE GATE — see the <head> anti-flash script and the CSS block
+     at the top of <style> for how this stays hidden once unlocked. Plain
+     client-side tester gate, not real access control (see that comment). ===== -->
+<div class="citixen-gate" id="citixenGate">
+  <form class="citixen-gate-card" id="citixenGateForm" autocomplete="off">
+    <div class="citixen-gate-brand">CITIXEN UX<sup class="tm-symbol">™</sup></div>
+    <div class="citixen-gate-label">Enter Access Passcode</div>
+    <input type="password" class="citixen-gate-input" id="citixenGateInput" placeholder="••••••••"
+      autocomplete="off" autocapitalize="off" spellcheck="false">
+    <div class="citixen-gate-error" id="citixenGateError"></div>
+    <button type="submit" class="citixen-gate-btn">Unlock</button>
+  </form>
+</div>
+
 <div class="splash-screen" id="splashScreen">
   <svg class="splash-logo" viewBox="0 0 24 24" width="64" height="64" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
   <div class="splash-word"><span class="brand-white">CITIXEN</span> <span class="brand-lime">UX</span><sup class="brand-tm">™</sup></div>
@@ -1114,27 +1215,25 @@ textarea.input{resize:none;line-height:1.4}
             the official report's Community Action Snapshot uses, computed
             by updateAppTelemetryScorecard(), which used to sit in the
             Dashboard's standalone Scorecard card).
-         The Map tab's own Geo-Hatch overlay below (renderGeoHatchOverlay(),
-         amber/mint vector cells drawn directly on the basemap) is the only
-         Geo-Hatch grid in app.html; the Dashboard's separate block-grid card
-         (City/State/Country tabs + Citywide Asset Coverage) has been removed. -->
+         The old Geo-Hatch square overlay (renderGeoHatchOverlay(), amber/mint
+         vector cells drawn directly on the basemap) and its explainer tooltip
+         were removed outright this round for a decluttered map — pins are
+         now plain glowing/pulsing dots only (amber = active, red = urgent),
+         with a green burst-and-unmount animation on resolution. See
+         mapPinColor()/resolveMapCase(). The Dashboard's separate block-grid
+         card (City/State/Country tabs + Citywide Asset Coverage) was already
+         removed in an earlier round. -->
     <section id="tab-map" class="tabpane">
       <div class="card">
-        <div class="label">
-          <span>Civic Dispatch Map</span>
-          <span class="map-count-wrap">
-            <span id="mCount" style="color:var(--mint2)">3 active</span>
-            <button type="button" class="map-info-btn" id="mapClusterInfoBtn" aria-label="What do the square boxes on the map mean?" aria-expanded="false">i</button>
-          </span>
-        </div>
-        <div class="map-cluster-tooltip" id="mapClusterTooltip" role="tooltip">
-          Square boxes represent active cluster zones where multiple neighborhood reports overlap.
-        </div>
+        <div class="label"><span>Civic Dispatch Map</span><span id="mCount" style="color:var(--mint2)">3 active</span></div>
         <div id="map"></div>
       </div>
 
       <div class="card">
-        <div class="label">Live Dispatch Feed</div>
+        <div class="label">
+          <span>Live Dispatch Feed</span>
+          <span class="resolved-today-badge"><b id="resolvedTodayCount">0</b> Resolved Today</span>
+        </div>
         <div class="metrics-ticker" id="appScorecardCard" aria-live="polite">
           <div class="metrics-ticker-head"><span class="metrics-ticker-dot" aria-hidden="true"></span><span id="appScorecardLabel">CITYWIDE LIVE METRICS</span></div>
           <!-- 3-part layout mirrors the Civic Brief's own "Civic Performance
@@ -1776,19 +1875,19 @@ textarea.input{resize:none;line-height:1.4}
       <div class="onboarding-header-bar">
         <span class="onboarding-brand">CITIXEN UX<sup class="tm-symbol">™</sup></span>
         <div class="onboarding-header-right">
-          <span class="onboarding-badge confidential">CONFIDENTIAL • PRIVATE ALPHA COHORT</span>
           <button type="button" class="onboarding-close" id="btnOnboardingClose" aria-label="Skip walkthrough">✕</button>
         </div>
       </div>
 
       <div class="onboarding-slides" id="onboardingSlides">
-        <div class="onboarding-slide active" data-slide="0">
-          <h2 class="onboarding-headline">You Are 1 of 10 Beta Testers</h2>
+        <div class="onboarding-slide onboarding-centered active" data-slide="0">
+          <span class="onboarding-badge-pill">CONFIDENTIAL • PRIVATE ALPHA</span>
+          <h2 class="onboarding-headline onboarding-headline-xl">You Are a Beta Tester</h2>
           <div class="onboarding-warning">
-            <span class="onboarding-warning-icon">🔒</span>
+            <svg class="onboarding-warning-icon" viewBox="0 0 24 24" width="16" height="16" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
             <span class="onboarding-warning-text">This access is strictly private. Please do not forward or share this link.</span>
           </div>
-          <p class="onboarding-body">We are testing back-end data aggregation and routing speed. All you need to do is submit a test report and verify it hits the public ledger.</p>
+          <p class="onboarding-body">Quickly testing back-end data aggregation and routing speed. Just submit a test report and verify it hits the public ledger.</p>
         </div>
 
         <div class="onboarding-slide" data-slide="1">
@@ -1818,7 +1917,7 @@ textarea.input{resize:none;line-height:1.4}
           <span class="onboarding-dot" data-dot="1"></span>
         </div>
         <div class="onboarding-nav">
-          <button type="button" class="btn-onboarding-outline" id="btnOnboardingNext">Next: How It Works →</button>
+          <button type="button" class="btn-onboarding-glass" id="btnOnboardingNext">Next: How It Works →</button>
         </div>
       </div>
     </div>
@@ -1828,6 +1927,37 @@ textarea.input{resize:none;line-height:1.4}
 
 <script>
 'use strict';
+
+// ===== PASSCODE GATE — see the <head> anti-flash script (adds/reads
+// html.citixen-gate-locked) and the #citixenGate markup near the top of
+// <body>. Deliberately simple: the passcode and the check both live in this
+// same client-served file, so this is a tester-honesty speed bump, never
+// real access control — the same framing this file already uses for Admin
+// Light's mock email gate.
+const CITIXEN_AUTH_KEY = 'citixen_auth_token';
+const CITIXEN_GATE_PASSCODE = 'citixen_01';
+(function initCitixenGate(){
+  const form = document.getElementById('citixenGateForm');
+  const input = document.getElementById('citixenGateInput');
+  const errorEl = document.getElementById('citixenGateError');
+  if (!form || !input || !errorEl) return;
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (input.value.trim() === CITIXEN_GATE_PASSCODE) {
+      try { localStorage.setItem(CITIXEN_AUTH_KEY, '1'); } catch (err) { /* storage blocked — unlocks this page view, just won't persist a reload */ }
+      errorEl.textContent = '';
+      document.documentElement.classList.remove('citixen-gate-locked');
+    } else {
+      errorEl.textContent = 'Incorrect passcode — try again.';
+      input.value = '';
+      input.focus();
+    }
+  });
+  if (document.documentElement.classList.contains('citixen-gate-locked')) {
+    setTimeout(() => input.focus(), 250);
+  }
+})();
+
 let map, mapInit=false, markers={}, cat='Pothole / Road', userMarker=null;
 
 // `ageMin` (minutes since intake) drives the SLA time-in-process color
@@ -3880,7 +4010,6 @@ function initMap(){
     map.attributionControl.setPrefix(false);
     addBaseLayer();
     cases.forEach(plotMarker);
-    renderGeoHatchOverlay();
     if (window.CITIXEN_RESOLVED_LOCATION && typeof window.CITIXEN_RESOLVED_LOCATION.lat === 'number') {
       plotUserLocationMarker(window.CITIXEN_RESOLVED_LOCATION.lat, window.CITIXEN_RESOLVED_LOCATION.lng);
     }
@@ -3906,6 +4035,17 @@ function categoryColor(item){
   return statusColor(item.status);
 }
 
+// Map-pin-only color simplification (declutter pass): every still-open
+// hazard renders as a single amber/orange pulsing dot regardless of its
+// finer-grained severity label, except a genuinely urgent/high-priority
+// report, which stays a distinct red pulse so it isn't lost in the crowd.
+// This intentionally differs from statusColor()/categoryColor() above,
+// which still drive the feed list's text pills elsewhere on this tab —
+// only the map pins themselves were asked to declutter down to two colors.
+function mapPinColor(item){
+  return item.status === 'Critical' ? '#ef4444' : '#f59e0b';
+}
+
 function beaconIcon(color, size, pulse){
   const s = size || 26;
   return L.divIcon({
@@ -3920,67 +4060,53 @@ function beaconIcon(color, size, pulse){
 }
 
 function plotMarker(item){
-  const col=categoryColor(item);
-  const icon=beaconIcon(col, 26, item.status === 'Critical');
+  // Every open pin pulses now (no more static/boxed tiers) — see
+  // mapPinColor() just above for the amber/red simplification.
+  const icon=beaconIcon(mapPinColor(item), 26, true);
   const m=L.marker([item.lat,item.lng],{icon, zIndexOffset: item.status === 'Critical' ? 500 : 0}).addTo(map);
   m.bindPopup(`<strong>${esc(item.title)}</strong><br><span style="font-size:.7rem">${esc(item.loc)} • ${esc(item.time)}</span>`);
   markers[item.id]=m;
 }
 
-/* =====================================================================
-   GEO-HATCH COVERAGE ENGINE — real vector grid overlay drawn directly on
-   the Leaflet map (not just the card below it). Cells are geo-anchored to
-   this device's actual case coordinates (the same `cases` array plotMarker
-   draws from) — a cell only renders where a real report actually exists,
-   never claiming coverage of empty ground. Amber (hatched) = at least one
-   still-active hazard (triageBucket !== 'resolved') in that cell; Emerald
-   Green = every report in that cell is resolved/secured.
-   ===================================================================== */
-let geoHatchLayerGroup = null;
-const GEO_HATCH_CELL_DEG = 0.0022; // ≈150-200m per cell at this latitude — matches the "Ward (150m)" tier language
-
-function ensureGeoHatchPatternDefs(){
-  if (document.getElementById('geoHatchAmberPattern')) return;
-  const svgNs = 'http://www.w3.org/2000/svg';
-  const svg = document.createElementNS(svgNs, 'svg');
-  svg.setAttribute('width', '0');
-  svg.setAttribute('height', '0');
-  svg.style.position = 'absolute';
-  svg.innerHTML = `<defs>
-    <pattern id="geoHatchAmberPattern" width="8" height="8" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
-      <rect width="8" height="8" fill="#ffbb00" fill-opacity="0.16"></rect>
-      <line x1="0" y1="0" x2="0" y2="8" stroke="#ffbb00" stroke-width="3" stroke-opacity="0.55"></line>
-    </pattern>
-  </defs>`;
-  document.body.appendChild(svg);
-}
-
-function renderGeoHatchOverlay(){
-  if (typeof L === 'undefined' || !map) return;
-  ensureGeoHatchPatternDefs();
-  if (geoHatchLayerGroup) map.removeLayer(geoHatchLayerGroup);
-  geoHatchLayerGroup = L.layerGroup().addTo(map);
-  if (!cases.length) return;
-
-  const lats = cases.map(c => c.lat), lngs = cases.map(c => c.lng);
-  const minLat = Math.min(...lats) - GEO_HATCH_CELL_DEG * 1.5;
-  const maxLat = Math.max(...lats) + GEO_HATCH_CELL_DEG * 1.5;
-  const minLng = Math.min(...lngs) - GEO_HATCH_CELL_DEG * 1.5;
-  const maxLng = Math.max(...lngs) + GEO_HATCH_CELL_DEG * 1.5;
-
-  for (let lat = minLat; lat < maxLat; lat += GEO_HATCH_CELL_DEG) {
-    for (let lng = minLng; lng < maxLng; lng += GEO_HATCH_CELL_DEG) {
-      const inCell = cases.filter(c => c.lat >= lat && c.lat < lat + GEO_HATCH_CELL_DEG && c.lng >= lng && c.lng < lng + GEO_HATCH_CELL_DEG);
-      if (!inCell.length) continue; // leave uncharted cells undrawn — no claimed coverage without a real report
-      const hasActive = inCell.some(c => triageBucket(c) !== 'resolved');
-      const bounds = [[lat, lng], [lat + GEO_HATCH_CELL_DEG, lng + GEO_HATCH_CELL_DEG]];
-      L.rectangle(bounds, hasActive ? {
-        color: '#ffbb00', weight: 1.5, fillColor: 'url(#geoHatchAmberPattern)', fillOpacity: 1, className: 'geo-hatch-cell geo-hatch-active'
-      } : {
-        color: '#00E699', weight: 1.5, fillColor: '#00E699', fillOpacity: 0.22, className: 'geo-hatch-cell geo-hatch-resolved'
-      }).addTo(geoHatchLayerGroup);
-    }
+// Resolved-pin lifecycle: swap to a glowing emerald beacon, play a 600ms
+// expanding-ring burst at the exact same coordinates, then unmount the pin
+// entirely rather than leaving a static "resolved" marker cluttering the
+// map — paired with incrementResolvedToday() and renderFeed()'s own filter
+// (both below) so the feed list and the Resolved Today counter move in
+// lockstep with whatever just left the map. Called from cycleAdminTicketStage()
+// when an Admin Light resolution matches one of this device's own tickets
+// by real ticket/report ID (see nc.ticketId in finalizeSubmitReport()) —
+// never a guessed or simulated match.
+function resolveMapCase(caseId){
+  const item = cases.find(c => c.id === caseId);
+  if (!item || item.status === 'Resolved') return;
+  item.status = 'Resolved';
+  const marker = markers[caseId];
+  if (mapInit && map && marker) {
+    const latlng = marker.getLatLng();
+    marker.setIcon(beaconIcon('#10b981', 26, false));
+    const burstIcon = L.divIcon({ className: '', html: '<div class="pin-resolve-burst"></div>', iconSize: [70, 70], iconAnchor: [35, 35] });
+    const burstMarker = L.marker(latlng, { icon: burstIcon, interactive: false, zIndexOffset: 2000 }).addTo(map);
+    setTimeout(() => {
+      map.removeLayer(burstMarker);
+      map.removeLayer(marker);
+      delete markers[caseId];
+    }, 600);
   }
+  // renderFeed() -> renderTriageGauge() recomputes #resolvedTodayCount from
+  // the real `cases` array (never a separately-tracked, driftable counter),
+  // so the roll animation here is purely a visual flourish layered on top of
+  // an already-accurate number, not the source of truth for it.
+  renderFeed();
+  playResolvedTodayRollAnimation();
+}
+function playResolvedTodayRollAnimation(){
+  const el = document.getElementById('resolvedTodayCount');
+  if (!el) return;
+  el.classList.remove('rolling-in');
+  void el.offsetWidth; // restart the animation even if it's still mid-run
+  el.classList.add('rolling-in');
+  setTimeout(() => el.classList.remove('rolling-in'), 260);
 }
 
 // "You are here" beacon — only plotted once the device's own GPS has
@@ -4018,6 +4144,15 @@ function renderTriageGauge(){
   setTextIfExists('triageOpenCount', open);
   setTextIfExists('triageTaggedCount', tagged);
   setTextIfExists('triageResolvedCount', resolved);
+  // Resolved Today badge (Live Dispatch Feed header) — same real resolved
+  // count, so it's always accurate even outside the resolveMapCase() path
+  // (e.g. on first load, before anything's been resolved this session).
+  setTextIfExists('resolvedTodayCount', resolved);
+  // Civic Dispatch Map header count — pins still actually on the map, i.e.
+  // every non-resolved case (resolved ones unmount via resolveMapCase()),
+  // so this never drifts from what's really plotted.
+  const mCountEl = document.getElementById('mCount');
+  if (mCountEl) mCountEl.textContent = (open + tagged) + ' active';
   // Active Hazards (Analytics Big 3) reuses this same live open-case count —
   // a real number from this device's own feed, not a seeded/API figure.
   setTextIfExists('big3Active', open);
@@ -4030,7 +4165,11 @@ function renderTriageGauge(){
 
 function renderFeed(){
   const c=document.getElementById('feed'); c.innerHTML='';
-  cases.forEach(item=>{
+  // Feed declutter: resolved items already got their own moment (the map's
+  // green burst-and-unmount in resolveMapCase() and the Resolved Today
+  // counter) — the live list itself now shows active/in-progress work only,
+  // same real `cases` data, just filtered rather than a second query.
+  cases.filter(item => triageBucket(item) !== 'resolved').forEach(item=>{
     const pill=statusPill(item.status);
     const el=document.createElement('div');
     el.className='feed-item';
@@ -4392,28 +4531,6 @@ function openDispatchReceiptModal(opts){
 function closeDispatchReceiptModal(){
   document.getElementById('dispatchReceiptModal').classList.remove('open');
 }
-// Map Geofence Cluster tooltip — tap the "i" next to the active-count badge
-// to reveal/hide what the Geo-Hatch squares on the map mean; tap anywhere
-// else to dismiss it, same lightweight pattern as the other tap-toggled UI
-// in this file (no library, no persistent state — it's just an explainer).
-(function initMapClusterTooltip(){
-  const btn = document.getElementById('mapClusterInfoBtn');
-  const tip = document.getElementById('mapClusterTooltip');
-  if (!btn || !tip) return;
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const nowOpen = !tip.classList.contains('open');
-    tip.classList.toggle('open', nowOpen);
-    btn.setAttribute('aria-expanded', String(nowOpen));
-  });
-  document.addEventListener('click', (e) => {
-    if (tip.classList.contains('open') && !tip.contains(e.target) && e.target !== btn) {
-      tip.classList.remove('open');
-      btn.setAttribute('aria-expanded', 'false');
-    }
-  });
-})();
-
 document.getElementById('btnReceiptDismiss').addEventListener('click', closeDispatchReceiptModal);
 document.getElementById('dispatchReceiptModal').addEventListener('click', (e) => {
   if (e.target.id === 'dispatchReceiptModal') closeDispatchReceiptModal();
@@ -4651,6 +4768,16 @@ function cycleAdminTicketStage(idx, newStage){
   const label = ADMIN_STAGES.find(s => s.value === newStage).label;
   toast('✓ ' + t.reportId + ' marked ' + label + ' — constituent notified');
   trackEvent('admin_light_stage_change', { reportId: t.reportId, stage: newStage });
+  // If this exact ticket is also one of this device's own pins on the Civic
+  // Dispatch Map (matched by real ticket/report ID — see nc.ticketId in
+  // finalizeSubmitReport()), resolve it there too: same burst-and-unmount
+  // lifecycle as resolveMapCase() plays for any other pin. Most seeded
+  // Admin Light tickets won't match anything on this device's own map, and
+  // nothing visually happens for those — never a guessed/simulated match.
+  if (newStage === 'resolved') {
+    const matchedCase = cases.find(c => c.ticketId && c.ticketId === t.reportId);
+    if (matchedCase) resolveMapCase(matchedCase.id);
+  }
 }
 document.getElementById('btnAdminPanelClose').addEventListener('click', closeAdminLightPanel);
 document.getElementById('adminLightPanel').addEventListener('click', (e) => { if (e.target.id === 'adminLightPanel') closeAdminLightPanel(); });
@@ -4710,9 +4837,8 @@ async function finalizeSubmitReport(opts){
   // Publish. Only the actual server submission (below) depends on
   // connectivity, and that's reported honestly, not assumed to have worked.
   cases.unshift(nc);
-  renderFeed();
-  document.getElementById('mCount').textContent=cases.length+' active';
-  if(mapInit) { plotMarker(nc); renderGeoHatchOverlay(); }
+  renderFeed(); // also refreshes #mCount via renderTriageGauge()
+  if(mapInit) plotMarker(nc);
   // Captured before the photo box is hidden below — this is the same
   // already-stripped (no EXIF/GPS) dataURL shown in the capture preview,
   // reused as the 1:1 social graphic's background rather than re-asking
@@ -4759,6 +4885,10 @@ async function finalizeSubmitReport(opts){
   // reachable; a queued-offline submission gets a client-derived ID in the
   // same taxonomy instead, since there's no server response to read yet.
   const ticketId = (result.ok && result.reportId) ? result.reportId : buildLiveTicketId(ward, nc.id, hz.code);
+  // Stored on the local case so a later Admin Light resolution of this exact
+  // ticket (matched by real ID, see cycleAdminTicketStage()) can find and
+  // retire the matching pin on this device's own map — never a guessed match.
+  nc.ticketId = ticketId;
   if (result.ok) {
     toast(urgentOverride ? '✓ Published as urgent — routed to ' + dept : '✓ Published — routed to ' + dept);
     trackEvent('report_submit', { ok: true, category: cat, dept, ward, urgentOverride, reportId: ticketId });
