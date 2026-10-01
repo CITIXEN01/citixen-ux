@@ -91,6 +91,9 @@
     } catch (e) { tz = ''; }
     return mm + '/' + dd + '/' + yy + ' • ' + h + ':' + mins + ' ' + ampm + tz;
   }
+  function shortDate(now) {
+    return String(now.getMonth() + 1).padStart(2, '0') + '/' + String(now.getDate()).padStart(2, '0') + '/' + String(now.getFullYear()).slice(-2);
+  }
   function cipLabel(status) { return status === 'on-time' ? 'On-Time' : status === 'delayed' ? 'Delayed' : 'In Progress'; }
   function cipClass(status) { return status === 'on-time' ? 'cx-pill-ontime' : status === 'delayed' ? 'cx-pill-delayed' : 'cx-pill-progress'; }
   // Ward health score: share of this jurisdiction's tickets that are
@@ -454,10 +457,12 @@
             '<div class="cx-mast-lg-tagline">Upgrade your civic experience.</div>' +
           '</div>' +
         '</div>' +
-        '<div class="cx-subrow">' +
-          '<span class="cx-subrow-geo">' + esc(cityStateLabel(d)) + '</span>' +
-          '<span class="cx-subrow-title">Civic Intelligence™ Brief</span>' +
-          '<span class="cx-subrow-time">Generated ' + esc(stamp(generatedAt)) + ' • citixenux.com</span>' +
+        // Inner marketing header. The jurisdiction and "Civic Intelligence™
+        // Brief" title are shown once, in the modal top bar (single source
+        // of truth), so the card body doesn't repeat them.
+        '<div class="cx-brief-hdr">' +
+          '<span class="cx-brief-headline">Free Civic Report</span>' +
+          '<span class="cx-brief-stamp">Generated ' + esc(shortDate(generatedAt)) + ' • citixenux.com</span>' +
         '</div>' +
         '<div class="cx-sec">' +
           '<div class="cx-acards-wrap"><div class="cx-acards-head">Living Ledger™ Snapshot</div><div class="cx-acards">' +
@@ -854,11 +859,16 @@
     rr(ctx, 30, 30, W - 60, W - 60, 36); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,230,153,0.55)'; ctx.stroke();
     ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
 
-    // ---- Header ----
-    ctx.font = font(800, 40); ctx.fillStyle = '#FFFFFF';
-    ctx.fillText('CIVIC INTELLIGENCE™ BRIEF', W / 2, 105);
-    ctx.font = font(700, 24); ctx.fillStyle = SLATE;
-    ctx.fillText(cityStateLabel(d).toUpperCase(), W / 2, 148);
+    // ---- Header: glowing FREE CIVIC REPORT + location ----
+    ctx.save();
+    ctx.font = font(900, 52); ctx.fillStyle = MINT;
+    ctx.shadowColor = 'rgba(0,230,153,0.65)'; ctx.shadowBlur = 22;
+    ctx.fillText('FREE CIVIC REPORT', W / 2, 100);
+    ctx.shadowColor = 'rgba(0,230,153,0.3)'; ctx.shadowBlur = 44;
+    ctx.fillText('FREE CIVIC REPORT', W / 2, 100);
+    ctx.restore();
+    ctx.font = font(700, 22); ctx.fillStyle = SLATE;
+    ctx.fillText(cityStateLabel(d).toUpperCase() + '  •  ' + shortDate(generatedAt), W / 2, 148);
 
     // ---- Living Ledger™ Snapshot panel ----
     var px = 70, pw = W - 140, py = 190, ph = 360;

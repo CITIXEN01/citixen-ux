@@ -139,9 +139,11 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
 .input:focus{border-color:var(--mint2)}
 textarea.input{resize:none;line-height:1.4}
 
-.btn-submit{width:100%;background:var(--mint);color:#051311;border:none;padding:14px;border-radius:12px;
-  font-weight:900;font-size:.85rem;letter-spacing:.4px;cursor:pointer;display:flex;align-items:center;
-  justify-content:center;gap:9px}
+/* Primary CTA spec — shared 1:1 with .cx-btn-primary (shared/instant-report.css):
+   52px tall, 14px/16px padding, 12px radius (rounded-xl), 16px/700 (font-bold text-base). */
+.btn-submit{width:100%;box-sizing:border-box;min-height:52px;background:var(--mint);color:#051311;border:none;
+  padding:14px 16px;border-radius:12px;font-family:inherit;font-weight:700;font-size:16px;line-height:24px;
+  letter-spacing:.01em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
 
 .bottomnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;
   background:rgba(3,7,18,.96);backdrop-filter:blur(16px);border-top:1px solid var(--border);

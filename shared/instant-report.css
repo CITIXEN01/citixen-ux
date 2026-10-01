@@ -15,9 +15,11 @@
 /* Button stack — vertical flex column, one consistent 12px gap between all
    3 buttons (replaces each button's own margin-top). */
 .cx-btn-stack{display:flex;flex-direction:column;gap:12px}
+/* Primary CTA spec — shared 1:1 with app.html's .btn-submit ("Publish report"):
+   52px tall, 14px/16px padding, 12px radius (rounded-xl), 16px/700 (font-bold text-base). */
 .cx-btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;
-  min-height:48px;padding:16px;border:1px solid #00E699;border-radius:12px;
-  background:#00E699;color:#0B0E14;font:inherit;font-weight:800;font-size:.95rem;letter-spacing:.02em;cursor:pointer}
+  min-height:52px;padding:14px 16px;border:1px solid #00E699;border-radius:12px;
+  background:#00E699;color:#0B0E14;font-family:inherit;font-weight:700;font-size:16px;line-height:24px;letter-spacing:.01em;cursor:pointer}
 .cx-btn-primary:hover{filter:brightness(1.08)}
 .cx-btn-primary{border:none;transition:transform .12s ease,filter .15s ease,box-shadow .18s ease}
 .cx-btn-primary:hover{box-shadow:0 6px 20px rgba(0,230,153,.25)}
@@ -211,6 +213,16 @@
 /* Footer */
 .cx-footer-single{background:#0B0E14;color:#9CA3AF;border-top:1px solid #1E293B}
 .cx-verify-line{text-align:center;font-size:10px;color:#6B7280}
+
+/* ---------- Neon glow pass (Digital Brief) ---------- */
+.cx-sec-title,.cx-acards-head,.cx-brief-headline,.cx-mast-lg-brand b,.cx-mast-lg-tagline,.cx-mcard-val{
+  text-shadow:0 0 10px rgba(0,230,153,.65),0 0 20px rgba(0,230,153,.3)}
+.cx-acards-wrap,.cx-mcard,.cx-therm{border-color:#00E69922;box-shadow:0 0 18px rgba(0,230,153,.07),0 0 2px rgba(0,230,153,.12)}
+/* Inner card marketing header: "FREE CIVIC REPORT" left, timestamp/domain right.
+   The jurisdiction + "Civic Intelligence™ Brief" title live only in the modal top bar. */
+.cx-brief-hdr{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid #1E293B}
+.cx-brief-headline{font-size:18px;font-weight:700;letter-spacing:.06em;color:#00E699;text-transform:uppercase;white-space:nowrap}
+.cx-brief-stamp{font-size:11px;color:#94A3B8;text-align:right;font-variant-numeric:tabular-nums}
 
 /* Dark-surface variant of the CIP list (Capital Projects deep-dive panels) */
 .cx-cip-dark li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);color:#E2E8F0}
