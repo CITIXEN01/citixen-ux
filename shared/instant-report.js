@@ -335,17 +335,37 @@
       (subText ? '<div class="cx-mcard-sub">' + esc(subText) + '</div>' : '') +
     '</div></div>';
   }
-  function hazardPillHtml(hz) {
-    return '<span class="cx-pill" style="background:' + hz.color + '26;color:' + hz.color + '">' + esc(hz.label) + '</span>';
-  }
   // Community Action Snapshot: plain cards (no black header bar), visually
   // distinct from Section 1's cards per this round's spec.
   function actionCard(val, lbl, color) {
     return '<div class="cx-acard"><div class="cx-acard-val"' + (color ? ' style="color:' + color + '"' : '') + '>' + esc(val) + '</div>' +
       '<div class="cx-acard-lbl">' + esc(lbl) + '</div></div>';
   }
-  function actionCardHtml(innerHtml, lbl) {
-    return '<div class="cx-acard"><div class="cx-acard-val">' + innerHtml + '</div><div class="cx-acard-lbl">' + esc(lbl) + '</div></div>';
+  // Hazard Index gauge: a 180°, 3-segment semicircular meter (green/amber/
+  // red). The needle is centered within whichever segment matches the real
+  // computed hazardIndex() reading for this jurisdiction — never a fixed or
+  // fabricated angle — and the label beneath it is that same real reading.
+  function hazardGaugeAngle(label) { return label === 'CRITICAL' ? 150 : label === 'MODERATE' ? 90 : 30; }
+  function hazardGaugeSvg(hz, vw, vh) {
+    var cx = vw / 2, cy = vh - 6, r = Math.min(vw / 2 - 6, vh - 16), sw = Math.max(10, Math.round(r * 0.24));
+    function pt(a, rad) { var rad2 = a * Math.PI / 180; return { x: cx - rad * Math.cos(rad2), y: cy - rad * Math.sin(rad2) }; }
+    var segs = [{ a0: 0, a1: 60, color: '#00E699' }, { a0: 60, a1: 120, color: '#F59E0B' }, { a0: 120, a1: 180, color: '#EF4444' }];
+    var arcs = segs.map(function (s) {
+      var p0 = pt(s.a0, r), p1 = pt(s.a1, r);
+      return '<path d="M' + p0.x.toFixed(1) + ',' + p0.y.toFixed(1) + ' A' + r.toFixed(1) + ',' + r.toFixed(1) + ' 0 0 1 ' + p1.x.toFixed(1) + ',' + p1.y.toFixed(1) + '" stroke="' + s.color + '" stroke-width="' + sw + '" fill="none"/>';
+    }).join('');
+    var needleA = hazardGaugeAngle(hz.label), tip = pt(needleA, r - sw - 4);
+    return '<svg viewBox="0 0 ' + vw + ' ' + vh + '" width="100%" role="img" aria-label="Hazard Index gauge: ' + esc(hz.label) + '">' +
+      arcs +
+      '<line x1="' + cx + '" y1="' + cy + '" x2="' + tip.x.toFixed(1) + '" y2="' + tip.y.toFixed(1) + '" stroke="#090D16" stroke-width="3.5" stroke-linecap="round"/>' +
+      '<circle cx="' + cx + '" cy="' + cy + '" r="7" fill="#090D16"/>' +
+    '</svg>';
+  }
+  function hazardGaugeCardHtml(hz) {
+    var lblColor = hz.label === 'CRITICAL' ? '#EF4444' : hz.label === 'MODERATE' ? '#F59E0B' : '#00E699';
+    var lblText = hz.label === 'LOW RISK' ? 'LOW RISK' : hz.label + ' RISK';
+    return '<div class="cx-acard cx-acard-gauge">' + hazardGaugeSvg(hz, 160, 92) +
+      '<div class="cx-acard-lbl" style="color:' + lblColor + '">' + esc(lblText) + '</div></div>';
   }
   // Capital Project Tracker: a qualitative progress bar per status tier —
   // On-Time (green) / In Progress or a stale field update (amber) /
@@ -363,42 +383,6 @@
         '<span class="cx-therm-end">' + esc(p.scheduled || '—') + ' · ' + cipLabel(p.status) + '</span>' +
       '</div>';
     }).join('') + '</div>';
-  }
-  // A jurisdiction's own real report coordinates (d.nodes), scaled to their
-  // own bounding box — see localProject()'s comment on why no boundary
-  // shape is drawn.
-  var hazardSvgUid = 0;
-  // Heat-map SVG: additive radial-gradient glows over a decorative block
-  // grid (not a real street layout — see drawHazardMap()'s comment above
-  // for why no boundary shape is drawn).
-  function hazardHeatSvg(nodes, vw, vh, label) {
-    var pts = localProject(nodes || [], vw - 2 * 22, vh - 2 * 22, 0).map(function (p) { return { x: p.x + 22, y: p.y + 22, status: p.status }; });
-    if (!pts.length) return '<div class="cx-hazard-empty">No live hazard nodes yet</div>';
-    var uid = 'hz' + (++hazardSvgUid), defs = '', glows = '', cols = 8, rows = 5, i, grid = '';
-    for (i = 1; i < cols; i++) grid += '<line x1="' + (vw / cols * i).toFixed(1) + '" y1="0" x2="' + (vw / cols * i).toFixed(1) + '" y2="' + vh + '"/>';
-    for (i = 1; i < rows; i++) grid += '<line x1="0" y1="' + (vh / rows * i).toFixed(1) + '" x2="' + vw + '" y2="' + (vh / rows * i).toFixed(1) + '"/>';
-    var dots = pts.map(function (p, i) {
-      var c = nodeColor(p.status), gid = uid + '-' + i, r = hazardRadius(p.status) * 0.4;
-      defs += '<radialGradient id="' + gid + '" cx="50%" cy="50%" r="50%">' +
-        '<stop offset="0%" stop-color="' + c + '" stop-opacity="0.9"/>' +
-        '<stop offset="55%" stop-color="' + c + '" stop-opacity="0.32"/>' +
-        '<stop offset="100%" stop-color="' + c + '" stop-opacity="0"/>' +
-      '</radialGradient>';
-      glows += '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="' + r.toFixed(1) + '" fill="url(#' + gid + ')"/>';
-      return '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="4" fill="' + c + '"/>';
-    }).join('');
-    return '<svg viewBox="0 0 ' + vw + ' ' + vh + '" preserveAspectRatio="xMidYMid meet" role="img" aria-label="' + esc(label) + '">' +
-      '<defs>' + defs + '</defs>' +
-      '<g class="cx-hazard-grid">' + grid + '</g>' +
-      '<g style="mix-blend-mode:screen">' + glows + '</g>' +
-      dots +
-    '</svg>';
-  }
-  function hazardModuleHtml(d) {
-    var label = 'Live Hazard Nodes · ' + cityStateLabel(d).toUpperCase();
-    return '<div class="cx-hazard">' + hazardHeatSvg(d.nodes, 300, 140, label) +
-      '<span class="cx-hazard-label">' + esc(label) + '</span>' +
-    '</div>';
   }
   function renderPdfPane() {
     var d = data, r = d.ranks, hz = hazardIndex(d);
@@ -418,7 +402,6 @@
           '<span class="cx-subrow-title">Free Report</span>' +
           '<span class="cx-subrow-time">Generated<br>' + esc(stamp(generatedAt)) + '</span>' +
         '</div>' +
-        '<div class="cx-sec">' + hazardModuleHtml(d) + '</div>' +
         '<div class="cx-sec"><div class="cx-sec-title"><span>1</span>CIVIC PERFORMANCE METRICS</div>' +
           '<div class="cx-mcards">' +
             mcard(avgHoursText(d), 'Avg. Fix Speed') +
@@ -427,13 +410,13 @@
           '</div></div>' +
         '<div class="cx-sec"><div class="cx-sec-title"><span>2</span>CAPITAL PROJECT TRACKER</div>' + cipThermHtml(d.cip) + '</div>' +
         '<div class="cx-sec"><div class="cx-sec-title"><span>3</span>COMMUNITY ACTION SNAPSHOT</div>' +
-          '<div class="cx-acards">' +
+          '<div class="cx-acards cx-acards-gauge">' +
             actionCard(d.total, 'Reports Filed') +
-            actionCard(d.counts.dispatched + ' Open', 'Active Dispatches', d.counts.dispatched > 0 ? '#FF3B30' : null) +
-            actionCardHtml(hazardPillHtml(hz), 'Hazard Index') +
+            hazardGaugeCardHtml(hz) +
+            actionCard(d.counts.dispatched, 'Open Active Dispatches', d.counts.dispatched > 0 ? '#FF3B30' : null) +
           '</div></div>' +
         '<div class="cx-footer cx-footer-ip">' +
-          '<div>CITIXEN UX™ Engine • Civic Intelligence™ • Civic Memory™ • #CrowdSaveAmerica™</div>' +
+          '<div>CITIXEN UX™ Engine • Civic Intelligence™ • Civic Memory™ • citixenux.com</div>' +
           '<div>Patents Pending (Spatial Recognition Engine &amp; Economic Scraping/Planning Systems) • Public Ledger Verified</div>' +
         '</div>' +
       '</div>' +
@@ -502,44 +485,6 @@
         doc.text(title, M + 24, y); y += 16;
       }
 
-      // Geospatial Hazard Distribution Module — this jurisdiction's own real
-      // report coordinates (d.nodes), plotted on their own bounding box.
-      // There is no ward/city boundary geometry on file, so no boundary
-      // outline is drawn or invented — only the real relative node positions.
-      (function hazardMap() {
-        // Heat-map glow approximated with layered, decreasing-opacity
-        // circles (jsPDF has no native radial-gradient fill) over a
-        // decorative block-grid texture — not a real street layout, since
-        // the app has no boundary geometry on file for this jurisdiction.
-        var mh = 118, mx = M, mw = W - 2 * M, gi, gj, gx, gy2;
-        function opacity(v) { try { doc.setGState(new doc.GState({ opacity: v })); } catch (e) { /* older jsPDF without GState */ } }
-        doc.setFillColor(10, 13, 20); doc.roundedRect(mx, y, mw, mh, 8, 8, 'F');
-        doc.setDrawColor(0, 230, 153); doc.setLineWidth(0.8); doc.roundedRect(mx, y, mw, mh, 8, 8, 'S');
-        doc.setDrawColor(0, 230, 153); doc.setLineWidth(0.4); opacity(0.07);
-        for (gi = 1; gi < 8; gi++) { gx = mx + (mw / 8) * gi; doc.line(gx, y, gx, y + mh); }
-        for (gj = 1; gj < 5; gj++) { gy2 = y + (mh / 5) * gj; doc.line(mx, gy2, mx + mw, gy2); }
-        opacity(1);
-        var pts = localProject(d.nodes || [], mw - 32, mh - 32, 0).map(function (p) { return { x: mx + 16 + p.x, y: y + 16 + p.y, status: p.status }; });
-        if (pts.length) {
-          pts.forEach(function (p) {
-            var rgb = hexRgb(nodeColor(p.status)), r = hazardRadius(p.status) * 0.22, steps = 5, s;
-            for (s = steps; s >= 1; s--) {
-              var frac = s / steps;
-              opacity(0.22 * (1 - frac) + 0.05);
-              doc.setFillColor(rgb[0], rgb[1], rgb[2]); doc.circle(p.x, p.y, r * frac, 'F');
-            }
-            opacity(1);
-            doc.setFillColor(rgb[0], rgb[1], rgb[2]); doc.circle(p.x, p.y, 2.2, 'F');
-          });
-        } else {
-          doc.setTextColor(148, 163, 184); doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
-          doc.text('No live hazard nodes yet', mx + mw / 2, y + mh / 2, { align: 'center' });
-        }
-        doc.setTextColor(148, 163, 184); doc.setFont('helvetica', 'bold'); doc.setFontSize(7);
-        doc.text(('LIVE HAZARD NODES · ' + cityStateLabel(d)).toUpperCase(), mx + 10, y + mh - 9);
-        y += mh + 20;
-      })();
-
       // Metric cards: every card in a solid-black header bar + white body,
       // per this round's card-standardization rule.
       function cardGrid(items, cols) {
@@ -603,49 +548,66 @@
       });
       y += 10;
 
-      // Community Action Snapshot: plain cards with no black header bar, so
-      // this section reads as visually distinct from Section 1. "Civic Audit
-      // Coverage" is permanently removed per this round's spec; "Reports
-      // Filed" uses the real aggregate ticket count (d.total), not the
-      // 'submitted'-stage-only subset.
-      function plainCardGrid(items, cols) {
-        var gap = 10, bw = (W - 2 * M - (cols - 1) * gap) / cols, bodyH = 54;
-        items.forEach(function (it, k) {
-          var col = k % cols, row = Math.floor(k / cols);
-          var x = M + col * (bw + gap), by = y + row * (bodyH + 10);
-          doc.setDrawColor(226, 232, 240); doc.setLineWidth(1);
-          doc.roundedRect(x, by, bw, bodyH, 6, 6, 'S');
-          var cy = by + bodyH / 2;
-          if (it.pill) {
-            var rgb = hexRgb(it.pill), pw2 = doc.getTextWidth(it.val) + 16;
-            doc.setFillColor(rgb[0], rgb[1], rgb[2]); doc.roundedRect(x + bw / 2 - pw2 / 2, cy - 14, pw2, 16, 8, 8, 'F');
-            doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(8);
-            doc.text(it.val, x + bw / 2, cy - 2.5, { align: 'center' });
-          } else {
-            doc.setTextColor.apply(doc, it.color || [9, 13, 22]);
-            doc.setFont('helvetica', 'bold'); doc.setFontSize(14);
-            doc.text(String(it.val), x + bw / 2, cy - 2, { align: 'center' });
-          }
-          doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5);
-          doc.text(it.lbl.toUpperCase(), x + bw / 2, by + bodyH - 9, { align: 'center' });
+      // Hazard Index gauge: 180°, 3-segment semicircular meter. The needle
+      // is centered within whichever segment matches the real computed
+      // hazardIndex() reading for this jurisdiction — never a fixed or
+      // fabricated angle — matching hazardGaugeSvg()'s HTML-pane version.
+      function drawHazardGauge(cx, cy, r, sw, hz) {
+        function pt(a, rad) { var rd = a * Math.PI / 180; return { x: cx - rad * Math.cos(rd), y: cy - rad * Math.sin(rd) }; }
+        var segs = [[0, 60, [0, 230, 153]], [60, 120, [245, 158, 11]], [120, 180, [239, 68, 68]]];
+        doc.setLineWidth(sw);
+        segs.forEach(function (s) {
+          var steps = 16, prev = pt(s[0], r), i, a, p;
+          doc.setDrawColor(s[2][0], s[2][1], s[2][2]);
+          for (i = 1; i <= steps; i++) { a = s[0] + (s[1] - s[0]) * i / steps; p = pt(a, r); doc.line(prev.x, prev.y, p.x, p.y); prev = p; }
         });
-        y += Math.ceil(items.length / cols) * (bodyH + 10);
+        var tip = pt(hazardGaugeAngle(hz.label), r - sw - 4);
+        doc.setDrawColor(9, 13, 22); doc.setLineWidth(2.2); doc.line(cx, cy, tip.x, tip.y);
+        doc.setFillColor(9, 13, 22); doc.circle(cx, cy, 4, 'F');
       }
 
-      ensureRoom(100);
+      // Community Action Snapshot: 3 symmetrical plain cards (no black
+      // header bar) — Reports Filed (real aggregate d.total, not the
+      // 'submitted'-stage-only subset) and Open Active Dispatches flank the
+      // Hazard Index gauge, matching the HTML pane's layout exactly.
+      ensureRoom(130);
       sectionTitle(3, 'COMMUNITY ACTION SNAPSHOT');
-      plainCardGrid([
-        { val: String(d.total), lbl: 'Reports Filed' },
-        { val: d.counts.dispatched + ' Active Dispatches', lbl: 'Open Tickets', color: d.counts.dispatched > 0 ? [204, 36, 29] : [4, 120, 87] },
-        { val: hz.label, lbl: 'Hazard Index', pill: hz.color }
-      ], 3);
+      (function section3Cards() {
+        var gap = 10, bw = (W - 2 * M - 2 * gap) / 3, bodyH = 92, by = y;
+        function cardBox(x) { doc.setDrawColor(226, 232, 240); doc.setLineWidth(1); doc.roundedRect(x, by, bw, bodyH, 6, 6, 'S'); }
+        function labelLines(text, x) {
+          var lines = doc.splitTextToSize(text.toUpperCase(), bw - 10);
+          doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5);
+          lines.forEach(function (line, i) { doc.text(line, x, by + bodyH - 16 + i * 7, { align: 'center' }); });
+        }
+
+        var lx = M; cardBox(lx);
+        doc.setTextColor(9, 13, 22); doc.setFont('helvetica', 'bold'); doc.setFontSize(14);
+        doc.text(String(d.total), lx + bw / 2, by + bodyH / 2 - 6, { align: 'center' });
+        labelLines('Reports Filed', lx + bw / 2);
+
+        var cx2 = M + bw + gap; cardBox(cx2);
+        var gcx = cx2 + bw / 2, gcy = by + bodyH - 28, gr = Math.min(bw / 2 - 16, 40), gsw = 9;
+        drawHazardGauge(gcx, gcy, gr, gsw, hz);
+        var lblColor = hz.label === 'CRITICAL' ? [239, 68, 68] : hz.label === 'MODERATE' ? [245, 158, 11] : [0, 230, 153];
+        doc.setTextColor(lblColor[0], lblColor[1], lblColor[2]); doc.setFont('helvetica', 'bold'); doc.setFontSize(7);
+        doc.text(hz.label === 'LOW RISK' ? 'LOW RISK' : hz.label + ' RISK', gcx, by + bodyH - 8, { align: 'center' });
+
+        var rx = M + 2 * (bw + gap); cardBox(rx);
+        doc.setTextColor.apply(doc, d.counts.dispatched > 0 ? [204, 36, 29] : [4, 120, 87]);
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(14);
+        doc.text(String(d.counts.dispatched), rx + bw / 2, by + bodyH / 2 - 6, { align: 'center' });
+        labelLines('Open Active Dispatches', rx + bw / 2);
+
+        y += bodyH + 10;
+      })();
 
       // Institutional / IP footer block: left trademark-suite declaration,
       // right Patent Pending disclosure, on the same row.
       ensureRoom(40);
       doc.setDrawColor(226, 232, 240); doc.setLineWidth(0.75); doc.line(M, y, W - M, y); y += 14;
       doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5);
-      doc.text('CITIXEN UX™ Engine • Civic Intelligence™ • Civic Memory™ • #CrowdSaveAmerica™', M, y);
+      doc.text('CITIXEN UX™ Engine • Civic Intelligence™ • Civic Memory™ • citixenux.com', M, y);
       doc.text('Patents Pending (Spatial Recognition Engine & Economic', W - M, y, { align: 'right' }); y += 9;
       doc.text('Scraping/Planning Systems) • Public Ledger Verified', W - M, y, { align: 'right' });
 
@@ -663,7 +625,7 @@
   function renderGraphicPane() {
     var el = modal.querySelector('#cxPane-graphic');
     el.innerHTML =
-      '<div class="cx-card-wrap"><canvas id="cxCardCanvas" width="1080" height="1080" role="img" aria-label="#CrowdSaveAmerica Free Report card for ' + esc(cityStateLabel(data)) + '"></canvas></div>' +
+      '<div class="cx-card-wrap"><canvas id="cxCardCanvas" width="1080" height="1080" role="img" aria-label="CITIXEN UX™ Free Report card for ' + esc(cityStateLabel(data)) + '"></canvas></div>' +
       '<div class="cx-actions"><button type="button" class="cx-btn-primary" id="cxShareCardBtn">' + icon('phoneShare') + 'Share #CrowdSaveAmerica Card</button></div>' +
       '<p class="cx-hint" id="cxHint-graphic"></p>';
     el.querySelector('#cxShareCardBtn').addEventListener('click', shareCard);
@@ -699,6 +661,22 @@
     ctx.restore();
   }
   function hazardRadius(status) { return status === 'Critical' ? 92 : status === 'Warning' ? 70 : 54; }
+
+  // Hazard Index gauge (canvas): same 180°, 3-segment meter as the HTML/
+  // jsPDF versions — see hazardGaugeSvg()'s comment for why the needle
+  // angle is always derived from the real hazardIndex() reading.
+  function drawHazardGaugeCanvas(ctx, cx, cy, r, sw, hz) {
+    function canvasAngle(a) { return Math.PI + a * Math.PI / 180; }
+    var segs = [[0, 60, '#00E699'], [60, 120, '#F59E0B'], [120, 180, '#EF4444']];
+    segs.forEach(function (s) {
+      ctx.beginPath(); ctx.arc(cx, cy, r, canvasAngle(s[0]), canvasAngle(s[1]), false);
+      ctx.lineWidth = sw; ctx.strokeStyle = s[2]; ctx.lineCap = 'butt'; ctx.stroke();
+    });
+    var ca = canvasAngle(hazardGaugeAngle(hz.label)), tipR = r - sw - 6;
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + tipR * Math.cos(ca), cy + tipR * Math.sin(ca));
+    ctx.lineWidth = 5; ctx.strokeStyle = '#090D16'; ctx.lineCap = 'round'; ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx, cy, 9, 0, Math.PI * 2); ctx.fillStyle = '#090D16'; ctx.fill();
+  }
 
   function drawHazardMap(ctx, d, phase, mx, my, mw, mh) {
     var raw = localProject(d.nodes || [], mw - 40, mh - 40, 0);
@@ -770,12 +748,13 @@
     ctx.fillText(cityStateLabel(d) + '  •  CURRENT SNAPSHOT', W / 2, 252);
     ctx.textAlign = 'left';
 
-    // Featured headline trio — every card gets its own solid-black header
-    // bar per this round's card-standardization rule.
+    // Community Action Snapshot: a symmetrical 3-card row — Reports Filed
+    // (real aggregate d.total) and Open Active Dispatches flank the Hazard
+    // Index gauge, matching the PDF Brief's Section 3 layout.
     var trio = [
-      { lbl: 'STATE RANK', val: stateRankValue(d.ranks), sub: stateRankSubtext(d.ranks), color: '#FFFFFF' },
-      { lbl: 'HAZARD INDEX', val: hz.label, sub: null, color: hz.color },
-      { lbl: 'ACTIVE DISPATCHES', val: d.counts.dispatched + ' OPEN', sub: null, color: d.counts.dispatched > 0 ? '#FF3B30' : MINT }
+      { lbl: 'REPORTS FILED', kind: 'text', val: String(d.total), color: '#FFFFFF' },
+      { lbl: 'HAZARD INDEX', kind: 'gauge' },
+      { lbl: 'OPEN ACTIVE DISPATCHES', kind: 'text', val: String(d.counts.dispatched), color: d.counts.dispatched > 0 ? '#FF3B30' : MINT }
     ];
     var gap = 22, cw = (W - 2 * P - 2 * gap) / 3, cardY = 318, headH = 40, bodyH = 116;
     trio.forEach(function (c, i) {
@@ -787,9 +766,16 @@
       rr(ctx, x, cardY, cw, headH + bodyH, 18); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,230,153,0.35)'; ctx.stroke();
       ctx.textAlign = 'center';
       ctx.font = font(800, 15); ctx.fillStyle = MINT; ctx.fillText(c.lbl, x + cw / 2, cardY + headH / 2 + 1);
-      ctx.font = font(900, 34); ctx.fillStyle = c.color;
-      ctx.fillText(c.val, x + cw / 2, cardY + headH + bodyH / 2 + (c.sub ? -10 : 2));
-      if (c.sub) { ctx.font = font(700, 16); ctx.fillStyle = SLATE; ctx.fillText(c.sub, x + cw / 2, cardY + headH + bodyH / 2 + 18); }
+      if (c.kind === 'gauge') {
+        var gcx = x + cw / 2, gcy = cardY + headH + bodyH - 36, gr = Math.min(cw / 2 - 22, 56), gsw = 13;
+        drawHazardGaugeCanvas(ctx, gcx, gcy, gr, gsw, hz);
+        var lblColor = hz.label === 'CRITICAL' ? '#EF4444' : hz.label === 'MODERATE' ? '#F59E0B' : '#00E699';
+        ctx.font = font(800, 16); ctx.fillStyle = lblColor;
+        ctx.fillText(hz.label === 'LOW RISK' ? 'LOW RISK' : hz.label + ' RISK', gcx, cardY + headH + bodyH - 12);
+      } else {
+        ctx.font = font(900, 34); ctx.fillStyle = c.color;
+        ctx.fillText(c.val, x + cw / 2, cardY + headH + bodyH / 2 + 2);
+      }
     });
     ctx.textAlign = 'left';
 
@@ -797,9 +783,10 @@
     // drawHazardMap() above for why no boundary shape is drawn).
     drawHazardMap(ctx, d, phase, P, 500, W - 2 * P, 300);
 
-    // Footer: campaign + verification + IP disclosure
+    // Footer: brand + verification + IP disclosure (no #CrowdSaveAmerica
+    // marks, per this round's spec)
     ctx.textAlign = 'center';
-    var line1 = [['#CrowdSaveAmerica™', MINT], ['  •  CITIXEN UX™ Engine  •  Public Ledger Verified', SLATE]];
+    var line1 = [['CITIXEN UX™ Engine', MINT], ['  •  Public Ledger Verified', SLATE]];
     ctx.font = font(700, 22);
     var w = line1.reduce(function (s, p) { return s + ctx.measureText(p[0]).width; }, 0), fx = W / 2 - w / 2;
     ctx.textAlign = 'left';
