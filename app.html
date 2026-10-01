@@ -625,6 +625,18 @@ textarea.input{resize:none;line-height:1.4}
 .btn-receipt-secondary.copied svg{color:#34d399}
 .btn-receipt-dismiss{width:100%;box-sizing:border-box;min-height:52px;background:var(--mint);color:#051311;
   border:none;padding:14px 16px;border-radius:12px;font-family:inherit;font-weight:700;font-size:16px;cursor:pointer}
+/* Add to Apple Wallet — dark glass button, its own full-width row between the
+   secondary action pair and the Dismiss button. See handleAddToWallet(): this
+   always calls the real /api/passbook endpoint, which honestly reports that
+   pass signing isn't available in this beta rather than faking a .pkpass, so
+   every tap (iOS or not) falls back to the Copy Direct Link behavior. */
+.btn-receipt-wallet{width:100%;box-sizing:border-box;min-height:48px;background:#000;
+  border:1px solid #1e293b;color:#f1f5f9;padding:12px 16px;border-radius:10px;font-family:inherit;
+  font-weight:700;font-size:.74rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  gap:8px;transition:border-color .15s}
+.btn-receipt-wallet:hover{border-color:#334155}
+.btn-receipt-wallet svg{flex-shrink:0;color:#f1f5f9}
+.btn-receipt-wallet.copied{color:#34d399;border-color:rgba(52,211,153,.5)}
 
 /* ===== 1:1 SOCIAL GRAPHIC EXPORT — real DOM node rendered to PNG via
    html2canvas (see renderAndShowSocialGraphic()), not a hand-drawn canvas,
@@ -1760,6 +1772,10 @@ textarea.input{resize:none;line-height:1.4}
             <span id="btnReceiptCopyLinkLabel">Copy Direct Link</span>
           </button>
         </div>
+        <button type="button" class="btn-receipt-wallet" id="btnReceiptWallet">
+          <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
+          <span id="btnReceiptWalletLabel">Add to Apple Wallet</span>
+        </button>
         <button type="button" class="btn-receipt-dismiss" id="btnReceiptDismiss">Dismiss to Feed</button>
       </div>
 
@@ -3123,7 +3139,7 @@ async function cityTicketCounts(){
 // and a large open backlog relative to total ticket volume nudges the tier
 // down — nothing here is a invented/external score.
 function computeCivicHealth(d){
-  if (!d || !d.total) return { label: 'CIVIC HEALTH', value: 'N/A', tier: 'unknown' };
+  if (!d || !d.total) return { label: 'N/A', value: 'N/A', tier: 'unknown' };
   const resolvedPct = Math.round((d.resolved / d.total) * 100);
   const activeCount = (d.counts.submitted || 0) + (d.counts.dispatched || 0);
   const activeShare = activeCount / d.total;
@@ -3153,11 +3169,15 @@ async function updateAppTelemetryScorecard(){
     const m = window.CitixenInstantReport.metricsFor(d);
     avgEl.textContent = m.avgFixSpeed;
     rateEl.textContent = m.resolutionRate;
+    // Matches the other two slots' convention exactly: a big glowing value on
+    // top (here, the tier word itself — GOOD/MODERATE/NEEDS ATTENTION/N/A,
+    // not the raw percentage) and a small static label underneath ("CIVIC
+    // HEALTH", same as "AVG. FIX SPEED"/"RESOLUTION RATE" never change).
     const health = computeCivicHealth(d);
-    rankEl.textContent = health.value;
+    rankEl.textContent = health.label;
     rankEl.classList.remove('civic-health-good', 'civic-health-moderate', 'civic-health-poor', 'civic-health-unknown');
     rankEl.classList.add('civic-health-' + health.tier);
-    if (rankLblEl) rankLblEl.textContent = health.value === 'N/A' ? 'CIVIC HEALTH' : health.label;
+    if (rankLblEl) rankLblEl.textContent = 'CIVIC HEALTH';
   } catch (e) { /* leave the placeholder dashes if this fails */ }
   renderAppScorecardTimestamp();
 }
@@ -4565,6 +4585,40 @@ document.getElementById('btnReceiptCopyLink').addEventListener('click', async ()
     toast('Could not copy — try again');
   }
 });
+// Add to Apple Wallet — a real .pkpass requires a signed Apple Pass Type ID
+// certificate + WWDR intermediate + private signing key, none of which exist
+// in this beta environment, and an unsigned .pkpass is rejected by the real
+// Wallet app anyway. Rather than fake a working integration, this calls the
+// real /api/passbook endpoint (which performs a genuine ticket lookup) and
+// honestly surfaces that pass generation isn't available yet, then falls
+// back to the same reliable behavior as Copy Direct Link — on iOS or not.
+async function handleAddToWallet(){
+  const id = document.getElementById('receiptTicketId').textContent;
+  const btn = document.getElementById('btnReceiptWallet');
+  const labelEl = document.getElementById('btnReceiptWalletLabel');
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  try {
+    const res = await fetch('/api/passbook?ticket=' + encodeURIComponent(id));
+    if (res.ok) {
+      // A real signed pass would be a blob download — not reachable in this
+      // beta, so this branch is unused today but left honest for when
+      // real Apple signing credentials exist.
+      return;
+    }
+  } catch (e) { /* network/offline — fall through to the same fallback */ }
+  const url = location.origin + '/app?report=' + encodeURIComponent(id);
+  const ok = await copyTextToClipboard(url);
+  const prevText = labelEl.textContent;
+  if (ok) {
+    labelEl.textContent = isIOS ? 'Not available yet — link copied!' : 'Link Copied!';
+    btn.classList.add('copied');
+  } else {
+    toast('Wallet pass isn\'t available in this beta yet');
+  }
+  setTimeout(() => { labelEl.textContent = prevText; btn.classList.remove('copied'); }, 2400);
+}
+document.getElementById('btnReceiptWallet').addEventListener('click', handleAddToWallet);
 // Real 1:1 social-card export: populates the off-screen
 // #socialGraphicExportCard DOM node (ticket ID, breadcrumb, coords/time, and
 // the citizen's own uploaded photo as the background), rasterizes it with

@@ -34,7 +34,15 @@
       "destination": "/report.html?id=:id"
     },
     {
-      "source": "/((?!api/|app$|dispatch$|admin$|rep$|icons/|shared/|manifest.json|sw.js|favicon.ico|CITIXEN_UX_Executive_Deck\\.pptx).*)",
+      "source": "/operator/feedback",
+      "destination": "/operator-feedback.html"
+    },
+    {
+      "source": "/operator",
+      "destination": "/operator.html"
+    },
+    {
+      "source": "/((?!api/|app$|dispatch$|admin$|rep$|operator$|operator/feedback$|icons/|shared/|manifest.json|sw.js|favicon.ico|CITIXEN_UX_Executive_Deck\\.pptx).*)",
       "destination": "/index.html"
     }
   ],

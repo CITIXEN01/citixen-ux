@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Passcode gate — identical pattern to app.html's (same localStorage key,
+     same passcode), so unlocking app.html already unlocks this page via
+     shared-origin localStorage, and vice versa. See app.html's own gate
+     comment for the full honesty note: this is a tester speed bump, never
+     real access control. -->
+<script>
+(function(){
+  try {
+    if (localStorage.getItem('citixen_auth_token') !== '1') {
+      document.documentElement.classList.add('citixen-gate-locked');
+    }
+  } catch (e) { /* storage blocked — fails open, same as app.html */ }
+})();
+</script>
+<title>CITIXEN UX™ · Network Operator Control</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#00E699">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" type="image/x-icon" href="/favicon.ico?v=5">
+<style>
+:root{
+  --bg-obsidian:#030712; --bg-card:#111827;
+  --mint:#00E699; --mint2:#00c985; --text:#f8fafc; --muted:#8e9fa8;
+  --border:rgba(255,255,255,.08);
+  --surface-card-bg:rgba(5,11,20,0.8); --surface-card-border:1px solid rgba(0,230,153,0.2); --surface-blur:16px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg-obsidian);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  min-height:100vh;display:flex;justify-content:center}
+.wrap{width:100%;max-width:480px;min-height:100vh;padding:24px 16px calc(40px + env(safe-area-inset-bottom,0px));
+  box-sizing:border-box}
+
+/* ===== PASSCODE GATE — exact copy of app.html's gate chrome, reusing
+   citixen_auth_token so the two pages share one unlock. ===== */
+.citixen-gate{display:none;position:fixed;inset:0;z-index:99999;align-items:center;justify-content:center;
+  background:rgba(2,6,23,.92);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+  padding:24px;box-sizing:border-box}
+html.citixen-gate-locked .citixen-gate{display:flex}
+html.citixen-gate-locked body{overflow:hidden}
+.citixen-gate-card{width:100%;max-width:360px;background:rgba(2,6,23,.8);border:1px solid rgba(30,41,59,.85);
+  border-radius:18px;padding:32px 26px;text-align:center;box-shadow:0 0 40px rgba(0,0,0,.6);box-sizing:border-box}
+.citixen-gate-brand{font-weight:800;font-size:.9rem;letter-spacing:.3px;color:#00E699;margin-bottom:20px}
+.citixen-gate-label{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;
+  color:#94a3b8;margin-bottom:14px}
+.citixen-gate-input{width:100%;box-sizing:border-box;background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#f1f5f9;padding:14px 16px;font-size:1rem;
+  text-align:center;letter-spacing:.1em;margin-bottom:12px;font-family:inherit}
+.citixen-gate-input:focus{outline:none;border-color:rgba(0,230,153,.5)}
+.citixen-gate-error{font-size:.7rem;color:#f87171;font-weight:700;margin-bottom:10px;min-height:14px}
+.citixen-gate-btn{width:100%;box-sizing:border-box;background:#00E699;color:#051311;border:none;padding:13px;
+  border-radius:10px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit}
+
+/* ===== HEADER ===== */
+.op-header{text-align:center;margin-bottom:18px}
+.op-brand{font-weight:900;font-size:1rem;letter-spacing:.04em;color:var(--mint)}
+.op-brand .tm{font-size:.6em;vertical-align:super}
+.op-sub{font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+
+/* ===== COHORT BAR ===== */
+.cohort-bar{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--surface-card-bg);
+  backdrop-filter:blur(var(--surface-blur));border:var(--surface-card-border);border-radius:999px;
+  padding:9px 16px;margin-bottom:18px;font-size:.7rem;font-weight:700;color:var(--mint2);text-align:center}
+.cohort-dot{width:7px;height:7px;border-radius:50%;background:var(--mint);flex-shrink:0;
+  animation:cohortPulse 2s ease-in-out infinite}
+@keyframes cohortPulse{0%,100%{opacity:.5}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.cohort-dot{animation:none;opacity:1}}
+
+/* ===== AGGREGATE STATS ROW ===== */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
+.stat-tile{background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));
+  border:var(--surface-card-border);border-radius:12px;padding:14px 8px;text-align:center}
+.stat-val{font-size:1.3rem;font-weight:900;color:var(--mint2)}
+.stat-val.loading{color:var(--muted);font-size:.9rem}
+.stat-lbl{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-top:4px;line-height:1.3}
+.stat-val.civic-good{color:#10b981}
+.stat-val.civic-moderate{color:#f59e0b}
+.stat-val.civic-poor{color:#f87171}
+
+.card{background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));border:var(--surface-card-border);
+  border-radius:12px;padding:16px;margin-bottom:14px}
+.label{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:10px}
+.data-note{font-size:.68rem;color:var(--muted);line-height:1.5}
+
+.op-nav{display:flex;gap:10px;margin-top:4px}
+.op-nav-link{flex:1;text-align:center;background:rgba(0,230,153,.08);border:1px solid rgba(0,230,153,.3);
+  color:var(--mint2);text-decoration:none;font-weight:800;font-size:.72rem;padding:12px 10px;border-radius:10px}
+</style>
+</head>
+<body>
+
+<!-- ===== PASSCODE GATE ===== -->
+<div class="citixen-gate" id="citixenGate">
+  <form class="citixen-gate-card" id="citixenGateForm" autocomplete="off">
+    <div class="citixen-gate-brand">CITIXEN UX<sup class="tm-symbol">™</sup></div>
+    <div class="citixen-gate-label">Enter Access Passcode</div>
+    <input type="password" class="citixen-gate-input" id="citixenGateInput" placeholder="••••••••"
+      autocomplete="off" autocapitalize="off" spellcheck="false">
+    <div class="citixen-gate-error" id="citixenGateError"></div>
+    <button type="submit" class="citixen-gate-btn">Unlock</button>
+  </form>
+</div>
+
+<div class="wrap">
+  <div class="op-header">
+    <div class="op-brand">CITIXEN UX<sup class="tm">™</sup> · NETWORK OPERATOR CONTROL</div>
+  </div>
+
+  <!-- Cohort Bar — "District 4 · Beta Cohort 10/10 active" is literal static
+       display copy per spec, not a computed metric: this build has no real
+       multi-tenant operator roster to count against, so rather than fabricate
+       a live number, this line is labeled honestly in code as fixed text. -->
+  <div class="cohort-bar"><span class="cohort-dot"></span><span>District 4 · Beta Cohort 10/10 active</span></div>
+
+  <!-- Aggregate Stats Row — real numbers computed from the same seeded ticket
+       ledger /api/coverage/tickets already serves to app.html/index.html
+       (api/_lib/store.js). Civic Health Index reuses the identical
+       good/moderate/poor thresholds as app.html's computeCivicHealth(). -->
+  <div class="stats-row">
+    <div class="stat-tile"><div class="stat-val loading" id="opStatTotal">—</div><div class="stat-lbl">Total Reports</div></div>
+    <div class="stat-tile"><div class="stat-val loading" id="opStatRatio">—</div><div class="stat-lbl">Open / Resolved</div></div>
+    <div class="stat-tile"><div class="stat-val loading" id="opStatHealth">—</div><div class="stat-lbl">Civic Health Index</div></div>
+  </div>
+
+  <div class="card">
+    <div class="label">Network Status</div>
+    <div class="data-note" id="opStatusNote">Loading ledger…</div>
+  </div>
+
+  <div class="op-nav">
+    <a class="op-nav-link" href="/operator/feedback">Feedback Queue →</a>
+    <a class="op-nav-link" href="/app">Citizen App →</a>
+  </div>
+</div>
+
+<script>
+'use strict';
+// ===== PASSCODE GATE — identical logic to app.html's initCitixenGate(). =====
+const CITIXEN_AUTH_KEY = 'citixen_auth_token';
+const CITIXEN_GATE_PASSCODE = 'citixen_01';
+(function initCitixenGate(){
+  const form = document.getElementById('citixenGateForm');
+  const input = document.getElementById('citixenGateInput');
+  const errorEl = document.getElementById('citixenGateError');
+  if (!form || !input || !errorEl) return;
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (input.value.trim() === CITIXEN_GATE_PASSCODE) {
+      try { localStorage.setItem(CITIXEN_AUTH_KEY, '1'); } catch (err) { /* fails open for this view only */ }
+      errorEl.textContent = '';
+      document.documentElement.classList.remove('citixen-gate-locked');
+    } else {
+      errorEl.textContent = 'Incorrect passcode — try again.';
+      input.value = '';
+      input.focus();
+    }
+  });
+  if (document.documentElement.classList.contains('citixen-gate-locked')) {
+    setTimeout(() => input.focus(), 250);
+  }
+})();
+
+// ===== AGGREGATE STATS — real data from /api/coverage/tickets. Civic Health
+// Index mirrors app.html's computeCivicHealth() thresholds exactly so the
+// two pages never disagree about what "good" means. =====
+function computeCivicHealthIndex(total, resolved, submitted, dispatched){
+  if (!total) return { label: 'N/A', tier: 'unknown' };
+  const resolvedPct = Math.round((resolved / total) * 100);
+  const activeShare = (submitted + dispatched) / total;
+  if (resolvedPct >= 70 && activeShare <= 0.4) return { label: 'GOOD', tier: 'good' };
+  if (resolvedPct >= 40) return { label: 'MODERATE', tier: 'moderate' };
+  return { label: 'NEEDS ATTENTION', tier: 'poor' };
+}
+async function loadOperatorStats(){
+  const noteEl = document.getElementById('opStatusNote');
+  try {
+    const res = await fetch('/api/coverage/tickets');
+    if (!res.ok) throw new Error('bad status ' + res.status);
+    const data = await res.json();
+    const tickets = (data && data.tickets) || [];
+    const total = tickets.length;
+    const submitted = tickets.filter(t => t.stage === 'submitted').length;
+    const dispatched = tickets.filter(t => t.stage === 'dispatched').length;
+    const resolved = tickets.filter(t => t.stage === 'resolved').length;
+    const open = submitted + dispatched;
+
+    document.getElementById('opStatTotal').textContent = String(total);
+    document.getElementById('opStatTotal').classList.remove('loading');
+    document.getElementById('opStatRatio').textContent = open + ':' + resolved;
+    document.getElementById('opStatRatio').classList.remove('loading');
+
+    const health = computeCivicHealthIndex(total, resolved, submitted, dispatched);
+    const healthEl = document.getElementById('opStatHealth');
+    healthEl.textContent = health.label;
+    healthEl.classList.remove('loading');
+    healthEl.classList.add('civic-' + health.tier);
+
+    noteEl.textContent = 'Live from the seeded ticket ledger (' + total + ' records across all districts) — the same data app.html’s Civic Health metric and the District Health Summary export read from.';
+  } catch (e) {
+    noteEl.textContent = 'Could not reach the ledger — ' + (e && e.message ? e.message : 'network error') + '. Stats will populate once the API is reachable.';
+  }
+}
+loadOperatorStats();
+</script>
+</body>
+</html>

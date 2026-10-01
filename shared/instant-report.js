@@ -295,17 +295,16 @@
           '<div class="cx-head-sub" id="cxJuris">Loading jurisdiction…</div></div>' +
           '<button type="button" class="cx-close" aria-label="Close">✕</button>' +
         '</div>' +
+        '<div class="cx-export-banner" id="cxExportBanner">' +
+          '<span class="cx-export-banner-text">↑ Tap or Scroll for Export &amp; Sharing Options</span>' +
+        '</div>' +
         '<div class="cx-body">' +
           '<div id="cxPane-pdf"></div>' +
-        '</div>' +
-        '<div class="cx-scroll-hint" id="cxScrollHint" aria-hidden="true">' +
-          '<span class="cx-scroll-hint-text">↓ Scroll for Export &amp; Sharing Options</span>' +
         '</div>' +
       '</div>';
     document.body.appendChild(modal);
     modal.querySelector('.cx-close').addEventListener('click', close);
     modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
-    modal.querySelector('.cx-body').addEventListener('scroll', updateScrollHint);
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'Escape' || !modal.classList.contains('open')) return;
       // Escape closes the top-most export sheet first, then the Brief.
@@ -336,23 +335,6 @@
     modal.querySelector('#cxJuris').textContent = cityStateLabel(data);
     renderPdfPane();
     modal.querySelector('.cx-close').focus();
-    updateScrollHint();
-    // Content height can still settle a tick later (fonts/layout), so check
-    // again once rendering has fully flushed rather than relying on a
-    // single synchronous read.
-    setTimeout(updateScrollHint, 60);
-  }
-
-  // Shows "↓ Scroll for Export & Sharing Options" while .cx-body has more
-  // content below the visible area, hides it once scrolled within 24px of
-  // the bottom (or if the content never overflowed in the first place) —
-  // a real scroll-position check, not a timed auto-hide.
-  function updateScrollHint() {
-    if (!modal) return;
-    var body = modal.querySelector('.cx-body'), hint = modal.querySelector('#cxScrollHint');
-    if (!body || !hint) return;
-    var hasMore = (body.scrollHeight - body.scrollTop - body.clientHeight) > 24;
-    hint.classList.toggle('visible', hasMore);
   }
 
   function close() {
