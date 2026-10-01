@@ -311,7 +311,16 @@ textarea.input{resize:none;line-height:1.4}
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
   transition:opacity .5s ease,visibility .5s ease}
 .splash-screen.hide{opacity:0;visibility:hidden;pointer-events:none}
-.splash-logo{width:64px;height:64px;stroke:var(--brand-mint);filter:drop-shadow(0 0 16px rgba(0,230,153,.55))}
+.splash-logo{width:64px;height:64px;stroke:var(--brand-mint);
+  animation:shieldGlowPulse 2.8s ease-in-out infinite;will-change:filter,transform}
+@keyframes shieldGlowPulse{
+  0%{filter:drop-shadow(0 0 6px rgba(0,230,153,.4)) drop-shadow(0 0 15px rgba(0,230,153,.2));transform:scale(1)}
+  50%{filter:drop-shadow(0 0 18px rgba(0,230,153,.8)) drop-shadow(0 0 35px rgba(0,230,153,.4));transform:scale(1.03)}
+  100%{filter:drop-shadow(0 0 6px rgba(0,230,153,.4)) drop-shadow(0 0 15px rgba(0,230,153,.2));transform:scale(1)}
+}
+@media (prefers-reduced-motion: reduce){
+  .splash-logo{animation:none;filter:drop-shadow(0 0 16px rgba(0,230,153,.55))}
+}
 .splash-word{font-weight:900;font-size:1.6rem;letter-spacing:.3px;text-align:center}
 .splash-tag{font-size:.86rem;font-weight:700;color:var(--mint2);text-align:center;padding:0 24px}
 
