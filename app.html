@@ -96,6 +96,7 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
 .app-drawer-panel{width:min(400px,86vw);height:100%;box-sizing:border-box;padding-top:env(safe-area-inset-top, 44px);background:var(--surface-card-bg);backdrop-filter:blur(12px);border-left:var(--surface-card-border);
   display:flex;flex-direction:column}
 .app-drawer-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--border)}
+.app-drawer-title{font-weight:800;text-transform:uppercase;color:#FFFFFF;font-size:16px;letter-spacing:.5px}
 .app-drawer-body{flex:1;overflow-y:auto;padding:16px 18px 32px}
 .bridge-banner{background:linear-gradient(160deg,rgba(0,230,153,.16),rgba(0,230,153,.04));
   border:1px solid rgba(0,230,153,.4);border-radius:14px;padding:16px}
@@ -539,12 +540,17 @@ textarea.input{resize:none;line-height:1.4}
   color:#94A3B8;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.02em}
 /* ===== The standalone "Live Public Ledger" gateway pill (.gateway-pill and
    friends, .ledger-trust-subtitle, .ledger-banner-section/-stacked,
-   .ledger-pill-glow, .ledger-pulse-dot/@keyframes ledgerPulseRing) is
-   removed outright this round — the button itself moved into the Export &
-   Share hero module's button stack (shared/instant-report.js's
-   renderModule(), new .cx-btn-ledger) per this round's "Move Live Public
-   Ledger Into Hero Stack" spec, so this whole shell has no caller left on
-   this page and is deleted with it rather than left as dead CSS. ===== */
+   .ledger-pill-glow, .ledger-pulse-dot/@keyframes ledgerPulseRing) was
+   removed outright in an earlier round — the button itself moved into the
+   Export & Share hero module's button stack (shared/instant-report.js's
+   renderModule(), .cx-btn-tertiary). As of the "Dashboard Stack & Drawer
+   Integration" round, that hero-stack slot on THIS page (app.html) no
+   longer opens the Ledger at all — it was repointed via the onStack option
+   to open the hamburger-menu drawer instead (see initInstantReportAndQuickKeys()
+   below). Real Ledger access on this page now lives at the Quick Keys
+   drawer's "Community Archive" key, which calls openLedgerDrawer()
+   directly. index.html keeps the original onLedger wiring since it has no
+   drawer of its own. ===== */
 .matrix-summary-section{padding-top:12px}
 .hub-row{display:flex;flex-direction:column;max-width:920px;margin:0 auto 26px;padding:0;box-sizing:border-box}
 .hub-card{position:relative;display:flex;align-items:center;justify-content:space-between;width:100%;
@@ -656,15 +662,18 @@ textarea.input{resize:none;line-height:1.4}
     </div>
   </header>
 
-  <!-- ===== MENU DRAWER — QUICK KEYS COMMAND CENTER. Three sections of
-       quick keys, each bound to a real feature already on this page (the
-       Instant Report modal, the Dashboard's Civic Intelligence Stack
-       panels, the info modal and the Geo-Hatch grid). Icons are filled in
-       from shared/instant-report.js's 1px Laser Mint line-art set. ===== -->
+  <!-- ===== MENU DRAWER — CIVIC INTELLIGENCE STACK™ COMMAND CENTER
+       (header renamed from "Quick Keys" to match the Dashboard's hero-stack
+       3rd button, which now opens this same drawer via #appMenuBtn). Three
+       sections of quick keys, each bound to a real feature already on this
+       page (the Instant Report modal, the Dashboard's Civic Intelligence
+       Stack panels, the info modal and the Geo-Hatch grid). Icons are
+       filled in from shared/instant-report.js's 1px Laser Mint line-art
+       set. ===== -->
   <div class="app-drawer" id="appDrawer">
-    <div class="app-drawer-panel" role="dialog" aria-modal="true" aria-label="Quick keys">
+    <div class="app-drawer-panel" role="dialog" aria-modal="true" aria-label="Civic Intelligence Stack">
       <div class="app-drawer-head">
-        <strong>Quick Keys</strong>
+        <strong class="app-drawer-title">CIVIC INTELLIGENCE STACK<sup class="tm-symbol">™</sup></strong>
         <button class="menu-btn" id="appDrawerCloseBtn" type="button" aria-label="Close menu">✕</button>
       </div>
       <div class="app-drawer-body">
@@ -2359,11 +2368,12 @@ const APP_MODAL_DATA = {
     ['Roadmap: H3 resolution 9','The target is a national matrix of roughly 11 million H3 hexagonal cells at census-block scale, keyed on-device for privacy. That nationwide index is not live in this build yet.'],
     ['Why blocks, not addresses','Grouping reports into cells shows coverage and gaps without pinning any report to a household.']
   ]},
-  civicMemory: { title: 'Civic Memory™ — What This Section Covers', body: [
-    ['State Constitution Reference','A representative-summary pointer to this jurisdiction\'s state constitution, the same reference carried in the full web dashboard\'s CITIXEN Codex.'],
-    ['Spatial Hashing Architecture','How this platform buckets reports by location today (ward-tier), and the H3 hexagonal-grid model targeted as its roadmap replacement.'],
-    ['Public Ledger & Standards','Tap the LIVE PUBLIC LEDGER button above to open the real, searchable public record — the same drawer this card\'s subtitle points to.']
-  ]},
+  civicMemory: { title: 'Civic Memory™ — What This Section Covers', html:
+    '<h4>State Constitution Reference</h4><p>A representative-summary pointer to this jurisdiction\'s state constitution, the same reference carried in the full web dashboard\'s CITIXEN Codex.</p>' +
+    '<h4>Spatial Hashing Architecture</h4><p>How this platform buckets reports by location today (ward-tier), and the H3 hexagonal-grid model targeted as its roadmap replacement.</p>' +
+    '<h4>Public Ledger &amp; Standards</h4><p>Open the real, searchable public record of every filed and resolved report below.</p>' +
+    '<button type="button" id="civicMemoryLedgerBtn" class="cx-btn-dashed" style="margin-top:4px;">Open Live Public Ledger ↗</button>'
+  },
   /* Quick Help (header "?" button, next to the hamburger menu) — this is
      the single home for "how does this work" content now that the
      standalone "How Does This Work?" CTA button has been removed (the "?"
@@ -3780,6 +3790,12 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('appInfoModal').addEventListener('click', (e) => {
     if (e.target.id === 'appInfoModal') closeAppInfoModal();
   });
+  // Delegated — #civicMemoryLedgerBtn only exists in the DOM while the
+  // Civic Memory info modal is open (openAppInfoModal() rebuilds the body
+  // on every call), so a direct listener can't be attached once at load.
+  document.getElementById('appInfoModalBody').addEventListener('click', (e) => {
+    if (e.target.closest('#civicMemoryLedgerBtn')) { closeAppInfoModal(); openLedgerDrawer(); }
+  });
 
   initInstantReportAndQuickKeys();
   initDashboardGeoHatch();
@@ -3854,7 +3870,12 @@ function initInstantReportAndQuickKeys(){
     return;
   }
   const IR = window.CitixenInstantReport;
-  IR.init({ getData: appInstantReportData, toast, onLedger: openLedgerDrawer });
+  // 3rd hero-stack button opens the Quick Keys / Civic Intelligence Stack™
+  // drawer (same real click as tapping the hamburger menu) rather than the
+  // Ledger directly — see the "Dashboard Stack & Drawer Integration" CSS
+  // comment above the .telemetry-scorecard-timestamp rule for where Ledger
+  // access moved to instead.
+  IR.init({ getData: appInstantReportData, toast, onStack: () => document.getElementById('appMenuBtn').click() });
 
   document.querySelectorAll('#appDrawer [data-cx-icon]').forEach(el => { el.outerHTML = IR.icon(el.dataset.cxIcon); });
   const actions = {
@@ -3863,7 +3884,12 @@ function initInstantReportAndQuickKeys(){
     share: () => { closeAppDrawer(); IR.sharePlatform(); },
     capital: () => goToDashboardPanel('appHubAnalyticsBtn'),
     tracker: () => goToDashboardPanel('appHubMunicipalBtn'),
-    archive: () => goToDashboardPanel('appHubMemoryBtn'),
+    // Community Archive is this drawer's landing zone for the real public
+    // record (civic resources: the Public Ledger of filed/resolved
+    // reports) — it opens #ledgerDrawer directly rather than the
+    // educational "Civic Memory" text panel, which stays reachable from
+    // its own Dashboard hub-card.
+    archive: () => { closeAppDrawer(); openLedgerDrawer(); },
     privacy: () => { closeAppDrawer(); openAppInfoModal('privacyEngine'); },
     grid: () => {
       closeAppDrawer();

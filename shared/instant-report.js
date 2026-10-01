@@ -180,7 +180,7 @@
   function stateRankHeaderLabel(r) { return (stateRankSubtext(r) ? stateRankSubtext(r) + ' ' : '') + 'State Rank'; }
 
   // ---------- state ----------
-  var cfg = { getData: null, toast: null, onLedger: null };
+  var cfg = { getData: null, toast: null, onLedger: null, onStack: null };
   var data = null, generatedAt = null, current = 'pdf', modal = null, rafId = 0, lastFocus = null;
 
   function toast(msg) {
@@ -213,16 +213,23 @@
               '<sup style="color:#94A3B8;font-weight:400;font-size:.65em;margin-left:1px;line-height:0">™</sup>' +
             '</span>' +
           '</button>' +
-          (cfg.onLedger
-            ? '<button type="button" class="cx-btn-ledger" data-cx-ledger>' +
-                '<span class="cx-ledger-pulse-dot" aria-hidden="true"></span>' +
-                '<span>View Live Public Ledger</span>' +
+          (cfg.onStack
+            ? '<button type="button" class="cx-btn-tertiary" data-cx-stack>' +
+                '<svg class="cx-stack-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>' +
+                '<span>Civic Intelligence Stack<sup style="font-size:.62em;margin-left:1px;color:#00E699">™</sup> ↗</span>' +
               '</button>'
-            : '') +
+            : cfg.onLedger
+              ? '<button type="button" class="cx-btn-tertiary" data-cx-ledger>' +
+                  '<span class="cx-ledger-pulse-dot" aria-hidden="true"></span>' +
+                  '<span>View Live Public Ledger</span>' +
+                '</button>'
+              : '') +
         '</div>' +
       '</section>';
     mount.querySelector('[data-cx-open]').addEventListener('click', function (e) { open('pdf', e.currentTarget); });
     mount.querySelector('[data-cx-share-platform]').addEventListener('click', sharePlatform);
+    var stackBtn = mount.querySelector('[data-cx-stack]');
+    if (stackBtn) stackBtn.addEventListener('click', function () { cfg.onStack(); });
     var ledgerBtn = mount.querySelector('[data-cx-ledger]');
     if (ledgerBtn) ledgerBtn.addEventListener('click', function () { cfg.onLedger(); });
   }
@@ -921,6 +928,7 @@
       cfg.getData = options.getData;
       cfg.toast = options.toast || null;
       cfg.onLedger = options.onLedger || null;
+      cfg.onStack = options.onStack || null;
       document.querySelectorAll('[data-cx-export-module]').forEach(renderModule);
     },
     open: open,
