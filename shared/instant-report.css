@@ -109,18 +109,20 @@
 .cx-mcard-body{padding:10px 6px;text-align:center;background:#FFFFFF}
 .cx-mcard-val{font-size:1.05rem;font-weight:800;color:#047857;font-variant-numeric:tabular-nums}
 .cx-mcard-sub{font-size:.58rem;font-weight:600;color:#475569;margin-top:2px}
-/* Community Action Snapshot: plain cards with no black header bar, so this
-   section reads as visually distinct from Section 1. */
+/* Community Action Snapshot: all 3 cards share one unified black/charcoal
+   anchor container instead of separate white cards, to read as a single
+   strong visual anchor at the bottom of the document. */
+.cx-acards-wrap{background:#000000;border-radius:12px;padding:16px 10px}
 .cx-acards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.cx-acard{border:1px solid #E2E8F0;border-radius:10px;padding:12px 6px 10px;text-align:center;background:#FFFFFF}
-.cx-acard-val{font-size:1.05rem;font-weight:800;color:#090D16;font-variant-numeric:tabular-nums}
-.cx-acard-lbl{font-size:.54rem;font-weight:700;letter-spacing:.06em;color:#64748B;text-transform:uppercase;margin-top:4px}
-/* Hazard Index semi-circular gauge card: same box as the flanking Reports
-   Filed / Open Active Dispatches cards, holding the gauge SVG instead of a
-   big number. */
-.cx-acard-gauge{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-top:6px}
-.cx-acard-gauge svg{display:block;width:100%;max-width:150px}
-.cx-acard-gauge .cx-acard-lbl{font-size:.6rem;margin-top:2px}
+.cx-acard{border:none;border-radius:0;padding:0;text-align:center;background:transparent}
+.cx-acard-lbl{font-size:.54rem;font-weight:800;letter-spacing:.06em;color:#00E699;text-transform:uppercase;margin-bottom:8px}
+.cx-acard-val{font-size:1.1rem;font-weight:800;color:#FFFFFF;font-variant-numeric:tabular-nums}
+/* Hazard Index semi-circular gauge card: same unified dark backdrop as the
+   flanking Reports Filed / Open Active Dispatches cards, holding the
+   gauge SVG (white needle/hub for contrast) instead of a big number. */
+.cx-acard-gauge{display:flex;flex-direction:column;align-items:center}
+.cx-acard-gauge svg{display:block;width:100%;max-width:150px;margin-top:-2px}
+.cx-acard-risk-lbl{font-size:.62rem;font-weight:800;margin-top:2px}
 /* Capital Project Tracker: a qualitative progress bar per status tier —
    there is no measured percent-complete field in the data, so no specific
    completion number is ever printed. */

@@ -339,16 +339,20 @@
       (subText ? '<div class="cx-mcard-sub">' + esc(subText) + '</div>' : '') +
     '</div></div>';
   }
-  // Community Action Snapshot: plain cards (no black header bar), visually
-  // distinct from Section 1's cards per this round's spec.
+  // Community Action Snapshot: all 3 cards share one black/charcoal anchor
+  // container (.cx-acards-wrap) — Reports Filed and Open Active Dispatches
+  // flank the Hazard Index gauge. Header labels are Brand Green/bold/
+  // uppercase, values Crisp White (color overridden only for the open-
+  // dispatches crimson callout).
   function actionCard(val, lbl, color) {
-    return '<div class="cx-acard"><div class="cx-acard-val"' + (color ? ' style="color:' + color + '"' : '') + '>' + esc(val) + '</div>' +
-      '<div class="cx-acard-lbl">' + esc(lbl) + '</div></div>';
+    return '<div class="cx-acard"><div class="cx-acard-lbl">' + esc(lbl) + '</div>' +
+      '<div class="cx-acard-val"' + (color ? ' style="color:' + color + '"' : '') + '>' + esc(val) + '</div></div>';
   }
   // Hazard Index gauge: a 180°, 3-segment semicircular meter (green/amber/
   // red). The needle is centered within whichever segment matches the real
   // computed hazardIndex() reading for this jurisdiction — never a fixed or
-  // fabricated angle — and the label beneath it is that same real reading.
+  // fabricated angle. Needle/hub are rendered in white for contrast against
+  // the dark anchor container.
   function hazardGaugeAngle(label) { return label === 'CRITICAL' ? 150 : label === 'MODERATE' ? 90 : 30; }
   function hazardGaugeSvg(hz, vw, vh) {
     var cx = vw / 2, cy = vh - 6, r = Math.min(vw / 2 - 6, vh - 16), sw = Math.max(10, Math.round(r * 0.24));
@@ -361,15 +365,15 @@
     var needleA = hazardGaugeAngle(hz.label), tip = pt(needleA, r - sw - 4);
     return '<svg viewBox="0 0 ' + vw + ' ' + vh + '" width="100%" role="img" aria-label="Hazard Index gauge: ' + esc(hz.label) + '">' +
       arcs +
-      '<line x1="' + cx + '" y1="' + cy + '" x2="' + tip.x.toFixed(1) + '" y2="' + tip.y.toFixed(1) + '" stroke="#090D16" stroke-width="3.5" stroke-linecap="round"/>' +
-      '<circle cx="' + cx + '" cy="' + cy + '" r="7" fill="#090D16"/>' +
+      '<line x1="' + cx + '" y1="' + cy + '" x2="' + tip.x.toFixed(1) + '" y2="' + tip.y.toFixed(1) + '" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>' +
+      '<circle cx="' + cx + '" cy="' + cy + '" r="7" fill="#FFFFFF"/>' +
     '</svg>';
   }
   function hazardGaugeCardHtml(hz) {
-    var lblColor = hz.label === 'CRITICAL' ? '#EF4444' : hz.label === 'MODERATE' ? '#F59E0B' : '#00E699';
-    var lblText = hz.label === 'LOW RISK' ? 'LOW RISK' : hz.label + ' RISK';
-    return '<div class="cx-acard cx-acard-gauge">' + hazardGaugeSvg(hz, 160, 92) +
-      '<div class="cx-acard-lbl" style="color:' + lblColor + '">' + esc(lblText) + '</div></div>';
+    var riskColor = hz.label === 'CRITICAL' ? '#EF4444' : hz.label === 'MODERATE' ? '#F59E0B' : '#00E699';
+    var riskText = hz.label === 'LOW RISK' ? 'LOW RISK' : hz.label + ' RISK';
+    return '<div class="cx-acard cx-acard-gauge"><div class="cx-acard-lbl">Risk Gauge</div>' + hazardGaugeSvg(hz, 160, 92) +
+      '<div class="cx-acard-risk-lbl" style="color:' + riskColor + '">' + esc(riskText) + '</div></div>';
   }
   // Capital Project Tracker: a qualitative progress bar per status tier —
   // On-Time (green) / In Progress or a stale field update (amber) /
@@ -414,11 +418,11 @@
           '</div></div>' +
         '<div class="cx-sec"><div class="cx-sec-title"><span>2</span>CAPITAL PROJECT TRACKER</div>' + cipThermHtml(d.cip) + '</div>' +
         '<div class="cx-sec"><div class="cx-sec-title"><span>3</span>COMMUNITY ACTION SNAPSHOT</div>' +
-          '<div class="cx-acards cx-acards-gauge">' +
+          '<div class="cx-acards-wrap"><div class="cx-acards">' +
             actionCard(d.total, 'Reports Filed') +
             hazardGaugeCardHtml(hz) +
             actionCard(d.counts.dispatched, 'Open Active Dispatches', d.counts.dispatched > 0 ? '#FF3B30' : null) +
-          '</div></div>' +
+          '</div></div></div>' +
         '<div class="cx-footer-single">CITIXEN UX™ • Civic Intelligence™</div>' +
         '</div>' +
       '</div>' +
@@ -568,44 +572,49 @@
           for (i = 1; i <= steps; i++) { a = s[0] + (s[1] - s[0]) * i / steps; p = pt(a, r); doc.line(prev.x, prev.y, p.x, p.y); prev = p; }
         });
         var tip = pt(hazardGaugeAngle(hz.label), r - sw - 4);
-        doc.setDrawColor(9, 13, 22); doc.setLineWidth(2.2); doc.line(cx, cy, tip.x, tip.y);
-        doc.setFillColor(9, 13, 22); doc.circle(cx, cy, 4, 'F');
+        doc.setDrawColor(255, 255, 255); doc.setLineWidth(2.2); doc.line(cx, cy, tip.x, tip.y);
+        doc.setFillColor(255, 255, 255); doc.circle(cx, cy, 4, 'F');
       }
 
-      // Community Action Snapshot: 3 symmetrical plain cards (no black
-      // header bar) — Reports Filed (real aggregate d.total, not the
+      // Community Action Snapshot: all 3 cards share one unified black
+      // anchor container — Reports Filed (real aggregate d.total, not the
       // 'submitted'-stage-only subset) and Open Active Dispatches flank the
       // Hazard Index gauge, matching the HTML pane's layout exactly.
-      ensureRoom(130);
+      ensureRoom(140);
       sectionTitle(3, 'COMMUNITY ACTION SNAPSHOT');
       (function section3Cards() {
-        var gap = 10, bw = (W - 2 * M - 2 * gap) / 3, bodyH = 92, by = y;
-        function cardBox(x) { doc.setDrawColor(226, 232, 240); doc.setLineWidth(1); doc.roundedRect(x, by, bw, bodyH, 6, 6, 'S'); }
-        function labelLines(text, x) {
-          var lines = doc.splitTextToSize(text.toUpperCase(), bw - 10);
-          doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5);
-          lines.forEach(function (line, i) { doc.text(line, x, by + bodyH - 16 + i * 7, { align: 'center' }); });
+        var pad = 12, gap = 10, boxH = 108, by = y;
+        doc.setFillColor(0, 0, 0); doc.roundedRect(M, by, W - 2 * M, boxH, 10, 10, 'F');
+        var innerW = W - 2 * M - 2 * pad, bw = (innerW - 2 * gap) / 3;
+
+        function headerLabel(text, cxCol) {
+          var lines = doc.splitTextToSize(text.toUpperCase(), bw);
+          doc.setTextColor(0, 230, 153); doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5);
+          lines.forEach(function (line, i) { doc.text(line, cxCol, by + pad + 4 + i * 7, { align: 'center' }); });
+        }
+        function bigValue(text, cxCol, color) {
+          doc.setTextColor.apply(doc, color || [255, 255, 255]);
+          doc.setFont('helvetica', 'bold'); doc.setFontSize(15);
+          doc.text(text, cxCol, by + boxH / 2 + 10, { align: 'center' });
         }
 
-        var lx = M; cardBox(lx);
-        doc.setTextColor(9, 13, 22); doc.setFont('helvetica', 'bold'); doc.setFontSize(14);
-        doc.text(String(d.total), lx + bw / 2, by + bodyH / 2 - 6, { align: 'center' });
-        labelLines('Reports Filed', lx + bw / 2);
+        var lcx = M + pad + bw / 2;
+        headerLabel('Reports Filed', lcx);
+        bigValue(String(d.total), lcx, [255, 255, 255]);
 
-        var cx2 = M + bw + gap; cardBox(cx2);
-        var gcx = cx2 + bw / 2, gcy = by + bodyH - 28, gr = Math.min(bw / 2 - 16, 40), gsw = 9;
-        drawHazardGauge(gcx, gcy, gr, gsw, hz);
-        var lblColor = hz.label === 'CRITICAL' ? [239, 68, 68] : hz.label === 'MODERATE' ? [245, 158, 11] : [0, 230, 153];
-        doc.setTextColor(lblColor[0], lblColor[1], lblColor[2]); doc.setFont('helvetica', 'bold'); doc.setFontSize(7);
-        doc.text(hz.label === 'LOW RISK' ? 'LOW RISK' : hz.label + ' RISK', gcx, by + bodyH - 8, { align: 'center' });
+        var ccx = M + pad + bw + gap + bw / 2;
+        headerLabel('Risk Gauge', ccx);
+        var gcy = by + boxH - 16, gr = Math.min(bw / 2 - 14, 38), gsw = 9;
+        drawHazardGauge(ccx, gcy, gr, gsw, hz);
+        var riskColor = hz.label === 'CRITICAL' ? [239, 68, 68] : hz.label === 'MODERATE' ? [245, 158, 11] : [0, 230, 153];
+        doc.setTextColor(riskColor[0], riskColor[1], riskColor[2]); doc.setFont('helvetica', 'bold'); doc.setFontSize(7);
+        doc.text(hz.label === 'LOW RISK' ? 'LOW RISK' : hz.label + ' RISK', ccx, by + boxH - 6, { align: 'center' });
 
-        var rx = M + 2 * (bw + gap); cardBox(rx);
-        doc.setTextColor.apply(doc, d.counts.dispatched > 0 ? [204, 36, 29] : [4, 120, 87]);
-        doc.setFont('helvetica', 'bold'); doc.setFontSize(14);
-        doc.text(String(d.counts.dispatched), rx + bw / 2, by + bodyH / 2 - 6, { align: 'center' });
-        labelLines('Open Active Dispatches', rx + bw / 2);
+        var rcx = M + pad + 2 * (bw + gap) + bw / 2;
+        headerLabel('Open Active Dispatches', rcx);
+        bigValue(String(d.counts.dispatched), rcx, d.counts.dispatched > 0 ? [255, 59, 48] : [255, 255, 255]);
 
-        y += bodyH + 10;
+        y += boxH + 10;
       })();
 
       // Footer: a single centered line with just the two core marks — no
@@ -694,10 +703,11 @@
       ctx.beginPath(); ctx.arc(cx, cy, r, canvasAngle(s[0]), canvasAngle(s[1]), false);
       ctx.lineWidth = sw; ctx.strokeStyle = s[2]; ctx.lineCap = 'butt'; ctx.stroke();
     });
+    // White needle/hub for contrast against this card's dark body.
     var ca = canvasAngle(hazardGaugeAngle(hz.label)), tipR = r - sw - 6;
     ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + tipR * Math.cos(ca), cy + tipR * Math.sin(ca));
-    ctx.lineWidth = 5; ctx.strokeStyle = '#090D16'; ctx.lineCap = 'round'; ctx.stroke();
-    ctx.beginPath(); ctx.arc(cx, cy, 9, 0, Math.PI * 2); ctx.fillStyle = '#090D16'; ctx.fill();
+    ctx.lineWidth = 5; ctx.strokeStyle = '#FFFFFF'; ctx.lineCap = 'round'; ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx, cy, 9, 0, Math.PI * 2); ctx.fillStyle = '#FFFFFF'; ctx.fill();
   }
 
   function drawHazardMap(ctx, d, phase, mx, my, mw, mh) {
