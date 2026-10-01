@@ -354,6 +354,10 @@
   // fabricated angle. Needle/hub are rendered in white for contrast against
   // the dark anchor container.
   function hazardGaugeAngle(label) { return label === 'CRITICAL' ? 150 : label === 'MODERATE' ? 90 : 30; }
+  // Display text for the gauge's 3 zones, distinct from Section 2's
+  // On-Time/Delayed capital-project vocabulary: real-time dispatch-load
+  // reading, not a project-timeline status.
+  function civicHealthZoneLabel(label) { return label === 'CRITICAL' ? 'HIGH LOAD' : label === 'MODERATE' ? 'MODERATE' : 'OPTIMAL'; }
   function hazardGaugeSvg(hz, vw, vh) {
     var cx = vw / 2, cy = vh - 6, r = Math.min(vw / 2 - 6, vh - 16), sw = Math.max(10, Math.round(r * 0.24));
     function pt(a, rad) { var rad2 = a * Math.PI / 180; return { x: cx - rad * Math.cos(rad2), y: cy - rad * Math.sin(rad2) }; }
@@ -363,7 +367,7 @@
       return '<path d="M' + p0.x.toFixed(1) + ',' + p0.y.toFixed(1) + ' A' + r.toFixed(1) + ',' + r.toFixed(1) + ' 0 0 1 ' + p1.x.toFixed(1) + ',' + p1.y.toFixed(1) + '" stroke="' + s.color + '" stroke-width="' + sw + '" fill="none"/>';
     }).join('');
     var needleA = hazardGaugeAngle(hz.label), tip = pt(needleA, r - sw - 4);
-    return '<svg viewBox="0 0 ' + vw + ' ' + vh + '" width="100%" role="img" aria-label="Hazard Index gauge: ' + esc(hz.label) + '">' +
+    return '<svg viewBox="0 0 ' + vw + ' ' + vh + '" width="100%" role="img" aria-label="Civic Health gauge: ' + esc(civicHealthZoneLabel(hz.label)) + '">' +
       arcs +
       '<line x1="' + cx + '" y1="' + cy + '" x2="' + tip.x.toFixed(1) + '" y2="' + tip.y.toFixed(1) + '" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>' +
       '<circle cx="' + cx + '" cy="' + cy + '" r="7" fill="#FFFFFF"/>' +
@@ -371,9 +375,8 @@
   }
   function hazardGaugeCardHtml(hz) {
     var riskColor = hz.label === 'CRITICAL' ? '#EF4444' : hz.label === 'MODERATE' ? '#F59E0B' : '#00E699';
-    var riskText = hz.label === 'LOW RISK' ? 'LOW RISK' : hz.label + ' RISK';
-    return '<div class="cx-acard cx-acard-gauge"><div class="cx-acard-lbl">Risk Gauge</div>' + hazardGaugeSvg(hz, 160, 92) +
-      '<div class="cx-acard-risk-lbl" style="color:' + riskColor + '">' + esc(riskText) + '</div></div>';
+    return '<div class="cx-acard cx-acard-gauge"><div class="cx-acard-lbl">Civic Health</div>' + hazardGaugeSvg(hz, 160, 92) +
+      '<div class="cx-acard-risk-lbl" style="color:' + riskColor + '">' + esc(civicHealthZoneLabel(hz.label)) + '</div></div>';
   }
   // Capital Project Tracker: a qualitative progress bar per status tier —
   // On-Time (green) / In Progress or a stale field update (amber) /
@@ -603,12 +606,12 @@
         bigValue(String(d.total), lcx, [255, 255, 255]);
 
         var ccx = M + pad + bw + gap + bw / 2;
-        headerLabel('Risk Gauge', ccx);
+        headerLabel('Civic Health', ccx);
         var gcy = by + boxH - 16, gr = Math.min(bw / 2 - 14, 38), gsw = 9;
         drawHazardGauge(ccx, gcy, gr, gsw, hz);
         var riskColor = hz.label === 'CRITICAL' ? [239, 68, 68] : hz.label === 'MODERATE' ? [245, 158, 11] : [0, 230, 153];
         doc.setTextColor(riskColor[0], riskColor[1], riskColor[2]); doc.setFont('helvetica', 'bold'); doc.setFontSize(7);
-        doc.text(hz.label === 'LOW RISK' ? 'LOW RISK' : hz.label + ' RISK', ccx, by + boxH - 6, { align: 'center' });
+        doc.text(civicHealthZoneLabel(hz.label), ccx, by + boxH - 6, { align: 'center' });
 
         var rcx = M + pad + 2 * (bw + gap) + bw / 2;
         headerLabel('Open Active Dispatches', rcx);
@@ -785,7 +788,7 @@
     // Index gauge, matching the PDF Brief's Section 3 layout.
     var trio = [
       { lbl: 'REPORTS FILED', kind: 'text', val: String(d.total), color: '#FFFFFF' },
-      { lbl: 'HAZARD INDEX', kind: 'gauge' },
+      { lbl: 'CIVIC HEALTH', kind: 'gauge' },
       { lbl: 'OPEN ACTIVE DISPATCHES', kind: 'text', val: String(d.counts.dispatched), color: d.counts.dispatched > 0 ? '#FF3B30' : MINT }
     ];
     var gap = 22, cw = (W - 2 * P - 2 * gap) / 3, cardY = 318, headH = 40, bodyH = 116;
@@ -803,7 +806,7 @@
         drawHazardGaugeCanvas(ctx, gcx, gcy, gr, gsw, hz);
         var lblColor = hz.label === 'CRITICAL' ? '#EF4444' : hz.label === 'MODERATE' ? '#F59E0B' : '#00E699';
         ctx.font = font(800, 16); ctx.fillStyle = lblColor;
-        ctx.fillText(hz.label === 'LOW RISK' ? 'LOW RISK' : hz.label + ' RISK', gcx, cardY + headH + bodyH - 12);
+        ctx.fillText(civicHealthZoneLabel(hz.label), gcx, cardY + headH + bodyH - 12);
       } else {
         ctx.font = font(900, 34); ctx.fillStyle = c.color;
         ctx.fillText(c.val, x + cw / 2, cardY + headH + bodyH / 2 + 2);
