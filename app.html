@@ -705,6 +705,17 @@ textarea.input{resize:none;line-height:1.4}
           <button type="button" class="cx-drawer-key cx-drawer-key-single" data-cx-key="share"><span data-cx-icon="shareUp"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">Share CITIXEN UX™ Platform</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
         </div>
         <div class="cx-drawer-section">
+          <!-- Capital Projects and City Action Tracker: real deep-dive
+               panels (CIP Intercept & Budget Tracking / Live Work Orders &
+               Response) that used to have their own cards on the Dashboard
+               hub-row. That row was replaced by the Civic Memory™ &
+               Citizenship™ narrative funnel, so these two real features
+               moved here rather than being removed. -->
+          <div class="cx-drawer-heading">Civic Operations</div>
+          <button type="button" class="cx-drawer-key" data-cx-key="capitalProjects"><span data-cx-icon="capital"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">Capital Projects</span><span class="cx-drawer-key-sub">CIP intercept &amp; budget tracking</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
+          <button type="button" class="cx-drawer-key" data-cx-key="cityActionTracker"><span data-cx-icon="truck"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">City Action Tracker</span><span class="cx-drawer-key-sub">Live work orders &amp; response</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
+        </div>
+        <div class="cx-drawer-section">
           <div class="cx-drawer-heading">Civic Intelligence<sup class="tm-symbol">™</sup> Stack</div>
           <button type="button" class="cx-drawer-key" data-cx-key="civicMemory"><span data-cx-icon="archive"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">Civic Memory™</span><span class="cx-drawer-key-sub">Constitutions, charters &amp; foundational codex</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
           <button type="button" class="cx-drawer-key" data-cx-key="livingLedger"><span data-cx-icon="truck"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">Living Ledger™</span><span class="cx-drawer-key-sub">Live dispatch &amp; public ledger</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
@@ -903,33 +914,50 @@ textarea.input{resize:none;line-height:1.4}
            hero module above (item 3) as its 3rd stacked button, wired via
            CitixenInstantReport.init()'s onLedger option. -->
 
-      <!-- 7. CIVIC INTELLIGENCE STACK™ — human-first labels: Capital
-           Projects / City Action Tracker / Community Archive. -->
+      <!-- 7. CIVIC MEMORY & CITIZENSHIP™ — Dashboard Narrative Funnel
+           (replaces the old "Civic Intelligence™ Stack" 3-card hub-row of
+           Capital Projects / City Action Tracker / Community Archive with a
+           3-node story: Sacred Codex -> Living Ledger -> Protocol). These 3
+           nodes reuse real, already-wired features — not new content:
+             Node 1 reuses the drawer's "Civic Memory™" key's own target
+               (openAppInfoModal('civicMemory') — governing documents,
+               charters, foundational codex).
+             Node 2 reuses the drawer's "Living Ledger™" key's own target
+               (openLedgerDrawer() — the real, searchable public ledger).
+             Node 3 reuses the drawer's "CITIXEN UX™ Protocol" key's own
+               target (openAppInfoModal('citixenProtocol') — the real local
+               routing/classification + Capital Project intercept logic).
+           Capital Projects (CIP Intercept & Budget Tracking) and City Action
+           Tracker (Live Work Orders & Response) are real features and keep
+           their full functionality — they move into the Quick Keys drawer
+           (new "Civic Operations" section below) rather than being deleted,
+           since this narrative replaces the Dashboard's visible hub-row,
+           not the features themselves. -->
       <section class="matrix-summary-section">
-        <h3 style="color:#00E699;font-size:1.1rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin:4px 0 6px;text-align:center;">Civic Intelligence<sup class="tm-symbol">™</sup> Stack</h3>
-        <p style="color:var(--muted);font-size:.78rem;text-align:center;font-style:italic;margin:0 0 16px;">Click on any live module below for an instant report.</p>
+        <h3 style="color:#00E699;font-size:1.1rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin:4px 0 6px;text-align:center;">Civic Memory<sup class="tm-symbol">™</sup> &amp; Citizenship<sup class="tm-symbol">™</sup></h3>
+        <p style="color:var(--muted);font-size:.78rem;text-align:center;font-style:italic;margin:0 0 16px;">The record, the ledger, and the protocol behind every report.</p>
       </section>
-      <div class="hub-row" role="navigation" aria-label="Deep-dive sections">
-        <button class="hub-card telemetry-card" id="appHubAnalyticsBtn" type="button" aria-expanded="false" aria-controls="appDeepdiveAnalytics">
-          <span class="hub-card-main">
-            <svg class="cx-hub-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 20h16"/><path d="M6 20v-5h3v5M10.5 20v-9h3v9M15 20v-7h3v7"/><path d="M5 10l5-4 4 3 5-5"/><path d="M16 4h3v3"/></svg>
-            <span class="hub-card-title">Capital Projects</span>
-          </span>
-          <span class="hub-card-actions"><span class="hub-card-sub">CIP Intercept &amp; Budget Tracking</span><span class="hub-card-arrow">↗</span></span>
-        </button>
-        <button class="hub-card telemetry-card" id="appHubMunicipalBtn" type="button" aria-expanded="false" aria-controls="appMunicipalPanel">
-          <span class="hub-card-main">
-            <svg class="cx-hub-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M2 6h11v10H2z"/><path d="M13 9h4l4 4v3h-8z"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>
-            <span class="hub-card-title">City Action Tracker</span>
-          </span>
-          <span class="hub-card-actions"><span class="hub-card-sub">Live Work Orders &amp; Response</span><span class="hub-card-arrow">↗</span></span>
-        </button>
-        <button class="hub-card telemetry-card" id="appHubMemoryBtn" type="button">
+      <div class="hub-row" role="navigation" aria-label="Civic Memory & Citizenship">
+        <button class="hub-card telemetry-card" id="appNodeCodexBtn" type="button">
           <span class="hub-card-main">
             <svg class="cx-hub-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 9l9-5 9 5"/><path d="M4 9h16"/><path d="M6 9v8M10 9v8M14 9v8M18 9v8"/><path d="M4 17h16M3 20h18"/></svg>
-            <span class="hub-card-title">Community Archive</span>
+            <span class="hub-card-title">The Sacred Codex<sup class="tm-symbol">™</sup></span>
           </span>
-          <span class="hub-card-actions"><span class="hub-card-sub">Public Ledger &amp; Civic Memory™</span><span class="hub-card-arrow">↗</span></span>
+          <span class="hub-card-actions"><span class="hub-card-sub">Constitutions, charters &amp; foundational codex</span><span class="hub-card-arrow">↗</span></span>
+        </button>
+        <button class="hub-card telemetry-card" id="appNodeLedgerBtn" type="button">
+          <span class="hub-card-main">
+            <svg class="cx-hub-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M2 6h11v10H2z"/><path d="M13 9h4l4 4v3h-8z"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>
+            <span class="hub-card-title">The Living Ledger<sup class="tm-symbol">™</sup></span>
+          </span>
+          <span class="hub-card-actions"><span class="hub-card-sub">Our shared civic memory</span><span class="hub-card-arrow">↗</span></span>
+        </button>
+        <button class="hub-card telemetry-card" id="appNodeProtocolBtn" type="button">
+          <span class="hub-card-main">
+            <svg class="cx-hub-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="6" cy="12" r="2.4"/><circle cx="18" cy="6" r="2.4"/><circle cx="18" cy="18" r="2.4"/><path d="M8.2 10.9l7.6-3.8M8.2 13.1l7.6 3.8"/></svg>
+            <span class="hub-card-title">CITIXEN UX<sup class="tm-symbol">™</sup> Protocol</span>
+          </span>
+          <span class="hub-card-actions"><span class="hub-card-sub">Apolitical infrastructure admin</span><span class="hub-card-arrow">↗</span></span>
         </button>
       </div>
 
@@ -3839,23 +3867,26 @@ window.addEventListener('DOMContentLoaded',()=>{
   if (pdfBtn) pdfBtn.addEventListener('click', () => downloadWardHealthPdf(pdfBtn));
 
   /* ===== DASHBOARD TAB (Screen 3) WIRING ===== */
-  document.getElementById('appHubAnalyticsBtn').addEventListener('click', (e) => {
-    openAppDeepdivePanel('appDeepdiveAnalytics', e.currentTarget);
-  });
+  // Civic Memory™ & Citizenship™ narrative funnel (replaces the old
+  // Capital Projects / City Action Tracker / Community Archive hub-row) —
+  // each node opens the same real, already-wired feature its equivalent
+  // Quick Keys drawer key opens (see the drawer's "Civic Intelligence™
+  // Stack" section below).
+  document.getElementById('appNodeCodexBtn').addEventListener('click', () => openAppInfoModal('civicMemory'));
+  document.getElementById('appNodeLedgerBtn').addEventListener('click', () => openLedgerDrawer());
+  document.getElementById('appNodeProtocolBtn').addEventListener('click', () => openAppInfoModal('citixenProtocol'));
+  // Capital Projects and City Action Tracker keep their full deep-dive
+  // panels and real data loads — they moved into the Quick Keys drawer's
+  // new "Civic Operations" section (data-cx-key="capitalProjects" /
+  // "cityActionTracker") rather than being removed, since the Dashboard's
+  // hub-row above was replaced by the narrative funnel, not the features
+  // themselves.
   document.getElementById('appDeepdiveAnalyticsCloseBtn').addEventListener('click', () => {
     document.getElementById('appDeepdiveAnalytics').classList.remove('open');
-    document.getElementById('appHubAnalyticsBtn').setAttribute('aria-expanded', 'false');
-  });
-  document.getElementById('appHubMunicipalBtn').addEventListener('click', async (e) => {
-    openAppDeepdivePanel('appMunicipalPanel', e.currentTarget);
-    if (!ledgerTickets.length) ledgerTickets = await fetchLedgerTickets();
-    renderAppMunicipalPanel();
   });
   document.getElementById('appMunicipalPanelCloseBtn').addEventListener('click', () => {
     document.getElementById('appMunicipalPanel').classList.remove('open');
-    document.getElementById('appHubMunicipalBtn').setAttribute('aria-expanded', 'false');
   });
-  document.getElementById('appHubMemoryBtn').addEventListener('click', () => openAppInfoModal('civicMemory'));
 
   document.getElementById('appTileFeatures').addEventListener('click', () => toggleAppFeatureAccordion('ciFeatures', 'appTileFeatures'));
   document.getElementById('appTileSafety').addEventListener('click', () => toggleAppFeatureAccordion('ciSafety', 'appTileSafety'));
@@ -3999,16 +4030,30 @@ function initInstantReportAndQuickKeys(){
       closeAppDrawer();
       switchTab('tab-analytics', document.querySelector('.navtab[data-target="tab-analytics"]'));
       openAppInfoModal('spatialGrid');
+    },
+    // Capital Projects and City Action Tracker: real deep-dive panels that
+    // used to open from their own Dashboard hub-row cards, now reached from
+    // here since that hub-row was replaced by the Civic Memory™ &
+    // Citizenship™ narrative funnel. Switches to the Dashboard tab first so
+    // the panel (which lives in that tab's markup) has somewhere to open
+    // into and scroll to.
+    capitalProjects: async () => {
+      closeAppDrawer();
+      switchTab('tab-analytics', document.querySelector('.navtab[data-target="tab-analytics"]'));
+      openAppDeepdivePanel('appDeepdiveAnalytics');
+      const { knownWards } = computeAppWardCoverage(currentWardMeta);
+      IR.renderCipList(document.getElementById('appCipList'), await appJurisdictionCipProjects(knownWards));
+    },
+    cityActionTracker: async () => {
+      closeAppDrawer();
+      switchTab('tab-analytics', document.querySelector('.navtab[data-target="tab-analytics"]'));
+      openAppDeepdivePanel('appMunicipalPanel');
+      if (!ledgerTickets.length) ledgerTickets = await fetchLedgerTickets();
+      renderAppMunicipalPanel();
     }
   };
   document.querySelectorAll('#appDrawer [data-cx-key]').forEach(btn => {
     btn.addEventListener('click', () => { const fn = actions[btn.dataset.cxKey]; if (fn) fn(); });
-  });
-
-  // Capital Projects panel: real CIP list for this jurisdiction
-  document.getElementById('appHubAnalyticsBtn').addEventListener('click', async () => {
-    const { knownWards } = computeAppWardCoverage(currentWardMeta);
-    IR.renderCipList(document.getElementById('appCipList'), await appJurisdictionCipProjects(knownWards));
   });
 }
 

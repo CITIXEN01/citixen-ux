@@ -2,12 +2,18 @@
    CITIXEN UX™ — INSTANT REPORT (shared by index.html and app.html)
    ---------------------------------------------------------------------
    Renders the Dashboard's "REPORTS & EASY SHARE" hero card and the
-   3-branch Instant Report modal from one file, so the web Dashboard and
-   the app's Dashboard tab stay 1:1:
-     A. OFFICIAL PDF BRIEF        — branded preview + jsPDF download
-     B. #CrowdSaveAmerica GRAPHIC — 1:1 card drawn on <canvas>, shared as
-                                    an image through navigator.share()
-     C. DIRECT LINK PAYLOAD       — copy/share-ready text + link
+   digital-first Civic Intelligence™ Brief modal from one file, so the web
+   Dashboard and the app's Dashboard tab stay 1:1. Tapping "Generate Free
+   Report" goes straight to the dark-mode on-screen Brief — no format-picker
+   tabs or other upfront prompts. From there, one "Share & Export Brief"
+   button expands a drawer with everything the Brief can turn into:
+     • Download Official PDF Brief   — branded jsPDF download
+     • Share Graphic (1:1 Canvas)    — truncated #CrowdSaveAmerica card,
+                                        drawn on an off-screen <canvas> and
+                                        shared/saved as an image
+     • + Append Living Ledger™ Audit Summary — optional checkbox; appends
+                                        the real ward-score/rank summary
+                                        (payloadText()) as an extra PDF page
 
    Each page supplies its own data adapter (getData) because the two pages
    keep their jurisdiction state differently (currentWardMeta in app.html,
@@ -25,12 +31,13 @@
      avgDays: 0.8 | null,                      // avg resolution, days
      counts: { submitted, dispatched, resolved },
      cip: [{ name, status: 'on-time'|'on-track'|'delayed', scheduled }],
-     nodes: [{ lat, lng }]                     // optional; not drawn by the
-                                                // #CrowdSaveAmerica graphic
-                                                // (see drawMapArea() — it
-                                                // always shows the national
-                                                // map), kept for callers that
-                                                // may still want the raw pins
+     nodes: [{ lat, lng }]                     // optional; unused by this
+                                                // file today (the share
+                                                // graphic is truncated to
+                                                // header/gauge+metric/footer
+                                                // only — see drawCard()),
+                                                // kept for callers that may
+                                                // still want the raw pins
    }
    ===================================================================== */
 (function () {
@@ -115,31 +122,6 @@
     if (warn / nodes.length >= 0.34) return { label: 'MODERATE', color: '#F59E0B' };
     return { label: 'LOW RISK', color: MINT };
   }
-  // Plots this jurisdiction's own real report coordinates (d.nodes) inside
-  // a neutral frame, scaled to their own bounding box. This is not a traced
-  // city-limits boundary — the app has no ward/city boundary geometry on
-  // file (see the "no live ward-boundary geofencing" note in both pages'
-  // map setup) — so no border shape is drawn or invented; only the real,
-  // relative positions of actual report locations.
-  function localProject(nodes, vw, vh, pad) {
-    if (!nodes.length) return [];
-    var lats = nodes.map(function (n) { return n.lat; }), lngs = nodes.map(function (n) { return n.lng; });
-    var minLat = Math.min.apply(null, lats), maxLat = Math.max.apply(null, lats);
-    var minLng = Math.min.apply(null, lngs), maxLng = Math.max.apply(null, lngs);
-    var k = Math.cos((minLat + maxLat) / 2 * Math.PI / 180) || 1;
-    var dLat = (maxLat - minLat) || 0.01, dLng = (maxLng - minLng) || 0.01;
-    var w = vw - 2 * pad, h = vh - 2 * pad;
-    var s = Math.min(w / (dLng * k), h / dLat);
-    var cx = (minLng + maxLng) / 2, cy = (minLat + maxLat) / 2;
-    return nodes.map(function (n) {
-      return { x: vw / 2 + (n.lng - cx) * k * s, y: vh / 2 - (n.lat - cy) * s, status: n.status };
-    });
-  }
-  function nodeColor(status) {
-    return (window.CitixenSeverity && window.CitixenSeverity.color(status)) ||
-      (status === 'Critical' ? '#FF3B30' : status === 'Warning' ? '#F59E0B' : MINT);
-  }
-
   // ---------- Civic Health Ranking ----------
   // Ranks every mapped ward (from /api/coverage/national) on an even blend
   // of block coverage and resolution speed:
@@ -182,10 +164,15 @@
 
   // ---------- state ----------
   var cfg = { getData: null, toast: null, onLedger: null, onStack: null, ledgerAsSecondary: false };
-  var data = null, generatedAt = null, current = 'pdf', modal = null, rafId = 0, lastFocus = null;
+  var data = null, generatedAt = null, modal = null, lastFocus = null;
+  // Whether the "+ Append Living Ledger™ Audit Summary" checkbox in the
+  // Share & Export drawer is checked. Reset to false each time the Brief
+  // is (re)opened so a stale choice never silently carries into a
+  // different jurisdiction's PDF.
+  var appendLedgerSummary = false;
 
   function toast(msg) {
-    var hint = modal && modal.classList.contains('open') && modal.querySelector('#cxHint-' + current);
+    var hint = modal && modal.classList.contains('open') && modal.querySelector('#cxHint-pdf');
     if (hint) hint.textContent = msg;
     if (typeof cfg.toast === 'function') { cfg.toast(msg); return; }
     if (hint) return;
@@ -272,6 +259,18 @@
     modal.setAttribute('role', 'dialog');
     modal.setAttribute('aria-modal', 'true');
     modal.setAttribute('aria-labelledby', 'cxTitle');
+    // Digital-first flow (per the "Report Flow, Visual DNA & Narrative
+    // Funnel" round): tapping "Generate Free Civic Report" goes straight to
+    // the dark-mode Digital Brief below — no upfront format-picker tiles,
+    // no intermediate prompts. The brief is the only pane; "Official PDF
+    // Brief ↓" / "Report Share Graphic ↓" / "Public Link & Summary ↓" are no
+    // longer separate tabs the person must choose between first — the PDF
+    // download and the share graphic are both reachable from the single
+    // "Share & Export Brief" drawer at the bottom of this same view (see
+    // renderPdfPane()). The old link-payload tab's content (ward score,
+    // resolution, ranks — the same figures as payloadText()) still exists,
+    // folded into that drawer as the optional "+ Append Living Ledger™
+    // Audit Summary" checkbox rather than a tab of its own.
     modal.innerHTML =
       '<div class="cx-panel">' +
         // Modal breakout header: CIVIC INTELLIGENCE™ BRIEF centered, city/state tag
@@ -283,27 +282,13 @@
           '<button type="button" class="cx-close" aria-label="Close">✕</button>' +
         '</div>' +
         '<div class="cx-body">' +
-          '<div class="cx-tiles" role="tablist" aria-label="Export format">' +
-            tile('pdf', 'doc', 'Official PDF Brief ↓') +
-            tile('graphic', 'nodes', 'Report Share Graphic ↓') +
-            tile('link', 'link', 'Public Link & Summary ↓') +
-          '</div>' +
-          '<div id="cxPane-pdf" role="tabpanel" aria-labelledby="cxTab-pdf"></div>' +
-          '<div id="cxPane-graphic" role="tabpanel" aria-labelledby="cxTab-graphic" hidden></div>' +
-          '<div id="cxPane-link" role="tabpanel" aria-labelledby="cxTab-link" hidden></div>' +
+          '<div id="cxPane-pdf"></div>' +
         '</div>' +
       '</div>';
     document.body.appendChild(modal);
     modal.querySelector('.cx-close').addEventListener('click', close);
     modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && modal.classList.contains('open')) close(); });
-    modal.querySelectorAll('.cx-tile').forEach(function (b) {
-      b.addEventListener('click', function () { select(b.dataset.tab); });
-    });
-  }
-  function tile(key, ic, label) {
-    return '<button type="button" class="cx-tile" role="tab" id="cxTab-' + key + '" data-tab="' + key + '" aria-controls="cxPane-' + key + '" aria-selected="false">' +
-      icon(ic) + '<span class="cx-tile-label">' + label + '</span></button>';
   }
 
   async function open(tab, trigger) {
@@ -312,23 +297,20 @@
     lastFocus = trigger || document.activeElement;
     modal.classList.add('open');
     document.documentElement.style.overflow = 'hidden';
-    select(tab || 'pdf');
+    appendLedgerSummary = false;
     modal.querySelector('#cxJuris').textContent = 'Loading jurisdiction…';
-    ['pdf', 'graphic', 'link'].forEach(function (k) {
-      modal.querySelector('#cxPane-' + k).innerHTML = '<p class="cx-hint">Compiling the current ward snapshot…</p>';
-    });
+    modal.querySelector('#cxPane-pdf').innerHTML = '<p class="cx-hint">Compiling the current ward snapshot…</p>';
     try {
       data = await cfg.getData();
       data.ranks = computeRanks(data);
       generatedAt = new Date();
     } catch (err) {
       console.warn('Instant Report data failed to load', err);
-      modal.querySelector('#cxPane-' + current).innerHTML = '<p class="cx-hint">Could not load the ward snapshot. Check your connection and try again.</p>';
+      modal.querySelector('#cxPane-pdf').innerHTML = '<p class="cx-hint">Could not load the ward snapshot. Check your connection and try again.</p>';
       return;
     }
     modal.querySelector('#cxJuris').textContent = cityStateLabel(data);
-    renderPdfPane(); renderGraphicPane(); renderLinkPane();
-    select(current);
+    renderPdfPane();
     modal.querySelector('.cx-close').focus();
   }
 
@@ -336,15 +318,7 @@
     if (!modal) return;
     modal.classList.remove('open');
     document.documentElement.style.overflow = '';
-    stopAnim();
     if (lastFocus && lastFocus.focus) lastFocus.focus();
-  }
-
-  function select(tab) {
-    current = tab;
-    modal.querySelectorAll('.cx-tile').forEach(function (b) { b.setAttribute('aria-selected', String(b.dataset.tab === tab)); });
-    ['pdf', 'graphic', 'link'].forEach(function (k) { modal.querySelector('#cxPane-' + k).hidden = k !== tab; });
-    if (tab === 'graphic' && data) startAnim(); else stopAnim();
   }
 
   // ---------- Branch A: Official PDF brief ----------
@@ -452,9 +426,31 @@
         '<div class="cx-footer-single">CITIXEN UX™ • Civic Intelligence™<div class="cx-verify-line">Verified via CITIXEN UX™ Protocol | Living Ledger™ Output</div></div>' +
         '</div>' +
       '</div>' +
-      '<div class="cx-actions"><button type="button" class="cx-btn-primary" id="cxPdfBtn">' + icon('printer') + 'Download / Print Official PDF</button></div>' +
+      // "Share & Export Brief" expands a streamlined drawer in place — no
+      // separate tab/screen — holding the PDF download, the #CrowdSaveAmerica
+      // share graphic (drawn on the hidden canvas below), and the optional
+      // Living Ledger™ Audit Summary append (the old "Public Link & Summary"
+      // tab's content, folded in here rather than kept as its own tab).
+      '<div class="cx-actions"><button type="button" class="cx-btn-primary" id="cxShareExportBtn" aria-expanded="false" aria-controls="cxExportDrawer">' + icon('shareUp') + 'Share &amp; Export Brief</button></div>' +
+      '<div class="cx-export-drawer" id="cxExportDrawer" hidden>' +
+        '<button type="button" class="cx-btn-dashed" id="cxPdfBtn">' + icon('doc') + 'Download Official PDF Brief</button>' +
+        '<button type="button" class="cx-btn-dashed" id="cxShareCardBtn">' + icon('phoneShare') + 'Share Graphic (1:1 Canvas)</button>' +
+        '<label class="cx-export-check"><input type="checkbox" id="cxAppendLedgerSummary">' +
+          '<span>+ Append Living Ledger<sup class="cx-tm">™</sup> Audit Summary</span>' +
+        '</label>' +
+      '</div>' +
+      '<canvas id="cxCardCanvas" width="1080" height="1080" style="display:none" aria-hidden="true"></canvas>' +
       '<p class="cx-hint" id="cxHint-pdf"></p>';
+    var exportBtn = el.querySelector('#cxShareExportBtn');
+    var exportDrawer = el.querySelector('#cxExportDrawer');
+    exportBtn.addEventListener('click', function () {
+      var willOpen = exportDrawer.hidden;
+      exportDrawer.hidden = !willOpen;
+      exportBtn.setAttribute('aria-expanded', String(willOpen));
+    });
     el.querySelector('#cxPdfBtn').addEventListener('click', function (e) { downloadPdf(e.currentTarget); });
+    el.querySelector('#cxShareCardBtn').addEventListener('click', function (e) { drawCard(); shareCard(e.currentTarget); });
+    el.querySelector('#cxAppendLedgerSummary').addEventListener('change', function (e) { appendLedgerSummary = e.target.checked; });
   }
 
   function hexRgb(hex) {
@@ -665,6 +661,34 @@
       doc.setTextColor(107, 114, 128); doc.setFontSize(7);
       doc.text('VERIFIED VIA CITIXEN UX™ PROTOCOL | LIVING LEDGER™ OUTPUT', W / 2, y + 21, { align: 'center' });
 
+      // Optional appendix page: "+ Append Living Ledger™ Audit Summary"
+      // checkbox in the Share & Export drawer. Same real figures as
+      // payloadText() (ward health score, resolution, ranks) — nothing
+      // invented for this appendix either.
+      if (appendLedgerSummary) {
+        doc.addPage();
+        y = 70;
+        doc.setTextColor(0, 0, 0); doc.setFont('helvetica', 'bold'); doc.setFontSize(13);
+        doc.text('LIVING LEDGER™ AUDIT SUMMARY', W / 2, y, { align: 'center' });
+        y += 10;
+        doc.setDrawColor(226, 232, 240); doc.setLineWidth(0.75); doc.line(M, y, W - M, y);
+        y += 26;
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(51, 65, 85);
+        payloadText().split('\n').forEach(function (line) {
+          doc.splitTextToSize(line, W - 2 * M).forEach(function (wline) {
+            ensureRoom(16);
+            doc.text(wline, M, y); y += 16;
+          });
+          y += 6;
+        });
+        y += 14;
+        ensureRoom(40);
+        doc.setDrawColor(226, 232, 240); doc.line(M, y, W - M, y);
+        y += 18;
+        doc.setTextColor(107, 114, 128); doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
+        doc.text('VERIFIED VIA CITIXEN UX™ PROTOCOL | LIVING LEDGER™ OUTPUT', W / 2, y, { align: 'center' });
+      }
+
       // Share as a real, named application/pdf File when the OS share sheet
       // is available (iOS Mail/Messages/Notes otherwise show a bare "blob:"
       // heading instead of the filename); fall back to a direct download
@@ -691,17 +715,11 @@
     }
   }
 
-  // ---------- Branch B: #CrowdSaveAmerica graphic ----------
-  function renderGraphicPane() {
-    var el = modal.querySelector('#cxPane-graphic');
-    el.innerHTML =
-      '<div class="cx-card-wrap"><canvas id="cxCardCanvas" width="1080" height="1080" role="img" aria-label="CITIXEN UX™ Civic Intelligence™ Brief card for ' + esc(cityStateLabel(data)) + '"></canvas></div>' +
-      '<div class="cx-actions"><button type="button" class="cx-btn-primary" id="cxShareCardBtn">' + icon('phoneShare') + 'Share #CrowdSaveAmerica Card</button></div>' +
-      '<p class="cx-hint" id="cxHint-graphic"></p>';
-    el.querySelector('#cxShareCardBtn').addEventListener('click', shareCard);
-    drawCard(0.55);
-  }
-
+  // ---------- Branch B: #CrowdSaveAmerica share graphic ----------
+  // The canvas itself now lives inline in renderPdfPane()'s markup (hidden
+  // off-screen — this truncated graphic is drawn to be shared/saved, not
+  // previewed in its own tab; see drawCard() below for the "Visual DNA
+  // Alignment" truncation to header/gauge+metric/footer only).
   function rr(ctx, x, y, w, h, r) {
     ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
     ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
@@ -730,8 +748,6 @@
     for (j = 1; j < rows; j++) { y = my + (mh / rows) * j; ctx.beginPath(); ctx.moveTo(mx, y); ctx.lineTo(mx + mw, y); ctx.stroke(); }
     ctx.restore();
   }
-  function hazardRadius(status) { return status === 'Critical' ? 92 : status === 'Warning' ? 70 : 54; }
-
   // Hazard Index gauge (canvas): same 180°, 3-segment meter as the HTML/
   // jsPDF versions — see hazardGaugeSvg()'s comment for why the needle
   // angle is always derived from the real hazardIndex() reading.
@@ -749,157 +765,72 @@
     ctx.beginPath(); ctx.arc(cx, cy, 9, 0, Math.PI * 2); ctx.fillStyle = '#FFFFFF'; ctx.fill();
   }
 
-  function drawHazardMap(ctx, d, phase, mx, my, mw, mh) {
-    var raw = localProject(d.nodes || [], mw - 40, mh - 40, 0);
-    var pts = raw.map(function (p) { return { x: mx + 20 + p.x, y: my + 20 + p.y, status: p.status }; });
-    ctx.save(); rr(ctx, mx, my, mw, mh, 22); ctx.clip();
-    ctx.fillStyle = '#060B16'; ctx.fillRect(mx, my, mw, mh);
-    drawUrbanGrid(ctx, mx, my, mw, mh);
-    if (pts.length) {
-      var breathe = 0.85 + 0.3 * Math.sin(phase * Math.PI * 2);
-      ctx.save(); ctx.globalCompositeOperation = 'lighter';
-      pts.forEach(function (p) {
-        var rgb = hexRgb(nodeColor(p.status)), r = hazardRadius(p.status) * breathe;
-        var g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
-        g.addColorStop(0, 'rgba(' + rgb.join(',') + ',0.85)');
-        g.addColorStop(0.55, 'rgba(' + rgb.join(',') + ',0.3)');
-        g.addColorStop(1, 'rgba(' + rgb.join(',') + ',0)');
-        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.fill();
-      });
-      ctx.restore();
-      pts.forEach(function (p) { ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, Math.PI * 2); ctx.fillStyle = nodeColor(p.status); ctx.fill(); });
-    } else {
-      ctx.textAlign = 'center'; ctx.font = font(600, 22); ctx.fillStyle = SLATE;
-      ctx.fillText('No live hazard nodes yet', mx + mw / 2, my + mh / 2);
-    }
-    ctx.restore();
-    rr(ctx, mx, my, mw, mh, 22); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,230,153,0.25)'; ctx.stroke();
-    ctx.textAlign = 'left'; ctx.font = font(700, 16); ctx.fillStyle = SLATE;
-    ctx.fillText(('LIVE HAZARD NODES · ' + cityStateLabel(d)).toUpperCase(), mx + 20, my + mh - 22);
-  }
-
-  function drawCard(phase) {
+  // Truncated 1:1 share graphic (per the "Social Share Graphic Visual DNA
+  // Alignment" round): shows ONLY a header (title + location), a central
+  // focus (the real Civic Health gauge + the real Avg. Fix Speed metric —
+  // the same hazardIndex()/avgHoursText() figures as the Digital Brief and
+  // PDF), and a footer (the verification line + a URL asset). Everything
+  // else the card used to carry — the Patents Pending badge, the full
+  // CITIXEN UX wordmark lockup, the Reports Filed / Open Dispatches trio,
+  // and the geospatial hazard heat map — is intentionally dropped so the
+  // graphic reads as a single, truncated, focused takeaway rather than a
+  // shrunk-down copy of the full Brief. No QR code is drawn: a QR-shaped
+  // graphic that doesn't actually decode would be misleading, and this
+  // build has no QR-encoding library, so the "QR code/URL asset" is
+  // satisfied with the real, readable site URL text instead.
+  function drawCard() {
     var canvas = modal && modal.querySelector('#cxCardCanvas');
     if (!canvas || !data) return;
-    var d = data, hz = hazardIndex(d), ctx = canvas.getContext('2d'), W = 1080, P = 84;
+    var d = data, hz = hazardIndex(d), ctx = canvas.getContext('2d'), W = 1080;
     ctx.clearRect(0, 0, W, W);
     ctx.fillStyle = '#0A0D12'; ctx.fillRect(0, 0, W, W);
-    // UI frame
-    rr(ctx, 30, 30, W - 60, W - 60, 36); ctx.fillStyle = '#0A0D12'; ctx.fill();
-    ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,230,153,0.55)'; ctx.stroke();
+    drawUrbanGrid(ctx, 30, 30, W - 60, W - 60); // dark grid texture, matching the Brief/PDF's visual DNA
+    rr(ctx, 30, 30, W - 60, W - 60, 36); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,230,153,0.55)'; ctx.stroke();
 
-    // Solid-black header: Patents Pending badge, shield + wordmark, tagline,
-    // FREE REPORT title, geotag (city + state, never a ward number).
-    ctx.save(); rr(ctx, 30, 30, W - 60, 248, 36); ctx.clip();
-    ctx.fillStyle = '#000000'; ctx.fillRect(30, 30, W - 60, 248);
-    ctx.restore();
+    ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
 
-    ctx.textBaseline = 'middle';
-    var badgeTxt = 'PATENTS PENDING';
-    ctx.font = font(800, 16);
-    var badgeW = ctx.measureText(badgeTxt).width + 28;
-    ctx.textAlign = 'center';
-    rr(ctx, W - P - badgeW, 56, badgeW, 32, 16); ctx.lineWidth = 1.5; ctx.strokeStyle = MINT; ctx.stroke();
-    ctx.fillStyle = MINT; ctx.fillText(badgeTxt, W - P - badgeW / 2, 72);
+    // ---- Header: CIVIC INTELLIGENCE™ BRIEF + location ----
+    ctx.font = font(800, 40); ctx.fillStyle = '#FFFFFF';
+    ctx.fillText('CIVIC INTELLIGENCE™ BRIEF', W / 2, 150);
+    ctx.font = font(700, 24); ctx.fillStyle = SLATE;
+    ctx.fillText(cityStateLabel(d).toUpperCase(), W / 2, 194);
 
-    shieldPath(ctx, W / 2 - 18, 100, 2.6); ctx.lineWidth = 1; ctx.strokeStyle = MINT; ctx.stroke();
-    ctx.font = font(800, 42);
-    var t1 = 'CITIXEN ', t2 = 'UX';
-    var w1 = ctx.measureText(t1).width, w2 = ctx.measureText(t2).width, bx = W / 2 - (w1 + w2) / 2;
-    ctx.textAlign = 'left'; ctx.fillStyle = '#FFFFFF'; ctx.fillText(t1, bx, 150);
-    ctx.fillStyle = MINT; ctx.fillText(t2, bx + w1, 150);
-    ctx.font = font(700, 18); ctx.fillText('™', bx + w1 + w2 + 3, 134);
+    // ---- Central focus: Civic Health gauge + primary speed metric ----
+    ctx.font = font(800, 20); ctx.fillStyle = MINT;
+    ctx.fillText('CIVIC HEALTH', W / 2, 330);
+    var gcx = W / 2, gcy = 610, gr = 220, gsw = 44;
+    drawHazardGaugeCanvas(ctx, gcx, gcy, gr, gsw, hz);
+    var lblColor = hz.label === 'CRITICAL' ? '#EF4444' : hz.label === 'MODERATE' ? '#F59E0B' : '#00E699';
+    ctx.font = font(800, 28); ctx.fillStyle = lblColor;
+    ctx.fillText(civicHealthZoneLabel(hz.label), gcx, gcy + 50);
+    ctx.font = font(900, 70); ctx.fillStyle = '#FFFFFF';
+    ctx.fillText(avgHoursText(d), gcx, gcy + 160);
+    ctx.font = font(800, 22); ctx.fillStyle = MINT;
+    ctx.fillText('AVG. FIX SPEED', gcx, gcy + 215);
 
-    ctx.textAlign = 'center';
-    ctx.font = 'italic ' + font(600, 20); ctx.fillStyle = MINT;
-    ctx.fillText('Upgrade your civic experience.', W / 2, 180);
-    ctx.font = font(800, 26); ctx.fillStyle = '#FFFFFF';
-    ctx.fillText('CIVIC INTELLIGENCE™ BRIEF', W / 2, 220);
-    ctx.font = font(700, 18); ctx.fillStyle = SLATE;
-    ctx.fillText(cityStateLabel(d) + '  •  CURRENT SNAPSHOT', W / 2, 252);
-    ctx.textAlign = 'left';
-
-    // Community Action Snapshot: a symmetrical 3-card row — Reports Filed
-    // (real aggregate d.total) and Open Active Dispatches flank the Hazard
-    // Index gauge, matching the PDF Brief's Section 3 layout.
-    var trio = [
-      { lbl: 'REPORTS FILED', kind: 'text', val: String(d.total), color: '#FFFFFF' },
-      { lbl: 'CIVIC HEALTH', kind: 'gauge' },
-      { lbl: 'OPEN ACTIVE DISPATCHES', kind: 'text', val: String(d.counts.dispatched), color: d.counts.dispatched > 0 ? '#FF3B30' : MINT }
-    ];
-    var gap = 22, cw = (W - 2 * P - 2 * gap) / 3, cardY = 318, headH = 40, bodyH = 116;
-    trio.forEach(function (c, i) {
-      var x = P + i * (cw + gap);
-      ctx.save(); rr(ctx, x, cardY, cw, headH + bodyH, 18); ctx.clip();
-      ctx.fillStyle = '#000000'; ctx.fillRect(x, cardY, cw, headH);
-      ctx.fillStyle = '#0B1120'; ctx.fillRect(x, cardY + headH, cw, bodyH);
-      ctx.restore();
-      rr(ctx, x, cardY, cw, headH + bodyH, 18); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,230,153,0.35)'; ctx.stroke();
-      ctx.textAlign = 'center';
-      ctx.font = font(800, 15); ctx.fillStyle = MINT; ctx.fillText(c.lbl, x + cw / 2, cardY + headH / 2 + 1);
-      if (c.kind === 'gauge') {
-        var gcx = x + cw / 2, gcy = cardY + headH + bodyH - 36, gr = Math.min(cw / 2 - 22, 56), gsw = 13;
-        drawHazardGaugeCanvas(ctx, gcx, gcy, gr, gsw, hz);
-        var lblColor = hz.label === 'CRITICAL' ? '#EF4444' : hz.label === 'MODERATE' ? '#F59E0B' : '#00E699';
-        ctx.font = font(800, 16); ctx.fillStyle = lblColor;
-        ctx.fillText(civicHealthZoneLabel(hz.label), gcx, cardY + headH + bodyH - 12);
-      } else {
-        ctx.font = font(900, 34); ctx.fillStyle = c.color;
-        ctx.fillText(c.val, x + cw / 2, cardY + headH + bodyH / 2 + 2);
-      }
-    });
-    ctx.textAlign = 'left';
-
-    // Geospatial Map Snippet — this jurisdiction's own real nodes (see
-    // drawHazardMap() above for why no boundary shape is drawn).
-    drawHazardMap(ctx, d, phase, P, 500, W - 2 * P, 300);
-
-    // Footer: brand + verification + IP disclosure (no #CrowdSaveAmerica
-    // marks, per this round's spec)
-    ctx.textAlign = 'center';
-    var line1 = [['CITIXEN UX™ Engine', MINT], ['  •  Public Ledger Verified', SLATE]];
-    ctx.font = font(700, 22);
-    var w = line1.reduce(function (s, p) { return s + ctx.measureText(p[0]).width; }, 0), fx = W / 2 - w / 2;
-    ctx.textAlign = 'left';
-    line1.forEach(function (p) { ctx.fillStyle = p[1]; ctx.fillText(p[0], fx, 950); fx += ctx.measureText(p[0]).width; });
-    ctx.textAlign = 'center'; ctx.font = font(600, 16); ctx.fillStyle = SLATE;
-    ctx.fillText('Civic Intelligence™ • Civic Memory™ • Patents Pending • citixenux.com', W / 2, 980);
-    // Secondary metadata line — same mark as the HTML pane/PDF footer
-    // (#6B7280, uppercase). Sized at 13px rather than a literal 10px: this
-    // canvas is a 1080x1080 share asset where every other footer line runs
-    // 16-22px, so 10px would be illegibly small relative to this medium's
-    // own scale — 13px keeps it the smallest, most muted line on the card
-    // while staying readable at typical shared/display sizes.
-    ctx.font = font(600, 13); ctx.fillStyle = '#6B7280';
-    ctx.fillText('VERIFIED VIA CITIXEN UX™ PROTOCOL | LIVING LEDGER™ OUTPUT', W / 2, 1008);
+    // ---- Footer: verification line + URL asset ----
+    ctx.font = font(600, 20); ctx.fillStyle = '#6B7280';
+    ctx.fillText('VERIFIED VIA CITIXEN UX™ PROTOCOL | LIVING LEDGER™ OUTPUT', W / 2, 962);
+    ctx.font = font(700, 26); ctx.fillStyle = MINT;
+    ctx.fillText(siteUrl().replace(/^https?:\/\//, '').replace(/\/$/, ''), W / 2, 1002);
   }
-
-  function startAnim() {
-    stopAnim();
-    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) { drawCard(0.55); return; }
-    var t0 = performance.now();
-    (function loop(now) {
-      drawCard(((now - t0) / 1800) % 1);
-      rafId = requestAnimationFrame(loop);
-    })(t0);
-  }
-  function stopAnim() { if (rafId) cancelAnimationFrame(rafId); rafId = 0; }
 
   function shareText() {
     var hz = hazardIndex(data);
-    return '#CrowdSaveAmerica — ' + cityStateLabel(data) + ' hazard index: ' + hz.label +
+    return 'CITIXEN UX™ Civic Intelligence™ Brief — ' + cityStateLabel(data) + ' civic health: ' + civicHealthZoneLabel(hz.label) +
       '. Free & anonymous civic reporting with CITIXEN UX™.';
   }
 
-  function shareCard() {
-    stopAnim(); drawCard(0.55);
+  function shareCard(btn) {
     var canvas = modal.querySelector('#cxCardCanvas');
+    var label = btn && btn.innerHTML;
+    if (btn) { btn.disabled = true; btn.textContent = 'Rendering…'; }
     canvas.toBlob(async function (blob) {
-      if (current === 'graphic') startAnim();
-      if (!blob) { toast('Could not render the card image.'); return; }
-      var file = new File([blob], 'crowdsaveamerica-free-report.png', { type: 'image/png' });
+      if (btn) { btn.disabled = false; btn.innerHTML = label; }
+      if (!blob) { toast('Could not render the share graphic.'); return; }
+      var file = new File([blob], 'citixen-ux-civic-intelligence-brief.png', { type: 'image/png' });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        try { await navigator.share({ files: [file], title: '#CrowdSaveAmerica', text: shareText() }); }
+        try { await navigator.share({ files: [file], title: 'CITIXEN UX™', text: shareText() }); }
         catch (err) { if (err && err.name !== 'AbortError') toast('Sharing failed — please try again.'); }
         return;
       }
@@ -907,11 +838,13 @@
       var url = URL.createObjectURL(blob), a = document.createElement('a');
       a.href = url; a.download = file.name; document.body.appendChild(a); a.click(); a.remove();
       setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
-      toast('This browser cannot share images directly, so the card was saved as a PNG.');
+      toast('This browser cannot share images directly, so the graphic was saved as a PNG.');
     }, 'image/png');
   }
 
-  // ---------- Branch C: direct link payload ----------
+  // ---------- Living Ledger™ Audit Summary (optional PDF append) ----------
+  // Same figures as the old "Public Link & Summary" tab, now folded into
+  // the Share & Export drawer's checkbox rather than kept as its own tab.
   function payloadText() {
     var d = data, score = healthScore(d);
     return [
@@ -923,31 +856,6 @@
       siteUrl()
     ].join('\n');
   }
-  function renderLinkPane() {
-    var el = modal.querySelector('#cxPane-link');
-    el.innerHTML =
-      '<label for="cxPayload" class="cx-hint" style="display:block;text-align:left;margin:0 0 6px">Ready to paste into email, text or a council comment form</label>' +
-      '<textarea id="cxPayload" class="cx-payload" readonly></textarea>' +
-      '<span class="cx-payload-url">' + esc(siteUrl()) + '</span>' +
-      '<div class="cx-actions"><button type="button" class="cx-btn-primary" id="cxCopyPayloadBtn">' + icon('copy') + 'Copy Summary & Link</button>' +
-      '<button type="button" class="cx-btn-dashed" id="cxSharePayloadBtn">' + icon('shareUp') + 'Share Link</button></div>' +
-      '<p class="cx-hint" id="cxHint-link"></p>';
-    var ta = el.querySelector('#cxPayload');
-    ta.value = payloadText();
-    el.querySelector('#cxCopyPayloadBtn').addEventListener('click', async function () {
-      if (await copyText(ta.value)) toast('Summary & link copied.');
-      else { ta.focus(); ta.select(); toast('Press and hold to copy the selected text.'); }
-    });
-    el.querySelector('#cxSharePayloadBtn').addEventListener('click', async function () {
-      if (!navigator.share) {
-        if (await copyText(ta.value)) toast('Sharing is not available here, so the summary & link were copied instead.');
-        else { ta.focus(); ta.select(); toast('Sharing is not available here — copy the selected text instead.'); }
-        return;
-      }
-      try { await navigator.share({ title: 'CITIXEN UX™ Ward Health Brief', text: ta.value.replace(/\n[^\n]*$/, ''), url: siteUrl() }); } catch (err) { /* dismissed */ }
-    });
-  }
-
   // ---------- public API ----------
   window.CitixenInstantReport = {
     init: function (options) {
