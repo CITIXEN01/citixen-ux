@@ -37,7 +37,12 @@ html.citixen-gate-locked .citixen-gate{display:flex}
 html.citixen-gate-locked body{overflow:hidden}
 .citixen-gate-card{width:100%;max-width:360px;background:rgba(2,6,23,.8);border:1px solid rgba(30,41,59,.85);
   border-radius:18px;padding:32px 26px;text-align:center;box-shadow:0 0 40px rgba(0,0,0,.6);box-sizing:border-box}
-.citixen-gate-brand{font-weight:800;font-size:.9rem;letter-spacing:.3px;color:#00E699;margin-bottom:20px}
+/* Split white/glowing-emerald treatment, matching app.html's and
+   operator.html's gate. */
+.citixen-gate-brand{font-weight:800;font-size:.9rem;letter-spacing:.3px;margin-bottom:20px}
+.citixen-gate-brand .brand-white{color:#ffffff}
+.citixen-gate-brand .brand-lime{color:#34d399;text-shadow:0 0 10px rgba(52,211,153,.55)}
+.citixen-gate-brand .brand-tm{font-size:.55em;color:#34d399;opacity:.85;margin-left:1px;text-shadow:0 0 8px rgba(52,211,153,.5)}
 .citixen-gate-label{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:14px}
 .citixen-gate-input{width:100%;box-sizing:border-box;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.14);
   border-radius:10px;color:#f1f5f9;padding:14px 16px;font-size:1rem;text-align:center;letter-spacing:.1em;margin-bottom:12px;font-family:inherit}
@@ -112,7 +117,7 @@ html.citixen-gate-locked body{overflow:hidden}
 
 <div class="citixen-gate" id="citixenGate">
   <form class="citixen-gate-card" id="citixenGateForm" autocomplete="off">
-    <div class="citixen-gate-brand">CITIXEN UX<sup class="tm-symbol">™</sup></div>
+    <div class="citixen-gate-brand"><span class="brand-white">CITIXEN</span> <span class="brand-lime">UX</span><sup class="brand-tm">™</sup></div>
     <div class="citixen-gate-label">Enter Access Passcode</div>
     <input type="password" class="citixen-gate-input" id="citixenGateInput" placeholder="••••••••"
       autocomplete="off" autocapitalize="off" spellcheck="false">

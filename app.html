@@ -103,7 +103,11 @@ html.citixen-gate-locked .citixen-gate{display:flex}
 html.citixen-gate-locked body{overflow:hidden}
 .citixen-gate-card{width:100%;max-width:360px;background:rgba(2,6,23,.8);border:1px solid rgba(30,41,59,.85);
   border-radius:18px;padding:32px 26px;text-align:center;box-shadow:0 0 40px rgba(0,0,0,.6);box-sizing:border-box}
-.citixen-gate-brand{font-weight:800;font-size:.9rem;letter-spacing:.3px;color:#00E699;margin-bottom:20px}
+/* Split white/glowing-emerald treatment, same convention as the main
+   header's .brand-wordmark (.brand-white/.brand-lime, defined globally
+   below) — the gate card no longer renders "CITIXEN UX™" as one flat
+   mint color. */
+.citixen-gate-brand{font-weight:800;font-size:.9rem;letter-spacing:.3px;margin-bottom:20px}
 .citixen-gate-label{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;
   color:#94a3b8;margin-bottom:14px}
 .citixen-gate-input{width:100%;box-sizing:border-box;background:rgba(255,255,255,.03);
@@ -1103,7 +1107,7 @@ textarea.input{resize:none;line-height:1.4}
      client-side tester gate, not real access control (see that comment). ===== -->
 <div class="citixen-gate" id="citixenGate">
   <form class="citixen-gate-card" id="citixenGateForm" autocomplete="off">
-    <div class="citixen-gate-brand">CITIXEN UX<sup class="tm-symbol">™</sup></div>
+    <div class="citixen-gate-brand"><span class="brand-white">CITIXEN</span> <span class="brand-lime">UX</span><sup class="brand-tm">™</sup></div>
     <div class="citixen-gate-label">Enter Access Passcode</div>
     <input type="password" class="citixen-gate-input" id="citixenGateInput" placeholder="••••••••"
       autocomplete="off" autocapitalize="off" spellcheck="false">
@@ -2041,6 +2045,11 @@ const CITIXEN_GATE_PASSCODE = 'CITIXEN01';
       try { localStorage.setItem(CITIXEN_AUTH_KEY, '1'); } catch (err) { /* storage blocked — unlocks this page view, just won't persist a reload */ }
       errorEl.textContent = '';
       document.documentElement.classList.remove('citixen-gate-locked');
+      // Unlock lands the citizen on the Emerald Shield Gateway splash, not
+      // mid-flow into onboarding/the report form — see
+      // startPostUnlockLanding() for why this is the moment that starts
+      // those timers rather than raw page load.
+      if (typeof startPostUnlockLanding === 'function') startPostUnlockLanding();
     } else {
       errorEl.textContent = 'Incorrect passcode — try again.';
       input.value = '';
@@ -5208,6 +5217,36 @@ function hideSplash(){
   if (splash) splash.classList.add('hide');
 }
 
+// Starts the splash-dismiss timer and (separately) the Front Door
+// Onboarding auto-open timer. Called once — either immediately on load if
+// the passcode gate is already unlocked, or from initCitixenGate()'s
+// submit handler the moment CITIXEN01 is accepted — so a gated visitor
+// always lands squarely on the splash screen on unlock, and the onboarding
+// deck (which is what ultimately leads into the report form) never
+// auto-opens, and nothing auto-focuses, while the gate is still up.
+let postUnlockLandingStarted = false;
+function startPostUnlockLanding(){
+  if (postUnlockLandingStarted) return;
+  postUnlockLandingStarted = true;
+
+  const splash = document.getElementById('splashScreen');
+  if (splash) {
+    splash.addEventListener('click', hideSplash);
+    setTimeout(hideSplash, 1400);
+  }
+
+  // Front Door Onboarding opens shortly after the splash clears — once per
+  // device, never interrupting a returning beta tester.
+  let onboardingSeen = false;
+  try { onboardingSeen = localStorage.getItem(ONBOARDING_SEEN_KEY) === '1'; } catch (e) { /* storage blocked — treat as unseen */ }
+  // Arrived via report.html's "Connect District →" wedge (?claim=admin) —
+  // open the same Admin Light claim flow directly, skipping the citizen
+  // onboarding deck (an official clicking that link already knows what
+  // this app is; showing both at once would just be clutter).
+  if (pendingAdminClaimFromLink) setTimeout(openAdminLightClaim, 1700);
+  else if (!onboardingSeen) setTimeout(openFrontDoorOnboarding, 1700);
+}
+
 // ===== FRONT DOOR ONBOARDING — "Private Beta" 2-card notice =====
 // Gated per-device by localStorage, same convention as markGridCellLit()'s
 // lit-grid-cities key, so the 10 first-adopter beta testers see it once
@@ -5351,22 +5390,17 @@ window.addEventListener('DOMContentLoaded',()=>{
   flushOfflineQueue();
   window.addEventListener('online', flushOfflineQueue);
 
-  const splash = document.getElementById('splashScreen');
-  if (splash) {
-    splash.addEventListener('click', hideSplash);
-    setTimeout(hideSplash, 1400);
+  // Splash + onboarding only start their clocks once the person is actually
+  // looking at the app — see startPostUnlockLanding() below. If the
+  // passcode gate is still up, these timers used to run anyway behind it,
+  // so by the time someone unlocked, the splash had already auto-hidden
+  // and the onboarding deck could already be open waiting for them. Now
+  // unlock itself (initCitixenGate()'s submit handler) is what kicks this
+  // off, so a fresh unlock always lands on the full Emerald Shield Gateway
+  // splash first, exactly like a never-gated visit would.
+  if (!document.documentElement.classList.contains('citixen-gate-locked')) {
+    startPostUnlockLanding();
   }
-
-  // Front Door Onboarding opens shortly after the splash clears — once per
-  // device, never interrupting a returning beta tester.
-  let onboardingSeen = false;
-  try { onboardingSeen = localStorage.getItem(ONBOARDING_SEEN_KEY) === '1'; } catch (e) { /* storage blocked — treat as unseen */ }
-  // Arrived via report.html's "Connect District →" wedge (?claim=admin) —
-  // open the same Admin Light claim flow directly, skipping the citizen
-  // onboarding deck (an official clicking that link already knows what
-  // this app is; showing both at once would just be clutter).
-  if (pendingAdminClaimFromLink) setTimeout(openAdminLightClaim, 1700);
-  else if (!onboardingSeen) setTimeout(openFrontDoorOnboarding, 1700);
 
   const repLoc = document.getElementById('repLoc');
   if (repLoc) repLoc.addEventListener('input', () => { repLoc.dataset.userEdited = '1'; });

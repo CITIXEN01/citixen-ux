@@ -287,6 +287,14 @@
     // Audit Summary" checkbox rather than a tab of its own.
     modal.innerHTML =
       '<div class="cx-panel">' +
+        // Export & Share toolbar: strictly ABOVE the main header per Patch
+        // 4.5 — real, working buttons (not decorative text), wired below to
+        // the same export functions the bottom drawer already uses.
+        '<div class="cx-toolbar" id="cxToolbar">' +
+          '<button type="button" class="cx-toolbar-btn cx-toolbar-btn-primary" id="cxToolbarExport">' + icon('shareUp') + 'Export &amp; Share Brief</button>' +
+          '<button type="button" class="cx-toolbar-btn cx-toolbar-btn-secondary" id="cxToolbarPdf">' + icon('doc') + 'Download PDF</button>' +
+          '<button type="button" class="cx-toolbar-btn cx-toolbar-btn-secondary" id="cxToolbarCopyLink">' + icon('link') + 'Copy Link</button>' +
+        '</div>' +
         // Modal breakout header: CIVIC INTELLIGENCE™ BRIEF centered, city/state tag
         // beneath it (never a ward number), no timestamp here — the PDF
         // brief already renders its own.
@@ -294,9 +302,6 @@
           '<div class="cx-head-text"><div class="cx-head-title" id="cxTitle">Civic Intelligence<sup class="cx-tm">™</sup> Brief</div>' +
           '<div class="cx-head-sub" id="cxJuris">Loading jurisdiction…</div></div>' +
           '<button type="button" class="cx-close" aria-label="Close">✕</button>' +
-        '</div>' +
-        '<div class="cx-export-banner" id="cxExportBanner">' +
-          '<span class="cx-export-banner-text">↑ Tap or Scroll for Export &amp; Sharing Options</span>' +
         '</div>' +
         '<div class="cx-body">' +
           '<div id="cxPane-pdf"></div>' +
@@ -311,6 +316,22 @@
       var openSheet = modal.querySelector('.cx-sheet-overlay.open');
       if (openSheet) { hideSheet(openSheet); return; }
       close();
+    });
+    // Primary toolbar CTA opens the same pre-export audit prompt → export
+    // sheet flow as the in-body "Share & Export Brief" button.
+    modal.querySelector('#cxToolbarExport').addEventListener('click', openPreExport);
+    // Secondary toolbar shortcuts call the same real export functions
+    // directly, skipping the audit-summary prompt (it stays available via
+    // the primary CTA for anyone who wants that option).
+    modal.querySelector('#cxToolbarPdf').addEventListener('click', function (e) {
+      if (!data) { toast('Still loading the district snapshot — try again in a moment.'); return; }
+      downloadPdf(e.currentTarget);
+    });
+    modal.querySelector('#cxToolbarCopyLink').addEventListener('click', async function () {
+      var ok = await copyText(auditUrl());
+      if (ok) mintToast('Direct link copied to clipboard');
+      else toast('Copy is blocked here — the address is ' + auditUrl());
+      trackEvent('export_copy_link', { ok: ok, source: 'toolbar' });
     });
   }
 
