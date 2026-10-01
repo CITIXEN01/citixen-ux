@@ -269,6 +269,9 @@
   max-width:min(92vw,420px);padding:10px 14px;border-radius:12px;border:1px solid rgba(0,230,153,.4);background:#090D16;
   color:#E2E8F0;font-size:.8rem;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s}
 .cx-toast.show{opacity:1}
+/* Neon green confirmation toast (share/clipboard), stacked above the Brief modal. */
+.cx-toast-mint{z-index:7100;background:#00E699;color:#04140D;border-color:#00E699;font-weight:800;
+  box-shadow:0 0 22px rgba(0,230,153,.55),0 0 6px rgba(0,230,153,.9)}
 
 /* ---------- Geo-Hatch Coverage Engine (shared/geo-hatch.js) ---------- */
 .cx-geo{max-width:640px;margin:0 auto 18px;padding:16px;box-sizing:border-box;text-align:left;

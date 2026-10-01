@@ -5,12 +5,15 @@
    digital-first Civic Intelligence™ Brief modal from one file, so the web
    Dashboard and the app's Dashboard tab stay 1:1. Tapping "Generate Free
    Report" goes straight to the dark-mode on-screen Brief — no format-picker
-   tabs or other upfront prompts. From there, one "Share & Export Brief"
+   tabs or other upfront prompts — and the Civic Health needle runs a short
+   live calibration sweep before settling on the real reading. From there, one "Share & Export Brief"
    button expands a drawer with everything the Brief can turn into:
      • Download Official PDF Brief   — branded jsPDF download
-     • Share Graphic (1:1 Canvas)    — truncated #CrowdSaveAmerica card,
-                                        drawn on an off-screen <canvas> and
-                                        shared/saved as an image
+     • Share Graphic (1:1 Canvas)    — Living Ledger™ Snapshot + 3 metrics
+                                        + scannable QR, drawn on an off-screen
+                                        1080x1080 <canvas>; native share sheet
+                                        on phones, "Copy Link & Image to
+                                        Clipboard" on desktop browsers
      • + Append Living Ledger™ Audit Summary — optional checkbox; appends
                                         the real ward-score/rank summary
                                         (payloadText()) as an extra PDF page
@@ -363,17 +366,63 @@
       var p0 = pt(s.a0, r), p1 = pt(s.a1, r);
       return '<path d="M' + p0.x.toFixed(1) + ',' + p0.y.toFixed(1) + ' A' + r.toFixed(1) + ',' + r.toFixed(1) + ' 0 0 1 ' + p1.x.toFixed(1) + ',' + p1.y.toFixed(1) + '" stroke="' + s.color + '" stroke-width="' + sw + '" fill="none"/>';
     }).join('');
-    var needleA = hazardGaugeAngle(hz.label), tip = pt(needleA, r - sw - 4);
+    // The needle is drawn pointing at 0° (far left) and rotated into place
+    // with an SVG rotate() about the hub, so calibrateGaugeNeedle() can
+    // animate it. Its initial rotation is the real target angle, so the
+    // gauge still reads correctly if the animation never runs (reduced
+    // motion, or a renderer without JS).
+    var needleA = hazardGaugeAngle(hz.label), tip = pt(0, r - sw - 4);
     return '<svg viewBox="0 0 ' + vw + ' ' + vh + '" width="100%" role="img" aria-label="Civic Health gauge: ' + esc(civicHealthZoneLabel(hz.label)) + '">' +
       arcs +
-      '<line x1="' + cx + '" y1="' + cy + '" x2="' + tip.x.toFixed(1) + '" y2="' + tip.y.toFixed(1) + '" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>' +
+      '<line class="cx-gauge-needle" data-cx-target="' + needleA + '" data-cx-cx="' + cx + '" data-cx-cy="' + cy + '" transform="rotate(' + needleA + ' ' + cx + ' ' + cy + ')" x1="' + cx + '" y1="' + cy + '" x2="' + tip.x.toFixed(1) + '" y2="' + tip.y.toFixed(1) + '" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>' +
       '<circle cx="' + cx + '" cy="' + cy + '" r="7" fill="#FFFFFF"/>' +
     '</svg>';
   }
   function hazardGaugeCardHtml(hz) {
     var riskColor = hz.label === 'CRITICAL' ? '#EF4444' : hz.label === 'MODERATE' ? '#F59E0B' : '#00E699';
     return '<div class="cx-acard cx-acard-gauge"><div class="cx-acard-lbl">Civic Health</div>' + hazardGaugeSvg(hz, 160, 92) +
-      '<div class="cx-acard-risk-lbl" style="color:' + riskColor + '">' + esc(civicHealthZoneLabel(hz.label)) + '</div></div>';
+      '<div class="cx-acard-risk-lbl" data-cx-risk-lbl data-cx-final="' + esc(civicHealthZoneLabel(hz.label)) + '" style="color:' + riskColor + '">' + esc(civicHealthZoneLabel(hz.label)) + '</div></div>';
+  }
+  // Live calibration sweep for the Civic Health needle: starts at 0°,
+  // swings across the full spectrum, then settles with a damped shake onto
+  // the real computed angle (hazardGaugeAngle(), never a fixed reading).
+  // The zone label reads "CALIBRATING…" until the needle lands.
+  // prefers-reduced-motion skips straight to the settled reading.
+  function calibrateGaugeNeedle(root) {
+    var needle = root && root.querySelector('.cx-gauge-needle');
+    if (!needle) return;
+    var target = +needle.getAttribute('data-cx-target');
+    var cx = needle.getAttribute('data-cx-cx'), cy = needle.getAttribute('data-cx-cy');
+    var lbl = root.querySelector('[data-cx-risk-lbl]');
+    function setA(a) { needle.setAttribute('transform', 'rotate(' + a.toFixed(2) + ' ' + cx + ' ' + cy + ')'); }
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) { setA(target); return; }
+    function clamp(a) { return Math.max(0, Math.min(180, a)); }
+    // Keyframes (angle, duration ms): full sweep, swing back, then a
+    // damped oscillation around the target.
+    var keys = [[0, 0], [176, 620], [18, 520], [clamp(target + 34), 360], [clamp(target - 20), 260],
+      [clamp(target + 11), 200], [clamp(target - 5), 160], [clamp(target + 2), 130], [target, 120]];
+    var finalTxt = lbl ? lbl.getAttribute('data-cx-final') : '', finalColor = lbl ? lbl.style.color : '';
+    if (lbl) { lbl.textContent = 'CALIBRATING…'; lbl.style.color = '#94A3B8'; }
+    setA(0);
+    var seg = 1, segStart = null;
+    function ease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+    function step(ts) {
+      if (!needle.isConnected) return;
+      if (segStart === null) segStart = ts;
+      var from = keys[seg - 1][0], to = keys[seg][0], dur = keys[seg][1];
+      var t = Math.min((ts - segStart) / dur, 1);
+      // A hair of needle jitter while it is still moving fast, for a live
+      // instrument feel; zero by the final settle.
+      var jitter = seg < keys.length - 2 ? (Math.random() - 0.5) * 1.6 : 0;
+      setA(clamp(from + (to - from) * ease(t) + jitter));
+      if (t < 1) { requestAnimationFrame(step); return; }
+      seg++; segStart = ts;
+      if (seg < keys.length) { requestAnimationFrame(step); return; }
+      setA(target);
+      if (lbl) { lbl.textContent = finalTxt; lbl.style.color = finalColor; }
+    }
+    // Small delay so the sweep starts after the modal has painted.
+    setTimeout(function () { requestAnimationFrame(step); }, 180);
   }
   // Capital Project Tracker: a qualitative progress bar per status tier —
   // On-Time (green) / In Progress or a stale field update (amber) /
@@ -434,7 +483,8 @@
       '<div class="cx-actions"><button type="button" class="cx-btn-primary" id="cxShareExportBtn" aria-expanded="false" aria-controls="cxExportDrawer">' + icon('shareUp') + 'Share &amp; Export Brief</button></div>' +
       '<div class="cx-export-drawer" id="cxExportDrawer" hidden>' +
         '<button type="button" class="cx-btn-dashed" id="cxPdfBtn">' + icon('doc') + 'Download Official PDF Brief</button>' +
-        '<button type="button" class="cx-btn-dashed" id="cxShareCardBtn">' + icon('phoneShare') + 'Share Graphic (1:1 Canvas)</button>' +
+        '<button type="button" class="cx-btn-dashed" id="cxShareCardBtn">' + icon(canShareImageFiles() ? 'phoneShare' : 'copy') +
+          (canShareImageFiles() ? 'Share Graphic (1:1 Canvas)' : 'Copy Link &amp; Image to Clipboard') + '</button>' +
         '<label class="cx-export-check"><input type="checkbox" id="cxAppendLedgerSummary">' +
           '<span>+ Append Living Ledger<sup class="cx-tm">™</sup> Audit Summary</span>' +
         '</label>' +
@@ -451,6 +501,7 @@
     el.querySelector('#cxPdfBtn').addEventListener('click', function (e) { downloadPdf(e.currentTarget); });
     el.querySelector('#cxShareCardBtn').addEventListener('click', function (e) { drawCard(); shareCard(e.currentTarget); });
     el.querySelector('#cxAppendLedgerSummary').addEventListener('change', function (e) { appendLedgerSummary = e.target.checked; });
+    calibrateGaugeNeedle(el);
   }
 
   function hexRgb(hex) {
@@ -765,81 +816,177 @@
     ctx.beginPath(); ctx.arc(cx, cy, 9, 0, Math.PI * 2); ctx.fillStyle = '#FFFFFF'; ctx.fill();
   }
 
-  // Truncated 1:1 share graphic (per the "Social Share Graphic Visual DNA
-  // Alignment" round): shows ONLY a header (title + location), a central
-  // focus (the real Civic Health gauge + the real Avg. Fix Speed metric —
-  // the same hazardIndex()/avgHoursText() figures as the Digital Brief and
-  // PDF), and a footer (the verification line + a URL asset). Everything
-  // else the card used to carry — the Patents Pending badge, the full
-  // CITIXEN UX wordmark lockup, the Reports Filed / Open Dispatches trio,
-  // and the geospatial hazard heat map — is intentionally dropped so the
-  // graphic reads as a single, truncated, focused takeaway rather than a
-  // shrunk-down copy of the full Brief. No QR code is drawn: a QR-shaped
-  // graphic that doesn't actually decode would be misleading, and this
-  // build has no QR-encoding library, so the "QR code/URL asset" is
-  // satisfied with the real, readable site URL text instead.
+  // 1:1 share graphic (1080x1080): ONLY the top Living Ledger™ Snapshot
+  // (Reports Filed / Civic Health gauge / Open Active Dispatches), the 3
+  // Civic Performance Metrics (Avg. Fix Speed / Resolution Rate / State
+  // Rank) and a real, scannable QR code in the corner pointing at the
+  // reporting app ("Scan to Audit Your Block | Anonymous & Sovereign").
+  // Every figure is the same hazardIndex()/avgHoursText()/resolutionRate()/
+  // stateRankValue() reading the Digital Brief and PDF show. The Capital
+  // Project Tracker is intentionally left off the graphic.
+  //
+  // The QR is encoded with the qrcode-generator library (loaded from cdnjs
+  // by the page as window.qrcode). If it failed to load, no QR-shaped
+  // placeholder is drawn — a QR that doesn't decode would be misleading —
+  // and the corner shows the readable URL instead.
+  function auditUrl() { return location.origin + '/app'; }
+  function drawQr(ctx, text, x, y, size) {
+    if (typeof window.qrcode !== 'function') return false;
+    try {
+      var qr = window.qrcode(0, 'M'); qr.addData(text); qr.make();
+      var n = qr.getModuleCount(), quiet = 3, cell = Math.floor(size / (n + 2 * quiet));
+      var full = cell * (n + 2 * quiet), ox = x + (size - full) / 2, oy = y + (size - full) / 2;
+      rr(ctx, ox - 6, oy - 6, full + 12, full + 12, 14); ctx.fillStyle = '#FFFFFF'; ctx.fill();
+      ctx.fillStyle = '#090D16';
+      for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) {
+        if (qr.isDark(r, c)) ctx.fillRect(ox + (c + quiet) * cell, oy + (r + quiet) * cell, cell, cell);
+      }
+      return true;
+    } catch (e) { console.warn('QR encode failed', e); return false; }
+  }
   function drawCard() {
     var canvas = modal && modal.querySelector('#cxCardCanvas');
     if (!canvas || !data) return;
     var d = data, hz = hazardIndex(d), ctx = canvas.getContext('2d'), W = 1080;
     ctx.clearRect(0, 0, W, W);
     ctx.fillStyle = '#0A0D12'; ctx.fillRect(0, 0, W, W);
-    drawUrbanGrid(ctx, 30, 30, W - 60, W - 60); // dark grid texture, matching the Brief/PDF's visual DNA
+    drawUrbanGrid(ctx, 30, 30, W - 60, W - 60);
     rr(ctx, 30, 30, W - 60, W - 60, 36); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,230,153,0.55)'; ctx.stroke();
-
     ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
 
-    // ---- Header: CIVIC INTELLIGENCE™ BRIEF + location ----
+    // ---- Header ----
     ctx.font = font(800, 40); ctx.fillStyle = '#FFFFFF';
-    ctx.fillText('CIVIC INTELLIGENCE™ BRIEF', W / 2, 150);
+    ctx.fillText('CIVIC INTELLIGENCE™ BRIEF', W / 2, 105);
     ctx.font = font(700, 24); ctx.fillStyle = SLATE;
-    ctx.fillText(cityStateLabel(d).toUpperCase(), W / 2, 194);
+    ctx.fillText(cityStateLabel(d).toUpperCase(), W / 2, 148);
 
-    // ---- Central focus: Civic Health gauge + primary speed metric ----
+    // ---- Living Ledger™ Snapshot panel ----
+    var px = 70, pw = W - 140, py = 190, ph = 360;
+    rr(ctx, px, py, pw, ph, 26); ctx.fillStyle = '#000000'; ctx.fill();
+    ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,230,153,0.35)'; ctx.stroke();
+    ctx.font = font(800, 24); ctx.fillStyle = MINT;
+    ctx.fillText('LIVING LEDGER™ SNAPSHOT', W / 2, py + 40);
+    var colW = pw / 3, c1 = px + colW / 2, c2 = px + colW * 1.5, c3 = px + colW * 2.5, lblY = py + 100;
     ctx.font = font(800, 20); ctx.fillStyle = MINT;
-    ctx.fillText('CIVIC HEALTH', W / 2, 330);
-    var gcx = W / 2, gcy = 610, gr = 220, gsw = 44;
-    drawHazardGaugeCanvas(ctx, gcx, gcy, gr, gsw, hz);
+    ctx.fillText('REPORTS FILED', c1, lblY);
+    ctx.fillText('CIVIC HEALTH', c2, lblY);
+    ctx.fillText('OPEN DISPATCHES', c3, lblY);
+    ctx.font = font(900, 104); ctx.fillStyle = '#FFFFFF';
+    ctx.fillText(String(d.total), c1, py + 225);
+    ctx.fillStyle = d.counts.dispatched > 0 ? '#FF3B30' : '#FFFFFF';
+    ctx.fillText(String(d.counts.dispatched), c3, py + 225);
+    drawHazardGaugeCanvas(ctx, c2, py + 275, 118, 30, hz);
     var lblColor = hz.label === 'CRITICAL' ? '#EF4444' : hz.label === 'MODERATE' ? '#F59E0B' : '#00E699';
-    ctx.font = font(800, 28); ctx.fillStyle = lblColor;
-    ctx.fillText(civicHealthZoneLabel(hz.label), gcx, gcy + 50);
-    ctx.font = font(900, 70); ctx.fillStyle = '#FFFFFF';
-    ctx.fillText(avgHoursText(d), gcx, gcy + 160);
-    ctx.font = font(800, 22); ctx.fillStyle = MINT;
-    ctx.fillText('AVG. FIX SPEED', gcx, gcy + 215);
+    ctx.font = font(800, 24); ctx.fillStyle = lblColor;
+    ctx.fillText(civicHealthZoneLabel(hz.label), c2, py + 320);
 
-    // ---- Footer: verification line + URL asset ----
-    ctx.font = font(600, 20); ctx.fillStyle = '#6B7280';
-    ctx.fillText('VERIFIED VIA CITIXEN UX™ PROTOCOL | LIVING LEDGER™ OUTPUT', W / 2, 962);
-    ctx.font = font(700, 26); ctx.fillStyle = MINT;
-    ctx.fillText(siteUrl().replace(/^https?:\/\//, '').replace(/\/$/, ''), W / 2, 1002);
+    // ---- Civic Performance Metrics (3 cards) ----
+    var my = 590, mh = 180, gap = 22, mw = (pw - 2 * gap) / 3;
+    [[avgHoursText(d), 'AVG. FIX SPEED'], [resolutionRate(d), 'RESOLUTION RATE'], [stateRankValue(d.ranks), stateRankHeaderLabel(d.ranks).toUpperCase()]]
+      .forEach(function (m, i) {
+        var mx = px + i * (mw + gap);
+        rr(ctx, mx, my, mw, mh, 20); ctx.fillStyle = '#0F141C'; ctx.fill();
+        ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(148,163,184,0.25)'; ctx.stroke();
+        ctx.font = font(800, 19); ctx.fillStyle = MINT; ctx.fillText(m[1], mx + mw / 2, my + 42);
+        ctx.font = font(900, 64); ctx.fillStyle = '#FFFFFF'; ctx.fillText(String(m[0]), mx + mw / 2, my + 112);
+      });
+
+    // ---- Footer: QR corner + call to action ----
+    var qs = 200, qx = px + pw - qs, qy = 810;
+    var hasQr = drawQr(ctx, auditUrl(), qx, qy, qs);
+    ctx.textAlign = 'left';
+    ctx.font = font(900, 40); ctx.fillStyle = MINT;
+    ctx.fillText('Scan to Audit Your Block', px, 850);
+    ctx.font = font(700, 26); ctx.fillStyle = '#FFFFFF';
+    ctx.fillText('Anonymous & Sovereign', px, 900);
+    ctx.font = font(700, 24); ctx.fillStyle = SLATE;
+    ctx.fillText(auditUrl().replace(/^https?:\/\//, ''), px, 950);
+    ctx.font = font(600, 16); ctx.fillStyle = '#6B7280';
+    ctx.fillText('VERIFIED VIA CITIXEN UX™ PROTOCOL | LIVING LEDGER™ OUTPUT', px, 995);
+    if (!hasQr) {
+      ctx.textAlign = 'center'; ctx.font = font(700, 20); ctx.fillStyle = MINT;
+      ctx.fillText('#CrowdSaveAmerica', qx + qs / 2, qy + qs / 2);
+    }
+    ctx.textAlign = 'center';
   }
 
   function shareText() {
     var hz = hazardIndex(data);
     return 'CITIXEN UX™ Civic Intelligence™ Brief — ' + cityStateLabel(data) + ' civic health: ' + civicHealthZoneLabel(hz.label) +
-      '. Free & anonymous civic reporting with CITIXEN UX™.';
+      ' · Avg fix ' + avgHoursText(data) + ' · ' + resolutionRate(data) + ' resolved. Audit your block — anonymous & sovereign. #CrowdSaveAmerica';
+  }
+
+  // Whether this device's share sheet accepts image files (phones and some
+  // desktop Safari/Edge builds). Decides the Tier 2 button's label too.
+  function canShareImageFiles() {
+    try {
+      return !!(navigator.share && navigator.canShare &&
+        navigator.canShare({ files: [new File([''], 'probe.png', { type: 'image/png' })] }));
+    } catch (e) { return false; }
+  }
+
+  // Neon green confirmation toast, always rendered above the Brief modal
+  // (the page's own toast may sit underneath it).
+  function mintToast(msg) {
+    var el = document.getElementById('cxMintToast');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'cxMintToast'; el.className = 'cx-toast cx-toast-mint'; el.setAttribute('role', 'status');
+      document.body.appendChild(el);
+    }
+    el.textContent = msg; el.classList.add('show');
+    clearTimeout(el._t); el._t = setTimeout(function () { el.classList.remove('show'); }, 3200);
   }
 
   function shareCard(btn) {
     var canvas = modal.querySelector('#cxCardCanvas');
     var label = btn && btn.innerHTML;
+    var text = shareText(), url = auditUrl();
+    var blobPromise = new Promise(function (res) { canvas.toBlob(res, 'image/png'); });
+    function done() { if (btn) { btn.disabled = false; btn.innerHTML = label; } }
     if (btn) { btn.disabled = true; btn.textContent = 'Rendering…'; }
-    canvas.toBlob(async function (blob) {
-      if (btn) { btn.disabled = false; btn.innerHTML = label; }
-      if (!blob) { toast('Could not render the share graphic.'); return; }
-      var file = new File([blob], 'citixen-ux-civic-intelligence-brief.png', { type: 'image/png' });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        try { await navigator.share({ files: [file], title: 'CITIXEN UX™', text: shareText() }); }
+
+    // Tier 2a — native share sheet with the graphic + pre-populated text/link.
+    if (canShareImageFiles()) {
+      blobPromise.then(async function (blob) {
+        done();
+        if (!blob) { toast('Could not render the share graphic.'); return; }
+        var file = new File([blob], 'citixen-ux-living-ledger-snapshot.png', { type: 'image/png' });
+        try { await navigator.share({ files: [file], title: 'CITIXEN UX™ Living Ledger™ Snapshot', text: text + '\n' + url, url: url }); }
         catch (err) { if (err && err.name !== 'AbortError') toast('Sharing failed — please try again.'); }
+      });
+      return;
+    }
+
+    // Tier 2b — desktop fallback: copy the image AND the link to the
+    // clipboard in one item. The ClipboardItem is built synchronously
+    // (with a promised blob) so the click's user activation still counts.
+    (async function () {
+      var copied = false;
+      if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
+        var textBlob = new Blob([text + '\n' + url], { type: 'text/plain' });
+        try {
+          await navigator.clipboard.write([new ClipboardItem({ 'image/png': blobPromise, 'text/plain': textBlob })]);
+          copied = true;
+        } catch (e) {
+          try { await navigator.clipboard.write([new ClipboardItem({ 'image/png': blobPromise })]); copied = 'image'; } catch (e2) { /* fall through */ }
+        }
+      }
+      done();
+      if (copied === true) { mintToast('Link & image copied to clipboard'); return; }
+      if (copied === 'image') {
+        var linkOk = await copyText(url);
+        mintToast(linkOk ? 'Image copied — link copied after it' : 'Image copied to clipboard');
         return;
       }
-      // No image sharing here (most desktop browsers): save the PNG instead.
-      var url = URL.createObjectURL(blob), a = document.createElement('a');
-      a.href = url; a.download = file.name; document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
-      toast('This browser cannot share images directly, so the graphic was saved as a PNG.');
-    }, 'image/png');
+      // No clipboard image support at all: save the PNG and copy the link.
+      var blob = await blobPromise;
+      if (!blob) { toast('Could not render the share graphic.'); return; }
+      var a = document.createElement('a'), href = URL.createObjectURL(blob);
+      a.href = href; a.download = 'citixen-ux-living-ledger-snapshot.png'; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(href); }, 4000);
+      mintToast((await copyText(url)) ? 'Link copied · graphic saved as PNG' : 'Graphic saved as PNG');
+    })();
   }
 
   // ---------- Living Ledger™ Audit Summary (optional PDF append) ----------
