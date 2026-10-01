@@ -12,15 +12,18 @@
 .cx-export-kicker{font-size:.62rem;font-weight:700;letter-spacing:.22em;color:#94A3B8;margin-bottom:6px}
 .cx-export-title{margin:0 0 14px;color:#00E699;font-weight:800;font-size:1.05rem;letter-spacing:.08em;text-transform:uppercase;text-wrap:balance}
 .cx-export-sub{margin:0 auto 14px;max-width:44ch;color:#94A3B8;font-size:.8rem;line-height:1.5}
+/* Button stack — vertical flex column, one consistent 12px gap between all
+   3 buttons (replaces each button's own margin-top). */
+.cx-btn-stack{display:flex;flex-direction:column;gap:12px}
 .cx-btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;
-  min-height:48px;padding:12px 16px;border:1px solid #00E699;border-radius:12px;
+  min-height:48px;padding:16px;border:1px solid #00E699;border-radius:12px;
   background:#00E699;color:#090D16;font:inherit;font-weight:800;font-size:.95rem;letter-spacing:.02em;cursor:pointer}
 .cx-btn-primary:hover{filter:brightness(1.08)}
 .cx-btn-primary[disabled]{opacity:.6;cursor:progress}
 .cx-btn-dashed{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;
-  min-height:46px;margin-top:10px;padding:11px 16px;border:1px dashed rgba(0,230,153,.7);border-radius:12px;
+  min-height:46px;padding:14px 16px;border:1.5px dashed #00E699;border-radius:12px;
   background:transparent;color:#E2E8F0;font:inherit;font-weight:700;font-size:.88rem;cursor:pointer}
-.cx-btn-dashed:hover{border-color:#00E699;color:#00E699}
+.cx-btn-dashed:hover{filter:brightness(1.15)}
 /* Live Public Ledger — moved into this hero button stack as its 3rd,
    tertiary action (per the "Move Live Public Ledger Into Hero Stack" round)
    from a standalone gateway pill elsewhere on the page. Opens the real
@@ -28,7 +31,7 @@
    CitixenInstantReport.init()'s onLedger option — only rendered when a page
    supplies one. */
 .cx-btn-ledger{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;
-  min-height:46px;margin-top:10px;padding:11px 16px;border:1px solid rgba(0,230,153,.4);border-radius:12px;
+  min-height:46px;padding:14px 16px;border:1px solid rgba(0,230,153,.3);border-radius:12px;
   background:#121B2D;color:#FFFFFF;font:inherit;font-weight:700;font-size:.88rem;letter-spacing:.01em;cursor:pointer}
 .cx-btn-ledger:hover{border-color:#00E699}
 .cx-ledger-pulse-dot{position:relative;width:8px;height:8px;border-radius:50%;background:#00E699;flex-shrink:0;
