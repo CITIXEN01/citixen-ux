@@ -53,7 +53,8 @@
     archive: '<path d="M3 9l9-5 9 5"/><path d="M4 9h16"/><path d="M6 9v8M10 9v8M14 9v8M18 9v8"/><path d="M4 17h16M3 20h18"/>',
     shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',
     shieldPlain: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
-    hexgrid: '<path d="M8 3l3.5 2v4L8 11 4.5 9V5z"/><path d="M15.5 3L19 5v4l-3.5 2L12 9V5z"/><path d="M11.75 10.5l3.5 2v4l-3.5 2-3.5-2v-4z"/><path d="M4.5 14.5L8 12.5"/><path d="M19 14.5l-3.75-2"/><path d="M8.25 16.5L4.5 18.5M15.25 16.5l3.75 2"/>'
+    hexgrid: '<path d="M8 3l3.5 2v4L8 11 4.5 9V5z"/><path d="M15.5 3L19 5v4l-3.5 2L12 9V5z"/><path d="M11.75 10.5l3.5 2v4l-3.5 2-3.5-2v-4z"/><path d="M4.5 14.5L8 12.5"/><path d="M19 14.5l-3.75-2"/><path d="M8.25 16.5L4.5 18.5M15.25 16.5l3.75 2"/>',
+    pin: '<path d="M12 21s7-5.33 7-11a7 7 0 0 0-14 0c0 5.67 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>'
   };
   function icon(name, extraClass) {
     return '<svg class="cx-icon' + (extraClass ? ' ' + extraClass : '') + '" viewBox="0 0 24 24" aria-hidden="true">' + (ICONS[name] || '') + '</svg>';
@@ -180,7 +181,7 @@
   function stateRankHeaderLabel(r) { return (stateRankSubtext(r) ? stateRankSubtext(r) + ' ' : '') + 'State Rank'; }
 
   // ---------- state ----------
-  var cfg = { getData: null, toast: null, onLedger: null, onStack: null };
+  var cfg = { getData: null, toast: null, onLedger: null, onStack: null, ledgerAsSecondary: false };
   var data = null, generatedAt = null, current = 'pdf', modal = null, rafId = 0, lastFocus = null;
 
   function toast(msg) {
@@ -205,20 +206,30 @@
       '<section class="cx-export" aria-labelledby="cxExportTitle">' +
         '<h3 class="cx-export-title" id="cxExportTitle">Reports &amp; Easy Share</h3>' +
         '<div class="cx-btn-stack">' +
-          '<button type="button" class="cx-btn-primary" data-cx-open="pdf">Generate Free Report</button>' +
-          '<button type="button" class="cx-btn-dashed" data-cx-share-platform>' +
-            '<span style="color:#FFFFFF">Share CITIXEN </span>' +
-            '<span>' +
-              '<span style="color:#00E699">UX</span>' +
-              '<sup style="color:#94A3B8;font-weight:400;font-size:.65em;margin-left:1px;line-height:0">™</sup>' +
-            '</span>' +
-          '</button>' +
+          '<button type="button" class="cx-btn-primary" data-cx-open="pdf">Generate Free Civic Report ↗</button>' +
+          // Button 2 (secondary slot): "View Living Public Ledger ↗" when a
+          // page opts in via ledgerAsSecondary (app.html — the Ledger moved
+          // here because Button 3 below no longer opens it, see onStack);
+          // otherwise the original "Share CITIXEN UX™" action (index.html,
+          // unchanged).
+          (cfg.ledgerAsSecondary && cfg.onLedger
+            ? '<button type="button" class="cx-btn-dashed" data-cx-ledger-secondary>' +
+                '<span class="cx-ledger-pulse-dot" aria-hidden="true"></span>' +
+                '<span>View Living Public Ledger ↗</span>' +
+              '</button>'
+            : '<button type="button" class="cx-btn-dashed" data-cx-share-platform>' +
+                '<span style="color:#FFFFFF">Share CITIXEN </span>' +
+                '<span>' +
+                  '<span style="color:#00E699">UX</span>' +
+                  '<sup style="color:#94A3B8;font-weight:400;font-size:.65em;margin-left:1px;line-height:0">™</sup>' +
+                '</span>' +
+              '</button>') +
           (cfg.onStack
             ? '<button type="button" class="cx-btn-tertiary" data-cx-stack>' +
                 '<svg class="cx-stack-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>' +
                 '<span>Civic Intelligence Stack<sup style="font-size:.62em;margin-left:1px;color:#00E699">™</sup> ↗</span>' +
               '</button>'
-            : cfg.onLedger
+            : (!cfg.ledgerAsSecondary && cfg.onLedger)
               ? '<button type="button" class="cx-btn-tertiary" data-cx-ledger>' +
                   '<span class="cx-ledger-pulse-dot" aria-hidden="true"></span>' +
                   '<span>View Live Public Ledger</span>' +
@@ -227,7 +238,10 @@
         '</div>' +
       '</section>';
     mount.querySelector('[data-cx-open]').addEventListener('click', function (e) { open('pdf', e.currentTarget); });
-    mount.querySelector('[data-cx-share-platform]').addEventListener('click', sharePlatform);
+    var sharePlatformBtn = mount.querySelector('[data-cx-share-platform]');
+    if (sharePlatformBtn) sharePlatformBtn.addEventListener('click', sharePlatform);
+    var ledgerSecondaryBtn = mount.querySelector('[data-cx-ledger-secondary]');
+    if (ledgerSecondaryBtn) ledgerSecondaryBtn.addEventListener('click', function () { cfg.onLedger(); });
     var stackBtn = mount.querySelector('[data-cx-stack]');
     if (stackBtn) stackBtn.addEventListener('click', function () { cfg.onStack(); });
     var ledgerBtn = mount.querySelector('[data-cx-ledger]');
@@ -929,6 +943,7 @@
       cfg.toast = options.toast || null;
       cfg.onLedger = options.onLedger || null;
       cfg.onStack = options.onStack || null;
+      cfg.ledgerAsSecondary = !!options.ledgerAsSecondary;
       document.querySelectorAll('[data-cx-export-module]').forEach(renderModule);
     },
     open: open,
