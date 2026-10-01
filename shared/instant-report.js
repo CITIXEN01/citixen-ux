@@ -413,6 +413,12 @@
           '<span class="cx-subrow-title">Free Report</span>' +
           '<span class="cx-subrow-time">Generated ' + esc(stamp(generatedAt)) + ' • citixenux.com</span>' +
         '</div>' +
+        '<div class="cx-sec">' +
+          '<div class="cx-acards-wrap"><div class="cx-acards-head">Community Action Snapshot</div><div class="cx-acards">' +
+            actionCard(d.total, 'Reports Filed') +
+            hazardGaugeCardHtml(hz) +
+            actionCard(d.counts.dispatched, 'Open Active Dispatches', d.counts.dispatched > 0 ? '#FF3B30' : null) +
+          '</div></div></div>' +
         '<div class="cx-sec"><div class="cx-sec-title">Civic Performance Metrics</div>' +
           '<div class="cx-mcards">' +
             mcard(avgHoursText(d), 'Avg. Fix Speed') +
@@ -420,12 +426,6 @@
             mcard(stateRankValue(r), stateRankHeaderLabel(r)) +
           '</div></div>' +
         '<div class="cx-sec"><div class="cx-sec-title">Capital Project Tracker</div>' + cipThermHtml(d.cip) + '</div>' +
-        '<div class="cx-sec">' +
-          '<div class="cx-acards-wrap"><div class="cx-acards-head">Community Action Snapshot</div><div class="cx-acards">' +
-            actionCard(d.total, 'Reports Filed') +
-            hazardGaugeCardHtml(hz) +
-            actionCard(d.counts.dispatched, 'Open Active Dispatches', d.counts.dispatched > 0 ? '#FF3B30' : null) +
-          '</div></div></div>' +
         '<div class="cx-footer-single">CITIXEN UX™ • Civic Intelligence™</div>' +
         '</div>' +
       '</div>' +
@@ -499,69 +499,6 @@
         y += 16;
       }
 
-      // Metric cards: every card in a solid-black header bar + white body,
-      // per this round's card-standardization rule.
-      function cardGrid(items, cols) {
-        var gap = 10, bw = (W - 2 * M - (cols - 1) * gap) / cols, headH = 16, bodyH = 46;
-        items.forEach(function (it, k) {
-          var col = k % cols, row = Math.floor(k / cols);
-          var x = M + col * (bw + gap), by = y + row * (headH + bodyH + 10);
-          doc.setFillColor(0, 0, 0); doc.roundedRect(x, by, bw, headH, 3, 3, 'F');
-          doc.setFillColor(0, 0, 0); doc.rect(x, by + headH - 4, bw, 4, 'F');
-          doc.setTextColor(0, 230, 153); doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5);
-          doc.text(it.lbl.toUpperCase(), x + bw / 2, by + headH / 2 + 2.5, { align: 'center' });
-          doc.setDrawColor(226, 232, 240); doc.setLineWidth(1);
-          doc.roundedRect(x, by + headH, bw, bodyH, 3, 3, 'S');
-          var cy = by + headH + bodyH / 2;
-          if (it.pill) {
-            var rgb = hexRgb(it.pill), pw2 = doc.getTextWidth(it.val) + 16;
-            doc.setFillColor(rgb[0], rgb[1], rgb[2]); doc.roundedRect(x + bw / 2 - pw2 / 2, cy - 8, pw2, 16, 8, 8, 'F');
-            doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(8);
-            doc.text(it.val, x + bw / 2, cy + 3, { align: 'center' });
-          } else {
-            doc.setTextColor.apply(doc, it.color || [4, 120, 87]);
-            doc.setFont('helvetica', 'bold'); doc.setFontSize(14);
-            doc.text(String(it.val), x + bw / 2, cy + (it.sub ? -2 : 4), { align: 'center' });
-            if (it.sub) {
-              doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
-              doc.text(String(it.sub), x + bw / 2, cy + 10, { align: 'center' });
-            }
-          }
-        });
-        y += Math.ceil(items.length / cols) * (headH + bodyH + 10);
-      }
-
-      sectionTitle('CIVIC PERFORMANCE METRICS');
-      cardGrid([
-        { val: avgHoursText(d), lbl: 'Avg. Fix Speed' },
-        { val: resolutionRate(d), lbl: 'Resolution Rate' },
-        { val: stateRankValue(d.ranks), lbl: stateRankHeaderLabel(d.ranks) }
-      ], 3);
-
-      // Capital Project Tracker: a qualitative progress bar per status tier
-      // — there is no measured percent-complete field in the CIP data, so
-      // no specific completion number is printed, only the real name,
-      // quarter and status alongside a relative fill.
-      sectionTitle('CAPITAL PROJECT TRACKER');
-      if (!d.cip.length) {
-        doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
-        doc.text('No capital projects are on file for this jurisdiction yet.', M, y + 4); y += 22;
-      }
-      d.cip.forEach(function (p) {
-        ensureRoom(30);
-        var barH = 20, fullW = W - 2 * M;
-        var rgb = p.status === 'on-time' ? [0, 230, 153] : p.status === 'delayed' ? [255, 59, 48] : [245, 158, 11];
-        var fillPct = p.status === 'on-time' ? 0.92 : p.status === 'delayed' ? 0.28 : 0.56;
-        doc.setFillColor(244, 245, 247); doc.roundedRect(M, y, fullW, barH, 10, 10, 'F');
-        doc.setFillColor(rgb[0], rgb[1], rgb[2]); doc.roundedRect(M, y, Math.max(fullW * fillPct, barH), barH, 10, 10, 'F');
-        doc.setTextColor(9, 13, 22); doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5);
-        doc.text(doc.splitTextToSize(p.name || 'Capital project', fullW * 0.55)[0], M + 12, y + barH / 2 + 3);
-        doc.setTextColor(51, 65, 85); doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
-        doc.text((p.scheduled || '—') + ' · ' + cipLabel(p.status), W - M - 10, y + barH / 2 + 3, { align: 'right' });
-        y += barH + 9;
-      });
-      y += 10;
-
       // Hazard Index gauge: 180°, 3-segment semicircular meter. The needle
       // is centered within whichever segment matches the real computed
       // hazardIndex() reading for this jurisdiction — never a fixed or
@@ -580,11 +517,15 @@
         doc.setFillColor(255, 255, 255); doc.circle(cx, cy, 4, 'F');
       }
 
-      // Community Action Snapshot: one unified black anchor container holds
-      // its own title (no separate pill banner above it) plus all 3 cards —
-      // Reports Filed (real aggregate d.total, not the 'submitted'-stage-
-      // only subset) and Open Active Dispatches flank the Civic Health
-      // gauge, matching the HTML pane's layout exactly.
+      // Section order (per this round's spec): Community Action Snapshot
+      // (top), Civic Performance Metrics (middle), Capital Project Tracker
+      // (bottom, directly above the footer).
+
+      // 1. Community Action Snapshot: one unified black anchor container
+      // holds its own title (no separate pill banner above it) plus all 3
+      // cards — Reports Filed (real aggregate d.total, not the
+      // 'submitted'-stage-only subset) and Open Active Dispatches flank the
+      // Civic Health gauge, matching the HTML pane's layout exactly.
       ensureRoom(170);
       (function section3Cards() {
         var padX = 12, gap = 10, titleBandH = 20, cardAreaH = 108, boxH = titleBandH + cardAreaH, by = y, cardTop = by + titleBandH;
@@ -623,6 +564,72 @@
 
         y += boxH + 10;
       })();
+
+      // 2. Civic Performance Metrics: every card in a solid-black header
+      // bar + white body, per the card-standardization rule.
+      function cardGrid(items, cols) {
+        var gap = 10, bw = (W - 2 * M - (cols - 1) * gap) / cols, headH = 16, bodyH = 46;
+        items.forEach(function (it, k) {
+          var col = k % cols, row = Math.floor(k / cols);
+          var x = M + col * (bw + gap), by = y + row * (headH + bodyH + 10);
+          doc.setFillColor(0, 0, 0); doc.roundedRect(x, by, bw, headH, 3, 3, 'F');
+          doc.setFillColor(0, 0, 0); doc.rect(x, by + headH - 4, bw, 4, 'F');
+          doc.setTextColor(0, 230, 153); doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5);
+          doc.text(it.lbl.toUpperCase(), x + bw / 2, by + headH / 2 + 2.5, { align: 'center' });
+          doc.setDrawColor(226, 232, 240); doc.setLineWidth(1);
+          doc.roundedRect(x, by + headH, bw, bodyH, 3, 3, 'S');
+          var cy = by + headH + bodyH / 2;
+          if (it.pill) {
+            var rgb = hexRgb(it.pill), pw2 = doc.getTextWidth(it.val) + 16;
+            doc.setFillColor(rgb[0], rgb[1], rgb[2]); doc.roundedRect(x + bw / 2 - pw2 / 2, cy - 8, pw2, 16, 8, 8, 'F');
+            doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(8);
+            doc.text(it.val, x + bw / 2, cy + 3, { align: 'center' });
+          } else {
+            doc.setTextColor.apply(doc, it.color || [4, 120, 87]);
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(14);
+            doc.text(String(it.val), x + bw / 2, cy + (it.sub ? -2 : 4), { align: 'center' });
+            if (it.sub) {
+              doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
+              doc.text(String(it.sub), x + bw / 2, cy + 10, { align: 'center' });
+            }
+          }
+        });
+        y += Math.ceil(items.length / cols) * (headH + bodyH + 10);
+      }
+
+      ensureRoom(80);
+      sectionTitle('CIVIC PERFORMANCE METRICS');
+      cardGrid([
+        { val: avgHoursText(d), lbl: 'Avg. Fix Speed' },
+        { val: resolutionRate(d), lbl: 'Resolution Rate' },
+        { val: stateRankValue(d.ranks), lbl: stateRankHeaderLabel(d.ranks) }
+      ], 3);
+
+      // 3. Capital Project Tracker (bottom block, directly above the
+      // footer): a qualitative progress bar per status tier — there is no
+      // measured percent-complete field in the CIP data, so no specific
+      // completion number is printed, only the real name, quarter and
+      // status alongside a relative fill.
+      ensureRoom(50);
+      sectionTitle('CAPITAL PROJECT TRACKER');
+      if (!d.cip.length) {
+        doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
+        doc.text('No capital projects are on file for this jurisdiction yet.', M, y + 4); y += 22;
+      }
+      d.cip.forEach(function (p) {
+        ensureRoom(30);
+        var barH = 20, fullW = W - 2 * M;
+        var rgb = p.status === 'on-time' ? [0, 230, 153] : p.status === 'delayed' ? [255, 59, 48] : [245, 158, 11];
+        var fillPct = p.status === 'on-time' ? 0.92 : p.status === 'delayed' ? 0.28 : 0.56;
+        doc.setFillColor(244, 245, 247); doc.roundedRect(M, y, fullW, barH, 10, 10, 'F');
+        doc.setFillColor(rgb[0], rgb[1], rgb[2]); doc.roundedRect(M, y, Math.max(fullW * fillPct, barH), barH, 10, 10, 'F');
+        doc.setTextColor(9, 13, 22); doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5);
+        doc.text(doc.splitTextToSize(p.name || 'Capital project', fullW * 0.55)[0], M + 12, y + barH / 2 + 3);
+        doc.setTextColor(51, 65, 85); doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
+        doc.text((p.scheduled || '—') + ' · ' + cipLabel(p.status), W - M - 10, y + barH / 2 + 3, { align: 'right' });
+        y += barH + 9;
+      });
+      y += 10;
 
       // Footer: a single centered line with just the two core marks — no
       // legal text, patent disclosure, or links (per this round's spec).
