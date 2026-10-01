@@ -864,6 +864,14 @@
     line1.forEach(function (p) { ctx.fillStyle = p[1]; ctx.fillText(p[0], fx, 950); fx += ctx.measureText(p[0]).width; });
     ctx.textAlign = 'center'; ctx.font = font(600, 16); ctx.fillStyle = SLATE;
     ctx.fillText('Civic Intelligence™ • Civic Memory™ • Patents Pending • citixenux.com', W / 2, 980);
+    // Secondary metadata line — same mark as the HTML pane/PDF footer
+    // (#6B7280, uppercase). Sized at 13px rather than a literal 10px: this
+    // canvas is a 1080x1080 share asset where every other footer line runs
+    // 16-22px, so 10px would be illegibly small relative to this medium's
+    // own scale — 13px keeps it the smallest, most muted line on the card
+    // while staying readable at typical shared/display sizes.
+    ctx.font = font(600, 13); ctx.fillStyle = '#6B7280';
+    ctx.fillText('VERIFIED VIA CITIXEN UX™ PROTOCOL | LIVING LEDGER™ OUTPUT', W / 2, 1008);
   }
 
   function startAnim() {
