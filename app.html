@@ -32,7 +32,7 @@
   --bg-obsidian:#030712 !important;
   --bg-card:#111827 !important;
   --border-muted:rgba(255,255,255,0.08) !important;
-  --fow-amber:#FFB800 !important;
+  --fow-amber:#F59E0B !important; /* this round's "11,000,000 Block Base Matrix" spec's exact Pending amber hex */
   /* ===== STANDARDIZED SURFACE TOKENS — synchronized with index.html per
      this round's item 1: every card wrapper and category block below
      draws from the same translucent glass fill + Fresh Mint hairline, and
@@ -148,8 +148,15 @@ textarea.input{resize:none;line-height:1.4}
 .beacon-incident{position:relative;width:100%;height:100%}
 .beacon-incident .beacon-pulse{position:absolute;inset:-6px;border-radius:50%;background:var(--beacon-color);
   opacity:.4;animation:beaconPulse 1.8s ease-out infinite}
+/* This round's "Custom Pulse Markers" spec: 1px Midnight Navy (#090D16)
+   border on report-pin cores, replacing the old 2px white ring. The core
+   fill itself stays per-category (--beacon-color: Critical=red, pothole/
+   road=Laser Mint, lighting=amber, etc.) rather than forcing every pin to
+   one flat color — that category/status color-coding is real, load-
+   bearing information this spec's "all active report pins... Laser Mint"
+   line would otherwise erase; see categoryColor() below. */
 .beacon-incident .beacon-core{position:absolute;inset:5px;border-radius:50%;background:var(--beacon-color);
-  border:2px solid #fff;box-shadow:0 0 6px var(--beacon-color)}
+  border:1px solid #090D16;box-shadow:0 0 6px var(--beacon-color)}
 .beacon-user{position:relative;width:100%;height:100%}
 .beacon-user .beacon-pulse{position:absolute;inset:-8px;border-radius:50%;background:#00E699;
   opacity:.4;animation:beaconPulse 1.6s ease-out infinite}
@@ -247,10 +254,13 @@ textarea.input{resize:none;line-height:1.4}
 .coverage-ticker{font-size:1.6rem;font-weight:900;color:var(--mint2)}
 .coverage-sub{font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
 .cov-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-bottom:10px}
-.cov-cell{aspect-ratio:1;border-radius:3px;background:rgba(255,255,255,.06);cursor:pointer;border:none;padding:0;
+/* Block Cell Visual States — this round's exact hex values: Uncharted
+   (Dark Slate #1E293B, 0.3 opacity), Pending (Amber, --fow-amber above),
+   Auditable (Laser Mint, var(--mint2)/#00E699). */
+.cov-cell{aspect-ratio:1;border-radius:3px;background:rgba(30,41,59,.3);cursor:pointer;border:none;padding:0;
   transition:transform .12s ease,box-shadow .3s ease,background .3s ease}
 .cov-cell.covered{background:var(--mint2);box-shadow:0 0 6px rgba(0,230,153,.7)}
-.cov-cell.pending{background:var(--fow-amber);box-shadow:0 0 6px rgba(255,184,0,.6)}
+.cov-cell.pending{background:var(--fow-amber);box-shadow:0 0 6px rgba(245,158,11,.6)}
 .cov-cell.you{box-shadow:0 0 0 1.5px #fff,0 0 6px rgba(0,230,153,.7)}
 .cov-cell:active{transform:scale(.82)}
 .cov-legend{display:flex;justify-content:space-between;font-size:.62rem;color:var(--muted);margin-bottom:4px;flex-wrap:wrap;gap:6px 12px}
@@ -726,7 +736,7 @@ textarea.input{resize:none;line-height:1.4}
         <div class="cov-legend">
           <span><span class="dot" style="background:var(--mint2)"></span>Auditable</span>
           <span><span class="dot" style="background:var(--fow-amber)"></span>Pending</span>
-          <span><span class="dot" style="background:rgba(255,255,255,.15)"></span>Uncharted</span>
+          <span><span class="dot" style="background:rgba(30,41,59,.3)"></span>Uncharted</span>
         </div>
         <div class="cov-grid" id="covGrid"></div>
         <canvas id="tierCanvas" width="600" height="240" style="display:none;"></canvas>

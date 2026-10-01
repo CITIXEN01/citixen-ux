@@ -651,12 +651,28 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
    round along with it — the Aggregation Hub is now a real Leaflet map. ===== */
 
 
-/* ===== MAP BEACONS (CartoDB Dark Matter basemap) ===== */
+/* ===== MAP BEACONS — basemap is plain OSM raster tiles + a dark CSS
+   filter (see .leaflet-tile-pane below), not CartoDB Dark Matter: Carto's
+   basemap tiles now require a provisioned API key this project doesn't
+   have, and the one documented attempt at using them rendered an "API KEY
+   REQUIRED" watermark over the map, so this build switched to OSM.
+   Mapbox Dark-v11 and Stadia Alidade Smooth Dark (this round's other two
+   suggested providers) likewise require their own API keys/accounts —
+   none are configured here either, so swapping to any of the three named
+   providers without a real key would reproduce the same broken-watermark
+   regression. The OSM+filter combination is the honest way to get a dark,
+   high-contrast map without a paid/keyed tile service. ===== */
 .beacon-incident{position:relative;width:100%;height:100%}
 .beacon-incident .beacon-pulse{position:absolute;inset:-6px;border-radius:50%;background:var(--beacon-color);
   opacity:.4;animation:beaconPulse 1.8s ease-out infinite}
+/* This round's "Custom Pulse Markers" spec: 1px Midnight Navy (#090D16)
+   border on report-pin cores, replacing the old 2px white ring. The core
+   fill itself stays per-category rather than forcing every pin to one
+   flat color — that color-coding is real, load-bearing information this
+   spec's "all active report pins... Laser Mint" line would otherwise
+   erase. */
 .beacon-incident .beacon-core{position:absolute;inset:5px;border-radius:50%;background:var(--beacon-color);
-  border:2px solid #fff;box-shadow:0 0 6px var(--beacon-color)}
+  border:1px solid #090D16;box-shadow:0 0 6px var(--beacon-color)}
 .beacon-user{position:relative;width:100%;height:100%}
 .beacon-user .beacon-pulse{position:absolute;inset:-8px;border-radius:50%;background:#00E699;
   opacity:.4;animation:beaconPulse 1.6s ease-out infinite}
