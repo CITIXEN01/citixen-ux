@@ -404,7 +404,7 @@
         '<div class="cx-subrow">' +
           '<span class="cx-subrow-geo">' + esc(cityStateLabel(d)) + '</span>' +
           '<span class="cx-subrow-title">Free Report</span>' +
-          '<span class="cx-subrow-time">Generated ' + esc(stamp(generatedAt)) + '<br>citixenux.com</span>' +
+          '<span class="cx-subrow-time">Generated ' + esc(stamp(generatedAt)) + ' • citixenux.com</span>' +
         '</div>' +
         '<div class="cx-sec"><div class="cx-sec-title"><span>1</span>CIVIC PERFORMANCE METRICS</div>' +
           '<div class="cx-mcards">' +
@@ -478,10 +478,9 @@
       doc.text(cityStateLabel(d), M, y);
       doc.text('FREE REPORT', W / 2, y, { align: 'center' });
       doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
-      doc.text('Generated ' + stamp(generatedAt), W - M, y, { align: 'right' });
-      doc.text('citixenux.com', W - M, y + 10, { align: 'right' });
-      doc.setDrawColor(226, 232, 240); doc.setLineWidth(0.75); doc.line(M, y + 20, W - M, y + 20);
-      y += 42;
+      doc.text('Generated ' + stamp(generatedAt) + ' • citixenux.com', W - M, y, { align: 'right' });
+      doc.setDrawColor(226, 232, 240); doc.setLineWidth(0.75); doc.line(M, y + 12, W - M, y + 12);
+      y += 34;
 
       function ensureRoom(h) { if (y + h > 740) { doc.addPage(); y = 60; } }
       function sectionTitle(n, title) {
