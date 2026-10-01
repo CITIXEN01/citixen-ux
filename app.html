@@ -525,6 +525,55 @@ textarea.input{resize:none;line-height:1.4}
 .btn-receipt-dismiss{width:100%;box-sizing:border-box;min-height:52px;background:var(--mint);color:#051311;
   border:none;padding:14px 16px;border-radius:12px;font-family:inherit;font-weight:700;font-size:16px;cursor:pointer}
 
+/* ===== FRONT DOOR ONBOARDING — "First Look" beta walkthrough
+   (#frontDoorOnboardingModal). Obsidian Glass per spec: translucent
+   slate-950/60 fill + heavy blur + a slate-800/60 hairline, distinct from
+   the emerald-tinted glass the rest of this file uses elsewhere. ===== */
+.onboarding-card{background:rgba(2,6,23,.6);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border:1px solid rgba(30,41,59,.6);box-shadow:0 0 32px rgba(0,0,0,.5)}
+.onboarding-header-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.onboarding-brand{font-weight:800;font-size:.8rem;letter-spacing:.3px;color:var(--mint2)}
+.onboarding-header-right{display:flex;align-items:center;gap:10px}
+.onboarding-badge{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.6rem;
+  font-weight:700;letter-spacing:.06em;color:#94a3b8;text-transform:uppercase}
+.onboarding-close{background:transparent;border:none;color:#94a3b8;font-size:1rem;line-height:1;
+  cursor:pointer;padding:2px 4px;border-radius:6px}
+.onboarding-close:hover{color:var(--text)}
+.onboarding-slides{min-height:260px}
+.onboarding-slide{display:none}
+.onboarding-slide.active{display:block;animation:onboardingFadeIn .25s ease}
+@keyframes onboardingFadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.onboarding-eyebrow{font-size:.64rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--mint2);margin-bottom:10px}
+.onboarding-headline{font-size:1.28rem;font-weight:900;line-height:1.25;color:var(--text);margin-bottom:10px}
+.onboarding-subtitle{font-size:.8rem;font-weight:700;color:var(--mint2);margin-bottom:12px}
+.onboarding-body{font-size:.84rem;line-height:1.55;color:var(--muted)}
+.onboarding-step{display:flex;gap:12px;align-items:flex-start;margin-bottom:16px}
+.onboarding-step:last-child{margin-bottom:0}
+.onboarding-step-num{flex-shrink:0;width:26px;height:26px;border-radius:50%;background:rgba(0,230,153,.12);
+  border:1px solid rgba(0,230,153,.4);color:var(--mint2);font-weight:800;font-size:.76rem;
+  display:flex;align-items:center;justify-content:center}
+.onboarding-step-text{display:flex;flex-direction:column;gap:3px}
+.onboarding-step-text b{font-size:.84rem;color:var(--text)}
+.onboarding-step-text span{font-size:.76rem;color:var(--muted);line-height:1.4}
+.onboarding-checklist{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.onboarding-checklist li{font-size:.82rem;color:var(--text);padding:10px 12px;background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.07);border-radius:10px;display:flex;align-items:center;gap:8px}
+.onboarding-checklist li::before{content:'';flex-shrink:0;width:16px;height:16px;border-radius:5px;
+  border:1.5px solid rgba(0,230,153,.5);background:rgba(0,230,153,.08)}
+.btn-onboarding-cta{width:100%;box-sizing:border-box;min-height:52px;background:var(--mint);color:#051311;
+  border:none;padding:14px 16px;border-radius:12px;font-family:inherit;font-weight:700;font-size:16px;cursor:pointer}
+.onboarding-footer{display:flex;flex-direction:column;gap:16px;margin-top:20px}
+.onboarding-dots{display:flex;justify-content:center;gap:8px}
+.onboarding-dot{width:7px;height:7px;border-radius:50%;background:rgba(148,163,184,.3);transition:all .2s ease}
+.onboarding-dot.active{background:#34d399;box-shadow:0 0 8px rgba(52,211,153,.8);width:20px;border-radius:4px}
+.onboarding-nav{display:flex;gap:10px}
+.btn-onboarding-outline{flex:1;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.12);
+  color:var(--text);padding:12px;border-radius:10px;font-weight:700;font-size:.8rem;cursor:pointer;
+  transition:border-color .15s,background .15s}
+.btn-onboarding-outline:hover{border-color:rgba(0,230,153,.4);background:rgba(0,230,153,.04)}
+.btn-onboarding-outline:disabled{opacity:0;pointer-events:none}
+
 /* ===== "WHAT IS CIVIC INTELLIGENCE?" HERO (index.html only markup, shared styles) ===== */
 .ci-hero{padding:0}
 .ci-compare{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
@@ -1487,6 +1536,72 @@ textarea.input{resize:none;line-height:1.4}
           </button>
         </div>
         <button type="button" class="btn-receipt-dismiss" id="btnReceiptDismiss">Dismiss to Feed</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FRONT DOOR ONBOARDING — "First Look" 3-card walkthrough shown
+       once per device to the first-adopter beta cohort (gated by
+       ONBOARDING_SEEN_KEY in localStorage, same per-device convention as
+       markGridCellLit()'s lit-grid-cities key). Auto-opens shortly after
+       the launch splash fades; the header "✕" and the final CTA both mark
+       it seen so a returning beta tester never has to sit through it
+       twice. See openFrontDoorOnboarding()/closeFrontDoorOnboarding(). ===== -->
+  <div id="frontDoorOnboardingModal" class="confirm-drawer">
+    <div class="confirm-card onboarding-card">
+      <div class="onboarding-header-bar">
+        <span class="onboarding-brand">CITIXEN UX<sup class="tm-symbol">™</sup></span>
+        <div class="onboarding-header-right">
+          <span class="onboarding-badge">FIRST LOOK BETA</span>
+          <button type="button" class="onboarding-close" id="btnOnboardingClose" aria-label="Skip walkthrough">✕</button>
+        </div>
+      </div>
+
+      <div class="onboarding-slides" id="onboardingSlides">
+        <div class="onboarding-slide active" data-slide="0">
+          <div class="onboarding-eyebrow">Welcome to Citixen UX™</div>
+          <h2 class="onboarding-headline">Fixing Your Neighborhood Just Got Effortless.</h2>
+          <div class="onboarding-subtitle">No app downloads. No account required. 100% private.</div>
+          <p class="onboarding-body">You're getting an exclusive first look at Citixen. Help us make taking care of local issues—like potholes, broken streetlights, or overgrown parks—as fast and smooth as taking a photo.</p>
+        </div>
+
+        <div class="onboarding-slide" data-slide="1">
+          <div class="onboarding-eyebrow">How It Works in 30 Seconds</div>
+          <div class="onboarding-step">
+            <div class="onboarding-step-num">1</div>
+            <div class="onboarding-step-text"><b>Choose a Category</b><span>Select an option or type a quick note. The system routes it automatically.</span></div>
+          </div>
+          <div class="onboarding-step">
+            <div class="onboarding-step-num">2</div>
+            <div class="onboarding-step-text"><b>Snap a Photo</b><span>Tap the glowing green camera button. Location and photo details are automatically anonymized.</span></div>
+          </div>
+          <div class="onboarding-step">
+            <div class="onboarding-step-num">3</div>
+            <div class="onboarding-step-text"><b>Get Your Confirmation</b><span>Hit "Publish Report" to instantly receive a receipt code to track progress or share.</span></div>
+          </div>
+        </div>
+
+        <div class="onboarding-slide" data-slide="2">
+          <div class="onboarding-eyebrow">Your Quick Start</div>
+          <ul class="onboarding-checklist">
+            <li>Is submitting taking under 30 seconds?</li>
+            <li>Are the buttons clear while walking around?</li>
+            <li>Does receiving your confirmation receipt feel satisfying?</li>
+          </ul>
+          <button type="button" class="btn-onboarding-cta" id="btnOnboardingStart">Start 30-Second Test Report</button>
+        </div>
+      </div>
+
+      <div class="onboarding-footer">
+        <div class="onboarding-dots" id="onboardingDots" role="tablist" aria-label="Onboarding progress">
+          <span class="onboarding-dot active" data-dot="0"></span>
+          <span class="onboarding-dot" data-dot="1"></span>
+          <span class="onboarding-dot" data-dot="2"></span>
+        </div>
+        <div class="onboarding-nav">
+          <button type="button" class="btn-onboarding-outline" id="btnOnboardingBack">Back</button>
+          <button type="button" class="btn-onboarding-outline" id="btnOnboardingNext">Next</button>
+        </div>
       </div>
     </div>
   </div>
@@ -4242,6 +4357,58 @@ function hideSplash(){
   if (splash) splash.classList.add('hide');
 }
 
+// ===== FRONT DOOR ONBOARDING — "First Look" 3-card beta walkthrough =====
+// Gated per-device by localStorage, same convention as markGridCellLit()'s
+// lit-grid-cities key, so the 10 first-adopter beta testers see it once
+// and never again on return visits — not re-shown every session the way
+// the launch splash is.
+const ONBOARDING_SEEN_KEY = 'citixen_onboarding_seen_v1';
+const ONBOARDING_SLIDE_COUNT = 3;
+let onboardingSlideIndex = 0;
+function renderOnboardingSlide(){
+  document.querySelectorAll('.onboarding-slide').forEach(el => {
+    el.classList.toggle('active', Number(el.dataset.slide) === onboardingSlideIndex);
+  });
+  document.querySelectorAll('.onboarding-dot').forEach(el => {
+    el.classList.toggle('active', Number(el.dataset.dot) === onboardingSlideIndex);
+  });
+  document.getElementById('btnOnboardingBack').disabled = onboardingSlideIndex === 0;
+  document.getElementById('btnOnboardingNext').style.display = (onboardingSlideIndex === ONBOARDING_SLIDE_COUNT - 1) ? 'none' : '';
+}
+function openFrontDoorOnboarding(){
+  onboardingSlideIndex = 0;
+  renderOnboardingSlide();
+  document.getElementById('frontDoorOnboardingModal').classList.add('open');
+}
+function closeFrontDoorOnboarding(markSeen){
+  document.getElementById('frontDoorOnboardingModal').classList.remove('open');
+  if (markSeen) {
+    try { localStorage.setItem(ONBOARDING_SEEN_KEY, '1'); } catch (e) { /* storage blocked (private mode, etc.) — shows again next load, harmless */ }
+  }
+}
+document.getElementById('btnOnboardingNext').addEventListener('click', () => {
+  if (onboardingSlideIndex < ONBOARDING_SLIDE_COUNT - 1) { onboardingSlideIndex++; renderOnboardingSlide(); }
+});
+document.getElementById('btnOnboardingBack').addEventListener('click', () => {
+  if (onboardingSlideIndex > 0) { onboardingSlideIndex--; renderOnboardingSlide(); }
+});
+document.getElementById('btnOnboardingClose').addEventListener('click', () => closeFrontDoorOnboarding(true));
+document.getElementById('frontDoorOnboardingModal').addEventListener('click', (e) => {
+  if (e.target.id === 'frontDoorOnboardingModal') closeFrontDoorOnboarding(true);
+});
+document.querySelectorAll('#onboardingDots .onboarding-dot').forEach(dot => {
+  dot.addEventListener('click', () => { onboardingSlideIndex = Number(dot.dataset.dot); renderOnboardingSlide(); });
+});
+document.getElementById('btnOnboardingStart').addEventListener('click', () => {
+  closeFrontDoorOnboarding(true);
+  // "Dismisses modal directly to the Report form" — Report is already the
+  // default/first tab, so just make sure it's active and hand focus to
+  // the description field, the natural next step of a 30-second test report.
+  switchTab('tab-report', document.querySelector('.navtab[data-target="tab-report"]'));
+  const repDescEl = document.getElementById('repDesc');
+  if (repDescEl) repDescEl.focus();
+});
+
 window.addEventListener('DOMContentLoaded',()=>{
   applyJurisdictionFromQueryString();
   renderFeed();
@@ -4259,6 +4426,12 @@ window.addEventListener('DOMContentLoaded',()=>{
     splash.addEventListener('click', hideSplash);
     setTimeout(hideSplash, 1400);
   }
+
+  // Front Door Onboarding opens shortly after the splash clears — once per
+  // device, never interrupting a returning beta tester.
+  let onboardingSeen = false;
+  try { onboardingSeen = localStorage.getItem(ONBOARDING_SEEN_KEY) === '1'; } catch (e) { /* storage blocked — treat as unseen */ }
+  if (!onboardingSeen) setTimeout(openFrontDoorOnboarding, 1700);
 
   const repLoc = document.getElementById('repLoc');
   if (repLoc) repLoc.addEventListener('input', () => { repLoc.dataset.userEdited = '1'; });
