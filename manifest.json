@@ -2,7 +2,7 @@
   "id": "/app",
   "name": "CITIXEN UX",
   "short_name": "CITIXEN UX",
-  "description": "Zero-account, anonymous civic hazard reporting and live ward dispatch tracking.",
+  "description": "Zero-account, anonymous civic hazard reporting and live district dispatch tracking.",
   "start_url": "/app?source=pwa",
   "scope": "/",
   "display": "standalone",

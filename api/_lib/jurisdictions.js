@@ -82,7 +82,7 @@ function stateLayer(stateName){
     cliffNotes: [
       'Defines the powers and limits of ' + stateName + '\'s state government, distinct from federal authority.',
       'Establishes home-rule authority that lets municipalities set their own ordinances within state law.',
-      'Governs how state infrastructure funding and local aid are appropriated to cities and wards.'
+      'Governs how state infrastructure funding and local aid are appropriated to cities and districts.'
     ],
     videoAvailable: false,
     audioAvailable: false
@@ -117,7 +117,7 @@ function municipalLayer(cityName){
         'Representative summary — pending integration with ' + cityName + '\'s official charter document. ' +
         'A production deployment reads this layer live from the city clerk\'s published records.',
       cliffNotes: [
-        cityName + '\'s charter establishes its form of government and the council\'s composition by ward.',
+        cityName + '\'s charter establishes its form of government and the council\'s composition by district.',
         'Defines how the city budget, including CapEx for infrastructure repair, is adopted each cycle.'
       ],
       videoAvailable: false,
@@ -216,7 +216,7 @@ function wardLayer(wardName, alderman, cityName){
         'published by the city clerk\'s office — a production deployment reads them live rather than hardcoding contact information here.',
       cliffNotes: [
         alderman + ' is the elected council member/alderman for ' + wardName + '.',
-        'Residents may contact their alderman directly regarding unresolved reports or next quarter\'s budget priorities for the ward.'
+        'Residents may contact their alderman directly regarding unresolved reports or next quarter\'s budget priorities for the district.'
       ],
       videoAvailable: false,
       audioAvailable: false

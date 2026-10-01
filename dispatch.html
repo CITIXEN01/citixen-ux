@@ -200,7 +200,7 @@ function briefingFilter(list){
         status=document.getElementById('fStatus').value,
         stage=document.getElementById('fStage').value,
         risk=document.getElementById('fSlaRisk').checked;
-  return list.filter(t=>(ward==='All' || (t.ward||'Ward 4')===ward)
+  return list.filter(t=>(ward==='All' || (t.ward||'District 4')===ward)
     && (status==='All' || t.status===status)
     && (stage==='All' || t.stage===stage)
     && (!risk || (!t.slaOk && t.stage!=='RESOLVED & AUDITED' && t.stage!=='Resolved')));
@@ -209,7 +209,7 @@ function briefingText(list){
   const ward=document.getElementById('fWard').value;
   const count=s=>list.filter(t=>t.status===s).length;
   const atRisk=list.filter(t=>!t.slaOk && t.stage!=='Resolved' && t.stage!=='RESOLVED & AUDITED');
-  let txt=`${ward==='All'?'All wards':ward}: ${list.length} ticket(s) — ${count('Critical')} critical, ${count('Warning')} warning, ${count('Resolved')} resolved. `;
+  let txt=`${ward==='All'?'All districts':ward}: ${list.length} ticket(s) — ${count('Critical')} critical, ${count('Warning')} warning, ${count('Resolved')} resolved. `;
   txt+= atRisk.length ? `SLA at risk: ${atRisk.map(t=>t.title+' ('+t.sla+')').join('; ')}.` : 'No tickets at SLA risk.';
   return txt;
 }
@@ -249,22 +249,22 @@ function renderBriefing(list){
 
   <section class="briefing" id="briefing" aria-label="Alderman briefing">
     <h3>Alderman briefing</h3>
-    <label>Ward
-      <select class="grid-select" id="fWard"><option value="All">All wards</option><option>Ward 4</option></select></label>
+    <label>District
+      <select class="grid-select" id="fWard"><option value="All">All districts</option><option>District 4</option></select></label>
     <label>Severity
       <select class="grid-select" id="fStatus"><option>All</option><option>Critical</option><option>Warning</option><option>Resolved</option></select></label>
     <label>Stage
       <select class="grid-select" id="fStage"><option>All</option><option>Critical</option><option>Assigned to Public Works</option><option>In Progress</option><option>Resolved</option><option>RESOLVED &amp; AUDITED</option></select></label>
     <label><input type="checkbox" id="fSlaRisk"> SLA at risk only</label>
-    <button class="btn btn-ghost" id="printWardReport" type="button">Print My Ward Report</button>
+    <button class="btn btn-ghost" id="printWardReport" type="button">Print My District Report</button>
     <div id="briefSummary"></div>
   </section>
 
   <div class="overview">
     <div class="metric">
-      <div class="label">Ward Health Index</div>
+      <div class="label">District Health Index</div>
       <div class="value" id="wardHealthValue">88%</div>
-      <div class="sub" id="wardHealthSub">Ward 4 — Stable</div>
+      <div class="sub" id="wardHealthSub">District 4 — Stable</div>
     </div>
     <div class="metric">
       <div class="label">Active Dispatch Capacity</div>
@@ -274,7 +274,7 @@ function renderBriefing(list){
     <div class="metric">
       <div class="label" style="color:var(--mint2)">Weekly Resolve Rate</div>
       <div class="value" id="resolveFraction" style="font-size:1.9rem;">84<span style="color:var(--muted);font-size:1.1rem;">/91</span></div>
-      <div class="sub">Resolved this week, Ward 4</div>
+      <div class="sub">Resolved this week, District 4</div>
     </div>
   </div>
 
@@ -417,7 +417,7 @@ function initMap(){
     L.polygon([
       [43.8210,-91.2640],[43.8210,-91.2400],[43.8060,-91.2400],[43.8060,-91.2640]
     ],{color:'#00ff88',weight:2,dashArray:'8 6',fillColor:'#00ff88',fillOpacity:.04,opacity:.6})
-      .addTo(map).bindTooltip('Ward 4 boundary',{sticky:true});
+      .addTo(map).bindTooltip('District 4 boundary',{sticky:true});
     // Simulated active service-vehicle route overlay between two ticket locations.
     L.polyline([[43.8138,-91.2519],[43.8180,-91.2480]],{color:'#00ff88',weight:2,dashArray:'6 5',opacity:.75}).addTo(map);
     tickets.forEach(plotTicket);
@@ -551,7 +551,7 @@ function updateOverviewWidgets(){
   set('woSub', workOrderCount===0 ? 'No routes approved this session' : `Last: ${lastWorkOrderNum}`);
 
   set('wardHealthValue', WARD_HEALTH_PCT+'%');
-  set('wardHealthSub', 'Ward 4 — '+(WARD_HEALTH_PCT>=90?'Nominal':WARD_HEALTH_PCT>=75?'Stable':'Degraded'));
+  set('wardHealthSub', 'District 4 — '+(WARD_HEALTH_PCT>=90?'Nominal':WARD_HEALTH_PCT>=75?'Stable':'Degraded'));
 
   const activeCount=tickets.filter(t=>t.stage!=='Resolved' && t.stage!=='RESOLVED & AUDITED').length;
   const capPct=Math.round((activeCount/CREW_CAPACITY_SLOTS)*100);
@@ -683,7 +683,7 @@ window.addEventListener('DOMContentLoaded',()=>{
 const ACCESS={
   'c5ee0bdccf0ab935906ddf15f2b426b2804f157ebd2613b1a3ef0d6d2bb5cb50':{role:'Administrator',ward:'All'},
   'a5304d3c74298671ba095d176789b75acff86e25512a28348c41706f8e77d97c':{role:'Dispatcher',ward:'All'},
-  'ed9ee0096baf6747c061d312f0ae532cd91d35cb8063931a1f9a1b90cb07ef4e':{role:'Alderman — Ward 4',ward:'Ward 4'}
+  'ed9ee0096baf6747c061d312f0ae532cd91d35cb8063931a1f9a1b90cb07ef4e':{role:'Alderman — District 4',ward:'District 4'}
 };
 async function sha256(s){
   const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
@@ -724,14 +724,14 @@ function buildAndPrintWardReport(){
     || '<tr><td colspan="4">No tickets match the current filters.</td></tr>';
   const area=document.getElementById('printReportArea');
   area.innerHTML=`
-    <h2>CITIXEN UX — Ward Report</h2>
-    <div class="meta">${esc(ward==='All'?'All wards':ward)} · Generated ${esc(new Date().toLocaleString())}</div>
+    <h2>CITIXEN UX — District Report</h2>
+    <div class="meta">${esc(ward==='All'?'All districts':ward)} · Generated ${esc(new Date().toLocaleString())}</div>
     <h3>Dispatch Summary</h3>
     <div>${esc(document.getElementById('briefSummary').textContent || briefingText(list))}</div>
     <h3>SLA &amp; Operational Metrics</h3>
     <table>
       <tr><th>Metric</th><th>Value</th></tr>
-      <tr><td>Ward Health Index</td><td>${esc(get('wardHealthValue'))} — ${esc(get('wardHealthSub'))}</td></tr>
+      <tr><td>District Health Index</td><td>${esc(get('wardHealthValue'))} — ${esc(get('wardHealthSub'))}</td></tr>
       <tr><td>Active Dispatch Capacity</td><td>${esc(get('capValue'))} — ${esc(get('capSub'))}</td></tr>
       <tr><td>Weekly Resolve Rate</td><td>${esc(get('resolveFraction'))}</td></tr>
       <tr><td>CapEx Scoping Ledger</td><td>${esc(get('capexTotal'))}</td></tr>

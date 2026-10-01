@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Adds the Android manifest permissions CITIXEN UX's camera capture and
- * ward-jurisdiction lookup need, after `npx cap add android` has generated
+ * district-jurisdiction lookup need, after `npx cap add android` has generated
  * android/app/src/main/AndroidManifest.xml. Idempotent, and exits quietly
  * (never throws) if `cap add android` hasn't been run yet.
  */

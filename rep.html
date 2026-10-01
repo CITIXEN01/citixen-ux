@@ -142,23 +142,23 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 
   <div class="wrap">
     <div class="page-head">
-      <h1>District Health &amp; Ward Performance</h1>
+      <h1>District Health &amp; Performance</h1>
       <p>Public accountability data for residents and their elected Alderman/Representative — the same real, live-computed
-        figures shown on the main CITIXEN UX dashboard, broken down by ward. No login is required to view this page.</p>
+        figures shown on the main CITIXEN UX dashboard, broken down by district. No login is required to view this page.</p>
       <div class="public-note">
         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v5"/><circle cx="12" cy="16" r=".3" fill="currentColor"/></svg>
         Public read access — Rep Tools below require an office access code
       </div>
     </div>
 
-    <!-- WARD SELECTOR -->
+    <!-- DISTRICT SELECTOR -->
     <section class="card">
       <h2>Select a district</h2>
-      <div class="sub">Same onboarded wards as the main dashboard's jurisdiction picker (api/_lib/store.js).</div>
+      <div class="sub">Same onboarded districts as the main dashboard's jurisdiction picker (api/_lib/store.js).</div>
       <div class="ward-picker">
         <select class="grid-select" id="stateSel" aria-label="State"></select>
         <select class="grid-select" id="citySel" aria-label="City"></select>
-        <select class="grid-select" id="wardSel" aria-label="Ward"></select>
+        <select class="grid-select" id="wardSel" aria-label="District"></select>
       </div>
       <div class="alderman-line" id="aldermanLine">Loading district…</div>
     </section>
@@ -166,17 +166,17 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
     <!-- DISTRICT HEALTH INDEX -->
     <section class="card">
       <h2>District Health Index</h2>
-      <div class="sub" id="healthSourceNote">Ward-level governance metadata — api/_lib/store.js.</div>
+      <div class="sub" id="healthSourceNote">District-level governance metadata — api/_lib/store.js.</div>
       <div class="overview">
         <div class="metric">
-          <div class="label">Ward Health Index</div>
+          <div class="label">District Health Index</div>
           <div class="value" id="mHealth">–</div>
           <div class="sub" id="mHealthSub">–</div>
         </div>
         <div class="metric">
           <div class="label">SLA Compliance</div>
           <div class="value" id="mSla">–</div>
-          <div class="sub">Service-level agreement compliance, ward-wide</div>
+          <div class="sub">Service-level agreement compliance, district-wide</div>
         </div>
         <div class="metric">
           <div class="label">CapEx Scoped</div>
@@ -201,7 +201,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 
     <!-- THE BIG 3 FOR THIS WARD -->
     <section class="card">
-      <h2>The Big 3 — this ward</h2>
+      <h2>The Big 3 — this district</h2>
       <div class="sub">Computed live from the same seeded ticket/CapEx records as the public dashboard's Big 3 (api/coverage/big3) — never a hand-typed headline figure.</div>
       <div class="big3-row">
         <div class="big3-tile"><div class="big3-val" id="big3Speed">–</div><div class="big3-lbl">Speed of Resolution</div></div>
@@ -213,8 +213,8 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 
     <!-- TICKET LEDGER FOR THIS WARD -->
     <section class="card">
-      <h2>Ward Ticket Ledger</h2>
-      <div class="sub">Every seeded case in this ward, by stage (api/coverage/tickets).</div>
+      <h2>District Ticket Ledger</h2>
+      <div class="sub">Every seeded case in this district, by stage (api/coverage/tickets).</div>
       <div class="stage-row" style="margin-bottom:14px;">
         <div class="stage-tile"><div class="n" id="cSubmitted">0</div><div class="l">Submitted</div></div>
         <div class="stage-tile"><div class="n" id="cDispatched">0</div><div class="l">Dispatched</div></div>
@@ -223,7 +223,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
       <div id="ticketList"></div>
       <button class="btn btn-outline" id="btnDownloadRepPdf" style="width:100%;justify-content:center;margin-top:14px;">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>
-        Download Ward Health Summary (PDF)
+        Download District Health Summary (PDF)
       </button>
     </section>
 
@@ -290,16 +290,16 @@ async function fetchDirectory(){
     return { states: [
       { slug:'wi', name:'Wisconsin', cities: [
         { slug:'la-crosse', name:'La Crosse', wards: [
-          { slug:'ward-4', name:'Ward 4', alderman:'Ald. Rebecca Voss', coveragePct:42.5, coveredCount:34, totalCells:80, capExScopedUSD:482600 },
-          { slug:'ward-7', name:'Ward 7', alderman:'Ald. Marcus Dahl', coveragePct:62.5, coveredCount:40, totalCells:64, capExScopedUSD:310000 }
+          { slug:'ward-4', name:'District 4', alderman:'Ald. Rebecca Voss', coveragePct:42.5, coveredCount:34, totalCells:80, capExScopedUSD:482600 },
+          { slug:'ward-7', name:'District 7', alderman:'Ald. Marcus Dahl', coveragePct:62.5, coveredCount:40, totalCells:64, capExScopedUSD:310000 }
         ]},
         { slug:'milwaukee', name:'Milwaukee', wards: [
-          { slug:'ward-12', name:'Ward 12', alderman:'Ald. Priya Shah', coveragePct:58.3, coveredCount:70, totalCells:120, capExScopedUSD:1150000 }
+          { slug:'ward-12', name:'District 12', alderman:'Ald. Priya Shah', coveragePct:58.3, coveredCount:70, totalCells:120, capExScopedUSD:1150000 }
         ]}
       ]},
       { slug:'il', name:'Illinois', cities: [
         { slug:'chicago', name:'Chicago', wards: [
-          { slug:'ward-3', name:'Ward 3', alderman:'Ald. Denise Coleman', coveragePct:55, coveredCount:55, totalCells:100, capExScopedUSD:940000 }
+          { slug:'ward-3', name:'District 3', alderman:'Ald. Denise Coleman', coveragePct:55, coveredCount:55, totalCells:100, capExScopedUSD:940000 }
         ]}
       ]}
     ]};
@@ -391,7 +391,7 @@ const FALLBACK_WARD_TICKET_DETAIL = {
     { title:'Pavement gap, bike lane', loc:'6th St & Cass', stage:'resolved' }
   ],
   'ward-7': [
-    { title:'Dark corner, no lighting', loc:'Ward 7 & Copeland', stage:'resolved' },
+    { title:'Dark corner, no lighting', loc:'Copeland Ave & 7th', stage:'resolved' },
     { title:'Large pothole cluster', loc:'La Crosse St', stage:'resolved' },
     { title:'Sidewalk heave, trip hazard', loc:'Losey Blvd', stage:'dispatched' },
     { title:'Clogged culvert', loc:'George St', stage:'resolved' }
@@ -526,14 +526,14 @@ async function initWardPicker(){
 
 /* =====================================================================
    PDF EXPORT — same client-side jsPDF pattern as index.html/app.html's
-   "Download Ward Health Summary (PDF)" button, scoped to the selected
+   "Download District Health Summary (PDF)" button, scoped to the selected
    ward. Every figure comes from currentSummary/currentBig3/currentTickets
    above — the exact same fetched/fallback data this page already
    renders, never a second numbers pipeline.
    ===================================================================== */
 async function downloadRepWardPdf(triggerBtn){
   if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) {
-    alert('PDF library failed to load (check your connection) — could not generate the Ward Health Summary.');
+    alert('PDF library failed to load (check your connection) — could not generate the District Health Summary.');
     return;
   }
   const originalLabel = triggerBtn ? triggerBtn.innerHTML : null;
@@ -543,7 +543,7 @@ async function downloadRepWardPdf(triggerBtn){
     const doc = new jsPDF({ unit:'pt', format:'letter' });
     let y = 56;
     doc.setFont('helvetica','bold'); doc.setFontSize(18);
-    doc.text('CITIXEN UX — Ward Health Summary', 40, y); y += 22;
+    doc.text('CITIXEN UX — District Health Summary', 40, y); y += 22;
     doc.setFont('helvetica','normal'); doc.setFontSize(11);
     doc.text('District: ' + (current.wardName || '—') + ', ' + (current.cityName || '—') + ', ' + (current.stateName || '—'), 40, y); y += 16;
     doc.text('Alderman/Representative: ' + (current.alderman || 'Not on file'), 40, y); y += 16;
@@ -553,14 +553,14 @@ async function downloadRepWardPdf(triggerBtn){
     doc.text('District Health Index', 40, y); y += 18;
     doc.setFont('helvetica','normal'); doc.setFontSize(11);
     const s = currentSummary || {};
-    doc.text('Ward Health Index: ' + (s.healthIndex != null ? s.healthIndex + '%' : 'N/A'), 48, y); y += 16;
+    doc.text('District Health Index: ' + (s.healthIndex != null ? s.healthIndex + '%' : 'N/A'), 48, y); y += 16;
     doc.text('SLA Compliance: ' + (s.slaPct != null ? s.slaPct + '%' : 'N/A'), 48, y); y += 16;
     doc.text('Road Condition Index: ' + (s.roadPct != null ? s.roadPct + '%' : 'N/A'), 48, y); y += 16;
     doc.text('Lighting Condition Index: ' + (s.lightingPct != null ? s.lightingPct + '%' : 'N/A'), 48, y); y += 16;
     doc.text('Asset Grid Coverage: ' + (s.coveragePct != null ? s.coveragePct + '%' : 'N/A'), 48, y); y += 30;
 
     doc.setFont('helvetica','bold'); doc.setFontSize(13);
-    doc.text('The Big 3 — This Ward', 40, y); y += 18;
+    doc.text('The Big 3 — This District', 40, y); y += 18;
     doc.setFont('helvetica','normal'); doc.setFontSize(11);
     const b = currentBig3 || {};
     doc.text('Speed of Resolution (avg hrs): ' + (b.avgResolutionHours != null ? b.avgResolutionHours + 'h' : 'N/A'), 48, y); y += 16;
@@ -568,7 +568,7 @@ async function downloadRepWardPdf(triggerBtn){
     doc.text('Capital Project Timeline Adherence: ' + (b.capExAdherencePct != null ? b.capExAdherencePct + '%' : 'N/A'), 48, y); y += 30;
 
     doc.setFont('helvetica','bold'); doc.setFontSize(13);
-    doc.text('Ward Ticket Ledger', 40, y); y += 18;
+    doc.text('District Ticket Ledger', 40, y); y += 18;
     doc.setFont('helvetica','normal'); doc.setFontSize(11);
     const counts = { submitted:0, dispatched:0, resolved:0 };
     currentTickets.forEach(t => { if (Object.prototype.hasOwnProperty.call(counts, t.stage)) counts[t.stage]++; });
@@ -579,16 +579,16 @@ async function downloadRepWardPdf(triggerBtn){
 
     doc.setFont('helvetica','italic'); doc.setFontSize(9);
     [
-      'This export reflects a current snapshot of CITIXEN UX seed/demo ward data, computed live from the',
+      'This export reflects a current snapshot of CITIXEN UX seed/demo district data, computed live from the',
       'same records this page displays (api/_lib/store.js). It is not a synthetic historical trend — no such',
       'dataset exists in this build. No reporter-identifying information is included in this export or in',
       'the underlying data model.'
     ].forEach(line => { doc.text(line, 40, y); y += 12; });
 
-    doc.save('citixen-' + (current.ward || 'ward') + '-health-summary.pdf');
+    doc.save('citixen-' + (current.ward || 'district') + '-health-summary.pdf');
   } catch (err) {
-    console.error('Rep ward PDF generation failed', err);
-    alert('Could not generate the Ward Health Summary PDF — please try again.');
+    console.error('Rep district PDF generation failed', err);
+    alert('Could not generate the District Health Summary PDF — please try again.');
   } finally {
     if (triggerBtn) { triggerBtn.disabled = false; if (originalLabel !== null) triggerBtn.innerHTML = originalLabel; }
   }
@@ -609,7 +609,7 @@ document.getElementById('btnDownloadRepPdf').addEventListener('click', (e) => do
    claimed as sent or published anywhere.
    ===================================================================== */
 const REP_ACCESS = {
-  '13c56b362535ef010542d6dac7aa160d2ae39f7e850977dd67ed27ae91570767': { role:'Alderman — Ward 4', ward:'ward-4' },
+  '13c56b362535ef010542d6dac7aa160d2ae39f7e850977dd67ed27ae91570767': { role:'Alderman — District 4', ward:'ward-4' },
   '65b801e6fea02395b356adc14f7c6b1a84f966116193378bc9773c04ba7aad3f': { role:'Representative Office', ward:'All' }
 };
 async function sha256(s){

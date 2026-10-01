@@ -319,14 +319,14 @@
     document.documentElement.style.overflow = 'hidden';
     appendLedgerSummary = false;
     modal.querySelector('#cxJuris').textContent = 'Loading jurisdiction…';
-    modal.querySelector('#cxPane-pdf').innerHTML = '<p class="cx-hint">Compiling the current ward snapshot…</p>';
+    modal.querySelector('#cxPane-pdf').innerHTML = '<p class="cx-hint">Compiling the current district snapshot…</p>';
     try {
       data = await cfg.getData();
       data.ranks = computeRanks(data);
       generatedAt = new Date();
     } catch (err) {
       console.warn('Instant Report data failed to load', err);
-      modal.querySelector('#cxPane-pdf').innerHTML = '<p class="cx-hint">Could not load the ward snapshot. Check your connection and try again.</p>';
+      modal.querySelector('#cxPane-pdf').innerHTML = '<p class="cx-hint">Could not load the district snapshot. Check your connection and try again.</p>';
       return;
     }
     modal.querySelector('#cxJuris').textContent = cityStateLabel(data);
@@ -1233,10 +1233,10 @@
   function payloadText() {
     var d = data, score = healthScore(d);
     return [
-      d.jurisdiction + ' — Ward Health Brief (' + stamp(generatedAt) + ')',
-      'Ward health score: ' + (score != null ? score + ' / 10' : 'N/A') + ' · Resolved: ' + (d.total ? d.resolved + ' / ' + d.total : 'N/A'),
-      'Avg fix: ' + (d.avgDays != null ? daysText(d) + ' days' : 'N/A') + ' · Ward coverage: ' + pctText(d.coveragePct) + ' · Delayed capital projects: ' + delayedCount(d),
-      "Nat'l rank: " + natRankText(d.ranks) + (d.ranks ? ' of ' + d.ranks.nationalOf + ' mapped wards' : '') + ' · State rank: ' + stateRankText(d.ranks),
+      d.jurisdiction + ' — District Health Brief (' + stamp(generatedAt) + ')',
+      'District health score: ' + (score != null ? score + ' / 10' : 'N/A') + ' · Resolved: ' + (d.total ? d.resolved + ' / ' + d.total : 'N/A'),
+      'Avg fix: ' + (d.avgDays != null ? daysText(d) + ' days' : 'N/A') + ' · District coverage: ' + pctText(d.coveragePct) + ' · Delayed capital projects: ' + delayedCount(d),
+      "Nat'l rank: " + natRankText(d.ranks) + (d.ranks ? ' of ' + d.ranks.nationalOf + ' mapped districts' : '') + ' · State rank: ' + stateRankText(d.ranks),
       '#CrowdSaveAmerica — free & anonymous civic reporting',
       siteUrl()
     ].join('\n');

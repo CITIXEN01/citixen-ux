@@ -22,15 +22,15 @@
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.1.4/leaflet-maplibre-gl.js"></script>
-<!-- Client-side PDF export for the Ward Health Summary — same CDN-script pattern as Leaflet above, no bundler/build step. -->
+<!-- Client-side PDF export for the District Health Summary — same CDN-script pattern as Leaflet above, no bundler/build step. -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <!-- Instant Report (Export & Share module, 3-branch export modal, Quick
      Keys drawer styles) — one shared file pair used by both app.html and
      index.html so the Dashboard renders from identical code on both. -->
-<link rel="stylesheet" href="/shared/instant-report.css?v=beta-launch-final">
-<script src="/shared/instant-report.js?v=beta-launch-final"></script>
-<script src="/shared/severity.js?v=beta-launch-final"></script>
+<link rel="stylesheet" href="/shared/instant-report.css?v=master-release">
+<script src="/shared/instant-report.js?v=master-release"></script>
+<script src="/shared/severity.js?v=master-release"></script>
 <style>
 :root{
   /* Green unification + obsidian canvas brought in line with index.html
@@ -226,7 +226,6 @@ textarea.input{resize:none;line-height:1.4}
 @media (prefers-reduced-motion:reduce){.metrics-ticker-dot{animation:none}}
 .feed-cat{display:inline-block;font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94A3B8;
   border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:1px 8px;margin-bottom:4px}
-.feed-sla{font-size:.62rem;font-weight:800;letter-spacing:.3px}
 .feed-project-link{display:inline-block;margin-top:6px;font-size:.68rem;font-weight:800;color:var(--mint2);text-decoration:none}
 .bar{height:6px;background:rgba(255,255,255,.08);border-radius:10px;overflow:hidden;margin-top:4px}
 .bar>span{display:block;height:100%;background:var(--mint2)}
@@ -414,6 +413,11 @@ textarea.input{resize:none;line-height:1.4}
 .ledger-report-card:hover{border-color:var(--mint2)}
 .ledger-report-id{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.62rem;color:var(--mint2)}
 .ledger-empty{text-align:center;color:var(--muted);font-size:.78rem;padding:24px 0}
+/* 3-stage chain-of-custody footer — see custodyFooter() */
+.cx-custody-footer{display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.08)}
+.cx-custody-step{font-size:.58rem;font-weight:700;letter-spacing:.02em;color:var(--muted);white-space:nowrap}
+.cx-custody-step.done{color:var(--mint2)}
+.cx-custody-arrow{font-size:.58rem;color:var(--muted);opacity:.5}
 
 /* ===== GENERATE LEDGER REPORT OVERLAY — stacked above the Public Ledger
    drawer (higher z-index), same solid-background/safe-area/sticky-header
@@ -541,7 +545,9 @@ textarea.input{resize:none;line-height:1.4}
 .citizen-dashboard-subheader{font-size:clamp(1.6rem,5vw,2.4rem);font-weight:900;letter-spacing:0.08em;
   text-transform:uppercase;text-align:center;margin:16px 0 8px}
 .citizen-dashboard-subheader .cds-white{color:#FFFFFF}
-.citizen-dashboard-subheader .cds-mint{color:#00E699}
+/* Glow matches .csap-title (CROWD SAVE AMERICA™'s own heading) 1:1 —
+   same mint, same text-shadow spread. */
+.citizen-dashboard-subheader .cds-mint{color:#00E699;text-shadow:0 0 14px rgba(0,230,153,.4)}
 .hero-tagline-subtle{text-align:center;color:#94A3B8;font-size:.88rem;
   max-width:520px;margin:0 auto 20px;padding:0 24px}
 .telemetry-scorecard-card{display:block;width:100%;max-width:640px;text-align:left;
@@ -1228,20 +1234,20 @@ textarea.input{resize:none;line-height:1.4}
       </div>
 
       <div class="csap-sec">
-        <div class="csap-sec-title">Your Ward — Live Metrics</div>
+        <div class="csap-sec-title">Your District — Live Metrics</div>
         <div class="csap-metrics">
           <div class="csap-metric"><div class="csap-metric-val" id="csapWardReports">—</div><div class="csap-metric-lbl">Reports Filed</div></div>
           <div class="csap-metric"><div class="csap-metric-val" id="csapWardResolved">—</div><div class="csap-metric-lbl">Resolved</div></div>
           <div class="csap-metric"><div class="csap-metric-val" id="csapWardOpen">—</div><div class="csap-metric-lbl">Open Dispatches</div></div>
           <div class="csap-metric"><div class="csap-metric-val" id="csaModalPct">—</div><div class="csap-metric-lbl">Block Coverage</div></div>
         </div>
-        <p class="csap-note">Blocks surveyed in your ward: <strong id="csaModalFraction">— / —</strong> · from this jurisdiction's live ledger.</p>
+        <p class="csap-note">Blocks surveyed in your district: <strong id="csaModalFraction">— / —</strong> · from this jurisdiction's live ledger.</p>
       </div>
 
       <div class="csap-sec">
         <div class="csap-sec-title">Civic Audit Roadmap</div>
         <ol class="csap-road">
-          <li class="is-live"><span class="csap-road-tag">Live</span><div><strong>Ward-level block grid</strong><p>Reports bucketed into ~150 m blocks across mapped wards, each tracked as auditable, pending or uncharted.</p></div></li>
+          <li class="is-live"><span class="csap-road-tag">Live</span><div><strong>District-level block grid</strong><p>Reports bucketed into ~150 m blocks across mapped districts, each tracked as auditable, pending or uncharted.</p></div></li>
           <li class="is-active"><span class="csap-road-tag">Now</span><div><strong>Zone-by-zone verification</strong><p>Local zones verified block by block — La Crosse is the first zone in progress.</p></div></li>
           <li><span class="csap-road-tag">Roadmap</span><div><strong>11M-block national matrix</strong><p>A nationwide H3 grid at census-block scale, keyed on-device for privacy. Not live in this build yet.</p></div></li>
         </ol>
@@ -1574,19 +1580,19 @@ const FALLBACK_CAPEX_PROJECTS = [
 // this file. These are illustrative, hand-picked coordinates, NOT a real
 // municipal GIS/CIP import.
 const FALLBACK_CIP_PROJECTS = [
-  { id: 'cip-1', name: 'Ward 4 Storm Sewer Relining', ward: 'ward-4', scheduled: 'Q3 2026', status: 'on-time',
+  { id: 'cip-1', name: 'District 4 Storm Sewer Relining', ward: 'ward-4', scheduled: 'Q3 2026', status: 'on-time',
     category: 'Drainage', scope: 'Full storm sewer reline along the Pine St alley corridor, replacing collapsed clay pipe.',
     lat: 43.8100, lng: -91.2550, radiusMeters: 300 },
   { id: 'cip-2', name: 'Main St Resurfacing Phase II', ward: 'ward-4', scheduled: 'Q4 2026', status: 'on-track',
     category: 'Pothole', scope: 'Full-depth mill-and-overlay resurfacing of Main St from 2nd Ave to 6th Ave, including the 4th Ave intersection.',
     lat: 43.8138, lng: -91.2519, radiusMeters: 250 },
-  { id: 'cip-3', name: 'Ward 7 Streetlight LED Retrofit', ward: 'ward-7', scheduled: 'Q2 2026', status: 'delayed',
-    category: 'Streetlight', scope: 'Citywide swap of Ward 7 cobra-head fixtures to LED, corridor-wide rather than pole-by-pole.',
+  { id: 'cip-3', name: 'District 7 Streetlight LED Retrofit', ward: 'ward-7', scheduled: 'Q2 2026', status: 'delayed',
+    category: 'Streetlight', scope: 'Citywide swap of District 7 cobra-head fixtures to LED, corridor-wide rather than pole-by-pole.',
     lat: 43.8050, lng: -91.2430, radiusMeters: 400 },
   { id: 'cip-4', name: 'Losey Blvd Sidewalk/ADA Upgrade', ward: 'ward-7', scheduled: 'Q3 2026', status: 'on-track',
     category: 'Sidewalk', scope: 'Sidewalk panel replacement and ADA curb ramp upgrades along Losey Blvd.',
     lat: 43.8020, lng: -91.2380, radiusMeters: 300 },
-  { id: 'cip-5', name: 'Ward 12 Culvert Replacement', ward: 'ward-12', scheduled: 'Q1 2026', status: 'on-time',
+  { id: 'cip-5', name: 'District 12 Culvert Replacement', ward: 'ward-12', scheduled: 'Q1 2026', status: 'on-time',
     category: 'Drainage', scope: 'Replacement of an undersized culvert causing recurring backups near National Ave.',
     lat: 43.0230, lng: -87.9650, radiusMeters: 350 },
   { id: 'cip-6', name: 'National Ave Signage Modernization', ward: 'ward-12', scheduled: 'Q4 2026', status: 'on-track',
@@ -1682,7 +1688,7 @@ async function downloadWardHealthPdf(triggerBtn){
     const doc = new jsPDF({ unit: 'pt', format: 'letter' });
     let y = 56;
     doc.setFont('helvetica', 'bold'); doc.setFontSize(18);
-    doc.text('CITIXEN UX — Ward Health Summary', 40, y); y += 22;
+    doc.text('CITIXEN UX — District Health Summary', 40, y); y += 22;
     doc.setFont('helvetica', 'normal'); doc.setFontSize(11);
     doc.text('Jurisdiction: ' + jurisdictionLine, 40, y); y += 16;
     doc.text('Generated: ' + new Date().toLocaleString() + '  —  current snapshot, not a 12-month history', 40, y); y += 30;
@@ -1718,9 +1724,9 @@ async function downloadWardHealthPdf(triggerBtn){
       'reporter-identifying information is included in this export or in the underlying data model.'
     ].forEach(line => { doc.text(line, 40, y); y += 12; });
 
-    doc.save('citixen-ward-health-summary.pdf');
+    doc.save('citixen-district-health-summary.pdf');
   } catch (err) {
-    console.error('Ward Health PDF generation failed', err);
+    console.error('District Health PDF generation failed', err);
     toast('Could not generate the PDF — please try again.');
   } finally {
     if (triggerBtn) { triggerBtn.disabled = false; if (originalLabel !== null) triggerBtn.innerHTML = originalLabel; }
@@ -1951,7 +1957,7 @@ function fallbackLedgerTickets(){
       { id: 'w4t5', category: 'Signage', title: 'Stop sign knocked down', loc: 'Cameron Ave', stage: 'submitted', verified: null, submittedAgo: '12m ago' }
     ],
     'ward-7': [
-      { id: 'w7t1', category: 'Streetlight', title: 'Dark corner, no lighting', loc: 'Ward 7 & Copeland', stage: 'resolved', verified: true, submittedAgo: '4d ago' },
+      { id: 'w7t1', category: 'Streetlight', title: 'Dark corner, no lighting', loc: 'Copeland Ave & 7th', stage: 'resolved', verified: true, submittedAgo: '4d ago' },
       { id: 'w7t2', category: 'Pothole', title: 'Large pothole cluster', loc: 'La Crosse St', stage: 'resolved', verified: false, submittedAgo: '9d ago' },
       { id: 'w7t3', category: 'Sidewalk', title: 'Sidewalk heave, trip hazard', loc: 'Losey Blvd', stage: 'dispatched', verified: null, submittedAgo: '2h ago' }
     ],
@@ -1964,7 +1970,7 @@ function fallbackLedgerTickets(){
       { id: 'w3t2', category: 'Pothole', title: 'Deep pothole, arterial road', loc: 'Ashland Ave', stage: 'resolved', verified: false, submittedAgo: '4d ago' }
     ]
   };
-  const WARD_NAMES = { 'ward-4': 'Ward 4', 'ward-7': 'Ward 7', 'ward-12': 'Ward 12', 'ward-3': 'Ward 3' };
+  const WARD_NAMES = { 'ward-4': 'District 4', 'ward-7': 'District 7', 'ward-12': 'District 12', 'ward-3': 'District 3' };
   const WARD_JURISDICTION = {
     'ward-4': { state: 'wi', city: 'la-crosse', cityName: 'La Crosse' },
     'ward-7': { state: 'wi', city: 'la-crosse', cityName: 'La Crosse' },
@@ -1972,12 +1978,29 @@ function fallbackLedgerTickets(){
     'ward-3': { state: 'il', city: 'chicago', cityName: 'Chicago' }
   };
   function hashTo4Digits(str){ let h=0; for(let i=0;i<str.length;i++) h=(h*31+str.charCodeAt(i))>>>0; return 1000+(h%9000); }
+  // National 4-part ticket taxonomy — mirrors api/_lib/store.js's
+  // makeReportId()/hazardCode()/dateCodeFromAgo() exactly: [ZONE]-[HAZARD]-
+  // [YYMMDD]-[HASH], e.g. "D4-PTH-261001-8752". ZONE reuses the existing
+  // district number (same number the ward slug already carried); HAZARD is
+  // this ticket's own real category; YYMMDD is derived from this ticket's
+  // own real submittedAgo age, not a fabricated date.
+  var HAZARD_CODES = { pothole:'PTH', streetlight:'LGT', light:'LGT', drainage:'DRN', signage:'SGN', sidewalk:'ADA', waste:'WST', litter:'WST', trash:'WST' };
+  function hazardCode(category){ return HAZARD_CODES[String(category||'').toLowerCase().trim()] || 'GEN'; }
+  function dateCodeFromAgo(agoStr){
+    var m = /^(\d+)\s*([mhd])/i.exec(String(agoStr||'').trim()), ms = 0;
+    if (m) { var n = parseInt(m[1],10), u = m[2].toLowerCase(); ms = u==='m'?n*60000:u==='h'?n*3600000:n*86400000; }
+    var d = new Date(Date.now() - ms);
+    return String(d.getFullYear()).slice(-2) + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+  }
+  function makeReportId(wardSlug, ticketId, category, submittedAgo){
+    return ['D' + wardSlug.match(/\d+/)[0], hazardCode(category), dateCodeFromAgo(submittedAgo), hashTo4Digits(ticketId)].join('-');
+  }
   const out = [];
   Object.entries(WARD_TICKETS).forEach(([wardSlug, tickets]) => {
     const j = WARD_JURISDICTION[wardSlug];
     tickets.forEach(t => {
       out.push(Object.assign({}, t, {
-        reportId: 'W' + wardSlug.match(/\d+/)[0] + '-' + hashTo4Digits(t.id),
+        reportId: makeReportId(wardSlug, t.id, t.category, t.submittedAgo),
         ward: wardSlug, wardName: WARD_NAMES[wardSlug], state: j.state, city: j.city, cityName: j.cityName
       }));
     });
@@ -2038,7 +2061,7 @@ function renderLedgerResults(){
     if (!ledgerTicketWithinRadius(t, ledgerFilters.radius)) return false;
     if (ledgerFilters.category && t.category !== ledgerFilters.category) return false;
     if (ledgerFilters.status && t.stage !== ledgerFilters.status) return false;
-    if (q && !((t.title || '').toLowerCase().includes(q) || (t.loc || '').toLowerCase().includes(q) || (t.category || '').toLowerCase().includes(q))) return false;
+    if (q && !((t.title || '').toLowerCase().includes(q) || (t.loc || '').toLowerCase().includes(q) || (t.category || '').toLowerCase().includes(q) || (t.reportId || '').toLowerCase().includes(q))) return false;
     return true;
   });
   container.innerHTML = '';
@@ -2055,9 +2078,34 @@ function renderLedgerResults(){
     const pillClass = t.stage === 'resolved' ? 'pill-ok' : t.stage === 'dispatched' ? 'pill-warn' : 'pill-crit';
     a.innerHTML = `<div class="row"><span class="ledger-report-id">${esc(t.reportId)}</span><span class="pill ${pillClass}">${esc(t.stage)}</span></div>
       <div style="font-weight:700;font-size:.82rem;margin:4px 0">${esc(t.title)}</div>
-      <div class="small">${esc(t.loc)} • ${esc(t.wardName)} • ${esc(t.category)}${t.stage === 'resolved' ? (t.verified ? ' • ✓ photo-verified' : ' • desk closure') : ''}</div>`;
+      <div class="small">${esc(t.loc)} • ${esc(t.wardName)} • ${esc(t.category)}${t.stage === 'resolved' ? (t.verified ? ' • ✓ photo-verified' : ' • desk closure') : ''}</div>
+      ${custodyFooter(t)}`;
     container.appendChild(a);
   });
+}
+
+// 3-stage chain-of-custody footer — every real stage this ticket's own
+// `stage`/`verified` fields already carry, just rendered as a pipeline:
+//   1. EXIF Scrubbed   — true for every submission (stripped on-device
+//                        before upload, see Privacy Engine copy above).
+//   2. Routed          — once past 'submitted', to the real department
+//                        parseDepartment() would route this category to.
+//   3. Block Verified  — only once this ticket is resolved AND photo-
+//                        verified. The block number is this ticket's own
+//                        reportId hash segment (stable per ticket), never
+//                        a borrowed/invented counter.
+function custodyFooter(t){
+  var blockNum = (t.reportId || '').split('-').pop() || '----';
+  var dept = parseDepartment(t.category || t.title || '');
+  var routed = t.stage === 'dispatched' || t.stage === 'resolved';
+  var verified = t.stage === 'resolved' && t.verified === true;
+  return '<div class="cx-custody-footer">' +
+    '<span class="cx-custody-step done">🛡️ EXIF Scrubbed</span>' +
+    '<span class="cx-custody-arrow">➔</span>' +
+    '<span class="cx-custody-step' + (routed ? ' done' : '') + '">⚡ Routed to ' + esc(dept) + '</span>' +
+    '<span class="cx-custody-arrow">➔</span>' +
+    '<span class="cx-custody-step' + (verified ? ' done' : '') + '">🔗 Block #' + esc(blockNum) + (verified ? ' Verified' : ' Pending') + '</span>' +
+  '</div>';
 }
 
 async function openLedgerDrawer(){
@@ -2279,16 +2327,16 @@ function fallbackDirectory(){
   return { states: [
     { slug: 'wi', name: 'Wisconsin', cities: [
       { slug: 'la-crosse', name: 'La Crosse', wards: [
-        { slug: 'ward-4', name: 'Ward 4', alderman: 'Ald. Rebecca Voss', coveragePct: 42.5, coveredCount: 34, totalCells: 80, capExScopedUSD: 482600 },
-        { slug: 'ward-7', name: 'Ward 7', alderman: 'Ald. Marcus Dahl', coveragePct: 62.5, coveredCount: 40, totalCells: 64, capExScopedUSD: 310000 }
+        { slug: 'ward-4', name: 'District 4', alderman: 'Ald. Rebecca Voss', coveragePct: 42.5, coveredCount: 34, totalCells: 80, capExScopedUSD: 482600 },
+        { slug: 'ward-7', name: 'District 7', alderman: 'Ald. Marcus Dahl', coveragePct: 62.5, coveredCount: 40, totalCells: 64, capExScopedUSD: 310000 }
       ] },
       { slug: 'milwaukee', name: 'Milwaukee', wards: [
-        { slug: 'ward-12', name: 'Ward 12', alderman: 'Ald. Priya Shah', coveragePct: 58.3, coveredCount: 70, totalCells: 120, capExScopedUSD: 1150000 }
+        { slug: 'ward-12', name: 'District 12', alderman: 'Ald. Priya Shah', coveragePct: 58.3, coveredCount: 70, totalCells: 120, capExScopedUSD: 1150000 }
       ] }
     ] },
     { slug: 'il', name: 'Illinois', cities: [
       { slug: 'chicago', name: 'Chicago', wards: [
-        { slug: 'ward-3', name: 'Ward 3', alderman: 'Ald. Denise Coleman', coveragePct: 55.0, coveredCount: 55, totalCells: 100, capExScopedUSD: 940000 }
+        { slug: 'ward-3', name: 'District 3', alderman: 'Ald. Denise Coleman', coveragePct: 55.0, coveredCount: 55, totalCells: 100, capExScopedUSD: 940000 }
       ] }
     ] }
   ] };
@@ -2489,8 +2537,8 @@ function renderAppMunicipalPanel(){
   const noteEl = document.getElementById('appMunicipalCoverageNote');
   if (noteEl) {
     noteEl.textContent = knownWards.length
-      ? (pct != null ? pct : 0) + '% ward coverage — ' + loggedWardSlugs.size + ' of ' + knownWards.length + ' known ward' + (knownWards.length === 1 ? '' : 's') + ' in ' + (meta ? meta.cityName : 'this jurisdiction') + ' have at least one logged report on file.'
-      : 'No ward directory on file yet for this jurisdiction.';
+      ? (pct != null ? pct : 0) + '% district coverage — ' + loggedWardSlugs.size + ' of ' + knownWards.length + ' known district' + (knownWards.length === 1 ? '' : 's') + ' in ' + (meta ? meta.cityName : 'this jurisdiction') + ' have at least one logged report on file.'
+      : 'No district directory on file yet for this jurisdiction.';
   }
 }
 
@@ -2564,9 +2612,9 @@ const APP_MODAL_DATA = {
   // link in the hamburger drawer's "Explore CITIXEN UX™ Features" section.
   systemInfrastructure: { title: 'System Infrastructure, Safety & Security', body: [
     ['Features — Real-Time Spatial Tracking','Reports are placed on the live national map and this jurisdiction\'s own dispatch view the moment they are filed.'],
-    ['Features — Automated SLA Logging','Every report is timestamped against its ward\'s published response-time commitment automatically — no manual entry.'],
-    ['Features — Ward Heatmaps','Hazard density and resolution-speed views broken out ward by ward, drawn from the same records dispatchers see.'],
-    ['Safety — Ground-Truth Civic Verification','Reports are tied to a real ward and jurisdiction, not a self-reported location, so the public record reflects where a hazard actually is.'],
+    ['Features — Automated SLA Logging','Every report is timestamped against its district\'s published response-time commitment automatically — no manual entry.'],
+    ['Features — District Heatmaps','Hazard density and resolution-speed views broken out district by district, drawn from the same records dispatchers see.'],
+    ['Safety — Ground-Truth Civic Verification','Reports are tied to a real district and jurisdiction, not a self-reported location, so the public record reflects where a hazard actually is.'],
     ['Safety — Incident Priority Ranking','Open hazards can be ranked by category so limited repair budget goes to the highest-need items first.'],
     ['Safety — Hazard Prevention Metrics','Resolution-time and reopen-rate trends surface recurring hazard patterns before they become repeat incidents.'],
     ['Security — Zero-Knowledge Privacy Engine','No accounts, no login, and no device fingerprinting anywhere in this system — see the full Anonymity Whitepaper.'],
@@ -2575,11 +2623,11 @@ const APP_MODAL_DATA = {
   ]},
   privacyEngine: { title: 'Privacy Engine & EXIF Scrubber Protocol', body: [
     ['No account, no identity','Reporting needs no login, email or phone number, and the app does not fingerprint your device.'],
-    ['EXIF scrubbed on-device','Before a photo leaves your phone, its embedded GPS coordinates, device model and camera serial data are stripped. Only the image and the ward-level location you confirm are submitted.'],
-    ['What is kept','The public ledger stores the hazard category, ward, timestamps and resolution status, with no reporter-identifying field in the data model.']
+    ['EXIF scrubbed on-device','Before a photo leaves your phone, its embedded GPS coordinates, device model and camera serial data are stripped. Only the image and the district-level location you confirm are submitted.'],
+    ['What is kept','The public ledger stores the hazard category, district, timestamps and resolution status, with no reporter-identifying field in the data model.']
   ]},
   spatialGrid: { title: '11M Block H3 Spatial Grid Matrix', body: [
-    ['Today: mapped wards','Reports are bucketed into 150 m blocks per mapped ward, each tracked as auditable, pending or uncharted — the same #CrowdSaveAmerica grid model behind the national coverage map.'],
+    ['Today: mapped districts','Reports are bucketed into 150 m blocks per mapped district, each tracked as auditable, pending or uncharted — the same #CrowdSaveAmerica grid model behind the national coverage map.'],
     ['Roadmap: H3 resolution 9','The target is a national matrix of roughly 11 million H3 hexagonal cells at census-block scale, keyed on-device for privacy. That nationwide index is not live in this build yet.'],
     ['Why blocks, not addresses','Grouping reports into cells shows coverage and gaps without pinning any report to a household.']
   ]},
@@ -2607,7 +2655,7 @@ const APP_MODAL_DATA = {
     '<p>The apolitical engine that turns a citizen\'s right to petition (Citixenship™) into a permanent public record (Civic Memory™) — with nothing about the reporter attached.</p>' +
     '<h4>Zero-Friction</h4><p>No account, no login, no email or phone number. Pick a category, snap one photo, confirm your location, publish.</p>' +
     '<h4>Sovereign</h4><p>Before a photo leaves your phone, its embedded GPS coordinates, device model and camera data are stripped. The data model has no reporter-identifying field — you keep your identity.</p>' +
-    '<h4>Micro-Capture</h4><p>Each report is one small, verifiable unit: a category, a photo, a ward-level location and a timestamp, bucketed into a ~150 m block. Many small captures build a block-by-block audit.</p>' +
+    '<h4>Micro-Capture</h4><p>Each report is one small, verifiable unit: a category, a photo, a district-level location and a timestamp, bucketed into a ~150 m block. Many small captures build a block-by-block audit.</p>' +
     '<h4>Local, Non-PII Routing</h4><p>The description is scanned on-device for keywords and sorted into a department queue — Public Works / ADA, Utilities &amp; Electrical, Sanitation, or general Public Works — before dispatch.</p>' +
     '<h4>Stage Tracking</h4><p>Every report moves through Submitted, Dispatched and Resolved, each stage timestamped into the Living Ledger™.</p>' +
     '<h4>Capital Project Intercept</h4><p>Before a routine ticket is dispatched, it is checked against the jurisdiction\'s scheduled Capital Improvement Projects. Work already funded and scheduled is intercepted rather than sending a duplicate crew — unless the reporter flags an urgent safety hazard.</p>'
@@ -2795,11 +2843,26 @@ async function resolveDisplayLocation(){
 // running its own lookup. `null` means GPS was denied, timed out, or
 // unavailable — every caller falls back to a neutral label rather than
 // guessing a place.
+// Block-level coordinate precision for the report-location field — the
+// device's own real lat/lng (same values onLocationResolved already
+// receives, never a guess), to 3 decimal places (~110m, i.e. block-level,
+// not rounded to the whole city). Direction letters are derived from the
+// real sign rather than hardcoded N/W, so this reads correctly outside
+// the northern/western hemisphere too.
+function formatCoordPrecision(lat, lng){
+  return Math.abs(lat).toFixed(3) + '° ' + (lat >= 0 ? 'N' : 'S') + ', ' +
+    Math.abs(lng).toFixed(3) + '° ' + (lng >= 0 ? 'E' : 'W');
+}
 function onLocationResolved(loc){
   window.CITIXEN_RESOLVED_LOCATION = loc;
   const repLoc = document.getElementById('repLoc');
   if (repLoc && !repLoc.dataset.userEdited) {
-    repLoc.value = loc ? `${loc.city}, ${loc.stateCode} (Current GPS)` : 'Local District (GPS unavailable)';
+    // District only appears once a real match exists (currentWardMeta) —
+    // never guessed ahead of that confirmation.
+    const districtPart = (loc && currentWardMeta && currentWardMeta.isGpsMatch) ? ' (' + currentWardMeta.wardName + ')' : '';
+    repLoc.value = loc
+      ? `${formatCoordPrecision(loc.lat, loc.lng)}${districtPart} · ${loc.city}, ${loc.stateCode}`
+      : 'Local District (GPS unavailable)';
   }
   updateSmartLocationBanner(loc);
   if (analyticsInitialized && coverageDirectory) {
@@ -3438,15 +3501,6 @@ function triageBucket(item){
   return 'open';
 }
 
-// SLA time-in-process color shift: the longer an OPEN case sits unresolved,
-// the more its age reads as risk — green-ish under 30min, amber 30-120min,
-// red past 2 hours. Resolved/tagged cases don't carry this aging signal.
-function slaAgeColor(ageMin){
-  if (ageMin >= 120) return '#ff4444';
-  if (ageMin >= 30) return '#ffbb00';
-  return '#00E699';
-}
-
 function renderTriageGauge(){
   const open = cases.filter(c => triageBucket(c) === 'open').length;
   const tagged = cases.filter(c => triageBucket(c) === 'tagged').length;
@@ -3468,12 +3522,8 @@ function renderFeed(){
   const c=document.getElementById('feed'); c.innerHTML='';
   cases.forEach(item=>{
     const pill=statusPill(item.status);
-    const bucket=triageBucket(item);
     const el=document.createElement('div');
     el.className='feed-item';
-    const slaTag = bucket === 'open'
-      ? `<span class="feed-sla" style="color:${slaAgeColor(item.ageMin || 0)}">SLA age: ${esc(item.time)}</span>`
-      : '';
     // No dedicated per-project route exists on the deployed site (there is
     // no /projects/:id page) — link to the dashboard root rather than a
     // path that would 404, while still surfacing the project id as text.
@@ -3484,7 +3534,6 @@ function renderFeed(){
       <div class="row"><strong>${esc(item.title)}</strong><span class="pill ${pill}">${esc(item.status)}</span></div>
       <div class="small" style="margin:4px 0">${esc(item.desc)}</div>
       <div class="row small"><span>${esc(item.loc)}</span><span>${esc(item.time)}</span></div>
-      ${slaTag}
       ${projectLink}`;
     el.addEventListener('click',(e)=>{
       if (e.target.closest('a')) return; // let the project link navigate normally

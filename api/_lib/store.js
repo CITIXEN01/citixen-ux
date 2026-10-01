@@ -81,7 +81,7 @@ const DB = globalThis.__CITIXEN_COVERAGE_DB__ || (globalThis.__CITIXEN_COVERAGE_
         name: 'La Crosse',
         wards: {
           'ward-4': {
-            name: 'Ward 4',
+            name: 'District 4',
             alderman: 'Ald. Rebecca Voss',
             healthIndex: 82,
             slaPct: 91,
@@ -91,7 +91,7 @@ const DB = globalThis.__CITIXEN_COVERAGE_DB__ || (globalThis.__CITIXEN_COVERAGE_
             cells: buildWard4Cells()
           },
           'ward-7': {
-            name: 'Ward 7',
+            name: 'District 7',
             alderman: 'Ald. Marcus Dahl',
             healthIndex: 74,
             slaPct: 85,
@@ -106,7 +106,7 @@ const DB = globalThis.__CITIXEN_COVERAGE_DB__ || (globalThis.__CITIXEN_COVERAGE_
         name: 'Milwaukee',
         wards: {
           'ward-12': {
-            name: 'Ward 12',
+            name: 'District 12',
             alderman: 'Ald. Priya Shah',
             healthIndex: 79,
             slaPct: 88,
@@ -126,7 +126,7 @@ const DB = globalThis.__CITIXEN_COVERAGE_DB__ || (globalThis.__CITIXEN_COVERAGE_
         name: 'Chicago',
         wards: {
           'ward-3': {
-            name: 'Ward 3',
+            name: 'District 3',
             alderman: 'Ald. Denise Coleman',
             healthIndex: 76,
             slaPct: 86,
@@ -157,19 +157,49 @@ const DB = globalThis.__CITIXEN_COVERAGE_DB__ || (globalThis.__CITIXEN_COVERAGE_
 // from a desk with no field proof (false) — deliberately mixed so the
 // Resolution Verification Rate below is a real, non-trivial percentage.
 //
-// `reportId` (e.g. "W4-8092") is generated deterministically from the
-// ward number + a stable hash of the ticket's own id, so the same
-// ticket always resolves to the same shareable /report/:id URL rather
-// than a random one that would change on every reload.
+// `reportId` (e.g. "D4-PTH-261001-8092") follows the national 4-part
+// ticket taxonomy [ZONE]-[HAZARD]-[YYMMDD]-[HASH]:
+//   ZONE   — 'D' + the district number (same number the ward slug already
+//            carries, e.g. 'ward-4' -> 'D4'; district numbering IS the
+//            existing ward numbering, just relabeled).
+//   HAZARD — a fixed 3-letter code for the ticket's own real `category`.
+//   YYMMDD — derived from the ticket's own real `submittedAgo` age against
+//            the current time, not a fabricated/frozen date — a ticket
+//            logged "3d ago" always resolves to today minus 3 days.
+//   HASH   — a stable hash of the ticket's own id, so the same ticket
+//            always resolves to the same shareable /report/:id URL rather
+//            than a random one that would change on every reload.
 function hashTo4Digits(str) {
   let h = 0;
   for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
   return 1000 + (h % 9000);
 }
 
-function makeReportId(wardSlug, ticketId) {
+const HAZARD_CODES = {
+  pothole: 'PTH', streetlight: 'LGT', light: 'LGT', drainage: 'DRN',
+  signage: 'SGN', sidewalk: 'ADA', waste: 'WST', litter: 'WST', trash: 'WST'
+};
+function hazardCode(category) {
+  return HAZARD_CODES[String(category || '').toLowerCase().trim()] || 'GEN';
+}
+
+// Real age ("3d ago", "45m ago", "0m ago" for a just-submitted ticket) back
+// into a calendar date, so the YYMMDD segment reflects this ticket's own
+// recency rather than a made-up timestamp field.
+function dateCodeFromAgo(agoStr) {
+  const m = /^(\d+)\s*([mhd])/i.exec(String(agoStr || '').trim());
+  let ms = 0;
+  if (m) {
+    const n = parseInt(m[1], 10);
+    ms = m[2].toLowerCase() === 'm' ? n * 60000 : m[2].toLowerCase() === 'h' ? n * 3600000 : n * 86400000;
+  }
+  const d = new Date(Date.now() - ms);
+  return String(d.getFullYear()).slice(-2) + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+}
+
+function makeReportId(wardSlug, ticketId, category, submittedAgo) {
   const wardNum = (String(wardSlug).match(/\d+/) || ['0'])[0];
-  return 'W' + wardNum + '-' + hashTo4Digits(String(ticketId));
+  return ['D' + wardNum, hazardCode(category), dateCodeFromAgo(submittedAgo), hashTo4Digits(String(ticketId))].join('-');
 }
 
 // stage: 'submitted' (filed, not yet dispatched) -> 'dispatched' (crew
@@ -194,7 +224,7 @@ const WARD_TICKETS = globalThis.__CITIXEN_WARD_TICKETS__ || (globalThis.__CITIXE
     { id: 'w4t6', category: 'Pothole', title: 'Pavement gap, bike lane', loc: '6th St & Cass', stage: 'resolved', verified: true, resolutionHours: 31, submittedAgo: '8d ago' }
   ],
   'ward-7': [
-    { id: 'w7t1', category: 'Streetlight', title: 'Dark corner, no lighting', loc: 'Ward 7 & Copeland', stage: 'resolved', verified: true, resolutionHours: 18, submittedAgo: '4d ago' },
+    { id: 'w7t1', category: 'Streetlight', title: 'Dark corner, no lighting', loc: 'Copeland Ave & 7th', stage: 'resolved', verified: true, resolutionHours: 18, submittedAgo: '4d ago' },
     { id: 'w7t2', category: 'Pothole', title: 'Large pothole cluster', loc: 'La Crosse St', stage: 'resolved', verified: false, resolutionHours: 27, submittedAgo: '9d ago' },
     { id: 'w7t3', category: 'Sidewalk', title: 'Sidewalk heave, trip hazard', loc: 'Losey Blvd', stage: 'dispatched', verified: null, resolutionHours: null, submittedAgo: '2h ago' },
     { id: 'w7t4', category: 'Drainage', title: 'Clogged culvert', loc: 'George St', stage: 'resolved', verified: true, resolutionHours: 12, submittedAgo: '2d ago' }
@@ -212,7 +242,7 @@ const WARD_TICKETS = globalThis.__CITIXEN_WARD_TICKETS__ || (globalThis.__CITIXE
   ]
 });
 
-const WARD_NAMES = { 'ward-4': 'Ward 4', 'ward-7': 'Ward 7', 'ward-12': 'Ward 12', 'ward-3': 'Ward 3' };
+const WARD_NAMES = { 'ward-4': 'District 4', 'ward-7': 'District 7', 'ward-12': 'District 12', 'ward-3': 'District 3' };
 const WARD_JURISDICTION = {
   'ward-4': { state: 'wi', stateName: 'Wisconsin', city: 'la-crosse', cityName: 'La Crosse' },
   'ward-7': { state: 'wi', stateName: 'Wisconsin', city: 'la-crosse', cityName: 'La Crosse' },
@@ -230,7 +260,7 @@ function allTickets() {
     const j = WARD_JURISDICTION[wardSlug];
     tickets.forEach(t => {
       out.push(Object.assign({}, t, {
-        reportId: makeReportId(wardSlug, t.id),
+        reportId: makeReportId(wardSlug, t.id, t.category, t.submittedAgo),
         ward: wardSlug,
         wardName: WARD_NAMES[wardSlug],
         state: j.state, stateName: j.stateName, city: j.city, cityName: j.cityName
@@ -266,19 +296,19 @@ function getTicketByReportId(reportId) {
 // checked against a project's category before treating a spatial match as
 // a real "this is already being fixed" intercept.
 const CAPEX_PROJECTS = [
-  { id: 'cip-1', name: 'Ward 4 Storm Sewer Relining', ward: 'ward-4', scheduled: 'Q3 2026', status: 'on-time',
+  { id: 'cip-1', name: 'District 4 Storm Sewer Relining', ward: 'ward-4', scheduled: 'Q3 2026', status: 'on-time',
     category: 'Drainage', scope: 'Full storm sewer reline along the Pine St alley corridor, replacing collapsed clay pipe.',
     lat: 43.8100, lng: -91.2550, radiusMeters: 300 },
   { id: 'cip-2', name: 'Main St Resurfacing Phase II', ward: 'ward-4', scheduled: 'Q4 2026', status: 'on-track',
     category: 'Pothole', scope: 'Full-depth mill-and-overlay resurfacing of Main St from 2nd Ave to 6th Ave, including the 4th Ave intersection.',
     lat: 43.8138, lng: -91.2519, radiusMeters: 250 },
-  { id: 'cip-3', name: 'Ward 7 Streetlight LED Retrofit', ward: 'ward-7', scheduled: 'Q2 2026', status: 'delayed',
-    category: 'Streetlight', scope: 'Citywide swap of Ward 7 cobra-head fixtures to LED, corridor-wide rather than pole-by-pole.',
+  { id: 'cip-3', name: 'District 7 Streetlight LED Retrofit', ward: 'ward-7', scheduled: 'Q2 2026', status: 'delayed',
+    category: 'Streetlight', scope: 'Citywide swap of District 7 cobra-head fixtures to LED, corridor-wide rather than pole-by-pole.',
     lat: 43.8050, lng: -91.2430, radiusMeters: 400 },
   { id: 'cip-4', name: 'Losey Blvd Sidewalk/ADA Upgrade', ward: 'ward-7', scheduled: 'Q3 2026', status: 'on-track',
     category: 'Sidewalk', scope: 'Sidewalk panel replacement and ADA curb ramp upgrades along Losey Blvd.',
     lat: 43.8020, lng: -91.2380, radiusMeters: 300 },
-  { id: 'cip-5', name: 'Ward 12 Culvert Replacement', ward: 'ward-12', scheduled: 'Q1 2026', status: 'on-time',
+  { id: 'cip-5', name: 'District 12 Culvert Replacement', ward: 'ward-12', scheduled: 'Q1 2026', status: 'on-time',
     category: 'Drainage', scope: 'Replacement of an undersized culvert causing recurring backups near National Ave.',
     lat: 43.0230, lng: -87.9650, radiusMeters: 350 },
   { id: 'cip-6', name: 'National Ave Signage Modernization', ward: 'ward-12', scheduled: 'Q4 2026', status: 'on-track',
@@ -313,7 +343,7 @@ function capExAdherencePct(projects) {
 // hardcoded. Returns null for a metric when there isn't yet enough seed
 // data to compute it honestly (see capExAdherencePct above).
 function bigThree(wardSlug) {
-  const tickets = wardSlug ? (WARD_TICKETS[wardSlug] || []).map(t => Object.assign({}, t, { reportId: makeReportId(wardSlug, t.id) })) : allTickets();
+  const tickets = wardSlug ? (WARD_TICKETS[wardSlug] || []).map(t => Object.assign({}, t, { reportId: makeReportId(wardSlug, t.id, t.category, t.submittedAgo) })) : allTickets();
   const resolved = tickets.filter(t => t.stage === 'resolved');
   const active = tickets.filter(t => t.stage !== 'resolved'); // 'submitted' + 'dispatched' — real, not-yet-closed tickets
   const withResolutionTime = resolved.filter(t => typeof t.resolutionHours === 'number');
@@ -409,7 +439,7 @@ function addTicket(input) {
     lng: typeof input.lng === 'number' ? input.lng : null
   };
   WARD_TICKETS[wardSlug].push(ticket);
-  return { reportId: makeReportId(wardSlug, id), ward: wardSlug };
+  return { reportId: makeReportId(wardSlug, id, category, ticket.submittedAgo), ward: wardSlug };
 }
 
 function getWard(state, city, ward) {

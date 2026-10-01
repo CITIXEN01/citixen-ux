@@ -162,9 +162,9 @@ function tagPill(slide, x, y, text) {
   eyebrowAndNumber(s, "THE PLATFORM", "03 / 10");
   title(s, [{ text: "One Pipeline. " }, { text: "Three Modules.", color: MINT }]);
   const mods = [
-    { tag: "MODULE 1 · GATEWAY", h: "Gateway", p: "The public civic web dashboard — jurisdiction auto-detection, live ward-health telemetry, the immutable public ledger, a QR install card, and the Civic Tools drawer. No login required." },
+    { tag: "MODULE 1 · GATEWAY", h: "Gateway", p: "The public civic web dashboard — jurisdiction auto-detection, live district-health telemetry, the immutable public ledger, a QR install card, and the Civic Tools drawer. No login required." },
     { tag: "MODULE 2 · PWA REPORTER", h: "PWA Reporter", p: "The zero-account mobile hazard-reporting app — the 4-tier legal stack, fog-of-war spatial grid, live map, and feed. EXIF and GPS are stripped from every photo before it leaves the device." },
-    { tag: "MODULE 3 · CONSOLE", h: "Municipal Console", p: "The staff-facing dispatch console — severity-tiered ticket queues, a live GIS dispatch map, SLA tracking, the CapEx scoping ledger, AI-assisted quick-resolve, and printable Ward Reports for council packets." },
+    { tag: "MODULE 3 · CONSOLE", h: "Municipal Console", p: "The staff-facing dispatch console — severity-tiered ticket queues, a live GIS dispatch map, SLA tracking, the CapEx scoping ledger, AI-assisted quick-resolve, and printable District Reports for council packets." },
   ];
   const colW = (W - 1.2 - 0.4) / 3;
   mods.forEach((m, i) => {
@@ -247,7 +247,7 @@ function tagPill(slide, x, y, text) {
   const colW = (W - 1.2 - 0.4) / 3;
   const rows = [
     { label: "SCOPED CAPITAL SPEND", value: "$482,600", sub: "CapEx Scoping Ledger · Track 2, current cycle", accent: true },
-    { label: "GRID COVERAGE", value: "55%", sub: "Blocks field-verified across active wards" },
+    { label: "GRID COVERAGE", value: "55%", sub: "Blocks field-verified across active districts" },
     { label: "POPULATION COVERED", value: "52k", sub: "Residents represented in live ledger inputs" },
   ];
   rows.forEach((r, i) => {
@@ -295,7 +295,7 @@ function tagPill(slide, x, y, text) {
   card(s, x, 2.75, colW, 2.9);
   tagPill(s, x + 0.3, 3.0, "AGENDA / RECORDS");
   s.addText("Legistar-Compatible Export", { x: x + 0.3, y: 3.4, w: colW - 0.6, h: 0.45, fontFace: FONT, fontSize: 15, bold: true, color: TEXT, isTextBox: true, margin: 0 });
-  s.addText("Ward reports and capital-ledger summaries export in a format built to attach directly to council agenda packets.", {
+  s.addText("District reports and capital-ledger summaries export in a format built to attach directly to council agenda packets.", {
     x: x + 0.3, y: 3.9, w: colW - 0.6, h: 1.6, fontFace: FONT, fontSize: 12, color: MUTED, isTextBox: true, margin: 0, lineSpacingMultiple: 1.35,
   });
   x = 0.6 + colW + 0.3;
@@ -346,7 +346,7 @@ function tagPill(slide, x, y, text) {
   });
 }
 
-// ================= SLIDE 10 — NEXT STEP: THE 30-DAY WARD PILOT =================
+// ================= SLIDE 10 — NEXT STEP: THE 30-DAY DISTRICT PILOT =================
 {
   const s = newSlide();
   s.addText("NEXT STEP", {
@@ -356,10 +356,10 @@ function tagPill(slide, x, y, text) {
     x: 0, y: 1.35, w: W - 0.6, h: 0.3, align: "right", fontFace: "Courier New", fontSize: 10, color: MUTED, isTextBox: true, margin: 0,
   });
   s.addText(
-    [{ text: "The ", options: { color: TEXT } }, { text: "30-Day Ward Pilot", options: { color: MINT } }],
+    [{ text: "The ", options: { color: TEXT } }, { text: "30-Day District Pilot", options: { color: MINT } }],
     { x: 0.6, y: 1.8, w: W - 1.2, h: 0.9, align: "center", fontFace: FONT, fontSize: 30, bold: true, isTextBox: true, margin: 0 }
   );
-  s.addText("No procurement cycle required to start the conversation — setup takes under two weeks, one ward at a time.", {
+  s.addText("No procurement cycle required to start the conversation — setup takes under two weeks, one district at a time.", {
     x: W / 2 - 4.5, y: 2.7, w: 9, h: 0.6, align: "center", fontFace: FONT, fontSize: 14, color: MUTED, isTextBox: true, margin: 0, lineSpacingMultiple: 1.3,
   });
   // CTA buttons
@@ -381,7 +381,7 @@ function tagPill(slide, x, y, text) {
     x, y: 3.75, w: btn2W, h: 0.55, align: "center", valign: "middle", fontFace: FONT, fontSize: 12, bold: true, color: TEXT, isTextBox: true, margin: 0,
     hyperlink: { url: "https://citixenux.com/pilot" },
   });
-  s.addText("Active reference deployment: La Crosse, WI — Ward 4", {
+  s.addText("Active reference deployment: La Crosse, WI — District 4", {
     x: 0, y: 4.7, w: W, h: 0.3, align: "center", fontFace: "Courier New", fontSize: 9, color: MUTED, isTextBox: true, margin: 0,
   });
 }

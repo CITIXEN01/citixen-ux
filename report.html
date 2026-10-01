@@ -98,7 +98,22 @@ function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&l
 // running, as during local preview). Same illustrative-seed-data convention
 // as every other coverage endpoint's fallback in this codebase.
 function hashTo4Digits(str){ let h=0; for(let i=0;i<str.length;i++) h=(h*31+str.charCodeAt(i))>>>0; return 1000+(h%9000); }
-function makeReportId(wardSlug, ticketId){ const n=(String(wardSlug).match(/\d+/)||['0'])[0]; return 'W'+n+'-'+hashTo4Digits(String(ticketId)); }
+// National 4-part ticket taxonomy — mirrors api/_lib/store.js's
+// makeReportId()/hazardCode()/dateCodeFromAgo() exactly: must stay byte-
+// identical here, since this page resolves /report/:id by recomputing
+// every seeded ticket's id and matching it against the URL.
+const HAZARD_CODES = { pothole:'PTH', streetlight:'LGT', light:'LGT', drainage:'DRN', signage:'SGN', sidewalk:'ADA', waste:'WST', litter:'WST', trash:'WST' };
+function hazardCode(category){ return HAZARD_CODES[String(category||'').toLowerCase().trim()] || 'GEN'; }
+function dateCodeFromAgo(agoStr){
+  const m = /^(\d+)\s*([mhd])/i.exec(String(agoStr||'').trim()); let ms = 0;
+  if (m) { const n = parseInt(m[1],10), u = m[2].toLowerCase(); ms = u==='m'?n*60000:u==='h'?n*3600000:n*86400000; }
+  const d = new Date(Date.now() - ms);
+  return String(d.getFullYear()).slice(-2) + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+}
+function makeReportId(wardSlug, ticketId, category, submittedAgo){
+  const n=(String(wardSlug).match(/\d+/)||['0'])[0];
+  return ['D'+n, hazardCode(category), dateCodeFromAgo(submittedAgo), hashTo4Digits(String(ticketId))].join('-');
+}
 
 const WARD_TICKETS = {
   'ward-4': [
@@ -110,7 +125,7 @@ const WARD_TICKETS = {
     { id:'w4t6', category:'Pothole', title:'Pavement gap, bike lane', loc:'6th St & Cass', stage:'resolved', verified:true, resolutionHours:31, submittedAgo:'8d ago' }
   ],
   'ward-7': [
-    { id:'w7t1', category:'Streetlight', title:'Dark corner, no lighting', loc:'Ward 7 & Copeland', stage:'resolved', verified:true, resolutionHours:18, submittedAgo:'4d ago' },
+    { id:'w7t1', category:'Streetlight', title:'Dark corner, no lighting', loc:'Copeland Ave & 7th', stage:'resolved', verified:true, resolutionHours:18, submittedAgo:'4d ago' },
     { id:'w7t2', category:'Pothole', title:'Large pothole cluster', loc:'La Crosse St', stage:'resolved', verified:false, resolutionHours:27, submittedAgo:'9d ago' },
     { id:'w7t3', category:'Sidewalk', title:'Sidewalk heave, trip hazard', loc:'Losey Blvd', stage:'dispatched', verified:null, resolutionHours:null, submittedAgo:'2h ago' },
     { id:'w7t4', category:'Drainage', title:'Clogged culvert', loc:'George St', stage:'resolved', verified:true, resolutionHours:12, submittedAgo:'2d ago' }
@@ -127,7 +142,7 @@ const WARD_TICKETS = {
     { id:'w3t3', category:'Streetlight', title:'Streetlight pole down', loc:'Milwaukee Ave', stage:'resolved', verified:true, resolutionHours:10, submittedAgo:'2d ago' }
   ]
 };
-const WARD_NAMES = { 'ward-4':'Ward 4', 'ward-7':'Ward 7', 'ward-12':'Ward 12', 'ward-3':'Ward 3' };
+const WARD_NAMES = { 'ward-4':'District 4', 'ward-7':'District 7', 'ward-12':'District 12', 'ward-3':'District 3' };
 const WARD_JURISDICTION = {
   'ward-4': { state:'wi', stateName:'Wisconsin', city:'la-crosse', cityName:'La Crosse' },
   'ward-7': { state:'wi', stateName:'Wisconsin', city:'la-crosse', cityName:'La Crosse' },
@@ -137,7 +152,7 @@ const WARD_JURISDICTION = {
 function fallbackTicketByReportId(reportId){
   for (const [wardSlug, tickets] of Object.entries(WARD_TICKETS)){
     for (const t of tickets){
-      if (makeReportId(wardSlug, t.id) === reportId){
+      if (makeReportId(wardSlug, t.id, t.category, t.submittedAgo) === reportId){
         const j = WARD_JURISDICTION[wardSlug];
         return Object.assign({}, t, { reportId, ward: wardSlug, wardName: WARD_NAMES[wardSlug],
           state: j.state, stateName: j.stateName, city: j.city, cityName: j.cityName });

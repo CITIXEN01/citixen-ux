@@ -16,7 +16,7 @@ const PERMISSIONS = {
   NSCameraUsageDescription:
     'CITIXEN UX uses your camera to document infrastructure issues anonymously. Photos are stripped of EXIF data.',
   NSLocationWhenInUseUsageDescription:
-    'CITIXEN UX uses your precise GPS location to identify ward jurisdiction and map report coordinates.'
+    'CITIXEN UX uses your precise GPS location to identify district jurisdiction and map report coordinates.'
 };
 
 function main(){
