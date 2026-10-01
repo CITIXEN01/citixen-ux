@@ -490,12 +490,19 @@
       y += 34;
 
       function ensureRoom(h) { if (y + h > 740) { doc.addPage(); y = 60; } }
+      // Full-width black pill banner spanning the content width, with a
+      // solid mint circle number badge (black bold number) and a bold
+      // white uppercase title.
       function sectionTitle(n, title) {
-        doc.setFillColor(9, 13, 22); doc.circle(M + 8, y - 4, 8, 'F');
-        doc.setTextColor(0, 230, 153); doc.setFontSize(9); doc.setFont('helvetica', 'bold');
-        doc.text(String(n), M + 8, y - 1, { align: 'center' });
-        doc.setTextColor(9, 13, 22); doc.setFontSize(10.5);
-        doc.text(title, M + 24, y); y += 16;
+        var ph = 22, pw = W - 2 * M;
+        doc.setFillColor(0, 0, 0); doc.roundedRect(M, y, pw, ph, 11, 11, 'F');
+        var bcx = M + 17, bcy = y + ph / 2;
+        doc.setFillColor(0, 230, 153); doc.circle(bcx, bcy, 7.5, 'F');
+        doc.setTextColor(0, 0, 0); doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5);
+        doc.text(String(n), bcx, bcy + 2.8, { align: 'center' });
+        doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5);
+        doc.text(title.toUpperCase(), bcx + 15, bcy + 3);
+        y += ph + 10;
       }
 
       // Metric cards: every card in a solid-black header bar + white body,
@@ -583,7 +590,7 @@
       // anchor container — Reports Filed (real aggregate d.total, not the
       // 'submitted'-stage-only subset) and Open Active Dispatches flank the
       // Hazard Index gauge, matching the HTML pane's layout exactly.
-      ensureRoom(140);
+      ensureRoom(160);
       sectionTitle(3, 'COMMUNITY ACTION SNAPSHOT');
       (function section3Cards() {
         var pad = 12, gap = 10, boxH = 108, by = y;
