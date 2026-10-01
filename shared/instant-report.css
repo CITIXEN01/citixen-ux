@@ -67,6 +67,10 @@
 .cx-sec-title span{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;
   background:#090D16;color:#00E699;font-size:.58rem;letter-spacing:0}
 .cx-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cx-metrics-4{grid-template-columns:repeat(4,1fr)}
+@media (max-width:480px){.cx-metrics-4{grid-template-columns:repeat(2,1fr)}}
+.cx-bench{margin:10px 0 0;font-size:.66rem;line-height:1.5;color:#475569}
+.cx-bench b{color:#090D16}
 .cx-metric{border:1px solid #E2E8F0;border-radius:10px;padding:8px 6px;text-align:center}
 .cx-metric-val{font-size:1.05rem;font-weight:800;color:#047857;font-variant-numeric:tabular-nums}
 .cx-metric-lbl{font-size:.56rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748B;margin-top:2px}

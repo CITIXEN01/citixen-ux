@@ -87,6 +87,45 @@
   function badgeText(d) { return d.cityLabel + (d.wardLabel ? ' · ' + d.wardLabel : ''); }
   function siteUrl() { return location.origin + '/'; }
 
+  // ---------- Civic Health Ranking ----------
+  // Ranks every mapped ward (from /api/coverage/national) on an even blend
+  // of block coverage and resolution speed:
+  //   score = 0.5 × coverage% + 0.5 × speed, speed = 100 × fastest avg / own avg
+  // computed from the same ledger tickets the dashboard shows. Ranks are
+  // among wards actually mapped today. There is no quarter-over-quarter
+  // history in this data yet, so no movement arrow is invented.
+  function computeRanks(d) {
+    var ms = d.national || [], tickets = d.tickets || [], h = d.home;
+    if (!ms.length || !h) return null;
+    var rows = ms.map(function (m) {
+      var t = tickets.filter(function (x) { return x.state === m.state && x.city === m.city && x.ward === m.ward; });
+      var timed = t.filter(function (x) { return x.stage === 'resolved' && typeof x.resolutionHours === 'number'; });
+      var avg = timed.length ? timed.reduce(function (s, x) { return s + x.resolutionHours; }, 0) / timed.length : null;
+      return { m: m, cov: m.coveragePct || 0, avg: avg };
+    });
+    var timedAvgs = rows.filter(function (r) { return r.avg != null; }).map(function (r) { return r.avg; });
+    var fastest = timedAvgs.length ? Math.min.apply(null, timedAvgs) : null;
+    rows.forEach(function (r) { r.score = 0.5 * r.cov + 0.5 * (r.avg != null && fastest ? 100 * fastest / r.avg : 0); });
+    rows.sort(function (a, b) { return b.score - a.score; });
+    var me = rows.filter(function (r) { return r.m.state === h.state && r.m.city === h.city && r.m.ward === h.ward; })[0];
+    if (!me) return null;
+    var inState = rows.filter(function (r) { return r.m.state === h.state; });
+    return {
+      national: rows.indexOf(me) + 1, nationalOf: rows.length,
+      state: inState.indexOf(me) + 1, stateOf: inState.length,
+      stateName: me.m.stateName || h.stateName || String(h.state).toUpperCase(),
+      subject: (me.m.cityName || h.cityName) + ' ' + (me.m.wardName || h.wardName || '')
+    };
+  }
+  function natRankText(r) { return r ? '#' + r.national : 'N/A'; }
+  function stateRankText(r) { return r ? '#' + r.state + ' IN ' + String(r.stateName).toUpperCase() : 'N/A'; }
+  function rankNote(r) {
+    if (!r) return 'National and state ranks need the live coverage service.';
+    return r.subject.trim() + ' currently ranks #' + r.national + ' nationally and #' + r.state + ' in ' + r.stateName +
+      ' among ' + r.nationalOf + ' mapped wards (' + r.stateOf + ' in-state), based on resolution speed and block coverage. ' +
+      'Quarter-over-quarter movement will show once a prior quarter is on file.';
+  }
+
   // ---------- state ----------
   var cfg = { getData: null, toast: null };
   var data = null, generatedAt = null, current = 'pdf', modal = null, rafId = 0, lastFocus = null;
@@ -111,7 +150,6 @@
   function renderModule(mount) {
     mount.innerHTML =
       '<section class="cx-export" aria-labelledby="cxExportTitle">' +
-        '<div class="cx-export-kicker">[ EXPORT &amp; SHARE ]</div>' +
         '<h3 class="cx-export-title" id="cxExportTitle">Reports &amp; Easy Share</h3>' +
         '<button type="button" class="cx-btn-primary" data-cx-open="pdf">Generate Free Report ↗</button>' +
         '<button type="button" class="cx-btn-dashed" data-cx-share-platform>Share CITIXEN UX™</button>' +
@@ -145,7 +183,7 @@
     modal.innerHTML =
       '<div class="cx-panel">' +
         '<div class="cx-head">' + icon('shieldPlain') +
-          '<div class="cx-head-text"><div class="cx-head-title" id="cxTitle">Instant Report</div>' +
+          '<div class="cx-head-text"><div class="cx-head-title" id="cxTitle">Free Report</div>' +
           '<div class="cx-head-sub" id="cxJuris">Loading jurisdiction…</div></div>' +
           '<button type="button" class="cx-close" aria-label="Close">✕</button>' +
         '</div>' +
@@ -186,6 +224,7 @@
     });
     try {
       data = await cfg.getData();
+      data.ranks = computeRanks(data);
       generatedAt = new Date();
     } catch (err) {
       console.warn('Instant Report data failed to load', err);
@@ -194,6 +233,7 @@
     }
     modal.querySelector('#cxJuris').textContent = data.jurisdiction + ' · ' + stamp(generatedAt);
     renderPdfPane(); renderGraphicPane(); renderLinkPane();
+    prepareMapSnapshot(data);
     select(current);
     modal.querySelector('.cx-close').focus();
   }
@@ -236,7 +276,8 @@
         '</div>' +
         '<div class="cx-paper-juris">' + esc(d.jurisdiction) + '</div>' +
         '<div class="cx-sec"><div class="cx-sec-title"><span>1</span>CIVIC PERFORMANCE METRICS</div>' +
-          '<div class="cx-metrics">' + metric(daysText(d) + (d.avgDays != null ? ' days' : ''), 'Fix Speed') + metric(resolutionRate(d), 'Resolution Rate') + metric(pctText(d.coveragePct), 'Ward Coverage') + '</div></div>' +
+          '<div class="cx-metrics cx-metrics-4">' + metric(daysText(d) + (d.avgDays != null ? ' days' : ''), 'Fix Speed') + metric(resolutionRate(d), 'Resolution Rate') + metric(pctText(d.coveragePct), 'Ward Coverage') + metric(natRankText(d.ranks), "Nat'l Rank") + '</div>' +
+          '<p class="cx-bench"><b>State rank:</b> ' + esc(stateRankText(d.ranks)) + '. ' + esc(rankNote(d.ranks)) + '</p></div>' +
         '<div class="cx-sec"><div class="cx-sec-title"><span>2</span>CAPITAL INFRASTRUCTURE INVESTMENTS</div>' + cipListHtml(d.cip, false) + '</div>' +
         '<div class="cx-sec"><div class="cx-sec-title"><span>3</span>COMMUNITY ACTION SNAPSHOT</div>' +
           '<div class="cx-metrics">' + metric(d.counts.dispatched, 'Active Dispatches') + metric(d.counts.submitted, 'Pending Review') + metric(d.counts.resolved, 'Resolved Items') + '</div></div>' +
@@ -281,7 +322,7 @@
         doc.text(title, M + 24, y); y += 16;
       }
       function boxes(items) {
-        var bw = (W - 2 * M - 2 * 12) / 3;
+        var bw = (W - 2 * M - (items.length - 1) * 12) / items.length;
         items.forEach(function (it, k) {
           var x = M + k * (bw + 12);
           doc.setDrawColor(226, 232, 240); doc.setLineWidth(1); doc.roundedRect(x, y, bw, 56, 8, 8, 'S');
@@ -295,7 +336,13 @@
       function ensureRoom(h) { if (y + h > 740) { doc.addPage(); y = 60; } }
 
       sectionTitle(1, 'CIVIC PERFORMANCE METRICS');
-      boxes([[d.avgDays != null ? daysText(d) + ' days' : 'N/A', 'Fix Speed'], [resolutionRate(d), 'Resolution Rate'], [pctText(d.coveragePct), 'Ward Coverage']]);
+      boxes([[d.avgDays != null ? daysText(d) + ' days' : 'N/A', 'Fix Speed'], [resolutionRate(d), 'Resolution Rate'], [pctText(d.coveragePct), 'Ward Coverage'], [natRankText(d.ranks), "Nat'l Rank"]]);
+      y -= 14;
+      doc.setTextColor(9, 13, 22); doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
+      doc.text('State rank: ' + stateRankText(d.ranks), M, y); y += 13;
+      doc.setTextColor(71, 85, 105); doc.setFont('helvetica', 'normal');
+      var benchLines = doc.splitTextToSize(rankNote(d.ranks), W - 2 * M);
+      doc.text(benchLines, M, y); y += benchLines.length * 11 + 22;
 
       sectionTitle(2, 'CAPITAL INFRASTRUCTURE INVESTMENTS');
       if (!d.cip.length) {
@@ -360,6 +407,202 @@
     ctx.bezierCurveTo(4, 18, 12, 22, 12, 22); ctx.closePath(); ctx.restore();
   }
 
+  // ---------- Dark vector map for the share card ----------
+  var VECTOR_STYLE_URL = 'https://tiles.openfreemap.org/styles/dark';
+  var MAP_W = 912, MAP_H = 300;
+  // Public geographic centers for mapped cities/states (used to place
+  // nationwide nodes and frame the State view). Unknown places are skipped.
+  var CITY_CENTERS = { 'wi/la-crosse': [43.8138, -91.2519], 'wi/milwaukee': [43.0389, -87.9065], 'il/chicago': [41.8781, -87.6298] };
+  var STATE_VIEW = { wi: { center: [-89.9, 44.6], zoom: 5.4 }, il: { center: [-89.2, 40.0], zoom: 5.2 } };
+  // Stylized contiguous-U.S. outline, [lng, lat].
+  var US_OUTLINE = [[-124.7,48.4],[-122.8,49.0],[-95.2,49.0],[-94.8,49.4],[-89.6,48.0],[-84.8,46.5],[-83.5,46.1],[-82.5,43.0],[-82.9,42.0],[-79.0,42.8],[-79.2,43.5],[-76.2,44.2],[-74.7,45.0],[-71.5,45.0],[-70.0,46.7],[-69.2,47.4],[-67.8,47.1],[-67.0,44.8],[-70.7,43.1],[-70.0,41.8],[-71.9,41.3],[-73.9,40.6],[-74.2,39.6],[-75.0,38.8],[-75.9,37.2],[-76.3,36.9],[-75.5,35.2],[-77.0,34.6],[-79.0,33.4],[-81.4,30.7],[-80.0,26.8],[-80.4,25.2],[-81.3,25.4],[-82.7,27.5],[-83.0,29.1],[-84.3,30.0],[-86.5,30.4],[-88.9,30.4],[-89.6,29.3],[-90.8,29.1],[-93.8,29.7],[-94.7,29.3],[-97.2,27.7],[-97.4,25.9],[-99.1,26.4],[-100.3,28.0],[-101.4,29.8],[-103.1,29.0],[-104.5,29.6],[-106.5,31.8],[-108.2,31.3],[-111.1,31.3],[-114.8,32.5],[-117.1,32.5],[-118.5,34.0],[-120.6,34.6],[-121.9,36.6],[-122.5,37.8],[-123.8,39.6],[-124.2,41.0],[-124.5,42.8],[-124.0,46.2],[-124.7,48.4]];
+  var mapShot = null, mapShotKey = null, styleCache = null;
+
+  function cardScope() {
+    return window.CitixenGeoHatch && window.CitixenGeoHatch.getScope ? window.CitixenGeoHatch.getScope() : 'city';
+  }
+  function sevColor(s) { return s === 'Critical' ? '#FF3B30' : s === 'Warning' ? '#F59E0B' : MINT; }
+  // City: live report pins. State / Country: one glowing node per mapped
+  // city, sized by its surveyed blocks.
+  function scopeNodes(d, scope) {
+    if (scope === 'city') {
+      return (d.nodes || []).filter(function (n) { return typeof n.lat === 'number' && typeof n.lng === 'number'; })
+        .map(function (n) { return { lat: n.lat, lng: n.lng, color: sevColor(n.status), r: 1 }; });
+    }
+    var list = window.CitixenGeoHatch && window.CitixenGeoHatch.wardSummaries ? window.CitixenGeoHatch.wardSummaries() : [];
+    var byCity = {};
+    list.forEach(function (w) {
+      if (scope === 'state' && d.home && w.state !== d.home.state) return;
+      var k = w.state + '/' + w.city, c = CITY_CENTERS[k];
+      if (!c) return;
+      byCity[k] = byCity[k] || { lat: c[0], lng: c[1], surveyed: 0 };
+      byCity[k].surveyed += w.surveyed;
+    });
+    var arr = Object.keys(byCity).map(function (k) { return byCity[k]; });
+    var max = Math.max.apply(null, arr.map(function (n) { return n.surveyed; }).concat([1]));
+    return arr.map(function (n) { return { lat: n.lat, lng: n.lng, color: MINT, r: 0.75 + 0.6 * n.surveyed / max }; });
+  }
+
+  function webglOk() {
+    try { var c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch (e) { return false; }
+  }
+  function recolorStyle(style) {
+    var C = { bg: '#030712', land: '#060b16', water: '#0a1726', park: '#071a14', building: '#0d1424', road: '#151d2b', roadMajor: '#1e2a3a', highway: '#2a2a1f', boundary: '#1f2937', label: '#6b7280' };
+    style.layers.forEach(function (l) {
+      var id = l.id.toLowerCase(), p = l.paint || (l.paint = {});
+      if (l.type === 'background') p['background-color'] = C.bg;
+      else if (l.type === 'fill') {
+        if (id.indexOf('water') !== -1) p['fill-color'] = C.water;
+        else if (/park|wood|grass|forest|landcover|green|cemetery|wetland/.test(id)) p['fill-color'] = C.park;
+        else if (id.indexOf('building') !== -1) p['fill-color'] = C.building;
+        else p['fill-color'] = C.land;
+      } else if (l.type === 'line') {
+        if (/water|river/.test(id)) p['line-color'] = C.water;
+        else if (/motorway|trunk/.test(id)) p['line-color'] = C.highway;
+        else if (/primary|secondary/.test(id)) p['line-color'] = C.roadMajor;
+        else if (/boundary|admin/.test(id)) p['line-color'] = C.boundary;
+        else if (/road|street|highway|minor|service|tertiary|path|bridge|tunnel|rail/.test(id)) p['line-color'] = C.road;
+      } else if (l.type === 'symbol') {
+        if (/poi/.test(id)) { l.layout = Object.assign({}, l.layout, { visibility: 'none' }); return; }
+        if (l.layout && l.layout['text-field']) { p['text-color'] = C.label; p['text-halo-color'] = C.bg; p['text-halo-width'] = 1.2; }
+      } else if (l.type === 'fill-extrusion') {
+        l.layout = Object.assign({}, l.layout, { visibility: 'none' });
+      }
+    });
+    return style;
+  }
+  function loadStyle() {
+    if (!styleCache) {
+      styleCache = fetch(VECTOR_STYLE_URL).then(function (r) { if (!r.ok) throw new Error('style ' + r.status); return r.json(); })
+        .then(recolorStyle).catch(function (e) { styleCache = null; throw e; });
+    }
+    return styleCache.then(function (s) { return JSON.parse(JSON.stringify(s)); });
+  }
+
+  // Renders the vector basemap off-screen once and keeps a bitmap plus the
+  // projected node positions; falls back (resolves null) without WebGL,
+  // MapLibre or network, or if tiles don't settle within 9 s.
+  function vectorSnapshot(scope, nodes, home) {
+    return new Promise(function (resolve) {
+      if (typeof maplibregl === 'undefined' || !webglOk()) return resolve(null);
+      loadStyle().then(function (style) {
+        var el = document.createElement('div');
+        el.style.cssText = 'position:fixed;left:-10000px;top:0;width:' + MAP_W + 'px;height:' + MAP_H + 'px;pointer-events:none';
+        document.body.appendChild(el);
+        var map = null, done = false;
+        function finish(result) {
+          if (done) return; done = true;
+          try { if (map) map.remove(); } catch (e) { /* already gone */ }
+          el.remove(); resolve(result);
+        }
+        var timer = setTimeout(function () { finish(null); }, 9000);
+        try {
+          var opts = { container: el, style: style, interactive: false, attributionControl: false, preserveDrawingBuffer: true, fadeDuration: 0, pixelRatio: 1 };
+          var sv = home && STATE_VIEW[home.state];
+          if (scope === 'state' && sv) { opts.center = sv.center; opts.zoom = sv.zoom; }
+          else if (nodes.length) { opts.center = [nodes[0].lng, nodes[0].lat]; opts.zoom = 13; }
+          else { clearTimeout(timer); return finish(null); }
+          map = new maplibregl.Map(opts);
+          if (scope === 'city' && nodes.length > 1) {
+            var b = new maplibregl.LngLatBounds();
+            nodes.forEach(function (n) { b.extend([n.lng, n.lat]); });
+            map.fitBounds(b, { padding: 60, maxZoom: 15, duration: 0 });
+          }
+        } catch (e) { clearTimeout(timer); return finish(null); }
+        map.once('idle', function () {
+          clearTimeout(timer);
+          try {
+            var c = document.createElement('canvas'); c.width = MAP_W; c.height = MAP_H;
+            c.getContext('2d').drawImage(map.getCanvas(), 0, 0, MAP_W, MAP_H);
+            var pts = nodes.map(function (n) { var p = map.project([n.lng, n.lat]); return Object.assign({}, n, { x: p.x, y: p.y }); });
+            finish({ image: c, points: pts });
+          } catch (e) { finish(null); }
+        });
+      }, function () { resolve(null); });
+    });
+  }
+
+  function prepareMapSnapshot(d) {
+    var scope = cardScope();
+    if (scope === 'country') { mapShot = null; mapShotKey = null; return; }
+    var nodes = scopeNodes(d, scope), keyStr = scope + '|' + (d.home ? d.home.state + '/' + d.home.city : '') + '|' + JSON.stringify(nodes);
+    if (mapShotKey === keyStr && mapShot) return;
+    mapShot = null; mapShotKey = keyStr;
+    vectorSnapshot(scope, nodes, d.home).then(function (shot) {
+      if (mapShotKey !== keyStr) return;
+      mapShot = shot;
+      if (modal && modal.classList.contains('open') && !rafId) drawCard(0.55);
+    });
+  }
+
+  function drawNodes(ctx, pts, phase) {
+    pts.forEach(function (n, k) {
+      var t = (phase + k * 0.33) % 1, r = n.r || 1, rgb = n.color === '#FF3B30' ? '255,59,48' : n.color === '#F59E0B' ? '245,158,11' : '0,230,153';
+      ctx.beginPath(); ctx.arc(n.x, n.y, (14 + t * 34) * r, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(' + rgb + ',' + (0.55 * (1 - t)).toFixed(3) + ')'; ctx.lineWidth = 3; ctx.stroke();
+      ctx.beginPath(); ctx.arc(n.x, n.y, 26 * r, 0, Math.PI * 2); ctx.fillStyle = 'rgba(' + rgb + ',0.16)'; ctx.fill();
+      ctx.beginPath(); ctx.arc(n.x, n.y, 12 * r, 0, Math.PI * 2); ctx.fillStyle = n.color; ctx.fill();
+      ctx.lineWidth = 3; ctx.strokeStyle = NAVY; ctx.stroke();
+    });
+  }
+
+  function drawUsOutline(ctx, x, y, w, h, nodes, phase) {
+    var minLng = -125, maxLng = -66, minLat = 24, maxLat = 50, k = Math.cos(37 * Math.PI / 180);
+    var gw = (maxLng - minLng) * k, gh = maxLat - minLat, s = Math.min((w - 60) / gw, (h - 50) / gh);
+    var ox = x + (w - gw * s) / 2, oy = y + (h - gh * s) / 2;
+    function proj(lng, lat) { return [ox + (lng - minLng) * k * s, oy + (maxLat - lat) * s]; }
+    ctx.beginPath();
+    US_OUTLINE.forEach(function (pt, i) { var q = proj(pt[0], pt[1]); if (i) ctx.lineTo(q[0], q[1]); else ctx.moveTo(q[0], q[1]); });
+    ctx.closePath(); ctx.fillStyle = '#0A1424'; ctx.fill();
+    ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,230,153,0.45)'; ctx.stroke();
+    drawNodes(ctx, nodes.map(function (n) { var q = proj(n.lng, n.lat); return Object.assign({}, n, { x: q[0], y: q[1] }); }), phase);
+  }
+
+  function drawSchematic(ctx, mx, my, mw, mh, nodes, phase) {
+    ctx.fillStyle = '#0A1726';
+    ctx.beginPath(); ctx.moveTo(mx, my + mh * 0.15); ctx.bezierCurveTo(mx + 120, my + mh * 0.35, mx + 60, my + mh * 0.7, mx + 150, my + mh);
+    ctx.lineTo(mx, my + mh); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(148,163,184,0.09)'; ctx.lineWidth = 2;
+    for (var gx = mx + 190; gx < mx + mw; gx += 46) { ctx.beginPath(); ctx.moveTo(gx, my); ctx.lineTo(gx, my + mh); ctx.stroke(); }
+    for (var gy = my + 20; gy < my + mh; gy += 40) { ctx.beginPath(); ctx.moveTo(mx + 170, gy); ctx.lineTo(mx + mw, gy); ctx.stroke(); }
+    if (!nodes.length) return;
+    var lats = nodes.map(function (n) { return n.lat; }), lngs = nodes.map(function (n) { return n.lng; });
+    var minLat = Math.min.apply(null, lats), maxLat = Math.max.apply(null, lats), minLng = Math.min.apply(null, lngs), maxLng = Math.max.apply(null, lngs);
+    var spanLat = Math.max(maxLat - minLat, 0.004), spanLng = Math.max(maxLng - minLng, 0.004);
+    var ix = mx + 250, iy = my + 46, iw = mw - 320, ih = mh - 120;
+    drawNodes(ctx, nodes.map(function (n) {
+      return Object.assign({}, n, { x: ix + ((n.lng - minLng) / spanLng) * iw, y: iy + (1 - (n.lat - minLat) / spanLat) * ih });
+    }), phase);
+  }
+
+  function drawMapArea(ctx, d, phase, mx, my, mw, mh) {
+    var scope = cardScope(), nodes = scopeNodes(d, scope), usedTiles = false;
+    ctx.save(); rr(ctx, mx, my, mw, mh, 22); ctx.clip();
+    ctx.fillStyle = '#060B16'; ctx.fillRect(mx, my, mw, mh);
+    if (scope === 'country') {
+      drawUsOutline(ctx, mx, my, mw, mh, nodes, phase);
+    } else if (mapShot) {
+      ctx.drawImage(mapShot.image, mx, my, mw, mh);
+      drawNodes(ctx, mapShot.points.map(function (n) { return Object.assign({}, n, { x: mx + n.x * mw / MAP_W, y: my + n.y * mh / MAP_H }); }), phase);
+      usedTiles = true;
+    } else {
+      drawSchematic(ctx, mx, my, mw, mh, nodes, phase);
+    }
+    if (!nodes.length) {
+      ctx.textAlign = 'center'; ctx.font = font(600, 22); ctx.fillStyle = SLATE;
+      ctx.fillText('No live report nodes yet', mx + mw / 2, my + mh / 2);
+    }
+    ctx.restore();
+    rr(ctx, mx, my, mw, mh, 22); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,230,153,0.25)'; ctx.stroke();
+    ctx.textAlign = 'left'; ctx.font = font(700, 16); ctx.fillStyle = SLATE;
+    var where = scope === 'country' ? 'UNITED STATES' : scope === 'state' ? (d.home && d.home.stateName ? String(d.home.stateName).toUpperCase() : d.cityLabel) : d.cityLabel;
+    ctx.fillText((scope === 'city' ? 'LIVE REPORT NODES · ' : 'AUDIT NODES · ') + where, mx + 20, my + mh - 22);
+    if (usedTiles) {
+      ctx.textAlign = 'right'; ctx.font = font(600, 13); ctx.fillStyle = 'rgba(148,163,184,0.8)';
+      ctx.fillText('© OpenStreetMap contributors · OpenFreeMap', mx + mw - 16, my + mh - 22);
+    }
+  }
+
   function drawCard(phase) {
     var canvas = modal && modal.querySelector('#cxCardCanvas');
     if (!canvas || !data) return;
@@ -396,6 +639,13 @@
     ctx.fillText(sTxt, P - 4, 408);
     var sw = ctx.measureText(sTxt).width;
     ctx.font = font(800, 64); ctx.fillStyle = MINT; ctx.fillText(' / 10', P + sw, 424);
+    // Civic Health Ranking indicators
+    ctx.textAlign = 'right';
+    ctx.font = font(700, 20); ctx.fillStyle = SLATE; ctx.fillText("NAT'L RANK", W - P, 318);
+    ctx.font = font(900, 56); ctx.fillStyle = '#FFFFFF'; ctx.fillText(natRankText(d.ranks), W - P, 366);
+    if (d.ranks) { ctx.font = font(700, 18); ctx.fillStyle = SLATE; ctx.fillText('of ' + d.ranks.nationalOf + ' mapped wards', W - P, 404); }
+    ctx.font = font(800, 20); ctx.fillStyle = MINT; ctx.fillText('STATE RANK ' + stateRankText(d.ranks), W - P, 440);
+    ctx.textAlign = 'left';
 
     // Metric badges
     var cols = [
@@ -412,44 +662,9 @@
       ctx.font = font(700, 18); ctx.fillStyle = SLATE; ctx.fillText(c[1], x + cw / 2, 570);
     });
 
-    // Dark vector map snippet with pulsing report nodes
-    var mx = P, my = 626, mw = W - 2 * P, mh = 300;
-    ctx.save(); rr(ctx, mx, my, mw, mh, 22); ctx.clip();
-    ctx.fillStyle = '#060B16'; ctx.fillRect(mx, my, mw, mh);
-    ctx.fillStyle = '#0A1726'; // river band
-    ctx.beginPath(); ctx.moveTo(mx, my + mh * 0.15); ctx.bezierCurveTo(mx + 120, my + mh * 0.35, mx + 60, my + mh * 0.7, mx + 150, my + mh);
-    ctx.lineTo(mx, my + mh); ctx.closePath(); ctx.fill();
-    ctx.strokeStyle = 'rgba(148,163,184,0.09)'; ctx.lineWidth = 2;
-    for (var gx = mx + 190; gx < mx + mw; gx += 46) { ctx.beginPath(); ctx.moveTo(gx, my); ctx.lineTo(gx, my + mh); ctx.stroke(); }
-    for (var gy = my + 20; gy < my + mh; gy += 40) { ctx.beginPath(); ctx.moveTo(mx + 170, gy); ctx.lineTo(mx + mw, gy); ctx.stroke(); }
-    ctx.strokeStyle = 'rgba(148,163,184,0.2)'; ctx.lineWidth = 5;
-    ctx.beginPath(); ctx.moveTo(mx + 200, my + mh); ctx.lineTo(mx + 420, my); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(mx + 170, my + mh * 0.62); ctx.lineTo(mx + mw, my + mh * 0.62); ctx.stroke();
-    var nodes = (d.nodes || []).filter(function (n) { return typeof n.lat === 'number' && typeof n.lng === 'number'; });
-    if (nodes.length) {
-      var lats = nodes.map(function (n) { return n.lat; }), lngs = nodes.map(function (n) { return n.lng; });
-      var minLat = Math.min.apply(null, lats), maxLat = Math.max.apply(null, lats);
-      var minLng = Math.min.apply(null, lngs), maxLng = Math.max.apply(null, lngs);
-      var spanLat = Math.max(maxLat - minLat, 0.004), spanLng = Math.max(maxLng - minLng, 0.004);
-      var ix = mx + 250, iy = my + 46, iw = mw - 320, ih = mh - 120; // keeps pins clear of the caption
-      nodes.forEach(function (n, k) {
-        var px = ix + ((n.lng - minLng) / spanLng) * iw;
-        var py = iy + (1 - (n.lat - minLat) / spanLat) * ih;
-        var t = (phase + k * 0.33) % 1;
-        ctx.beginPath(); ctx.arc(px, py, 14 + t * 34, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(0,230,153,' + (0.55 * (1 - t)).toFixed(3) + ')'; ctx.lineWidth = 3; ctx.stroke();
-        ctx.beginPath(); ctx.arc(px, py, 26, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,230,153,0.16)'; ctx.fill();
-        ctx.beginPath(); ctx.arc(px, py, 12, 0, Math.PI * 2); ctx.fillStyle = MINT; ctx.fill();
-        ctx.lineWidth = 3; ctx.strokeStyle = NAVY; ctx.stroke();
-      });
-    } else {
-      ctx.textAlign = 'center'; ctx.font = font(600, 22); ctx.fillStyle = SLATE;
-      ctx.fillText('No live report nodes yet', mx + mw / 2 + 80, my + mh / 2);
-    }
-    ctx.restore();
-    rr(ctx, mx, my, mw, mh, 22); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,230,153,0.25)'; ctx.stroke();
-    ctx.textAlign = 'left'; ctx.font = font(700, 16); ctx.fillStyle = SLATE;
-    ctx.fillText('LIVE REPORT NODES · ' + d.cityLabel, mx + 20, my + mh - 22);
+    // Dark vector map with pulsing report nodes (scope follows the
+    // #CrowdSaveAmerica grid: City / State vector basemap, Country = U.S. outline)
+    drawMapArea(ctx, d, phase, P, 626, W - 2 * P, 300);
 
     // Footer
     var parts = [['#CrowdSaveAmerica', MINT], ['  •  Privacy Engine: Verified  •  ', SLATE], ['citixenux.com', '#FFFFFF']];
@@ -504,6 +719,7 @@
       d.jurisdiction + ' — Ward Health Brief (' + stamp(generatedAt) + ')',
       'Ward health score: ' + (score != null ? score + ' / 10' : 'N/A') + ' · Resolved: ' + (d.total ? d.resolved + ' / ' + d.total : 'N/A'),
       'Avg fix: ' + (d.avgDays != null ? daysText(d) + ' days' : 'N/A') + ' · Ward coverage: ' + pctText(d.coveragePct) + ' · Delayed capital projects: ' + delayedCount(d),
+      "Nat'l rank: " + natRankText(d.ranks) + (d.ranks ? ' of ' + d.ranks.nationalOf + ' mapped wards' : '') + ' · State rank: ' + stateRankText(d.ranks),
       '#CrowdSaveAmerica — free & anonymous civic reporting',
       siteUrl()
     ].join('\n');

@@ -642,7 +642,7 @@ textarea.input{resize:none;line-height:1.4}
       <div class="app-drawer-body">
         <div class="cx-drawer-section">
           <div class="cx-drawer-heading">Executive Actions &amp; Export Quick Keys</div>
-          <button type="button" class="cx-drawer-key" data-cx-key="pdf"><span data-cx-icon="doc"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">Instant Report</span><span class="cx-drawer-key-sub">PDF brief</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
+          <button type="button" class="cx-drawer-key" data-cx-key="pdf"><span data-cx-icon="doc"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">Generate Free Report</span><span class="cx-drawer-key-sub">PDF brief</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
           <button type="button" class="cx-drawer-key" data-cx-key="graphic"><span data-cx-icon="phoneShare"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">#CrowdSaveAmerica Graphic Card</span><span class="cx-drawer-key-sub">1:1 share card</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
           <button type="button" class="cx-drawer-key" data-cx-key="share"><span data-cx-icon="shareUp"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">Share CITIXEN UX™ Platform</span><span class="cx-drawer-key-sub">Native share sheet</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
         </div>
@@ -3554,8 +3554,24 @@ async function appInstantReportData(){
     avgDays: computeAppAvgResolutionDays(cityTickets),
     counts,
     cip: await appJurisdictionCipProjects(knownWards),
-    nodes: cases.map(c => ({ lat: c.lat, lng: c.lng }))
+    nodes: cases.map(c => ({ lat: c.lat, lng: c.lng, status: c.status })),
+    // Ranking inputs: every mapped ward (real rollup, or the identical
+    // offline seed mirror) and the full ticket ledger.
+    home: meta ? { state: meta.state, stateName: meta.stateName, city: meta.city, cityName: meta.cityName, ward: meta.ward, wardName: meta.wardName } : null,
+    national: await appNationalForRanking(),
+    tickets: ledgerTickets
   };
+}
+async function appNationalForRanking(){
+  if (lastNationalData && lastNationalData.municipalities) return lastNationalData.municipalities;
+  try {
+    const res = await fetch('/api/coverage/national');
+    if (!res.ok) throw new Error('national returned ' + res.status);
+    lastNationalData = await res.json();
+  } catch (e) {
+    lastNationalData = fallbackNational();
+  }
+  return lastNationalData.municipalities || [];
 }
 // CIP projects inside this jurisdiction's known wards (all projects when no
 // ward directory is on file, rather than guessing which ones apply).

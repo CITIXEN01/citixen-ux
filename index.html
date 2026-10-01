@@ -37,6 +37,9 @@
 <!-- Instant Report — shared with app.html's Dashboard tab (same markup,
      styles and export modal from one file pair). -->
 <link rel="stylesheet" href="/shared/instant-report.css">
+<!-- MapLibre GL (same pinned build as app.html) — draws the dark vector
+     map inside the #CrowdSaveAmerica share card. -->
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script src="/shared/instant-report.js"></script>
 <script src="/shared/geo-hatch.js"></script>
 <script src="/shared/severity.js"></script>
@@ -393,6 +396,13 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .telemetry-scorecard-card{display:block;width:100%;max-width:640px;text-align:left;
   background:#090D16;border:1px solid rgba(0,230,153,.4);
   border-radius:12px;padding:14px 18px;cursor:pointer;font-family:inherit;color:var(--text);overflow:hidden}
+.loc-pill-row{display:flex;justify-content:center;margin:-2px 0 18px}
+.loc-pill{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;cursor:pointer;
+  background:rgba(0,230,153,.12);border:1px solid rgba(0,230,153,.4);color:#00E699;font:inherit;font-size:.74rem;font-weight:700;letter-spacing:.04em}
+.loc-pill:hover{border-color:#00E699}
+.loc-pill:focus-visible{outline:2px solid #00E699;outline-offset:2px}
+.loc-pill-dot{width:7px;height:7px;border-radius:50%;background:#00E699}
+.loc-pill-change{color:#94A3B8;font-weight:600;text-decoration:underline;text-underline-offset:2px}
 /* This round's "Solid White High-Contrast Banner Header" replaces the
    plain centered Bright White title with a full-width solid white band
    bleeding edge-to-edge across the top of the card (negative margins
@@ -1374,6 +1384,17 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        sticky nav's own brand mark. ===== -->
   <p class="citizen-dashboard-subheader"><span class="cds-white">Citixen</span> <span class="cds-mint">Dashboard</span></p>
 
+  <!-- Location pill — the web equivalent of the app header's "City •
+       Active" pill (the standalone Scorecard card that used to double as
+       the jurisdiction switcher is gone, matching the app's Dashboard).
+       Same ids, so updateSmartLocationBanner() / openLocationPicker() keep
+       working. -->
+  <div class="loc-pill-row">
+    <button type="button" class="loc-pill" id="navJurisdictionBadge" aria-label="Change your location">
+      <span class="loc-pill-dot" aria-hidden="true"></span><span id="navJurisdictionText">La Crosse, WI • Active</span><span class="loc-pill-change">Change</span>
+    </button>
+  </div>
+
   <!-- ===== ELEVATED PRIMARY HERO MODULE — [ EXPORT & SHARE ]. Rendered by
        shared/instant-report.js, identical to app.html's Dashboard tab.
        "Instant Report ↗" opens the 3-branch export modal (Official PDF
@@ -1414,28 +1435,6 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        honestly captioning these metrics as last-updated-at-this-moment
        rather than implying a live data feed this dataset doesn't have.
        ===== -->
-  <section class="geo-pill-section" style="padding-top:8px;">
-    <button type="button" class="telemetry-scorecard-card" id="navJurisdictionBadge" aria-label="Change your jurisdiction">
-      <div class="telemetry-scorecard-head">
-        <span id="navJurisdictionText">LA CROSSE, WI SCORECARD</span>
-      </div>
-      <div class="telemetry-scorecard-grid">
-        <div class="telemetry-scorecard-col">
-          <div class="telemetry-scorecard-val" id="scorecardResolved">—</div>
-          <div class="telemetry-scorecard-lbl">Resolved</div>
-        </div>
-        <div class="telemetry-scorecard-col">
-          <div class="telemetry-scorecard-val" id="scorecardCovered">—</div>
-          <div class="telemetry-scorecard-lbl">Covered</div>
-        </div>
-        <div class="telemetry-scorecard-col">
-          <div class="telemetry-scorecard-val" id="scorecardSla">—</div>
-          <div class="telemetry-scorecard-lbl">Avg Response</div>
-        </div>
-      </div>
-      <span class="telemetry-scorecard-timestamp" id="scorecardTimestamp" aria-hidden="true"></span>
-    </button>
-  </section>
 
   <!-- ===== LIVE PUBLIC LEDGER BANNER — sits directly beneath the Citixen
        Dashboard sub-header/tagline above, and directly ABOVE the
@@ -3546,7 +3545,7 @@ function updateSmartLocationBanner(j){
   const textEl = document.getElementById('navJurisdictionText');
   if (!textEl) return;
   if (j) {
-    textEl.textContent = (j.cityName + ', ' + j.state.toUpperCase() + ' Scorecard').toUpperCase();
+    textEl.textContent = j.cityName + ', ' + j.state.toUpperCase() + ' • Active';
   }
 }
 document.getElementById('navJurisdictionBadge').addEventListener('click', () => openLocationPicker());
@@ -4903,6 +4902,19 @@ async function webJurisdictionCipProjects(knownWards){
   const slugs = (knownWards || []).map(w => (w && (w.slug || w.ward)) || w).filter(x => typeof x === 'string');
   return slugs.length ? all.filter(p => !p.ward || slugs.includes(p.ward)) : all;
 }
+let webNationalCache = null;
+async function webNationalForRanking(){
+  if (webNationalCache) return webNationalCache;
+  try {
+    const res = await fetch('/api/coverage/national');
+    if (!res.ok) throw new Error('national returned ' + res.status);
+    const json = await res.json();
+    webNationalCache = Array.isArray(json.municipalities) ? json.municipalities : [];
+  } catch (e) {
+    return []; // ranks show N/A until the live rollup is reachable
+  }
+  return webNationalCache;
+}
 async function webInstantReportData(){
   if (!jurisdictionDirectory) { try { jurisdictionDirectory = await fetchJurisdictionDirectory(); } catch (e) { /* coverage shows N/A */ } }
   if (!ledgerTickets.length) { try { ledgerTickets = await fetchLedgerTickets(); } catch (e) { /* empty snapshot */ } }
@@ -4921,7 +4933,11 @@ async function webInstantReportData(){
     avgDays: computeAvgResolutionDays(cityTickets),
     counts,
     cip: await webJurisdictionCipProjects(knownWards),
-    nodes: cases.map(c => ({ lat: c.lat, lng: c.lng }))
+    nodes: cases.map(c => ({ lat: c.lat, lng: c.lng, status: c.status })),
+    // Ranking inputs: every mapped ward from the live rollup + full ledger.
+    home: j ? { state: j.state, stateName: j.stateName, city: j.city, cityName: j.cityName, ward: j.ward, wardName: j.wardName } : null,
+    national: await webNationalForRanking(),
+    tickets: ledgerTickets
   };
 }
 (function initWebInstantReport(){

@@ -280,6 +280,16 @@
       });
     },
     load: load,
+    // Active scope ('city' | 'state' | 'country') — the share card's map follows it.
+    getScope: function () { return scope; },
+    // Per-ward block totals for every mapped ward loaded (live data only).
+    wardSummaries: function () {
+      return Object.keys(wards).map(function (k) {
+        var w = wards[k];
+        return { state: w.state, stateName: w.stateName, city: w.city, cityName: w.cityName, ward: w.ward,
+          surveyed: w.cells.filter(function (c) { return c.covered; }).length, total: w.cells.length, live: w.live };
+      }).filter(function (w) { return w.live; });
+    },
     // Re-fetch after the page's jurisdiction changes.
     reload: async function () { loaded = false; await load(); },
     // Light up one of the viewer's home-ward blocks after this device files a report for it.
