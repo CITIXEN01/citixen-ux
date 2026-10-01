@@ -1,7 +1,7 @@
 /* =====================================================================
    CITIXEN UX™ — INSTANT REPORT (shared by index.html and app.html)
    ---------------------------------------------------------------------
-   Renders the Dashboard's "[ EXPORT & SHARE ]" hero module and the
+   Renders the Dashboard's "REPORTS & EASY SHARE" hero card and the
    3-branch Instant Report modal from one file, so the web Dashboard and
    the app's Dashboard tab stay 1:1:
      A. OFFICIAL PDF BRIEF        — branded preview + jsPDF download
@@ -111,10 +111,8 @@
   function renderModule(mount) {
     mount.innerHTML =
       '<section class="cx-export" aria-labelledby="cxExportTitle">' +
-        '<div class="cx-export-kicker">[ EXPORT &amp; SHARE ]</div>' +
         '<h3 class="cx-export-title" id="cxExportTitle">Reports &amp; Easy Share</h3>' +
-        '<p class="cx-export-sub">Compile the current ward health snapshot into a PDF, or share this platform natively.</p>' +
-        '<button type="button" class="cx-btn-primary" data-cx-open="pdf">Instant Report ↗</button>' +
+        '<button type="button" class="cx-btn-primary" data-cx-open="pdf">Generate Free Report ↗</button>' +
         '<button type="button" class="cx-btn-dashed" data-cx-share-platform>Share CITIXEN UX™</button>' +
       '</section>';
     mount.querySelector('[data-cx-open]').addEventListener('click', function (e) { open('pdf', e.currentTarget); });

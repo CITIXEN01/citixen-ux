@@ -201,6 +201,15 @@ textarea.input{resize:none;line-height:1.4}
 /* ===== TRIAGE STATUS GAUGE (Map & feed) — Open / Tagged to Project / Resolved ===== */
 .triage-gauge{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;gap:6px}
 .triage-num{font-size:1.5rem;font-weight:900}
+.metrics-ticker{border:1px solid rgba(0,230,153,.35);border-radius:12px;background:#090D16;padding:10px 12px;margin-bottom:12px}
+.metrics-ticker-head{display:flex;align-items:center;gap:8px;font-size:.62rem;font-weight:800;letter-spacing:.12em;color:#FFFFFF;margin-bottom:6px}
+.metrics-ticker-dot{width:7px;height:7px;border-radius:50%;background:#00E699;box-shadow:0 0 8px rgba(0,230,153,.8);animation:ledgerLivePulse 2s ease-in-out infinite}
+.metrics-ticker-row{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;font-size:.66rem;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.metrics-ticker-row b{color:#00E699;font-size:.86rem;font-weight:800}
+.metrics-ticker-sep{color:#334155}
+@media (prefers-reduced-motion:reduce){.metrics-ticker-dot{animation:none}}
+.feed-cat{display:inline-block;font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94A3B8;
+  border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:1px 8px;margin-bottom:4px}
 .feed-sla{font-size:.62rem;font-weight:800;letter-spacing:.3px}
 .feed-project-link{display:inline-block;margin-top:6px;font-size:.68rem;font-weight:800;color:var(--mint2);text-decoration:none}
 .bar{height:6px;background:rgba(255,255,255,.08);border-radius:10px;overflow:hidden;margin-top:4px}
@@ -656,13 +665,13 @@ textarea.input{resize:none;line-height:1.4}
   <main class="main">
     <div id="toast" class="toast"></div>
 
-    <div class="privacy-note">
-      <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-      No account required. No personal data retained. Photos are stripped of device ID and GPS EXIF tags before submission.
-    </div>
 
     <!-- 911/Emergency lives ONLY in the Report view per nav restructure. -->
     <section id="tab-report" class="tabpane active">
+      <div class="privacy-note">
+        <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+        No account required. No personal data retained. Photos are stripped of device ID and GPS EXIF tags before submission.
+      </div>
       <div class="notice-banner">
         <div class="left-txt">
           <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
@@ -724,67 +733,31 @@ textarea.input{resize:none;line-height:1.4}
       </div>
     </section>
 
-    <!-- MAP & FEED — pure triage stream, three field modules:
-         1. Civic Dispatch Map (dark vector basemap, mint pulse markers)
-         2. Local Ward Matrix & Triage Status (ward grid + triage HUD)
-         3. Live Dispatch Feed (SLA age, project links, urgency badges)
-         The full Geo-Hatch Coverage Engine (all three scopes) lives on the
-         Dashboard, directly under the Scorecard.
-         No 911/Emergency and no Live Public Ledger here. -->
+    <!-- MAP & FEED — two stacked field modules:
+         1. Civic Dispatch Map (dark vector basemap, severity-colored pins)
+         2. Live Dispatch Feed, topped by the jurisdiction's live metrics
+            ticker (resolved / covered / avg response — the same real
+            numbers updateAppTelemetryScorecard() computes, which used to
+            sit in the Dashboard's standalone Scorecard card).
+         The Geo-Hatch block grid lives only on the Dashboard now. -->
     <section id="tab-map" class="tabpane">
       <div class="card">
         <div class="label"><span>Civic Dispatch Map</span><span id="mCount" style="color:var(--mint2)">3 active</span></div>
         <div id="map"></div>
       </div>
 
-      <div class="card" id="geoHatchCard">
-        <div class="radius-tag">
-          <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3l3.5 2v4L8 11 4.5 9V5z"/><path d="M15.5 3L19 5v4l-3.5 2L12 9V5z"/><path d="M11.75 10.5l3.5 2v4l-3.5 2-3.5-2v-4z"/></svg>
-          LOCAL WARD MATRIX &amp; TRIAGE STATUS
-        </div>
-        <div class="coverage-head">
-          <div>
-            <div class="label" style="margin-bottom:2px">Ward block coverage</div>
-            <div class="coverage-ticker" id="covTicker">0.0%</div>
-          </div>
-          <div style="text-align:right">
-            <div class="coverage-sub" id="covSub">CITYWIDE BLOCKS SURVEYED</div>
-            <div style="font-size:.8rem;font-weight:800" id="covFraction">0 / 0</div>
-          </div>
-        </div>
-        <div class="cov-legend">
-          <span><span class="dot" style="background:var(--mint2)"></span>Auditable</span>
-          <span><span class="dot" style="background:var(--fow-amber)"></span>Pending</span>
-          <span><span class="dot" style="background:rgba(30,41,59,.3)"></span>Uncharted</span>
-        </div>
-        <div class="cov-grid" id="covGrid"></div>
-        <div class="cov-toast" id="covToast">
-          <span id="covToastText"></span>
-          <button class="ct-cta" id="covToastCta">Report it</button>
-        </div>
-        <div class="your-impact" id="yourImpactRow">
-          <div class="num" id="covYouCount">0</div>
-          <div class="lbl">blocks you've helped verify — tap any dark block to report it and light it up for everyone.</div>
-        </div>
-        <div class="label" style="justify-content:center;margin-top:14px">Triage status</div>
-        <div class="triage-gauge">
-          <div class="triage-tile">
-            <div class="triage-num" id="triageOpenCount" style="color:var(--brand-amber)">0</div>
-            <div class="small">Open</div>
-          </div>
-          <div class="triage-tile">
-            <div class="triage-num" id="triageTaggedCount" style="color:var(--mint2)">0</div>
-            <div class="small">Tagged to project</div>
-          </div>
-          <div class="triage-tile">
-            <div class="triage-num" id="triageResolvedCount" style="color:var(--brand-mint)">0</div>
-            <div class="small">Resolved</div>
-          </div>
-        </div>
-      </div>
-
       <div class="card">
         <div class="label">Live Dispatch Feed</div>
+        <div class="metrics-ticker" id="appScorecardCard" aria-live="polite">
+          <div class="metrics-ticker-head"><span class="metrics-ticker-dot" aria-hidden="true"></span><span id="appScorecardLabel">CITYWIDE LIVE METRICS</span></div>
+          <div class="metrics-ticker-row">
+            <span><b id="appScorecardResolved">—</b> Resolved</span>
+            <span class="metrics-ticker-sep" aria-hidden="true">•</span>
+            <span><b id="appScorecardCovered">—</b> Covered</span>
+            <span class="metrics-ticker-sep" aria-hidden="true">•</span>
+            <span><b id="appScorecardSla">—</b> Avg Response</span>
+          </div>
+        </div>
         <div id="feed"></div>
       </div>
     </section>
@@ -800,7 +773,6 @@ textarea.input{resize:none;line-height:1.4}
 
       <!-- 2. HERO HEADER -->
       <p class="citizen-dashboard-subheader"><span class="cds-white">Citixen</span> <span class="cds-mint">Dashboard</span></p>
-      <p class="hero-tagline-subtle">Real-time community reporting and municipal tracking.</p>
 
       <!-- 3. ELEVATED PRIMARY HERO MODULE — [ EXPORT & SHARE ]. Rendered by
            shared/instant-report.js (same markup as index.html). "Instant
@@ -808,44 +780,18 @@ textarea.input{resize:none;line-height:1.4}
            jurisdiction; "Share CITIXEN UX™" calls navigator.share(). -->
       <div data-cx-export-module></div>
 
-      <!-- 4. GEOTAGGED SCORECARD — real numbers computed from this app's own
-           coverageDirectory/currentWardMeta/ledgerTickets (see
-           updateAppTelemetryScorecard() below), the same formulas
-           index.html's Scorecard uses, not duplicated/divergent math. -->
-      <section style="padding-top:8px;">
-        <div class="telemetry-scorecard-card" id="appScorecardCard">
-          <div class="telemetry-scorecard-head">
-            <span id="appScorecardLabel">LA CROSSE, WI SCORECARD</span>
-          </div>
-          <div class="telemetry-scorecard-grid">
-            <div class="telemetry-scorecard-col">
-              <div class="telemetry-scorecard-val" id="appScorecardResolved">—</div>
-              <div class="telemetry-scorecard-lbl">Resolved</div>
-            </div>
-            <div class="telemetry-scorecard-col">
-              <div class="telemetry-scorecard-val" id="appScorecardCovered">—</div>
-              <div class="telemetry-scorecard-lbl">Covered</div>
-            </div>
-            <div class="telemetry-scorecard-col">
-              <div class="telemetry-scorecard-val" id="appScorecardSla">—</div>
-              <div class="telemetry-scorecard-lbl">Avg Response</div>
-            </div>
-          </div>
-          <span class="telemetry-scorecard-timestamp" id="appScorecardTimestamp" aria-hidden="true"></span>
-        </div>
-      </section>
-
-      <!-- 5. MIGRATED MACRO ANALYTICS ENGINE — GEO-HATCH COVERAGE. Rendered
+      <!-- 4. GEOTAGGED GEO-HATCH COVERAGE ENGINE — the Dashboard's primary
+           analytics anchor, directly under the report card. Rendered
            by shared/geo-hatch.js (same component as index.html): Ward
            (150m) / Municipal blocks / State–National toggles, Citywide
            Asset Coverage %, and the block grid. Tapping an uncharted block
            opens a ground-truth audit prompt that starts a report for it. -->
       <div data-cx-geohatch></div>
 
-      <!-- 6. TRUST INDICATOR SUBTITLE -->
+      <!-- 5. TRUST INDICATOR SUBTITLE -->
       <p class="ledger-trust-subtitle">free &amp; anonymous</p>
 
-      <!-- 7. PRIMARY LIVING GATEWAY — opens the same real Live Public Ledger
+      <!-- 6. PRIMARY LIVING GATEWAY — opens the same real Live Public Ledger
            drawer this tab already had (#ledgerDrawer / openLedgerDrawer()),
            just restyled to the shared .gateway-pill shell instead of the
            old plain "Live Civic Memory™" button. -->
@@ -857,7 +803,7 @@ textarea.input{resize:none;line-height:1.4}
         </button>
       </section>
 
-      <!-- 8. CIVIC INTELLIGENCE STACK™ — human-first labels: Capital
+      <!-- 7. CIVIC INTELLIGENCE STACK™ — human-first labels: Capital
            Projects / City Action Tracker / Community Archive. -->
       <section class="matrix-summary-section">
         <h3 style="color:#00E699;font-size:1.1rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin:4px 0 6px;text-align:center;">Civic Intelligence Stack<sup class="tm-symbol">™</sup></h3>
@@ -1175,9 +1121,9 @@ let map, mapInit=false, markers={}, cat='Pothole / Road', userMarker=null;
 // links out to the web project ledger; its absence means the case is
 // still just "Open".
 const cases=[
-  {id:'c1',title:'Deep Pothole - Right Lane',loc:'Main St & 4th Ave',lat:43.8138,lng:-91.2519,status:'Critical',time:'12m ago',ageMin:12,desc:'Severe pavement gap.'},
-  {id:'c2',title:'Streetlight Outage',loc:'Grand Ave & 7th St',lat:43.8180,lng:-91.2480,status:'Warning',time:'45m ago',ageMin:45,desc:'Dark corner, visibility issue.',projectId:'PRJ-1042'},
-  {id:'c3',title:'Overfilled Trash Bin',loc:'Pine St Alley',lat:43.8100,lng:-91.2550,status:'Resolved',time:'2h ago',ageMin:120,desc:'Debris blocking access.'}
+  {id:'c1',title:'Deep Pothole - Right Lane',loc:'Main St & 4th Ave',lat:43.8138,lng:-91.2519,status:'Critical',time:'12m ago',ageMin:12,desc:'Severe pavement gap.',category:'Pothole / Road'},
+  {id:'c2',title:'Streetlight Outage',loc:'Grand Ave & 7th St',lat:43.8180,lng:-91.2480,status:'Warning',time:'45m ago',ageMin:45,desc:'Dark corner, visibility issue.',projectId:'PRJ-1042',category:'Power / Lighting'},
+  {id:'c3',title:'Overfilled Trash Bin',loc:'Pine St Alley',lat:43.8100,lng:-91.2550,status:'Resolved',time:'2h ago',ageMin:120,desc:'Debris blocking access.',category:'Waste / Litter'}
 ];
 // Seed data runs through the same 3-tier severity matrix as new reports.
 if (window.CitixenSeverity) window.CitixenSeverity.applyTo(cases);
@@ -1212,7 +1158,9 @@ function switchTab(id,btn){
   if (btn) btn.classList.add('active');
   if(id==='tab-map'){
     if(!mapInit) initMap();
-    initCoverageGrid();  // Citywide Asset Coverage card now lives on this tab
+    // Loads the ward directory + coverage cells (still used by reports tied
+    // to a Geo-Hatch block), then fills the feed's live metrics ticker.
+    initCoverageGrid().then(updateAppTelemetryScorecard);
     // Force Leaflet to recalculate container dimensions once unhidden
     setTimeout(()=>{ if(map) map.invalidateSize(); },200);
   }
@@ -2020,6 +1968,8 @@ function applyWardMeta(meta, opts){
   const named = opts.explicit || meta.isGpsMatch;
   setTextIfExists('covSub', named ? (meta.cityName + ', ' + meta.state.toUpperCase() + ' blocks surveyed') : 'CITYWIDE BLOCKS SURVEYED');
   updateAppTelemetryScorecard();
+  // Re-pull the Dashboard's Geo-Hatch engine for the newly detected ward.
+  if (window.CitixenGeoHatch) window.CitixenGeoHatch.reload();
 }
 
 /* =====================================================================
@@ -2083,7 +2033,7 @@ async function updateAppTelemetryScorecard(){
     try { ledgerTickets = await fetchLedgerTickets(); } catch (e) { /* leave the placeholder dashes if this fails */ }
   }
   const meta = currentWardMeta;
-  if (labelEl) labelEl.textContent = meta ? (meta.cityName.toUpperCase() + ', ' + meta.state.toUpperCase() + ' SCORECARD') : 'CITYWIDE SCORECARD';
+  if (labelEl) labelEl.textContent = meta ? (meta.cityName.toUpperCase() + ', ' + meta.state.toUpperCase() + ' LIVE METRICS') : 'CITYWIDE LIVE METRICS';
   const cityTickets = meta ? ledgerTickets.filter(t => t.city === meta.city && t.state === meta.state) : ledgerTickets;
   const resolvedCount = cityTickets.filter(t => t.stage === 'resolved').length;
   resolvedEl.textContent = cityTickets.length ? (resolvedCount + ' / ' + cityTickets.length) : '—';
@@ -2182,7 +2132,7 @@ const APP_MODAL_DATA = {
     ['What is kept','The public ledger stores the hazard category, ward, timestamps and resolution status, with no reporter-identifying field in the data model.']
   ]},
   spatialGrid: { title: '11M Block H3 Spatial Grid Matrix', body: [
-    ['Today: ward-tier Geo-Hatch','Reports are bucketed into 150 m Geo-Hatch cells per ward. That grid is live on Map & Feed, where each block shows as auditable, pending or uncharted.'],
+    ['Today: ward-tier Geo-Hatch','Reports are bucketed into 150 m Geo-Hatch cells per ward. That grid is live on the Dashboard, where each block shows as auditable, pending or uncharted.'],
     ['Roadmap: H3 resolution 9','The target is a national matrix of roughly 11 million H3 hexagonal cells at census-block scale, keyed on-device for privacy. That nationwide index is not live in this build yet.'],
     ['Why blocks, not addresses','Grouping reports into cells shows coverage and gaps without pinning any report to a household.']
   ]},
@@ -3037,7 +2987,8 @@ function renderFeed(){
     const projectLink = item.projectId
       ? `<a class="feed-project-link" href="https://citixenux.com/" target="_blank" rel="noopener noreferrer">View Project (${esc(item.projectId)}) →</a>`
       : '';
-    el.innerHTML=`<div class="row"><strong>${esc(item.title)}</strong><span class="pill ${pill}">${esc(item.status)}</span></div>
+    el.innerHTML=`${item.category ? `<span class="feed-cat">${esc(item.category)}</span>` : ''}
+      <div class="row"><strong>${esc(item.title)}</strong><span class="pill ${pill}">${esc(item.status)}</span></div>
       <div class="small" style="margin:4px 0">${esc(item.desc)}</div>
       <div class="row small"><span>${esc(item.loc)}</span><span>${esc(item.time)}</span></div>
       ${slaTag}
@@ -3364,7 +3315,7 @@ async function finalizeSubmitReport(opts){
     ? ' [Flagged despite scheduled CIP work: ' + opts.matchedProject.name + ']'
     : '';
   const nc={
-    id:'c'+Date.now(), title:cat, loc:rawLoc,
+    id:'c'+Date.now(), title:cat, category:cat, loc:rawLoc,
     lat:43.8150+(Math.random()-.5)*.01, lng:-91.2500+(Math.random()-.5)*.01,
     status: window.CitixenSeverity
       ? window.CitixenSeverity.classify({ category: cat, title: cat, desc: rawDesc, urgentOverride })
@@ -3644,9 +3595,9 @@ function initInstantReportAndQuickKeys(){
     privacy: () => { closeAppDrawer(); openAppInfoModal('privacyEngine'); },
     grid: () => {
       closeAppDrawer();
-      switchTab('tab-map', document.querySelector('.navtab[data-target="tab-map"]'));
+      switchTab('tab-analytics', document.querySelector('.navtab[data-target="tab-analytics"]'));
       setTimeout(() => {
-        const card = document.getElementById('geoHatchCard');
+        const card = document.querySelector('[data-cx-geohatch]');
         if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
         openAppInfoModal('spatialGrid');
       }, 250);
