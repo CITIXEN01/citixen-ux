@@ -2,7 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- HARD-LOCK ONBOARDING round — maximum-scale=1/user-scalable=no pins the
+     viewport so mobile Safari/Chrome can't auto-zoom the page in (e.g. the
+     zoom those browsers trigger when a focused text input renders below
+     16px, among other triggers); combined with removing this file's two
+     on-load auto-focus calls above/below, no input on this page should
+     trigger that zoom in the first place. -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <!-- Passcode gate — earliest possible check, before anything else parses, so
      a locked-out visitor never sees a flash of the real app shell first. This
      is a lightweight, client-side-only tester gate (the passcode lives in
@@ -60,11 +66,12 @@
 <meta property="og:url" content="https://citixenux.com/app">
 <meta property="og:title" content="CITIXEN UX™">
 <meta property="og:description" content="Improve Your Civic Experience">
-<!-- Patch #4.10.2: renaming the asset from og-preview.png to og-v4.png is
-     itself a new URL, so this round's content change is already guaranteed
-     a fresh crawl without needing its own "?v=" cache-buster (the pattern
-     Patch 4.10.1 used for a same-URL content change). -->
-<meta property="og:image" content="https://citixenux.com/og-v4.png">
+<!-- BREAK APPLE IMESSAGE CACHE round: explicit "?v=999" query-string
+     cache-buster on top of the og-v4.png rename, since iMessage/Applebot
+     and other link-preview crawlers are known to cache stubbornly even
+     across a URL rename — belt-and-suspenders with Patch 4.10.1's same
+     "bump the version string on any future content change" convention. -->
+<meta property="og:image" content="https://citixenux.com/og-v4.png?v=999">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="CITIXEN UX™ - Improve Your Civic Experience">
@@ -74,7 +81,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="CITIXEN UX™">
 <meta name="twitter:description" content="Improve Your Civic Experience">
-<meta name="twitter:image" content="https://citixenux.com/og-v4.png">
+<meta name="twitter:image" content="https://citixenux.com/og-v4.png?v=999">
 <meta name="theme-color" content="#00E699">
 <meta name="referrer" content="no-referrer">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -278,14 +285,14 @@ textarea.input{resize:none;line-height:1.4}
 .btn-submit{width:100%;box-sizing:border-box;min-height:52px;background:var(--mint);color:#051311;border:none;
   padding:14px 16px;border-radius:12px;font-family:inherit;font-weight:700;font-size:16px;line-height:24px;
   letter-spacing:.01em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
-/* Patch 4.8 — visually locked until a photo is actually attached; see
-   updateSubmitPhotoGate(). Patch 4.13 changed this from a native
-   `disabled` attribute to this CSS-only "soft-disabled" class: the button
-   must stay genuinely tappable in its locked state so submitReport()'s
-   click handler can catch the no-photo tap and surface the mandatory-
-   photo alert, which a truly disabled button could never receive. */
-.btn-submit-locked{background:rgba(148,163,184,.18);color:#64748b;cursor:not-allowed}
-.btn-submit-locked svg{stroke:#64748b}
+/* HARDWARE CAMERA FIREWALL LOCK — reverted to a real native `disabled`
+   attribute (Patch 4.13's tappable "soft-disabled" .btn-submit-locked
+   class is gone): the button now lives inside #reportStep2Locked, which
+   is itself hidden until a photo is attached, so there's no longer a
+   locked-but-visible button that needs to stay tappable. See
+   updateSubmitPhotoGate(). */
+.btn-submit:disabled{background:rgba(148,163,184,.18);color:#64748b;cursor:not-allowed}
+.btn-submit:disabled svg{stroke:#64748b}
 
 .bottomnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;
   background:rgba(3,7,18,.96);backdrop-filter:blur(16px);border-top:1px solid var(--border);
@@ -1284,14 +1291,29 @@ textarea.input{resize:none;line-height:1.4}
           <div class="small" style="color:var(--mint2);margin-top:6px;">✓ Captured — device ID and GPS tags scrubbed from EXIF before upload</div>
         </div>
 
-        <div class="label">3. Location & details</div>
-        <input class="input" id="repLoc" value="Local District (GPS)">
-        <textarea class="input" id="repDesc" rows="3" placeholder="Describe the hazard, cross street, or specific risk..."></textarea>
+        <!-- HARDWARE CAMERA FIREWALL LOCK — Section 3 (location & details)
+             and the Publish button are now part of one camera-gated block,
+             completely hidden (not just visually disabled) until a real
+             photo is attached. hasAttachedPhoto() stays the single source
+             of truth; updateSubmitPhotoGate() below toggles this block's
+             display the same way it toggles the button, so the two can
+             never drift apart. This supersedes the prior round's
+             tappable-while-locked / scroll-and-flash-a-red-alert design —
+             there's no longer a locked button to tap at all, since the
+             whole section it lives in is hidden until a photo exists. -->
+        <div id="reportCameraLockHint" class="small" style="color:var(--muted);text-align:center;padding:14px 4px;">
+          📷 Attach a photo above to unlock location &amp; description.
+        </div>
+        <div id="reportStep2Locked" style="display:none;">
+          <div class="label">3. Location &amp; details</div>
+          <input class="input" id="repLoc" value="Local District (GPS)">
+          <textarea class="input" id="repDesc" rows="3" placeholder="Describe the hazard, cross street, or specific risk..."></textarea>
 
-        <button type="button" class="btn-submit btn-submit-locked" id="btnSubmit" aria-disabled="true">
-          <svg viewBox="0 0 24 24" width="17" height="17" stroke="#051311" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          <span id="btnSubmitLabel">Photo Required to Submit</span>
-        </button>
+          <button type="button" class="btn-submit" id="btnSubmit" disabled>
+            <svg viewBox="0 0 24 24" width="17" height="17" stroke="#051311" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            <span id="btnSubmitLabel">Publish report</span>
+          </button>
+        </div>
       </div>
 
       <!-- PERSISTENT FOOTER — same brand shield + verification seal as the
@@ -2095,9 +2117,14 @@ const CITIXEN_GATE_PASSCODE = 'CITIXEN01';
       input.focus();
     }
   });
-  if (document.documentElement.classList.contains('citixen-gate-locked')) {
-    setTimeout(() => input.focus(), 250);
-  }
+  // HARD-LOCK ONBOARDING round removed the auto-focus-on-load that used to
+  // sit here (a setTimeout(() => input.focus(), 250) that fired the moment
+  // the gate screen rendered): auto-focusing a text input before the
+  // citizen has tapped anything is exactly the pattern that makes mobile
+  // Safari/Chrome auto-zoom into the page on load. The citizen now taps
+  // the passcode field themselves; the wrong-passcode re-focus above
+  // (after their own form submission) is unaffected since it's a response
+  // to a real interaction, not an on-load auto-focus.
 })();
 
 let map, mapInit=false, markers={}, cat='Pothole / Road', userMarker=null;
@@ -4742,27 +4769,30 @@ function hasAttachedPhoto(){
   const img = document.getElementById('photoImg');
   return !!(img && img.style.display !== 'none' && img.src);
 }
+// HARDWARE CAMERA FIREWALL LOCK — hides the entire Section 3 (location &
+// details) + Publish button block, not just the button, until a real photo
+// is attached. `disabled` goes back to a true native HTML attribute (not
+// Patch 4.13's tappable CSS-only lock) since there's no longer a visible
+// locked button for that workaround to apply to.
 function updateSubmitPhotoGate(){
   const btn = document.getElementById('btnSubmit');
   const lbl = document.getElementById('btnSubmitLabel');
+  const lockedSection = document.getElementById('reportStep2Locked');
+  const lockHint = document.getElementById('reportCameraLockHint');
   const has = hasAttachedPhoto();
-  // Patch 4.13 — this is now a CSS-only "soft-disabled" state, not a native
-  // `disabled` attribute: the button must stay tappable so submitReport()'s
-  // own click-time guard (below) can catch a no-photo tap and scroll to +
-  // flash the mandatory-safeguard alert, which a truly disabled button
-  // could never receive a click to do.
-  if (btn) {
-    btn.classList.toggle('btn-submit-locked', !has);
-    btn.setAttribute('aria-disabled', has ? 'false' : 'true');
-  }
-  if (lbl) lbl.textContent = has ? 'Publish report' : 'Photo Required to Submit';
+  if (btn) btn.disabled = !has;
+  if (lbl) lbl.textContent = 'Publish report';
+  if (lockedSection) lockedSection.style.display = has ? '' : 'none';
+  if (lockHint) lockHint.style.display = has ? 'none' : '';
 }
 
 async function submitReport(){
+  // Defense in depth: the button is both hardware-disabled and hidden
+  // behind #reportStep2Locked while no photo is attached, so this guard
+  // should be unreachable through the normal UI — kept anyway in case
+  // submitReport() is ever invoked some other way (see the backend's own
+  // independent check at POST /api/report/submit for the same reasoning).
   if (!hasAttachedPhoto()) {
-    // Patch 4.13 — HARD SAFETY GATE: a tap with no photo attached scrolls
-    // the citizen straight to the Capture Proof section and flashes a
-    // prominent red alert, rather than a generic/neutral toast.
     const captureLabel = document.getElementById('captureProofLabel');
     if (captureLabel && typeof captureLabel.scrollIntoView === 'function') {
       captureLabel.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -5449,8 +5479,12 @@ document.getElementById('btnOnboardingStart').addEventListener('click', () => {
 document.getElementById('btnEnterApp').addEventListener('click', () => {
   hideSplash();
   switchTab('tab-report', document.querySelector('.navtab[data-target="tab-report"]'));
-  const repDescEl = document.getElementById('repDesc');
-  if (repDescEl) repDescEl.focus();
+  // HARDWARE CAMERA FIREWALL LOCK removed the auto-focus into #repDesc that
+  // used to live here: that field is now hidden behind #reportStep2Locked
+  // until a photo is attached, and auto-focusing a text input on landing
+  // is also exactly the mobile Safari/Chrome auto-zoom pattern this round
+  // asked to eliminate — the citizen taps into it themselves once it's
+  // actually visible.
 });
 
 // ===== GLOBAL FLOATING ALPHA FEEDBACK BADGE =====
