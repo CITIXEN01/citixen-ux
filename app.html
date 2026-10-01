@@ -206,7 +206,7 @@ textarea.input{resize:none;line-height:1.4}
 .metrics-ticker{border:1px solid rgba(0,230,153,.35);border-radius:12px;background:#090D16;padding:10px 12px;margin-bottom:12px}
 .metrics-ticker-head{display:flex;align-items:center;gap:8px;font-size:.62rem;font-weight:800;letter-spacing:.12em;color:#FFFFFF;margin-bottom:6px}
 .metrics-ticker-dot{width:7px;height:7px;border-radius:50%;background:#00E699;box-shadow:0 0 8px rgba(0,230,153,.8);animation:ledgerLivePulse 2s ease-in-out infinite}
-.metrics-ticker-row{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;font-size:.66rem;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.metrics-ticker-row{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;font-size:.66rem;font-weight:700;color:#FFFFFF;text-transform:uppercase;letter-spacing:.04em;font-variant-numeric:tabular-nums}
 .metrics-ticker-row b{color:#00E699;font-size:.86rem;font-weight:800}
 .metrics-ticker-sep{color:#334155}
 @media (prefers-reduced-motion:reduce){.metrics-ticker-dot{animation:none}}
@@ -733,9 +733,11 @@ textarea.input{resize:none;line-height:1.4}
     <!-- MAP & FEED — two stacked field modules:
          1. Civic Dispatch Map (dark vector basemap, severity-colored pins)
          2. Live Dispatch Feed, topped by the jurisdiction's live metrics
-            ticker (resolved / covered / avg response — the same real
-            numbers updateAppTelemetryScorecard() computes, which used to
-            sit in the Dashboard's standalone Scorecard card).
+            ticker (Reports Filed / Resolved % / Open Dispatches — the same
+            real d.total / resolutionRate() / d.counts.dispatched figures
+            the official report's Community Action Snapshot uses, computed
+            by updateAppTelemetryScorecard(), which used to sit in the
+            Dashboard's standalone Scorecard card).
          The Geo-Hatch block grid lives only on the Dashboard now. -->
     <section id="tab-map" class="tabpane">
       <div class="card">
@@ -748,11 +750,11 @@ textarea.input{resize:none;line-height:1.4}
         <div class="metrics-ticker" id="appScorecardCard" aria-live="polite">
           <div class="metrics-ticker-head"><span class="metrics-ticker-dot" aria-hidden="true"></span><span id="appScorecardLabel">CITYWIDE LIVE METRICS</span></div>
           <div class="metrics-ticker-row">
-            <span><b id="appScorecardResolved">—</b> Resolved</span>
+            <span><b id="appScorecardTotal">—</b> Reports Filed</span>
             <span class="metrics-ticker-sep" aria-hidden="true">•</span>
-            <span><b id="appScorecardCovered">—</b> Covered</span>
+            <span><b id="appScorecardRate">—</b> Resolved</span>
             <span class="metrics-ticker-sep" aria-hidden="true">•</span>
-            <span><b id="appScorecardSla">—</b> Avg Response</span>
+            <span><b id="appScorecardOpen">—</b> Open Dispatches</span>
           </div>
         </div>
         <div id="feed"></div>
@@ -2015,22 +2017,26 @@ function renderAppScorecardTimestamp(){
 }
 async function updateAppTelemetryScorecard(){
   const labelEl = document.getElementById('appScorecardLabel');
-  const resolvedEl = document.getElementById('appScorecardResolved');
-  const coveredEl = document.getElementById('appScorecardCovered');
-  const slaEl = document.getElementById('appScorecardSla');
-  if (!resolvedEl || !coveredEl || !slaEl) return;
+  const totalEl = document.getElementById('appScorecardTotal');
+  const rateEl = document.getElementById('appScorecardRate');
+  const openEl = document.getElementById('appScorecardOpen');
+  if (!totalEl || !rateEl || !openEl) return;
   if (!ledgerTickets.length) {
     try { ledgerTickets = await fetchLedgerTickets(); } catch (e) { /* leave the placeholder dashes if this fails */ }
   }
   const meta = currentWardMeta;
   if (labelEl) labelEl.textContent = meta ? (meta.cityName.toUpperCase() + ', ' + meta.state.toUpperCase() + ' LIVE METRICS') : 'CITYWIDE LIVE METRICS';
   const cityTickets = meta ? ledgerTickets.filter(t => t.city === meta.city && t.state === meta.state) : ledgerTickets;
+  // Reports Filed / Resolved % / Open Dispatches — the same real counts and
+  // rounding as the official report's Community Action Snapshot
+  // (d.total / resolutionRate() / d.counts.dispatched in
+  // shared/instant-report.js), so this ticker never drifts from the PDF
+  // brief's numbers for the same jurisdiction.
   const resolvedCount = cityTickets.filter(t => t.stage === 'resolved').length;
-  resolvedEl.textContent = cityTickets.length ? (resolvedCount + ' / ' + cityTickets.length) : '—';
-  const { knownWards, pct } = computeAppWardCoverage(meta);
-  coveredEl.textContent = knownWards.length ? (pct != null ? pct : 0) + '%' : 'N/A';
-  const avgDays = computeAppAvgResolutionDays(cityTickets);
-  slaEl.textContent = avgDays != null ? avgDays.toFixed(1) + ' Days' : 'N/A';
+  const openCount = cityTickets.filter(t => t.stage === 'dispatched').length;
+  totalEl.textContent = cityTickets.length ? String(cityTickets.length) : '—';
+  rateEl.textContent = cityTickets.length ? Math.round((resolvedCount / cityTickets.length) * 100) + '%' : 'N/A';
+  openEl.textContent = cityTickets.length ? String(openCount) : '—';
   renderAppScorecardTimestamp();
 }
 
