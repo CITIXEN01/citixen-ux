@@ -178,6 +178,42 @@
 .cx-footer-single{text-align:center;padding:12px 14px 14px;font-size:11px;color:#64748B;background:#F8FAFC}
 .cx-verify-line{margin-top:4px;font-size:10px;color:#6B7280;text-transform:uppercase;letter-spacing:.5px}
 
+/* ---------- Civic Intelligence™ Brief — dark-mode tactical skin ----------
+   Overrides the light "paper" preview above so the on-screen brief matches
+   the app: #0B0E14 body, white primary text, #9CA3AF secondary labels,
+   #00E699 section titles, #111827 / #1E293B data cards. (The downloadable
+   PDF keeps its light print layout — see downloadPdf().) */
+.cx-paper{background:#0B0E14;color:#FFFFFF;border-color:#1E293B}
+.cx-mast-lg{background:#0B0E14;border-bottom:1px solid #1E293B}
+.cx-patents-badge{background:#0F172A;color:#00E699;border-color:rgba(0,230,153,.45)}
+.cx-subrow{border-bottom-color:#1E293B}
+.cx-subrow-geo{color:#FFFFFF}
+.cx-subrow-title{color:#FFFFFF}
+.cx-subrow-time{color:#9CA3AF}
+.cx-sec{border-bottom-color:#1E293B}
+.cx-sec-title,.cx-acards-head{color:#00E699;font-weight:800;text-transform:uppercase;letter-spacing:1px}
+/* Living Ledger™ Snapshot block */
+.cx-acards-wrap{background:#111827;border:1px solid #1E293B}
+.cx-acard-lbl{color:#9CA3AF}
+.cx-acard-val{color:#FFFFFF}
+/* Civic Performance metric boxes */
+.cx-mcard{background:#111827;border-color:#1E293B}
+.cx-mcard-head{background:transparent;color:#9CA3AF;border-bottom:1px solid #1E293B}
+.cx-mcard-body{background:#111827}
+.cx-mcard-val{color:#00E699}
+.cx-mcard-sub{color:#9CA3AF}
+/* Capital Project rows: dark row, white name, muted meta, status shown as
+   a slim colored progress rail along the bottom edge (same qualitative
+   fill widths as before — no invented percent-complete numbers). */
+.cx-therm{background:#111827;border:1px solid #1E293B;border-radius:10px;min-height:40px}
+.cx-therm-fill{top:auto;height:3px;border-radius:0 3px 3px 0}
+.cx-therm-name{color:#FFFFFF}
+.cx-therm-end{color:#9CA3AF}
+.cx-paper .cx-empty{color:#9CA3AF}
+/* Footer */
+.cx-footer-single{background:#0B0E14;color:#9CA3AF;border-top:1px solid #1E293B}
+.cx-verify-line{text-align:center;font-size:10px;color:#6B7280}
+
 /* Dark-surface variant of the CIP list (Capital Projects deep-dive panels) */
 .cx-cip-dark li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);color:#E2E8F0}
 .cx-cip-dark li:last-child{border-bottom:none}
