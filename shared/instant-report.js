@@ -36,7 +36,7 @@
 (function () {
   'use strict';
 
-  var MINT = '#00E699', NAVY = '#090D16', OBSIDIAN = '#030712', SLATE = '#94A3B8';
+  var MINT = '#00E699', NAVY = '#090D16', SLATE = '#94A3B8';
 
   // Custom 1px line-art icon set (Laser Mint via .cx-icon). No emoji or
   // system glyphs anywhere in the module, modal or drawer.
@@ -90,6 +90,51 @@
   function resolutionRate(d) { return d.total ? Math.round((d.resolved / d.total) * 100) + '%' : 'N/A'; }
   function delayedCount(d) { return d.cip.filter(function (p) { return p.status === 'delayed'; }).length; }
   function siteUrl() { return location.origin + '/'; }
+  // City + state only, never a ward number — the home jurisdiction both
+  // pages already resolve via GPS/search (home.cityName / home.stateName),
+  // falling back to parsing the " — Ward N" suffix off the full label.
+  function cityStateLabel(d) {
+    if (d.home && d.home.cityName && d.home.stateName) return d.home.cityName + ', ' + d.home.stateName;
+    return String(d.jurisdiction || '').replace(/\s*—\s*.*$/, '').replace(/\s*\(citywide\)\s*$/i, '');
+  }
+  // Hazard Index: a live read of this jurisdiction's own report nodes
+  // (the same severity classification CitixenSeverity already assigns to
+  // every pin on the dashboard map) — never a fabricated score. Any open
+  // Critical hazard makes the whole jurisdiction CRITICAL; otherwise a
+  // meaningful share of open Warning items makes it MODERATE.
+  function hazardIndex(d) {
+    var nodes = (d.nodes || []).filter(function (n) { return n.status !== 'Resolved'; });
+    if (!nodes.length) return { label: 'LOW RISK', color: MINT };
+    var crit = nodes.filter(function (n) { return n.status === 'Critical'; }).length;
+    if (crit > 0) return { label: 'CRITICAL', color: '#FF3B30' };
+    var warn = nodes.filter(function (n) { return n.status === 'Warning'; }).length;
+    if (warn / nodes.length >= 0.34) return { label: 'MODERATE', color: '#F59E0B' };
+    return { label: 'LOW RISK', color: MINT };
+  }
+  // Plots this jurisdiction's own real report coordinates (d.nodes) inside
+  // a neutral frame, scaled to their own bounding box. This is not a traced
+  // city-limits boundary — the app has no ward/city boundary geometry on
+  // file (see the "no live ward-boundary geofencing" note in both pages'
+  // map setup) — so no border shape is drawn or invented; only the real,
+  // relative positions of actual report locations.
+  function localProject(nodes, vw, vh, pad) {
+    if (!nodes.length) return [];
+    var lats = nodes.map(function (n) { return n.lat; }), lngs = nodes.map(function (n) { return n.lng; });
+    var minLat = Math.min.apply(null, lats), maxLat = Math.max.apply(null, lats);
+    var minLng = Math.min.apply(null, lngs), maxLng = Math.max.apply(null, lngs);
+    var k = Math.cos((minLat + maxLat) / 2 * Math.PI / 180) || 1;
+    var dLat = (maxLat - minLat) || 0.01, dLng = (maxLng - minLng) || 0.01;
+    var w = vw - 2 * pad, h = vh - 2 * pad;
+    var s = Math.min(w / (dLng * k), h / dLat);
+    var cx = (minLng + maxLng) / 2, cy = (minLat + maxLat) / 2;
+    return nodes.map(function (n) {
+      return { x: vw / 2 + (n.lng - cx) * k * s, y: vh / 2 - (n.lat - cy) * s, status: n.status };
+    });
+  }
+  function nodeColor(status) {
+    return (window.CitixenSeverity && window.CitixenSeverity.color(status)) ||
+      (status === 'Critical' ? '#FF3B30' : status === 'Warning' ? '#F59E0B' : MINT);
+  }
 
   // ---------- Civic Health Ranking ----------
   // Ranks every mapped ward (from /api/coverage/national) on an even blend
@@ -118,13 +163,14 @@
       national: rows.indexOf(me) + 1, nationalOf: rows.length,
       state: inState.indexOf(me) + 1, stateOf: inState.length,
       stateName: me.m.stateName || h.stateName || String(h.state).toUpperCase(),
+      stateAbbr: String(me.m.state || h.state || '').toUpperCase(),
       subject: (me.m.cityName || h.cityName) + ' ' + (me.m.wardName || h.wardName || '')
     };
   }
   function natRankText(r) { return r ? '#' + r.national : 'N/A'; }
   function stateRankText(r) { return r ? '#' + r.state + ' IN ' + String(r.stateName).toUpperCase() : 'N/A'; }
   function stateRankValue(r) { return r ? '#' + r.state : 'N/A'; }
-  function stateRankSubtext(r) { return r ? 'In ' + r.stateName : ''; }
+  function stateRankSubtext(r) { return r ? r.stateAbbr : ''; }
 
   // ---------- state ----------
   var cfg = { getData: null, toast: null, onLedger: null };
@@ -277,87 +323,139 @@
         '<span class="cx-pill ' + cipClass(p.status) + '">' + cipLabel(p.status) + '</span></li>';
     }).join('') + '</ul>';
   }
-  function metric(val, lbl) {
-    return '<div class="cx-metric"><div class="cx-metric-val">' + esc(val) + '</div><div class="cx-metric-lbl">' + esc(lbl) + '</div></div>';
+  function mcard(val, lbl, color, subText) {
+    return '<div class="cx-mcard"><div class="cx-mcard-head">' + esc(lbl) + '</div><div class="cx-mcard-body">' +
+      '<div class="cx-mcard-val"' + (color ? ' style="color:' + color + '"' : '') + '>' + esc(val) + '</div>' +
+      (subText ? '<div class="cx-mcard-sub">' + esc(subText) + '</div>' : '') +
+    '</div></div>';
   }
-  function metricSub(val, sub, lbl) {
-    return '<div class="cx-metric"><div class="cx-metric-val">' + esc(val) + '</div>' +
-      (sub ? '<div class="cx-metric-sub">' + esc(sub) + '</div>' : '') +
-      '<div class="cx-metric-lbl">' + esc(lbl) + '</div></div>';
+  function mcardHtml(innerHtml, lbl) {
+    return '<div class="cx-mcard"><div class="cx-mcard-head">' + esc(lbl) + '</div><div class="cx-mcard-body">' + innerHtml + '</div></div>';
   }
-  function cipGridHtml(projects) {
+  function hazardPillHtml(hz) {
+    return '<span class="cx-pill" style="background:' + hz.color + '26;color:' + hz.color + '">' + esc(hz.label) + '</span>';
+  }
+  // Capital Project Tracker: a qualitative progress bar per status tier.
+  // There is no measured percent-complete field in the CIP data model, so
+  // no specific completion number is ever shown — only a relative fill
+  // (On-Time fullest, Delayed least) alongside the real name/quarter/status.
+  function cipThermHtml(projects) {
     if (!projects.length) return '<p class="cx-empty">No capital projects are on file for this jurisdiction yet.</p>';
-    return '<div class="cx-cip-grid">' + projects.map(function (p) {
-      return '<div class="cx-cip-row">' +
-        '<span class="cx-cip-grid-name">' + esc(p.name || 'Capital project') + '</span>' +
-        '<span class="cx-cip-grid-when">' + esc(p.scheduled || '—') + '</span>' +
-        '<span class="cx-pill ' + cipClass(p.status) + '">' + cipLabel(p.status) + '</span>' +
+    return '<div class="cx-therm-list">' + projects.map(function (p) {
+      var fill = p.status === 'on-time' ? 92 : p.status === 'delayed' ? 28 : 56;
+      var color = p.status === 'on-time' ? MINT : p.status === 'delayed' ? '#FF3B30' : '#38BDF8';
+      return '<div class="cx-therm">' +
+        '<div class="cx-therm-fill" style="width:' + fill + '%;background:' + color + '"></div>' +
+        '<span class="cx-therm-name">' + esc(p.name || 'Capital project') + '</span>' +
+        '<span class="cx-therm-end">' + esc(p.scheduled || '—') + ' · ' + cipLabel(p.status) + '</span>' +
       '</div>';
     }).join('') + '</div>';
   }
+  // A jurisdiction's own real report coordinates (d.nodes), scaled to their
+  // own bounding box — see localProject()'s comment on why no boundary
+  // shape is drawn.
+  function hazardModuleHtml(d) {
+    var pts = localProject(d.nodes || [], 300, 140, 20);
+    var label = 'Live Hazard Nodes · ' + cityStateLabel(d).toUpperCase();
+    var dots = pts.map(function (p) {
+      var c = nodeColor(p.status);
+      return '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="9" fill="' + c + '" fill-opacity="0.2"/>' +
+        '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="4.5" fill="' + c + '"/>';
+    }).join('');
+    return '<div class="cx-hazard">' +
+      (pts.length
+        ? '<svg viewBox="0 0 300 140" preserveAspectRatio="xMidYMid meet" role="img" aria-label="' + esc(label) + '">' + dots + '</svg>'
+        : '<div class="cx-hazard-empty">No live hazard nodes yet</div>') +
+      '<span class="cx-hazard-label">' + esc(label) + '</span>' +
+    '</div>';
+  }
   function renderPdfPane() {
-    var d = data, r = d.ranks;
+    var d = data, r = d.ranks, hz = hazardIndex(d);
     var el = modal.querySelector('#cxPane-pdf');
     el.innerHTML =
       '<div class="cx-paper">' +
-        '<div class="cx-mast">' + icon('shieldPlain') +
-          '<div><div class="cx-mast-brand">CITIXEN <b>UX</b>™</div><div class="cx-mast-label">Official Municipal Health Brief</div></div>' +
-          '<div class="cx-mast-time">Generated<br>' + esc(stamp(generatedAt)) + '</div>' +
+        '<div class="cx-mast-lg">' +
+          '<span class="cx-patents-badge">Patents Pending</span>' +
+          icon('shieldPlain', 'cx-mast-lg-icon') +
+          '<div class="cx-mast-lg-brand">CITIXEN <b>UX</b>™</div>' +
+          '<div class="cx-mast-lg-tagline">Upgrade your civic experience.</div>' +
         '</div>' +
-        '<div class="cx-geo-row">' +
-          '<span class="cx-geo-title">' + esc(d.jurisdiction) + '</span>' +
-          '<span class="cx-snapshot-pill">• Current Snapshot</span>' +
+        '<div class="cx-subrow">' +
+          '<span class="cx-subrow-geo">' + esc(cityStateLabel(d)) + '</span>' +
+          '<span class="cx-subrow-title">Free Report</span>' +
+          '<span class="cx-subrow-time">Generated<br>' + esc(stamp(generatedAt)) + '</span>' +
         '</div>' +
+        '<div class="cx-sec">' + hazardModuleHtml(d) + '</div>' +
         '<div class="cx-sec"><div class="cx-sec-title"><span>1</span>CIVIC PERFORMANCE METRICS</div>' +
-          '<div class="cx-metrics">' +
-            metricSub(daysText(d) + (d.avgDays != null ? ' days' : ''), null, 'Avg. Fix Speed') +
-            metricSub(resolutionRate(d), d.total ? (d.resolved + ' / ' + d.total + ' Resolved') : null, 'Resolution Rate') +
-            metricSub(stateRankValue(r), stateRankSubtext(r), 'State Rank') +
+          '<div class="cx-mcards">' +
+            mcard(daysText(d) + (d.avgDays != null ? ' days' : ''), 'Avg. Fix Speed') +
+            mcard(resolutionRate(d), 'Resolution Rate', null, d.total ? (d.resolved + ' / ' + d.total + ' Resolved') : null) +
+            mcard(stateRankValue(r), 'State Rank', null, stateRankSubtext(r)) +
           '</div></div>' +
-        '<div class="cx-sec"><div class="cx-sec-title"><span>2</span>CAPITAL PROJECT TRACKER</div>' + cipGridHtml(d.cip) + '</div>' +
+        '<div class="cx-sec"><div class="cx-sec-title"><span>2</span>CAPITAL PROJECT TRACKER</div>' + cipThermHtml(d.cip) + '</div>' +
         '<div class="cx-sec"><div class="cx-sec-title"><span>3</span>COMMUNITY ACTION SNAPSHOT</div>' +
-          '<div class="cx-metrics">' + metric(d.counts.submitted, 'Reports Filed') + metric(d.counts.dispatched, 'Active Dispatches') + metric(d.counts.resolved, 'Reports Resolved') + '</div></div>' +
-        '<div class="cx-footer"><span>CITIXEN UX™ Verification Engine • Public Ledger Verified</span><span>Page 1 of 1</span></div>' +
+          '<div class="cx-mcards cx-mcards-4">' +
+            mcard(d.counts.submitted, 'Reports Filed') +
+            mcard(d.counts.dispatched + ' Open', 'Active Dispatches', d.counts.dispatched > 0 ? '#FF3B30' : null) +
+            mcardHtml(hazardPillHtml(hz), 'Hazard Index') +
+            mcard(pctText(d.coveragePct), 'Civic Audit Coverage') +
+          '</div></div>' +
+        '<div class="cx-footer cx-footer-ip">' +
+          '<div>CITIXEN UX™ Engine • Civic Intelligence™ • Civic Memory™ • #CrowdSaveAmerica™</div>' +
+          '<div>Patents Pending (Spatial Recognition Engine &amp; Economic Scraping/Planning Systems) • Public Ledger Verified</div>' +
+        '</div>' +
       '</div>' +
       '<div class="cx-actions"><button type="button" class="cx-btn-primary" id="cxPdfBtn">' + icon('printer') + 'Download / Print Official PDF</button></div>' +
       '<p class="cx-hint" id="cxHint-pdf"></p>';
     el.querySelector('#cxPdfBtn').addEventListener('click', function (e) { downloadPdf(e.currentTarget); });
   }
 
+  function hexRgb(hex) {
+    hex = String(hex).replace('#', '');
+    return [parseInt(hex.substr(0, 2), 16), parseInt(hex.substr(2, 2), 16), parseInt(hex.substr(4, 2), 16)];
+  }
   function downloadPdf(btn) {
     if (!window.jspdf || !window.jspdf.jsPDF) { toast('The PDF library did not load — check your connection and try again.'); return; }
-    var d = data, label = btn.innerHTML;
+    var d = data, hz = hazardIndex(d), label = btn.innerHTML;
     btn.disabled = true; btn.textContent = 'Generating…';
     try {
       var doc = new window.jspdf.jsPDF({ unit: 'pt', format: 'letter' });
       var W = 612, M = 40, y;
-      // Masthead
-      doc.setFillColor(9, 13, 22); doc.rect(0, 0, W, 86, 'F');
-      doc.setFillColor(0, 230, 153); doc.rect(0, 86, W, 3, 'F');
-      doc.setDrawColor(0, 230, 153); doc.setLineWidth(1.2);
-      var s = 1.7, ox = M, oy = 22; // brand shield outline
-      var pts = [[12, 2], [20, 5], [20, 12], [17.5, 17], [12, 22], [6.5, 17], [4, 12], [4, 5]];
-      var segs = []; for (var i = 1; i < pts.length; i++) segs.push([(pts[i][0] - pts[i - 1][0]) * s, (pts[i][1] - pts[i - 1][1]) * s]);
-      doc.lines(segs, ox + pts[0][0] * s, oy + pts[0][1] * s, [1, 1], 'S', true);
-      doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(18);
-      doc.text('CITIXEN', M + 52, 44);
-      doc.setTextColor(0, 230, 153); doc.text('UX™', M + 52 + doc.getTextWidth('CITIXEN '), 44);
-      doc.setTextColor(148, 163, 184); doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
-      doc.text('OFFICIAL MUNICIPAL HEALTH BRIEF', M + 52, 60);
-      doc.text('Generated ' + stamp(generatedAt), W - M, 44, { align: 'right' });
-      doc.text('Privacy Engine: Verified', W - M, 60, { align: 'right' });
-      y = 112;
 
-      // Geotag & time-scope sub-header
-      doc.setTextColor(9, 13, 22); doc.setFont('helvetica', 'bold'); doc.setFontSize(14);
-      doc.text(d.jurisdiction, M, y);
-      var pillTxt = '• CURRENT SNAPSHOT', pillW = doc.getTextWidth(pillTxt) + 16;
-      doc.setFillColor(230, 250, 242); doc.setDrawColor(0, 230, 153); doc.setLineWidth(0.8);
-      doc.roundedRect(W - M - pillW, y - 12, pillW, 17, 8, 8, 'FD');
-      doc.setTextColor(0, 148, 99); doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5);
-      doc.text(pillTxt, W - M - pillW / 2, y - 1, { align: 'center' });
-      y += 32;
+      // Top branding masthead — solid black, scaled-up logo + tagline, and
+      // the Patents Pending badge.
+      doc.setFillColor(0, 0, 0); doc.rect(0, 0, W, 150, 'F');
+      var badgeTxt = 'PATENTS PENDING', badgeW = doc.getTextWidth(badgeTxt) + 18;
+      doc.setDrawColor(0, 230, 153); doc.setLineWidth(0.8);
+      doc.roundedRect(W - M - badgeW, 18, badgeW, 17, 8, 8, 'S');
+      doc.setTextColor(0, 230, 153); doc.setFont('helvetica', 'bold'); doc.setFontSize(7);
+      doc.text(badgeTxt, W - M - badgeW / 2, 29, { align: 'center' });
 
+      var s = 1.6, ox = W / 2 - 12 * s, oy = 32; // centered brand shield outline
+      var shieldPts = [[12, 2], [20, 5], [20, 12], [17.5, 17], [12, 22], [6.5, 17], [4, 12], [4, 5]];
+      var segs = []; for (var i = 1; i < shieldPts.length; i++) segs.push([(shieldPts[i][0] - shieldPts[i - 1][0]) * s, (shieldPts[i][1] - shieldPts[i - 1][1]) * s]);
+      doc.setDrawColor(0, 230, 153); doc.setLineWidth(1.3);
+      doc.lines(segs, ox + shieldPts[0][0] * s, oy + shieldPts[0][1] * s, [1, 1], 'S', true);
+
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(22);
+      var t1 = 'CITIXEN ', t2 = 'UX™', w1 = doc.getTextWidth(t1), w2 = doc.getTextWidth(t2), bx = W / 2 - (w1 + w2) / 2;
+      doc.setTextColor(255, 255, 255); doc.text(t1, bx, 100);
+      doc.setTextColor(0, 230, 153); doc.text(t2, bx + w1, 100);
+      doc.setFont('helvetica', 'italic'); doc.setFontSize(10); doc.setTextColor(0, 230, 153);
+      doc.text('Upgrade your civic experience.', W / 2, 122, { align: 'center' });
+
+      // White sub-header row: geotag (city + state, never a ward number) /
+      // FREE REPORT / timestamp.
+      y = 182;
+      doc.setTextColor(9, 13, 22); doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
+      doc.text(cityStateLabel(d), M, y);
+      doc.text('FREE REPORT', W / 2, y, { align: 'center' });
+      doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
+      doc.text('Generated ' + stamp(generatedAt), W - M, y, { align: 'right' });
+      doc.setDrawColor(226, 232, 240); doc.setLineWidth(0.75); doc.line(M, y + 12, W - M, y + 12);
+      y += 34;
+
+      function ensureRoom(h) { if (y + h > 740) { doc.addPage(); y = 60; } }
       function sectionTitle(n, title) {
         doc.setFillColor(9, 13, 22); doc.circle(M + 8, y - 4, 8, 'F');
         doc.setTextColor(0, 230, 153); doc.setFontSize(9); doc.setFont('helvetica', 'bold');
@@ -365,63 +463,119 @@
         doc.setTextColor(9, 13, 22); doc.setFontSize(10.5);
         doc.text(title, M + 24, y); y += 16;
       }
-      function boxes(items) {
-        var bw = (W - 2 * M - (items.length - 1) * 12) / items.length;
+
+      // Geospatial Hazard Distribution Module — this jurisdiction's own real
+      // report coordinates (d.nodes), plotted on their own bounding box.
+      // There is no ward/city boundary geometry on file, so no boundary
+      // outline is drawn or invented — only the real relative node positions.
+      (function hazardMap() {
+        var mh = 118, mx = M, mw = W - 2 * M;
+        doc.setFillColor(10, 13, 20); doc.roundedRect(mx, y, mw, mh, 8, 8, 'F');
+        doc.setDrawColor(0, 230, 153); doc.setLineWidth(0.8); doc.roundedRect(mx, y, mw, mh, 8, 8, 'S');
+        var nodes = d.nodes || [];
+        if (nodes.length) {
+          var lats = nodes.map(function (n) { return n.lat; }), lngs = nodes.map(function (n) { return n.lng; });
+          var minLat = Math.min.apply(null, lats), maxLat = Math.max.apply(null, lats);
+          var minLng = Math.min.apply(null, lngs), maxLng = Math.max.apply(null, lngs);
+          var k = Math.cos((minLat + maxLat) / 2 * Math.PI / 180) || 1;
+          var dLat = (maxLat - minLat) || 0.01, dLng = (maxLng - minLng) || 0.01;
+          var pad = 16, pw = mw - 2 * pad, ph = mh - 2 * pad;
+          var sc = Math.min(pw / (dLng * k), ph / dLat);
+          var ccx = (minLng + maxLng) / 2, ccy = (minLat + maxLat) / 2;
+          nodes.forEach(function (n) {
+            var px = mx + mw / 2 + (n.lng - ccx) * k * sc, py = y + mh / 2 - (n.lat - ccy) * sc;
+            var rgb = n.status === 'Critical' ? [255, 59, 48] : n.status === 'Warning' ? [245, 158, 11] : [0, 230, 153];
+            doc.setFillColor(rgb[0], rgb[1], rgb[2]); doc.circle(px, py, 3, 'F');
+          });
+        } else {
+          doc.setTextColor(148, 163, 184); doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+          doc.text('No live hazard nodes yet', mx + mw / 2, y + mh / 2, { align: 'center' });
+        }
+        doc.setTextColor(148, 163, 184); doc.setFont('helvetica', 'bold'); doc.setFontSize(7);
+        doc.text(('LIVE HAZARD NODES · ' + cityStateLabel(d)).toUpperCase(), mx + 10, y + mh - 9);
+        y += mh + 20;
+      })();
+
+      // Metric cards: every card in a solid-black header bar + white body,
+      // per this round's card-standardization rule.
+      function cardGrid(items, cols) {
+        var gap = 10, bw = (W - 2 * M - (cols - 1) * gap) / cols, headH = 16, bodyH = 46;
         items.forEach(function (it, k) {
-          var x = M + k * (bw + 12), hasSub = it.length > 2 && it[1];
-          doc.setDrawColor(226, 232, 240); doc.setLineWidth(1); doc.roundedRect(x, y, bw, 56, 8, 8, 'S');
-          doc.setTextColor(4, 120, 87); doc.setFont('helvetica', 'bold'); doc.setFontSize(18);
-          doc.text(String(it[0]), x + bw / 2, y + 22, { align: 'center' });
-          if (hasSub) {
-            doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
-            doc.text(String(it[1]), x + bw / 2, y + 33, { align: 'center' });
+          var col = k % cols, row = Math.floor(k / cols);
+          var x = M + col * (bw + gap), by = y + row * (headH + bodyH + 10);
+          doc.setFillColor(0, 0, 0); doc.roundedRect(x, by, bw, headH, 3, 3, 'F');
+          doc.setFillColor(0, 0, 0); doc.rect(x, by + headH - 4, bw, 4, 'F');
+          doc.setTextColor(0, 230, 153); doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5);
+          doc.text(it.lbl.toUpperCase(), x + bw / 2, by + headH / 2 + 2.5, { align: 'center' });
+          doc.setDrawColor(226, 232, 240); doc.setLineWidth(1);
+          doc.roundedRect(x, by + headH, bw, bodyH, 3, 3, 'S');
+          var cy = by + headH + bodyH / 2;
+          if (it.pill) {
+            var rgb = hexRgb(it.pill), pw2 = doc.getTextWidth(it.val) + 16;
+            doc.setFillColor(rgb[0], rgb[1], rgb[2]); doc.roundedRect(x + bw / 2 - pw2 / 2, cy - 8, pw2, 16, 8, 8, 'F');
+            doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(8);
+            doc.text(it.val, x + bw / 2, cy + 3, { align: 'center' });
+          } else {
+            doc.setTextColor.apply(doc, it.color || [4, 120, 87]);
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(14);
+            doc.text(String(it.val), x + bw / 2, cy + (it.sub ? -2 : 4), { align: 'center' });
+            if (it.sub) {
+              doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
+              doc.text(String(it.sub), x + bw / 2, cy + 10, { align: 'center' });
+            }
           }
-          doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
-          doc.text(String(it[2]).toUpperCase(), x + bw / 2, y + 46, { align: 'center' });
         });
-        y += 56 + 28;
+        y += Math.ceil(items.length / cols) * (headH + bodyH + 10);
       }
-      function ensureRoom(h) { if (y + h > 740) { doc.addPage(); y = 60; } }
 
       sectionTitle(1, 'CIVIC PERFORMANCE METRICS');
-      boxes([
-        [d.avgDays != null ? daysText(d) + ' days' : 'N/A', null, 'Avg. Fix Speed'],
-        [resolutionRate(d), d.total ? (d.resolved + ' / ' + d.total + ' Resolved') : null, 'Resolution Rate'],
-        [stateRankValue(d.ranks), stateRankSubtext(d.ranks), 'State Rank']
-      ]);
+      cardGrid([
+        { val: d.avgDays != null ? daysText(d) + ' days' : 'N/A', lbl: 'Avg. Fix Speed' },
+        { val: resolutionRate(d), lbl: 'Resolution Rate', sub: d.total ? (d.resolved + ' / ' + d.total + ' Resolved') : null },
+        { val: stateRankValue(d.ranks), lbl: 'State Rank', sub: stateRankSubtext(d.ranks) }
+      ], 3);
 
+      // Capital Project Tracker: a qualitative progress bar per status tier
+      // — there is no measured percent-complete field in the CIP data, so
+      // no specific completion number is printed, only the real name,
+      // quarter and status alongside a relative fill.
       sectionTitle(2, 'CAPITAL PROJECT TRACKER');
       if (!d.cip.length) {
         doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
         doc.text('No capital projects are on file for this jurisdiction yet.', M, y + 4); y += 22;
       }
-      var cipCenterX = M + (W - 2 * M) * 0.62;
       d.cip.forEach(function (p) {
-        ensureRoom(24);
-        doc.setTextColor(9, 13, 22); doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
-        doc.text(doc.splitTextToSize(p.name || 'Capital project', 230)[0], M, y + 4);
-        doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
-        doc.text(p.scheduled || '—', cipCenterX, y + 4, { align: 'center' });
-        var lbl = cipLabel(p.status), fill = p.status === 'on-time' ? [209, 250, 229] : p.status === 'delayed' ? [254, 243, 199] : [224, 242, 254];
-        var ink = p.status === 'on-time' ? [6, 95, 70] : p.status === 'delayed' ? [146, 64, 14] : [7, 89, 133];
-        doc.setFillColor(fill[0], fill[1], fill[2]); doc.roundedRect(W - M - 80, y - 7, 80, 16, 8, 8, 'F');
-        doc.setTextColor(ink[0], ink[1], ink[2]); doc.setFont('helvetica', 'bold'); doc.setFontSize(8);
-        doc.text(lbl, W - M - 40, y + 4, { align: 'center' });
-        doc.setDrawColor(226, 232, 240); doc.line(M, y + 13, W - M, y + 13);
-        y += 24;
+        ensureRoom(30);
+        var barH = 20, fullW = W - 2 * M;
+        var rgb = p.status === 'on-time' ? [0, 230, 153] : p.status === 'delayed' ? [255, 59, 48] : [56, 189, 248];
+        var fillPct = p.status === 'on-time' ? 0.92 : p.status === 'delayed' ? 0.28 : 0.56;
+        doc.setFillColor(244, 245, 247); doc.roundedRect(M, y, fullW, barH, 10, 10, 'F');
+        doc.setFillColor(rgb[0], rgb[1], rgb[2]); doc.roundedRect(M, y, Math.max(fullW * fillPct, barH), barH, 10, 10, 'F');
+        doc.setTextColor(9, 13, 22); doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5);
+        doc.text(doc.splitTextToSize(p.name || 'Capital project', fullW * 0.55)[0], M + 12, y + barH / 2 + 3);
+        doc.setTextColor(51, 65, 85); doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
+        doc.text((p.scheduled || '—') + ' · ' + cipLabel(p.status), W - M - 10, y + barH / 2 + 3, { align: 'right' });
+        y += barH + 9;
       });
-      y += 16;
+      y += 10;
 
-      ensureRoom(110);
+      ensureRoom(130);
       sectionTitle(3, 'COMMUNITY ACTION SNAPSHOT');
-      boxes([[d.counts.submitted, null, 'Reports Filed'], [d.counts.dispatched, null, 'Active Dispatches'], [d.counts.resolved, null, 'Reports Resolved']]);
+      cardGrid([
+        { val: String(d.counts.submitted), lbl: 'Reports Filed' },
+        { val: d.counts.dispatched + ' Open', lbl: 'Active Dispatches', color: d.counts.dispatched > 0 ? [204, 36, 29] : [4, 120, 87] },
+        { val: hz.label, lbl: 'Hazard Index', pill: hz.color },
+        { val: pctText(d.coveragePct), lbl: 'Civic Audit Coverage' }
+      ], 2);
 
-      // Report footer block
-      doc.setDrawColor(226, 232, 240); doc.setLineWidth(0.75); doc.line(M, 756, W - M, 756);
-      doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
-      doc.text('CITIXEN UX™ Verification Engine • Public Ledger Verified', M, 770);
-      doc.text('Page 1 of 1', W - M, 770, { align: 'right' });
-      doc.save('citixen-official-municipal-health-brief.pdf');
+      // Institutional / IP footer block
+      ensureRoom(40);
+      doc.setDrawColor(226, 232, 240); doc.setLineWidth(0.75); doc.line(M, y, W - M, y); y += 14;
+      doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
+      doc.text('CITIXEN UX™ Engine • Civic Intelligence™ • Civic Memory™ • #CrowdSaveAmerica™', M, y); y += 11;
+      doc.text('Patents Pending (Spatial Recognition Engine & Economic Scraping/Planning Systems) • Public Ledger Verified', M, y);
+
+      doc.save('citixen-free-report.pdf');
       toast('Official PDF brief downloaded.');
     } catch (err) {
       console.error('Official brief PDF failed', err);
@@ -435,7 +589,7 @@
   function renderGraphicPane() {
     var el = modal.querySelector('#cxPane-graphic');
     el.innerHTML =
-      '<div class="cx-card-wrap"><canvas id="cxCardCanvas" width="1080" height="1080" role="img" aria-label="#CrowdSaveAmerica ward health card for ' + esc(data.jurisdiction) + '"></canvas></div>' +
+      '<div class="cx-card-wrap"><canvas id="cxCardCanvas" width="1080" height="1080" role="img" aria-label="#CrowdSaveAmerica Free Report card for ' + esc(cityStateLabel(data)) + '"></canvas></div>' +
       '<div class="cx-actions"><button type="button" class="cx-btn-primary" id="cxShareCardBtn">' + icon('phoneShare') + 'Share #CrowdSaveAmerica Card</button></div>' +
       '<p class="cx-hint" id="cxHint-graphic"></p>';
     el.querySelector('#cxShareCardBtn').addEventListener('click', shareCard);
@@ -455,40 +609,12 @@
   }
 
   // ---------- Dark vector map for the share card ----------
-  // Per this round's "replace the share card's old graphic with the real US
-  // map" fix: the card's centerpiece is now ALWAYS the CROWD SAVE AMERICA™
-  // US Vector Map (the same national outline + one glowing node per mapped
-  // city the popup Aggregation Hub draws at its Country tier) — never the
-  // old abstract "LIVE REPORT NODES" line-grid placeholder, and never a
-  // live OpenFreeMap/MapLibre tile fetch (that network+WebGL dependency,
-  // and its line-grid fallback for when it fails, are both removed outright
-  // rather than left as dead code). This also makes the card fully
-  // self-contained: no external tile request, so it renders identically
-  // offline or on a blocked network.
-  // Public geographic centers for mapped cities (used to place the
-  // nationwide nodes). Unknown places are skipped.
-  var CITY_CENTERS = { 'wi/la-crosse': [43.8138, -91.2519], 'wi/milwaukee': [43.0389, -87.9065], 'il/chicago': [41.8781, -87.6298] };
-  // Stylized contiguous-U.S. outline, [lng, lat].
-  var US_OUTLINE = [[-124.7,48.4],[-122.8,49.0],[-95.2,49.0],[-94.8,49.4],[-89.6,48.0],[-84.8,46.5],[-83.5,46.1],[-82.5,43.0],[-82.9,42.0],[-79.0,42.8],[-79.2,43.5],[-76.2,44.2],[-74.7,45.0],[-71.5,45.0],[-70.0,46.7],[-69.2,47.4],[-67.8,47.1],[-67.0,44.8],[-70.7,43.1],[-70.0,41.8],[-71.9,41.3],[-73.9,40.6],[-74.2,39.6],[-75.0,38.8],[-75.9,37.2],[-76.3,36.9],[-75.5,35.2],[-77.0,34.6],[-79.0,33.4],[-81.4,30.7],[-80.0,26.8],[-80.4,25.2],[-81.3,25.4],[-82.7,27.5],[-83.0,29.1],[-84.3,30.0],[-86.5,30.4],[-88.9,30.4],[-89.6,29.3],[-90.8,29.1],[-93.8,29.7],[-94.7,29.3],[-97.2,27.7],[-97.4,25.9],[-99.1,26.4],[-100.3,28.0],[-101.4,29.8],[-103.1,29.0],[-104.5,29.6],[-106.5,31.8],[-108.2,31.3],[-111.1,31.3],[-114.8,32.5],[-117.1,32.5],[-118.5,34.0],[-120.6,34.6],[-121.9,36.6],[-122.5,37.8],[-123.8,39.6],[-124.2,41.0],[-124.5,42.8],[-124.0,46.2],[-124.7,48.4]];
-
-  // One glowing node per mapped city nationwide, sized by its surveyed
-  // blocks — the same real Geo-Hatch ward data the popup Aggregation Hub's
-  // own Country tier uses (window.CitixenGeoHatch.wardSummaries()), not a
-  // second/fabricated node set.
-  function nationwideNodes() {
-    var list = window.CitixenGeoHatch && window.CitixenGeoHatch.wardSummaries ? window.CitixenGeoHatch.wardSummaries() : [];
-    var byCity = {};
-    list.forEach(function (w) {
-      var k = w.state + '/' + w.city, c = CITY_CENTERS[k];
-      if (!c) return;
-      byCity[k] = byCity[k] || { lat: c[0], lng: c[1], surveyed: 0 };
-      byCity[k].surveyed += w.surveyed;
-    });
-    var arr = Object.keys(byCity).map(function (k) { return byCity[k]; });
-    var max = Math.max.apply(null, arr.map(function (n) { return n.surveyed; }).concat([1]));
-    return arr.map(function (n) { return { lat: n.lat, lng: n.lng, color: MINT, r: 0.75 + 0.6 * n.surveyed / max }; });
-  }
-
+  // Per this round's "complete refactor" spec, the Geospatial Map Snippet
+  // plots this jurisdiction's own real report coordinates (d.nodes) inside
+  // a neutral frame — never a traced city-limits boundary (the app has no
+  // ward/city boundary geometry on file; see localProject()'s comment) and
+  // never a live external tile fetch. Reuses the same pulsing-node renderer
+  // every live map on the dashboard uses.
   function drawNodes(ctx, pts, phase) {
     pts.forEach(function (n, k) {
       var t = (phase + k * 0.33) % 1, r = n.r || 1, rgb = n.color === '#FF3B30' ? '255,59,48' : n.color === '#F59E0B' ? '245,158,11' : '0,230,153';
@@ -500,107 +626,99 @@
     });
   }
 
-  function drawUsOutline(ctx, x, y, w, h, nodes, phase) {
-    var minLng = -125, maxLng = -66, minLat = 24, maxLat = 50, k = Math.cos(37 * Math.PI / 180);
-    var gw = (maxLng - minLng) * k, gh = maxLat - minLat, s = Math.min((w - 60) / gw, (h - 50) / gh);
-    var ox = x + (w - gw * s) / 2, oy = y + (h - gh * s) / 2;
-    function proj(lng, lat) { return [ox + (lng - minLng) * k * s, oy + (maxLat - lat) * s]; }
-    ctx.beginPath();
-    US_OUTLINE.forEach(function (pt, i) { var q = proj(pt[0], pt[1]); if (i) ctx.lineTo(q[0], q[1]); else ctx.moveTo(q[0], q[1]); });
-    ctx.closePath(); ctx.fillStyle = '#0A1424'; ctx.fill();
-    ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,230,153,0.45)'; ctx.stroke();
-    drawNodes(ctx, nodes.map(function (n) { var q = proj(n.lng, n.lat); return Object.assign({}, n, { x: q[0], y: q[1] }); }), phase);
-  }
-
-  function drawMapArea(ctx, d, phase, mx, my, mw, mh) {
-    var nodes = nationwideNodes();
+  function drawHazardMap(ctx, d, phase, mx, my, mw, mh) {
+    var raw = localProject(d.nodes || [], mw - 40, mh - 40, 0);
+    var pts = raw.map(function (p) { return { x: mx + 20 + p.x, y: my + 20 + p.y, color: nodeColor(p.status) }; });
     ctx.save(); rr(ctx, mx, my, mw, mh, 22); ctx.clip();
     ctx.fillStyle = '#060B16'; ctx.fillRect(mx, my, mw, mh);
-    drawUsOutline(ctx, mx, my, mw, mh, nodes, phase);
-    if (!nodes.length) {
+    if (pts.length) drawNodes(ctx, pts, phase);
+    else {
       ctx.textAlign = 'center'; ctx.font = font(600, 22); ctx.fillStyle = SLATE;
-      ctx.fillText('No live report nodes yet', mx + mw / 2, my + mh / 2);
+      ctx.fillText('No live hazard nodes yet', mx + mw / 2, my + mh / 2);
     }
     ctx.restore();
     rr(ctx, mx, my, mw, mh, 22); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,230,153,0.25)'; ctx.stroke();
     ctx.textAlign = 'left'; ctx.font = font(700, 16); ctx.fillStyle = SLATE;
-    ctx.fillText('AUDIT NODES · UNITED STATES', mx + 20, my + mh - 22);
+    ctx.fillText(('LIVE HAZARD NODES · ' + cityStateLabel(d)).toUpperCase(), mx + 20, my + mh - 22);
   }
 
   function drawCard(phase) {
     var canvas = modal && modal.querySelector('#cxCardCanvas');
     if (!canvas || !data) return;
-    var d = data, ctx = canvas.getContext('2d'), W = 1080, P = 84;
+    var d = data, hz = hazardIndex(d), ctx = canvas.getContext('2d'), W = 1080, P = 84;
     ctx.clearRect(0, 0, W, W);
-    ctx.fillStyle = OBSIDIAN; ctx.fillRect(0, 0, W, W);
+    ctx.fillStyle = '#0A0D12'; ctx.fillRect(0, 0, W, W);
     // UI frame
-    rr(ctx, 30, 30, W - 60, W - 60, 36); ctx.fillStyle = NAVY; ctx.fill();
+    rr(ctx, 30, 30, W - 60, W - 60, 36); ctx.fillStyle = '#0A0D12'; ctx.fill();
     ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,230,153,0.55)'; ctx.stroke();
 
-    // Header: shield + wordmark (the top-right "CITY, ST · WARD" jurisdiction
-    // pill is removed per this round's "Share Card Header Refactor" spec)
-    shieldPath(ctx, P - 6, 78, 3); ctx.lineWidth = 0.8; ctx.strokeStyle = MINT; ctx.stroke();
-    ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
-    ctx.font = font(800, 40); ctx.fillStyle = '#FFFFFF'; ctx.fillText('CITIXEN', P + 74, 114);
-    var wx = P + 74 + ctx.measureText('CITIXEN ').width;
-    ctx.fillStyle = MINT; ctx.fillText('UX', wx, 114);
-    var uxw = ctx.measureText('UX').width;
-    ctx.font = font(700, 18); ctx.fillText('™', wx + uxw + 3, 100);
-    ctx.fillStyle = 'rgba(255,255,255,0.08)'; ctx.fillRect(P, 172, W - 2 * P, 2);
+    // Solid-black header: Patents Pending badge, shield + wordmark, tagline,
+    // FREE REPORT title, geotag (city + state, never a ward number).
+    ctx.save(); rr(ctx, 30, 30, W - 60, 248, 36); ctx.clip();
+    ctx.fillStyle = '#000000'; ctx.fillRect(30, 30, W - 60, 248);
+    ctx.restore();
 
-    // Title marquee — replaces the old "#CrowdSaveAmerica" hashtag pill with
-    // a centered "CROWD SAVE AMERICA" title (no hashtag symbol) + tagline,
-    // per this round's spec. The campaign hashtag still appears once, in
-    // the footer below.
+    ctx.textBaseline = 'middle';
+    var badgeTxt = 'PATENTS PENDING';
+    ctx.font = font(800, 16);
+    var badgeW = ctx.measureText(badgeTxt).width + 28;
     ctx.textAlign = 'center';
-    ctx.font = font(800, 40); ctx.fillStyle = MINT;
-    ctx.fillText('CROWD SAVE AMERICA', W / 2, 232);
-    ctx.font = 'italic ' + font(600, 24); ctx.fillStyle = SLATE;
-    ctx.fillText('Restoring civic trust, one snap at a time.', W / 2, 270);
+    rr(ctx, W - P - badgeW, 56, badgeW, 32, 16); ctx.lineWidth = 1.5; ctx.strokeStyle = MINT; ctx.stroke();
+    ctx.fillStyle = MINT; ctx.fillText(badgeTxt, W - P - badgeW / 2, 72);
+
+    shieldPath(ctx, W / 2 - 18, 100, 2.6); ctx.lineWidth = 1; ctx.strokeStyle = MINT; ctx.stroke();
+    ctx.font = font(800, 42);
+    var t1 = 'CITIXEN ', t2 = 'UX';
+    var w1 = ctx.measureText(t1).width, w2 = ctx.measureText(t2).width, bx = W / 2 - (w1 + w2) / 2;
+    ctx.textAlign = 'left'; ctx.fillStyle = '#FFFFFF'; ctx.fillText(t1, bx, 150);
+    ctx.fillStyle = MINT; ctx.fillText(t2, bx + w1, 150);
+    ctx.font = font(700, 18); ctx.fillText('™', bx + w1 + w2 + 3, 134);
+
+    ctx.textAlign = 'center';
+    ctx.font = 'italic ' + font(600, 20); ctx.fillStyle = MINT;
+    ctx.fillText('Upgrade your civic experience.', W / 2, 180);
+    ctx.font = font(800, 26); ctx.fillStyle = '#FFFFFF';
+    ctx.fillText('FREE REPORT', W / 2, 220);
+    ctx.font = font(700, 18); ctx.fillStyle = SLATE;
+    ctx.fillText(cityStateLabel(d) + '  •  CURRENT SNAPSHOT', W / 2, 252);
     ctx.textAlign = 'left';
 
-    ctx.font = font(700, 24); ctx.fillStyle = SLATE; ctx.fillText('WARD HEALTH SCORE', P, 318);
-    var score = healthScore(d);
-    ctx.font = font(900, 132); ctx.fillStyle = '#FFFFFF';
-    var sTxt = score != null ? String(score) : '—';
-    ctx.fillText(sTxt, P - 4, 408);
-    var sw = ctx.measureText(sTxt).width;
-    ctx.font = font(800, 64); ctx.fillStyle = MINT; ctx.fillText(' / 10', P + sw, 424);
-    // Civic Health Ranking indicators
-    ctx.textAlign = 'right';
-    ctx.font = font(700, 20); ctx.fillStyle = SLATE; ctx.fillText("NAT'L RANK", W - P, 318);
-    ctx.font = font(900, 56); ctx.fillStyle = '#FFFFFF'; ctx.fillText(natRankText(d.ranks), W - P, 366);
-    if (d.ranks) { ctx.font = font(700, 18); ctx.fillStyle = SLATE; ctx.fillText('of ' + d.ranks.nationalOf + ' mapped wards', W - P, 404); }
-    ctx.font = font(800, 20); ctx.fillStyle = MINT; ctx.fillText('STATE RANK ' + stateRankText(d.ranks), W - P, 440);
-    ctx.textAlign = 'left';
-
-    // Metric badges
-    var cols = [
-      [daysText(d) + (d.avgDays != null ? ' DAYS' : ''), 'AVG FIX'],
-      [pctText(d.coveragePct), 'WARD COVERED'],
-      [String(delayedCount(d)), 'DELAYED PROJECTS']
+    // Featured headline trio — every card gets its own solid-black header
+    // bar per this round's card-standardization rule.
+    var trio = [
+      { lbl: 'STATE RANK', val: stateRankValue(d.ranks), sub: stateRankSubtext(d.ranks), color: '#FFFFFF' },
+      { lbl: 'HAZARD INDEX', val: hz.label, sub: null, color: hz.color },
+      { lbl: 'ACTIVE DISPATCHES', val: d.counts.dispatched + ' OPEN', sub: null, color: d.counts.dispatched > 0 ? '#FF3B30' : MINT }
     ];
-    var gap = 22, cw = (W - 2 * P - 2 * gap) / 3;
-    cols.forEach(function (c, i) {
+    var gap = 22, cw = (W - 2 * P - 2 * gap) / 3, cardY = 318, headH = 40, bodyH = 116;
+    trio.forEach(function (c, i) {
       var x = P + i * (cw + gap);
-      rr(ctx, x, 488, cw, 108, 20); ctx.fillStyle = '#0B1120'; ctx.fill();
-      ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,230,153,0.35)'; ctx.stroke();
-      ctx.textAlign = 'center'; ctx.font = font(800, 38); ctx.fillStyle = MINT; ctx.fillText(c[0], x + cw / 2, 528);
-      ctx.font = font(700, 18); ctx.fillStyle = SLATE; ctx.fillText(c[1], x + cw / 2, 570);
+      ctx.save(); rr(ctx, x, cardY, cw, headH + bodyH, 18); ctx.clip();
+      ctx.fillStyle = '#000000'; ctx.fillRect(x, cardY, cw, headH);
+      ctx.fillStyle = '#0B1120'; ctx.fillRect(x, cardY + headH, cw, bodyH);
+      ctx.restore();
+      rr(ctx, x, cardY, cw, headH + bodyH, 18); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,230,153,0.35)'; ctx.stroke();
+      ctx.textAlign = 'center';
+      ctx.font = font(800, 15); ctx.fillStyle = MINT; ctx.fillText(c.lbl, x + cw / 2, cardY + headH / 2 + 1);
+      ctx.font = font(900, 34); ctx.fillStyle = c.color;
+      ctx.fillText(c.val, x + cw / 2, cardY + headH + bodyH / 2 + (c.sub ? -10 : 2));
+      if (c.sub) { ctx.font = font(700, 16); ctx.fillStyle = SLATE; ctx.fillText(c.sub, x + cw / 2, cardY + headH + bodyH / 2 + 18); }
     });
-
-    // CROWD SAVE AMERICA™ US Vector Map — always the national outline with
-    // pulsing per-city nodes (see drawMapArea() above), the same graphic
-    // the popup Aggregation Hub's Country tier draws.
-    drawMapArea(ctx, d, phase, P, 626, W - 2 * P, 300);
-
-    // Footer
-    var parts = [['#CrowdSaveAmerica', MINT], ['  •  Privacy Engine: Verified  •  ', SLATE], ['citixenux.com', '#FFFFFF']];
-    ctx.font = font(700, 24);
-    var total = parts.reduce(function (s, p) { return s + ctx.measureText(p[0]).width; }, 0);
-    var fx = (W - total) / 2;
     ctx.textAlign = 'left';
-    parts.forEach(function (p) { ctx.fillStyle = p[1]; ctx.fillText(p[0], fx, 990); fx += ctx.measureText(p[0]).width; });
+
+    // Geospatial Map Snippet — this jurisdiction's own real nodes (see
+    // drawHazardMap() above for why no boundary shape is drawn).
+    drawHazardMap(ctx, d, phase, P, 500, W - 2 * P, 300);
+
+    // Footer: campaign + verification + IP disclosure
+    ctx.textAlign = 'center';
+    var line1 = [['#CrowdSaveAmerica™', MINT], ['  •  CITIXEN UX™ Engine  •  Public Ledger Verified', SLATE]];
+    ctx.font = font(700, 22);
+    var w = line1.reduce(function (s, p) { return s + ctx.measureText(p[0]).width; }, 0), fx = W / 2 - w / 2;
+    ctx.textAlign = 'left';
+    line1.forEach(function (p) { ctx.fillStyle = p[1]; ctx.fillText(p[0], fx, 950); fx += ctx.measureText(p[0]).width; });
+    ctx.textAlign = 'center'; ctx.font = font(600, 16); ctx.fillStyle = SLATE;
+    ctx.fillText('Civic Intelligence™ • Civic Memory™ • Patents Pending • citixenux.com', W / 2, 980);
   }
 
   function startAnim() {
@@ -615,8 +733,8 @@
   function stopAnim() { if (rafId) cancelAnimationFrame(rafId); rafId = 0; }
 
   function shareText() {
-    var score = healthScore(data);
-    return '#CrowdSaveAmerica — ' + data.jurisdiction + ' ward health score: ' + (score != null ? score + ' / 10' : 'not yet rated') +
+    var hz = hazardIndex(data);
+    return '#CrowdSaveAmerica — ' + cityStateLabel(data) + ' hazard index: ' + hz.label +
       '. Free & anonymous civic reporting with CITIXEN UX™.';
   }
 
@@ -626,7 +744,7 @@
     canvas.toBlob(async function (blob) {
       if (current === 'graphic') startAnim();
       if (!blob) { toast('Could not render the card image.'); return; }
-      var file = new File([blob], 'crowdsaveamerica-ward-health.png', { type: 'image/png' });
+      var file = new File([blob], 'crowdsaveamerica-free-report.png', { type: 'image/png' });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         try { await navigator.share({ files: [file], title: '#CrowdSaveAmerica', text: shareText() }); }
         catch (err) { if (err && err.name !== 'AbortError') toast('Sharing failed — please try again.'); }
