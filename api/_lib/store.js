@@ -183,6 +183,36 @@ function hazardCode(category) {
   return HAZARD_CODES[String(category || '').toLowerCase().trim()] || 'GEN';
 }
 
+// Dynamic departmental routing: parses a submitted report's free-text
+// description for a specific hazard keyword and returns the matching
+// taxonomy code — a finer-grained signal than the 5-value CATEGORIES list
+// above can carry (that list has no slot for a park bench, graffiti, or a
+// biohazard spill). Checked in priority order so an overlapping word (e.g.
+// "signal" containing "sign") resolves to the more specific department.
+// Mirrors app.html's classifyHazard() exactly, so a citizen sees the same
+// department their ticket actually gets routed to server-side.
+const DESCRIPTION_HAZARD_GROUPS = [
+  { code: 'PRK', keywords: ['planter', 'plant', 'tree', 'park', 'bench'] },
+  { code: 'BIO', keywords: ['vomit', 'spill', 'biohazard'] },
+  { code: 'WST', keywords: ['overflow', 'trash', 'litter', 'waste', 'dump'] },
+  { code: 'SIG', keywords: ['signal'] },
+  { code: 'LGT', keywords: ['light', 'power', 'dark', 'wire'] },
+  { code: 'VAN', keywords: ['graffiti', 'vandalism', 'vandalize', 'stolen'] },
+  { code: 'SGN', keywords: ['sign'] },
+  { code: 'ADA', keywords: ['sidewalk', 'ada', 'ramp'] },
+  { code: 'PTH', keywords: ['pothole', 'asphalt', 'pavement', 'gap'] },
+  { code: 'DRN', keywords: ['drainage'] }
+];
+function classifyDescriptionHazard(description) {
+  const t = String(description || '').toLowerCase();
+  for (const group of DESCRIPTION_HAZARD_GROUPS) {
+    for (const kw of group.keywords) {
+      if (new RegExp('\\b' + kw + '\\b').test(t)) return group.code;
+    }
+  }
+  return null;
+}
+
 // Real age ("3d ago", "45m ago", "0m ago" for a just-submitted ticket) back
 // into a calendar date, so the YYMMDD segment reflects this ticket's own
 // recency rather than a made-up timestamp field.
@@ -197,9 +227,10 @@ function dateCodeFromAgo(agoStr) {
   return String(d.getFullYear()).slice(-2) + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
 }
 
-function makeReportId(wardSlug, ticketId, category, submittedAgo) {
+function makeReportId(wardSlug, ticketId, category, submittedAgo, hazardOverride) {
   const wardNum = (String(wardSlug).match(/\d+/) || ['0'])[0];
-  return ['D' + wardNum, hazardCode(category), dateCodeFromAgo(submittedAgo), hashTo4Digits(String(ticketId))].join('-');
+  const code = hazardOverride || hazardCode(category);
+  return ['D' + wardNum, code, dateCodeFromAgo(submittedAgo), hashTo4Digits(String(ticketId))].join('-');
 }
 
 // stage: 'submitted' (filed, not yet dispatched) -> 'dispatched' (crew
@@ -260,7 +291,7 @@ function allTickets() {
     const j = WARD_JURISDICTION[wardSlug];
     tickets.forEach(t => {
       out.push(Object.assign({}, t, {
-        reportId: makeReportId(wardSlug, t.id, t.category, t.submittedAgo),
+        reportId: makeReportId(wardSlug, t.id, t.category, t.submittedAgo, t.hazardOverride),
         ward: wardSlug,
         wardName: WARD_NAMES[wardSlug],
         state: j.state, stateName: j.stateName, city: j.city, cityName: j.cityName
@@ -343,7 +374,7 @@ function capExAdherencePct(projects) {
 // hardcoded. Returns null for a metric when there isn't yet enough seed
 // data to compute it honestly (see capExAdherencePct above).
 function bigThree(wardSlug) {
-  const tickets = wardSlug ? (WARD_TICKETS[wardSlug] || []).map(t => Object.assign({}, t, { reportId: makeReportId(wardSlug, t.id, t.category, t.submittedAgo) })) : allTickets();
+  const tickets = wardSlug ? (WARD_TICKETS[wardSlug] || []).map(t => Object.assign({}, t, { reportId: makeReportId(wardSlug, t.id, t.category, t.submittedAgo, t.hazardOverride) })) : allTickets();
   const resolved = tickets.filter(t => t.stage === 'resolved');
   const active = tickets.filter(t => t.stage !== 'resolved'); // 'submitted' + 'dispatched' — real, not-yet-closed tickets
   const withResolutionTime = resolved.filter(t => typeof t.resolutionHours === 'number');
@@ -421,9 +452,16 @@ function addTicket(input) {
   const wardSlug = (input.ward && WARD_TICKETS[input.ward]) ? input.ward : 'ward-4';
   const id = 'sub-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7);
   const category = CATEGORIES.includes(input.category) ? input.category : 'Pothole';
+  // Dynamic departmental routing: a free-text hazard keyword (e.g. "planter",
+  // "graffiti", "signal") routes this ticket to a more specific department
+  // than the fixed CATEGORIES list can express — see classifyDescriptionHazard().
+  // Falls through to the category-based code when the description names
+  // nothing specific, same as before this feature existed.
+  const hazardOverride = classifyDescriptionHazard(input.description);
   const ticket = {
     id,
     category,
+    hazardOverride,
     title: (input.description ? String(input.description).slice(0, 140) : category + ' reported'),
     loc: input.location ? String(input.location).slice(0, 120) : 'Local District',
     stage: 'submitted',
@@ -439,7 +477,11 @@ function addTicket(input) {
     lng: typeof input.lng === 'number' ? input.lng : null
   };
   WARD_TICKETS[wardSlug].push(ticket);
-  return { reportId: makeReportId(wardSlug, id, category, ticket.submittedAgo), ward: wardSlug };
+  return {
+    reportId: makeReportId(wardSlug, id, category, ticket.submittedAgo, hazardOverride),
+    ward: wardSlug,
+    hazardCode: hazardOverride || hazardCode(category)
+  };
 }
 
 function getWard(state, city, ward) {

@@ -135,14 +135,15 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
 .chip{background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));border:var(--surface-card-border);color:var(--text);padding:13px 12px;
   border-radius:12px;font-size:.76rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:9px;
   transition:border-color .15s,background .15s}
-.chip.active{border-color:var(--mint2);background:rgba(0,230,153,.12);color:var(--mint2)}
+.chip.active{border-color:rgba(0,230,153,.5);background:rgba(0,230,153,.1);color:var(--mint2)}
 .chip svg{width:17px;height:17px;flex-shrink:0}
 .chip-other-row{display:flex;justify-content:center;margin-bottom:14px}
 .chip-other{min-width:150px;justify-content:center}
 
-.btn-camera{width:100%;background:rgba(0,230,153,.04);border:1px dashed var(--mint2);color:var(--text);padding:13px;
+.btn-camera{width:100%;background:rgba(3,7,18,.6);border:1px solid rgba(255,255,255,.08);color:var(--text);padding:13px;
   border-radius:12px;font-weight:800;font-size:.8rem;letter-spacing:.3px;cursor:pointer;display:flex;
-  align-items:center;justify-content:center;gap:8px;margin-bottom:12px}
+  align-items:center;justify-content:center;gap:8px;margin-bottom:12px;transition:border-color .15s}
+.btn-camera:hover{border-color:rgba(255,255,255,.18)}
 .btn-camera svg{color:var(--mint2)}
 
 .input{width:100%;padding:11px 13px;background:var(--surface-input-bg);border:var(--surface-input-border);color:var(--text);
@@ -492,6 +493,36 @@ textarea.input{resize:none;line-height:1.4}
 .btn-confirm-lock:disabled{opacity:.4;cursor:not-allowed}
 .btn-confirm-cancel{width:100%;background:transparent;color:var(--muted);border:1px solid var(--border);
   padding:13px;border-radius:12px;font-weight:700;font-size:.8rem;cursor:pointer}
+
+/* ===== POST-SUBMISSION DISPATCH RECEIPT MODAL (#dispatchReceiptModal) —
+   reuses .confirm-drawer/.confirm-card for the overlay + card chrome,
+   same obsidian glass + mint accent convention as every other modal here. */
+.receipt-card{text-align:center}
+.receipt-icon-wrap{display:flex;justify-content:center;margin-bottom:10px}
+.receipt-title{font-size:1rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em;color:var(--mint2);margin-bottom:4px}
+.receipt-sub{font-size:.76rem;color:var(--muted);margin-bottom:18px;line-height:1.4}
+.receipt-ticket-badge{width:100%;background:rgba(0,230,153,.08);border:1px solid rgba(0,230,153,.4);
+  border-radius:14px;padding:16px;margin-bottom:16px;cursor:pointer;font-family:inherit}
+.receipt-ticket-id{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:1.22rem;
+  font-weight:900;color:var(--mint2);letter-spacing:.02em;word-break:break-all}
+.receipt-ticket-hint{font-size:.6rem;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:.05em}
+.receipt-summary{display:flex;flex-direction:column;gap:8px;margin-bottom:18px;text-align:left}
+.receipt-row{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:.78rem;
+  padding:10px 12px;background:rgba(255,255,255,.03);border-radius:10px;border:1px solid rgba(255,255,255,.06)}
+.receipt-row-label{color:var(--muted);font-weight:800;text-transform:uppercase;font-size:.6rem;letter-spacing:.05em;flex-shrink:0}
+.receipt-row-value{color:var(--text);font-weight:700;text-align:right}
+.receipt-status-pill{display:inline-block;padding:3px 10px;border-radius:9999px;font-size:.6rem;font-weight:800;
+  letter-spacing:.04em;text-transform:uppercase;background:rgba(0,230,153,.14);color:var(--mint2);border:1px solid rgba(0,230,153,.4)}
+.receipt-status-pill.offline{background:rgba(245,158,11,.14);color:var(--warn);border-color:rgba(245,158,11,.4)}
+.receipt-actions{display:flex;flex-direction:column;gap:10px}
+.receipt-action-row{display:flex;gap:10px}
+.btn-receipt-secondary{flex:1;background:rgba(3,7,18,.6);border:1px solid rgba(255,255,255,.08);color:var(--text);
+  padding:11px 8px;border-radius:10px;font-weight:700;font-size:.68rem;cursor:pointer;display:flex;
+  align-items:center;justify-content:center;gap:6px;transition:border-color .15s}
+.btn-receipt-secondary:hover{border-color:rgba(255,255,255,.18)}
+.btn-receipt-secondary svg{color:var(--mint2);flex-shrink:0}
+.btn-receipt-dismiss{width:100%;box-sizing:border-box;min-height:52px;background:var(--mint);color:#051311;
+  border:none;padding:14px 16px;border-radius:12px;font-family:inherit;font-weight:700;font-size:16px;cursor:pointer}
 
 /* ===== "WHAT IS CIVIC INTELLIGENCE?" HERO (index.html only markup, shared styles) ===== */
 .ci-hero{padding:0}
@@ -1417,6 +1448,48 @@ textarea.input{resize:none;line-height:1.4}
     </div>
   </div>
 
+  <!-- ===== POST-SUBMISSION DISPATCH RECEIPT MODAL — fires immediately after
+       finalizeSubmitReport() auto-routes to Map & Feed, acknowledging the
+       real ticket ID (server-authoritative reportId when reachable, the
+       same taxonomy computed client-side when queued offline) rather than
+       leaving the citizen to go find their own report in the feed below.
+       See openDispatchReceiptModal()/closeDispatchReceiptModal(). ===== -->
+  <div id="dispatchReceiptModal" class="confirm-drawer">
+    <div class="confirm-card receipt-card">
+      <div class="receipt-icon-wrap">
+        <svg viewBox="0 0 24 24" width="40" height="40" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+      </div>
+      <div class="receipt-title">Dispatch Acknowledged</div>
+      <div class="receipt-sub" id="receiptSub">Your report has been logged to the public ledger.</div>
+
+      <button type="button" class="receipt-ticket-badge" id="receiptTicketBadge" aria-label="Copy ticket ID">
+        <div class="receipt-ticket-id" id="receiptTicketId">—</div>
+        <div class="receipt-ticket-hint">Tap to copy ticket ID</div>
+      </button>
+
+      <div class="receipt-summary">
+        <div class="receipt-row"><span class="receipt-row-label">Type &amp; Dept.</span><span class="receipt-row-value" id="receiptDept">—</span></div>
+        <div class="receipt-row"><span class="receipt-row-label">Location</span><span class="receipt-row-value" id="receiptLoc">—</span></div>
+        <div class="receipt-row"><span class="receipt-row-label">Status</span><span class="receipt-row-value"><span class="receipt-status-pill" id="receiptStatus">Open Dispatch</span></span></div>
+        <div class="receipt-row"><span class="receipt-row-label">Timestamp</span><span class="receipt-row-value" id="receiptTime">—</span></div>
+      </div>
+
+      <div class="receipt-actions">
+        <div class="receipt-action-row">
+          <button type="button" class="btn-receipt-secondary" id="btnReceiptGraphic">
+            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download Graphic
+          </button>
+          <button type="button" class="btn-receipt-secondary" id="btnReceiptCopyLink">
+            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            Copy Direct Link
+          </button>
+        </div>
+        <button type="button" class="btn-receipt-dismiss" id="btnReceiptDismiss">Dismiss to Feed</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -1443,14 +1516,67 @@ function esc(s){
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-// Local-only, non-PII classification of free text into a routing department.
-// Runs entirely client-side; nothing is sent anywhere for this step.
-function parseDepartment(text){
-  const t = text.toLowerCase();
-  if (t.includes('sidewalk') || t.includes('ada') || t.includes('ramp')) return 'Public Works / ADA';
-  if (t.includes('wire') || t.includes('dark') || t.includes('power') || t.includes('light')) return 'Utilities & Electrical';
-  if (t.includes('trash') || t.includes('dump') || t.includes('litter') || t.includes('waste')) return 'Sanitation';
-  return 'Public Works';
+// Local-only, non-PII classification of free text into a routing
+// department + national taxonomy hazard code. Runs entirely client-side;
+// nothing is sent anywhere for this step. Mirrors api/_lib/store.js's
+// classifyDescriptionHazard() exactly (same groups, same priority order),
+// so a citizen's toast/receipt always names the same department the
+// server actually routes the ticket to. Checked in priority order so an
+// overlapping word (e.g. "signal" containing "sign") resolves to the more
+// specific department.
+const HAZARD_GROUPS = [
+  { code: 'PRK', department: 'Parks & Forestry', keywords: ['planter', 'plant', 'tree', 'park', 'bench'] },
+  { code: 'BIO', department: 'Sanitation & Health', keywords: ['vomit', 'spill', 'biohazard'] },
+  { code: 'WST', department: 'Sanitation & Health', keywords: ['overflow', 'trash', 'litter', 'waste', 'dump'] },
+  { code: 'SIG', department: 'Traffic & Electrical', keywords: ['signal'] },
+  { code: 'LGT', department: 'Traffic & Electrical', keywords: ['light', 'power', 'dark', 'wire'] },
+  { code: 'VAN', department: 'Property & Traffic', keywords: ['graffiti', 'vandalism', 'vandalize', 'stolen'] },
+  { code: 'SGN', department: 'Property & Traffic', keywords: ['sign'] },
+  { code: 'ADA', department: 'Public Works / ADA', keywords: ['sidewalk', 'ada', 'ramp'] },
+  { code: 'PTH', department: 'Public Works / Roads', keywords: ['pothole', 'asphalt', 'pavement', 'gap'] },
+  { code: 'DRN', department: 'Public Works', keywords: ['drainage'] }
+];
+// Category-chip fallback for when the free-text description names nothing
+// specific (e.g. a blank description with just a category tap) — keyed by
+// the exact "data-cat" labels in Section 1 of the report form.
+const HAZARD_CATEGORY_FALLBACK = {
+  'pothole / road': { code: 'PTH', department: 'Public Works / Roads' },
+  'power / lighting': { code: 'LGT', department: 'Traffic & Electrical' },
+  'waste / litter': { code: 'WST', department: 'Sanitation & Health' },
+  'sidewalk / ada': { code: 'ADA', department: 'Public Works / ADA' }
+};
+function classifyHazard(text, category){
+  const t = String(text || '').toLowerCase();
+  for (const group of HAZARD_GROUPS) {
+    for (const kw of group.keywords) {
+      if (new RegExp('\\b' + kw + '\\b').test(t)) {
+        return { code: group.code, department: group.department, type: kw.charAt(0).toUpperCase() + kw.slice(1) };
+      }
+    }
+  }
+  const fallback = HAZARD_CATEGORY_FALLBACK[String(category || '').toLowerCase().trim()];
+  if (fallback) return Object.assign({ type: category }, fallback);
+  return { code: 'GEN', department: 'Public Works', type: category || 'General Hazard' };
+}
+function parseDepartment(text, category){
+  return classifyHazard(text, category).department;
+}
+
+// Client-side fallback ticket ID — only used when this report had to be
+// queued offline (attemptSubmitReport() couldn't reach the server, so
+// there's no server-authoritative reportId yet). Mirrors the same
+// [ZONE]-[HAZARD]-[YYMMDD]-[HASH] taxonomy makeReportId() uses elsewhere
+// in this file, dated to the moment of submission ("0m ago").
+function liveTicketHash(str){
+  let h = 0; const s = String(str || '');
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return 1000 + (h % 9000);
+}
+function buildLiveTicketId(wardSlug, clientId, hazCode){
+  const wardNum = (String(wardSlug || '').match(/\d+/) || ['4'])[0];
+  const d = new Date();
+  const dateCode = String(d.getFullYear()).slice(-2) + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+  return ['D' + wardNum, hazCode, dateCode, liveTicketHash(clientId)].join('-');
 }
 
 function toast(msg){
@@ -3749,7 +3875,11 @@ async function attemptSubmitReport(payload){
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
     });
     if (!res.ok) throw new Error('submit failed: ' + res.status);
-    return { ok: true };
+    // The server is the authority on this ticket's real reportId/hazardCode
+    // (it runs the same classifyDescriptionHazard() logic against the
+    // description) — pass that straight through rather than re-deriving it.
+    const body = await res.json().catch(() => ({}));
+    return { ok: true, reportId: body.reportId || null, hazardCode: body.hazardCode || null };
   } catch (err) {
     return { ok: false };
   }
@@ -3853,6 +3983,95 @@ document.getElementById('btnConfirmCancel').addEventListener('click', () => {
   document.getElementById('photoBox').style.display = 'none';
 });
 
+// ===== POST-SUBMISSION DISPATCH RECEIPT MODAL — see finalizeSubmitReport(),
+// the only place that opens this (right after auto-routing to Map & Feed).
+async function copyTextToClipboard(text){
+  try { await navigator.clipboard.writeText(text); return true; } catch (e) { return false; }
+}
+let pendingReceiptOpts = null;
+function openDispatchReceiptModal(opts){
+  pendingReceiptOpts = opts || {};
+  const { ticketId, department, type, location: loc, queuedOffline, timestamp } = pendingReceiptOpts;
+  document.getElementById('receiptTicketId').textContent = ticketId || '—';
+  document.getElementById('receiptDept').textContent = (department || 'Public Works') + (type ? ' / ' + type : '');
+  document.getElementById('receiptLoc').textContent = loc || 'Local District';
+  const statusEl = document.getElementById('receiptStatus');
+  statusEl.textContent = queuedOffline ? 'Queued Offline' : 'Open Dispatch';
+  statusEl.classList.toggle('offline', !!queuedOffline);
+  document.getElementById('receiptSub').textContent = queuedOffline
+    ? 'Saved on this device — will sync to the public ledger once you\'re back online.'
+    : 'Your report has been logged to the public ledger.';
+  const ts = timestamp instanceof Date ? timestamp : new Date();
+  document.getElementById('receiptTime').textContent = ts.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  document.getElementById('dispatchReceiptModal').classList.add('open');
+}
+function closeDispatchReceiptModal(){
+  document.getElementById('dispatchReceiptModal').classList.remove('open');
+}
+document.getElementById('btnReceiptDismiss').addEventListener('click', closeDispatchReceiptModal);
+document.getElementById('dispatchReceiptModal').addEventListener('click', (e) => {
+  if (e.target.id === 'dispatchReceiptModal') closeDispatchReceiptModal();
+});
+document.getElementById('receiptTicketBadge').addEventListener('click', async () => {
+  const ok = await copyTextToClipboard(document.getElementById('receiptTicketId').textContent);
+  toast(ok ? '✓ Ticket ID copied' : 'Could not copy — select and copy manually');
+});
+document.getElementById('btnReceiptCopyLink').addEventListener('click', async () => {
+  const id = document.getElementById('receiptTicketId').textContent;
+  const url = location.origin + '/report/' + encodeURIComponent(id);
+  const ok = await copyTextToClipboard(url);
+  toast(ok ? '✓ Direct link copied' : 'Could not copy — try again');
+});
+// Small canvas-rendered proof-of-submission card (ticket ID + routing
+// summary) the citizen can save/share immediately — a lighter-weight
+// counterpart to the full Civic Brief's 1:1 Social Graphic, scoped to just
+// this one ticket rather than the whole district's live metrics.
+function downloadReceiptGraphic(opts){
+  const canvas = document.createElement('canvas');
+  const W = 720, H = 720;
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#0A0D12'; ctx.fillRect(0, 0, W, H);
+  ctx.strokeStyle = 'rgba(0,230,153,0.5)'; ctx.lineWidth = 2;
+  ctx.strokeRect(20, 20, W - 40, H - 40);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.font = '900 22px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif';
+  ctx.fillStyle = '#00E699';
+  ctx.fillText('CITIXEN UX™ — DISPATCH ACKNOWLEDGED', W / 2, 90);
+  ctx.font = '900 34px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace';
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText(opts.ticketId || '—', W / 2, 170);
+  const rows = [
+    ['TYPE & DEPT.', (opts.department || 'Public Works') + (opts.type ? ' / ' + opts.type : '')],
+    ['LOCATION', opts.location || 'Local District'],
+    ['STATUS', opts.queuedOffline ? 'QUEUED OFFLINE' : 'OPEN DISPATCH'],
+    ['TIMESTAMP', (opts.timestamp instanceof Date ? opts.timestamp : new Date()).toLocaleString()]
+  ];
+  let y = 260;
+  rows.forEach(([label, value]) => {
+    ctx.font = '800 15px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif';
+    ctx.fillStyle = '#00E699';
+    ctx.fillText(label, W / 2, y);
+    ctx.font = '700 20px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText(value, W / 2, y + 32);
+    y += 96;
+  });
+  ctx.font = '600 13px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif';
+  ctx.fillStyle = '#6B7280';
+  ctx.fillText('ANONYMOUS & SOVEREIGN · CITIXENUX.COM/APP', W / 2, H - 50);
+  canvas.toBlob(blob => {
+    if (!blob) { toast('Could not render the receipt graphic.'); return; }
+    const a = document.createElement('a'), href = URL.createObjectURL(blob);
+    a.href = href; a.download = 'citixen-ux-dispatch-receipt.png';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(href), 4000);
+  }, 'image/png');
+}
+document.getElementById('btnReceiptGraphic').addEventListener('click', () => {
+  downloadReceiptGraphic(pendingReceiptOpts || {});
+});
+
 // ===== GEOSPATIAL GRID HASHING & STATE SYNC — real cross-page-load
 // persistence via same-origin localStorage (index.html and app.html are
 // served from the same origin), not a simulated/fake sync: a city code
@@ -3882,7 +4101,8 @@ async function finalizeSubmitReport(opts){
   opts = opts || {};
   const rawDesc=document.getElementById('repDesc').value.trim() || 'Hazard reported.';
   const rawLoc=document.getElementById('repLoc').value.trim() || 'Local District';
-  const dept=parseDepartment(rawDesc);
+  const hz=classifyHazard(rawDesc, cat);
+  const dept=hz.department;
   const urgentOverride = !!opts.urgentOverride;
   const overrideNote = urgentOverride && opts.matchedProject
     ? ' [Flagged despite scheduled CIP work: ' + opts.matchedProject.name + ']'
@@ -3938,9 +4158,14 @@ async function finalizeSubmitReport(opts){
   }; // no PII fields — see api/_lib/store.js's privacy note; this matches that model exactly.
 
   const result = await attemptSubmitReport(payload);
+  // The server runs the same classifyDescriptionHazard() logic against the
+  // description and is the authority on this ticket's real reportId when
+  // reachable; a queued-offline submission gets a client-derived ID in the
+  // same taxonomy instead, since there's no server response to read yet.
+  const ticketId = (result.ok && result.reportId) ? result.reportId : buildLiveTicketId(ward, nc.id, hz.code);
   if (result.ok) {
     toast(urgentOverride ? '✓ Published as urgent — routed to ' + dept : '✓ Published — routed to ' + dept);
-    trackEvent('report_submit', { ok: true, category: cat, dept, ward, urgentOverride });
+    trackEvent('report_submit', { ok: true, category: cat, dept, ward, urgentOverride, reportId: ticketId });
     // Now that the ticket actually landed in the shared store (see
     // api/report/submit.js -> addTicket()), pull the Big 3 again so this
     // device's own Analytics tab reflects it immediately — no refresh, no
@@ -3953,7 +4178,7 @@ async function finalizeSubmitReport(opts){
     // 'online' event (see flushOfflineQueue()) — not just described as such.
     await queueOfflineSubmission({ id: 'sub-' + Date.now() + '-' + Math.random().toString(36).slice(2), payload });
     toast('Saved offline — will submit when you\'re back online.');
-    trackEvent('report_submit', { ok: false, queuedOffline: true, category: cat, dept, ward, urgentOverride });
+    trackEvent('report_submit', { ok: false, queuedOffline: true, category: cat, dept, ward, urgentOverride, reportId: ticketId });
   }
 
   // If this report started from tapping a dark block on the coverage grid,
@@ -3965,6 +4190,13 @@ async function finalizeSubmitReport(opts){
   }
 
   switchTab('tab-map', document.querySelectorAll('.navtab')[1]);
+  // Immediate overlay on top of the Map & Feed tab we just auto-routed to —
+  // acknowledges the dispatch with its real ticket ID before the citizen
+  // has to go hunting for their own report in the feed below.
+  openDispatchReceiptModal({
+    ticketId, department: dept, type: hz.type, location: rawLoc,
+    queuedOffline: !result.ok, timestamp: new Date()
+  });
 }
 
 function registerSW(){

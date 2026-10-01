@@ -29,7 +29,7 @@ module.exports = (req, res) => {
     return;
   }
   const body = req.body || {};
-  const { reportId, ward } = addTicket({
+  const { reportId, ward, hazardCode } = addTicket({
     category: body.category,
     location: body.location,
     description: body.description,
@@ -39,5 +39,5 @@ module.exports = (req, res) => {
     lng: body.lng,
     ward: body.ward
   });
-  res.status(200).json({ ok: true, receivedAt: new Date().toISOString(), reportId, ward });
+  res.status(200).json({ ok: true, receivedAt: new Date().toISOString(), reportId, ward, hazardCode });
 };
