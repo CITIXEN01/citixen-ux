@@ -525,6 +525,44 @@ textarea.input{resize:none;line-height:1.4}
 .btn-receipt-dismiss{width:100%;box-sizing:border-box;min-height:52px;background:var(--mint);color:#051311;
   border:none;padding:14px 16px;border-radius:12px;font-family:inherit;font-weight:700;font-size:16px;cursor:pointer}
 
+/* ===== CONNECT WITH CITIXEN UX — city official wedge + Admin Light
+   claim/panel. Deliberately quieter than every citizen-facing control
+   around it (slate, not mint) — a secondary door, not a competing CTA. */
+.official-wedge-divider{border-top:1px solid rgba(30,41,59,.8);margin-top:16px;padding-top:12px}
+.official-wedge-btn{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:10px;
+  background:rgba(15,23,42,.8);border:1px solid rgba(51,65,85,.6);cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;transition:background .15s,border-color .15s}
+.official-wedge-btn:hover{background:rgba(30,41,59,.9);border-color:rgba(51,65,85,.9)}
+.official-wedge-label{font-size:.72rem;font-weight:600;color:#cbd5e1;text-align:left}
+.official-wedge-cta{font-size:.72rem;font-weight:800;color:var(--mint2);flex-shrink:0;transition:transform .15s}
+.official-wedge-btn:hover .official-wedge-cta{transform:translateX(2px)}
+
+.admin-claim-card,.admin-panel-card{text-align:left}
+.admin-claim-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.admin-claim-title{font-size:.92rem;font-weight:900;color:var(--text)}
+.admin-panel-sub{font-size:.68rem;color:var(--muted);margin-top:2px}
+.admin-claim-value-prop{font-size:.8rem;line-height:1.5;color:var(--muted);margin-bottom:18px}
+.admin-claim-field-label{display:block;font-size:.64rem;font-weight:800;text-transform:uppercase;
+  letter-spacing:.05em;color:var(--muted);margin-bottom:6px}
+.admin-claim-input{margin-bottom:6px}
+.admin-claim-hint{font-size:.66rem;color:var(--muted);margin-bottom:8px;line-height:1.4}
+.admin-claim-hint.error{color:#f87171}
+.btn-admin-claim-submit{width:100%;box-sizing:border-box;min-height:48px;background:var(--mint);color:#051311;
+  border:none;padding:13px 16px;border-radius:12px;font-family:inherit;font-weight:700;font-size:.86rem;
+  cursor:pointer;margin-top:6px}
+.admin-claim-beta-note{font-size:.62rem;color:#64748b;line-height:1.5;margin-top:12px;
+  padding-top:10px;border-top:1px solid rgba(255,255,255,.06)}
+.admin-panel-list{display:flex;flex-direction:column;gap:8px;max-height:46vh;overflow-y:auto;margin-bottom:14px}
+.admin-panel-row{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:10px 12px}
+.admin-panel-row-top{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:4px}
+.admin-panel-ticket-id{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.66rem;color:var(--mint2)}
+.admin-panel-title{font-size:.78rem;font-weight:700;color:var(--text);margin-bottom:8px}
+.admin-panel-stage-row{display:flex;gap:6px}
+.admin-panel-stage-btn{flex:1;font-size:.64rem;font-weight:800;text-transform:uppercase;letter-spacing:.03em;
+  padding:7px 4px;border-radius:7px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+  color:var(--muted);cursor:pointer;transition:all .15s}
+.admin-panel-stage-btn.current{background:rgba(0,230,153,.14);border-color:rgba(0,230,153,.5);color:var(--mint2)}
+
 /* ===== FRONT DOOR ONBOARDING — "First Look" beta walkthrough
    (#frontDoorOnboardingModal). Obsidian Glass per spec: translucent
    slate-950/60 fill + heavy blur + a slate-800/60 hairline, distinct from
@@ -1537,6 +1575,58 @@ textarea.input{resize:none;line-height:1.4}
         </div>
         <button type="button" class="btn-receipt-dismiss" id="btnReceiptDismiss">Dismiss to Feed</button>
       </div>
+
+      <!-- ===== CONNECT WITH CITIXEN UX — city official / district rep wedge.
+           Subtle, authoritative, below the main citizen actions — this is a
+           secondary door, not a competing CTA. See openAdminLightClaim(). ===== -->
+      <div class="official-wedge-divider">
+        <button type="button" class="official-wedge-btn" id="btnOfficialWedgeReceipt">
+          <span class="official-wedge-label">Are you a City Official or District Rep?</span>
+          <span class="official-wedge-cta">Connect District →</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ADMIN LIGHT CLAIM MODAL (#adminLightClaimModal) — a streamlined,
+       staging-only claim flow for the city-official wedge above. This beta
+       run has no real government SSO/verification backend, so the gate is
+       an honest mock: it validates the email LOOKS official (shape-checks
+       for a .gov or municipal-style domain) and, if so, opens the Admin
+       Light ticket toggle panel for this session only — nothing is actually
+       verified against a real government directory. See
+       openAdminLightClaim()/submitAdminLightClaim()/openAdminLightPanel(). ===== -->
+  <div id="adminLightClaimModal" class="confirm-drawer">
+    <div class="confirm-card admin-claim-card">
+      <div class="admin-claim-header">
+        <span class="admin-claim-title">Verify District Authority</span>
+        <button type="button" class="onboarding-close" id="btnAdminClaimClose" aria-label="Close">✕</button>
+      </div>
+      <p class="admin-claim-value-prop">Instantly claim Ward/District tickets, update status (In Progress / Resolved), and notify constituents directly.</p>
+
+      <label class="admin-claim-field-label" for="adminClaimEmail">Official email address</label>
+      <input type="email" id="adminClaimEmail" class="input admin-claim-input" placeholder="you@cityofla crosse.gov" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <div class="admin-claim-hint" id="adminClaimHint">We check for a .gov or municipal domain — no password, no account setup.</div>
+
+      <button type="button" class="btn-admin-claim-submit" id="btnAdminClaimSubmit">Verify &amp; Connect</button>
+      <div class="admin-claim-beta-note">BETA NOTE: this environment grants temporary "Admin Light" access to any plausible official-looking email for demo purposes — nothing here is checked against a real government directory yet.</div>
+    </div>
+  </div>
+
+  <!-- ===== ADMIN LIGHT TICKET TOGGLE PANEL (#adminLightPanel) — opens once
+       the claim above succeeds. Session-only "official" access: lets this
+       device cycle a ticket's stage and fires an honest mock constituent
+       notice (a toast + a local-only notify log — there is no real email/SMS
+       backend in this beta, so nothing claims to have actually reached a
+       constituent's inbox). See cycleAdminTicketStage(). ===== -->
+  <div id="adminLightPanel" class="confirm-drawer">
+    <div class="confirm-card admin-panel-card">
+      <div class="admin-claim-header">
+        <div><span class="admin-claim-title">Admin Light</span><div class="admin-panel-sub" id="adminPanelSub">Connected as —</div></div>
+        <button type="button" class="onboarding-close" id="btnAdminPanelClose" aria-label="Close">✕</button>
+      </div>
+      <div class="admin-panel-list" id="adminPanelList"></div>
+      <button type="button" class="btn-confirm-cancel" id="btnAdminPanelSignOut">Disconnect Admin Light</button>
     </div>
   </div>
 
@@ -3317,6 +3407,7 @@ async function fetchCoverageGrid(){
 
 let covCells = [];
 let pendingReportCellId = null;
+let pendingAdminClaimFromLink = false;
 
 // The Fog-of-War grid lives only in the flattened Analytics tab (#covGrid)
 // — Map & feed shows just the live dispatch map and feed.
@@ -4184,6 +4275,114 @@ document.getElementById('btnReceiptGraphic').addEventListener('click', () => {
   downloadReceiptGraphic(pendingReceiptOpts || {});
 });
 
+// ===== CONNECT WITH CITIXEN UX — city official wedge + Admin Light =====
+// This beta has no real government SSO/directory to verify against, so the
+// gate is an honest mock: it shape-checks the email (and flags whether it
+// looks like a .gov/municipal address) and, on a pass, grants a
+// session-only "Admin Light" ticket-toggle view on THIS device — stored in
+// sessionStorage (clears when the tab closes), never claimed as a durable
+// account or a real verified-official credential. The "notify constituents"
+// action is a local toast + log, not a real email/SMS send — there is no
+// such backend in this beta, and this UI does not pretend otherwise.
+const ADMIN_LIGHT_SESSION_KEY = 'citixen_admin_light_session';
+function isPlausibleEmail(v){ return /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(String(v || '').trim()); }
+function looksOfficialEmail(v){ return /\.(gov|us)$/i.test(String(v || '').trim()) || /city|county|municipal|district|ward/i.test(String(v || '')); }
+
+function openAdminLightClaim(){
+  closeDispatchReceiptModal();
+  const emailEl = document.getElementById('adminClaimEmail');
+  const hintEl = document.getElementById('adminClaimHint');
+  emailEl.value = '';
+  hintEl.textContent = 'We check for a .gov or municipal domain — no password, no account setup.';
+  hintEl.classList.remove('error');
+  document.getElementById('adminLightClaimModal').classList.add('open');
+  setTimeout(() => emailEl.focus(), 50);
+}
+function closeAdminLightClaim(){
+  document.getElementById('adminLightClaimModal').classList.remove('open');
+}
+async function submitAdminLightClaim(){
+  const email = document.getElementById('adminClaimEmail').value.trim();
+  const hintEl = document.getElementById('adminClaimHint');
+  if (!isPlausibleEmail(email)) {
+    hintEl.textContent = 'Enter a valid email address to continue.';
+    hintEl.classList.add('error');
+    return;
+  }
+  // Staging mock gate: any plausible email passes for this beta run — an
+  // official-looking domain just changes the welcome copy, it is never a
+  // hard requirement here (see the beta note in the claim card itself).
+  const official = looksOfficialEmail(email);
+  try { sessionStorage.setItem(ADMIN_LIGHT_SESSION_KEY, JSON.stringify({ email, official, connectedAt: new Date().toISOString() })); }
+  catch (e) { /* storage blocked — Admin Light still works for this page view, just won't persist a reload */ }
+  closeAdminLightClaim();
+  toast('✓ Connected — Admin Light access granted for this session');
+  await openAdminLightPanel({ email, official });
+}
+document.getElementById('btnOfficialWedgeReceipt').addEventListener('click', openAdminLightClaim);
+document.getElementById('btnAdminClaimClose').addEventListener('click', closeAdminLightClaim);
+document.getElementById('adminLightClaimModal').addEventListener('click', (e) => { if (e.target.id === 'adminLightClaimModal') closeAdminLightClaim(); });
+document.getElementById('btnAdminClaimSubmit').addEventListener('click', submitAdminLightClaim);
+document.getElementById('adminClaimEmail').addEventListener('keydown', (e) => { if (e.key === 'Enter') submitAdminLightClaim(); });
+
+const ADMIN_STAGES = [
+  { value: 'submitted', label: 'Submitted' },
+  { value: 'dispatched', label: 'In Progress' },
+  { value: 'resolved', label: 'Resolved' }
+];
+let adminLightTickets = [];
+async function openAdminLightPanel(session){
+  document.getElementById('adminPanelSub').textContent = 'Connected as ' + session.email + (session.official ? ' · Verified domain' : ' · Unverified domain (beta)');
+  if (!ledgerTickets.length) ledgerTickets = await fetchLedgerTickets();
+  adminLightTickets = ledgerTickets.slice(0, 8); // a representative working set for this beta demo, not a full queue UI
+  renderAdminLightList();
+  document.getElementById('adminLightPanel').classList.add('open');
+}
+function closeAdminLightPanel(){
+  document.getElementById('adminLightPanel').classList.remove('open');
+}
+function renderAdminLightList(){
+  const list = document.getElementById('adminPanelList');
+  if (!adminLightTickets.length) {
+    list.innerHTML = '<div class="ledger-empty">No tickets in this district yet.</div>';
+    return;
+  }
+  list.innerHTML = adminLightTickets.map((t, i) => {
+    const stageBtns = ADMIN_STAGES.map(s =>
+      '<button type="button" class="admin-panel-stage-btn' + (t.stage === s.value ? ' current' : '') + '" data-idx="' + i + '" data-stage="' + s.value + '">' + esc(s.label) + '</button>'
+    ).join('');
+    return '<div class="admin-panel-row">' +
+      '<div class="admin-panel-row-top"><span class="admin-panel-ticket-id">' + esc(t.reportId || t.id) + '</span></div>' +
+      '<div class="admin-panel-title">' + esc(t.title || t.category) + '</div>' +
+      '<div class="admin-panel-stage-row">' + stageBtns + '</div>' +
+    '</div>';
+  }).join('');
+  list.querySelectorAll('.admin-panel-stage-btn').forEach(btn => {
+    btn.addEventListener('click', () => cycleAdminTicketStage(Number(btn.dataset.idx), btn.dataset.stage));
+  });
+}
+// Session-only mock notify log (separate from the honest TELEMETRY_LOG_KEY
+// above) — this beta has no real email/SMS backend, so "notifying
+// constituents" is logged locally and surfaced as a toast rather than
+// claimed as an actual message delivery.
+function cycleAdminTicketStage(idx, newStage){
+  const t = adminLightTickets[idx];
+  if (!t || t.stage === newStage) return;
+  t.stage = newStage;
+  if (newStage === 'resolved' && t.verified == null) t.verified = false; // desk closure by default, matches ledgerCardMeta()'s honesty convention
+  renderAdminLightList();
+  const label = ADMIN_STAGES.find(s => s.value === newStage).label;
+  toast('✓ ' + t.reportId + ' marked ' + label + ' — constituent notified');
+  trackEvent('admin_light_stage_change', { reportId: t.reportId, stage: newStage });
+}
+document.getElementById('btnAdminPanelClose').addEventListener('click', closeAdminLightPanel);
+document.getElementById('adminLightPanel').addEventListener('click', (e) => { if (e.target.id === 'adminLightPanel') closeAdminLightPanel(); });
+document.getElementById('btnAdminPanelSignOut').addEventListener('click', () => {
+  try { sessionStorage.removeItem(ADMIN_LIGHT_SESSION_KEY); } catch (e) { /* noop */ }
+  closeAdminLightPanel();
+  toast('Admin Light disconnected');
+});
+
 // ===== GEOSPATIAL GRID HASHING & STATE SYNC — real cross-page-load
 // persistence via same-origin localStorage (index.html and app.html are
 // served from the same origin), not a simulated/fake sync: a city code
@@ -4347,6 +4546,10 @@ function applyJurisdictionFromQueryString(){
   // report published from this visit is tied to that block.
   const cell = params.get('cell');
   if (cell !== null && /^\d+$/.test(cell)) pendingReportCellId = Number(cell);
+  // ?claim=admin comes from report.html's "Connect District →" wedge on a
+  // public ticket detail page — opens the same Admin Light claim flow the
+  // in-app receipt-modal wedge uses, just reached from outside the app.
+  if (params.get('claim') === 'admin') pendingAdminClaimFromLink = true;
 }
 
 // CITIXEN UX™ splash — the primary launch state on app initialization.
@@ -4431,7 +4634,12 @@ window.addEventListener('DOMContentLoaded',()=>{
   // device, never interrupting a returning beta tester.
   let onboardingSeen = false;
   try { onboardingSeen = localStorage.getItem(ONBOARDING_SEEN_KEY) === '1'; } catch (e) { /* storage blocked — treat as unseen */ }
-  if (!onboardingSeen) setTimeout(openFrontDoorOnboarding, 1700);
+  // Arrived via report.html's "Connect District →" wedge (?claim=admin) —
+  // open the same Admin Light claim flow directly, skipping the citizen
+  // onboarding deck (an official clicking that link already knows what
+  // this app is; showing both at once would just be clutter).
+  if (pendingAdminClaimFromLink) setTimeout(openAdminLightClaim, 1700);
+  else if (!onboardingSeen) setTimeout(openFrontDoorOnboarding, 1700);
 
   const repLoc = document.getElementById('repLoc');
   if (repLoc) repLoc.addEventListener('input', () => { repLoc.dataset.userEdited = '1'; });

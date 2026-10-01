@@ -76,6 +76,18 @@ h1{font-size:1.3rem;margin:10px 0 4px}
 .btn-primary{background:var(--mint);color:#051311}
 .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
 .notfound{text-align:center;padding:60px 20px}
+
+/* Connect with Citixen UX — city official wedge, same quiet/secondary
+   treatment as app.html's version (see .official-wedge-* there); this
+   page has no ticket-toggle UI of its own, so it hands off to app.html's
+   Admin Light claim flow via ?claim=admin. */
+.official-wedge-btn{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:10px;
+  background:rgba(15,23,42,.8);border:1px solid rgba(51,65,85,.6);cursor:pointer;text-decoration:none;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;transition:background .15s,border-color .15s}
+.official-wedge-btn:hover{background:rgba(30,41,59,.9);border-color:rgba(51,65,85,.9)}
+.official-wedge-label{font-size:.72rem;font-weight:600;color:#cbd5e1;text-align:left}
+.official-wedge-cta{font-size:.72rem;font-weight:800;color:var(--mint2);flex-shrink:0;transition:transform .15s}
+.official-wedge-btn:hover .official-wedge-cta{transform:translateX(2px)}
 </style>
 </head>
 <body>
@@ -270,6 +282,11 @@ function renderTicket(ticket){
       <a class="btn btn-primary" href="/app.html">File a similar report</a>
       <a class="btn btn-outline" href="/#dashboard">View full ledger</a>
     </div>
+
+    <a class="official-wedge-btn" href="/app?claim=admin" style="margin-top:10px">
+      <span class="official-wedge-label">Are you a City Official or District Rep?</span>
+      <span class="official-wedge-cta">Connect District →</span>
+    </a>
   `;
 
   loadBig3(ticket.ward);
