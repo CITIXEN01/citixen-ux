@@ -969,7 +969,7 @@ textarea.input{resize:none;line-height:1.4}
           <h2 class="csap-title csa-hero-title" id="csaTitle">CROWD SAVE AMERICA<span class="csap-tm">™</span></h2>
           <p class="csa-hero-sub">Restoring civic trust, one snap at a time.</p>
           <div class="csa-hero-badge"><span class="csap-live-dot" aria-hidden="true"></span>BLOCKS VERIFIED • LIVE</div>
-          <div class="csap-count csa-hero-count" data-csa-count>3,482,109</div>
+          <div class="csap-count csa-hero-count" data-csa-count>0</div>
           <div class="csa-hero-map">
           <svg class="csa-map" viewBox="-6 -6 658 366" aria-hidden="true" focusable="false" data-role="img" aria-label="Map of the continental United States covered in a block grid, with glowing dots marking cities reporting through CITIXEN UX">
             <defs>
@@ -988,7 +988,7 @@ textarea.input{resize:none;line-height:1.4}
           </div>
           <div class="csa-hero-progress">
             <div class="csa-hero-target"><span data-csa-target>11,000,000</span> TOTAL AMERICAN BLOCKS</div>
-            <div class="csa-hero-zone-row"><span class="csa-hero-zone" data-csa-zone-lbl>LA CROSSE ZONE: 34 / 80 BLOCKS VERIFIED</span><span class="csap-zone-pct" data-csa-zone-pct>42.5%</span></div>
+            <div class="csa-hero-zone-row"><span class="csa-hero-zone" data-csa-zone-lbl>LOCAL ZONE: 0 / 0 BLOCKS VERIFIED</span><span class="csap-zone-pct" data-csa-zone-pct>0%</span></div>
             <div class="csap-track csa-hero-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="42.5" aria-label="La Crosse zone blocks verified" data-csa-track><div class="csap-fill" data-csa-fill></div></div>
           </div>
           <span class="cx-btn-primary csa-hero-cta" id="csaHeroCta">Learn More</span>
@@ -1265,9 +1265,9 @@ textarea.input{resize:none;line-height:1.4}
         <div class="csap-divider" aria-hidden="true"></div>
         <div class="csap-target"><span data-csa-target>11,000,000</span> TOTAL AMERICAN BLOCKS</div>
         <div class="csap-zone">
-          <div class="csap-zone-lbl" data-csa-zone-lbl>LA CROSSE ZONE: 34 / 80 BLOCKS VERIFIED</div>
+          <div class="csap-zone-lbl" data-csa-zone-lbl>LOCAL ZONE: 0 / 0 BLOCKS VERIFIED</div>
           <div class="csap-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="42.5" aria-label="La Crosse zone blocks verified" data-csa-track><div class="csap-fill" data-csa-fill></div></div>
-          <div class="csap-zone-pct" data-csa-zone-pct>42.5%</div>
+          <div class="csap-zone-pct" data-csa-zone-pct>0%</div>
         </div>
       </div>
 
@@ -1536,6 +1536,11 @@ async function initAnalytics(){
   nationalDataCache = lastNationalData;
   await loadBig3();
   await updateAppTelemetryScorecard(); // Dashboard tab's Geotagged Scorecard — real numbers, see above
+  // Real national/coverage data has now loaded — refresh the Crowd Save
+  // America hero ticker (initCsaDashTicker() first hydrates it with honest
+  // placeholders before this data exists) so it shows the real aggregate.
+  const csaCardEl = document.getElementById('csaCard');
+  if (csaCardEl && typeof hydrateCsaTicker === 'function') hydrateCsaTicker(csaCardEl, true);
 }
 
 /* =====================================================================
@@ -4195,21 +4200,45 @@ function initInstantReportAndQuickKeys(){
   });
 }
 
-/* Crowd Save America™ progress modal figures. Fixed campaign display
-   values (not a live feed) — edit here to update the modal. */
+/* Crowd Save America™ progress modal figures. totalBlocks is a declared
+   nationwide matrix-size target (same disclosed figure as the Spatial
+   Grid info modal elsewhere in this app — not a live count). blocksVerified/
+   zoneName/zoneVerified/zoneTotal start as honest placeholders and are
+   overwritten by refreshCsaProgressData() with the real nationwide
+   verified-block aggregate (lastNationalData.nationalGridTilesDigitized,
+   the same figure #natTiles shows) and the real detected jurisdiction's
+   covCells coverage — never a fabricated "live" number. */
 const CSA_PROGRESS = {
-  blocksVerified: 3482109,
+  blocksVerified: 0,
   totalBlocks: 11000000,
-  zoneName: 'LA CROSSE',
-  zoneVerified: 34,
-  zoneTotal: 80
+  zoneName: 'LOCAL',
+  zoneVerified: 0,
+  zoneTotal: 0
 };
+// Pulls the latest real figures into CSA_PROGRESS. Safe to call before the
+// national/coverage data has loaded — it just keeps the honest placeholders
+// until lastNationalData/covCells/currentWardMeta are populated (see
+// initAnalytics()), at which point the next hydrateCsaTicker() call reflects
+// the real numbers.
+function refreshCsaProgressData(){
+  if (lastNationalData && typeof lastNationalData.nationalGridTilesDigitized === 'number') {
+    CSA_PROGRESS.blocksVerified = lastNationalData.nationalGridTilesDigitized;
+  }
+  if (covCells.length) {
+    CSA_PROGRESS.zoneTotal = covCells.length;
+    CSA_PROGRESS.zoneVerified = covCells.filter(c => c.covered).length;
+  }
+  if (currentWardMeta && currentWardMeta.cityName) {
+    CSA_PROGRESS.zoneName = currentWardMeta.cityName.toUpperCase();
+  }
+}
 // Fills a ticker block (any element with data-csa-* hooks) from
 // CSA_PROGRESS. animate=true ticks the counter up into its value and fills
 // the zone bar from empty; reduced motion jumps straight to the end state.
 const csaTickRafs = new WeakMap();
 function hydrateCsaTicker(root, animate){
   if (!root) return;
+  refreshCsaProgressData();
   const p = CSA_PROGRESS, fmt = (n) => Math.round(n).toLocaleString('en-US');
   const pct = p.zoneTotal ? (p.zoneVerified / p.zoneTotal) * 100 : 0;
   const q = (k) => root.querySelector('[data-csa-' + k + ']');
