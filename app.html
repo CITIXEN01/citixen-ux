@@ -47,24 +47,24 @@
 <title>CITIXEN UX™</title>
 <meta name="description" content="Improve Your Civic Experience">
 <!-- Open Graph / Twitter preview card — fixes the gray-box fallback iMessage/
-     SMS showed for citixenux.com/app. og-preview.png is a real pre-rendered
-     1200x630 PNG (glowing emerald logo on Obsidian Glass #020617), not a
-     generated-on-the-fly placeholder — see /tmp/.../og-source.html used to
-     render it. Absolute URLs throughout (the metadataBase equivalent for a
-     plain static site — there's no Next.js metadataBase config to set here,
-     so every URL below is just written out in full against
-     https://citixenux.com instead): relative og:image/icon URLs are
-     unreliable for link-preview crawlers. -->
+     SMS showed for citixenux.com/app. og-v4.png (Patch #4.10.2 — renamed
+     from og-preview.png, which no longer exists in this repo) is a real
+     pre-rendered 1200x630 PNG (glowing emerald shield scaled prominently on
+     a #090D16 background), not a generated-on-the-fly placeholder — see
+     /tmp/.../og-v4-source.html used to render it. Absolute URLs throughout
+     (the metadataBase equivalent for a plain static site — there's no
+     Next.js metadataBase config to set here, so every URL below is just
+     written out in full against https://citixenux.com instead): relative
+     og:image/icon URLs are unreliable for link-preview crawlers. -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://citixenux.com/app">
 <meta property="og:title" content="CITIXEN UX™">
 <meta property="og:description" content="Improve Your Civic Experience">
-<!-- Patch 4.10.1: a "?v=4.10.1" cache-busting query string on the image
-     URL — iMessage/Applebot and other link-preview crawlers cache an
-     og:image by URL, so a same-URL replacement (like 4.10's tagline swap)
-     can keep serving a stale cached render until the URL itself changes.
-     Bump this version string on any future og-preview.png content change. -->
-<meta property="og:image" content="https://citixenux.com/og-preview.png?v=4.10.1">
+<!-- Patch #4.10.2: renaming the asset from og-preview.png to og-v4.png is
+     itself a new URL, so this round's content change is already guaranteed
+     a fresh crawl without needing its own "?v=" cache-buster (the pattern
+     Patch 4.10.1 used for a same-URL content change). -->
+<meta property="og:image" content="https://citixenux.com/og-v4.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="CITIXEN UX™ - Improve Your Civic Experience">
@@ -74,7 +74,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="CITIXEN UX™">
 <meta name="twitter:description" content="Improve Your Civic Experience">
-<meta name="twitter:image" content="https://citixenux.com/og-preview.png?v=4.10.1">
+<meta name="twitter:image" content="https://citixenux.com/og-v4.png">
 <meta name="theme-color" content="#00E699">
 <meta name="referrer" content="no-referrer">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -712,18 +712,10 @@ textarea.input{resize:none;line-height:1.4}
 .btn-receipt-secondary.copied svg{color:#34d399}
 .btn-receipt-dismiss{width:100%;box-sizing:border-box;min-height:52px;background:var(--mint);color:#051311;
   border:none;padding:14px 16px;border-radius:12px;font-family:inherit;font-weight:700;font-size:16px;cursor:pointer}
-/* Add to Apple Wallet — dark glass button, its own full-width row between the
-   secondary action pair and the Dismiss button. See handleAddToWallet(): this
-   always calls the real /api/passbook endpoint, which honestly reports that
-   pass signing isn't available in this beta rather than faking a .pkpass, so
-   every tap (iOS or not) falls back to the Copy Direct Link behavior. */
-.btn-receipt-wallet{width:100%;box-sizing:border-box;min-height:48px;background:#000;
-  border:1px solid #1e293b;color:#f1f5f9;padding:12px 16px;border-radius:10px;font-family:inherit;
-  font-weight:700;font-size:.74rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  gap:8px;transition:border-color .15s}
-.btn-receipt-wallet:hover{border-color:#334155}
-.btn-receipt-wallet svg{flex-shrink:0;color:#f1f5f9}
-.btn-receipt-wallet.copied{color:#34d399;border-color:rgba(52,211,153,.5)}
+/* Patch #4.14 — "Add to Apple Wallet" (.btn-receipt-wallet / handleAddToWallet())
+   removed per this round's action-row streamline: the receipt now keeps only
+   Download Graphic, Copy Direct Link, and Dismiss to Feed. api/passbook.js
+   is left in place but is no longer called from here. */
 
 /* ===== 1:1 SOCIAL GRAPHIC EXPORT — real DOM node rendered to PNG via
    html2canvas (see renderAndShowSocialGraphic()), not a hand-drawn canvas,
@@ -1872,7 +1864,7 @@ textarea.input{resize:none;line-height:1.4}
           <span class="receipt-loc-coords" id="receiptLocCoords">—</span>
           <span class="receipt-loc-district" id="receiptLocDistrict"></span>
         </span></div>
-        <div class="receipt-row"><span class="receipt-row-label">Status</span><span class="receipt-row-value"><span class="receipt-status-pill" id="receiptStatus">Open Dispatch</span></span></div>
+        <div class="receipt-row"><span class="receipt-row-label">Status</span><span class="receipt-row-value"><span class="receipt-status-pill" id="receiptStatus">Logged To Ledger</span></span></div>
         <div class="receipt-row"><span class="receipt-row-label">Timestamp</span><span class="receipt-row-value" id="receiptTime">—</span></div>
       </div>
 
@@ -1887,10 +1879,6 @@ textarea.input{resize:none;line-height:1.4}
             <span id="btnReceiptCopyLinkLabel">Copy Direct Link</span>
           </button>
         </div>
-        <button type="button" class="btn-receipt-wallet" id="btnReceiptWallet">
-          <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
-          <span id="btnReceiptWalletLabel">Add to Apple Wallet</span>
-        </button>
         <button type="button" class="btn-receipt-dismiss" id="btnReceiptDismiss">Dismiss to Feed</button>
       </div>
     </div>
@@ -4860,9 +4848,17 @@ async function copyTextToClipboard(text){
 // of concatenating department+type and risking a repeated tag — e.g.
 // department "Public Works / ADA" + type "Ramp" becomes "Public Works ·
 // Ramp / ADA", never "Public Works / ADA / Ramp".
+// Patch #4.14 — citizen-facing surfaces (this receipt modal + the shared
+// social export graphic, the only two callers of this function) display
+// "Civic Intake" in place of the raw "Public Works" department root, per
+// this round's municipal-language scrub. The real routing taxonomy itself
+// (HAZARD_GROUPS/classifyHazard, used for operator dispatch and the
+// post-publish toast's "routed to <dept>" text) is untouched — this is a
+// display-only relabel on the two citizen-receipt surfaces.
 function formatDeptBreadcrumb(department, type){
   const parts = String(department || 'Public Works').split('/').map(s => s.trim()).filter(Boolean);
-  const root = parts[0] || 'Public Works';
+  let root = parts[0] || 'Public Works';
+  if (root === 'Public Works') root = 'Civic Intake';
   const sub = parts.slice(1).join(' / ');
   let typePart = (type || '').trim();
   if (sub && typePart && sub.toLowerCase() !== typePart.toLowerCase()) typePart = typePart + ' / ' + sub;
@@ -4895,7 +4891,7 @@ function openDispatchReceiptModal(opts){
   }
 
   const statusEl = document.getElementById('receiptStatus');
-  statusEl.textContent = queuedOffline ? 'Queued Offline' : 'Open Dispatch';
+  statusEl.textContent = queuedOffline ? 'Queued Offline' : 'Logged To Ledger';
   statusEl.classList.toggle('offline', !!queuedOffline);
   document.getElementById('receiptSub').textContent = queuedOffline
     ? 'Saved on this device — will sync to the public ledger once you\'re back online.'
@@ -4941,35 +4937,9 @@ document.getElementById('btnReceiptCopyLink').addEventListener('click', async ()
     toast('Could not copy — try again');
   }
 });
-// Add to Apple Wallet — a real .pkpass requires a signed Apple Pass Type ID
-// certificate + WWDR intermediate + private signing key, none of which exist
-// in this beta environment, and an unsigned .pkpass is rejected by the real
-// Wallet app anyway. Rather than fake a working integration, this calls the
-// real /api/passbook endpoint (which performs a genuine ticket lookup) and
-// honestly surfaces that pass generation isn't available yet, then falls
-// back to the same reliable behavior as Copy Direct Link — on iOS or not.
-async function handleAddToWallet(){
-  const id = document.getElementById('receiptTicketId').textContent;
-  try {
-    const res = await fetch('/api/passbook?ticket=' + encodeURIComponent(id));
-    if (res.ok) {
-      // Real signed-pass download path (iOS triggers the browser's native
-      // .pkpass handoff to Wallet here) — unreachable today since
-      // api/passbook.js honestly 501s with no Apple signing credentials in
-      // this beta, left in place for when those credentials exist.
-      return;
-    }
-  } catch (e) { /* network/offline — still show the fallback below */ }
-  // Native fallback: the pass-signing key isn't configured in this beta, so
-  // rather than surface that as an error or rewrite the button's own label,
-  // this quietly saves the direct link to the clipboard (a real, useful
-  // side effect) and confirms with a toast — Download Graphic and Copy
-  // Direct Link stay the clean, unmodified primary controls either way.
-  const url = location.origin + '/app?report=' + encodeURIComponent(id);
-  await copyTextToClipboard(url);
-  toast('Apple Wallet Pass Generated · Saved to Ledger');
-}
-document.getElementById('btnReceiptWallet').addEventListener('click', handleAddToWallet);
+// Patch #4.14 — "Add to Apple Wallet" (handleAddToWallet()/#btnReceiptWallet)
+// removed per this round's action-row streamline. api/passbook.js is left
+// in place but is no longer called from the client.
 // Real 1:1 social-card export: populates the off-screen
 // #socialGraphicExportCard DOM node (ticket ID, breadcrumb, coords/time, and
 // the citizen's own uploaded photo as the background), rasterizes it with
