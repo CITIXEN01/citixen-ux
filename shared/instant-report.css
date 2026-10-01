@@ -139,13 +139,9 @@
 .cx-pill-progress{background:#E0F2FE;color:#075985}
 .cx-pill-delayed{background:#FEF3C7;color:#92400E}
 .cx-empty{font-size:.72rem;color:#64748B}
-.cx-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px 12px;
-  font-size:.58rem;color:#64748B;background:#F8FAFC;font-variant-numeric:tabular-nums}
-/* Institutional / IP disclosure footer: trademark-suite declaration on the
-   left, Patent Pending disclosure on the right, on one row. */
-.cx-footer-ip{flex-wrap:wrap;text-align:right}
-.cx-footer-ip>div:first-child{text-align:left;flex:1;min-width:0}
-.cx-footer-ip>div:last-child{text-align:right;flex:1;min-width:0}
+/* Footer: a single centered line with just the two core marks — no legal
+   text, patent disclosure, or links. */
+.cx-footer-single{text-align:center;padding:12px 14px 14px;font-size:11px;color:#64748B;background:#F8FAFC}
 
 /* Dark-surface variant of the CIP list (Capital Projects deep-dive panels) */
 .cx-cip-dark li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);color:#E2E8F0}

@@ -404,7 +404,7 @@
         '<div class="cx-subrow">' +
           '<span class="cx-subrow-geo">' + esc(cityStateLabel(d)) + '</span>' +
           '<span class="cx-subrow-title">Free Report</span>' +
-          '<span class="cx-subrow-time">Generated<br>' + esc(stamp(generatedAt)) + '</span>' +
+          '<span class="cx-subrow-time">Generated ' + esc(stamp(generatedAt)) + '<br>citixenux.com</span>' +
         '</div>' +
         '<div class="cx-sec"><div class="cx-sec-title"><span>1</span>CIVIC PERFORMANCE METRICS</div>' +
           '<div class="cx-mcards">' +
@@ -419,9 +419,7 @@
             hazardGaugeCardHtml(hz) +
             actionCard(d.counts.dispatched, 'Open Active Dispatches', d.counts.dispatched > 0 ? '#FF3B30' : null) +
           '</div></div>' +
-        '<div class="cx-footer cx-footer-ip">' +
-          '<div>CITIXEN UX™ Engine • Civic Intelligence™ • Civic Memory™ • citixenux.com</div>' +
-          '<div>Patents Pending (Spatial Recognition Engine &amp; Economic Scraping/Planning Systems) • Public Ledger Verified</div>' +
+        '<div class="cx-footer-single">CITIXEN UX™ • Civic Intelligence™</div>' +
         '</div>' +
       '</div>' +
       '<div class="cx-actions"><button type="button" class="cx-btn-primary" id="cxPdfBtn">' + icon('printer') + 'Download / Print Official PDF</button></div>' +
@@ -470,15 +468,16 @@
       doc.text('Upgrade your civic experience.', tx, 56);
 
       // Document sub-header row: geotag (city + state, never a ward number) /
-      // FREE REPORT / timestamp.
+      // FREE REPORT / timestamp + citixenux.com.
       y = mastH + 30;
       doc.setTextColor(9, 13, 22); doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
       doc.text(cityStateLabel(d), M, y);
       doc.text('FREE REPORT', W / 2, y, { align: 'center' });
       doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
       doc.text('Generated ' + stamp(generatedAt), W - M, y, { align: 'right' });
-      doc.setDrawColor(226, 232, 240); doc.setLineWidth(0.75); doc.line(M, y + 12, W - M, y + 12);
-      y += 34;
+      doc.text('citixenux.com', W - M, y + 10, { align: 'right' });
+      doc.setDrawColor(226, 232, 240); doc.setLineWidth(0.75); doc.line(M, y + 20, W - M, y + 20);
+      y += 42;
 
       function ensureRoom(h) { if (y + h > 740) { doc.addPage(); y = 60; } }
       function sectionTitle(n, title) {
@@ -606,14 +605,14 @@
         y += bodyH + 10;
       })();
 
-      // Institutional / IP footer block: left trademark-suite declaration,
-      // right Patent Pending disclosure, on the same row.
-      ensureRoom(40);
-      doc.setDrawColor(226, 232, 240); doc.setLineWidth(0.75); doc.line(M, y, W - M, y); y += 14;
-      doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5);
-      doc.text('CITIXEN UX™ Engine • Civic Intelligence™ • Civic Memory™ • citixenux.com', M, y);
-      doc.text('Patents Pending (Spatial Recognition Engine & Economic', W - M, y, { align: 'right' }); y += 9;
-      doc.text('Scraping/Planning Systems) • Public Ledger Verified', W - M, y, { align: 'right' });
+      // Footer: a single centered line with just the two core marks — no
+      // legal text, patent disclosure, or links (per this round's spec).
+      // 11px in the on-screen CSS translates to ~8pt here (jsPDF's unit is
+      // pt, not px), to keep the same visual size.
+      ensureRoom(26);
+      doc.setFillColor(248, 250, 252); doc.rect(0, y - 6, W, 28, 'F');
+      doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
+      doc.text('CITIXEN UX™ • Civic Intelligence™', W / 2, y + 8, { align: 'center' });
 
       doc.save('citixen-free-report.pdf');
       toast('Official PDF brief downloaded.');
