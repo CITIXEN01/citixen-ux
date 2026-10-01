@@ -86,6 +86,9 @@
   // resolved, on a 10-point scale (7 of 10 resolved -> 7 / 10).
   function healthScore(d) { return d.total ? Math.round((d.resolved / d.total) * 10) : null; }
   function daysText(d) { return d.avgDays != null ? d.avgDays.toFixed(1) : '—'; }
+  // Direct unit conversion of the same real avgDays figure — not a
+  // different or invented measurement.
+  function avgHoursText(d) { return d.avgDays != null ? Math.round(d.avgDays * 24) + ' hrs' : 'N/A'; }
   function pctText(v) { return v != null ? v + '%' : 'N/A'; }
   function resolutionRate(d) { return d.total ? Math.round((d.resolved / d.total) * 100) + '%' : 'N/A'; }
   function delayedCount(d) { return d.cip.filter(function (p) { return p.status === 'delayed'; }).length; }
@@ -244,6 +247,9 @@
     modal.setAttribute('aria-labelledby', 'cxTitle');
     modal.innerHTML =
       '<div class="cx-panel">' +
+        // Modal breakout header: FREE REPORT centered, city/state tag
+        // beneath it (never a ward number), no timestamp here — the PDF
+        // brief already renders its own.
         '<div class="cx-head">' + icon('shieldPlain') +
           '<div class="cx-head-text"><div class="cx-head-title" id="cxTitle">Free Report</div>' +
           '<div class="cx-head-sub" id="cxJuris">Loading jurisdiction…</div></div>' +
@@ -293,7 +299,7 @@
       modal.querySelector('#cxPane-' + current).innerHTML = '<p class="cx-hint">Could not load the ward snapshot. Check your connection and try again.</p>';
       return;
     }
-    modal.querySelector('#cxJuris').textContent = data.jurisdiction + ' · ' + stamp(generatedAt);
+    modal.querySelector('#cxJuris').textContent = cityStateLabel(data);
     renderPdfPane(); renderGraphicPane(); renderLinkPane();
     select(current);
     modal.querySelector('.cx-close').focus();
@@ -329,21 +335,28 @@
       (subText ? '<div class="cx-mcard-sub">' + esc(subText) + '</div>' : '') +
     '</div></div>';
   }
-  function mcardHtml(innerHtml, lbl) {
-    return '<div class="cx-mcard"><div class="cx-mcard-head">' + esc(lbl) + '</div><div class="cx-mcard-body">' + innerHtml + '</div></div>';
-  }
   function hazardPillHtml(hz) {
     return '<span class="cx-pill" style="background:' + hz.color + '26;color:' + hz.color + '">' + esc(hz.label) + '</span>';
   }
-  // Capital Project Tracker: a qualitative progress bar per status tier.
-  // There is no measured percent-complete field in the CIP data model, so
-  // no specific completion number is ever shown — only a relative fill
-  // (On-Time fullest, Delayed least) alongside the real name/quarter/status.
+  // Community Action Snapshot: plain cards (no black header bar), visually
+  // distinct from Section 1's cards per this round's spec.
+  function actionCard(val, lbl, color) {
+    return '<div class="cx-acard"><div class="cx-acard-val"' + (color ? ' style="color:' + color + '"' : '') + '>' + esc(val) + '</div>' +
+      '<div class="cx-acard-lbl">' + esc(lbl) + '</div></div>';
+  }
+  function actionCardHtml(innerHtml, lbl) {
+    return '<div class="cx-acard"><div class="cx-acard-val">' + innerHtml + '</div><div class="cx-acard-lbl">' + esc(lbl) + '</div></div>';
+  }
+  // Capital Project Tracker: a qualitative progress bar per status tier —
+  // On-Time (green) / In Progress or a stale field update (amber) /
+  // Delayed (red). There is no measured percent-complete field in the CIP
+  // data model, so no specific completion number is ever shown — only a
+  // relative fill alongside the real name/quarter/status.
   function cipThermHtml(projects) {
     if (!projects.length) return '<p class="cx-empty">No capital projects are on file for this jurisdiction yet.</p>';
     return '<div class="cx-therm-list">' + projects.map(function (p) {
       var fill = p.status === 'on-time' ? 92 : p.status === 'delayed' ? 28 : 56;
-      var color = p.status === 'on-time' ? MINT : p.status === 'delayed' ? '#FF3B30' : '#38BDF8';
+      var color = p.status === 'on-time' ? MINT : p.status === 'delayed' ? '#FF3B30' : '#F59E0B';
       return '<div class="cx-therm">' +
         '<div class="cx-therm-fill" style="width:' + fill + '%;background:' + color + '"></div>' +
         '<span class="cx-therm-name">' + esc(p.name || 'Capital project') + '</span>' +
@@ -354,18 +367,36 @@
   // A jurisdiction's own real report coordinates (d.nodes), scaled to their
   // own bounding box — see localProject()'s comment on why no boundary
   // shape is drawn.
-  function hazardModuleHtml(d) {
-    var pts = localProject(d.nodes || [], 300, 140, 20);
-    var label = 'Live Hazard Nodes · ' + cityStateLabel(d).toUpperCase();
-    var dots = pts.map(function (p) {
-      var c = nodeColor(p.status);
-      return '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="9" fill="' + c + '" fill-opacity="0.2"/>' +
-        '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="4.5" fill="' + c + '"/>';
+  var hazardSvgUid = 0;
+  // Heat-map SVG: additive radial-gradient glows over a decorative block
+  // grid (not a real street layout — see drawHazardMap()'s comment above
+  // for why no boundary shape is drawn).
+  function hazardHeatSvg(nodes, vw, vh, label) {
+    var pts = localProject(nodes || [], vw - 2 * 22, vh - 2 * 22, 0).map(function (p) { return { x: p.x + 22, y: p.y + 22, status: p.status }; });
+    if (!pts.length) return '<div class="cx-hazard-empty">No live hazard nodes yet</div>';
+    var uid = 'hz' + (++hazardSvgUid), defs = '', glows = '', cols = 8, rows = 5, i, grid = '';
+    for (i = 1; i < cols; i++) grid += '<line x1="' + (vw / cols * i).toFixed(1) + '" y1="0" x2="' + (vw / cols * i).toFixed(1) + '" y2="' + vh + '"/>';
+    for (i = 1; i < rows; i++) grid += '<line x1="0" y1="' + (vh / rows * i).toFixed(1) + '" x2="' + vw + '" y2="' + (vh / rows * i).toFixed(1) + '"/>';
+    var dots = pts.map(function (p, i) {
+      var c = nodeColor(p.status), gid = uid + '-' + i, r = hazardRadius(p.status) * 0.4;
+      defs += '<radialGradient id="' + gid + '" cx="50%" cy="50%" r="50%">' +
+        '<stop offset="0%" stop-color="' + c + '" stop-opacity="0.9"/>' +
+        '<stop offset="55%" stop-color="' + c + '" stop-opacity="0.32"/>' +
+        '<stop offset="100%" stop-color="' + c + '" stop-opacity="0"/>' +
+      '</radialGradient>';
+      glows += '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="' + r.toFixed(1) + '" fill="url(#' + gid + ')"/>';
+      return '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="4" fill="' + c + '"/>';
     }).join('');
-    return '<div class="cx-hazard">' +
-      (pts.length
-        ? '<svg viewBox="0 0 300 140" preserveAspectRatio="xMidYMid meet" role="img" aria-label="' + esc(label) + '">' + dots + '</svg>'
-        : '<div class="cx-hazard-empty">No live hazard nodes yet</div>') +
+    return '<svg viewBox="0 0 ' + vw + ' ' + vh + '" preserveAspectRatio="xMidYMid meet" role="img" aria-label="' + esc(label) + '">' +
+      '<defs>' + defs + '</defs>' +
+      '<g class="cx-hazard-grid">' + grid + '</g>' +
+      '<g style="mix-blend-mode:screen">' + glows + '</g>' +
+      dots +
+    '</svg>';
+  }
+  function hazardModuleHtml(d) {
+    var label = 'Live Hazard Nodes · ' + cityStateLabel(d).toUpperCase();
+    return '<div class="cx-hazard">' + hazardHeatSvg(d.nodes, 300, 140, label) +
       '<span class="cx-hazard-label">' + esc(label) + '</span>' +
     '</div>';
   }
@@ -377,8 +408,10 @@
         '<div class="cx-mast-lg">' +
           '<span class="cx-patents-badge">Patents Pending</span>' +
           icon('shieldPlain', 'cx-mast-lg-icon') +
-          '<div class="cx-mast-lg-brand">CITIXEN <b>UX</b>™</div>' +
-          '<div class="cx-mast-lg-tagline">Upgrade your civic experience.</div>' +
+          '<div class="cx-mast-lg-text">' +
+            '<div class="cx-mast-lg-brand">CITIXEN <b>UX</b><sup class="cx-mast-lg-tm">™</sup></div>' +
+            '<div class="cx-mast-lg-tagline">Upgrade your civic experience.</div>' +
+          '</div>' +
         '</div>' +
         '<div class="cx-subrow">' +
           '<span class="cx-subrow-geo">' + esc(cityStateLabel(d)) + '</span>' +
@@ -388,17 +421,16 @@
         '<div class="cx-sec">' + hazardModuleHtml(d) + '</div>' +
         '<div class="cx-sec"><div class="cx-sec-title"><span>1</span>CIVIC PERFORMANCE METRICS</div>' +
           '<div class="cx-mcards">' +
-            mcard(daysText(d) + (d.avgDays != null ? ' days' : ''), 'Avg. Fix Speed') +
-            mcard(resolutionRate(d), 'Resolution Rate', null, d.total ? (d.resolved + ' / ' + d.total + ' Resolved') : null) +
-            mcard(stateRankValue(r), 'State Rank', null, stateRankSubtext(r)) +
+            mcard(avgHoursText(d), 'Avg. Fix Speed') +
+            mcard(resolutionRate(d), 'Resolution Rate') +
+            mcard(stateRankValue(r) + (stateRankSubtext(r) ? ' ' + stateRankSubtext(r) : ''), 'State Rank') +
           '</div></div>' +
         '<div class="cx-sec"><div class="cx-sec-title"><span>2</span>CAPITAL PROJECT TRACKER</div>' + cipThermHtml(d.cip) + '</div>' +
         '<div class="cx-sec"><div class="cx-sec-title"><span>3</span>COMMUNITY ACTION SNAPSHOT</div>' +
-          '<div class="cx-mcards cx-mcards-4">' +
-            mcard(d.counts.submitted, 'Reports Filed') +
-            mcard(d.counts.dispatched + ' Open', 'Active Dispatches', d.counts.dispatched > 0 ? '#FF3B30' : null) +
-            mcardHtml(hazardPillHtml(hz), 'Hazard Index') +
-            mcard(pctText(d.coveragePct), 'Civic Audit Coverage') +
+          '<div class="cx-acards">' +
+            actionCard(d.total, 'Reports Filed') +
+            actionCard(d.counts.dispatched + ' Open', 'Active Dispatches', d.counts.dispatched > 0 ? '#FF3B30' : null) +
+            actionCardHtml(hazardPillHtml(hz), 'Hazard Index') +
           '</div></div>' +
         '<div class="cx-footer cx-footer-ip">' +
           '<div>CITIXEN UX™ Engine • Civic Intelligence™ • Civic Memory™ • #CrowdSaveAmerica™</div>' +
@@ -422,31 +454,37 @@
       var doc = new window.jspdf.jsPDF({ unit: 'pt', format: 'letter' });
       var W = 612, M = 40, y;
 
-      // Top branding masthead — solid black, scaled-up logo + tagline, and
-      // the Patents Pending badge.
-      doc.setFillColor(0, 0, 0); doc.rect(0, 0, W, 150, 'F');
-      var badgeTxt = 'PATENTS PENDING', badgeW = doc.getTextWidth(badgeTxt) + 18;
-      doc.setDrawColor(0, 230, 153); doc.setLineWidth(0.8);
-      doc.roundedRect(W - M - badgeW, 18, badgeW, 17, 8, 8, 'S');
-      doc.setTextColor(0, 230, 153); doc.setFont('helvetica', 'bold'); doc.setFontSize(7);
-      doc.text(badgeTxt, W - M - badgeW / 2, 29, { align: 'center' });
+      // Top branding masthead: sleek horizontal compact banner, minimized
+      // vertical padding, shield + wordmark inline, tagline directly below
+      // the wordmark inside the banner, and the Patents Pending badge.
+      var mastH = 84;
+      doc.setFillColor(0, 0, 0); doc.rect(0, 0, W, mastH, 'F');
+      var badgeTxt = 'PATENTS PENDING', badgeW = doc.getTextWidth(badgeTxt) + 16;
+      doc.setDrawColor(0, 230, 153); doc.setLineWidth(0.7);
+      doc.roundedRect(W - M - badgeW, 14, badgeW, 15, 7, 7, 'S');
+      doc.setTextColor(0, 230, 153); doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5);
+      doc.text(badgeTxt, W - M - badgeW / 2, 24, { align: 'center' });
 
-      var s = 1.6, ox = W / 2 - 12 * s, oy = 32; // centered brand shield outline
+      var s = 1.3, ox = M, oy = 22; // inline brand shield outline, left-aligned
       var shieldPts = [[12, 2], [20, 5], [20, 12], [17.5, 17], [12, 22], [6.5, 17], [4, 12], [4, 5]];
       var segs = []; for (var i = 1; i < shieldPts.length; i++) segs.push([(shieldPts[i][0] - shieldPts[i - 1][0]) * s, (shieldPts[i][1] - shieldPts[i - 1][1]) * s]);
-      doc.setDrawColor(0, 230, 153); doc.setLineWidth(1.3);
+      doc.setDrawColor(0, 230, 153); doc.setLineWidth(1.1);
       doc.lines(segs, ox + shieldPts[0][0] * s, oy + shieldPts[0][1] * s, [1, 1], 'S', true);
 
-      doc.setFont('helvetica', 'bold'); doc.setFontSize(22);
-      var t1 = 'CITIXEN ', t2 = 'UX™', w1 = doc.getTextWidth(t1), w2 = doc.getTextWidth(t2), bx = W / 2 - (w1 + w2) / 2;
-      doc.setTextColor(255, 255, 255); doc.text(t1, bx, 100);
-      doc.setTextColor(0, 230, 153); doc.text(t2, bx + w1, 100);
-      doc.setFont('helvetica', 'italic'); doc.setFontSize(10); doc.setTextColor(0, 230, 153);
-      doc.text('Upgrade your civic experience.', W / 2, 122, { align: 'center' });
+      var tx = M + 42;
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(16);
+      var t1 = 'CITIXEN ', t2 = 'UX', w1 = doc.getTextWidth(t1), w2 = doc.getTextWidth(t2);
+      doc.setTextColor(255, 255, 255); doc.text(t1, tx, 42);
+      doc.setTextColor(0, 230, 153); doc.text(t2, tx + w1, 42);
+      // Trademark mark: muted gray, slight letter-spacing, superscript position
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
+      doc.setTextColor(148, 163, 184); doc.text(' ™', tx + w1 + w2 + 1, 36);
+      doc.setFont('helvetica', 'italic'); doc.setFontSize(8.5); doc.setTextColor(0, 230, 153);
+      doc.text('Upgrade your civic experience.', tx, 56);
 
-      // White sub-header row: geotag (city + state, never a ward number) /
+      // Document sub-header row: geotag (city + state, never a ward number) /
       // FREE REPORT / timestamp.
-      y = 182;
+      y = mastH + 30;
       doc.setTextColor(9, 13, 22); doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
       doc.text(cityStateLabel(d), M, y);
       doc.text('FREE REPORT', W / 2, y, { align: 'center' });
@@ -469,23 +507,29 @@
       // There is no ward/city boundary geometry on file, so no boundary
       // outline is drawn or invented — only the real relative node positions.
       (function hazardMap() {
-        var mh = 118, mx = M, mw = W - 2 * M;
+        // Heat-map glow approximated with layered, decreasing-opacity
+        // circles (jsPDF has no native radial-gradient fill) over a
+        // decorative block-grid texture — not a real street layout, since
+        // the app has no boundary geometry on file for this jurisdiction.
+        var mh = 118, mx = M, mw = W - 2 * M, gi, gj, gx, gy2;
+        function opacity(v) { try { doc.setGState(new doc.GState({ opacity: v })); } catch (e) { /* older jsPDF without GState */ } }
         doc.setFillColor(10, 13, 20); doc.roundedRect(mx, y, mw, mh, 8, 8, 'F');
         doc.setDrawColor(0, 230, 153); doc.setLineWidth(0.8); doc.roundedRect(mx, y, mw, mh, 8, 8, 'S');
-        var nodes = d.nodes || [];
-        if (nodes.length) {
-          var lats = nodes.map(function (n) { return n.lat; }), lngs = nodes.map(function (n) { return n.lng; });
-          var minLat = Math.min.apply(null, lats), maxLat = Math.max.apply(null, lats);
-          var minLng = Math.min.apply(null, lngs), maxLng = Math.max.apply(null, lngs);
-          var k = Math.cos((minLat + maxLat) / 2 * Math.PI / 180) || 1;
-          var dLat = (maxLat - minLat) || 0.01, dLng = (maxLng - minLng) || 0.01;
-          var pad = 16, pw = mw - 2 * pad, ph = mh - 2 * pad;
-          var sc = Math.min(pw / (dLng * k), ph / dLat);
-          var ccx = (minLng + maxLng) / 2, ccy = (minLat + maxLat) / 2;
-          nodes.forEach(function (n) {
-            var px = mx + mw / 2 + (n.lng - ccx) * k * sc, py = y + mh / 2 - (n.lat - ccy) * sc;
-            var rgb = n.status === 'Critical' ? [255, 59, 48] : n.status === 'Warning' ? [245, 158, 11] : [0, 230, 153];
-            doc.setFillColor(rgb[0], rgb[1], rgb[2]); doc.circle(px, py, 3, 'F');
+        doc.setDrawColor(0, 230, 153); doc.setLineWidth(0.4); opacity(0.07);
+        for (gi = 1; gi < 8; gi++) { gx = mx + (mw / 8) * gi; doc.line(gx, y, gx, y + mh); }
+        for (gj = 1; gj < 5; gj++) { gy2 = y + (mh / 5) * gj; doc.line(mx, gy2, mx + mw, gy2); }
+        opacity(1);
+        var pts = localProject(d.nodes || [], mw - 32, mh - 32, 0).map(function (p) { return { x: mx + 16 + p.x, y: y + 16 + p.y, status: p.status }; });
+        if (pts.length) {
+          pts.forEach(function (p) {
+            var rgb = hexRgb(nodeColor(p.status)), r = hazardRadius(p.status) * 0.22, steps = 5, s;
+            for (s = steps; s >= 1; s--) {
+              var frac = s / steps;
+              opacity(0.22 * (1 - frac) + 0.05);
+              doc.setFillColor(rgb[0], rgb[1], rgb[2]); doc.circle(p.x, p.y, r * frac, 'F');
+            }
+            opacity(1);
+            doc.setFillColor(rgb[0], rgb[1], rgb[2]); doc.circle(p.x, p.y, 2.2, 'F');
           });
         } else {
           doc.setTextColor(148, 163, 184); doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
@@ -530,9 +574,9 @@
 
       sectionTitle(1, 'CIVIC PERFORMANCE METRICS');
       cardGrid([
-        { val: d.avgDays != null ? daysText(d) + ' days' : 'N/A', lbl: 'Avg. Fix Speed' },
-        { val: resolutionRate(d), lbl: 'Resolution Rate', sub: d.total ? (d.resolved + ' / ' + d.total + ' Resolved') : null },
-        { val: stateRankValue(d.ranks), lbl: 'State Rank', sub: stateRankSubtext(d.ranks) }
+        { val: avgHoursText(d), lbl: 'Avg. Fix Speed' },
+        { val: resolutionRate(d), lbl: 'Resolution Rate' },
+        { val: stateRankValue(d.ranks) + (stateRankSubtext(d.ranks) ? ' ' + stateRankSubtext(d.ranks) : ''), lbl: 'State Rank' }
       ], 3);
 
       // Capital Project Tracker: a qualitative progress bar per status tier
@@ -547,7 +591,7 @@
       d.cip.forEach(function (p) {
         ensureRoom(30);
         var barH = 20, fullW = W - 2 * M;
-        var rgb = p.status === 'on-time' ? [0, 230, 153] : p.status === 'delayed' ? [255, 59, 48] : [56, 189, 248];
+        var rgb = p.status === 'on-time' ? [0, 230, 153] : p.status === 'delayed' ? [255, 59, 48] : [245, 158, 11];
         var fillPct = p.status === 'on-time' ? 0.92 : p.status === 'delayed' ? 0.28 : 0.56;
         doc.setFillColor(244, 245, 247); doc.roundedRect(M, y, fullW, barH, 10, 10, 'F');
         doc.setFillColor(rgb[0], rgb[1], rgb[2]); doc.roundedRect(M, y, Math.max(fullW * fillPct, barH), barH, 10, 10, 'F');
@@ -559,21 +603,51 @@
       });
       y += 10;
 
-      ensureRoom(130);
-      sectionTitle(3, 'COMMUNITY ACTION SNAPSHOT');
-      cardGrid([
-        { val: String(d.counts.submitted), lbl: 'Reports Filed' },
-        { val: d.counts.dispatched + ' Open', lbl: 'Active Dispatches', color: d.counts.dispatched > 0 ? [204, 36, 29] : [4, 120, 87] },
-        { val: hz.label, lbl: 'Hazard Index', pill: hz.color },
-        { val: pctText(d.coveragePct), lbl: 'Civic Audit Coverage' }
-      ], 2);
+      // Community Action Snapshot: plain cards with no black header bar, so
+      // this section reads as visually distinct from Section 1. "Civic Audit
+      // Coverage" is permanently removed per this round's spec; "Reports
+      // Filed" uses the real aggregate ticket count (d.total), not the
+      // 'submitted'-stage-only subset.
+      function plainCardGrid(items, cols) {
+        var gap = 10, bw = (W - 2 * M - (cols - 1) * gap) / cols, bodyH = 54;
+        items.forEach(function (it, k) {
+          var col = k % cols, row = Math.floor(k / cols);
+          var x = M + col * (bw + gap), by = y + row * (bodyH + 10);
+          doc.setDrawColor(226, 232, 240); doc.setLineWidth(1);
+          doc.roundedRect(x, by, bw, bodyH, 6, 6, 'S');
+          var cy = by + bodyH / 2;
+          if (it.pill) {
+            var rgb = hexRgb(it.pill), pw2 = doc.getTextWidth(it.val) + 16;
+            doc.setFillColor(rgb[0], rgb[1], rgb[2]); doc.roundedRect(x + bw / 2 - pw2 / 2, cy - 14, pw2, 16, 8, 8, 'F');
+            doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(8);
+            doc.text(it.val, x + bw / 2, cy - 2.5, { align: 'center' });
+          } else {
+            doc.setTextColor.apply(doc, it.color || [9, 13, 22]);
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(14);
+            doc.text(String(it.val), x + bw / 2, cy - 2, { align: 'center' });
+          }
+          doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5);
+          doc.text(it.lbl.toUpperCase(), x + bw / 2, by + bodyH - 9, { align: 'center' });
+        });
+        y += Math.ceil(items.length / cols) * (bodyH + 10);
+      }
 
-      // Institutional / IP footer block
+      ensureRoom(100);
+      sectionTitle(3, 'COMMUNITY ACTION SNAPSHOT');
+      plainCardGrid([
+        { val: String(d.total), lbl: 'Reports Filed' },
+        { val: d.counts.dispatched + ' Active Dispatches', lbl: 'Open Tickets', color: d.counts.dispatched > 0 ? [204, 36, 29] : [4, 120, 87] },
+        { val: hz.label, lbl: 'Hazard Index', pill: hz.color }
+      ], 3);
+
+      // Institutional / IP footer block: left trademark-suite declaration,
+      // right Patent Pending disclosure, on the same row.
       ensureRoom(40);
       doc.setDrawColor(226, 232, 240); doc.setLineWidth(0.75); doc.line(M, y, W - M, y); y += 14;
-      doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
-      doc.text('CITIXEN UX™ Engine • Civic Intelligence™ • Civic Memory™ • #CrowdSaveAmerica™', M, y); y += 11;
-      doc.text('Patents Pending (Spatial Recognition Engine & Economic Scraping/Planning Systems) • Public Ledger Verified', M, y);
+      doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5);
+      doc.text('CITIXEN UX™ Engine • Civic Intelligence™ • Civic Memory™ • #CrowdSaveAmerica™', M, y);
+      doc.text('Patents Pending (Spatial Recognition Engine & Economic', W - M, y, { align: 'right' }); y += 9;
+      doc.text('Scraping/Planning Systems) • Public Ledger Verified', W - M, y, { align: 'right' });
 
       doc.save('citixen-free-report.pdf');
       toast('Official PDF brief downloaded.');
@@ -609,30 +683,43 @@
   }
 
   // ---------- Dark vector map for the share card ----------
-  // Per this round's "complete refactor" spec, the Geospatial Map Snippet
-  // plots this jurisdiction's own real report coordinates (d.nodes) inside
-  // a neutral frame — never a traced city-limits boundary (the app has no
-  // ward/city boundary geometry on file; see localProject()'s comment) and
-  // never a live external tile fetch. Reuses the same pulsing-node renderer
-  // every live map on the dashboard uses.
-  function drawNodes(ctx, pts, phase) {
-    pts.forEach(function (n, k) {
-      var t = (phase + k * 0.33) % 1, r = n.r || 1, rgb = n.color === '#FF3B30' ? '255,59,48' : n.color === '#F59E0B' ? '245,158,11' : '0,230,153';
-      ctx.beginPath(); ctx.arc(n.x, n.y, (14 + t * 34) * r, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(' + rgb + ',' + (0.55 * (1 - t)).toFixed(3) + ')'; ctx.lineWidth = 3; ctx.stroke();
-      ctx.beginPath(); ctx.arc(n.x, n.y, 26 * r, 0, Math.PI * 2); ctx.fillStyle = 'rgba(' + rgb + ',0.16)'; ctx.fill();
-      ctx.beginPath(); ctx.arc(n.x, n.y, 12 * r, 0, Math.PI * 2); ctx.fillStyle = n.color; ctx.fill();
-      ctx.lineWidth = 3; ctx.strokeStyle = NAVY; ctx.stroke();
-    });
+  // Per this round's "complete refactor" spec, the Geospatial Hazard Risk
+  // Heat Map plots this jurisdiction's own real report coordinates (d.nodes)
+  // as additive radial-gradient glows — colored and sized by each node's
+  // real CitixenSeverity classification, never fabricated density data —
+  // inside a neutral frame over a decorative block-grid texture. The app
+  // has no ward/city/municipal boundary geometry on file, so no boundary
+  // outline is drawn or invented; the grid is purely decorative, not a
+  // real street layout.
+  function drawUrbanGrid(ctx, mx, my, mw, mh) {
+    ctx.save(); ctx.strokeStyle = 'rgba(0,230,153,0.07)'; ctx.lineWidth = 1;
+    var cols = 8, rows = 5, i, x, j, y;
+    for (i = 1; i < cols; i++) { x = mx + (mw / cols) * i; ctx.beginPath(); ctx.moveTo(x, my); ctx.lineTo(x, my + mh); ctx.stroke(); }
+    for (j = 1; j < rows; j++) { y = my + (mh / rows) * j; ctx.beginPath(); ctx.moveTo(mx, y); ctx.lineTo(mx + mw, y); ctx.stroke(); }
+    ctx.restore();
   }
+  function hazardRadius(status) { return status === 'Critical' ? 92 : status === 'Warning' ? 70 : 54; }
 
   function drawHazardMap(ctx, d, phase, mx, my, mw, mh) {
     var raw = localProject(d.nodes || [], mw - 40, mh - 40, 0);
-    var pts = raw.map(function (p) { return { x: mx + 20 + p.x, y: my + 20 + p.y, color: nodeColor(p.status) }; });
+    var pts = raw.map(function (p) { return { x: mx + 20 + p.x, y: my + 20 + p.y, status: p.status }; });
     ctx.save(); rr(ctx, mx, my, mw, mh, 22); ctx.clip();
     ctx.fillStyle = '#060B16'; ctx.fillRect(mx, my, mw, mh);
-    if (pts.length) drawNodes(ctx, pts, phase);
-    else {
+    drawUrbanGrid(ctx, mx, my, mw, mh);
+    if (pts.length) {
+      var breathe = 0.85 + 0.3 * Math.sin(phase * Math.PI * 2);
+      ctx.save(); ctx.globalCompositeOperation = 'lighter';
+      pts.forEach(function (p) {
+        var rgb = hexRgb(nodeColor(p.status)), r = hazardRadius(p.status) * breathe;
+        var g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
+        g.addColorStop(0, 'rgba(' + rgb.join(',') + ',0.85)');
+        g.addColorStop(0.55, 'rgba(' + rgb.join(',') + ',0.3)');
+        g.addColorStop(1, 'rgba(' + rgb.join(',') + ',0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.fill();
+      });
+      ctx.restore();
+      pts.forEach(function (p) { ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, Math.PI * 2); ctx.fillStyle = nodeColor(p.status); ctx.fill(); });
+    } else {
       ctx.textAlign = 'center'; ctx.font = font(600, 22); ctx.fillStyle = SLATE;
       ctx.fillText('No live hazard nodes yet', mx + mw / 2, my + mh / 2);
     }

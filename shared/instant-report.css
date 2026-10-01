@@ -56,9 +56,11 @@
   background:#090D16;border:1px solid rgba(0,230,153,.35);border-radius:12px 12px 0 0;color:#E2E8F0;
   padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (min-width:640px){.cx-panel{border-radius:12px}}
-.cx-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
-.cx-head-text{flex:1;min-width:0}
-.cx-head-title{font-weight:800;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase;color:#FFFFFF}
+/* FREE REPORT centered in the breakout header, city/state tag beneath it
+   (never a ward number, no timestamp — the PDF brief has its own). */
+.cx-head{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
+.cx-head-text{min-width:0;text-align:center}
+.cx-head-title{font-weight:800;font-size:1rem;letter-spacing:.08em;text-transform:uppercase;color:#FFFFFF}
 .cx-head-sub{font-size:.72rem;color:#94A3B8;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cx-close{width:36px;height:36px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:transparent;
   color:#E2E8F0;font:inherit;font-size:1rem;cursor:pointer;flex-shrink:0}
@@ -77,13 +79,17 @@
 .cx-paper{background:#FFFFFF;color:#090D16;border-radius:12px;overflow:hidden;border:1px solid #E2E8F0}
 /* Top branding masthead: solid black, scaled-up logo + tagline + the
    Patents Pending badge. */
-.cx-mast-lg{position:relative;background:#000000;color:#FFFFFF;padding:18px 14px 14px;text-align:center}
-.cx-patents-badge{position:absolute;top:10px;right:12px;font-size:.5rem;font-weight:800;letter-spacing:.08em;
-  text-transform:uppercase;color:#00E699;border:1px solid rgba(0,230,153,.5);border-radius:999px;padding:3px 8px}
-.cx-mast-lg-icon{width:34px;height:34px;stroke-width:1.2;margin:0 auto 4px}
-.cx-mast-lg-brand{font-weight:800;font-size:1.15rem;letter-spacing:.04em}
+/* Horizontal compact banner: shield + wordmark inline, minimal vertical
+   padding, tagline directly below the wordmark inside the banner. */
+.cx-mast-lg{position:relative;display:flex;align-items:center;gap:10px;background:#000000;color:#FFFFFF;padding:10px 14px}
+.cx-patents-badge{position:absolute;top:8px;right:10px;font-size:.48rem;font-weight:800;letter-spacing:.07em;
+  text-transform:uppercase;color:#00E699;border:1px solid rgba(0,230,153,.5);border-radius:999px;padding:3px 7px}
+.cx-mast-lg-icon{width:28px;height:28px;stroke-width:1.2;flex-shrink:0}
+.cx-mast-lg-text{min-width:0;text-align:left}
+.cx-mast-lg-brand{font-weight:800;font-size:1.05rem;letter-spacing:.02em}
 .cx-mast-lg-brand b{color:#00E699}
-.cx-mast-lg-tagline{color:#00E699;font-size:.68rem;font-weight:600;font-style:italic;margin-top:4px}
+.cx-mast-lg-tm{color:#94A3B8;font-weight:400;font-size:.55em;letter-spacing:.05em;margin-left:1px}
+.cx-mast-lg-tagline{color:#00E699;font-size:.64rem;font-weight:600;font-style:italic;margin-top:1px}
 /* White sub-header row: geotag (city + state, never a ward number) / FREE
    REPORT / timestamp. */
 .cx-subrow{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #E2E8F0}
@@ -101,17 +107,23 @@
    file), so no border shape is drawn. */
 .cx-hazard{position:relative;background:#060B16;border-radius:12px;overflow:hidden;border:1px solid rgba(0,230,153,.25)}
 .cx-hazard svg{display:block;width:100%;height:140px}
+.cx-hazard-grid line{stroke:rgba(0,230,153,.08);stroke-width:1}
 .cx-hazard-empty{height:140px;display:flex;align-items:center;justify-content:center;color:#94A3B8;font-size:.7rem}
 .cx-hazard-label{position:absolute;left:10px;bottom:8px;font-size:.56rem;font-weight:700;letter-spacing:.08em;color:#94A3B8;text-transform:uppercase}
 /* Metric cards: every card gets its own solid-black header bar, per the
    card-standardization rule. */
 .cx-mcards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.cx-mcards-4{grid-template-columns:repeat(2,1fr)}
 .cx-mcard{border:1px solid #E2E8F0;border-radius:10px;overflow:hidden}
 .cx-mcard-head{background:#000000;color:#00E699;font-size:.54rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;text-align:center;padding:6px 4px}
 .cx-mcard-body{padding:10px 6px;text-align:center;background:#FFFFFF}
 .cx-mcard-val{font-size:1.05rem;font-weight:800;color:#047857;font-variant-numeric:tabular-nums}
 .cx-mcard-sub{font-size:.58rem;font-weight:600;color:#475569;margin-top:2px}
+/* Community Action Snapshot: plain cards with no black header bar, so this
+   section reads as visually distinct from Section 1. */
+.cx-acards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cx-acard{border:1px solid #E2E8F0;border-radius:10px;padding:12px 6px 10px;text-align:center;background:#FFFFFF}
+.cx-acard-val{font-size:1.05rem;font-weight:800;color:#090D16;font-variant-numeric:tabular-nums}
+.cx-acard-lbl{font-size:.54rem;font-weight:700;letter-spacing:.06em;color:#64748B;text-transform:uppercase;margin-top:4px}
 /* Capital Project Tracker: a qualitative progress bar per status tier —
    there is no measured percent-complete field in the data, so no specific
    completion number is ever printed. */
@@ -132,9 +144,11 @@
 .cx-empty{font-size:.72rem;color:#64748B}
 .cx-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px 12px;
   font-size:.58rem;color:#64748B;background:#F8FAFC;font-variant-numeric:tabular-nums}
-/* Institutional / IP disclosure footer: 2 stacked lines instead of the
-   left/right single-line layout. */
-.cx-footer-ip{flex-direction:column;align-items:flex-start;gap:4px;line-height:1.5}
+/* Institutional / IP disclosure footer: trademark-suite declaration on the
+   left, Patent Pending disclosure on the right, on one row. */
+.cx-footer-ip{flex-wrap:wrap;text-align:right}
+.cx-footer-ip>div:first-child{text-align:left;flex:1;min-width:0}
+.cx-footer-ip>div:last-child{text-align:right;flex:1;min-width:0}
 
 /* Dark-surface variant of the CIP list (Capital Projects deep-dive panels) */
 .cx-cip-dark li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);color:#E2E8F0}
