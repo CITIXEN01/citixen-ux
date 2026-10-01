@@ -19,14 +19,29 @@
      icons — on every request, gate or no gate. There is no server (no
      middleware/edge function — this is a static HTML deploy with no
      framework) sitting in front of that response to add a bot bypass to;
-     the bypass this would protect against doesn't exist here. -->
+     the bypass this would protect against doesn't exist here.
+     PATCH 4.11.1 — HARD RESET: this gate no longer remembers a previous
+     unlock across visits (the old citixen_auth_token read is gone from
+     here entirely), and Step 2's onboarding carousel no longer remembers
+     being seen either (see startPostUnlockLanding()/closeFrontDoorOnboarding()
+     further down — the old ONBOARDING_SEEN_KEY check/write is gone too).
+     Every single pageview — first-time or returning — runs the full
+     4-step sequence (Gate -> Onboarding -> Welcome Hero -> Intake Form)
+     from scratch, for the duration of this alpha. -->
 <script>
 (function(){
+  // ?reset=true (e.g. citixenux.com/app?reset=true) — manual testing
+  // reset: purge all client storage and fall through to the unconditional
+  // lock below, same as any other pageview now gets.
   try {
-    if (localStorage.getItem('citixen_auth_token') !== '1') {
-      document.documentElement.classList.add('citixen-gate-locked');
+    if (/(?:^|[?&])reset=true(?:&|$)/.test(location.search)) {
+      try { localStorage.clear(); } catch (e) {}
+      try { sessionStorage.clear(); } catch (e) {}
     }
-  } catch (e) { /* storage blocked — fails open; see note above, this was never real security */ }
+  } catch (e) {}
+  try {
+    document.documentElement.classList.add('citixen-gate-locked');
+  } catch (e) {}
 })();
 </script>
 <title>CITIXEN UX™</title>
@@ -106,11 +121,12 @@
 .cgf-badge{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 
 /* ===== PASSCODE GATE — full-page Obsidian Glass blur blocking every route
-   until the tester enters citixen_01. Locked by default; the <head> script
-   above only ever REMOVES the html.citixen-gate-locked class (never adds it
-   after load), so this stays hidden the instant localStorage already has a
-   valid token, with no flash of the gate for a returning tester. See
-   initCitixenGate() near the end of <body>. ===== */
+   until the tester enters citixen_01. Locked by default on every single
+   pageview (the <head> script above adds html.citixen-gate-locked
+   unconditionally — Patch 4.11.1 removed the old localStorage check that
+   used to skip this for a returning tester). The gate's own submit handler
+   is the only thing that ever removes the class again, and only for the
+   current page view. See initCitixenGate() near the end of <body>. ===== */
 .citixen-gate{display:none;position:fixed;inset:0;z-index:99999;align-items:center;justify-content:center;
   background:rgba(2,6,23,.92);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
   padding:24px;box-sizing:border-box}
@@ -1960,18 +1976,18 @@ textarea.input{resize:none;line-height:1.4}
     </div>
   </div>
 
-  <!-- ===== FRONT DOOR ONBOARDING — Step 2 of the Patch 4.11 strict 4-step
-       alpha entrance sequencer (Gate -> this carousel -> Welcome Hero ->
-       intake form), shown once per device to the first-adopter beta
-       cohort (gated by ONBOARDING_SEEN_KEY in localStorage, same
-       per-device convention as markGridCellLit()'s lit-grid-cities key).
-       Opens immediately on a fresh unlock — no auto-timer, see
-       startPostUnlockLanding() — and, per "enforce strict" sequencing,
-       has no skip path: no backdrop-dismiss, no dot-jump, no "✕" (all
-       removed this round). The only way through is slide A's "Continue"
-       and slide B's "Got it", each a deliberate, completion-gated step.
-       Slide A covers what to report and the real state of photo privacy;
-       slide B covers what the 10-person alpha cohort is expected to do.
+  <!-- ===== FRONT DOOR ONBOARDING — Step 2 of the strict 4-step alpha
+       entrance sequencer (Gate -> this carousel -> Welcome Hero -> intake
+       form). Patch 4.11.1: shown in FULL on every single unlock, every
+       visit, for the duration of this alpha — the old once-per-device
+       ONBOARDING_SEEN_KEY gate is gone entirely (see
+       startPostUnlockLanding()'s own comment). Opens immediately on unlock
+       — no auto-timer — and, per "enforce strict" sequencing, has no skip
+       path: no backdrop-dismiss, no dot-jump, no "✕" (all removed in
+       Patch 4.11). The only way through is slide A's "Continue" and slide
+       B's "Got it", each a deliberate, completion-gated step. Slide A
+       covers what to report and the real state of photo privacy; slide B
+       covers what the 10-person alpha cohort is expected to do.
        See openFrontDoorOnboarding()/closeFrontDoorOnboarding(). ===== -->
   <div id="frontDoorOnboardingModal" class="confirm-drawer">
     <div class="confirm-card onboarding-card">
@@ -2048,16 +2064,19 @@ textarea.input{resize:none;line-height:1.4}
 <script>
 'use strict';
 
-// ===== PASSCODE GATE — see the <head> anti-flash script (adds/reads
-// html.citixen-gate-locked) and the #citixenGate markup near the top of
-// <body>. Deliberately simple: the passcode and the check both live in this
-// same client-served file, so this is a tester-honesty speed bump, never
-// real access control — the same framing this file already uses for Admin
-// Light's mock email gate.
-const CITIXEN_AUTH_KEY = 'citixen_auth_token';
+// ===== PASSCODE GATE — see the <head> anti-flash script (adds
+// html.citixen-gate-locked unconditionally now) and the #citixenGate
+// markup near the top of <body>. Deliberately simple: the passcode and the
+// check both live in this same client-served file, so this is a
+// tester-honesty speed bump, never real access control — the same framing
+// this file already uses for Admin Light's mock email gate.
+// PATCH 4.11.1: no localStorage write on unlock any more — a successful
+// passcode only unlocks THIS page view (in-memory, via the CSS class
+// below). There is deliberately nothing left to read on the next visit:
+// the whole point of this round is that every visit re-runs Step 1.
 // Case-insensitive app passcode, distinct from /operator's own CITIXEN12 —
-// each route checks its own passcode against its own localStorage key, so
-// unlocking the app never unlocks the Operator Control Center or vice versa.
+// each route checks its own passcode independently, so unlocking the app
+// never unlocks the Operator Control Center or vice versa.
 const CITIXEN_GATE_PASSCODE = 'CITIXEN01';
 (function initCitixenGate(){
   const form = document.getElementById('citixenGateForm');
@@ -2067,7 +2086,6 @@ const CITIXEN_GATE_PASSCODE = 'CITIXEN01';
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     if (input.value.trim().toUpperCase() === CITIXEN_GATE_PASSCODE) {
-      try { localStorage.setItem(CITIXEN_AUTH_KEY, '1'); } catch (err) { /* storage blocked — unlocks this page view, just won't persist a reload */ }
       errorEl.textContent = '';
       document.documentElement.classList.remove('citixen-gate-locked');
       // Unlock lands the citizen on the Emerald Shield Gateway splash, not
@@ -5344,19 +5362,19 @@ function showWelcomeHero(){
 }
 
 // Drives Steps 2 and 3 of the sequencer the moment Step 1 (the passcode
-// gate) succeeds — called once, either immediately on load if the gate was
-// already unlocked in an earlier visit, or from initCitixenGate()'s submit
-// handler the instant CITIXEN01 is accepted. No timers anywhere in this
-// function: Step 2 (if not yet seen on this device) opens immediately and
-// Step 3 only appears once Step 2 reports itself complete (see
-// closeFrontDoorOnboarding()) — the two screens are never shown together.
+// gate) succeeds — called from initCitixenGate()'s submit handler the
+// instant CITIXEN01 is accepted. No timers anywhere in this function: Step
+// 2 opens immediately and Step 3 only appears once Step 2 reports itself
+// complete (see closeFrontDoorOnboarding()) — the two screens are never
+// shown together.
+// PATCH 4.11.1: Step 2 is no longer skippable on a "seen before" basis —
+// there is no stored flag left to check here at all, so every single
+// unlock (first-time or returning tester) runs the onboarding carousel in
+// full, for the duration of this alpha.
 let postUnlockLandingStarted = false;
 function startPostUnlockLanding(){
   if (postUnlockLandingStarted) return;
   postUnlockLandingStarted = true;
-
-  let onboardingSeen = false;
-  try { onboardingSeen = localStorage.getItem(ONBOARDING_SEEN_KEY) === '1'; } catch (e) { /* storage blocked — treat as unseen */ }
 
   if (pendingAdminClaimFromLink) {
     // Arrived via report.html's "Connect District →" wedge (?claim=admin)
@@ -5366,24 +5384,19 @@ function startPostUnlockLanding(){
     // beta-tester onboarding/Hero steps would just be clutter for them.
     hideSplash();
     openAdminLightClaim();
-  } else if (!onboardingSeen) {
-    // Step 2: Front Door Onboarding carousel, shown immediately — the
-    // Hero (Step 3) is kept hidden until Step 2 reports completion.
+  } else {
+    // Step 2: Front Door Onboarding carousel, shown immediately, every
+    // time — the Hero (Step 3) is kept hidden until Step 2 reports
+    // completion.
     hideSplash();
     openFrontDoorOnboarding();
-  } else {
-    // Returning tester — Step 2 was already completed on this device, so
-    // the sequence resumes at Step 3.
-    showWelcomeHero();
   }
 }
 
 // ===== FRONT DOOR ONBOARDING — "Private Beta" 2-card notice =====
-// Gated per-device by localStorage, same convention as markGridCellLit()'s
-// lit-grid-cities key, so the 10 first-adopter beta testers see it once
-// and never again on return visits — not re-shown every session the way
-// the launch splash is.
-const ONBOARDING_SEEN_KEY = 'citixen_onboarding_seen_v1';
+// PATCH 4.11.1: no longer gated by a "seen it" flag — shown in full on
+// every unlock, every visit, for the duration of this alpha (see
+// startPostUnlockLanding()'s own comment for why).
 const ONBOARDING_SLIDE_COUNT = 2;
 let onboardingSlideIndex = 0;
 function renderOnboardingSlide(){
@@ -5402,15 +5415,14 @@ function openFrontDoorOnboarding(){
   document.getElementById('frontDoorOnboardingModal').classList.add('open');
 }
 // Step 2 -> Step 3 of the Patch 4.11 sequencer: completing the onboarding
-// deck (its only exit — slide B's "Got it") marks it seen and reveals the
-// Welcome Hero. There is no other way to close this modal any more: no
-// "✕", no backdrop-dismiss, no dot-jump — see the markup's own comment for
-// why ("enforce strict" sequencing means completion-gated, not skippable).
-function closeFrontDoorOnboarding(markSeen){
+// deck (its only exit — slide B's "Got it") reveals the Welcome Hero.
+// There is no other way to close this modal: no "✕", no backdrop-dismiss,
+// no dot-jump — see the markup's own comment for why ("enforce strict"
+// sequencing means completion-gated, not skippable). Patch 4.11.1: no
+// longer takes a markSeen param or writes anything to storage — closing
+// never "remembers" this deck for next time any more.
+function closeFrontDoorOnboarding(){
   document.getElementById('frontDoorOnboardingModal').classList.remove('open');
-  if (markSeen) {
-    try { localStorage.setItem(ONBOARDING_SEEN_KEY, '1'); } catch (e) { /* storage blocked (private mode, etc.) — shows again next load, harmless */ }
-  }
   showWelcomeHero();
 }
 // Slide A's "Continue" — the only other id this button needs; slide B's
@@ -5419,7 +5431,7 @@ document.getElementById('btnOnboardingNext').addEventListener('click', () => {
   if (onboardingSlideIndex < ONBOARDING_SLIDE_COUNT - 1) { onboardingSlideIndex++; renderOnboardingSlide(); }
 });
 document.getElementById('btnOnboardingStart').addEventListener('click', () => {
-  closeFrontDoorOnboarding(true);
+  closeFrontDoorOnboarding();
 });
 // Welcome Hero CTA (Step 3 -> Step 4) — "Enter App" is now the only way
 // off the Hero (Patch 4.11 removed the old tap-anywhere-to-dismiss
@@ -5453,17 +5465,11 @@ window.addEventListener('DOMContentLoaded',()=>{
   flushOfflineQueue();
   window.addEventListener('online', flushOfflineQueue);
 
-  // Splash + onboarding only start their clocks once the person is actually
-  // looking at the app — see startPostUnlockLanding() below. If the
-  // passcode gate is still up, these timers used to run anyway behind it,
-  // so by the time someone unlocked, the splash had already auto-hidden
-  // and the onboarding deck could already be open waiting for them. Now
-  // unlock itself (initCitixenGate()'s submit handler) is what kicks this
-  // off, so a fresh unlock always lands on the full Emerald Shield Gateway
-  // splash first, exactly like a never-gated visit would.
-  if (!document.documentElement.classList.contains('citixen-gate-locked')) {
-    startPostUnlockLanding();
-  }
+  // Steps 2-4 of the entrance sequence only ever start from a real unlock
+  // now (initCitixenGate()'s submit handler calls startPostUnlockLanding()
+  // directly) — Patch 4.11.1 made the gate unconditional on every pageview
+  // (see the <head> anti-flash script), so there is no "already unlocked
+  // at load" case left to handle here any more.
 
   const repLoc = document.getElementById('repLoc');
   if (repLoc) repLoc.addEventListener('input', () => { repLoc.dataset.userEdited = '1'; });
