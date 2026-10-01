@@ -146,8 +146,11 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
 /* ===== UNIFIED LOGO LOCKUP (identical markup/classes across index.html, dispatch.html, app.html) ===== */
 .brand-wordmark{font-weight:800;font-size:1.05rem;letter-spacing:.3px}
 .brand-white{color:#ffffff}
-.brand-lime{color:var(--brand-mint)}
-.brand-tm{font-size:.55em;color:var(--brand-mint);opacity:.75;margin-left:1px}
+/* "UX™" reads as glowing emerald (text-emerald-400 equivalent) rather than
+   flat mint — a soft text-shadow bloom, not a background effect, so it still
+   reads crisply at the small header size. */
+.brand-lime{color:#34d399;text-shadow:0 0 10px rgba(52,211,153,.55)}
+.brand-tm{font-size:.55em;color:#34d399;opacity:.85;margin-left:1px;text-shadow:0 0 8px rgba(52,211,153,.5)}
 .badge{font-size:.62rem;background:rgba(0,230,153,.12);color:var(--mint2);border:1px solid rgba(0,230,153,.4);
   padding:4px 10px;border-radius:20px;font-weight:700;letter-spacing:.4px;display:flex;align-items:center;gap:6px;
   white-space:nowrap;overflow:hidden;min-width:0;max-width:150px}
@@ -497,6 +500,11 @@ textarea.input{resize:none;line-height:1.4}
 .ledger-chip{background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--muted);
   font-size:.64rem;font-weight:700;padding:5px 10px;border-radius:20px;cursor:pointer}
 .ledger-chip.active{border-color:var(--mint2);background:rgba(0,230,153,.14);color:var(--mint2)}
+/* Radius pills specifically — emerald-500 border / emerald-400 text /
+   emerald-950-at-40% wash, a touch deeper than the generic chip.active
+   above so the active distance reads unmistakably at a glance. */
+#ledgerRadiusChips .ledger-chip.active,#ledgerReportRadiusChips .ledger-chip.active{
+  border-color:#10b981;color:#34d399;background:rgba(2,44,34,.4)}
 .ledger-print-cta{background:var(--bg-obsidian);border:1px solid #00E699;color:#00E699;font-weight:700;
   font-size:.7rem;padding:10px 14px;border-radius:9999px;white-space:nowrap;cursor:pointer;
   font-family:inherit;transition:filter .15s}
@@ -1951,7 +1959,10 @@ textarea.input{resize:none;line-height:1.4}
 // real access control — the same framing this file already uses for Admin
 // Light's mock email gate.
 const CITIXEN_AUTH_KEY = 'citixen_auth_token';
-const CITIXEN_GATE_PASSCODE = 'citixen_01';
+// Case-insensitive app passcode, distinct from /operator's own CITIXEN12 —
+// each route checks its own passcode against its own localStorage key, so
+// unlocking the app never unlocks the Operator Control Center or vice versa.
+const CITIXEN_GATE_PASSCODE = 'CITIXEN01';
 (function initCitixenGate(){
   const form = document.getElementById('citixenGateForm');
   const input = document.getElementById('citixenGateInput');
@@ -1959,7 +1970,7 @@ const CITIXEN_GATE_PASSCODE = 'citixen_01';
   if (!form || !input || !errorEl) return;
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    if (input.value.trim() === CITIXEN_GATE_PASSCODE) {
+    if (input.value.trim().toUpperCase() === CITIXEN_GATE_PASSCODE) {
       try { localStorage.setItem(CITIXEN_AUTH_KEY, '1'); } catch (err) { /* storage blocked — unlocks this page view, just won't persist a reload */ }
       errorEl.textContent = '';
       document.documentElement.classList.remove('citixen-gate-locked');
@@ -2546,13 +2557,65 @@ const LEDGER_CATEGORIES = ['Pothole', 'Streetlight', 'Signage', 'Sidewalk', 'Dra
 const LEDGER_STAGES = ['submitted', 'dispatched', 'resolved'];
 let ledgerTickets = [];
 let ledgerFilters = { radius: 10, category: '', status: '', q: '' };
+// Set once a typed query resolves to a real geocoded address (see
+// geocodeAddress() + maybeGeocodeLedgerQuery() below): { lat, lng, label }.
+// Cleared back to null when the search box is emptied.
+let ledgerSearchOrigin = null;
 
-// Real ward/city-tier proxy for the "distance" pills — same honest
-// convention as index.html's identical function: this dataset has no
-// per-report GPS coordinates to compute a true mile radius against, so
-// rather than fabricate one, it matches against the visitor's real
-// resolved ward/city (currentWardMeta) the rest of this app already uses.
+// Great-circle distance in miles — standard Haversine formula, no
+// approximation beyond the formula's own (negligible for city-scale
+// distances).
+function haversineMiles(lat1, lng1, lat2, lng2){
+  const R = 3958.8; // Earth radius, miles
+  const toRad = d => d * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1), dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// Nominatim returns full state names ("Wisconsin") and a very verbose
+// display_name; this trims that down to the clean "333 Buchner Pl, La
+// Crosse, WI" style the geo badge shows, using the real address components
+// Nominatim already parsed out (never a guess) — falling back to the raw
+// display_name whenever a component is missing.
+const US_STATE_ABBR = { 'alabama':'AL','alaska':'AK','arizona':'AZ','arkansas':'AR','california':'CA','colorado':'CO','connecticut':'CT','delaware':'DE','florida':'FL','georgia':'GA','hawaii':'HI','idaho':'ID','illinois':'IL','indiana':'IN','iowa':'IA','kansas':'KS','kentucky':'KY','louisiana':'LA','maine':'ME','maryland':'MD','massachusetts':'MA','michigan':'MI','minnesota':'MN','mississippi':'MS','missouri':'MO','montana':'MT','nebraska':'NE','nevada':'NV','new hampshire':'NH','new jersey':'NJ','new mexico':'NM','new york':'NY','north carolina':'NC','north dakota':'ND','ohio':'OH','oklahoma':'OK','oregon':'OR','pennsylvania':'PA','rhode island':'RI','south carolina':'SC','south dakota':'SD','tennessee':'TN','texas':'TX','utah':'UT','vermont':'VT','virginia':'VA','washington':'WA','west virginia':'WV','wisconsin':'WI','wyoming':'WY' };
+function formatGeocodedLabel(r){
+  const a = r.address || {};
+  const street = [a.house_number, a.road].filter(Boolean).join(' ');
+  const city = a.city || a.town || a.village || a.hamlet || '';
+  const stateAbbr = a.state ? (US_STATE_ABBR[a.state.toLowerCase()] || a.state) : '';
+  const parts = [street, city, stateAbbr].filter(Boolean);
+  return parts.length >= 2 ? parts.join(', ') : r.display_name;
+}
+// Forward geocoding via OpenStreetMap's free Nominatim search API — no key
+// required, real results for a real address. Returns null (never a guessed
+// coordinate) on no match, network failure, or an implausible/empty query.
+async function geocodeAddress(query){
+  const q = String(query || '').trim();
+  if (q.length < 4) return null;
+  try {
+    const res = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&addressdetails=1&q=' + encodeURIComponent(q));
+    if (!res.ok) return null;
+    const results = await res.json();
+    if (!Array.isArray(results) || !results.length) return null;
+    const r = results[0];
+    return { lat: parseFloat(r.lat), lng: parseFloat(r.lon), label: formatGeocodedLabel(r) };
+  } catch (e) {
+    return null;
+  }
+}
+
+// Distance pills: when a real address has been geocoded this round (search
+// origin set below), tickets carrying their own seeded/submitted lat/lng
+// (see api/_lib/store.js's WARD_TICKETS and addTicket()) are filtered by
+// genuine Haversine distance from that origin. Otherwise — no address
+// resolved yet, or this particular ticket has no coordinate on file — this
+// falls back to the same honest ward/city-tier proxy as before, rather than
+// fabricate a distance with nothing real to measure it against.
 function ledgerTicketWithinRadius(t, radiusMiles){
+  if (ledgerSearchOrigin && typeof t.lat === 'number' && typeof t.lng === 'number') {
+    return haversineMiles(ledgerSearchOrigin.lat, ledgerSearchOrigin.lng, t.lat, t.lng) <= radiusMiles;
+  }
   if (radiusMiles >= 10) return true;
   const j = currentWardMeta;
   if (!j) return true;
@@ -2561,33 +2624,86 @@ function ledgerTicketWithinRadius(t, radiusMiles){
 }
 function updateLedgerGeoBadge(){
   const el = document.getElementById('ledgerGeoBadgeText');
+  if (!el) return;
+  if (ledgerSearchOrigin) { el.textContent = ledgerSearchOrigin.label; return; }
   const j = currentWardMeta;
-  if (el && j) el.textContent = j.cityName + ', ' + j.state.toUpperCase();
+  if (j) el.textContent = j.cityName + ', ' + j.state.toUpperCase();
+}
+// Debounced geocode attempt — fires ~700ms after typing pauses so this
+// never spams Nominatim's free endpoint on every keystroke. A successful
+// resolution becomes the new radius-search origin and re-renders filtered
+// results; a miss silently leaves the existing substring search as-is.
+let ledgerGeocodeTimer = null;
+function maybeGeocodeLedgerQuery(query){
+  clearTimeout(ledgerGeocodeTimer);
+  if (!query || query.trim().length < 4) {
+    ledgerSearchOrigin = null;
+    updateLedgerGeoBadge();
+    return;
+  }
+  ledgerGeocodeTimer = setTimeout(async () => {
+    const resolved = await geocodeAddress(query);
+    if (!resolved) return;
+    ledgerSearchOrigin = resolved;
+    // The typed text was an address, not a keyword — once it resolves, stop
+    // also substring-matching it against title/loc/category (the raw
+    // address text won't appear in any of those), so the real Haversine
+    // radius filter is what actually governs the results.
+    ledgerFilters.q = '';
+    updateLedgerGeoBadge();
+    applyLedgerRadiusAutoExpand();
+    renderLedgerResults();
+  }, 700);
+}
+// "No reports within 1 mile — expanding search radius to 5 miles…" —
+// auto-widens the radius pill (never silently drops the citizen's chosen
+// radius without saying so) when the current pill returns zero matches but
+// a wider one wouldn't.
+function applyLedgerRadiusAutoExpand(){
+  const radiusRow = document.getElementById('ledgerRadiusChips');
+  if (!radiusRow) return;
+  const widerOrder = [1, 5, 10];
+  const idx = widerOrder.indexOf(ledgerFilters.radius);
+  if (idx < 0 || idx >= widerOrder.length - 1) return;
+  const countAt = (miles) => ledgerTickets.filter(t => ledgerTicketWithinRadius(t, miles)).length;
+  if (countAt(ledgerFilters.radius) > 0) return;
+  for (let i = idx + 1; i < widerOrder.length; i++) {
+    if (countAt(widerOrder[i]) > 0 || widerOrder[i] === 10) {
+      const fromMiles = ledgerFilters.radius, toMiles = widerOrder[i];
+      ledgerFilters.radius = toMiles;
+      radiusRow.querySelectorAll('.ledger-chip').forEach(c => c.classList.toggle('active', Number(c.dataset.radius) === toMiles));
+      toast('No reports within ' + fromMiles + ' mile' + (fromMiles === 1 ? '' : 's') + '. Expanding search radius to ' + toMiles + ' miles…');
+      return;
+    }
+  }
 }
 
 function fallbackLedgerTickets(){
   // Mirrors api/_lib/store.js's WARD_TICKETS + makeReportId exactly — same
   // fallback convention as everything else in this file.
+  // lat/lng mirror api/_lib/store.js's WARD_TICKETS exactly (real-world
+  // coordinates for the named cross street in each ticket's real city) so
+  // this offline fallback supports the same true Haversine radius search.
   const WARD_TICKETS = {
     'ward-4': [
-      { id: 'w4t1', category: 'Pothole', title: 'Deep pothole, right lane', loc: 'Main St & 4th Ave', stage: 'resolved', verified: true, submittedAgo: '3d ago' },
-      { id: 'w4t2', category: 'Streetlight', title: 'Streetlight outage', loc: 'Grand Ave & 7th St', stage: 'dispatched', verified: null, submittedAgo: '45m ago' },
-      { id: 'w4t3', category: 'Drainage', title: 'Storm drain backing up', loc: 'Pine St Alley', stage: 'resolved', verified: true, submittedAgo: '5d ago' },
-      { id: 'w4t4', category: 'Sidewalk', title: 'Cracked ADA ramp', loc: 'Cass St & 6th', stage: 'resolved', verified: false, submittedAgo: '6d ago' },
-      { id: 'w4t5', category: 'Signage', title: 'Stop sign knocked down', loc: 'Cameron Ave', stage: 'submitted', verified: null, submittedAgo: '12m ago' }
+      { id: 'w4t1', category: 'Pothole', title: 'Deep pothole, right lane', loc: 'Main St & 4th Ave', stage: 'resolved', verified: true, submittedAgo: '3d ago', lat: 43.8138, lng: -91.2519 },
+      { id: 'w4t2', category: 'Streetlight', title: 'Streetlight outage', loc: 'Grand Ave & 7th St', stage: 'dispatched', verified: null, submittedAgo: '45m ago', lat: 43.8120, lng: -91.2480 },
+      { id: 'w4t3', category: 'Drainage', title: 'Storm drain backing up', loc: 'Pine St Alley', stage: 'resolved', verified: true, submittedAgo: '5d ago', lat: 43.8100, lng: -91.2550 },
+      { id: 'w4t4', category: 'Sidewalk', title: 'Cracked ADA ramp', loc: 'Cass St & 6th', stage: 'resolved', verified: false, submittedAgo: '6d ago', lat: 43.8125, lng: -91.2500 },
+      { id: 'w4t5', category: 'Signage', title: 'Stop sign knocked down', loc: 'Cameron Ave', stage: 'submitted', verified: null, submittedAgo: '12m ago', lat: 43.8160, lng: -91.2470 }
     ],
     'ward-7': [
-      { id: 'w7t1', category: 'Streetlight', title: 'Dark corner, no lighting', loc: 'Copeland Ave & 7th', stage: 'resolved', verified: true, submittedAgo: '4d ago' },
-      { id: 'w7t2', category: 'Pothole', title: 'Large pothole cluster', loc: 'La Crosse St', stage: 'resolved', verified: false, submittedAgo: '9d ago' },
-      { id: 'w7t3', category: 'Sidewalk', title: 'Sidewalk heave, trip hazard', loc: 'Losey Blvd', stage: 'dispatched', verified: null, submittedAgo: '2h ago' }
+      { id: 'w7t1', category: 'Streetlight', title: 'Dark corner, no lighting', loc: 'Copeland Ave & 7th', stage: 'resolved', verified: true, submittedAgo: '4d ago', lat: 43.8050, lng: -91.2430 },
+      { id: 'w7t2', category: 'Pothole', title: 'Large pothole cluster', loc: 'La Crosse St', stage: 'resolved', verified: false, submittedAgo: '9d ago', lat: 43.8010, lng: -91.2400 },
+      { id: 'w7t3', category: 'Sidewalk', title: 'Sidewalk heave, trip hazard', loc: 'Losey Blvd', stage: 'dispatched', verified: null, submittedAgo: '2h ago', lat: 43.8020, lng: -91.2380 }
     ],
     'ward-12': [
-      { id: 'w12t1', category: 'Signage', title: 'Faded crosswalk signage', loc: 'National Ave', stage: 'resolved', verified: true, submittedAgo: '5d ago' },
-      { id: 'w12t2', category: 'Pothole', title: 'Pothole near crosswalk', loc: 'Mitchell St', stage: 'submitted', verified: null, submittedAgo: '30m ago' }
+      { id: 'w12t1', category: 'Signage', title: 'Faded crosswalk signage', loc: 'National Ave', stage: 'resolved', verified: true, submittedAgo: '5d ago', lat: 43.0130, lng: -87.9500 },
+      { id: 'w12t2', category: 'Pothole', title: 'Pothole near crosswalk', loc: 'Mitchell St', stage: 'submitted', verified: null, submittedAgo: '30m ago', lat: 43.0080, lng: -87.9470 }
     ],
     'ward-3': [
-      { id: 'w3t1', category: 'Drainage', title: 'Street flooding after rain', loc: 'Halsted St', stage: 'resolved', verified: true, submittedAgo: '6d ago' },
-      { id: 'w3t2', category: 'Pothole', title: 'Deep pothole, arterial road', loc: 'Ashland Ave', stage: 'resolved', verified: false, submittedAgo: '4d ago' }
+      { id: 'w3t1', category: 'Drainage', title: 'Street flooding after rain', loc: 'Halsted St', stage: 'resolved', verified: true, submittedAgo: '6d ago', lat: 41.8850, lng: -87.6480 },
+      { id: 'w3t2', category: 'Pothole', title: 'Deep pothole, arterial road', loc: 'Ashland Ave', stage: 'resolved', verified: false, submittedAgo: '4d ago', lat: 41.8850, lng: -87.6670 }
     ]
   };
   const WARD_NAMES = { 'ward-4': 'District 4', 'ward-7': 'District 7', 'ward-12': 'District 12', 'ward-3': 'District 3' };
@@ -2646,6 +2762,7 @@ function renderLedgerFilters(){
       radiusRow.querySelectorAll('.ledger-chip').forEach(c => c.classList.remove('active'));
       chip.classList.add('active');
       ledgerFilters.radius = Number(chip.dataset.radius);
+      applyLedgerRadiusAutoExpand();
       renderLedgerResults();
     });
   });
@@ -5136,6 +5253,10 @@ window.addEventListener('DOMContentLoaded',()=>{
   if (ledgerSearchInput) ledgerSearchInput.addEventListener('input', () => {
     ledgerFilters.q = ledgerSearchInput.value.trim();
     renderLedgerResults();
+    // Also attempt a debounced geocode of the same text — if it resolves to
+    // a real address, maybeGeocodeLedgerQuery() swaps the radius pills over
+    // to true Haversine distance from that address (see its own comment).
+    maybeGeocodeLedgerQuery(ledgerFilters.q);
     // Debounced so telemetry logs one query per pause-in-typing, not one
     // event per keystroke.
     clearTimeout(ledgerSearchTrackTimer);

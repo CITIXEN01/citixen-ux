@@ -245,31 +245,38 @@ function makeReportId(wardSlug, ticketId, category, submittedAgo, hazardOverride
 // does NOT make the store durable: a Vercel cold start or a request that
 // lands on a different concurrent instance still won't see it. That's the
 // same honest limitation documented at the top of this file, not a new one.
+// lat/lng on each ticket below are real-world coordinates for the named
+// cross street in that ticket's actual city (same convention CAPEX_PROJECTS
+// below already uses for its own lat/lng) — approximate placements along
+// the real street, not fabricated/random numbers, so a true Haversine
+// radius search against these has a genuine geographic basis. See
+// ledgerTicketWithinRadius() in app.html/index.html for how the Live Public
+// Ledger's distance pills use this.
 const WARD_TICKETS = globalThis.__CITIXEN_WARD_TICKETS__ || (globalThis.__CITIXEN_WARD_TICKETS__ = {
   'ward-4': [
-    { id: 'w4t1', category: 'Pothole', title: 'Deep pothole, right lane', loc: 'Main St & 4th Ave', stage: 'resolved', verified: true, resolutionHours: 14, submittedAgo: '3d ago' },
-    { id: 'w4t2', category: 'Streetlight', title: 'Streetlight outage', loc: 'Grand Ave & 7th St', stage: 'dispatched', verified: null, resolutionHours: null, submittedAgo: '45m ago' },
-    { id: 'w4t3', category: 'Drainage', title: 'Storm drain backing up', loc: 'Pine St Alley', stage: 'resolved', verified: true, resolutionHours: 22, submittedAgo: '5d ago' },
-    { id: 'w4t4', category: 'Sidewalk', title: 'Cracked ADA ramp', loc: 'Cass St & 6th', stage: 'resolved', verified: false, resolutionHours: 9, submittedAgo: '6d ago' },
-    { id: 'w4t5', category: 'Signage', title: 'Stop sign knocked down', loc: 'Cameron Ave', stage: 'submitted', verified: null, resolutionHours: null, submittedAgo: '12m ago' },
-    { id: 'w4t6', category: 'Pothole', title: 'Pavement gap, bike lane', loc: '6th St & Cass', stage: 'resolved', verified: true, resolutionHours: 31, submittedAgo: '8d ago' }
+    { id: 'w4t1', category: 'Pothole', title: 'Deep pothole, right lane', loc: 'Main St & 4th Ave', stage: 'resolved', verified: true, resolutionHours: 14, submittedAgo: '3d ago', lat: 43.8138, lng: -91.2519 },
+    { id: 'w4t2', category: 'Streetlight', title: 'Streetlight outage', loc: 'Grand Ave & 7th St', stage: 'dispatched', verified: null, resolutionHours: null, submittedAgo: '45m ago', lat: 43.8120, lng: -91.2480 },
+    { id: 'w4t3', category: 'Drainage', title: 'Storm drain backing up', loc: 'Pine St Alley', stage: 'resolved', verified: true, resolutionHours: 22, submittedAgo: '5d ago', lat: 43.8100, lng: -91.2550 },
+    { id: 'w4t4', category: 'Sidewalk', title: 'Cracked ADA ramp', loc: 'Cass St & 6th', stage: 'resolved', verified: false, resolutionHours: 9, submittedAgo: '6d ago', lat: 43.8125, lng: -91.2500 },
+    { id: 'w4t5', category: 'Signage', title: 'Stop sign knocked down', loc: 'Cameron Ave', stage: 'submitted', verified: null, resolutionHours: null, submittedAgo: '12m ago', lat: 43.8160, lng: -91.2470 },
+    { id: 'w4t6', category: 'Pothole', title: 'Pavement gap, bike lane', loc: '6th St & Cass', stage: 'resolved', verified: true, resolutionHours: 31, submittedAgo: '8d ago', lat: 43.8128, lng: -91.2503 }
   ],
   'ward-7': [
-    { id: 'w7t1', category: 'Streetlight', title: 'Dark corner, no lighting', loc: 'Copeland Ave & 7th', stage: 'resolved', verified: true, resolutionHours: 18, submittedAgo: '4d ago' },
-    { id: 'w7t2', category: 'Pothole', title: 'Large pothole cluster', loc: 'La Crosse St', stage: 'resolved', verified: false, resolutionHours: 27, submittedAgo: '9d ago' },
-    { id: 'w7t3', category: 'Sidewalk', title: 'Sidewalk heave, trip hazard', loc: 'Losey Blvd', stage: 'dispatched', verified: null, resolutionHours: null, submittedAgo: '2h ago' },
-    { id: 'w7t4', category: 'Drainage', title: 'Clogged culvert', loc: 'George St', stage: 'resolved', verified: true, resolutionHours: 12, submittedAgo: '2d ago' }
+    { id: 'w7t1', category: 'Streetlight', title: 'Dark corner, no lighting', loc: 'Copeland Ave & 7th', stage: 'resolved', verified: true, resolutionHours: 18, submittedAgo: '4d ago', lat: 43.8050, lng: -91.2430 },
+    { id: 'w7t2', category: 'Pothole', title: 'Large pothole cluster', loc: 'La Crosse St', stage: 'resolved', verified: false, resolutionHours: 27, submittedAgo: '9d ago', lat: 43.8010, lng: -91.2400 },
+    { id: 'w7t3', category: 'Sidewalk', title: 'Sidewalk heave, trip hazard', loc: 'Losey Blvd', stage: 'dispatched', verified: null, resolutionHours: null, submittedAgo: '2h ago', lat: 43.8020, lng: -91.2380 },
+    { id: 'w7t4', category: 'Drainage', title: 'Clogged culvert', loc: 'George St', stage: 'resolved', verified: true, resolutionHours: 12, submittedAgo: '2d ago', lat: 43.8005, lng: -91.2410 }
   ],
   'ward-12': [
-    { id: 'w12t1', category: 'Signage', title: 'Faded crosswalk signage', loc: 'National Ave', stage: 'resolved', verified: true, resolutionHours: 20, submittedAgo: '5d ago' },
-    { id: 'w12t2', category: 'Streetlight', title: 'Flickering streetlight', loc: 'Layton Blvd', stage: 'resolved', verified: true, resolutionHours: 16, submittedAgo: '3d ago' },
-    { id: 'w12t3', category: 'Pothole', title: 'Pothole near crosswalk', loc: 'Mitchell St', stage: 'submitted', verified: null, resolutionHours: null, submittedAgo: '30m ago' },
-    { id: 'w12t4', category: 'Sidewalk', title: 'Missing curb ramp', loc: '16th & Greenfield', stage: 'dispatched', verified: null, resolutionHours: null, submittedAgo: '1h ago' }
+    { id: 'w12t1', category: 'Signage', title: 'Faded crosswalk signage', loc: 'National Ave', stage: 'resolved', verified: true, resolutionHours: 20, submittedAgo: '5d ago', lat: 43.0130, lng: -87.9500 },
+    { id: 'w12t2', category: 'Streetlight', title: 'Flickering streetlight', loc: 'Layton Blvd', stage: 'resolved', verified: true, resolutionHours: 16, submittedAgo: '3d ago', lat: 43.0100, lng: -87.9480 },
+    { id: 'w12t3', category: 'Pothole', title: 'Pothole near crosswalk', loc: 'Mitchell St', stage: 'submitted', verified: null, resolutionHours: null, submittedAgo: '30m ago', lat: 43.0080, lng: -87.9470 },
+    { id: 'w12t4', category: 'Sidewalk', title: 'Missing curb ramp', loc: '16th & Greenfield', stage: 'dispatched', verified: null, resolutionHours: null, submittedAgo: '1h ago', lat: 43.0090, lng: -87.9510 }
   ],
   'ward-3': [
-    { id: 'w3t1', category: 'Drainage', title: 'Street flooding after rain', loc: 'Halsted St', stage: 'resolved', verified: true, resolutionHours: 25, submittedAgo: '6d ago' },
-    { id: 'w3t2', category: 'Pothole', title: 'Deep pothole, arterial road', loc: 'Ashland Ave', stage: 'resolved', verified: false, resolutionHours: 19, submittedAgo: '4d ago' },
-    { id: 'w3t3', category: 'Streetlight', title: 'Streetlight pole down', loc: 'Milwaukee Ave', stage: 'resolved', verified: true, resolutionHours: 10, submittedAgo: '2d ago' }
+    { id: 'w3t1', category: 'Drainage', title: 'Street flooding after rain', loc: 'Halsted St', stage: 'resolved', verified: true, resolutionHours: 25, submittedAgo: '6d ago', lat: 41.8850, lng: -87.6480 },
+    { id: 'w3t2', category: 'Pothole', title: 'Deep pothole, arterial road', loc: 'Ashland Ave', stage: 'resolved', verified: false, resolutionHours: 19, submittedAgo: '4d ago', lat: 41.8850, lng: -87.6670 },
+    { id: 'w3t3', category: 'Streetlight', title: 'Streetlight pole down', loc: 'Milwaukee Ave', stage: 'resolved', verified: true, resolutionHours: 10, submittedAgo: '2d ago', lat: 41.8900, lng: -87.6650 }
   ]
 });
 

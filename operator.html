@@ -3,15 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- Passcode gate — identical pattern to app.html's (same localStorage key,
-     same passcode), so unlocking app.html already unlocks this page via
-     shared-origin localStorage, and vice versa. See app.html's own gate
-     comment for the full honesty note: this is a tester speed bump, never
-     real access control. -->
+<!-- Passcode gate — same visual pattern as app.html's, but intentionally a
+     SEPARATE passcode and a separate localStorage key: the Operator Control
+     Center unlocks only with CITIXEN12, never with the citizen app's
+     CITIXEN01, so /app access never implies /operator access. See app.html's
+     own gate comment for the full honesty note: this is a tester speed bump,
+     never real access control. -->
 <script>
 (function(){
   try {
-    if (localStorage.getItem('citixen_auth_token') !== '1') {
+    if (localStorage.getItem('citixen_operator_auth_token') !== '1') {
       document.documentElement.classList.add('citixen-gate-locked');
     }
   } catch (e) { /* storage blocked — fails open, same as app.html */ }
@@ -58,8 +59,11 @@ html.citixen-gate-locked body{overflow:hidden}
 
 /* ===== HEADER ===== */
 .op-header{text-align:center;margin-bottom:18px}
-.op-brand{font-weight:900;font-size:1rem;letter-spacing:.04em;color:var(--mint)}
+.op-brand{font-weight:900;font-size:1rem;letter-spacing:.04em;color:var(--text)}
 .op-brand .tm{font-size:.6em;vertical-align:super}
+.op-brand .brand-white{color:#ffffff;font-weight:800;letter-spacing:.3px}
+.op-brand .brand-lime{color:#34d399;font-weight:800;letter-spacing:.3px;text-shadow:0 0 10px rgba(52,211,153,.55)}
+.op-brand .op-suffix{color:var(--mint2);font-weight:700}
 .op-sub{font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:4px}
 
 /* ===== COHORT BAR ===== */
@@ -108,7 +112,7 @@ html.citixen-gate-locked body{overflow:hidden}
 
 <div class="wrap">
   <div class="op-header">
-    <div class="op-brand">CITIXEN UX<sup class="tm">™</sup> · NETWORK OPERATOR CONTROL</div>
+    <div class="op-brand"><span class="brand-white">CITIXEN</span> <span class="brand-lime">UX</span><sup class="tm">™</sup> <span class="op-suffix">· NETWORK OPERATOR CONTROL</span></div>
   </div>
 
   <!-- Cohort Bar — "District 4 · Beta Cohort 10/10 active" is literal static
@@ -140,9 +144,11 @@ html.citixen-gate-locked body{overflow:hidden}
 
 <script>
 'use strict';
-// ===== PASSCODE GATE — identical logic to app.html's initCitixenGate(). =====
-const CITIXEN_AUTH_KEY = 'citixen_auth_token';
-const CITIXEN_GATE_PASSCODE = 'citixen_01';
+// ===== PASSCODE GATE — same logic/markup as app.html's initCitixenGate(),
+// but its own passcode (CITIXEN12) and its own localStorage key, so this
+// never shares an unlock with the citizen app's CITIXEN01 gate. =====
+const CITIXEN_OPERATOR_AUTH_KEY = 'citixen_operator_auth_token';
+const CITIXEN_OPERATOR_GATE_PASSCODE = 'CITIXEN12';
 (function initCitixenGate(){
   const form = document.getElementById('citixenGateForm');
   const input = document.getElementById('citixenGateInput');
@@ -150,8 +156,8 @@ const CITIXEN_GATE_PASSCODE = 'citixen_01';
   if (!form || !input || !errorEl) return;
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    if (input.value.trim() === CITIXEN_GATE_PASSCODE) {
-      try { localStorage.setItem(CITIXEN_AUTH_KEY, '1'); } catch (err) { /* fails open for this view only */ }
+    if (input.value.trim().toUpperCase() === CITIXEN_OPERATOR_GATE_PASSCODE) {
+      try { localStorage.setItem(CITIXEN_OPERATOR_AUTH_KEY, '1'); } catch (err) { /* fails open for this view only */ }
       errorEl.textContent = '';
       document.documentElement.classList.remove('citixen-gate-locked');
     } else {

@@ -3,10 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Same CITIXEN12 operator passcode and citixen_operator_auth_token key as
+     operator.html, so the two operator pages share one unlock but stay
+     separate from the citizen app's CITIXEN01 gate. -->
 <script>
 (function(){
   try {
-    if (localStorage.getItem('citixen_auth_token') !== '1') {
+    if (localStorage.getItem('citixen_operator_auth_token') !== '1') {
       document.documentElement.classList.add('citixen-gate-locked');
     }
   } catch (e) { /* fails open, same as app.html/operator.html */ }
@@ -127,8 +130,8 @@ html.citixen-gate-locked body{overflow:hidden}
 
 <script>
 'use strict';
-const CITIXEN_AUTH_KEY = 'citixen_auth_token';
-const CITIXEN_GATE_PASSCODE = 'citixen_01';
+const CITIXEN_OPERATOR_AUTH_KEY = 'citixen_operator_auth_token';
+const CITIXEN_OPERATOR_GATE_PASSCODE = 'CITIXEN12';
 (function initCitixenGate(){
   const form = document.getElementById('citixenGateForm');
   const input = document.getElementById('citixenGateInput');
@@ -136,8 +139,8 @@ const CITIXEN_GATE_PASSCODE = 'citixen_01';
   if (!form || !input || !errorEl) return;
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    if (input.value.trim() === CITIXEN_GATE_PASSCODE) {
-      try { localStorage.setItem(CITIXEN_AUTH_KEY, '1'); } catch (err) {}
+    if (input.value.trim().toUpperCase() === CITIXEN_OPERATOR_GATE_PASSCODE) {
+      try { localStorage.setItem(CITIXEN_OPERATOR_AUTH_KEY, '1'); } catch (err) {}
       errorEl.textContent = '';
       document.documentElement.classList.remove('citixen-gate-locked');
     } else {
