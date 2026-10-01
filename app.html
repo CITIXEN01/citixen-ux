@@ -421,6 +421,150 @@ textarea.input{resize:none;line-height:1.4}
   .hiw-dot{animation:none}
   .hiw-dot.d1{background:var(--mint2)}
 }
+
+/* =====================================================================
+   SCREEN 3 / DASHBOARD TAB — CONTENT PARITY WITH THE WEB DASHBOARD
+   -----------------------------------------------------------------
+   This round's "Unified Shared Component System" spec calls for 1:1
+   component parity between this app's 3rd tab and the web Dashboard
+   (citixenux.com), via a shared React/Vue <CommandCenterDashboard />.
+   This codebase has no framework/build step (plain static HTML/CSS/JS,
+   same as every other screen) — the user confirmed the honest path here
+   is CONTENT parity, not a literal shared component: this tab reuses the
+   exact same class names, markup shape, and (where real data already
+   exists on this side) the exact same computation logic as the
+   index.html Dashboard sequence, kept in sync by hand each round rather
+   than invented independently. Every CSS rule below is copied verbatim
+   from index.html's own Dashboard styling (same hex values, same
+   selectors) so a visual diff between the two surfaces stays at zero.
+   ===================================================================== */
+.citizen-dashboard-subheader{font-size:clamp(1.6rem,5vw,2.4rem);font-weight:900;letter-spacing:0.08em;
+  text-transform:uppercase;text-align:center;margin:16px 0 8px}
+.citizen-dashboard-subheader .cds-white{color:#FFFFFF}
+.citizen-dashboard-subheader .cds-mint{color:#00E699}
+.hero-tagline-subtle{text-align:center;color:#94A3B8;font-size:.88rem;
+  max-width:520px;margin:0 auto 20px;padding:0 24px}
+.telemetry-scorecard-card{display:block;width:100%;max-width:640px;text-align:left;
+  background:#090D16;border:1px solid rgba(0,230,153,.4);
+  border-radius:12px;padding:14px 18px;font-family:inherit;color:var(--text);overflow:hidden;margin:0 auto}
+.telemetry-scorecard-head{display:flex;align-items:center;justify-content:center;
+  background:#FFFFFF;color:#090D16;width:calc(100% + 36px);margin:-14px -18px 12px -18px;
+  padding:8px 0;border-bottom:1px solid #E2E8F0;
+  font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;text-align:center}
+.telemetry-scorecard-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center}
+.telemetry-scorecard-col{padding:6px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.telemetry-scorecard-col:not(:first-child){border-left:1px solid rgba(0,230,153,.2)}
+.telemetry-scorecard-val{font-size:1.15rem;font-weight:800;color:#00E699}
+.telemetry-scorecard-lbl{font-size:.64rem;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.03em}
+.telemetry-scorecard-timestamp{display:block;width:100%;text-align:center;padding:10px 0;
+  color:#94A3B8;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.02em}
+.ledger-trust-subtitle{max-width:640px;margin:16px auto;padding:0;
+  text-align:center;color:#00E699;font-weight:700;font-size:14px;
+  text-transform:lowercase;letter-spacing:.05em}
+.ledger-banner-section{max-width:640px;margin:0 auto 24px;padding:0 24px}
+.gateway-pill-stacked{margin-bottom:16px}
+.gateway-pill{display:flex;justify-content:space-between;align-items:center;width:100%;
+  min-height:52px;box-sizing:border-box;padding:14px 20px;border-radius:12px;
+  cursor:pointer;font-family:inherit;text-decoration:none;
+  transition:filter .15s}
+.gateway-pill-left{display:inline-flex;align-items:center;gap:6px;flex-shrink:0;font-size:.75rem;font-weight:700}
+.gateway-pill-center{flex:1 1 auto;flex-grow:1;min-width:0;text-align:center;font-weight:800;font-size:1.1rem;
+  letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  padding:0 8px}
+.gateway-pill-right{flex-shrink:0;text-align:right;font-size:.8rem;font-weight:600;color:#00E699;
+  white-space:nowrap}
+.gateway-pill:hover{filter:brightness(1.2)}
+.ledger-pill-glow{border:1px solid rgba(0,230,153,.35);background:#090D16;
+  animation:ledgerPillGlow 2.5s ease-in-out infinite}
+@keyframes ledgerPillGlow{
+  0%,100%{box-shadow:0 0 8px rgba(0,230,153,.18)}
+  50%{box-shadow:0 0 16px rgba(0,230,153,.4)}
+}
+.ledger-pulse-dot{position:relative;width:8px;height:8px;border-radius:50%;background:#00E699;flex-shrink:0;
+  box-shadow:0 0 6px #00E699;display:inline-block}
+.ledger-pulse-dot::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid #00E699;
+  animation:ledgerPulseRing 1.8s ease-out infinite}
+@keyframes ledgerPulseRing{
+  0%{transform:scale(.6);opacity:.9}
+  100%{transform:scale(2.2);opacity:0}
+}
+.matrix-summary-section{padding-top:12px}
+.hub-row{display:flex;flex-direction:column;max-width:920px;margin:0 auto 26px;padding:0;box-sizing:border-box}
+.hub-card{position:relative;display:flex;align-items:center;justify-content:space-between;width:100%;
+  background:var(--surface-card-bg);backdrop-filter:blur(12px);
+  border:var(--surface-card-border);border-radius:12px;padding:12px 18px;
+  margin-bottom:14px;box-sizing:border-box;cursor:pointer;color:var(--text);text-align:left;
+  transition:border-color .15s;font-family:inherit;min-width:0;gap:10px}
+.hub-card:last-child{margin-bottom:0}
+.hub-card-main{display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 auto}
+.hub-card svg{stroke:#00E699;flex-shrink:0}
+.hub-card-title{font-size:.8rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#FFFFFF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.hub-card-sub{font-size:.72rem !important;font-weight:500 !important;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hub-card-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.hub-card-arrow{font-size:.8rem;font-weight:600;color:#00E699;flex-shrink:0}
+.hub-card:hover{border-color:#00E699}
+.telemetry-card{background:rgba(3,7,18,.85);border:1px solid rgba(0,230,153,.35);
+  border-radius:12px}
+.citixen-feature-section{max-width:920px;margin:0 auto 18px;padding:0}
+.citixen-narrative-link{max-width:920px;margin:0 auto 18px;padding:0;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.citixen-narrative-link-title{display:flex;align-items:center;gap:8px;
+  color:#00E699;font-weight:800;font-size:1.1rem;letter-spacing:.08em;text-transform:uppercase}
+.citixen-feature-learn-more{display:inline-block;background:none;border:none;padding:0;font:inherit;
+  color:#00E699;font-size:.8rem;font-weight:700;cursor:pointer;text-decoration:underline;flex-shrink:0}
+.citixen-trust-badge{display:flex;align-items:flex-start;gap:12px;max-width:640px;width:100%;
+  box-sizing:border-box;margin:0 auto 18px;
+  background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);
+  border-radius:12px;padding:14px 16px}
+.citixen-trust-badge svg{flex-shrink:0;margin-top:2px}
+.citixen-trust-badge-title{color:#00E699;font-weight:800;font-size:.78rem;letter-spacing:.02em;
+  text-transform:uppercase;line-height:1.4;margin-bottom:4px}
+.citixen-trust-badge-sub{color:var(--muted);font-size:.76rem;line-height:1.45}
+.citixen-feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.citixen-feature-tile{background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);
+  border-radius:12px;padding:20px 10px;display:flex;flex-direction:column;align-items:center;gap:10px;
+  cursor:pointer;font-family:inherit;transition:border-color .15s,filter .15s,background .15s}
+.citixen-feature-tile:hover{border-color:#00E699;filter:brightness(1.08)}
+.citixen-feature-tile.active{border-color:#00E699;background:rgba(0,230,153,.08)}
+.citixen-feature-tile-icon{width:44px;height:44px;border-radius:50%;background:rgba(0,230,153,.1);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.citixen-feature-tile-label{color:var(--text);font-weight:700;font-size:.78rem;text-transform:uppercase;
+  letter-spacing:.05em}
+.citixen-feature-accordion{max-width:100%;max-height:0;overflow:hidden;opacity:0;
+  background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);
+  border-radius:12px;transition:max-height .3s ease,opacity .25s ease,margin .3s ease;margin-top:0}
+.citixen-feature-accordion.open{max-height:600px;opacity:1;margin-top:12px;padding:16px 18px}
+.citixen-feature-accordion h4{color:var(--text);font-size:.82rem;margin:12px 0 4px}
+.citixen-feature-accordion h4:first-child{margin-top:0}
+.citixen-feature-accordion p{color:var(--muted);font-size:.78rem;line-height:1.55}
+.civic-triad-section{max-width:640px;margin:0 auto 20px;padding:0}
+.civic-triad-card{background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);border-radius:12px;
+  padding:18px 16px;text-align:center}
+.civic-triad-header{color:#00E699;font-weight:800;font-size:.9rem;letter-spacing:.06em;
+  text-transform:uppercase;margin-bottom:14px}
+.civic-triad-svg{width:100%;height:auto;max-width:320px;margin:0 auto;display:block}
+.civic-triad-node-label{fill:#FFFFFF;font-size:10.5px;font-weight:700;text-anchor:middle}
+.civic-triad-node-sub{fill:#9CA3AF;font-size:8px;text-anchor:middle}
+.civic-triad-spoke{stroke:#00E699;stroke-width:1.6;opacity:.75;stroke-dasharray:4,4}
+.civic-triad-node-circle{fill:rgba(0,230,153,.1);stroke:#00E699;stroke-width:1.5}
+.civic-triad-root-circle{fill:rgba(0,230,153,.16);stroke:#00E699;stroke-width:1.8}
+.civic-triad-outer-ring{fill:none;stroke:#00E699;stroke-width:1.2;opacity:.55}
+.civic-triad-root-label-center{fill:#00E699;font-size:6.2px;font-weight:800;text-anchor:middle;letter-spacing:.02em}
+.civic-triad-nucleus-halo{fill:none;stroke:#00E699;stroke-width:2;opacity:.3;
+  animation:triadNucleusPulse 2.5s ease-in-out infinite}
+@keyframes triadNucleusPulse{
+  0%,100%{r:40px;opacity:.22}
+  50%{r:50px;opacity:.5}
+}
+.tm-symbol{font-weight:300 !important;font-size:.55em !important;margin-left:3px !important;opacity:.8;vertical-align:super}
+.hub-deepdive-panel{display:none;max-width:920px;margin:0 auto 18px;padding:0}
+.hub-deepdive-panel.open{display:block}
+.hub-deepdive-close{display:block;width:100%;background:none;border:1px solid var(--border);color:var(--muted);
+  border-radius:10px;padding:9px;font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+  cursor:pointer;margin-top:4px}
+#appInfoModalBody h4{color:var(--text);font-size:.82rem;margin:14px 0 4px}
+#appInfoModalBody h4:first-child{margin-top:0}
+#appInfoModalBody p{color:var(--muted);font-size:.78rem;line-height:1.55}
 </style>
 </head>
 <body>
@@ -620,58 +764,230 @@ textarea.input{resize:none;line-height:1.4}
       </div>
     </section>
 
-    <!-- No 911/Emergency in Analytics; Live Public Ledger now lives ONLY here, per nav restructure. -->
+    <!-- =====================================================================
+         SCREEN 3 — DASHBOARD (content parity with the web Dashboard, see
+         the "SCREEN 3 / DASHBOARD TAB" CSS comment above for why this is
+         hand-kept parity rather than a literally shared component). The
+         Sticky Header Bar (sequence item 1) is already the app shell's own
+         persistent <header class="topnav"> above — it's shared by all 3
+         tabs already, so it isn't duplicated again in here. ===== -->
     <section id="tab-analytics" class="tabpane">
 
-      <button class="btn-camera" id="btnOpenLedger" style="border-style:solid;">
-        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-        Live Civic Memory™
-      </button>
+      <!-- 2. HERO HEADER -->
+      <p class="citizen-dashboard-subheader"><span class="cds-white">Citixen</span> <span class="cds-mint">Dashboard</span></p>
+      <p class="hero-tagline-subtle">Real-time community reporting and municipal tracking.</p>
 
-      <!-- 0. THE BIG 3 — public health metrics, computed from real seed data -->
-      <div class="card">
-        <div class="label">The Big 3 — public health metrics</div>
-        <div class="big3-row">
-          <div class="big3-tile"><div class="big3-val" id="big3Active">–</div><div class="big3-lbl">Active Hazards<span class="big3-question">What's broken on my block right now?</span></div></div>
-          <div class="big3-tile"><div class="big3-val" id="big3Speed">–</div><div class="big3-lbl">Fix Speed<span class="big3-question">How fast is it going to get fixed?</span></div></div>
-          <div class="big3-tile"><div class="big3-val" id="big3Verify">–</div><div class="big3-lbl">Completion Rate<span class="big3-question">Are we catching up or falling behind?</span></div></div>
+      <!-- 3. GEOTAGGED SCORECARD — real numbers computed from this app's own
+           coverageDirectory/currentWardMeta/ledgerTickets (see
+           updateAppTelemetryScorecard() below), the same formulas
+           index.html's Scorecard uses, not duplicated/divergent math. -->
+      <section style="padding-top:8px;">
+        <div class="telemetry-scorecard-card" id="appScorecardCard">
+          <div class="telemetry-scorecard-head">
+            <span id="appScorecardLabel">LA CROSSE, WI SCORECARD</span>
+          </div>
+          <div class="telemetry-scorecard-grid">
+            <div class="telemetry-scorecard-col">
+              <div class="telemetry-scorecard-val" id="appScorecardResolved">—</div>
+              <div class="telemetry-scorecard-lbl">Reports Resolved</div>
+            </div>
+            <div class="telemetry-scorecard-col">
+              <div class="telemetry-scorecard-val" id="appScorecardCovered">—</div>
+              <div class="telemetry-scorecard-lbl">City Covered</div>
+            </div>
+            <div class="telemetry-scorecard-col">
+              <div class="telemetry-scorecard-val" id="appScorecardSla">—</div>
+              <div class="telemetry-scorecard-lbl">Avg City Response</div>
+            </div>
+          </div>
+          <span class="telemetry-scorecard-timestamp" id="appScorecardTimestamp" aria-hidden="true"></span>
         </div>
-        <div class="big3-note">Computed live from seeded ledger/CapEx demo data — not asserted as a production dataset.</div>
+      </section>
+
+      <!-- 4. TRUST INDICATOR SUBTITLE -->
+      <p class="ledger-trust-subtitle">free &amp; anonymous</p>
+
+      <!-- 5. PRIMARY LIVING GATEWAY — opens the same real Live Public Ledger
+           drawer this tab already had (#ledgerDrawer / openLedgerDrawer()),
+           just restyled to the shared .gateway-pill shell instead of the
+           old plain "Live Civic Memory™" button. -->
+      <section class="ledger-banner-section gateway-pill-stacked">
+        <button id="appLiveLedgerBanner" class="gateway-pill ledger-pill-glow" type="button">
+          <span class="gateway-pill-left" style="color: #00E699;"><span class="ledger-pulse-dot" aria-hidden="true"></span>LIVE</span>
+          <span class="gateway-pill-center" style="color: #FFFFFF;">PUBLIC LEDGER</span>
+          <span class="gateway-pill-right">View Now ↗</span>
+        </button>
+      </section>
+
+      <!-- 6. CIVIC INTELLIGENCE STACK™ (Rule of Three) -->
+      <section class="matrix-summary-section">
+        <h3 style="color:#00E699;font-size:1.1rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin:4px 0 6px;text-align:center;">Civic Intelligence Stack<sup class="tm-symbol">™</sup></h3>
+        <p style="color:var(--muted);font-size:.78rem;text-align:center;font-style:italic;margin:0 0 16px;">Click on any live module below for an instant report.</p>
+      </section>
+      <div class="hub-row" role="navigation" aria-label="Deep-dive sections">
+        <button class="hub-card telemetry-card" id="appHubAnalyticsBtn" type="button" aria-expanded="false" aria-controls="appDeepdiveAnalytics">
+          <span class="hub-card-main">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><rect x="6" y="10" width="3" height="9"/><rect x="11" y="6" width="3" height="13"/><rect x="16" y="13" width="3" height="6"/></svg>
+            <span class="hub-card-title">Analytics</span>
+          </span>
+          <span class="hub-card-actions"><span class="hub-card-sub">Data &amp; Reports</span><span class="hub-card-arrow">↗</span></span>
+        </button>
+        <button class="hub-card telemetry-card" id="appHubMunicipalBtn" type="button" aria-expanded="false" aria-controls="appMunicipalPanel">
+          <span class="hub-card-main">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9l8-5 8 5v12"/><path d="M9 21v-6h6v6"/><path d="M4 21h16"/></svg>
+            <span class="hub-card-title">Municipal Portal</span>
+          </span>
+          <span class="hub-card-actions"><span class="hub-card-sub">Work Orders &amp; Response</span><span class="hub-card-arrow">↗</span></span>
+        </button>
+        <button class="hub-card telemetry-card" id="appHubMemoryBtn" type="button">
+          <span class="hub-card-main">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 21 8 12 13 3 8 12 3"/><polyline points="3 13 12 18 21 13"/><polyline points="3 18 12 23 21 18"/></svg>
+            <span class="hub-card-title">Civic Memory™</span>
+          </span>
+          <span class="hub-card-actions"><span class="hub-card-sub">Public Ledger &amp; Standards</span><span class="hub-card-arrow">↗</span></span>
+        </button>
       </div>
 
-      <!-- 1. PRIMARY CTA — moved directly above National Network Live, per nav restructure -->
+      <!-- Analytics deep-dive — the tab's existing real Big 3 + National
+           Network content (same ids/data as before), now revealed from the
+           Civic Intelligence Stack's "Analytics" card instead of always
+           sitting open at the top of the tab. -->
+      <div class="hub-deepdive-panel" id="appDeepdiveAnalytics">
+        <div class="card">
+          <div class="label">The Big 3 — public health metrics</div>
+          <div class="big3-row">
+            <div class="big3-tile"><div class="big3-val" id="big3Active">–</div><div class="big3-lbl">Active Hazards<span class="big3-question">What's broken on my block right now?</span></div></div>
+            <div class="big3-tile"><div class="big3-val" id="big3Speed">–</div><div class="big3-lbl">Fix Speed<span class="big3-question">How fast is it going to get fixed?</span></div></div>
+            <div class="big3-tile"><div class="big3-val" id="big3Verify">–</div><div class="big3-lbl">Completion Rate<span class="big3-question">Are we catching up or falling behind?</span></div></div>
+          </div>
+          <div class="big3-note">Computed live from seeded ledger/CapEx demo data — not asserted as a production dataset.</div>
+        </div>
+        <div class="card">
+          <div class="label" style="justify-content:center">National network — live</div>
+          <div class="nat-tile">
+            <div class="stat-big" id="natActiveMunis">0</div>
+            <div class="small">Active municipalities</div>
+          </div>
+          <div class="nat-tile">
+            <div class="stat-big" id="natDistricts">0</div>
+            <div class="small">Districts mapped</div>
+          </div>
+          <div class="nat-tile">
+            <div class="stat-big" id="natTiles">0</div>
+            <div class="small">National grid tiles digitized</div>
+          </div>
+          <div class="nat-tile">
+            <div class="stat-big" style="color:#fff" id="natCapex">$0</div>
+            <div class="small">Total CapEx scoped nationwide</div>
+          </div>
+          <div class="small" style="text-align:center;font-style:italic;margin-top:8px;color:var(--muted);">America Covered One Block at a Time</div>
+        </div>
+        <div class="card" style="text-align:center;">
+          <div class="label" style="justify-content:center;">City-Wide Analytics</div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:12px;">
+            Access the same dashboard in a full browser window on the desktop portal.
+          </p>
+          <a href="index.html#analytics" class="btn-submit" style="text-decoration:none;">
+            Open on Web ↗
+          </a>
+        </div>
+        <button type="button" class="hub-deepdive-close" id="appDeepdiveAnalyticsCloseBtn">Close</button>
+      </div>
+
+      <!-- Municipal Portal deep-dive — real stage counts + ward coverage,
+           same formulas as index.html's renderMunicipalPanel(), computed
+           from this app's own currentWardMeta/ledgerTickets/
+           coverageDirectory (not a fabricated citywide asset inventory). -->
+      <div class="hub-deepdive-panel" id="appMunicipalPanel">
+        <div class="card">
+          <div class="label" id="appMunicipalCityLabel">Citywide</div>
+          <div class="big3-row">
+            <div class="big3-tile"><div class="big3-val" id="appMunicipalSubmitted">–</div><div class="big3-lbl">Submitted</div></div>
+            <div class="big3-tile"><div class="big3-val" id="appMunicipalDispatched">–</div><div class="big3-lbl">Dispatched</div></div>
+            <div class="big3-tile"><div class="big3-val" id="appMunicipalResolved">–</div><div class="big3-lbl">Resolved</div></div>
+          </div>
+          <div class="big3-note" id="appMunicipalCoverageNote">No ward directory on file yet for this jurisdiction.</div>
+        </div>
+        <button type="button" class="hub-deepdive-close" id="appMunicipalPanelCloseBtn">Close</button>
+      </div>
+
+      <!-- 7. INTERACTIVE OPTION GRID -->
+      <section class="citixen-feature-section">
+        <div class="citixen-feature-grid" role="list" aria-label="Platform feature categories">
+          <button type="button" class="citixen-feature-tile" id="appTileFeatures" role="listitem" aria-expanded="false" aria-controls="appFeatureAccordion">
+            <span class="citixen-feature-tile-icon">
+              <svg viewBox="0 0 24 24" width="22" height="22" stroke="#00E699" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><circle cx="9" cy="7" r="2" fill="#00E699" stroke="none"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2" fill="#00E699" stroke="none"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="11" cy="17" r="2" fill="#00E699" stroke="none"/></svg>
+            </span>
+            <span class="citixen-feature-tile-label">Features ↓</span>
+          </button>
+          <button type="button" class="citixen-feature-tile" id="appTileSafety" role="listitem" aria-expanded="false" aria-controls="appFeatureAccordion">
+            <span class="citixen-feature-tile-icon">
+              <svg viewBox="0 0 24 24" width="22" height="22" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </span>
+            <span class="citixen-feature-tile-label">Safety ↓</span>
+          </button>
+          <button type="button" class="citixen-feature-tile" id="appTileSecurity" role="listitem" aria-expanded="false" aria-controls="appFeatureAccordion">
+            <span class="citixen-feature-tile-icon">
+              <svg viewBox="0 0 24 24" width="22" height="22" stroke="#00E699" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 3 20 7.5 20 16.5 12 21 4 16.5 4 7.5 12 3"/><path d="m8.5 12 2.5 2.5 5-5"/></svg>
+            </span>
+            <span class="citixen-feature-tile-label">Security ↓</span>
+          </button>
+        </div>
+        <div class="citixen-feature-accordion" id="appFeatureAccordion" role="region" aria-live="polite"></div>
+      </section>
+
+      <!-- 8. CITIXEN UX™ ECOSYSTEM DIAGRAM LINK -->
+      <div class="citixen-narrative-link">
+        <span class="citixen-narrative-link-title">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="#00E699" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>CITIXEN UX<sup class="tm-symbol">™</sup></span>
+        </span>
+        <button type="button" id="appLearnMoreBtn" class="citixen-feature-learn-more">Learn More ↗</button>
+      </div>
+      <div class="hub-deepdive-panel" id="appLearnMorePanel">
+        <div class="card" style="padding-top:18px;">
+          <div id="appTriadDiagramMount"></div>
+          <p style="font-size:.78rem;color:var(--muted);line-height:1.55;">CITIXEN UX<sup class="tm-symbol">™</sup> is the zero-knowledge shield hub between every resident report and the two places it needs to go: the public ledger (so the record is open) and the municipal portal (so the work order actually gets created). No account, no device ID, and no GPS/EXIF metadata ever leaves your phone attached to the photo.</p>
+        </div>
+        <button type="button" class="hub-deepdive-close" id="appLearnMorePanelCloseBtn">Close</button>
+      </div>
+
+      <!-- 9. ZERO-KNOWLEDGE PRIVACY CARD -->
+      <div class="citixen-trust-badge">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+        <div>
+          <div class="citixen-trust-badge-title">Zero-Knowledge &amp; EXIF-Scrubbed — 100% Anonymous Civic Proof</div>
+          <div class="citixen-trust-badge-sub">No personal data is retained. Photo metadata is scrubbed at the device before it ever reaches the public ledger.</div>
+        </div>
+      </div>
+
+      <!-- 10. EXPORT ENGINE — "App Launcher & Download Triggers" is adapted
+           here: a mobile-app-store badge for the app you're already inside
+           of doesn't make sense, so this keeps the one part of item 10 that
+           does apply inside the app itself — the real PDF compiler
+           (downloadWardHealthPdf(), already wired to the Ledger drawer's
+           own Print/Export trigger) plus the same real navigator.share()
+           hook index.html's Export Hub uses (shareViaWebShareApi(), ported
+           verbatim below since it has no page-specific dependency). -->
       <div class="card" style="text-align:center;">
-        <div class="label" style="justify-content:center;">City-Wide Analytics</div>
-        <p style="font-size:.78rem;color:var(--muted);margin-bottom:12px;">
-          Access real-time GIS mapping, district heatmaps, and municipal SLAs on the desktop portal.
-        </p>
-        <a href="index.html#analytics" class="btn-submit" style="text-decoration:none;">
-          Open Web Dashboard ↗
-        </a>
+        <div class="label" style="justify-content:center;">Export &amp; Share</div>
+        <p style="font-size:.78rem;color:var(--muted);margin-bottom:12px;">Compile the current ward health snapshot into a PDF, or share this app natively.</p>
+        <button type="button" class="btn-submit" id="appExportPdfBtn" style="margin-bottom:10px;">Export Civic Report (PDF) ↗</button>
+        <button type="button" class="btn-camera" id="appShareBtn" style="width:100%;justify-content:center;">Share CITIXEN UX™</button>
       </div>
 
-      <!-- 2. NATIONAL NETWORK — LIVE. National Coverage Directory listing
-           removed per spec; this stat block + tagline is now the only
-           national-network content in Analytics. -->
-      <div class="card">
-        <div class="label" style="justify-content:center">National network — live</div>
-        <div class="nat-tile">
-          <div class="stat-big" id="natActiveMunis">0</div>
-          <div class="small">Active municipalities</div>
-        </div>
-        <div class="nat-tile">
-          <div class="stat-big" id="natDistricts">0</div>
-          <div class="small">Districts mapped</div>
-        </div>
-        <div class="nat-tile">
-          <div class="stat-big" id="natTiles">0</div>
-          <div class="small">National grid tiles digitized</div>
-        </div>
-        <div class="nat-tile">
-          <div class="stat-big" style="color:#fff" id="natCapex">$0</div>
-          <div class="small">Total CapEx scoped nationwide</div>
-        </div>
-        <div class="small" style="text-align:center;font-style:italic;margin-top:8px;color:var(--muted);">America Covered One Block at a Time</div>
+      <!-- 11. PERSISTENT FOOTER — the app shell's bottom tab bar is fixed in
+           place (unlike the web page's own scrolling footer), so a
+           same-content footer belongs at the end of this tab's scrollable
+           content instead of pinned under a fixed nav bar it would just
+           hide behind. Same real brand shield + verification seal copy as
+           index.html's footer; the "modal re-trigger link" there (reopens
+           the Crowd Save America™ entry pop-up) has no equivalent here —
+           this app shell uses a splash screen, not that entry modal — so
+           it's left out rather than wired to something it doesn't do. -->
+      <div class="card" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:4px;">
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="#00E699" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <div class="small" style="color:var(--muted)">CITIXEN UX<sup class="tm-symbol">™</sup> — Privacy Engine: Verified</div>
       </div>
 
     </section>
@@ -688,7 +1004,12 @@ textarea.input{resize:none;line-height:1.4}
     </button>
     <button class="navtab" data-target="tab-analytics">
       <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="20" x2="5" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="19" y1="20" x2="19" y2="15"/></svg>
-      <span>Analytics</span>
+      <!-- Tab 3 label renamed from "Analytics" to "Dashboard" per this
+           round's spec (the tab's content is now the full Dashboard
+           sequence, not just the old lightweight Analytics summary) — the
+           section id/data-target stay "tab-analytics" so every existing
+           real JS wiring (initAnalytics(), etc.) keeps working unchanged. -->
+      <span>Dashboard</span>
     </button>
   </nav>
 
@@ -708,6 +1029,23 @@ textarea.input{resize:none;line-height:1.4}
       <svg viewBox="0 0 24 24" width="17" height="17" stroke="#051311" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.2"/></svg>
       Capture proof
     </button>
+  </div>
+
+  <!-- ===== DASHBOARD TAB GENERIC INFO MODAL — reuses this file's own
+       .drawer full-screen overlay shell (same as #camModal above) instead
+       of importing index.html's separate .modal-overlay/.modal-box system,
+       since this app already has one working modal pattern. Holds the
+       Features/Safety/Security copy and the "How Your Report Moves"
+       diagram, same static text as index.html's modalData (no live data,
+       safe to duplicate verbatim — unlike the Scorecard/Municipal numbers,
+       which are computed, never hand-copied). ===== -->
+  <div id="appInfoModal" class="drawer">
+    <div class="row"><strong id="appInfoModalTitle" style="color:var(--mint2)"></strong>
+      <button class="icon-btn" id="appInfoModalCloseBtn">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+      </button>
+    </div>
+    <div id="appInfoModalBody" style="overflow-y:auto;margin-top:10px;"></div>
   </div>
 
   <!-- ===== LIVE PUBLIC LEDGER DRAWER — modal architecture synchronized with
@@ -880,6 +1218,7 @@ async function initAnalytics(){
   await loadNationalTab();
   nationalDataCache = lastNationalData;
   await loadBig3();
+  await updateAppTelemetryScorecard(); // Dashboard tab's Geotagged Scorecard — real numbers, see above
 }
 
 /* =====================================================================
@@ -1660,6 +1999,219 @@ function applyWardMeta(meta, opts){
 
   const named = opts.explicit || meta.isGpsMatch;
   setTextIfExists('covSub', named ? (meta.cityName + ', ' + meta.state.toUpperCase() + ' blocks surveyed') : 'CITYWIDE BLOCKS SURVEYED');
+  updateAppTelemetryScorecard();
+}
+
+/* =====================================================================
+   DASHBOARD TAB (Screen 3) — SCORECARD, MUNICIPAL PANEL, FEATURE
+   ACCORDION, DIAGRAM LINK, EXPORT/SHARE
+   -----------------------------------------------------------------
+   Content-parity port of index.html's own Dashboard sequence (see the
+   "SCREEN 3 / DASHBOARD TAB" CSS comment above). The Scorecard and
+   Municipal Portal numbers below use this app's own real
+   coverageDirectory/currentWardMeta/ledgerTickets — the exact same
+   formulas as index.html's computeWardCoverage()/
+   computeAvgResolutionDays()/updateTelemetryScorecard()/
+   renderMunicipalPanel(), re-derived here against this file's own data
+   rather than imported, since there is no shared module system between
+   the two static pages.
+   ===================================================================== */
+function computeAppWardCoverage(meta){
+  let knownWards = [];
+  if (meta && coverageDirectory) {
+    const st = coverageDirectory.states.find(s => s.slug === meta.state);
+    const c = st && st.cities.find(c => c.slug === meta.city);
+    knownWards = c ? c.wards : [];
+  }
+  const cityTickets = meta ? ledgerTickets.filter(t => t.city === meta.city && t.state === meta.state) : [];
+  const loggedWardSlugs = new Set(cityTickets.map(t => t.ward));
+  const pct = knownWards.length ? Math.round((loggedWardSlugs.size / knownWards.length) * 100) : null;
+  return { knownWards, loggedWardSlugs, pct };
+}
+function computeAppAvgResolutionDays(tickets){
+  const timed = tickets.filter(t => t.stage === 'resolved' && typeof t.resolutionHours === 'number');
+  if (!timed.length) return null;
+  const avgHours = timed.reduce((sum, t) => sum + t.resolutionHours, 0) / timed.length;
+  return avgHours / 24;
+}
+function formatAppScorecardTimestamp(now){
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const yy = String(now.getFullYear()).slice(-2);
+  let hours = now.getHours();
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12; if (hours === 0) hours = 12;
+  const mins = String(now.getMinutes()).padStart(2, '0');
+  let tz = '';
+  try {
+    const part = new Intl.DateTimeFormat('en-US', { timeZoneName: 'short' }).formatToParts(now).find(p => p.type === 'timeZoneName');
+    tz = part ? part.value : '';
+  } catch (e) { tz = ''; }
+  return 'Updated ' + mm + '/' + dd + '/' + yy + ' • ' + hours + ':' + mins + ' ' + ampm + (tz ? ' ' + tz : '');
+}
+function renderAppScorecardTimestamp(){
+  const el = document.getElementById('appScorecardTimestamp');
+  if (el) el.textContent = formatAppScorecardTimestamp(new Date());
+}
+async function updateAppTelemetryScorecard(){
+  const labelEl = document.getElementById('appScorecardLabel');
+  const resolvedEl = document.getElementById('appScorecardResolved');
+  const coveredEl = document.getElementById('appScorecardCovered');
+  const slaEl = document.getElementById('appScorecardSla');
+  if (!resolvedEl || !coveredEl || !slaEl) return;
+  if (!ledgerTickets.length) {
+    try { ledgerTickets = await fetchLedgerTickets(); } catch (e) { /* leave the placeholder dashes if this fails */ }
+  }
+  const meta = currentWardMeta;
+  if (labelEl) labelEl.textContent = meta ? (meta.cityName.toUpperCase() + ', ' + meta.state.toUpperCase() + ' SCORECARD') : 'CITYWIDE SCORECARD';
+  const cityTickets = meta ? ledgerTickets.filter(t => t.city === meta.city && t.state === meta.state) : ledgerTickets;
+  const resolvedCount = cityTickets.filter(t => t.stage === 'resolved').length;
+  resolvedEl.textContent = cityTickets.length ? (resolvedCount + ' / ' + cityTickets.length) : '—';
+  const { knownWards, pct } = computeAppWardCoverage(meta);
+  coveredEl.textContent = knownWards.length ? (pct != null ? pct : 0) + '%' : 'N/A';
+  const avgDays = computeAppAvgResolutionDays(cityTickets);
+  slaEl.textContent = avgDays != null ? avgDays.toFixed(1) + ' Days' : 'N/A';
+  renderAppScorecardTimestamp();
+}
+
+/* Municipal Portal deep-dive — same real stage-count/coverage math as
+   index.html's renderMunicipalPanel(), against this app's own data. */
+function renderAppMunicipalPanel(){
+  const meta = currentWardMeta;
+  const cityLabelEl = document.getElementById('appMunicipalCityLabel');
+  if (cityLabelEl) cityLabelEl.textContent = meta ? meta.cityName : 'Citywide';
+  const cityTickets = meta ? ledgerTickets.filter(t => t.city === meta.city && t.state === meta.state) : [];
+  setTextIfExists('appMunicipalSubmitted', cityTickets.filter(t => t.stage === 'submitted').length);
+  setTextIfExists('appMunicipalDispatched', cityTickets.filter(t => t.stage === 'dispatched').length);
+  setTextIfExists('appMunicipalResolved', cityTickets.filter(t => t.stage === 'resolved').length);
+  const { knownWards, loggedWardSlugs, pct } = computeAppWardCoverage(meta);
+  const noteEl = document.getElementById('appMunicipalCoverageNote');
+  if (noteEl) {
+    noteEl.textContent = knownWards.length
+      ? (pct != null ? pct : 0) + '% ward coverage — ' + loggedWardSlugs.size + ' of ' + knownWards.length + ' known ward' + (knownWards.length === 1 ? '' : 's') + ' in ' + (meta ? meta.cityName : 'this jurisdiction') + ' have at least one logged report on file.'
+      : 'No ward directory on file yet for this jurisdiction.';
+  }
+}
+
+/* "How Your Report Moves" tri-node schematic — same real geometry as
+   index.html's CIVIC_TRIAD_DIAGRAM_HTML, with its own node ids
+   (appTriad...) since this is a separate document, not shared DOM. */
+const APP_TRIAD_DIAGRAM_HTML = '<div class="civic-triad-section">' +
+  '<div class="civic-triad-card">' +
+    '<div class="civic-triad-header">How Your Report Moves</div>' +
+    '<svg class="civic-triad-svg" viewBox="0 0 320 310" role="img" aria-label="Diagram: a central CITIXEN UX nucleus radiates equally to Resident, Public Ledger, and Municipal Portal">' +
+      '<line x1="160" y1="127" x2="160" y2="118" class="civic-triad-spoke"/>' +
+      '<line x1="118.59" y1="199.24" x2="110.79" y2="203.81" class="civic-triad-spoke"/>' +
+      '<line x1="201.41" y1="199.24" x2="209.21" y2="203.81" class="civic-triad-spoke"/>' +
+      '<g id="appTriadNucleus">' +
+        '<circle cx="160" cy="175" r="48" class="civic-triad-nucleus-halo"/>' +
+        '<circle cx="160" cy="175" r="36" class="civic-triad-outer-ring"/>' +
+        '<circle cx="160" cy="175" r="32" class="civic-triad-root-circle"/>' +
+        '<g transform="translate(149.8,155.8) scale(0.85)">' +
+          '<path d="M12 2L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-3z" fill="none" stroke="#00E699" stroke-width="1.8" stroke-linejoin="round"/>' +
+        '</g>' +
+        '<text x="160" y="192" class="civic-triad-root-label-center">CITIXEN UX<tspan baseline-shift="super" font-size="4.5">™</tspan></text>' +
+      '</g>' +
+      '<g id="appTriadNodeResident">' +
+        '<circle cx="160" cy="80" r="26" class="civic-triad-node-circle"/>' +
+        '<path d="M160 68a6 6 0 1 0 0.001 0z" fill="none" stroke="#00E699" stroke-width="1.6"/>' +
+        '<path d="M148 94c2-7 7-11 12-11s10 4 12 11" fill="none" stroke="#00E699" stroke-width="1.6" stroke-linecap="round"/>' +
+        '<text x="160" y="30" class="civic-triad-node-label">Resident</text>' +
+        '<text x="160" y="16" class="civic-triad-node-sub">Mobile report capture</text>' +
+      '</g>' +
+      '<g id="appTriadNodeLedger">' +
+        '<circle cx="78" cy="223" r="26" class="civic-triad-node-circle"/>' +
+        '<path d="M66 211h24M66 219h24M66 227h16" fill="none" stroke="#00E699" stroke-width="1.6" stroke-linecap="round"/>' +
+        '<text x="78" y="273" class="civic-triad-node-label">Public Ledger</text>' +
+        '<text x="78" y="287" class="civic-triad-node-sub">Live, searchable record</text>' +
+      '</g>' +
+      '<g id="appTriadNodeMunicipal">' +
+        '<circle cx="242" cy="223" r="26" class="civic-triad-node-circle"/>' +
+        '<path d="M230 235v-14l12-8 12 8v14z" fill="none" stroke="#00E699" stroke-width="1.6" stroke-linejoin="round"/>' +
+        '<path d="M236 235v-8h12v8" fill="none" stroke="#00E699" stroke-width="1.6"/>' +
+        '<text x="242" y="273" class="civic-triad-node-label">Municipal Portal</text>' +
+        '<text x="242" y="287" class="civic-triad-node-sub">Work orders &amp; SLA</text>' +
+      '</g>' +
+    '</svg>' +
+  '</div>' +
+'</div>';
+
+/* Features/Safety/Security accordion copy + the Civic Memory/Anonymity
+   info-modal bodies — same static marketing/trust copy as index.html's
+   modalData (no live numbers here, so verbatim reuse is honest, unlike
+   the Scorecard/Municipal figures above which are always computed). */
+const APP_MODAL_DATA = {
+  ciFeatures: { title: 'Features', body: [
+    ['Real-Time Spatial Tracking','Reports are placed on the live national map and this jurisdiction\'s own dispatch view the moment they are filed.'],
+    ['Automated SLA Logging','Every report is timestamped against its ward\'s published response-time commitment automatically — no manual entry.'],
+    ['Ward Heatmaps','Hazard density and resolution-speed views broken out ward by ward, drawn from the same records dispatchers see.']
+  ]},
+  ciSafety: { title: 'Safety', body: [
+    ['Ground-Truth Civic Verification','Reports are tied to a real ward and jurisdiction, not a self-reported location, so the public record reflects where a hazard actually is.'],
+    ['Incident Priority Ranking','Open hazards can be ranked by category so limited repair budget goes to the highest-need items first.'],
+    ['Hazard Prevention Metrics','Resolution-time and reopen-rate trends surface recurring hazard patterns before they become repeat incidents.']
+  ]},
+  ciSecurity: { title: 'Security', body: [
+    ['Zero-Knowledge Privacy Engine','No accounts, no login, and no device fingerprinting anywhere in this system — see the full Anonymity Whitepaper.'],
+    ['On-Device Metadata Scrubbing','Photo metadata, including embedded GPS coordinates and device identifiers, is stripped on-device before a photo ever leaves the reporter\'s phone.'],
+    ['Immutable Public Ledger','Each resolved ledger entry carries a timestamp and verification hash so the resolution sequence can be audited without exposing reporter identity.']
+  ]},
+  civicMemory: { title: 'Civic Memory™ — What This Section Covers', body: [
+    ['State Constitution Reference','A representative-summary pointer to this jurisdiction\'s state constitution, the same reference carried in the full web dashboard\'s CITIXEN Codex.'],
+    ['Spatial Hashing Architecture','How this platform buckets reports by location today (ward-tier), and the H3 hexagonal-grid model targeted as its roadmap replacement.'],
+    ['Public Ledger & Standards','Tap the LIVE PUBLIC LEDGER button above to open the real, searchable public record — the same drawer this card\'s subtitle points to.']
+  ]}
+};
+function openAppInfoModal(key){
+  const d = APP_MODAL_DATA[key]; if (!d) return;
+  document.getElementById('appInfoModalTitle').textContent = d.title;
+  document.getElementById('appInfoModalBody').innerHTML = d.body.map(([h,p]) => `<h4>${esc(h)}</h4><p>${esc(p)}</p>`).join('');
+  document.getElementById('appInfoModal').classList.add('open');
+}
+function closeAppInfoModal(){
+  document.getElementById('appInfoModal').classList.remove('open');
+}
+function toggleAppFeatureAccordion(key, tileId){
+  const acc = document.getElementById('appFeatureAccordion');
+  const tileIds = ['appTileFeatures', 'appTileSafety', 'appTileSecurity'];
+  const wasOpenForThisTile = acc.classList.contains('open') && acc.dataset.activeTile === tileId;
+  tileIds.forEach(id => {
+    const isTarget = id === tileId && !wasOpenForThisTile;
+    document.getElementById(id).classList.toggle('active', isTarget);
+    document.getElementById(id).setAttribute('aria-expanded', String(isTarget));
+  });
+  if (wasOpenForThisTile) {
+    acc.classList.remove('open');
+    acc.dataset.activeTile = '';
+    return;
+  }
+  const d = APP_MODAL_DATA[key];
+  acc.innerHTML = d.body.map(([h, p]) => `<h4>${esc(h)}</h4><p>${esc(p)}</p>`).join('');
+  acc.classList.add('open');
+  acc.dataset.activeTile = tileId;
+}
+
+/* Deep-dive panel open/close for the Civic Intelligence Stack + Learn More
+   link — same single-panel-open-at-a-time pattern as index.html's
+   openDeepdivePanel()/closeDeepdivePanel(). */
+function openAppDeepdivePanel(panelId, triggerBtn){
+  document.querySelectorAll('.hub-deepdive-panel.open').forEach(p => { if (p.id !== panelId) p.classList.remove('open'); });
+  const panel = document.getElementById(panelId);
+  if (!panel) return;
+  const wasOpen = panel.classList.contains('open');
+  panel.classList.toggle('open', !wasOpen);
+  if (triggerBtn) triggerBtn.setAttribute('aria-expanded', String(!wasOpen));
+  if (!wasOpen) setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 30);
+}
+
+/* Native Web Share hook — ported verbatim from index.html's
+   shareViaWebShareApi(); pure function, no page-specific dependency. */
+async function shareViaWebShareApi(){
+  if (!navigator.share) return false;
+  try {
+    await navigator.share({ title: 'CITIXEN UX™ — Civic Intelligence', text: 'Real-time civic accountability, verified.', url: location.href });
+  } catch (err) { /* user cancelled the native share sheet — not an error */ }
+  return true;
 }
 
 /* =====================================================================
@@ -2869,7 +3421,10 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('btnCapture').addEventListener('click',capturePhoto);
   document.getElementById('btnSubmit').addEventListener('click',submitReport);
 
-  document.getElementById('btnOpenLedger').addEventListener('click', openLedgerDrawer);
+  // The old standalone "Live Civic Memory™" trigger (#btnOpenLedger) was
+  // restyled into the Dashboard tab's "LIVE PUBLIC LEDGER" gateway pill
+  // (#appLiveLedgerBanner) this round — same real openLedgerDrawer() call.
+  document.getElementById('appLiveLedgerBanner').addEventListener('click', openLedgerDrawer);
   document.getElementById('btnCloseLedger').addEventListener('click', closeLedgerDrawer);
   document.getElementById('ledgerDrawer').addEventListener('click', (e) => {
     if (e.target.id === 'ledgerDrawer') closeLedgerDrawer();
@@ -2885,6 +3440,49 @@ window.addEventListener('DOMContentLoaded',()=>{
 
   const pdfBtn = document.getElementById('btnDownloadWardHealthPdf');
   if (pdfBtn) pdfBtn.addEventListener('click', () => downloadWardHealthPdf(pdfBtn));
+
+  /* ===== DASHBOARD TAB (Screen 3) WIRING ===== */
+  document.getElementById('appHubAnalyticsBtn').addEventListener('click', (e) => {
+    openAppDeepdivePanel('appDeepdiveAnalytics', e.currentTarget);
+  });
+  document.getElementById('appDeepdiveAnalyticsCloseBtn').addEventListener('click', () => {
+    document.getElementById('appDeepdiveAnalytics').classList.remove('open');
+    document.getElementById('appHubAnalyticsBtn').setAttribute('aria-expanded', 'false');
+  });
+  document.getElementById('appHubMunicipalBtn').addEventListener('click', async (e) => {
+    openAppDeepdivePanel('appMunicipalPanel', e.currentTarget);
+    if (!ledgerTickets.length) ledgerTickets = await fetchLedgerTickets();
+    renderAppMunicipalPanel();
+  });
+  document.getElementById('appMunicipalPanelCloseBtn').addEventListener('click', () => {
+    document.getElementById('appMunicipalPanel').classList.remove('open');
+    document.getElementById('appHubMunicipalBtn').setAttribute('aria-expanded', 'false');
+  });
+  document.getElementById('appHubMemoryBtn').addEventListener('click', () => openAppInfoModal('civicMemory'));
+
+  document.getElementById('appTileFeatures').addEventListener('click', () => toggleAppFeatureAccordion('ciFeatures', 'appTileFeatures'));
+  document.getElementById('appTileSafety').addEventListener('click', () => toggleAppFeatureAccordion('ciSafety', 'appTileSafety'));
+  document.getElementById('appTileSecurity').addEventListener('click', () => toggleAppFeatureAccordion('ciSecurity', 'appTileSecurity'));
+
+  document.getElementById('appTriadDiagramMount').innerHTML = APP_TRIAD_DIAGRAM_HTML;
+  document.getElementById('appLearnMoreBtn').addEventListener('click', (e) => {
+    openAppDeepdivePanel('appLearnMorePanel', e.currentTarget);
+  });
+  document.getElementById('appLearnMorePanelCloseBtn').addEventListener('click', () => {
+    document.getElementById('appLearnMorePanel').classList.remove('open');
+  });
+
+  document.getElementById('appInfoModalCloseBtn').addEventListener('click', closeAppInfoModal);
+  document.getElementById('appInfoModal').addEventListener('click', (e) => {
+    if (e.target.id === 'appInfoModal') closeAppInfoModal();
+  });
+
+  const appExportPdfBtn = document.getElementById('appExportPdfBtn');
+  if (appExportPdfBtn) appExportPdfBtn.addEventListener('click', () => downloadWardHealthPdf(appExportPdfBtn));
+  document.getElementById('appShareBtn').addEventListener('click', async () => {
+    const shared = await shareViaWebShareApi();
+    if (!shared) toast('Native share isn\'t supported in this browser.');
+  });
 });
 </script>
 </body>
