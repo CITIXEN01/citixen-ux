@@ -140,11 +140,14 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
 .chip-other-row{display:flex;justify-content:center;margin-bottom:14px}
 .chip-other{min-width:150px;justify-content:center}
 
-.btn-camera{width:100%;background:rgba(3,7,18,.6);border:1px solid rgba(255,255,255,.08);color:var(--text);padding:13px;
-  border-radius:12px;font-weight:800;font-size:.8rem;letter-spacing:.3px;cursor:pointer;display:flex;
-  align-items:center;justify-content:center;gap:8px;margin-bottom:12px;transition:border-color .15s}
-.btn-camera:hover{border-color:rgba(255,255,255,.18)}
-.btn-camera svg{color:var(--mint2)}
+.btn-camera{width:100%;background:rgba(6,78,59,.3);border:2px solid rgba(0,230,153,.6);color:#6ee7b7;padding:13px;
+  border-radius:12px;font-weight:600;font-size:.8rem;letter-spacing:.3px;cursor:pointer;display:flex;
+  align-items:center;justify-content:center;gap:8px;margin-bottom:12px;transition:all .3s ease;
+  filter:drop-shadow(0 0 15px rgba(52,211,153,.4));animation:btnCameraPulse 2s ease-in-out infinite}
+.btn-camera:hover{border-color:rgba(52,211,153,.9)}
+.btn-camera svg{color:#6ee7b7;filter:drop-shadow(0 0 6px rgba(52,211,153,.8))}
+@keyframes btnCameraPulse{0%,100%{opacity:1}50%{opacity:.6}}
+@media (prefers-reduced-motion:reduce){.btn-camera{animation:none}}
 
 .input{width:100%;padding:11px 13px;background:var(--surface-input-bg);border:var(--surface-input-border);color:var(--text);
   border-radius:10px;font-size:.8rem;margin-bottom:10px;outline:none;transition:border-color .15s}
@@ -4189,14 +4192,14 @@ async function finalizeSubmitReport(opts){
     pendingReportCellId = null;
   }
 
-  switchTab('tab-map', document.querySelectorAll('.navtab')[1]);
-  // Immediate overlay on top of the Map & Feed tab we just auto-routed to —
-  // acknowledges the dispatch with its real ticket ID before the citizen
-  // has to go hunting for their own report in the feed below.
+  // Pops instantly, before the tab switch below — acknowledges the dispatch
+  // with its real ticket ID right away rather than after the citizen is
+  // already looking at the Map & Feed tab.
   openDispatchReceiptModal({
     ticketId, department: dept, type: hz.type, location: rawLoc,
     queuedOffline: !result.ok, timestamp: new Date()
   });
+  switchTab('tab-map', document.querySelectorAll('.navtab')[1]);
 }
 
 function registerSW(){
