@@ -29,7 +29,6 @@
      index.html so the Dashboard renders from identical code on both. -->
 <link rel="stylesheet" href="/shared/instant-report.css">
 <script src="/shared/instant-report.js"></script>
-<script src="/shared/geo-hatch.js"></script>
 <script src="/shared/severity.js"></script>
 <style>
 :root{
@@ -809,7 +808,10 @@ textarea.input{resize:none;line-height:1.4}
             the official report's Community Action Snapshot uses, computed
             by updateAppTelemetryScorecard(), which used to sit in the
             Dashboard's standalone Scorecard card).
-         The Geo-Hatch block grid lives only on the Dashboard now. -->
+         The Map tab's own Geo-Hatch overlay below (renderGeoHatchOverlay(),
+         amber/mint vector cells drawn directly on the basemap) is the only
+         Geo-Hatch grid in app.html; the Dashboard's separate block-grid card
+         (City/State/Country tabs + Citywide Asset Coverage) has been removed. -->
     <section id="tab-map" class="tabpane">
       <div class="card">
         <div class="label"><span>Civic Dispatch Map</span><span id="mCount" style="color:var(--mint2)">3 active</span></div>
@@ -888,21 +890,18 @@ textarea.input{resize:none;line-height:1.4}
         </div>
       </section>
 
-      <!-- 4. GEOTAGGED GEO-HATCH COVERAGE ENGINE — the Dashboard's primary
-           analytics anchor, directly under the report card. Rendered
-           by shared/geo-hatch.js (same component as index.html): Ward
-           (150m) / Municipal blocks / State–National toggles, Citywide
-           Asset Coverage %, and the block grid. Tapping an uncharted block
-           opens a ground-truth audit prompt that starts a report for it. -->
-      <div data-cx-geohatch></div>
-
-      <!-- The standalone "free & anonymous" trust line + Live Public Ledger
-           gateway pill that used to sit here (items 5+6, directly beneath
-           the Geo-Hatch Coverage card) are removed outright this round —
-           the ledger button moved into the Export & Share hero module above
-           (item 3) as its 3rd stacked button, same real openLedgerDrawer()
-           call, now wired via CitixenInstantReport.init()'s onLedger
-           option. -->
+      <!-- The #CrowdSaveAmerica Geo-Hatch Coverage card (City/State/Country
+           scope tabs + Citywide Asset Coverage block grid, shared/geo-hatch.js)
+           that used to sit directly under the Crowd Save America™ map card
+           is removed outright this round, along with its script include and
+           every app.html call into window.CitixenGeoHatch (init/load/reload/
+           markCovered — all now-dead references to a mount that no longer
+           exists). index.html keeps its own copy of this component
+           untouched. The standalone "free & anonymous" trust line + Live
+           Public Ledger gateway pill that used to sit here before that are
+           also already gone — the ledger button lives in the Export & Share
+           hero module above (item 3) as its 3rd stacked button, wired via
+           CitixenInstantReport.init()'s onLedger option. -->
 
       <!-- 7. CIVIC INTELLIGENCE STACK™ — human-first labels: Capital
            Projects / City Action Tracker / Community Archive. -->
@@ -1358,7 +1357,6 @@ async function initAnalytics(){
   nationalDataCache = lastNationalData;
   await loadBig3();
   await updateAppTelemetryScorecard(); // Dashboard tab's Geotagged Scorecard — real numbers, see above
-  if (window.CitixenGeoHatch) await window.CitixenGeoHatch.load(); // Geo-Hatch Coverage Engine under the Scorecard
 }
 
 /* =====================================================================
@@ -2220,8 +2218,6 @@ function applyWardMeta(meta, opts){
   const named = opts.explicit || meta.isGpsMatch;
   setTextIfExists('covSub', named ? (meta.cityName + ', ' + meta.state.toUpperCase() + ' blocks surveyed') : 'CITYWIDE BLOCKS SURVEYED');
   updateAppTelemetryScorecard();
-  // Re-pull the Dashboard's Geo-Hatch engine for the newly detected ward.
-  if (window.CitixenGeoHatch) window.CitixenGeoHatch.reload();
 }
 
 /* =====================================================================
@@ -2404,7 +2400,7 @@ const APP_MODAL_DATA = {
     ['What is kept','The public ledger stores the hazard category, ward, timestamps and resolution status, with no reporter-identifying field in the data model.']
   ]},
   spatialGrid: { title: '11M Block H3 Spatial Grid Matrix', body: [
-    ['Today: mapped wards','Reports are bucketed into 150 m blocks per mapped ward. The #CrowdSaveAmerica grid on the Dashboard rolls those blocks up by City, State and Country, with each block shown as auditable, pending or uncharted.'],
+    ['Today: mapped wards','Reports are bucketed into 150 m blocks per mapped ward, each tracked as auditable, pending or uncharted — the same #CrowdSaveAmerica grid model behind the national coverage map.'],
     ['Roadmap: H3 resolution 9','The target is a national matrix of roughly 11 million H3 hexagonal cells at census-block scale, keyed on-device for privacy. That nationwide index is not live in this build yet.'],
     ['Why blocks, not addresses','Grouping reports into cells shows coverage and gaps without pinning any report to a household.']
   ]},
@@ -2977,7 +2973,6 @@ async function verifyReportedCell(cellId, category){
     cellEl.classList.add('covered', 'you');
     cellEl.setAttribute('aria-label', 'Verified — reported by you');
   });
-  if (verifiedCell && window.CitixenGeoHatch) window.CitixenGeoHatch.markCovered(cellId, verifiedCell.category);
   const fromPct = computeCoveragePctBefore(cellId);
   refreshCoverageStats();
   animateTicker(fromPct, computeCoveragePct(), 600);
@@ -3848,7 +3843,6 @@ window.addEventListener('DOMContentLoaded',()=>{
   });
 
   initInstantReportAndQuickKeys();
-  initDashboardGeoHatch();
 });
 
 /* =====================================================================
@@ -3956,11 +3950,7 @@ function initInstantReportAndQuickKeys(){
     grid: () => {
       closeAppDrawer();
       switchTab('tab-analytics', document.querySelector('.navtab[data-target="tab-analytics"]'));
-      setTimeout(() => {
-        const card = document.querySelector('[data-cx-geohatch]');
-        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        openAppInfoModal('spatialGrid');
-      }, 250);
+      openAppInfoModal('spatialGrid');
     }
   };
   document.querySelectorAll('#appDrawer [data-cx-key]').forEach(btn => {
@@ -3974,27 +3964,6 @@ function initInstantReportAndQuickKeys(){
   });
 }
 
-/* #CrowdSaveAmerica coverage grid (Dashboard) — adapter for
-   shared/geo-hatch.js: City / State / Country scopes built from the real
-   per-ward block grids; an audit tap starts a report for that block. */
-function initDashboardGeoHatch(){
-  if (!window.CitixenGeoHatch) { console.warn('shared/geo-hatch.js did not load — the Dashboard coverage engine is unavailable.'); return; }
-  window.CitixenGeoHatch.init({
-    getScope: () => currentWardMeta ? {
-      state: currentWardMeta.state, stateName: currentWardMeta.stateName,
-      city: currentWardMeta.city, cityName: currentWardMeta.cityName, ward: currentWardMeta.ward
-    } : null,
-    getNational: async () => lastNationalData, // real rollup if already loaded; the module fetches it otherwise
-    onAuditBlock: (cellId, ward) => {
-      // Tie the report to the block only when it's in the ward this
-      // device's reports file into; otherwise it's a plain report.
-      pendingReportCellId = (currentWardMeta && ward && ward.ward === currentWardMeta.ward) ? cellId : null;
-      switchTab('tab-report', document.querySelector('.navtab[data-target="tab-report"]'));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      toast('Ground-truth audit started — capture a photo of this block and publish.');
-    }
-  });
-}
 </script>
 </body>
 </html>
