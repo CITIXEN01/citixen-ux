@@ -63,7 +63,8 @@
     shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',
     shieldPlain: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
     hexgrid: '<path d="M8 3l3.5 2v4L8 11 4.5 9V5z"/><path d="M15.5 3L19 5v4l-3.5 2L12 9V5z"/><path d="M11.75 10.5l3.5 2v4l-3.5 2-3.5-2v-4z"/><path d="M4.5 14.5L8 12.5"/><path d="M19 14.5l-3.75-2"/><path d="M8.25 16.5L4.5 18.5M15.25 16.5l3.75 2"/>',
-    pin: '<path d="M12 21s7-5.33 7-11a7 7 0 0 0-14 0c0 5.67 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>'
+    pin: '<path d="M12 21s7-5.33 7-11a7 7 0 0 0-14 0c0 5.67 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+    chevronDown: '<path d="M6 9l6 6 6-6"/>'
   };
   function icon(name, extraClass) {
     return '<svg class="cx-icon' + (extraClass ? ' ' + extraClass : '') + '" viewBox="0 0 24 24" aria-hidden="true">' + (ICONS[name] || '') + '</svg>';
@@ -287,25 +288,28 @@
     // Audit Summary" checkbox rather than a tab of its own.
     modal.innerHTML =
       '<div class="cx-panel">' +
-        // Export & Share toolbar: strictly ABOVE the main header per Patch
-        // 4.5 — real, working buttons (not decorative text), wired below to
-        // the same export functions the bottom drawer already uses.
-        '<div class="cx-toolbar" id="cxToolbar">' +
-          '<button type="button" class="cx-toolbar-btn cx-toolbar-btn-primary" id="cxToolbarExport">' + icon('shareUp') + 'Export &amp; Share Brief</button>' +
-          '<button type="button" class="cx-toolbar-btn cx-toolbar-btn-secondary" id="cxToolbarPdf">' + icon('doc') + 'Download PDF</button>' +
-          '<button type="button" class="cx-toolbar-btn cx-toolbar-btn-secondary" id="cxToolbarCopyLink">' + icon('link') + 'Copy Link</button>' +
-        '</div>' +
-        // Modal breakout header: CIVIC INTELLIGENCE™ BRIEF centered, city/state tag
-        // beneath it (never a ward number), no timestamp here — the PDF
-        // brief already renders its own.
+        // ALPHA LAUNCH FINAL PATCH — the 3-button Export & Share toolbar
+        // that used to sit here (Export & Share Brief / Download PDF /
+        // Copy Link, added above the header in Patch 4.5) is removed: this
+        // round asked for a single Export/Action button at the bottom of
+        // the report view instead of a top cluster. That single button is
+        // '#cxShareExportBtn', already built at the bottom of the body by
+        // renderPdfPane() ("Share & Export Brief") — it opens the same
+        // openPreExport() flow the old toolbar's primary button did, so no
+        // export capability was lost, just the duplicate top-of-view entry
+        // points. A light scroll-continues indicator (#cxScrollIndicator,
+        // see below) takes the toolbar's old spot at the top of the body
+        // instead, since removing those 3 buttons also removed the visual
+        // cue that this panel has more content below the fold.
         '<div class="cx-head">' + icon('shieldPlain') +
           '<div class="cx-head-text"><div class="cx-head-title" id="cxTitle">Civic Intelligence<sup class="cx-tm">™</sup> Brief</div>' +
           '<div class="cx-head-sub" id="cxJuris">Loading jurisdiction…</div></div>' +
           '<button type="button" class="cx-close" aria-label="Close">✕</button>' +
         '</div>' +
-        '<div class="cx-body">' +
+        '<div class="cx-body" id="cxBody">' +
           '<div id="cxPane-pdf"></div>' +
         '</div>' +
+        '<div class="cx-scroll-indicator" id="cxScrollIndicator" aria-hidden="true">' + icon('chevronDown') + '</div>' +
       '</div>';
     document.body.appendChild(modal);
     modal.querySelector('.cx-close').addEventListener('click', close);
@@ -317,21 +321,14 @@
       if (openSheet) { hideSheet(openSheet); return; }
       close();
     });
-    // Primary toolbar CTA opens the same pre-export audit prompt → export
-    // sheet flow as the in-body "Share & Export Brief" button.
-    modal.querySelector('#cxToolbarExport').addEventListener('click', openPreExport);
-    // Secondary toolbar shortcuts call the same real export functions
-    // directly, skipping the audit-summary prompt (it stays available via
-    // the primary CTA for anyone who wants that option).
-    modal.querySelector('#cxToolbarPdf').addEventListener('click', function (e) {
-      if (!data) { toast('Still loading the district snapshot — try again in a moment.'); return; }
-      downloadPdf(e.currentTarget);
-    });
-    modal.querySelector('#cxToolbarCopyLink').addEventListener('click', async function () {
-      var ok = await copyText(auditUrl());
-      if (ok) mintToast('Direct link copied to clipboard');
-      else toast('Copy is blocked here — the address is ' + auditUrl());
-      trackEvent('export_copy_link', { ok: ok, source: 'toolbar' });
+    // Scroll-continues indicator: a light chevron near the top of the body,
+    // fades out once the citizen actually scrolls (and back in if they
+    // scroll back to the very top) — purely a visual affordance, never
+    // blocks taps underneath it (pointer-events:none, see CSS).
+    var scrollIndicatorEl = modal.querySelector('#cxScrollIndicator');
+    var bodyEl = modal.querySelector('#cxBody');
+    bodyEl.addEventListener('scroll', function () {
+      scrollIndicatorEl.classList.toggle('cx-scroll-indicator-hidden', bodyEl.scrollTop > 24);
     });
   }
 

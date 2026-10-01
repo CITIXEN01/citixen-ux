@@ -115,28 +115,23 @@
   color:#E2E8F0;font:inherit;font-size:1rem;cursor:pointer;flex-shrink:0}
 .cx-body{overflow-y:auto;padding:14px 16px 18px;-webkit-overflow-scrolling:touch}
 
-/* Export & Share toolbar — moved ABOVE the main Civic Intelligence™ Brief
-   header (.cx-head) per Patch 4.5, replacing the old green pulsing-text
-   discovery banner with a real, working amber/neon-orange toolbar: a
-   primary "Export & Share Brief" action plus two secondary shortcuts, all
-   wired to the same real export functions the bottom drawer already uses
-   (openPreExport / downloadPdf / the direct-link copy) — nothing here is
-   decorative. Sits in its own bar, a dark obsidian strip with a thin amber
-   bottom border, as the first child of .cx-panel so it renders before the
-   header rather than between the header and the body. */
-.cx-toolbar{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;
-  padding:10px 16px;background:rgba(2,6,23,.8);border-bottom:1px solid rgba(245,158,11,.2);
-  border-radius:12px 12px 0 0}
-@media (min-width:640px){.cx-toolbar{border-radius:12px 12px 0 0}}
-.cx-toolbar-btn{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-  font-size:.72rem;font-weight:700;letter-spacing:.02em;border-radius:8px;cursor:pointer;
-  display:inline-flex;align-items:center;gap:6px;padding:6px 14px;transition:background-color .15s ease;
-  background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);color:#fbbf24}
-.cx-toolbar-btn:hover{background:rgba(245,158,11,.25)}
-.cx-toolbar-btn-primary{box-shadow:0 4px 14px rgba(0,0,0,.35)}
-.cx-toolbar-btn-secondary{background:transparent;padding:6px 12px}
-.cx-toolbar-btn-secondary:hover{background:rgba(245,158,11,.12)}
-.cx-toolbar-btn .cx-icon{width:14px;height:14px;stroke:#fbbf24;stroke-width:1.6}
+/* ALPHA LAUNCH FINAL PATCH — the 3-button Export & Share toolbar
+   (.cx-toolbar/.cx-toolbar-btn*, added above .cx-head in Patch 4.5) is
+   removed: this round asked for a single Export/Action button at the
+   bottom of the report view (see shared/instant-report.js's
+   '#cxShareExportBtn') instead of a top button cluster. In its place, a
+   light scroll-continues chevron (below) sits near the top of the body,
+   since the toolbar's removal also removed the only visual cue that this
+   panel scrolls. */
+.cx-scroll-indicator{position:absolute;top:66px;left:50%;transform:translateX(-50%);
+  width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:rgba(0,230,153,.1);border:1px solid rgba(0,230,153,.35);color:#00E699;
+  pointer-events:none;z-index:1;opacity:.9;transition:opacity .25s ease;
+  animation:cxScrollIndicatorBob 1.6s ease-in-out infinite}
+.cx-scroll-indicator .cx-icon{width:16px;height:16px;stroke:#00E699;stroke-width:2.2}
+.cx-scroll-indicator-hidden{opacity:0}
+@keyframes cxScrollIndicatorBob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(4px)}}
+@media (prefers-reduced-motion: reduce){.cx-scroll-indicator{animation:none}}
 
 /* The old 3-tile PDF/Graphic/Link format-picker bar (.cx-tiles/.cx-tile) was
    removed this round — the Brief is now the only pane (digital-first flow,

@@ -33,7 +33,24 @@
 // that flag exactly the way the spec's backend check rejects a missing
 // image — it's just checking the honest signal this architecture actually
 // has, not a fabricated image field.
+//
+// ALPHA LAUNCH FINAL PATCH — LIGHTWEIGHT SUBMISSION HEURISTIC: adds two
+// more cheap, honest checks alongside the photo gate above, so a broken or
+// empty submission (a stray direct POST, a client bug, a malformed retry)
+// can't land in the shared ledger that the Big 3 / dashboard / Live Public
+// Ledger all read from:
+//   - `rightOfWayConfirmed` — the same pattern as `photoConfirmed`: the
+//     client only ever sends `true` once its own #confirmRowCheckbox gate
+//     (see app.html's openPostPhotoConfirm()/finalizeSubmitReport()) has
+//     actually been ticked, so this is a real assertion, not a formality.
+//   - category/location/description non-empty strings — catches a request
+//     with the right shape but empty/whitespace-only content, which
+//     addTicket() would otherwise happily append as a blank-looking ticket.
 const { addTicket } = require('../_lib/store');
+
+function isNonEmptyString(v) {
+  return typeof v === 'string' && v.trim().length > 0;
+}
 
 module.exports = (req, res) => {
   if (req.method !== 'POST') {
@@ -43,6 +60,14 @@ module.exports = (req, res) => {
   const body = req.body || {};
   if (!body.photoConfirmed) {
     res.status(400).json({ success: false, error: 'Photo proof payload mandatory.' });
+    return;
+  }
+  if (!body.rightOfWayConfirmed) {
+    res.status(400).json({ success: false, error: 'Right-of-way confirmation is mandatory.' });
+    return;
+  }
+  if (!isNonEmptyString(body.category) || !isNonEmptyString(body.location) || !isNonEmptyString(body.description)) {
+    res.status(400).json({ success: false, error: 'Report is missing required category, location, or description.' });
     return;
   }
   const { reportId, ward, hazardCode } = addTicket({

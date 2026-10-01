@@ -4,17 +4,23 @@
    variables/classes, so the identical widget looks right on app.html,
    operator.html and dispatch.html alike.
    ===================================================================== */
-.cgf-badge{position:fixed;bottom:24px;right:24px;z-index:9999;
-  background:rgba(2,6,23,.9);border:1px solid rgba(16,185,129,.35);color:#34d399;
-  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.72rem;font-weight:700;
-  border-radius:999px;padding:9px 16px;box-shadow:0 10px 30px rgba(0,0,0,.5);backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);cursor:pointer;display:flex;align-items:center;gap:7px;
-  transition:border-color .15s,transform .15s}
-.cgf-badge:hover{border-color:rgba(52,211,153,.75);transform:translateY(-1px)}
+/* ALPHA LAUNCH FINAL PATCH — moved from bottom-right to top-right, and
+   restyled from a subtle translucent dark/emerald pill to a solid, vibrant
+   neon green fill so it reads immediately against the dark blue-black
+   (#020617-family) background every host page uses. app.html no longer
+   needs its old bottom-nav clearance override (the top corner never
+   overlaps .bottomnav), so that override was removed there. */
+.cgf-badge{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:14px;z-index:9999;
+  background:#00FF94;border:1px solid rgba(2,26,18,.3);color:#021A12;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.72rem;font-weight:800;
+  border-radius:999px;padding:9px 16px;box-shadow:0 0 18px rgba(0,255,148,.7),0 10px 24px rgba(0,0,0,.4);
+  cursor:pointer;display:flex;align-items:center;gap:7px;
+  transition:box-shadow .15s,transform .15s}
+.cgf-badge:hover{box-shadow:0 0 24px rgba(0,255,148,.9),0 10px 24px rgba(0,0,0,.4);transform:translateY(1px)}
 .cgf-badge:active{transform:translateY(0)}
-.cgf-pulse-dot{width:6px;height:6px;border-radius:50%;background:#34d399;box-shadow:0 0 8px rgba(52,211,153,.9);
+.cgf-pulse-dot{width:6px;height:6px;border-radius:50%;background:#021A12;box-shadow:0 0 6px rgba(2,26,18,.7);
   flex-shrink:0;animation:cgfPulse 2s ease-in-out infinite}
-@keyframes cgfPulse{0%,100%{opacity:.5}50%{opacity:1}}
+@keyframes cgfPulse{0%,100%{opacity:.4}50%{opacity:1}}
 @media (prefers-reduced-motion:reduce){.cgf-pulse-dot{animation:none;opacity:1}}
 
 .cgf-drawer{position:fixed;inset:0;z-index:9998;display:none;align-items:flex-end;justify-content:center;

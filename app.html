@@ -120,12 +120,11 @@
 <script src="/shared/global-feedback.js?v=patch-4.7"></script>
 <script src="/shared/severity.js?v=master-release"></script>
 <style>
-/* Global Floating Alpha Feedback Badge (shared/global-feedback.css) sits at
-   the spec's standard bottom-6/right-6 on every other page, but app.html
-   alone has a fixed bottom tab bar (.bottomnav) that would otherwise sit
-   directly underneath it — tucked up above that bar here, same as the
-   page's own earlier per-page widget used to be. */
-.cgf-badge{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+/* ALPHA LAUNCH FINAL PATCH moved the Global Floating Alpha Feedback Badge
+   (shared/global-feedback.css) to a shared top-right position on every
+   host page, so the old per-page override that used to tuck it up above
+   app.html's bottom tab bar (.bottomnav) no longer applies — the top
+   corner never overlaps that bar, so there's nothing to clear here. */
 
 /* ===== PASSCODE GATE — full-page Obsidian Glass blur blocking every route
    until the tester enters citixen_01. Locked by default on every single
@@ -719,10 +718,19 @@ textarea.input{resize:none;line-height:1.4}
 .btn-receipt-secondary.copied svg{color:#34d399}
 .btn-receipt-dismiss{width:100%;box-sizing:border-box;min-height:52px;background:var(--mint);color:#051311;
   border:none;padding:14px 16px;border-radius:12px;font-family:inherit;font-weight:700;font-size:16px;cursor:pointer}
-/* Patch #4.14 — "Add to Apple Wallet" (.btn-receipt-wallet / handleAddToWallet())
-   removed per this round's action-row streamline: the receipt now keeps only
-   Download Graphic, Copy Direct Link, and Dismiss to Feed. api/passbook.js
-   is left in place but is no longer called from here. */
+/* ALPHA LAUNCH FINAL PATCH — restores the wallet-row button Patch #4.14
+   removed, with neutral copy ("Logged To Ledger" — see the markup below)
+   instead of "Add to Apple Wallet": this still calls the real
+   /api/passbook endpoint and falls back to the same Copy Direct Link
+   behavior as before (see handleAddToWallet()), just without branding a
+   result that's always the honest fallback as an Apple Wallet pass. */
+.btn-receipt-wallet{width:100%;box-sizing:border-box;min-height:48px;background:#000;
+  border:1px solid #1e293b;color:#f1f5f9;padding:12px 16px;border-radius:10px;font-family:inherit;
+  font-weight:700;font-size:.74rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  gap:8px;transition:border-color .15s}
+.btn-receipt-wallet:hover{border-color:#334155}
+.btn-receipt-wallet svg{flex-shrink:0;color:#f1f5f9}
+.btn-receipt-wallet.copied{color:#34d399;border-color:rgba(52,211,153,.5)}
 
 /* ===== 1:1 SOCIAL GRAPHIC EXPORT — real DOM node rendered to PNG via
    html2canvas (see renderAndShowSocialGraphic()), not a hand-drawn canvas,
@@ -1901,6 +1909,10 @@ textarea.input{resize:none;line-height:1.4}
             <span id="btnReceiptCopyLinkLabel">Copy Direct Link</span>
           </button>
         </div>
+        <button type="button" class="btn-receipt-wallet" id="btnReceiptWallet">
+          <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
+          <span id="btnReceiptWalletLabel">Logged To Ledger</span>
+        </button>
         <button type="button" class="btn-receipt-dismiss" id="btnReceiptDismiss">Dismiss to Feed</button>
       </div>
     </div>
@@ -4967,9 +4979,36 @@ document.getElementById('btnReceiptCopyLink').addEventListener('click', async ()
     toast('Could not copy — try again');
   }
 });
-// Patch #4.14 — "Add to Apple Wallet" (handleAddToWallet()/#btnReceiptWallet)
-// removed per this round's action-row streamline. api/passbook.js is left
-// in place but is no longer called from the client.
+// ALPHA LAUNCH FINAL PATCH — restores this button with neutral copy
+// ("Logged To Ledger" on the button itself, see markup) instead of
+// branding it as "Add to Apple Wallet": a real .pkpass requires a signed
+// Apple Pass Type ID certificate + WWDR intermediate + private signing
+// key, none of which exist in this beta environment, and an unsigned
+// .pkpass is rejected by the real Wallet app anyway. Rather than fake a
+// working integration, this calls the real /api/passbook endpoint (which
+// performs a genuine ticket lookup) and honestly surfaces that pass
+// generation isn't available yet, then falls back to the same reliable
+// behavior as Copy Direct Link — on iOS or not. The toast below is
+// deliberately neutral too ("Saved to Ledger — link copied"), not "Apple
+// Wallet Pass Generated", since that fallback is all that ever actually
+// happens today.
+async function handleAddToWallet(){
+  const id = document.getElementById('receiptTicketId').textContent;
+  try {
+    const res = await fetch('/api/passbook?ticket=' + encodeURIComponent(id));
+    if (res.ok) {
+      // Real signed-pass download path (iOS triggers the browser's native
+      // .pkpass handoff to Wallet here) — unreachable today since
+      // api/passbook.js honestly 501s with no Apple signing credentials in
+      // this beta, left in place for when those credentials exist.
+      return;
+    }
+  } catch (e) { /* network/offline — still show the fallback below */ }
+  const url = location.origin + '/app?report=' + encodeURIComponent(id);
+  await copyTextToClipboard(url);
+  toast('Saved to Ledger — link copied');
+}
+document.getElementById('btnReceiptWallet').addEventListener('click', handleAddToWallet);
 // Real 1:1 social-card export: populates the off-screen
 // #socialGraphicExportCard DOM node (ticket ID, breadcrumb, coords/time, and
 // the citizen's own uploaded photo as the background), rasterizes it with
@@ -5292,7 +5331,16 @@ async function finalizeSubmitReport(opts){
     // openInterceptModal()->handleInterceptOverride(), which itself is
     // only reached after that same gate passed) — so this flag states a
     // real fact the client verified, not a fabricated upload payload.
-    photoConfirmed: true
+    photoConfirmed: true,
+    // ALPHA LAUNCH FINAL PATCH — same honest-assertion pattern as
+    // photoConfirmed above, for the right-of-way checkbox
+    // (#confirmRowCheckbox, "I confirm this hazard is in the public
+    // right-of-way..."): finalizeSubmitReport() is only ever called from
+    // btnConfirmLock's click handler, which itself bails out while that
+    // checkbox is unchecked (see openPostPhotoConfirm()'s change listener
+    // disabling the Lock button). So this is always true here too — a real
+    // confirmation the client already required, not a fabricated flag.
+    rightOfWayConfirmed: true
   }; // no PII fields — see api/_lib/store.js's privacy note; this matches that model exactly.
 
   const result = await attemptSubmitReport(payload);
