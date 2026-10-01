@@ -49,9 +49,11 @@
 /* Button 2 — View Living Public Ledger: dark fill, SOLID 1px Laser Mint
    outline (no dashes), pulsing dot on the left, light-green label, no arrow. */
 .cx-btn-ledger{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;box-sizing:border-box;
-  min-height:46px;padding:14px 16px;border:1px solid #00E699;border-radius:12px;
-  background:#0B0E14;color:#5CF2C2;font:inherit;font-weight:700;font-size:.88rem;letter-spacing:.01em;cursor:pointer;
+  position:relative;min-height:46px;padding:14px 44px;border:1px solid #00E699;border-radius:12px;
+  background:#0B0E14;color:#00E699;font:inherit;font-weight:700;font-size:.88rem;letter-spacing:.01em;cursor:pointer;
   transition:transform .12s ease,background-color .15s ease,box-shadow .18s ease}
+/* Live indicator pinned to the far left; the label stays centered. */
+.cx-btn-ledger .cx-ledger-pulse-dot{position:absolute;left:20px;top:50%;margin-top:-4px}
 .cx-btn-ledger:hover{background:#111722;box-shadow:0 6px 20px rgba(0,230,153,.14)}
 /* Tap feedback replaces the old trailing arrows as the interactivity cue. */
 .cx-btn-primary:active,.cx-btn-ledger:active,.cx-btn-tertiary:active{transform:scale(.99)}
