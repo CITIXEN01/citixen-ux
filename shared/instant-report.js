@@ -156,16 +156,15 @@
       '<section class="cx-export" aria-labelledby="cxExportTitle">' +
         '<h3 class="cx-export-title" id="cxExportTitle">Reports &amp; Easy Share</h3>' +
         '<div class="cx-btn-stack">' +
-          '<button type="button" class="cx-btn-primary" data-cx-open="pdf">Generate Free Report ↗</button>' +
+          '<button type="button" class="cx-btn-primary" data-cx-open="pdf">Generate Free Report</button>' +
           '<button type="button" class="cx-btn-dashed" data-cx-share-platform>' +
             '<span style="color:#FFFFFF">Share CITIXEN</span>' +
             '<span style="color:#00E699">UX™</span>' +
-            '<span style="color:#FFFFFF;margin-left:2px">↗</span>' +
           '</button>' +
           (cfg.onLedger
             ? '<button type="button" class="cx-btn-ledger" data-cx-ledger>' +
                 '<span class="cx-ledger-pulse-dot" aria-hidden="true"></span>' +
-                '<span>LIVE Public Ledger View Now ↗</span>' +
+                '<span>View Live Public Ledger</span>' +
               '</button>'
             : '') +
         '</div>' +
