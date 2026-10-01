@@ -206,14 +206,17 @@
       '<section class="cx-export" aria-labelledby="cxExportTitle">' +
         '<h3 class="cx-export-title" id="cxExportTitle">Reports &amp; Easy Share</h3>' +
         '<div class="cx-btn-stack">' +
-          '<button type="button" class="cx-btn-primary" data-cx-open="pdf">Generate Free Civic Report ↗</button>' +
+          '<button type="button" class="cx-btn-primary" data-cx-open="pdf">Generate Free Report ↗</button>' +
           // Button 2 (secondary slot): "View Living Public Ledger ↗" when a
           // page opts in via ledgerAsSecondary (app.html — the Ledger moved
           // here because Button 3 below no longer opens it, see onStack);
           // otherwise the original "Share CITIXEN UX™" action (index.html,
-          // unchanged).
+          // unchanged). The "live monitor" look (dark fill + dashed green
+          // border + pulse dot) lives in .cx-btn-dark-dashed, a dedicated
+          // modifier so the plain .cx-btn-dashed used elsewhere (Share,
+          // the Civic Memory info-panel CTA) keeps its transparent look.
           (cfg.ledgerAsSecondary && cfg.onLedger
-            ? '<button type="button" class="cx-btn-dashed" data-cx-ledger-secondary>' +
+            ? '<button type="button" class="cx-btn-dark-dashed" data-cx-ledger-secondary>' +
                 '<span class="cx-ledger-pulse-dot" aria-hidden="true"></span>' +
                 '<span>View Living Public Ledger ↗</span>' +
               '</button>'
@@ -227,7 +230,7 @@
           (cfg.onStack
             ? '<button type="button" class="cx-btn-tertiary" data-cx-stack>' +
                 '<svg class="cx-stack-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>' +
-                '<span>Civic Intelligence Stack<sup style="font-size:.62em;margin-left:1px;color:#00E699">™</sup> ↗</span>' +
+                '<span>Civic Intelligence<sup style="font-size:.62em;margin-left:1px;color:#00E699">™</sup> Stack ↗</span>' +
               '</button>'
             : (!cfg.ledgerAsSecondary && cfg.onLedger)
               ? '<button type="button" class="cx-btn-tertiary" data-cx-ledger>' +

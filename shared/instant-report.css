@@ -17,23 +17,31 @@
 .cx-btn-stack{display:flex;flex-direction:column;gap:12px}
 .cx-btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;
   min-height:48px;padding:16px;border:1px solid #00E699;border-radius:12px;
-  background:#00E699;color:#090D16;font:inherit;font-weight:800;font-size:.95rem;letter-spacing:.02em;cursor:pointer}
+  background:#00E699;color:#0B0E14;font:inherit;font-weight:800;font-size:.95rem;letter-spacing:.02em;cursor:pointer}
 .cx-btn-primary:hover{filter:brightness(1.08)}
 .cx-btn-primary[disabled]{opacity:.6;cursor:progress}
 .cx-btn-dashed{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;
   min-height:46px;padding:14px 16px;border:1.5px dashed #00E699;border-radius:12px;
   background:transparent;color:#E2E8F0;font:inherit;font-weight:700;font-size:.88rem;cursor:pointer}
 .cx-btn-dashed:hover{filter:brightness(1.15)}
+/* "Live monitor" style — Button 2's Living Ledger CTA when ledgerAsSecondary
+   is on (app.html): a dark-filled card (vs. .cx-btn-dashed's transparent
+   fill, used elsewhere for Share and other secondary CTAs) with a dashed
+   green border, paired with .cx-ledger-pulse-dot for the glowing indicator. */
+.cx-btn-dark-dashed{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;
+  min-height:46px;padding:14px 16px;border:1px dashed #00E699;border-radius:12px;
+  background:#0B0E14;color:#FFFFFF;font:inherit;font-weight:700;font-size:.88rem;letter-spacing:.01em;cursor:pointer}
+.cx-btn-dark-dashed:hover{filter:brightness(1.15)}
 /* Tertiary hero-stack action (3rd button) — dark outline card button, one
    consistent style for whichever single tertiary action a page wires up.
-   app.html passes onStack (opens the Quick Keys / Civic Intelligence
-   Stack™ drawer via the hamburger menu); index.html — which has no
+   app.html passes onStack (opens the Quick Keys / Civic Intelligence™
+   Stack drawer via the hamburger menu); index.html — which has no
    drawer — still passes onLedger (opens #ledgerDrawer directly). Only one
    of the two ever renders, per the onStack/onLedger branch in
    renderModule(). */
 .cx-btn-tertiary{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;
   min-height:46px;padding:14px 16px;border:1px solid rgba(0,230,153,.3);border-radius:12px;
-  background:#121B2D;color:#FFFFFF;font:inherit;font-weight:700;font-size:.88rem;letter-spacing:.01em;cursor:pointer}
+  background:#0B0E14;color:#FFFFFF;font:inherit;font-weight:700;font-size:.88rem;letter-spacing:.01em;cursor:pointer}
 .cx-btn-tertiary:hover{border-color:#00E699}
 .cx-stack-icon{flex-shrink:0}
 .cx-ledger-pulse-dot{position:relative;width:8px;height:8px;border-radius:50%;background:#00E699;flex-shrink:0;
@@ -44,10 +52,10 @@
   0%{transform:scale(.6);opacity:.9}
   100%{transform:scale(2.2);opacity:0}
 }
-.cx-btn-primary:focus-visible,.cx-btn-dashed:focus-visible,.cx-tile:focus-visible,.cx-close:focus-visible,
+.cx-btn-primary:focus-visible,.cx-btn-dashed:focus-visible,.cx-btn-dark-dashed:focus-visible,.cx-tile:focus-visible,.cx-close:focus-visible,
 .cx-drawer-key:focus-visible{outline:2px solid #00E699;outline-offset:2px}
 .cx-icon{width:18px;height:18px;flex-shrink:0;stroke:#00E699;stroke-width:1;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.cx-btn-primary .cx-icon{stroke:#090D16;stroke-width:1.4}
+.cx-btn-primary .cx-icon{stroke:#0B0E14;stroke-width:1.4}
 
 /* ---------- Modal shell ---------- */
 .cx-modal{position:fixed;inset:0;z-index:6000;display:none;align-items:flex-end;justify-content:center;
