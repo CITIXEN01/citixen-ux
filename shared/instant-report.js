@@ -131,7 +131,7 @@
   }
 
   // ---------- state ----------
-  var cfg = { getData: null, toast: null };
+  var cfg = { getData: null, toast: null, onLedger: null };
   var data = null, generatedAt = null, current = 'pdf', modal = null, rafId = 0, lastFocus = null;
 
   function toast(msg) {
@@ -157,9 +157,14 @@
         '<h3 class="cx-export-title" id="cxExportTitle">Reports &amp; Easy Share</h3>' +
         '<button type="button" class="cx-btn-primary" data-cx-open="pdf">Generate Free Report ↗</button>' +
         '<button type="button" class="cx-btn-dashed" data-cx-share-platform>Share CITIXEN UX™</button>' +
+        (cfg.onLedger
+          ? '<button type="button" class="cx-btn-ledger" data-cx-ledger><span class="cx-ledger-pulse-dot" aria-hidden="true"></span>LIVE Public Ledger View Now ↗</button>'
+          : '') +
       '</section>';
     mount.querySelector('[data-cx-open]').addEventListener('click', function (e) { open('pdf', e.currentTarget); });
     mount.querySelector('[data-cx-share-platform]').addEventListener('click', sharePlatform);
+    var ledgerBtn = mount.querySelector('[data-cx-ledger]');
+    if (ledgerBtn) ledgerBtn.addEventListener('click', function () { cfg.onLedger(); });
   }
 
   async function sharePlatform() {
@@ -638,6 +643,7 @@
     init: function (options) {
       cfg.getData = options.getData;
       cfg.toast = options.toast || null;
+      cfg.onLedger = options.onLedger || null;
       document.querySelectorAll('[data-cx-export-module]').forEach(renderModule);
     },
     open: open,

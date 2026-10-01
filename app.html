@@ -494,36 +494,14 @@ textarea.input{resize:none;line-height:1.4}
 .telemetry-scorecard-lbl{font-size:.64rem;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.03em}
 .telemetry-scorecard-timestamp{display:block;width:100%;text-align:center;padding:10px 0;
   color:#94A3B8;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.02em}
-.ledger-trust-subtitle{max-width:640px;margin:16px auto;padding:0;
-  text-align:center;color:#FFFFFF;font-weight:800;font-size:14px;
-  text-transform:lowercase;letter-spacing:.05em}
-.ledger-banner-section{max-width:640px;margin:0 auto 24px;padding:0 24px}
-.gateway-pill-stacked{margin-bottom:16px}
-.gateway-pill{display:flex;justify-content:space-between;align-items:center;width:100%;
-  min-height:52px;box-sizing:border-box;padding:14px 20px;border-radius:12px;
-  cursor:pointer;font-family:inherit;text-decoration:none;
-  transition:filter .15s}
-.gateway-pill-left{display:inline-flex;align-items:center;gap:6px;flex-shrink:0;font-size:.75rem;font-weight:700}
-.gateway-pill-center{flex:1 1 auto;flex-grow:1;min-width:0;text-align:center;font-weight:800;font-size:1.1rem;
-  letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  padding:0 8px}
-.gateway-pill-right{flex-shrink:0;text-align:right;font-size:.8rem;font-weight:600;color:#00E699;
-  white-space:nowrap}
-.gateway-pill:hover{filter:brightness(1.2)}
-.ledger-pill-glow{border:1px solid rgba(0,230,153,.35);background:#090D16;
-  animation:ledgerPillGlow 2.5s ease-in-out infinite}
-@keyframes ledgerPillGlow{
-  0%,100%{box-shadow:0 0 8px rgba(0,230,153,.18)}
-  50%{box-shadow:0 0 16px rgba(0,230,153,.4)}
-}
-.ledger-pulse-dot{position:relative;width:8px;height:8px;border-radius:50%;background:#00E699;flex-shrink:0;
-  box-shadow:0 0 6px #00E699;display:inline-block}
-.ledger-pulse-dot::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid #00E699;
-  animation:ledgerPulseRing 1.8s ease-out infinite}
-@keyframes ledgerPulseRing{
-  0%{transform:scale(.6);opacity:.9}
-  100%{transform:scale(2.2);opacity:0}
-}
+/* ===== The standalone "Live Public Ledger" gateway pill (.gateway-pill and
+   friends, .ledger-trust-subtitle, .ledger-banner-section/-stacked,
+   .ledger-pill-glow, .ledger-pulse-dot/@keyframes ledgerPulseRing) is
+   removed outright this round — the button itself moved into the Export &
+   Share hero module's button stack (shared/instant-report.js's
+   renderModule(), new .cx-btn-ledger) per this round's "Move Live Public
+   Ledger Into Hero Stack" spec, so this whole shell has no caller left on
+   this page and is deleted with it rather than left as dead CSS. ===== */
 .matrix-summary-section{padding-top:12px}
 .hub-row{display:flex;flex-direction:column;max-width:920px;margin:0 auto 26px;padding:0;box-sizing:border-box}
 .hub-card{position:relative;display:flex;align-items:center;justify-content:space-between;width:100%;
@@ -788,20 +766,13 @@ textarea.input{resize:none;line-height:1.4}
            opens a ground-truth audit prompt that starts a report for it. -->
       <div data-cx-geohatch></div>
 
-      <!-- 5. TRUST INDICATOR SUBTITLE -->
-      <p class="ledger-trust-subtitle">free &amp; anonymous</p>
-
-      <!-- 6. PRIMARY LIVING GATEWAY — opens the same real Live Public Ledger
-           drawer this tab already had (#ledgerDrawer / openLedgerDrawer()),
-           just restyled to the shared .gateway-pill shell instead of the
-           old plain "Live Civic Memory™" button. -->
-      <section class="ledger-banner-section gateway-pill-stacked">
-        <button id="appLiveLedgerBanner" class="gateway-pill ledger-pill-glow" type="button">
-          <span class="gateway-pill-left" style="color: #00E699;"><span class="ledger-pulse-dot" aria-hidden="true"></span>LIVE</span>
-          <span class="gateway-pill-center" style="color: #FFFFFF;">PUBLIC LEDGER</span>
-          <span class="gateway-pill-right">View Now ↗</span>
-        </button>
-      </section>
+      <!-- The standalone "free & anonymous" trust line + Live Public Ledger
+           gateway pill that used to sit here (items 5+6, directly beneath
+           the Geo-Hatch Coverage card) are removed outright this round —
+           the ledger button moved into the Export & Share hero module above
+           (item 3) as its 3rd stacked button, same real openLedgerDrawer()
+           call, now wired via CitixenInstantReport.init()'s onLedger
+           option. -->
 
       <!-- 7. CIVIC INTELLIGENCE STACK™ — human-first labels: Capital
            Projects / City Action Tracker / Community Archive. -->
@@ -3469,10 +3440,10 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('btnCapture').addEventListener('click',capturePhoto);
   document.getElementById('btnSubmit').addEventListener('click',submitReport);
 
-  // The old standalone "Live Civic Memory™" trigger (#btnOpenLedger) was
-  // restyled into the Dashboard tab's "LIVE PUBLIC LEDGER" gateway pill
-  // (#appLiveLedgerBanner) this round — same real openLedgerDrawer() call.
-  document.getElementById('appLiveLedgerBanner').addEventListener('click', openLedgerDrawer);
+  // The Live Public Ledger trigger now lives inside the Export & Share hero
+  // module's button stack (shared/instant-report.js), wired via
+  // CitixenInstantReport.init()'s onLedger option below — same real
+  // openLedgerDrawer() call, no standalone #appLiveLedgerBanner anymore.
   document.getElementById('btnCloseLedger').addEventListener('click', closeLedgerDrawer);
   document.getElementById('ledgerDrawer').addEventListener('click', (e) => {
     if (e.target.id === 'ledgerDrawer') closeLedgerDrawer();
@@ -3598,7 +3569,7 @@ function initInstantReportAndQuickKeys(){
     return;
   }
   const IR = window.CitixenInstantReport;
-  IR.init({ getData: appInstantReportData, toast });
+  IR.init({ getData: appInstantReportData, toast, onLedger: openLedgerDrawer });
 
   document.querySelectorAll('#appDrawer [data-cx-icon]').forEach(el => { el.outerHTML = IR.icon(el.dataset.cxIcon); });
   const actions = {

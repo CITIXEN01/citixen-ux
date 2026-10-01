@@ -21,6 +21,24 @@
   min-height:46px;margin-top:10px;padding:11px 16px;border:1px dashed rgba(0,230,153,.7);border-radius:12px;
   background:transparent;color:#E2E8F0;font:inherit;font-weight:700;font-size:.88rem;cursor:pointer}
 .cx-btn-dashed:hover{border-color:#00E699;color:#00E699}
+/* Live Public Ledger — moved into this hero button stack as its 3rd,
+   tertiary action (per the "Move Live Public Ledger Into Hero Stack" round)
+   from a standalone gateway pill elsewhere on the page. Opens the real
+   #ledgerDrawer via the page's own openLedgerDrawer(), passed in through
+   CitixenInstantReport.init()'s onLedger option — only rendered when a page
+   supplies one. */
+.cx-btn-ledger{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;
+  min-height:46px;margin-top:10px;padding:11px 16px;border:1px solid rgba(0,230,153,.4);border-radius:12px;
+  background:#121B2D;color:#FFFFFF;font:inherit;font-weight:700;font-size:.88rem;letter-spacing:.01em;cursor:pointer}
+.cx-btn-ledger:hover{border-color:#00E699}
+.cx-ledger-pulse-dot{position:relative;width:8px;height:8px;border-radius:50%;background:#00E699;flex-shrink:0;
+  box-shadow:0 0 6px #00E699;display:inline-block}
+.cx-ledger-pulse-dot::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid #00E699;
+  animation:cxLedgerPulseRing 1.8s ease-out infinite}
+@keyframes cxLedgerPulseRing{
+  0%{transform:scale(.6);opacity:.9}
+  100%{transform:scale(2.2);opacity:0}
+}
 .cx-btn-primary:focus-visible,.cx-btn-dashed:focus-visible,.cx-tile:focus-visible,.cx-close:focus-visible,
 .cx-drawer-key:focus-visible{outline:2px solid #00E699;outline-offset:2px}
 .cx-icon{width:18px;height:18px;flex-shrink:0;stroke:#00E699;stroke-width:1;fill:none;stroke-linecap:round;stroke-linejoin:round}

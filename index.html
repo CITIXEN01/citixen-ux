@@ -930,69 +930,14 @@ audio.pw-audio-el{width:100%;margin-top:4px}
 /* 3x3 Analytics Matrix */
 .matrix-summary-section{padding-top:32px}
 
-/* ===== UNIFIED SINGLE-LINE GATEWAY PILL — the Live Public Ledger button
-   is the sole remaining user of this .gateway-pill shell (the Aggregation
-   Hub and Export/Print pills that once shared it were relocated/retired in
-   earlier rounds). This round's "Zero Neon Bloom" spec retires the
-   breathing box-shadow glow and the blinking "LIVE" dot in favor of a
-   calm, static 1px Laser Mint border on Deep Midnight Navy — the same
-   plain-frame language as the Crowd Save America map card — and a
-   uniform 12px rectangular corner radius shared with the Scorecard and
-   Civic Intelligence Stack buttons. ===== */
-/* Ledger Trust Subtitle — centered line directly above the Live Public
-   Ledger pill reassuring the reader the ledger costs nothing and needs no
-   identity to use. This round's item 2.4 "High-Visibility Typography"
-   moves it off muted gray onto Laser Mint, bold, at 14px, and "Symmetrical
-   Vertical Spacing" gives it an identical 16px margin top and bottom
-   between the Scorecard card above and the Live Public Ledger pill below
-   (margin:16px auto keeps it horizontally centered too, since this is
-   still a block-level element, not full-bleed). */
-.ledger-trust-subtitle{max-width:640px;margin:16px auto;padding:0;
-  text-align:center;color:#FFFFFF;font-weight:800;font-size:14px;
-  text-transform:lowercase;letter-spacing:.05em}
-.ledger-banner-section{max-width:640px;margin:0 auto 24px;padding:0 24px}
-/* Gap below the Live Public Ledger pill before the national map box, per
-   an earlier round's item 3 literal spec (margin-bottom: 16px) — the pill
-   is the only one directly above the map, since the Aggregation Hub pill
-   that used to stack beneath it was relocated (see .pixel-map-brand /
-   .pixel-map-view-trigger, nested inside the map card itself). */
-.gateway-pill-stacked{margin-bottom:16px}
-.gateway-pill{display:flex;justify-content:space-between;align-items:center;width:100%;
-  min-height:52px;box-sizing:border-box;padding:14px 20px;border-radius:12px;
-  cursor:pointer;font-family:inherit;text-decoration:none;
-  transition:filter .15s}
-.gateway-pill-left{display:inline-flex;align-items:center;gap:6px;flex-shrink:0;font-size:.75rem;font-weight:700}
-/* Typographic hierarchy: "PUBLIC LEDGER" is the pill's visual focal point
-   (1.1rem/800), sized well above the LIVE badge and the View Now action on
-   either side of it. */
-.gateway-pill-center{flex:1 1 auto;flex-grow:1;min-width:0;text-align:center;font-weight:800;font-size:1.1rem;
-  letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  padding:0 8px}
-.gateway-pill-right{flex-shrink:0;text-align:right;font-size:.8rem;font-weight:600;color:#00E699;
-  white-space:nowrap}
-.gateway-pill:hover{filter:brightness(1.2)}
-/* ===== FOCUSED LIVING GLOW (Public Ledger Only) — this round's item 1.3
-   reverses the previous round's "Zero Neon Bloom" for this ONE button:
-   the Live Public Ledger pill alone gets back its breathing Fresh Mint
-   box-shadow glow and a pulsing "LIVE" indicator dot. Every other card
-   (Scorecard, Civic Intelligence Stack, Privacy Card, Option Grid) stays
-   calm and static per this round's item 1.3 — these classes are scoped
-   to this one button only and are not the old shared .pulsing-dot/
-   .ledger-pill-glow globals removed last round. */
-.ledger-pill-glow{border:1px solid rgba(0,230,153,.35);background:#090D16;
-  animation:ledgerPillGlow 2.5s ease-in-out infinite}
-@keyframes ledgerPillGlow{
-  0%,100%{box-shadow:0 0 8px rgba(0,230,153,.18)}
-  50%{box-shadow:0 0 16px rgba(0,230,153,.4)}
-}
-.ledger-pulse-dot{position:relative;width:8px;height:8px;border-radius:50%;background:#00E699;flex-shrink:0;
-  box-shadow:0 0 6px #00E699;display:inline-block}
-.ledger-pulse-dot::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid #00E699;
-  animation:ledgerPulseRing 1.8s ease-out infinite}
-@keyframes ledgerPulseRing{
-  0%{transform:scale(.6);opacity:.9}
-  100%{transform:scale(2.2);opacity:0}
-}
+/* ===== The standalone "Live Public Ledger" gateway pill (.gateway-pill and
+   friends, .ledger-trust-subtitle, .ledger-banner-section/-stacked,
+   .ledger-pill-glow, .ledger-pulse-dot/@keyframes ledgerPulseRing) is
+   removed outright this round — the button itself moved into the Export &
+   Share hero module's button stack (shared/instant-report.js's
+   renderModule(), new .cx-btn-ledger) per this round's "Move Live Public
+   Ledger Into Hero Stack" spec, so this whole shell has no caller left on
+   this page and is deleted with it rather than left as dead CSS. ===== */
 
 /* ===== TRADEMARK (™) TYPOGRAPHY — lightweight superscript treatment
    applied via <sup class="tm-symbol"> across headings/copy, distinct from
@@ -1464,14 +1409,13 @@ audio.pw-audio-el{width:100%;margin-top:4px}
        hands off to the mobile reporter with that block pre-selected. ===== -->
   <div style="padding:0 16px"><div data-cx-geohatch></div></div>
 
-  <p class="ledger-trust-subtitle">free &amp; anonymous</p>
-  <section class="ledger-banner-section gateway-pill-stacked">
-    <button id="liveLedgerBanner" class="gateway-pill ledger-pill-glow" type="button">
-      <span class="gateway-pill-left" style="color: #00E699;"><span class="ledger-pulse-dot" aria-hidden="true"></span>LIVE</span>
-      <span class="gateway-pill-center" style="color: #FFFFFF;">PUBLIC LEDGER</span>
-      <span class="gateway-pill-right">View Now ↗</span>
-    </button>
-  </section>
+  <!-- ===== The standalone "free & anonymous" trust line + Live Public
+       Ledger gateway pill that used to sit here (directly beneath the
+       Geo-Hatch Coverage card) are removed outright this round — the
+       ledger button moved into the Export & Share hero module above as its
+       3rd stacked button (same real openLedgerDrawer() call, now wired via
+       CitixenInstantReport.init()'s onLedger option) per this round's
+       "Move Live Public Ledger Into Hero Stack" spec. ===== -->
 
   <!-- ===== The "System Interconnectivity" vertical flowchart container an
        earlier round added directly below the Live Public Ledger pill
@@ -4644,7 +4588,9 @@ async function openLedgerDrawer(){
 function closeLedgerDrawer(){
   document.getElementById('ledgerDrawer').classList.remove('open');
 }
-document.getElementById('liveLedgerBanner').addEventListener('click', () => openLedgerDrawer());
+// The standalone #liveLedgerBanner button no longer exists — the Live
+// Public Ledger trigger moved into the Export & Share hero module's button
+// stack, wired via CitixenInstantReport.init()'s onLedger option below.
 
 // The LEARN MORE ACCORDION (workflow row + CITIXEN UX/receipt/Civic
 // Intelligence copy behind a toggle) was removed entirely per this
@@ -4943,7 +4889,7 @@ async function webInstantReportData(){
 (function initWebInstantReport(){
   function start(){
     if (!window.CitixenInstantReport) { console.warn('shared/instant-report.js did not load — Instant Report is unavailable.'); return; }
-    window.CitixenInstantReport.init({ getData: webInstantReportData });
+    window.CitixenInstantReport.init({ getData: webInstantReportData, onLedger: openLedgerDrawer });
     if (window.CitixenGeoHatch) {
       window.CitixenGeoHatch.init({
         getScope: () => {
