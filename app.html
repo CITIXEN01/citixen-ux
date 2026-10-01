@@ -655,7 +655,7 @@ textarea.input{resize:none;line-height:1.4}
         <div class="cx-drawer-section">
           <div class="cx-drawer-heading">System Architecture &amp; Codex</div>
           <button type="button" class="cx-drawer-key" data-cx-key="privacy"><span data-cx-icon="shield"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">Privacy Engine &amp; EXIF Scrubber Protocol</span><span class="cx-drawer-key-sub">How reports stay anonymous</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
-          <button type="button" class="cx-drawer-key" data-cx-key="grid"><span data-cx-icon="hexgrid"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">11M Block H3 Spatial Grid Matrix</span><span class="cx-drawer-key-sub">Geo-Hatch coverage grid</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
+          <button type="button" class="cx-drawer-key" data-cx-key="grid"><span data-cx-icon="hexgrid"></span><span class="cx-drawer-key-text"><span class="cx-drawer-key-title">11M Block H3 Spatial Grid Matrix</span><span class="cx-drawer-key-sub">#CrowdSaveAmerica coverage grid</span></span><span class="cx-drawer-key-arrow" aria-hidden="true">↗</span></button>
         </div>
         <div class="cx-drawer-foot"><span data-cx-icon="shieldPlain"></span>CITIXEN UX™ — Privacy Engine: Verified</div>
       </div>
@@ -2132,7 +2132,7 @@ const APP_MODAL_DATA = {
     ['What is kept','The public ledger stores the hazard category, ward, timestamps and resolution status, with no reporter-identifying field in the data model.']
   ]},
   spatialGrid: { title: '11M Block H3 Spatial Grid Matrix', body: [
-    ['Today: ward-tier Geo-Hatch','Reports are bucketed into 150 m Geo-Hatch cells per ward. That grid is live on the Dashboard, where each block shows as auditable, pending or uncharted.'],
+    ['Today: mapped wards','Reports are bucketed into 150 m blocks per mapped ward. The #CrowdSaveAmerica grid on the Dashboard rolls those blocks up by City, State and Country, with each block shown as auditable, pending or uncharted.'],
     ['Roadmap: H3 resolution 9','The target is a national matrix of roughly 11 million H3 hexagonal cells at census-block scale, keyed on-device for privacy. That nationwide index is not live in this build yet.'],
     ['Why blocks, not addresses','Grouping reports into cells shows coverage and gaps without pinning any report to a household.']
   ]},
@@ -3614,17 +3614,21 @@ function initInstantReportAndQuickKeys(){
   });
 }
 
-/* Geo-Hatch Coverage Engine (Dashboard) — adapter for shared/geo-hatch.js.
-   Uses the same coverage endpoint and national rollup as this app's own
-   local ward grid; an audit tap starts a report tied to that block. */
+/* #CrowdSaveAmerica coverage grid (Dashboard) — adapter for
+   shared/geo-hatch.js: City / State / Country scopes built from the real
+   per-ward block grids; an audit tap starts a report for that block. */
 function initDashboardGeoHatch(){
   if (!window.CitixenGeoHatch) { console.warn('shared/geo-hatch.js did not load — the Dashboard coverage engine is unavailable.'); return; }
   window.CitixenGeoHatch.init({
-    getEndpoint: () => currentWardMeta ? COVERAGE_ENDPOINT : null,
-    getCityLabel: () => currentWardMeta ? (currentWardMeta.cityName + ', ' + currentWardMeta.state).toUpperCase() : null,
-    getNational: async () => lastNationalData || fallbackNational(),
-    onAuditBlock: (cellId) => {
-      pendingReportCellId = cellId;
+    getScope: () => currentWardMeta ? {
+      state: currentWardMeta.state, stateName: currentWardMeta.stateName,
+      city: currentWardMeta.city, cityName: currentWardMeta.cityName, ward: currentWardMeta.ward
+    } : null,
+    getNational: async () => lastNationalData, // real rollup if already loaded; the module fetches it otherwise
+    onAuditBlock: (cellId, ward) => {
+      // Tie the report to the block only when it's in the ward this
+      // device's reports file into; otherwise it's a plain report.
+      pendingReportCellId = (currentWardMeta && ward && ward.ward === currentWardMeta.ward) ? cellId : null;
       switchTab('tab-report', document.querySelector('.navtab[data-target="tab-report"]'));
       window.scrollTo({ top: 0, behavior: 'smooth' });
       toast('Ground-truth audit started — capture a photo of this block and publish.');

@@ -4930,11 +4930,13 @@ async function webInstantReportData(){
     window.CitixenInstantReport.init({ getData: webInstantReportData });
     if (window.CitixenGeoHatch) {
       window.CitixenGeoHatch.init({
-        getEndpoint: () => { const j = activeJurisdiction(); return j ? '/api/coverage/' + j.state + '/' + j.city + '/' + j.ward : null; },
-        getCityLabel: () => { const j = activeJurisdiction(); return j ? (j.cityName + ', ' + j.state).toUpperCase() : null; },
-        onAuditBlock: (cellId) => {
+        getScope: () => {
           const j = activeJurisdiction();
-          const qs = new URLSearchParams(j ? { state: j.state, city: j.city, ward: j.ward, cell: String(cellId) } : { cell: String(cellId) });
+          return j ? { state: j.state, stateName: j.stateName, city: j.city, cityName: j.cityName, ward: j.ward } : null;
+        },
+        onAuditBlock: (cellId, ward) => {
+          const w = ward || activeJurisdiction();
+          const qs = new URLSearchParams(w ? { state: w.state, city: w.city, ward: w.ward, cell: String(cellId) } : { cell: String(cellId) });
           window.location.href = '/app?' + qs.toString();
         }
       });

@@ -138,13 +138,14 @@
 /* ---------- Geo-Hatch Coverage Engine (shared/geo-hatch.js) ---------- */
 .cx-geo{max-width:640px;margin:0 auto 18px;padding:16px;box-sizing:border-box;text-align:left;
   background:#090D16;border:1px solid rgba(0,230,153,.4);border-radius:12px;color:#E2E8F0}
+.cx-geo-title{margin:0 0 14px;text-align:center;color:#00E699;font-weight:800;font-size:1.05rem;letter-spacing:.08em;text-wrap:balance}
 .cx-geo-head{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;margin-bottom:12px;border-radius:999px;
   border:1px solid rgba(0,230,153,.35);color:#00E699;font-size:.64rem;font-weight:800;letter-spacing:.12em}
 .cx-geo-head .cx-icon{width:16px;height:16px}
 .cx-geo-tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px}
 .cx-geo-tier{min-width:0;min-height:40px;padding:8px 4px;border:1px solid rgba(255,255,255,.1);border-radius:12px;
   background:#0B1120;color:#94A3B8;font:inherit;font-size:.72rem;font-weight:700;cursor:pointer}
-.cx-geo-tier[aria-pressed="true"]{border-color:#00E699;color:#00E699;background:rgba(0,230,153,.1)}
+.cx-geo-tier[aria-selected="true"]{border-color:#00E699;color:#00E699;background:rgba(0,230,153,.1)}
 .cx-geo-tier:focus-visible,.cx-geo-cell:focus-visible,.cx-geo-cta:focus-visible{outline:2px solid #00E699;outline-offset:2px}
 .cx-geo-metric{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap;margin-bottom:10px}
 .cx-geo-label{font-size:.64rem;font-weight:800;letter-spacing:.12em;color:#94A3B8;text-transform:uppercase}
