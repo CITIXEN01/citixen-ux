@@ -156,6 +156,17 @@ html.citixen-gate-locked body{overflow:hidden}
 
 /* ===== LIVE TICKET & FEEDBACK TRIAGE QUEUE ===== */
 .triage-sort-row{display:flex;gap:6px;margin-bottom:12px}
+/* Patch 4.8 — real, polling-driven "live notification" when a new Alpha
+   Feedback submission (from the Global Floating Alpha Feedback Badge on
+   any route) lands between one 5s poll and the next. Not a push
+   notification (this is a static site with no websocket/Supabase
+   realtime channel), but genuinely new data appearing live, flagged the
+   moment this page's own poll picks it up. */
+.triage-live-notice{display:flex;align-items:center;gap:8px;background:rgba(0,230,153,.1);
+  border:1px solid rgba(0,230,153,.4);color:#34d399;font-size:.7rem;font-weight:700;
+  padding:9px 12px;border-radius:10px;margin-bottom:10px;animation:triageLiveIn .25s ease-out}
+@keyframes triageLiveIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.triage-item.triage-item-new{animation:ecoFlash 2.2s ease-out 1}
 .triage-sort-btn{flex:1;background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--muted);
   font-size:.62rem;font-weight:700;padding:6px 10px;border-radius:8px;cursor:pointer}
 .triage-sort-btn.active{border-color:#10b981;color:#34d399;background:rgba(2,44,34,.4)}
@@ -288,6 +299,7 @@ html.citixen-gate-locked body{overflow:hidden}
       <button type="button" class="triage-sort-btn active" id="triageSortNewest" data-sort="newest">Newest First</button>
       <button type="button" class="triage-sort-btn" id="triageSortOldest" data-sort="oldest">Oldest First</button>
     </div>
+    <div id="triageLiveNotice" class="triage-live-notice" hidden></div>
     <div id="triageList"><div class="qa-stream-empty">Loading live traffic…</div></div>
   </div>
 
@@ -672,6 +684,8 @@ let triageFilter = 'all';
 let triageSort = 'newest';
 let triageItems = [];
 let triagePollTimer = null;
+let triageSeenKeys = null; // null until the first load completes, so nothing flashes as "new" on initial page load
+let triageNewKeys = new Set();
 
 function unifyTriageData(tickets, feedbackItems){
   const reportRows = tickets.map(t => ({
@@ -732,7 +746,7 @@ function renderTriageQueue(){
     const opts = statusOptionsFor(row).map(o =>
       '<option value="' + o.value + '"' + (o.value === row.status ? ' selected' : '') + '>' + o.label + '</option>'
     ).join('');
-    return '<div class="triage-item" data-triage-key="' + esc(row.key) + '">' +
+    return '<div class="triage-item' + (triageNewKeys.has(row.key) ? ' triage-item-new' : '') + '" data-triage-key="' + esc(row.key) + '">' +
       '<div class="triage-item-head">' +
         '<span class="triage-badge ' + badgeCls + '">' + badgeLbl + '</span>' +
         '<span class="triage-time">' + esc(relativeTimeFromEpoch(row.epoch)) + '<span class="triage-time-abs">' + esc(absTimeFromEpoch(row.epoch)) + '</span></span>' +
@@ -786,6 +800,20 @@ async function applyTriageStatusChange(key, newStatus){
   }
 }
 
+function showTriageLiveNotice(newRows){
+  const notice = document.getElementById('triageLiveNotice');
+  const fb = newRows.filter(r => r.kind === 'feedback');
+  if (!fb.length) return;
+  const first = fb[0];
+  const label = fb.length === 1
+    ? '● New ' + esc(first.category) + ' feedback from ' + esc(first.route)
+    : '● ' + fb.length + ' new feedback submissions just came in';
+  notice.textContent = label;
+  notice.hidden = false;
+  clearTimeout(notice._t);
+  notice._t = setTimeout(() => { notice.hidden = true; }, 6000);
+}
+
 async function loadTriageQueue(){
   try {
     const [ticketsRes, feedbackRes] = await Promise.all([
@@ -794,6 +822,18 @@ async function loadTriageQueue(){
     const ticketsData = ticketsRes.ok ? await ticketsRes.json() : { tickets: [] };
     const feedbackData = feedbackRes.ok ? await feedbackRes.json() : { items: [] };
     triageItems = unifyTriageData(ticketsData.tickets || [], feedbackData.items || []);
+
+    const currentKeys = new Set(triageItems.map(r => r.key));
+    if (triageSeenKeys) {
+      const newRows = triageItems.filter(r => !triageSeenKeys.has(r.key));
+      if (newRows.length) {
+        triageNewKeys = new Set(newRows.map(r => r.key));
+        showTriageLiveNotice(newRows);
+      } else {
+        triageNewKeys = new Set();
+      }
+    }
+    triageSeenKeys = currentKeys;
     renderTriageQueue();
   } catch (e) {
     document.getElementById('triageList').innerHTML = '<div class="qa-stream-empty">Could not reach the live feed — retrying in 5s…</div>';

@@ -256,6 +256,10 @@ textarea.input{resize:none;line-height:1.4}
 .btn-submit{width:100%;box-sizing:border-box;min-height:52px;background:var(--mint);color:#051311;border:none;
   padding:14px 16px;border-radius:12px;font-family:inherit;font-weight:700;font-size:16px;line-height:24px;
   letter-spacing:.01em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+/* Patch 4.8 — hard-disabled until a photo is actually attached; see
+   updateSubmitPhotoGate(). */
+.btn-submit:disabled{background:rgba(148,163,184,.18);color:#64748b;cursor:not-allowed}
+.btn-submit:disabled svg{stroke:#64748b}
 
 .bottomnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;
   background:rgba(3,7,18,.96);backdrop-filter:blur(16px);border-top:1px solid var(--border);
@@ -475,6 +479,12 @@ textarea.input{resize:none;line-height:1.4}
 }
 .splash-word{font-weight:900;font-size:1.6rem;letter-spacing:.3px;text-align:center}
 .splash-tag{font-size:.86rem;font-weight:700;color:var(--mint2);text-align:center;padding:0 24px}
+/* Patch 4.8 — the Welcome Hero's own explicit CTA, now that the hero no
+   longer auto-hides/auto-forwards into the form on its own. */
+.splash-cta{margin-top:10px;background:#00E699;color:#051311;border:none;padding:14px 26px;
+  border-radius:9999px;font-weight:800;font-size:.82rem;cursor:pointer;font-family:inherit;
+  box-shadow:0 10px 30px rgba(0,230,153,.3)}
+.splash-cta:hover{filter:brightness(1.05)}
 
 /* ===== SMART LOCATION HEADER (persistent, always visible) ===== */
 .location-banner{display:flex;align-items:center;gap:8px;background:rgba(0,230,153,.06);border:1px solid var(--border);
@@ -1017,6 +1027,7 @@ textarea.input{resize:none;line-height:1.4}
 .csap-sec-title{font-size:.72rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#00E699;margin-bottom:10px;
   text-shadow:0 0 10px rgba(0,230,153,.65),0 0 20px rgba(0,230,153,.3)}
 .csap-p{font-size:.8rem;line-height:1.6;color:#cbd5e1;margin:0}
+.csap-accent{color:#10B981;font-weight:600}
 .csap-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .csap-metric{background:var(--surface-card-bg);-webkit-backdrop-filter:blur(var(--surface-blur));backdrop-filter:blur(var(--surface-blur));
   border:1px solid #00E69922;border-radius:12px;padding:10px 4px;text-align:center;box-shadow:0 0 14px rgba(0,230,153,.06)}
@@ -1097,6 +1108,7 @@ textarea.input{resize:none;line-height:1.4}
   <svg class="splash-logo" viewBox="0 0 24 24" width="64" height="64" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
   <div class="splash-word"><span class="brand-white">CITIXEN</span> <span class="brand-lime">UX</span><sup class="brand-tm">™</sup></div>
   <div class="splash-tag">Upgrade Your Civic Experience</div>
+  <button type="button" class="splash-cta" id="btnSplashLogIssue">+ Log Infrastructure Issue</button>
 </div>
 
 <div class="shell">
@@ -1239,9 +1251,9 @@ textarea.input{resize:none;line-height:1.4}
         <input class="input" id="repLoc" value="Local District (GPS)">
         <textarea class="input" id="repDesc" rows="3" placeholder="Describe the hazard, cross street, or specific risk..."></textarea>
 
-        <button class="btn-submit" id="btnSubmit">
+        <button class="btn-submit" id="btnSubmit" disabled>
           <svg viewBox="0 0 24 24" width="17" height="17" stroke="#051311" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          Publish report
+          <span id="btnSubmitLabel">Photo Required to Submit</span>
         </button>
       </div>
 
@@ -1595,7 +1607,7 @@ textarea.input{resize:none;line-height:1.4}
 
       <div class="csap-sec">
         <div class="csap-sec-title">The National Campaign</div>
-        <p class="csap-p">Crowd Save America™ is a non-partisan, nationwide civic audit. Citizens snap broken public infrastructure — potholes, dark streetlights, blocked ADA ramps — anonymously, and every report is logged block by block into the public Living Ledger™. The goal: a verified, ground-truth record of all 11 million American blocks.</p>
+        <p class="csap-p"><span class="csap-accent">Crowd Save America™</span> is a non-partisan, nationwide civic audit. Citixens snap broken public infrastructure — potholes, dark streetlights, blocked ADA ramps — anonymously, and every report is logged block by block into the public <span class="csap-accent">Living Ledger™</span>. The goal: a verified, ground-truth record of <span class="csap-accent">all 11 million American blocks</span>.</p>
       </div>
 
       <div class="csap-sec">
@@ -4381,16 +4393,18 @@ async function handleCameraButtonClick(){
     photoImg.style.display = 'block';
     photoIconFallback.style.display = 'none';
     toast('✓ Captured — device ID and GPS tags scrubbed from EXIF before upload');
+    document.getElementById('photoBox').style.display = 'block';
   } else {
     // Camera permission denied (or the native camera sheet was cancelled) —
-    // same honest, non-blocking fallback as the web path: no photo is
-    // attached, but nothing here stops the report itself from being
-    // submitted (see finalizeSubmitReport() — a photo is optional).
+    // Patch 4.8 made a photo strictly required, so this no longer shows an
+    // icon-mock placeholder and lets the report through; the submit gate
+    // stays closed until a real capture succeeds.
     photoImg.style.display = 'none';
-    photoIconFallback.style.display = 'flex';
-    toast('Camera unavailable or permission denied — you can still submit without a photo.');
+    photoIconFallback.style.display = 'none';
+    document.getElementById('photoBox').style.display = 'none';
+    toast('Camera unavailable or permission denied — a photo is required to submit.');
   }
-  document.getElementById('photoBox').style.display = 'block';
+  updateSubmitPhotoGate();
 }
 
 let cameraStream=null;
@@ -4438,13 +4452,18 @@ function capturePhoto(){
     photoImg.src=canvas.toDataURL('image/jpeg',0.85);
     photoImg.style.display='block';
     document.getElementById('photoIconFallback').style.display='none';
+    document.getElementById('photoBox').style.display='block';
   } else {
-    // No live camera available — fall back to the icon mock so the flow still completes.
+    // No live camera available — Patch 4.8 made a photo strictly required,
+    // so this no longer falls back to an icon mock that let the flow
+    // complete without a real photo; the submit gate stays closed.
     photoImg.style.display='none';
-    document.getElementById('photoIconFallback').style.display='flex';
+    document.getElementById('photoIconFallback').style.display='none';
+    document.getElementById('photoBox').style.display='none';
+    toast('Could not capture a photo — a photo is required to submit.');
   }
   closeCamera();
-  document.getElementById('photoBox').style.display='block';
+  updateSubmitPhotoGate();
 }
 
 /* =====================================================================
@@ -4576,7 +4595,26 @@ async function flushOfflineQueue(){
 // intercept modal; anything else (no GPS resolved, no nearby project, no
 // category overlap) falls straight through to the normal submission flow,
 // unchanged from before this feature existed.
+// ===== HARD PHOTO GATE (Patch 4.8) — Publish report is disabled until a
+// real captured photo is on file; a bare icon-fallback mock no longer
+// counts (see handleCameraButtonClick()/capturePhoto()'s own comments on
+// why their old "fall back to the icon mock so the flow still completes"
+// paths were retired). Single source of truth for "has a photo" so the
+// button state can never drift from what's actually attached.
+function hasAttachedPhoto(){
+  const img = document.getElementById('photoImg');
+  return !!(img && img.style.display !== 'none' && img.src);
+}
+function updateSubmitPhotoGate(){
+  const btn = document.getElementById('btnSubmit');
+  const lbl = document.getElementById('btnSubmitLabel');
+  const has = hasAttachedPhoto();
+  if (btn) btn.disabled = !has;
+  if (lbl) lbl.textContent = has ? 'Publish report' : 'Photo Required to Submit';
+}
+
 async function submitReport(){
+  if (!hasAttachedPhoto()) { toast('A photo is required before you can submit this report.'); return; }
   const resolved = window.CITIXEN_RESOLVED_LOCATION;
   const lat = resolved && typeof resolved.lat === 'number' ? resolved.lat : null;
   const lng = resolved && typeof resolved.lng === 'number' ? resolved.lng : null;
@@ -4643,6 +4681,7 @@ document.getElementById('btnConfirmCancel').addEventListener('click', () => {
   const photoImg = document.getElementById('photoImg');
   if (photoImg) { photoImg.removeAttribute('src'); photoImg.style.display = 'none'; }
   document.getElementById('photoBox').style.display = 'none';
+  updateSubmitPhotoGate();
 });
 
 // ===== POST-SUBMISSION DISPATCH RECEIPT MODAL — see finalizeSubmitReport(),
@@ -5047,6 +5086,8 @@ async function finalizeSubmitReport(opts){
 
   document.getElementById('repDesc').value='';
   document.getElementById('photoBox').style.display='none';
+  if (photoImgForReceipt) { photoImgForReceipt.removeAttribute('src'); photoImgForReceipt.style.display = 'none'; }
+  updateSubmitPhotoGate();
 
   const resolved = window.CITIXEN_RESOLVED_LOCATION;
   // Jurisdiction routing: currentWardMeta is only set once the coverage
@@ -5166,42 +5207,52 @@ function applyJurisdictionFromQueryString(){
   if (params.get('claim') === 'admin') pendingAdminClaimFromLink = true;
 }
 
-// CITIXEN UX™ splash — the primary launch state on app initialization.
-// Held for a short beat so the brand mark registers, then fades to reveal
-// the Report tab; a tap dismisses it immediately for an impatient citizen.
+// CITIXEN UX™ splash / Welcome Hero — the primary launch state on app
+// initialization, and (Patch 4.8) the state the citizen also lands back on
+// after dismissing the Front Door Onboarding deck. No timer ever
+// auto-hides it any more: it stays up until a tap (hideSplash, the
+// backdrop-dismiss path) or the CTA (handleSplashCta, a deliberate "go to
+// the form" action) — see startPostUnlockLanding()'s own comment for why
+// an automatic timer was removed in the first place.
 function hideSplash(){
   const splash = document.getElementById('splashScreen');
   if (splash) splash.classList.add('hide');
 }
+function showWelcomeHero(){
+  const splash = document.getElementById('splashScreen');
+  if (splash) splash.classList.remove('hide');
+}
 
-// Starts the splash-dismiss timer and (separately) the Front Door
-// Onboarding auto-open timer. Called once — either immediately on load if
-// the passcode gate is already unlocked, or from initCitixenGate()'s
-// submit handler the moment CITIXEN01 is accepted — so a gated visitor
-// always lands squarely on the splash screen on unlock, and the onboarding
-// deck (which is what ultimately leads into the report form) never
-// auto-opens, and nothing auto-focuses, while the gate is still up.
+// Starts the splash/Welcome Hero (shown immediately, with no auto-hide
+// timer any more — see hideSplash()'s comment) and, separately, the Front
+// Door Onboarding auto-open timer. Called once — either immediately on
+// load if the passcode gate is already unlocked, or from
+// initCitixenGate()'s submit handler the moment CITIXEN01 is accepted —
+// so a gated visitor always lands squarely on the Welcome Hero on unlock,
+// and the onboarding deck (and, after Patch 4.8, the report form behind
+// it) never auto-opens and nothing auto-focuses, while the gate is still up.
 let postUnlockLandingStarted = false;
 function startPostUnlockLanding(){
   if (postUnlockLandingStarted) return;
   postUnlockLandingStarted = true;
 
   const splash = document.getElementById('splashScreen');
-  if (splash) {
-    splash.addEventListener('click', hideSplash);
-    setTimeout(hideSplash, 1400);
-  }
+  if (splash) splash.addEventListener('click', hideSplash);
 
-  // Front Door Onboarding opens shortly after the splash clears — once per
-  // device, never interrupting a returning beta tester.
+  // Front Door Onboarding opens shortly after unlock, on top of the
+  // Welcome Hero — once per device, never interrupting a returning beta
+  // tester. The Hero sits at a higher z-index than the onboarding deck (see
+  // .splash-screen/.confirm-drawer), so it's hidden for that one moment
+  // right as the deck opens, then restored (see closeFrontDoorOnboarding())
+  // once the citizen dismisses it, rather than jumping straight to the form.
   let onboardingSeen = false;
   try { onboardingSeen = localStorage.getItem(ONBOARDING_SEEN_KEY) === '1'; } catch (e) { /* storage blocked — treat as unseen */ }
   // Arrived via report.html's "Connect District →" wedge (?claim=admin) —
   // open the same Admin Light claim flow directly, skipping the citizen
   // onboarding deck (an official clicking that link already knows what
   // this app is; showing both at once would just be clutter).
-  if (pendingAdminClaimFromLink) setTimeout(openAdminLightClaim, 1700);
-  else if (!onboardingSeen) setTimeout(openFrontDoorOnboarding, 1700);
+  if (pendingAdminClaimFromLink) setTimeout(() => { hideSplash(); openAdminLightClaim(); }, 1700);
+  else if (!onboardingSeen) setTimeout(() => { hideSplash(); openFrontDoorOnboarding(); }, 1700);
 }
 
 // ===== FRONT DOOR ONBOARDING — "Private Beta" 2-card notice =====
@@ -5228,11 +5279,19 @@ function openFrontDoorOnboarding(){
   renderOnboardingSlide();
   document.getElementById('frontDoorOnboardingModal').classList.add('open');
 }
+// Patch 4.8: dismissing the onboarding deck (any path — Start Test Report,
+// the X, or tapping the backdrop) no longer jumps straight into the report
+// form. It lands back on the Welcome Hero (the splash screen, now
+// persistent — see showWelcomeHero()), with its own explicit "+ Log
+// Infrastructure Issue" CTA (handleSplashCta()) for the citizen to tap
+// when they're actually ready, rather than being auto-scrolled/auto-focused
+// into a form they may not have asked for yet.
 function closeFrontDoorOnboarding(markSeen){
   document.getElementById('frontDoorOnboardingModal').classList.remove('open');
   if (markSeen) {
     try { localStorage.setItem(ONBOARDING_SEEN_KEY, '1'); } catch (e) { /* storage blocked (private mode, etc.) — shows again next load, harmless */ }
   }
+  showWelcomeHero();
 }
 document.getElementById('btnOnboardingNext').addEventListener('click', () => {
   if (onboardingSlideIndex < ONBOARDING_SLIDE_COUNT - 1) { onboardingSlideIndex++; renderOnboardingSlide(); }
@@ -5246,9 +5305,13 @@ document.querySelectorAll('#onboardingDots .onboarding-dot').forEach(dot => {
 });
 document.getElementById('btnOnboardingStart').addEventListener('click', () => {
   closeFrontDoorOnboarding(true);
-  // "Dismisses modal directly to the Report form" — Report is already the
-  // default/first tab, so just make sure it's active and hand focus to
-  // the description field, the natural next step of a 30-second test report.
+});
+// Welcome Hero CTA — the one deliberate action that actually jumps to the
+// report form and focuses it; stopPropagation keeps the splash's own
+// tap-anywhere-to-dismiss handler from also firing on this same tap.
+document.getElementById('btnSplashLogIssue').addEventListener('click', (e) => {
+  e.stopPropagation();
+  hideSplash();
   switchTab('tab-report', document.querySelector('.navtab[data-target="tab-report"]'));
   const repDescEl = document.getElementById('repDesc');
   if (repDescEl) repDescEl.focus();
