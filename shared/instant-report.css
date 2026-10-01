@@ -95,12 +95,20 @@
 .cx-body{overflow-y:auto;padding:14px 16px 18px;-webkit-overflow-scrolling:touch}
 
 /* ---------- 3-tile selection grid ---------- */
-.cx-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+/* Export-format bar: neutral #111827 tiles (no navy cast) with Neon Green
+   labels/icons, separated from the brief below by a hairline divider. */
+.cx-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #1E293B}
 .cx-tile{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:8px;min-width:0;
-  padding:12px 6px;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:#0B1120;
-  color:#CBD5E1;font:inherit;font-size:.62rem;font-weight:800;letter-spacing:.06em;line-height:1.3;text-transform:uppercase;cursor:pointer;text-align:center}
-.cx-tile .cx-icon{width:24px;height:24px}
-.cx-tile[aria-selected="true"]{border-color:#00E699;color:#00E699;background:rgba(0,230,153,.07)}
+  padding:12px 6px;border:1px solid rgba(0,230,153,.22);border-radius:12px;background:#111827;
+  color:rgba(0,230,153,.72);font:inherit;font-size:.62rem;font-weight:800;letter-spacing:.06em;line-height:1.3;text-transform:uppercase;cursor:pointer;text-align:center;
+  transition:border-color .15s ease,box-shadow .18s ease,color .15s ease,transform .12s ease}
+.cx-tile .cx-icon{width:24px;height:24px;stroke:#00E699;opacity:.72;transition:opacity .15s ease}
+.cx-tile:hover{border-color:rgba(0,230,153,.5);color:#00E699}
+.cx-tile:hover .cx-icon{opacity:1}
+.cx-tile:active{transform:scale(.99)}
+.cx-tile[aria-selected="true"]{border:1px solid #00E699;color:#00E699;background:#0F172A;
+  box-shadow:0 0 0 1px rgba(0,230,153,.18),0 0 14px rgba(0,230,153,.28)}
+.cx-tile[aria-selected="true"] .cx-icon{opacity:1}
 .cx-tile-label{overflow-wrap:normal;word-break:normal;hyphens:none}
 
 /* ---------- Branch A: PDF brief preview (paper) ---------- */
