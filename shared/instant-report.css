@@ -98,13 +98,11 @@
 .cx-subrow-time{font-size:.56rem;color:#64748B;text-align:right;line-height:1.4;font-variant-numeric:tabular-nums}
 .cx-sec{padding:12px 14px;border-bottom:1px solid #E2E8F0}
 .cx-sec:last-of-type{border-bottom:none}
-/* Full-width black pill banner spanning the section's content width, with
-   a solid mint circle number badge (black bold number) and bold white
-   uppercase title. */
-.cx-sec-title{background:#000000;border-radius:20px;padding:6px 14px;display:flex;align-items:center;gap:10px;
-  margin-bottom:12px;font-size:12px;font-weight:800;letter-spacing:.8px;color:#FFFFFF;text-transform:uppercase}
-.cx-sec-title span{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:20px;height:20px;border-radius:50%;
-  background:#00E699;color:#000000;font-size:.68rem;font-weight:800;letter-spacing:0}
+/* Clean centered header, no number badge or pill background. Section 3's
+   title lives inside its own unified black container instead (see
+   .cx-acards-head below). */
+.cx-sec-title{text-align:center;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#000000;
+  font-size:.74rem;margin-bottom:10px}
 /* Metric cards: every card gets its own solid-black header bar, per the
    card-standardization rule. */
 .cx-mcards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
@@ -117,6 +115,8 @@
    anchor container instead of separate white cards, to read as a single
    strong visual anchor at the bottom of the document. */
 .cx-acards-wrap{background:#000000;border-radius:12px;padding:16px 10px}
+.cx-acards-head{text-align:center;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#00E699;
+  font-size:.74rem;margin-bottom:12px}
 .cx-acards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .cx-acard{border:none;border-radius:0;padding:0;text-align:center;background:transparent}
 .cx-acard-lbl{font-size:.54rem;font-weight:800;letter-spacing:.06em;color:#00E699;text-transform:uppercase;margin-bottom:8px}

@@ -413,15 +413,15 @@
           '<span class="cx-subrow-title">Free Report</span>' +
           '<span class="cx-subrow-time">Generated ' + esc(stamp(generatedAt)) + ' • citixenux.com</span>' +
         '</div>' +
-        '<div class="cx-sec"><div class="cx-sec-title"><span>1</span>CIVIC PERFORMANCE METRICS</div>' +
+        '<div class="cx-sec"><div class="cx-sec-title">Civic Performance Metrics</div>' +
           '<div class="cx-mcards">' +
             mcard(avgHoursText(d), 'Avg. Fix Speed') +
             mcard(resolutionRate(d), 'Resolution Rate') +
             mcard(stateRankValue(r), stateRankHeaderLabel(r)) +
           '</div></div>' +
-        '<div class="cx-sec"><div class="cx-sec-title"><span>2</span>CAPITAL PROJECT TRACKER</div>' + cipThermHtml(d.cip) + '</div>' +
-        '<div class="cx-sec"><div class="cx-sec-title"><span>3</span>COMMUNITY ACTION SNAPSHOT</div>' +
-          '<div class="cx-acards-wrap"><div class="cx-acards">' +
+        '<div class="cx-sec"><div class="cx-sec-title">Capital Project Tracker</div>' + cipThermHtml(d.cip) + '</div>' +
+        '<div class="cx-sec">' +
+          '<div class="cx-acards-wrap"><div class="cx-acards-head">Community Action Snapshot</div><div class="cx-acards">' +
             actionCard(d.total, 'Reports Filed') +
             hazardGaugeCardHtml(hz) +
             actionCard(d.counts.dispatched, 'Open Active Dispatches', d.counts.dispatched > 0 ? '#FF3B30' : null) +
@@ -490,19 +490,13 @@
       y += 34;
 
       function ensureRoom(h) { if (y + h > 740) { doc.addPage(); y = 60; } }
-      // Full-width black pill banner spanning the content width, with a
-      // solid mint circle number badge (black bold number) and a bold
-      // white uppercase title.
-      function sectionTitle(n, title) {
-        var ph = 22, pw = W - 2 * M;
-        doc.setFillColor(0, 0, 0); doc.roundedRect(M, y, pw, ph, 11, 11, 'F');
-        var bcx = M + 17, bcy = y + ph / 2;
-        doc.setFillColor(0, 230, 153); doc.circle(bcx, bcy, 7.5, 'F');
-        doc.setTextColor(0, 0, 0); doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5);
-        doc.text(String(n), bcx, bcy + 2.8, { align: 'center' });
-        doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5);
-        doc.text(title.toUpperCase(), bcx + 15, bcy + 3);
-        y += ph + 10;
+      // Clean centered header, no number badge or pill background — used
+      // for Sections 1 and 2. Section 3's title is drawn inside its own
+      // unified black container instead (see section3Cards() below).
+      function sectionTitle(title) {
+        doc.setTextColor(0, 0, 0); doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
+        doc.text(title.toUpperCase(), W / 2, y, { align: 'center' });
+        y += 16;
       }
 
       // Metric cards: every card in a solid-black header bar + white body,
@@ -537,7 +531,7 @@
         y += Math.ceil(items.length / cols) * (headH + bodyH + 10);
       }
 
-      sectionTitle(1, 'CIVIC PERFORMANCE METRICS');
+      sectionTitle('CIVIC PERFORMANCE METRICS');
       cardGrid([
         { val: avgHoursText(d), lbl: 'Avg. Fix Speed' },
         { val: resolutionRate(d), lbl: 'Resolution Rate' },
@@ -548,7 +542,7 @@
       // — there is no measured percent-complete field in the CIP data, so
       // no specific completion number is printed, only the real name,
       // quarter and status alongside a relative fill.
-      sectionTitle(2, 'CAPITAL PROJECT TRACKER');
+      sectionTitle('CAPITAL PROJECT TRACKER');
       if (!d.cip.length) {
         doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
         doc.text('No capital projects are on file for this jurisdiction yet.', M, y + 4); y += 22;
@@ -586,41 +580,44 @@
         doc.setFillColor(255, 255, 255); doc.circle(cx, cy, 4, 'F');
       }
 
-      // Community Action Snapshot: all 3 cards share one unified black
-      // anchor container — Reports Filed (real aggregate d.total, not the
-      // 'submitted'-stage-only subset) and Open Active Dispatches flank the
-      // Hazard Index gauge, matching the HTML pane's layout exactly.
-      ensureRoom(160);
-      sectionTitle(3, 'COMMUNITY ACTION SNAPSHOT');
+      // Community Action Snapshot: one unified black anchor container holds
+      // its own title (no separate pill banner above it) plus all 3 cards —
+      // Reports Filed (real aggregate d.total, not the 'submitted'-stage-
+      // only subset) and Open Active Dispatches flank the Civic Health
+      // gauge, matching the HTML pane's layout exactly.
+      ensureRoom(170);
       (function section3Cards() {
-        var pad = 12, gap = 10, boxH = 108, by = y;
+        var padX = 12, gap = 10, titleBandH = 20, cardAreaH = 108, boxH = titleBandH + cardAreaH, by = y, cardTop = by + titleBandH;
         doc.setFillColor(0, 0, 0); doc.roundedRect(M, by, W - 2 * M, boxH, 10, 10, 'F');
-        var innerW = W - 2 * M - 2 * pad, bw = (innerW - 2 * gap) / 3;
+        doc.setTextColor(0, 230, 153); doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
+        doc.text('COMMUNITY ACTION SNAPSHOT', W / 2, by + 14, { align: 'center' });
+
+        var innerW = W - 2 * M - 2 * padX, bw = (innerW - 2 * gap) / 3;
 
         function headerLabel(text, cxCol) {
           var lines = doc.splitTextToSize(text.toUpperCase(), bw);
           doc.setTextColor(0, 230, 153); doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5);
-          lines.forEach(function (line, i) { doc.text(line, cxCol, by + pad + 4 + i * 7, { align: 'center' }); });
+          lines.forEach(function (line, i) { doc.text(line, cxCol, cardTop + 10 + i * 7, { align: 'center' }); });
         }
         function bigValue(text, cxCol, color) {
           doc.setTextColor.apply(doc, color || [255, 255, 255]);
           doc.setFont('helvetica', 'bold'); doc.setFontSize(15);
-          doc.text(text, cxCol, by + boxH / 2 + 10, { align: 'center' });
+          doc.text(text, cxCol, cardTop + cardAreaH / 2 + 10, { align: 'center' });
         }
 
-        var lcx = M + pad + bw / 2;
+        var lcx = M + padX + bw / 2;
         headerLabel('Reports Filed', lcx);
         bigValue(String(d.total), lcx, [255, 255, 255]);
 
-        var ccx = M + pad + bw + gap + bw / 2;
+        var ccx = M + padX + bw + gap + bw / 2;
         headerLabel('Civic Health', ccx);
-        var gcy = by + boxH - 16, gr = Math.min(bw / 2 - 14, 38), gsw = 9;
+        var gcy = cardTop + cardAreaH - 16, gr = Math.min(bw / 2 - 14, 36), gsw = 9;
         drawHazardGauge(ccx, gcy, gr, gsw, hz);
         var riskColor = hz.label === 'CRITICAL' ? [239, 68, 68] : hz.label === 'MODERATE' ? [245, 158, 11] : [0, 230, 153];
         doc.setTextColor(riskColor[0], riskColor[1], riskColor[2]); doc.setFont('helvetica', 'bold'); doc.setFontSize(7);
-        doc.text(civicHealthZoneLabel(hz.label), ccx, by + boxH - 6, { align: 'center' });
+        doc.text(civicHealthZoneLabel(hz.label), ccx, cardTop + cardAreaH - 6, { align: 'center' });
 
-        var rcx = M + pad + 2 * (bw + gap) + bw / 2;
+        var rcx = M + padX + 2 * (bw + gap) + bw / 2;
         headerLabel('Open Active Dispatches', rcx);
         bigValue(String(d.counts.dispatched), rcx, d.counts.dispatched > 0 ? [255, 59, 48] : [255, 255, 255]);
 
