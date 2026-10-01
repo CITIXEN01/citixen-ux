@@ -619,6 +619,9 @@ textarea.input{resize:none;line-height:1.4}
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
         <div class="badge"><span class="badge-dot"></span> <span id="headerWardLabel">Local District • Active</span></div>
+        <button class="menu-btn" id="appHelpBtn" type="button" aria-label="Quick help: how your report moves" aria-controls="appInfoModal" aria-expanded="false">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </button>
         <button class="menu-btn" id="appMenuBtn" type="button" aria-label="Open menu" aria-controls="appDrawer" aria-expanded="false">
           <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
@@ -2137,12 +2140,18 @@ const APP_MODAL_DATA = {
     ['1. Spot & Snap','Geolocate your current position and tag the civic issue (potholes, streetlights, drainage).'],
     ['2. Automated Dispatch','CITIXEN UX™ routes data directly to municipal teams and registers the entry to the Public Ledger.'],
     ['3. Track Impact','Monitor neighborhood performance, resolution speeds, and active capital project timelines in real time.']
-  ]}
+  ]},
+  /* Quick Help (header "?" button, next to the hamburger menu) — reapplies
+     the same "How Your Report Moves" tri-node diagram (APP_TRIAD_DIAGRAM_HTML,
+     defined above) and its existing explanatory copy already used in the
+     Dashboard's "Learn More ↗" panel, rather than drawing a new graphic. */
+  quickHelp: { title: 'Quick Help', html: APP_TRIAD_DIAGRAM_HTML +
+    '<p style="font-size:.78rem;color:var(--muted);line-height:1.55;padding:0 2px;">CITIXEN UX<sup class="tm-symbol">™</sup> is the zero-knowledge shield hub between every resident report and the two places it needs to go: the public ledger (so the record is open) and the municipal portal (so the work order actually gets created). No account, no device ID, and no GPS/EXIF metadata ever leaves your phone attached to the photo.</p>' }
 };
 function openAppInfoModal(key){
   const d = APP_MODAL_DATA[key]; if (!d) return;
   document.getElementById('appInfoModalTitle').textContent = d.title;
-  document.getElementById('appInfoModalBody').innerHTML = d.body.map(([h,p]) => `<h4>${esc(h)}</h4><p>${esc(p)}</p>`).join('');
+  document.getElementById('appInfoModalBody').innerHTML = d.html ? d.html : d.body.map(([h,p]) => `<h4>${esc(h)}</h4><p>${esc(p)}</p>`).join('');
   document.getElementById('appInfoModal').classList.add('open');
 }
 function closeAppInfoModal(){
@@ -3404,6 +3413,7 @@ function closeAppDrawer(){
   document.getElementById('appDrawer').classList.remove('open');
   document.getElementById('appMenuBtn').setAttribute('aria-expanded', 'false');
 }
+document.getElementById('appHelpBtn').addEventListener('click', () => openAppInfoModal('quickHelp'));
 document.getElementById('appMenuBtn').addEventListener('click', openAppDrawer);
 document.getElementById('appDrawerCloseBtn').addEventListener('click', closeAppDrawer);
 document.getElementById('appDrawer').addEventListener('click', (e) => { if (e.target.id === 'appDrawer') closeAppDrawer(); });
