@@ -19,6 +19,8 @@
   min-height:48px;padding:16px;border:1px solid #00E699;border-radius:12px;
   background:#00E699;color:#0B0E14;font:inherit;font-weight:800;font-size:.95rem;letter-spacing:.02em;cursor:pointer}
 .cx-btn-primary:hover{filter:brightness(1.08)}
+.cx-btn-primary{border:none;transition:transform .12s ease,filter .15s ease,box-shadow .18s ease}
+.cx-btn-primary:hover{box-shadow:0 6px 20px rgba(0,230,153,.25)}
 .cx-btn-primary[disabled]{opacity:.6;cursor:progress}
 .cx-btn-dashed{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;
   min-height:46px;padding:14px 16px;border:1.5px dashed #00E699;border-radius:12px;
@@ -40,9 +42,23 @@
    of the two ever renders, per the onStack/onLedger branch in
    renderModule(). */
 .cx-btn-tertiary{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;
-  min-height:46px;padding:14px 16px;border:1px solid rgba(0,230,153,.3);border-radius:12px;
-  background:#0B0E14;color:#FFFFFF;font:inherit;font-weight:700;font-size:.88rem;letter-spacing:.01em;cursor:pointer}
-.cx-btn-tertiary:hover{border-color:#00E699}
+  min-height:46px;padding:14px 16px;border:1px solid #1E293B;border-radius:12px;
+  background:#0B0E14;color:#FFFFFF;font:inherit;font-weight:700;font-size:.88rem;letter-spacing:.01em;cursor:pointer;
+  transition:transform .12s ease,background-color .15s ease,border-color .15s ease}
+.cx-btn-tertiary:hover{background:#111722;border-color:#2B3A52}
+/* Button 2 — View Living Public Ledger: dark fill, SOLID 1px Laser Mint
+   outline (no dashes), pulsing dot on the left, light-green label, no arrow. */
+.cx-btn-ledger{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;box-sizing:border-box;
+  min-height:46px;padding:14px 16px;border:1px solid #00E699;border-radius:12px;
+  background:#0B0E14;color:#5CF2C2;font:inherit;font-weight:700;font-size:.88rem;letter-spacing:.01em;cursor:pointer;
+  transition:transform .12s ease,background-color .15s ease,box-shadow .18s ease}
+.cx-btn-ledger:hover{background:#111722;box-shadow:0 6px 20px rgba(0,230,153,.14)}
+/* Tap feedback replaces the old trailing arrows as the interactivity cue. */
+.cx-btn-primary:active,.cx-btn-ledger:active,.cx-btn-tertiary:active{transform:scale(.99)}
+.cx-tm{font-size:.62em;margin-left:1px;vertical-align:super;line-height:0;color:inherit}
+.cx-ledger-pulse-dot{animation:cxPulseGlow 1.8s ease-out infinite}
+@keyframes cxPulseGlow{0%{box-shadow:0 0 4px #00E699}50%{box-shadow:0 0 12px #00E699}100%{box-shadow:0 0 4px #00E699}}
+@media (prefers-reduced-motion:reduce){.cx-ledger-pulse-dot,.cx-ledger-pulse-dot::after{animation:none}}
 .cx-stack-icon{flex-shrink:0}
 .cx-ledger-pulse-dot{position:relative;width:8px;height:8px;border-radius:50%;background:#00E699;flex-shrink:0;
   box-shadow:0 0 6px #00E699;display:inline-block}
@@ -52,7 +68,7 @@
   0%{transform:scale(.6);opacity:.9}
   100%{transform:scale(2.2);opacity:0}
 }
-.cx-btn-primary:focus-visible,.cx-btn-dashed:focus-visible,.cx-btn-dark-dashed:focus-visible,.cx-tile:focus-visible,.cx-close:focus-visible,
+.cx-btn-primary:focus-visible,.cx-btn-dashed:focus-visible,.cx-btn-dark-dashed:focus-visible,.cx-btn-ledger:focus-visible,.cx-btn-tertiary:focus-visible,.cx-tile:focus-visible,.cx-close:focus-visible,
 .cx-drawer-key:focus-visible{outline:2px solid #00E699;outline-offset:2px}
 .cx-icon{width:18px;height:18px;flex-shrink:0;stroke:#00E699;stroke-width:1;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .cx-btn-primary .cx-icon{stroke:#0B0E14;stroke-width:1.4}
@@ -70,7 +86,7 @@
    (never a ward number, no timestamp — the PDF brief has its own). */
 .cx-head{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
 .cx-head-text{min-width:0;text-align:center}
-.cx-head-title{font-weight:800;font-size:1rem;letter-spacing:.08em;text-transform:uppercase;color:#FFFFFF}
+.cx-head-title{font-weight:800;font-size:1rem;letter-spacing:1px;text-transform:uppercase;color:#FFFFFF}
 .cx-head-sub{font-size:.72rem;color:#94A3B8;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cx-close{width:36px;height:36px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:transparent;
   color:#E2E8F0;font:inherit;font-size:1rem;cursor:pointer;flex-shrink:0}
@@ -158,6 +174,7 @@
 /* Footer: a single centered line with just the two core marks — no legal
    text, patent disclosure, or links. */
 .cx-footer-single{text-align:center;padding:12px 14px 14px;font-size:11px;color:#64748B;background:#F8FAFC}
+.cx-verify-line{margin-top:4px;font-size:10px;color:#6B7280;text-transform:uppercase;letter-spacing:.5px}
 
 /* Dark-surface variant of the CIP list (Capital Projects deep-dive panels) */
 .cx-cip-dark li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);color:#E2E8F0}

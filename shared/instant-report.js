@@ -206,7 +206,7 @@
       '<section class="cx-export" aria-labelledby="cxExportTitle">' +
         '<h3 class="cx-export-title" id="cxExportTitle">Reports &amp; Easy Share</h3>' +
         '<div class="cx-btn-stack">' +
-          '<button type="button" class="cx-btn-primary" data-cx-open="pdf">Generate Free Report ↗</button>' +
+          '<button type="button" class="cx-btn-primary" data-cx-open="pdf">Generate Free Report</button>' +
           // Button 2 (secondary slot): "View Living Public Ledger ↗" when a
           // page opts in via ledgerAsSecondary (app.html — the Ledger moved
           // here because Button 3 below no longer opens it, see onStack);
@@ -216,9 +216,9 @@
           // modifier so the plain .cx-btn-dashed used elsewhere (Share,
           // the Civic Memory info-panel CTA) keeps its transparent look.
           (cfg.ledgerAsSecondary && cfg.onLedger
-            ? '<button type="button" class="cx-btn-dark-dashed" data-cx-ledger-secondary>' +
+            ? '<button type="button" class="cx-btn-ledger" data-cx-ledger-secondary>' +
                 '<span class="cx-ledger-pulse-dot" aria-hidden="true"></span>' +
-                '<span>View Living Public Ledger ↗</span>' +
+                '<span>View Living Public Ledger</span>' +
               '</button>'
             : '<button type="button" class="cx-btn-dashed" data-cx-share-platform>' +
                 '<span style="color:#FFFFFF">Share CITIXEN </span>' +
@@ -229,8 +229,7 @@
               '</button>') +
           (cfg.onStack
             ? '<button type="button" class="cx-btn-tertiary" data-cx-stack>' +
-                '<svg class="cx-stack-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>' +
-                '<span>Civic Intelligence<sup style="font-size:.62em;margin-left:1px;color:#00E699">™</sup> Stack ↗</span>' +
+                '<span>Civic Intelligence<sup class="cx-tm">™</sup> Stack</span>' +
               '</button>'
             : (!cfg.ledgerAsSecondary && cfg.onLedger)
               ? '<button type="button" class="cx-btn-tertiary" data-cx-ledger>' +
@@ -275,11 +274,11 @@
     modal.setAttribute('aria-labelledby', 'cxTitle');
     modal.innerHTML =
       '<div class="cx-panel">' +
-        // Modal breakout header: FREE REPORT centered, city/state tag
+        // Modal breakout header: CIVIC INTELLIGENCE™ BRIEF centered, city/state tag
         // beneath it (never a ward number), no timestamp here — the PDF
         // brief already renders its own.
         '<div class="cx-head">' + icon('shieldPlain') +
-          '<div class="cx-head-text"><div class="cx-head-title" id="cxTitle">Free Report</div>' +
+          '<div class="cx-head-text"><div class="cx-head-title" id="cxTitle">Civic Intelligence<sup class="cx-tm">™</sup> Brief</div>' +
           '<div class="cx-head-sub" id="cxJuris">Loading jurisdiction…</div></div>' +
           '<button type="button" class="cx-close" aria-label="Close">✕</button>' +
         '</div>' +
@@ -434,11 +433,11 @@
         '</div>' +
         '<div class="cx-subrow">' +
           '<span class="cx-subrow-geo">' + esc(cityStateLabel(d)) + '</span>' +
-          '<span class="cx-subrow-title">Free Report</span>' +
+          '<span class="cx-subrow-title">Civic Intelligence™ Brief</span>' +
           '<span class="cx-subrow-time">Generated ' + esc(stamp(generatedAt)) + ' • citixenux.com</span>' +
         '</div>' +
         '<div class="cx-sec">' +
-          '<div class="cx-acards-wrap"><div class="cx-acards-head">Community Action Snapshot</div><div class="cx-acards">' +
+          '<div class="cx-acards-wrap"><div class="cx-acards-head">Living Ledger™ Snapshot</div><div class="cx-acards">' +
             actionCard(d.total, 'Reports Filed') +
             hazardGaugeCardHtml(hz) +
             actionCard(d.counts.dispatched, 'Open Active Dispatches', d.counts.dispatched > 0 ? '#FF3B30' : null) +
@@ -450,7 +449,7 @@
             mcard(stateRankValue(r), stateRankHeaderLabel(r)) +
           '</div></div>' +
         '<div class="cx-sec"><div class="cx-sec-title">Capital Project Tracker</div>' + cipThermHtml(d.cip) + '</div>' +
-        '<div class="cx-footer-single">CITIXEN UX™ • Civic Intelligence™</div>' +
+        '<div class="cx-footer-single">CITIXEN UX™ • Civic Intelligence™<div class="cx-verify-line">Verified via CITIXEN UX™ Protocol | Living Ledger™ Output</div></div>' +
         '</div>' +
       '</div>' +
       '<div class="cx-actions"><button type="button" class="cx-btn-primary" id="cxPdfBtn">' + icon('printer') + 'Download / Print Official PDF</button></div>' +
@@ -503,11 +502,11 @@
       doc.text('Upgrade your civic experience.', tx, 56);
 
       // Document sub-header row: geotag (city + state, never a ward number) /
-      // FREE REPORT / timestamp + citixenux.com.
+      // CIVIC INTELLIGENCE™ BRIEF / timestamp + citixenux.com.
       y = mastH + 30;
       doc.setTextColor(9, 13, 22); doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
       doc.text(cityStateLabel(d), M, y);
-      doc.text('FREE REPORT', W / 2, y, { align: 'center' });
+      doc.text('CIVIC INTELLIGENCE™ BRIEF', W / 2, y, { align: 'center' });
       doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
       doc.text('Generated ' + stamp(generatedAt) + ' • citixenux.com', W - M, y, { align: 'right' });
       doc.setDrawColor(226, 232, 240); doc.setLineWidth(0.75); doc.line(M, y + 12, W - M, y + 12);
@@ -555,7 +554,7 @@
         var padX = 12, gap = 10, titleBandH = 20, cardAreaH = 108, boxH = titleBandH + cardAreaH, by = y, cardTop = by + titleBandH;
         doc.setFillColor(0, 0, 0); doc.roundedRect(M, by, W - 2 * M, boxH, 10, 10, 'F');
         doc.setTextColor(0, 230, 153); doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
-        doc.text('COMMUNITY ACTION SNAPSHOT', W / 2, by + 14, { align: 'center' });
+        doc.text('LIVING LEDGER™ SNAPSHOT', W / 2, by + 14, { align: 'center' });
 
         var innerW = W - 2 * M - 2 * padX, bw = (innerW - 2 * gap) / 3;
 
@@ -659,22 +658,24 @@
       // legal text, patent disclosure, or links (per this round's spec).
       // 11px in the on-screen CSS translates to ~8pt here (jsPDF's unit is
       // pt, not px), to keep the same visual size.
-      ensureRoom(26);
-      doc.setFillColor(248, 250, 252); doc.rect(0, y - 6, W, 28, 'F');
+      ensureRoom(40);
+      doc.setFillColor(248, 250, 252); doc.rect(0, y - 6, W, 40, 'F');
       doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
       doc.text('CITIXEN UX™ • Civic Intelligence™', W / 2, y + 8, { align: 'center' });
+      doc.setTextColor(107, 114, 128); doc.setFontSize(7);
+      doc.text('VERIFIED VIA CITIXEN UX™ PROTOCOL | LIVING LEDGER™ OUTPUT', W / 2, y + 21, { align: 'center' });
 
       // Share as a real, named application/pdf File when the OS share sheet
       // is available (iOS Mail/Messages/Notes otherwise show a bare "blob:"
       // heading instead of the filename); fall back to a direct download
       // everywhere else, or if the user's device can't share a file at all.
-      var fileName = 'citixen-ux-free-report.pdf';
+      var fileName = 'citixen-ux-civic-intelligence-brief.pdf';
       var shared = false;
       if (navigator.share && navigator.canShare) {
         try {
           var pdfFile = new File([doc.output('blob')], fileName, { type: 'application/pdf' });
           if (navigator.canShare({ files: [pdfFile] })) {
-            await navigator.share({ title: 'CITIXEN UX™ Free Report', text: 'CITIXEN UX™ Civic Intelligence Report', files: [pdfFile] });
+            await navigator.share({ title: 'CITIXEN UX™ Civic Intelligence™ Brief', text: 'CITIXEN UX™ Civic Intelligence Report', files: [pdfFile] });
             shared = true;
           }
         } catch (shareErr) {
@@ -694,7 +695,7 @@
   function renderGraphicPane() {
     var el = modal.querySelector('#cxPane-graphic');
     el.innerHTML =
-      '<div class="cx-card-wrap"><canvas id="cxCardCanvas" width="1080" height="1080" role="img" aria-label="CITIXEN UX™ Free Report card for ' + esc(cityStateLabel(data)) + '"></canvas></div>' +
+      '<div class="cx-card-wrap"><canvas id="cxCardCanvas" width="1080" height="1080" role="img" aria-label="CITIXEN UX™ Civic Intelligence™ Brief card for ' + esc(cityStateLabel(data)) + '"></canvas></div>' +
       '<div class="cx-actions"><button type="button" class="cx-btn-primary" id="cxShareCardBtn">' + icon('phoneShare') + 'Share #CrowdSaveAmerica Card</button></div>' +
       '<p class="cx-hint" id="cxHint-graphic"></p>';
     el.querySelector('#cxShareCardBtn').addEventListener('click', shareCard);
@@ -813,7 +814,7 @@
     ctx.font = 'italic ' + font(600, 20); ctx.fillStyle = MINT;
     ctx.fillText('Upgrade your civic experience.', W / 2, 180);
     ctx.font = font(800, 26); ctx.fillStyle = '#FFFFFF';
-    ctx.fillText('FREE REPORT', W / 2, 220);
+    ctx.fillText('CIVIC INTELLIGENCE™ BRIEF', W / 2, 220);
     ctx.font = font(700, 18); ctx.fillStyle = SLATE;
     ctx.fillText(cityStateLabel(d) + '  •  CURRENT SNAPSHOT', W / 2, 252);
     ctx.textAlign = 'left';
