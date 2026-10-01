@@ -436,7 +436,11 @@
     var d = data, hz = hazardIndex(d), label = btn.innerHTML;
     btn.disabled = true; btn.textContent = 'Generating…';
     try {
-      var doc = new window.jspdf.jsPDF({ unit: 'pt', format: 'letter' });
+      // Letter, portrait, 612x792pt = 8.5"x11" — explicit here (jsPDF
+      // already defaults to portrait) since this is what actually
+      // determines the generated PDF's page size and orientation; this
+      // file has no @media print / browser-print path to control it.
+      var doc = new window.jspdf.jsPDF({ unit: 'pt', format: 'letter', orientation: 'portrait' });
       var W = 612, M = 40, y;
 
       // Top branding masthead: sleek horizontal compact banner, minimized
