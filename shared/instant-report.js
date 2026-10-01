@@ -89,7 +89,6 @@
   function pctText(v) { return v != null ? v + '%' : 'N/A'; }
   function resolutionRate(d) { return d.total ? Math.round((d.resolved / d.total) * 100) + '%' : 'N/A'; }
   function delayedCount(d) { return d.cip.filter(function (p) { return p.status === 'delayed'; }).length; }
-  function badgeText(d) { return d.cityLabel + (d.wardLabel ? ' · ' + d.wardLabel : ''); }
   function siteUrl() { return location.origin + '/'; }
 
   // ---------- Civic Health Ranking ----------
@@ -494,7 +493,8 @@
     rr(ctx, 30, 30, W - 60, W - 60, 36); ctx.fillStyle = NAVY; ctx.fill();
     ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,230,153,0.55)'; ctx.stroke();
 
-    // Header: shield + wordmark, jurisdiction badge
+    // Header: shield + wordmark (the top-right "CITY, ST · WARD" jurisdiction
+    // pill is removed per this round's "Share Card Header Refactor" spec)
     shieldPath(ctx, P - 6, 78, 3); ctx.lineWidth = 0.8; ctx.strokeStyle = MINT; ctx.stroke();
     ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
     ctx.font = font(800, 40); ctx.fillStyle = '#FFFFFF'; ctx.fillText('CITIXEN', P + 74, 114);
@@ -502,17 +502,19 @@
     ctx.fillStyle = MINT; ctx.fillText('UX', wx, 114);
     var uxw = ctx.measureText('UX').width;
     ctx.font = font(700, 18); ctx.fillText('™', wx + uxw + 3, 100);
-    ctx.font = font(800, 22);
-    var badge = badgeText(d), bw = ctx.measureText(badge).width + 40;
-    rr(ctx, W - P - bw, 92, bw, 46, 23); ctx.lineWidth = 2; ctx.strokeStyle = MINT; ctx.stroke();
-    ctx.fillStyle = MINT; ctx.textAlign = 'center'; ctx.fillText(badge, W - P - bw / 2, 116);
     ctx.fillStyle = 'rgba(255,255,255,0.08)'; ctx.fillRect(P, 172, W - 2 * P, 2);
 
-    // Campaign badge + score
-    ctx.textAlign = 'left'; ctx.font = font(800, 30);
-    var tag = '#CrowdSaveAmerica', tw = ctx.measureText(tag).width + 44;
-    rr(ctx, P, 206, tw, 58, 29); ctx.fillStyle = MINT; ctx.fill();
-    ctx.fillStyle = NAVY; ctx.fillText(tag, P + 22, 236);
+    // Title marquee — replaces the old "#CrowdSaveAmerica" hashtag pill with
+    // a centered "CROWD SAVE AMERICA" title (no hashtag symbol) + tagline,
+    // per this round's spec. The campaign hashtag still appears once, in
+    // the footer below.
+    ctx.textAlign = 'center';
+    ctx.font = font(800, 40); ctx.fillStyle = MINT;
+    ctx.fillText('CROWD SAVE AMERICA', W / 2, 232);
+    ctx.font = 'italic ' + font(600, 24); ctx.fillStyle = SLATE;
+    ctx.fillText('Restoring civic trust, one snap at a time.', W / 2, 270);
+    ctx.textAlign = 'left';
+
     ctx.font = font(700, 24); ctx.fillStyle = SLATE; ctx.fillText('WARD HEALTH SCORE', P, 318);
     var score = healthScore(d);
     ctx.font = font(900, 132); ctx.fillStyle = '#FFFFFF';
