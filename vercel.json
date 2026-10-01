@@ -5,6 +5,11 @@
       "source": "/",
       "destination": "/app",
       "permanent": true
+    },
+    {
+      "source": "/beta",
+      "destination": "/app?beta_cohort=alpha_10&ref=direct",
+      "permanent": false
     }
   ],
   "rewrites": [

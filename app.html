@@ -25,6 +25,9 @@
 <!-- Client-side PDF export for the District Health Summary — same CDN-script pattern as Leaflet above, no bundler/build step. -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<!-- Renders the real, off-screen #socialGraphicExportCard DOM node to a PNG
+     for the receipt modal's "Download Graphic" — see renderAndShowSocialGraphic(). -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <!-- Instant Report (Export & Share module, 3-branch export modal, Quick
      Keys drawer styles) — one shared file pair used by both app.html and
      index.html so the Dashboard renders from identical code on both. -->
@@ -232,6 +235,25 @@ textarea.input{resize:none;line-height:1.4}
 .metrics-ticker-col b{font-size:.92rem}
 .metrics-ticker-col span{font-size:.54rem;font-weight:700;letter-spacing:.06em;color:#94A3B8;white-space:normal}
 .metrics-ticker-divider{width:1px;align-self:stretch;background:rgba(255,255,255,.14);margin:0 10px}
+.civic-health-good{color:#34d399 !important}
+.civic-health-moderate{color:#f59e0b !important}
+.civic-health-poor{color:#f87171 !important}
+.civic-health-unknown{color:#94a3b8 !important}
+
+/* ===== MAP GEOFENCE CLUSTER INFO TOOLTIP — tap-to-reveal explainer for the
+   amber/mint Geo-Hatch squares drawn on the Civic Dispatch Map (see
+   renderGeoHatchOverlay()). Tap-based rather than hover-only so it works
+   the same on mobile, where this app is mostly used. ===== */
+.map-count-wrap{display:flex;align-items:center;gap:6px}
+.map-info-btn{width:16px;height:16px;border-radius:50%;background:rgba(148,163,184,.14);
+  border:1px solid rgba(148,163,184,.4);color:#94a3b8;font-size:.6rem;font-weight:800;font-style:italic;
+  font-family:Georgia,'Times New Roman',serif;line-height:1;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;padding:0;flex-shrink:0;transition:border-color .15s,color .15s}
+.map-info-btn:hover,.map-info-btn[aria-expanded="true"]{border-color:rgba(0,230,153,.5);color:var(--mint2)}
+.map-cluster-tooltip{display:none;font-size:.68rem;line-height:1.45;font-weight:600;color:var(--muted);
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;
+  padding:9px 11px;margin:-6px 0 10px}
+.map-cluster-tooltip.open{display:block;animation:onboardingFadeIn .15s ease}
 @media (prefers-reduced-motion:reduce){.metrics-ticker-dot{animation:none}}
 .feed-cat{display:inline-block;font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94A3B8;
   border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:1px 8px;margin-bottom:4px}
@@ -506,12 +528,20 @@ textarea.input{resize:none;line-height:1.4}
   border-radius:14px;padding:16px;margin-bottom:16px;cursor:pointer;font-family:inherit}
 .receipt-ticket-id{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:1.22rem;
   font-weight:900;color:var(--mint2);letter-spacing:.02em;word-break:break-all}
-.receipt-ticket-hint{font-size:.6rem;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:.05em}
+.receipt-ticket-hint{font-size:.6rem;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:.05em;
+  transition:color .15s}
+.receipt-ticket-hint.copied{color:#34d399;text-shadow:0 0 8px rgba(52,211,153,.7)}
 .receipt-summary{display:flex;flex-direction:column;gap:8px;margin-bottom:18px;text-align:left}
 .receipt-row{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:.78rem;
   padding:10px 12px;background:rgba(255,255,255,.03);border-radius:10px;border:1px solid rgba(255,255,255,.06)}
 .receipt-row-label{color:var(--muted);font-weight:800;text-transform:uppercase;font-size:.6rem;letter-spacing:.05em;flex-shrink:0}
-.receipt-row-value{color:var(--text);font-weight:700;text-align:right}
+.receipt-row-value{color:var(--text);font-weight:700;text-align:right;max-width:62%;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.receipt-loc-value{display:flex;flex-direction:column;align-items:flex-end;gap:2px;white-space:normal}
+.receipt-loc-coords{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.76rem;
+  font-weight:700;color:#e2e8f0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.receipt-loc-district{font-size:.64rem;font-weight:600;color:#94a3b8;max-width:100%;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
 .receipt-status-pill{display:inline-block;padding:3px 10px;border-radius:9999px;font-size:.6rem;font-weight:800;
   letter-spacing:.04em;text-transform:uppercase;background:rgba(0,230,153,.14);color:var(--mint2);border:1px solid rgba(0,230,153,.4)}
 .receipt-status-pill.offline{background:rgba(245,158,11,.14);color:var(--warn);border-color:rgba(245,158,11,.4)}
@@ -519,11 +549,56 @@ textarea.input{resize:none;line-height:1.4}
 .receipt-action-row{display:flex;gap:10px}
 .btn-receipt-secondary{flex:1;background:rgba(3,7,18,.6);border:1px solid rgba(255,255,255,.08);color:var(--text);
   padding:11px 8px;border-radius:10px;font-weight:700;font-size:.68rem;cursor:pointer;display:flex;
-  align-items:center;justify-content:center;gap:6px;transition:border-color .15s}
+  align-items:center;justify-content:center;gap:6px;transition:border-color .15s,color .15s}
 .btn-receipt-secondary:hover{border-color:rgba(255,255,255,.18)}
 .btn-receipt-secondary svg{color:var(--mint2);flex-shrink:0}
+.btn-receipt-secondary.copied{color:#34d399;border-color:rgba(52,211,153,.5)}
+.btn-receipt-secondary.copied svg{color:#34d399}
 .btn-receipt-dismiss{width:100%;box-sizing:border-box;min-height:52px;background:var(--mint);color:#051311;
   border:none;padding:14px 16px;border-radius:12px;font-family:inherit;font-weight:700;font-size:16px;cursor:pointer}
+
+/* ===== 1:1 SOCIAL GRAPHIC EXPORT — real DOM node rendered to PNG via
+   html2canvas (see renderAndShowSocialGraphic()), not a hand-drawn canvas,
+   so the citizen's own uploaded photo can be embedded as the background.
+   Rendered off-screen (never display:none — html2canvas can't capture
+   that) at its true 1080x1080 export size, then shown to the citizen only
+   as the rasterized preview image in #socialGraphicPreviewModal below. ===== */
+.social-graphic-export-card{position:fixed;top:-20000px;left:-20000px;width:1080px;height:1080px;
+  background:#020617;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  color:#fff}
+.sge-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
+.sge-overlay{position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(2,6,23,.55) 0%,rgba(2,6,23,.72) 50%,rgba(2,6,23,.97) 100%)}
+.sge-header{position:absolute;top:70px;left:70px;right:70px;display:flex;justify-content:space-between;align-items:center}
+.sge-brand{font-size:30px;font-weight:900;color:#00E699;letter-spacing:.02em}
+.sge-jurisdiction{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:20px;
+  font-weight:700;color:#94a3b8;letter-spacing:.05em}
+.sge-body{position:absolute;left:70px;right:70px;bottom:150px;display:flex;flex-direction:column;gap:16px}
+.sge-ticket{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:50px;font-weight:900;
+  color:#fff;letter-spacing:.01em;word-break:break-word}
+.sge-status{font-size:19px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#00E699}
+.sge-breadcrumb{font-size:25px;font-weight:700;color:#e2e8f0}
+.sge-meta-row{display:flex;justify-content:space-between;gap:20px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:18px;color:#94a3b8;margin-top:4px}
+.sge-footer{position:absolute;bottom:58px;left:0;right:0;text-align:center;font-size:16px;font-weight:700;
+  letter-spacing:.08em;color:#64748b}
+
+/* ===== SOCIAL GRAPHIC PREVIEW MODAL — full-screen rendered-image review
+   with a loading state while html2canvas works, then Download/Share. ===== */
+.sgp-card{padding:18px}
+.sgp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sgp-title{font-size:.92rem;font-weight:900;color:var(--text)}
+.sgp-image-wrap{position:relative;width:100%;aspect-ratio:1/1;border-radius:14px;overflow:hidden;
+  background:#020617;border:1px solid rgba(30,41,59,.8);margin-bottom:16px}
+.sgp-image{width:100%;height:100%;object-fit:cover;display:none}
+.sgp-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.sgp-spinner{width:34px;height:34px;border-radius:50%;border:3px solid rgba(0,230,153,.2);
+  border-top-color:#00E699;animation:sgpSpin .8s linear infinite}
+@keyframes sgpSpin{to{transform:rotate(360deg)}}
+.sgp-loading-text{font-size:.76rem;font-weight:700;color:var(--muted);letter-spacing:.02em}
+.sgp-actions{display:flex;flex-direction:column;gap:10px}
+.btn-sgp-share{width:100%;box-sizing:border-box;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.12);
+  color:var(--text);padding:13px;border-radius:12px;font-weight:700;font-size:.84rem;cursor:pointer}
 
 /* ===== CONNECT WITH CITIXEN UX — city official wedge + Admin Light
    claim/panel. Deliberately quieter than every citizen-facing control
@@ -1045,7 +1120,16 @@ textarea.input{resize:none;line-height:1.4}
          (City/State/Country tabs + Citywide Asset Coverage) has been removed. -->
     <section id="tab-map" class="tabpane">
       <div class="card">
-        <div class="label"><span>Civic Dispatch Map</span><span id="mCount" style="color:var(--mint2)">3 active</span></div>
+        <div class="label">
+          <span>Civic Dispatch Map</span>
+          <span class="map-count-wrap">
+            <span id="mCount" style="color:var(--mint2)">3 active</span>
+            <button type="button" class="map-info-btn" id="mapClusterInfoBtn" aria-label="What do the square boxes on the map mean?" aria-expanded="false">i</button>
+          </span>
+        </div>
+        <div class="map-cluster-tooltip" id="mapClusterTooltip" role="tooltip">
+          Square boxes represent active cluster zones where multiple neighborhood reports overlap.
+        </div>
         <div id="map"></div>
       </div>
 
@@ -1062,7 +1146,7 @@ textarea.input{resize:none;line-height:1.4}
             <span class="metrics-ticker-divider" aria-hidden="true"></span>
             <div class="metrics-ticker-col"><b id="appScorecardResRate">—</b><span>RESOLUTION RATE</span></div>
             <span class="metrics-ticker-divider" aria-hidden="true"></span>
-            <div class="metrics-ticker-col"><b id="appScorecardRank">—</b><span id="appScorecardRankLbl">STATE RANK</span></div>
+            <div class="metrics-ticker-col"><b id="appScorecardRank">—</b><span id="appScorecardRankLbl">CIVIC HEALTH</span></div>
           </div>
         </div>
         <div id="feed"></div>
@@ -1548,17 +1632,20 @@ textarea.input{resize:none;line-height:1.4}
       <div class="receipt-icon-wrap">
         <svg viewBox="0 0 24 24" width="40" height="40" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
       </div>
-      <div class="receipt-title">Dispatch Acknowledged</div>
+      <div class="receipt-title">Report Acknowledged</div>
       <div class="receipt-sub" id="receiptSub">Your report has been logged to the public ledger.</div>
 
       <button type="button" class="receipt-ticket-badge" id="receiptTicketBadge" aria-label="Copy ticket ID">
         <div class="receipt-ticket-id" id="receiptTicketId">—</div>
-        <div class="receipt-ticket-hint">Tap to copy ticket ID</div>
+        <div class="receipt-ticket-hint" id="receiptTicketHint">Tap to copy ticket ID</div>
       </button>
 
       <div class="receipt-summary">
         <div class="receipt-row"><span class="receipt-row-label">Type &amp; Dept.</span><span class="receipt-row-value" id="receiptDept">—</span></div>
-        <div class="receipt-row"><span class="receipt-row-label">Location</span><span class="receipt-row-value" id="receiptLoc">—</span></div>
+        <div class="receipt-row"><span class="receipt-row-label">Location</span><span class="receipt-row-value receipt-loc-value" id="receiptLoc">
+          <span class="receipt-loc-coords" id="receiptLocCoords">—</span>
+          <span class="receipt-loc-district" id="receiptLocDistrict"></span>
+        </span></div>
         <div class="receipt-row"><span class="receipt-row-label">Status</span><span class="receipt-row-value"><span class="receipt-status-pill" id="receiptStatus">Open Dispatch</span></span></div>
         <div class="receipt-row"><span class="receipt-row-label">Timestamp</span><span class="receipt-row-value" id="receiptTime">—</span></div>
       </div>
@@ -1567,11 +1654,11 @@ textarea.input{resize:none;line-height:1.4}
         <div class="receipt-action-row">
           <button type="button" class="btn-receipt-secondary" id="btnReceiptGraphic">
             <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Download Graphic
+            <span id="btnReceiptGraphicLabel">Download Graphic</span>
           </button>
           <button type="button" class="btn-receipt-secondary" id="btnReceiptCopyLink">
             <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-            Copy Direct Link
+            <span id="btnReceiptCopyLinkLabel">Copy Direct Link</span>
           </button>
         </div>
         <button type="button" class="btn-receipt-dismiss" id="btnReceiptDismiss">Dismiss to Feed</button>
@@ -1585,6 +1672,52 @@ textarea.input{resize:none;line-height:1.4}
           <span class="official-wedge-label">Are you a City Official or District Rep?</span>
           <span class="official-wedge-cta">Connect District →</span>
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 1:1 SOCIAL GRAPHIC EXPORT CARD — off-screen real DOM node
+       (never display:none) rasterized by html2canvas in
+       renderAndShowSocialGraphic(). The citizen never sees this node
+       itself, only the resulting PNG in #socialGraphicPreviewModal. ===== -->
+  <div id="socialGraphicExportCard" class="social-graphic-export-card" aria-hidden="true">
+    <img id="sgePhoto" class="sge-photo" alt="">
+    <div class="sge-overlay"></div>
+    <div class="sge-header">
+      <span class="sge-brand">CITIXEN UX™</span>
+      <span class="sge-jurisdiction" id="sgeJurisdiction">LOCAL DISTRICT</span>
+    </div>
+    <div class="sge-body">
+      <div class="sge-ticket" id="sgeTicket">—</div>
+      <div class="sge-status" id="sgeStatus">REPORT ACKNOWLEDGED · PUBLIC LEDGER</div>
+      <div class="sge-breadcrumb" id="sgeBreadcrumb">Public Works</div>
+      <div class="sge-meta-row">
+        <span id="sgeCoords">—</span>
+        <span id="sgeTimestamp">—</span>
+      </div>
+    </div>
+    <div class="sge-footer">ANONYMOUS &amp; SOVEREIGN · CITIXENUX.COM/APP</div>
+  </div>
+
+  <!-- ===== SOCIAL GRAPHIC PREVIEW MODAL — shows the rasterized PNG with a
+       loading state while html2canvas renders, then Download/Share.
+       See renderAndShowSocialGraphic(). ===== -->
+  <div id="socialGraphicPreviewModal" class="confirm-drawer">
+    <div class="confirm-card sgp-card">
+      <div class="sgp-header">
+        <span class="sgp-title">Your Social Card</span>
+        <button type="button" class="onboarding-close" id="btnSgpClose" aria-label="Close">✕</button>
+      </div>
+      <div class="sgp-image-wrap">
+        <img id="sgpPreviewImg" class="sgp-image" alt="1:1 social card preview">
+        <div class="sgp-loading" id="sgpLoading">
+          <div class="sgp-spinner"></div>
+          <div class="sgp-loading-text" id="sgpLoadingText">Rendering 1:1 Social Card...</div>
+        </div>
+      </div>
+      <div class="sgp-actions">
+        <button type="button" class="btn-onboarding-cta" id="btnSgpDownload">Download Image</button>
+        <button type="button" class="btn-sgp-share" id="btnSgpShare" style="display:none">Share</button>
       </div>
     </div>
   </div>
@@ -2851,6 +2984,25 @@ async function cityTicketCounts(){
     open: cityTickets.filter(t => t.stage === 'dispatched').length
   };
 }
+// Civic Health — replaces the old "State Rank" slot (which only ever read
+// real-N/A, since this beta has no real state-ranking dataset to compare
+// against — see stateRankValue() in shared/instant-report.js, still used
+// as-is everywhere else that slot appears, e.g. the PDF Civic Brief). This
+// slot instead derives an honest, locally-computable signal from this same
+// jurisdiction's own ticket counts: resolution rate is the primary signal,
+// and a large open backlog relative to total ticket volume nudges the tier
+// down — nothing here is a invented/external score.
+function computeCivicHealth(d){
+  if (!d || !d.total) return { label: 'CIVIC HEALTH', value: 'N/A', tier: 'unknown' };
+  const resolvedPct = Math.round((d.resolved / d.total) * 100);
+  const activeCount = (d.counts.submitted || 0) + (d.counts.dispatched || 0);
+  const activeShare = activeCount / d.total;
+  let tier, label;
+  if (resolvedPct >= 70 && activeShare <= 0.4) { tier = 'good'; label = 'GOOD'; }
+  else if (resolvedPct >= 40) { tier = 'moderate'; label = 'MODERATE'; }
+  else { tier = 'poor'; label = 'NEEDS ATTENTION'; }
+  return { label, value: resolvedPct + '%', tier };
+}
 async function updateAppTelemetryScorecard(){
   const labelEl = document.getElementById('appScorecardLabel');
   const avgEl = document.getElementById('appScorecardAvgFix');
@@ -2860,19 +3012,22 @@ async function updateAppTelemetryScorecard(){
   if (!avgEl || !rateEl || !rankEl) return;
   const meta = currentWardMeta;
   if (labelEl) labelEl.textContent = meta ? (meta.cityName.toUpperCase() + ', ' + meta.state.toUpperCase() + ' LIVE METRICS') : 'CITYWIDE LIVE METRICS';
-  // Avg Fix Speed / Resolution Rate / State Rank — the exact same figures
-  // and formulas as the Civic Brief's own "Civic Performance Metrics" row
+  // Avg Fix Speed / Resolution Rate — the exact same figures and formulas as
+  // the Civic Brief's own "Civic Performance Metrics" row
   // (CitixenInstantReport.metricsFor(), which wraps avgHoursText()/
-  // resolutionRate()/stateRankValue() in shared/instant-report.js), so this
-  // ticker never drifts from the PDF brief's numbers for the same
-  // jurisdiction.
+  // resolutionRate() in shared/instant-report.js), so this ticker never
+  // drifts from the PDF brief's numbers for the same jurisdiction. The third
+  // slot (Civic Health) is computed locally — see computeCivicHealth() above.
   try {
     const d = await appInstantReportData();
     const m = window.CitixenInstantReport.metricsFor(d);
     avgEl.textContent = m.avgFixSpeed;
     rateEl.textContent = m.resolutionRate;
-    rankEl.textContent = m.stateRankValue;
-    if (rankLblEl) rankLblEl.textContent = m.stateRankLabel;
+    const health = computeCivicHealth(d);
+    rankEl.textContent = health.value;
+    rankEl.classList.remove('civic-health-good', 'civic-health-moderate', 'civic-health-poor', 'civic-health-unknown');
+    rankEl.classList.add('civic-health-' + health.tier);
+    if (rankLblEl) rankLblEl.textContent = health.value === 'N/A' ? 'CIVIC HEALTH' : health.label;
   } catch (e) { /* leave the placeholder dashes if this fails */ }
   renderAppScorecardTimestamp();
 }
@@ -4186,13 +4341,44 @@ document.getElementById('btnConfirmCancel').addEventListener('click', () => {
 async function copyTextToClipboard(text){
   try { await navigator.clipboard.writeText(text); return true; } catch (e) { return false; }
 }
+// Builds a single clean breadcrumb ("Public Works · Sidewalk / ADA") instead
+// of concatenating department+type and risking a repeated tag — e.g.
+// department "Public Works / ADA" + type "Ramp" becomes "Public Works ·
+// Ramp / ADA", never "Public Works / ADA / Ramp".
+function formatDeptBreadcrumb(department, type){
+  const parts = String(department || 'Public Works').split('/').map(s => s.trim()).filter(Boolean);
+  const root = parts[0] || 'Public Works';
+  const sub = parts.slice(1).join(' / ');
+  let typePart = (type || '').trim();
+  if (sub && typePart && sub.toLowerCase() !== typePart.toLowerCase()) typePart = typePart + ' / ' + sub;
+  else if (sub && !typePart) typePart = sub;
+  if (typePart && typePart.toLowerCase() === root.toLowerCase()) typePart = '';
+  return typePart ? root + ' · ' + typePart : root;
+}
 let pendingReceiptOpts = null;
 function openDispatchReceiptModal(opts){
   pendingReceiptOpts = opts || {};
-  const { ticketId, department, type, location: loc, queuedOffline, timestamp } = pendingReceiptOpts;
+  const { ticketId, department, type, location: loc, queuedOffline, timestamp, wardMeta, resolvedLoc } = pendingReceiptOpts;
   document.getElementById('receiptTicketId').textContent = ticketId || '—';
-  document.getElementById('receiptDept').textContent = (department || 'Public Works') + (type ? ' / ' + type : '');
-  document.getElementById('receiptLoc').textContent = loc || 'Local District';
+  document.getElementById('receiptDept').textContent = formatDeptBreadcrumb(department, type);
+
+  // Location: a real GPS fix renders as two clean lines (coords + district ·
+  // city, state); otherwise fall back to whatever the citizen typed/left in
+  // the location field as a single line — never a guessed coordinate.
+  const coordsEl = document.getElementById('receiptLocCoords');
+  const districtEl = document.getElementById('receiptLocDistrict');
+  if (resolvedLoc && typeof resolvedLoc.lat === 'number' && typeof resolvedLoc.lng === 'number') {
+    coordsEl.textContent = formatCoordPrecision(resolvedLoc.lat, resolvedLoc.lng);
+    const districtPart = (wardMeta && wardMeta.wardName) ? wardMeta.wardName + ' · ' : '';
+    const cityPart = wardMeta ? wardMeta.cityName + ', ' + wardMeta.state.toUpperCase() : resolvedLoc.city + ', ' + resolvedLoc.stateCode;
+    districtEl.textContent = districtPart + cityPart;
+    districtEl.style.display = '';
+  } else {
+    coordsEl.textContent = loc || 'Local District';
+    districtEl.textContent = '';
+    districtEl.style.display = 'none';
+  }
+
   const statusEl = document.getElementById('receiptStatus');
   statusEl.textContent = queuedOffline ? 'Queued Offline' : 'Open Dispatch';
   statusEl.classList.toggle('offline', !!queuedOffline);
@@ -4206,68 +4392,164 @@ function openDispatchReceiptModal(opts){
 function closeDispatchReceiptModal(){
   document.getElementById('dispatchReceiptModal').classList.remove('open');
 }
+// Map Geofence Cluster tooltip — tap the "i" next to the active-count badge
+// to reveal/hide what the Geo-Hatch squares on the map mean; tap anywhere
+// else to dismiss it, same lightweight pattern as the other tap-toggled UI
+// in this file (no library, no persistent state — it's just an explainer).
+(function initMapClusterTooltip(){
+  const btn = document.getElementById('mapClusterInfoBtn');
+  const tip = document.getElementById('mapClusterTooltip');
+  if (!btn || !tip) return;
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const nowOpen = !tip.classList.contains('open');
+    tip.classList.toggle('open', nowOpen);
+    btn.setAttribute('aria-expanded', String(nowOpen));
+  });
+  document.addEventListener('click', (e) => {
+    if (tip.classList.contains('open') && !tip.contains(e.target) && e.target !== btn) {
+      tip.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  });
+})();
+
 document.getElementById('btnReceiptDismiss').addEventListener('click', closeDispatchReceiptModal);
 document.getElementById('dispatchReceiptModal').addEventListener('click', (e) => {
   if (e.target.id === 'dispatchReceiptModal') closeDispatchReceiptModal();
 });
+// Brief, glowing in-card confirmation (hint text swap) rather than relying
+// only on the toast — the citizen's eyes are already on the ticket badge
+// they just tapped.
 document.getElementById('receiptTicketBadge').addEventListener('click', async () => {
   const ok = await copyTextToClipboard(document.getElementById('receiptTicketId').textContent);
-  toast(ok ? '✓ Ticket ID copied' : 'Could not copy — select and copy manually');
+  const hintEl = document.getElementById('receiptTicketHint');
+  if (ok) {
+    const prevText = hintEl.textContent;
+    hintEl.textContent = 'Copied to clipboard!';
+    hintEl.classList.add('copied');
+    setTimeout(() => { hintEl.textContent = prevText; hintEl.classList.remove('copied'); }, 2000);
+  } else {
+    toast('Could not copy — select and copy manually');
+  }
 });
 document.getElementById('btnReceiptCopyLink').addEventListener('click', async () => {
   const id = document.getElementById('receiptTicketId').textContent;
-  const url = location.origin + '/report/' + encodeURIComponent(id);
+  const url = location.origin + '/app?report=' + encodeURIComponent(id);
   const ok = await copyTextToClipboard(url);
-  toast(ok ? '✓ Direct link copied' : 'Could not copy — try again');
+  const btn = document.getElementById('btnReceiptCopyLink');
+  const labelEl = document.getElementById('btnReceiptCopyLinkLabel');
+  if (ok) {
+    const prevText = labelEl.textContent;
+    labelEl.textContent = 'Link Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { labelEl.textContent = prevText; btn.classList.remove('copied'); }, 2000);
+  } else {
+    toast('Could not copy — try again');
+  }
 });
-// Small canvas-rendered proof-of-submission card (ticket ID + routing
-// summary) the citizen can save/share immediately — a lighter-weight
-// counterpart to the full Civic Brief's 1:1 Social Graphic, scoped to just
-// this one ticket rather than the whole district's live metrics.
-function downloadReceiptGraphic(opts){
-  const canvas = document.createElement('canvas');
-  const W = 720, H = 720;
-  canvas.width = W; canvas.height = H;
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#0A0D12'; ctx.fillRect(0, 0, W, H);
-  ctx.strokeStyle = 'rgba(0,230,153,0.5)'; ctx.lineWidth = 2;
-  ctx.strokeRect(20, 20, W - 40, H - 40);
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.font = '900 22px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif';
-  ctx.fillStyle = '#00E699';
-  ctx.fillText('CITIXEN UX™ — DISPATCH ACKNOWLEDGED', W / 2, 90);
-  ctx.font = '900 34px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace';
-  ctx.fillStyle = '#FFFFFF';
-  ctx.fillText(opts.ticketId || '—', W / 2, 170);
-  const rows = [
-    ['TYPE & DEPT.', (opts.department || 'Public Works') + (opts.type ? ' / ' + opts.type : '')],
-    ['LOCATION', opts.location || 'Local District'],
-    ['STATUS', opts.queuedOffline ? 'QUEUED OFFLINE' : 'OPEN DISPATCH'],
-    ['TIMESTAMP', (opts.timestamp instanceof Date ? opts.timestamp : new Date()).toLocaleString()]
-  ];
-  let y = 260;
-  rows.forEach(([label, value]) => {
-    ctx.font = '800 15px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif';
-    ctx.fillStyle = '#00E699';
-    ctx.fillText(label, W / 2, y);
-    ctx.font = '700 20px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif';
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillText(value, W / 2, y + 32);
-    y += 96;
-  });
-  ctx.font = '600 13px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif';
-  ctx.fillStyle = '#6B7280';
-  ctx.fillText('ANONYMOUS & SOVEREIGN · CITIXENUX.COM/APP', W / 2, H - 50);
-  canvas.toBlob(blob => {
-    if (!blob) { toast('Could not render the receipt graphic.'); return; }
-    const a = document.createElement('a'), href = URL.createObjectURL(blob);
-    a.href = href; a.download = 'citixen-ux-dispatch-receipt.png';
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(href), 4000);
-  }, 'image/png');
+// Real 1:1 social-card export: populates the off-screen
+// #socialGraphicExportCard DOM node (ticket ID, breadcrumb, coords/time, and
+// the citizen's own uploaded photo as the background), rasterizes it with
+// html2canvas at pixelRatio 2, then shows the result in
+// #socialGraphicPreviewModal with a loading state while that render runs —
+// replaces the old hand-drawn-canvas version, which never embedded the
+// photo and produced a generic, near-empty PNG.
+let lastSocialGraphicDataUrl = null;
+let lastSocialGraphicFile = null;
+async function renderAndShowSocialGraphic(opts){
+  opts = opts || {};
+  const modal = document.getElementById('socialGraphicPreviewModal');
+  const imgEl = document.getElementById('sgpPreviewImg');
+  const loadingEl = document.getElementById('sgpLoading');
+  const loadingTextEl = document.getElementById('sgpLoadingText');
+  const shareBtn = document.getElementById('btnSgpShare');
+  lastSocialGraphicDataUrl = null;
+  lastSocialGraphicFile = null;
+  imgEl.style.display = 'none';
+  imgEl.removeAttribute('src');
+  loadingTextEl.textContent = 'Rendering 1:1 Social Card...';
+  loadingEl.style.display = 'flex';
+  shareBtn.style.display = 'none';
+  modal.classList.add('open');
+
+  // Populate the hidden export card with this exact ticket's real data —
+  // same breadcrumb/coordinate logic as the receipt card above, so the two
+  // never drift out of sync.
+  document.getElementById('sgeJurisdiction').textContent = opts.wardMeta
+    ? (opts.wardMeta.cityName + ', ' + opts.wardMeta.state.toUpperCase())
+    : 'LOCAL DISTRICT';
+  document.getElementById('sgeTicket').textContent = opts.ticketId || '—';
+  document.getElementById('sgeStatus').textContent = (opts.queuedOffline ? 'QUEUED OFFLINE' : 'REPORT ACKNOWLEDGED') + ' · PUBLIC LEDGER';
+  document.getElementById('sgeBreadcrumb').textContent = formatDeptBreadcrumb(opts.department, opts.type);
+  const coordsText = (opts.resolvedLoc && typeof opts.resolvedLoc.lat === 'number' && typeof opts.resolvedLoc.lng === 'number')
+    ? formatCoordPrecision(opts.resolvedLoc.lat, opts.resolvedLoc.lng)
+    : (opts.location || 'Local District');
+  document.getElementById('sgeCoords').textContent = coordsText;
+  const ts = opts.timestamp instanceof Date ? opts.timestamp : new Date();
+  document.getElementById('sgeTimestamp').textContent = ts.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+
+  const photoEl = document.getElementById('sgePhoto');
+  if (opts.photoDataUrl) {
+    photoEl.src = opts.photoDataUrl;
+    photoEl.style.display = 'block';
+  } else {
+    photoEl.removeAttribute('src');
+    photoEl.style.display = 'none';
+  }
+
+  try {
+    if (typeof html2canvas !== 'function') throw new Error('html2canvas-unavailable');
+    const card = document.getElementById('socialGraphicExportCard');
+    // Give the photo a tick to finish decoding before the snapshot, so a
+    // just-set data: URL isn't captured mid-paint.
+    await new Promise(r => setTimeout(r, 60));
+    const canvas = await html2canvas(card, { width: 1080, height: 1080, scale: 2, useCORS: true, backgroundColor: '#020617' });
+    const dataUrl = canvas.toDataURL('image/png');
+    lastSocialGraphicDataUrl = dataUrl;
+    imgEl.src = dataUrl;
+    imgEl.style.display = 'block';
+    loadingEl.style.display = 'none';
+
+    // Web Share API with file support is spotty across browsers — only
+    // surface the Share button when this one actually supports sharing an
+    // image file; Download always works regardless.
+    if (navigator.share && navigator.canShare) {
+      try {
+        const blob = await (await fetch(dataUrl)).blob();
+        const file = new File([blob], 'citixen-ux-social-card.png', { type: 'image/png' });
+        if (navigator.canShare({ files: [file] })) {
+          lastSocialGraphicFile = file;
+          shareBtn.style.display = '';
+        }
+      } catch (e) { /* share-file support check failed — download-only fallback stays available */ }
+    }
+  } catch (err) {
+    loadingTextEl.textContent = 'Could not render the social card — try again.';
+    toast('Could not render the social card.');
+  }
 }
 document.getElementById('btnReceiptGraphic').addEventListener('click', () => {
-  downloadReceiptGraphic(pendingReceiptOpts || {});
+  renderAndShowSocialGraphic(pendingReceiptOpts || {});
+});
+document.getElementById('btnSgpDownload').addEventListener('click', () => {
+  if (!lastSocialGraphicDataUrl) return;
+  const a = document.createElement('a');
+  a.href = lastSocialGraphicDataUrl;
+  a.download = 'citixen-ux-social-card.png';
+  document.body.appendChild(a); a.click(); a.remove();
+});
+document.getElementById('btnSgpShare').addEventListener('click', async () => {
+  if (!lastSocialGraphicFile) return;
+  try {
+    await navigator.share({ files: [lastSocialGraphicFile], title: 'Citixen UX Report', text: 'My civic report just went live on the public ledger.' });
+  } catch (e) { /* citizen cancelled the native share sheet, or it's unsupported here — Download still works */ }
+});
+document.getElementById('btnSgpClose').addEventListener('click', () => {
+  document.getElementById('socialGraphicPreviewModal').classList.remove('open');
+});
+document.getElementById('socialGraphicPreviewModal').addEventListener('click', (e) => {
+  if (e.target.id === 'socialGraphicPreviewModal') document.getElementById('socialGraphicPreviewModal').classList.remove('open');
 });
 
 // ===== CONNECT WITH CITIXEN UX — city official wedge + Admin Light =====
@@ -4431,6 +4713,14 @@ async function finalizeSubmitReport(opts){
   renderFeed();
   document.getElementById('mCount').textContent=cases.length+' active';
   if(mapInit) { plotMarker(nc); renderGeoHatchOverlay(); }
+  // Captured before the photo box is hidden below — this is the same
+  // already-stripped (no EXIF/GPS) dataURL shown in the capture preview,
+  // reused as the 1:1 social graphic's background rather than re-asking
+  // the citizen for anything.
+  const photoImgForReceipt = document.getElementById('photoImg');
+  const photoDataUrl = (photoImgForReceipt && photoImgForReceipt.style.display !== 'none' && photoImgForReceipt.src)
+    ? photoImgForReceipt.src : null;
+
   document.getElementById('repDesc').value='';
   document.getElementById('photoBox').style.display='none';
 
@@ -4500,7 +4790,8 @@ async function finalizeSubmitReport(opts){
   // already looking at the Map & Feed tab.
   openDispatchReceiptModal({
     ticketId, department: dept, type: hz.type, location: rawLoc,
-    queuedOffline: !result.ok, timestamp: new Date()
+    queuedOffline: !result.ok, timestamp: new Date(),
+    wardMeta: currentWardMeta, resolvedLoc: resolved, photoDataUrl
   });
   switchTab('tab-map', document.querySelectorAll('.navtab')[1]);
 }
