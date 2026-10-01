@@ -15,7 +15,11 @@
 .cx-export{max-width:640px;margin:0 auto 18px;padding:18px 18px 16px;box-sizing:border-box;
   background:var(--surface-card-bg, rgba(5,11,20,.8));
   -webkit-backdrop-filter:blur(var(--surface-blur, 16px));backdrop-filter:blur(var(--surface-blur, 16px));
-  border:1px solid rgba(0,230,153,.4);border-radius:12px;text-align:center}
+  /* Border, radius and glow kept 1:1 with .csa-hero (the CROWD SAVE AMERICA
+     card right below this one) so the two primary dashboard cards read as
+     one unified obsidian-glass system rather than two different treatments. */
+  border:1px solid rgba(0,230,153,.2);border-radius:16px;
+  box-shadow:0 0 28px rgba(0,230,153,.08);text-align:center}
 .cx-export-kicker{font-size:.62rem;font-weight:700;letter-spacing:.22em;color:#94A3B8;margin-bottom:6px}
 .cx-export-title{margin:0 0 14px;color:#00E699;font-weight:800;font-size:1.05rem;letter-spacing:.08em;text-transform:uppercase;text-wrap:balance}
 .cx-export-sub{margin:0 auto 14px;max-width:44ch;color:#94A3B8;font-size:.8rem;line-height:1.5}
