@@ -574,7 +574,11 @@ function addFeedbackSubmission(input) {
     timestamp: new Date().toISOString(),
     route: typeof input.route === 'string' && input.route ? input.route.slice(0, 200) : '/app',
     device: typeof input.device === 'string' && input.device ? input.device.slice(0, 200) : 'Unknown Device',
-    tag: ['Bug', 'UI / Styling', 'Feature Idea', 'Camera / AI'].includes(input.tag) ? input.tag : 'Bug',
+    // 'UX Friction'/'Idea' are the Global Floating Alpha Feedback Badge's own
+    // 3-tag set (Patch 4.7); the other two are kept for backward
+    // compatibility with the earlier per-page widget's submissions already
+    // sitting in this array.
+    tag: ['Bug', 'UX Friction', 'Idea', 'UI / Styling', 'Feature Idea', 'Camera / AI'].includes(input.tag) ? input.tag : 'Bug',
     note: typeof input.note === 'string' ? input.note.slice(0, 2000) : '',
     // A data URL (image/png;base64,...) when the tester left "Attach UI
     // Snapshot" checked; null otherwise. Size-capped so one submission can't

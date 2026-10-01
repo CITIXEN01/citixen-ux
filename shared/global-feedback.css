@@ -1,0 +1,48 @@
+/* =====================================================================
+   CITIXEN UX™ — GLOBAL FLOATING ALPHA FEEDBACK BADGE (shared/global-feedback.js)
+   Self-contained styling — doesn't depend on any host page's own CSS
+   variables/classes, so the identical widget looks right on app.html,
+   operator.html and dispatch.html alike.
+   ===================================================================== */
+.cgf-badge{position:fixed;bottom:24px;right:24px;z-index:9999;
+  background:rgba(2,6,23,.9);border:1px solid rgba(16,185,129,.35);color:#34d399;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.72rem;font-weight:700;
+  border-radius:999px;padding:9px 16px;box-shadow:0 10px 30px rgba(0,0,0,.5);backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);cursor:pointer;display:flex;align-items:center;gap:7px;
+  transition:border-color .15s,transform .15s}
+.cgf-badge:hover{border-color:rgba(52,211,153,.75);transform:translateY(-1px)}
+.cgf-badge:active{transform:translateY(0)}
+.cgf-pulse-dot{width:6px;height:6px;border-radius:50%;background:#34d399;box-shadow:0 0 8px rgba(52,211,153,.9);
+  flex-shrink:0;animation:cgfPulse 2s ease-in-out infinite}
+@keyframes cgfPulse{0%,100%{opacity:.5}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.cgf-pulse-dot{animation:none;opacity:1}}
+
+.cgf-drawer{position:fixed;inset:0;z-index:9998;display:none;align-items:flex-end;justify-content:center;
+  background:rgba(2,6,23,.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:18px;box-sizing:border-box}
+.cgf-drawer.open{display:flex}
+@media (min-width:640px){.cgf-drawer{align-items:center}}
+.cgf-card{width:100%;max-width:400px;background:#090D16;border:1px solid rgba(16,185,129,.3);border-radius:16px;
+  padding:20px;box-sizing:border-box;box-shadow:0 0 40px rgba(0,0,0,.6)}
+.cgf-title{font-size:.9rem;font-weight:900;color:#fff;margin-bottom:10px}
+.cgf-route-chip{display:inline-block;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:.64rem;color:#34d399;background:rgba(0,230,153,.08);border:1px solid rgba(0,230,153,.25);
+  border-radius:8px;padding:5px 10px;margin-bottom:12px;word-break:break-all}
+.cgf-tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.cgf-tag-chip{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.14);color:#94a3b8;
+  font-size:.7rem;font-weight:700;padding:7px 13px;border-radius:999px;cursor:pointer;font-family:inherit}
+.cgf-tag-chip.active{border-color:#10b981;color:#34d399;background:rgba(2,44,34,.4)}
+.cgf-note{width:100%;box-sizing:border-box;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.14);
+  border-radius:10px;color:#f1f5f9;padding:10px 12px;font-size:.8rem;font-family:inherit;resize:none;margin-bottom:14px}
+.cgf-note:focus{outline:none;border-color:rgba(0,230,153,.5)}
+.cgf-actions{display:flex;flex-direction:column;gap:8px}
+.cgf-btn-submit{width:100%;background:#00E699;color:#051311;border:none;padding:13px;border-radius:9999px;
+  font-weight:800;font-size:.82rem;cursor:pointer;font-family:inherit}
+.cgf-btn-submit:disabled{opacity:.4;cursor:not-allowed}
+.cgf-btn-cancel{width:100%;background:transparent;color:#94a3b8;border:1px solid rgba(255,255,255,.14);
+  padding:12px;border-radius:12px;font-weight:700;font-size:.78rem;cursor:pointer;font-family:inherit}
+
+.cgf-toast{position:fixed;left:50%;bottom:90px;transform:translate(-50%,8px);z-index:10000;
+  background:rgba(2,6,23,.95);border:1px solid rgba(0,230,153,.4);color:#e2e8f0;font-size:.74rem;font-weight:700;
+  padding:10px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
+  max-width:90vw;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.cgf-toast.show{opacity:1;transform:translate(-50%,0)}

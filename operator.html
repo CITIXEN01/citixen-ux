@@ -19,6 +19,8 @@
 })();
 </script>
 <title>CITIXEN UX™ · Network Operator Control</title>
+<link rel="stylesheet" href="/shared/global-feedback.css?v=patch-4.7">
+<script src="/shared/global-feedback.js?v=patch-4.7"></script>
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#00E699">
 <meta name="referrer" content="no-referrer">
@@ -179,6 +181,40 @@ html.citixen-gate-locked body{overflow:hidden}
   background:rgba(2,6,23,.92);backdrop-filter:blur(10px);padding:24px;box-sizing:border-box;cursor:zoom-out}
 .triage-lightbox.open{display:flex}
 .triage-lightbox img{max-width:100%;max-height:100%;border-radius:10px;border:1px solid rgba(255,255,255,.15)}
+
+/* ===== ECOSYSTEM SWITCHER — top-level nav above the briefing metrics.
+   Public App / Dispatch Queue are real links to the other two gated
+   surfaces (/app, /dispatch); QA & Audit / Regional Heatmaps / System
+   Config scroll to + highlight real sections further down this same page
+   (this is a single static page, not a router, so "drill-down" here means
+   "jump to the real panel", never a fabricated separate screen). */
+.eco-switcher-row{display:flex;gap:7px;overflow-x:auto;padding-bottom:2px;margin-bottom:14px;-webkit-overflow-scrolling:touch}
+.eco-switcher-row::-webkit-scrollbar{display:none}
+.eco-tab{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.03);
+  border:1px solid var(--border);color:var(--muted);font-size:.68rem;font-weight:800;padding:9px 13px;
+  border-radius:999px;cursor:pointer;text-decoration:none;white-space:nowrap;font-family:inherit}
+.eco-tab.active{border-color:#34d399;color:#fff;background:rgba(2,44,34,.5);box-shadow:0 0 0 1px rgba(52,211,153,.3) inset}
+.eco-tab.active .eco-tab-emoji{filter:none}
+.eco-section-flash{animation:ecoFlash 1.6s ease-out 1}
+@keyframes ecoFlash{0%{box-shadow:0 0 0 2px rgba(52,211,153,.9)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
+
+/* ===== REGIONAL HEATMAPS ===== */
+.heatmap-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.heatmap-tile{border-radius:10px;padding:11px 10px;border:1px solid rgba(255,255,255,.08)}
+.heatmap-tile-city{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.3px;color:rgba(255,255,255,.85);margin-bottom:2px}
+.heatmap-tile-ward{font-size:.7rem;font-weight:700;color:#fff;margin-bottom:6px}
+.heatmap-tile-pct{font-size:1.1rem;font-weight:900}
+.heatmap-tile-sub{font-size:.6rem;color:rgba(255,255,255,.7);margin-top:2px}
+
+/* ===== SYSTEM CONFIG ===== */
+.cfg-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;
+  border-bottom:1px solid rgba(255,255,255,.06)}
+.cfg-row:last-child{border-bottom:none}
+.cfg-row-label{font-size:.74rem;font-weight:700;color:var(--text)}
+.cfg-row-sub{font-size:.62rem;color:var(--muted);margin-top:2px}
+.cfg-pill{flex-shrink:0;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.64rem;
+  font-weight:800;padding:4px 10px;border-radius:999px;background:rgba(0,230,153,.1);color:var(--mint2);
+  border:1px solid rgba(0,230,153,.35)}
 </style>
 </head>
 <body>
@@ -198,6 +234,17 @@ html.citixen-gate-locked body{overflow:hidden}
 <div class="wrap">
   <div class="op-header">
     <div class="op-brand"><span class="brand-white">CITIXEN</span> <span class="brand-lime">UX</span><sup class="tm">™</sup> <span class="op-suffix">· NETWORK OPERATOR CONTROL</span></div>
+  </div>
+
+  <!-- ===== ECOSYSTEM SWITCHER — see the CSS block's own comment for why
+       the last 3 tabs scroll+highlight a real section on this same page
+       instead of opening a separate screen this static build doesn't have. -->
+  <div class="eco-switcher-row" id="ecoSwitcherRow">
+    <a class="eco-tab" href="/app"><span class="eco-tab-emoji">📱</span>Public App</a>
+    <a class="eco-tab" href="/dispatch"><span class="eco-tab-emoji">🛠️</span>Dispatch Queue</a>
+    <button type="button" class="eco-tab" data-eco-target="ecoSectionQA"><span class="eco-tab-emoji">🛡️</span>QA &amp; Audit</button>
+    <button type="button" class="eco-tab" data-eco-target="ecoSectionHeatmap"><span class="eco-tab-emoji">📊</span>Regional Heatmaps</button>
+    <button type="button" class="eco-tab" data-eco-target="ecoSectionConfig"><span class="eco-tab-emoji">⚙️</span>System Config</button>
   </div>
 
   <!-- Cohort Bar — "District 4 · Beta Cohort 10/10 active" is literal static
@@ -249,6 +296,12 @@ html.citixen-gate-locked body{overflow:hidden}
     <div class="data-note" id="opStatusNote">Loading ledger…</div>
   </div>
 
+  <!-- ===== QA & AUDIT (ecoSectionQA) — the Ecosystem Switcher's "QA & Audit"
+       tab scrolls here. Wraps the two panels that already were this build's
+       real QA/audit surface: the Beta Test QA Audit Monitor and, further
+       down, the Cohort QA Action Stream. ===== -->
+  <div id="ecoSectionQA">
+
   <!-- ===== BETA TEST QA AUDIT MONITOR =====
        Mislabel Catch Rate is computed against a small, fixed battery of
        known test submissions (MISLABEL_QA_FIXTURES below) — half
@@ -290,6 +343,8 @@ html.citixen-gate-locked body{overflow:hidden}
     </div>
     <div class="scraper-log-list" id="vandalismLogList"></div>
   </div>
+
+  </div><!-- /ecoSectionQA -->
 
   <!-- ===== STARTUP LAUNCH TIMELINE & ROADMAP TRACKER — literal project
        status display copy (this beta's own real milestones), same honest
@@ -336,6 +391,42 @@ html.citixen-gate-locked body{overflow:hidden}
       <button type="button" class="qa-filter-chip" data-flag="review">Needs Manual Review</button>
     </div>
     <div id="qaStreamList"><div class="qa-stream-empty">Loading…</div></div>
+  </div>
+
+  <!-- ===== REGIONAL HEATMAPS (ecoSectionHeatmap) =====
+       Real per-district block-coverage data from /api/coverage/national —
+       the same endpoint the web Dashboard's National Network tab already
+       reads. "Heat" here is coverage intensity (% of that district's grid
+       cells with a logged report), not a fabricated density map — this
+       build has no geographic tile-rendering map library loaded on this
+       page, so a colored tile grid is the honest multi-city rollup this
+       real data actually supports today. -->
+  <div class="card" id="ecoSectionHeatmap">
+    <div class="label">Regional Heatmaps — Block Coverage by District</div>
+    <div class="heatmap-grid" id="heatmapGrid"><div class="qa-stream-empty">Loading regional coverage…</div></div>
+  </div>
+
+  <!-- ===== SYSTEM CONFIG (ecoSectionConfig) =====
+       Real, accurate config facts: which passcode gates which route (the
+       same honest "tester speed bump, not real access control" framing
+       used everywhere this gate is mentioned), and a live read of this
+       warm instance's actual in-memory record counts — never a fabricated
+       "Connected to Supabase" status, since no database is wired up in
+       this beta (see api/_lib/store.js's own notes on this). -->
+  <div class="card" id="ecoSectionConfig">
+    <div class="label">System Config — Passcode Gates &amp; Backend Status</div>
+    <div class="cfg-row">
+      <div><div class="cfg-row-label">/app</div><div class="cfg-row-sub">citizen_auth_token · tester speed bump, not real access control</div></div>
+      <span class="cfg-pill">CITIXEN01</span>
+    </div>
+    <div class="cfg-row">
+      <div><div class="cfg-row-label">/operator &amp; /operator/feedback</div><div class="cfg-row-sub">citixen_operator_auth_token · separate key, never shared with /app</div></div>
+      <span class="cfg-pill">CITIXEN12</span>
+    </div>
+    <div class="cfg-row">
+      <div><div class="cfg-row-label">Backend</div><div class="cfg-row-sub" id="cfgBackendNote">Checking store…</div></div>
+      <span class="cfg-pill" style="background:rgba(245,158,11,.1);color:#f59e0b;border-color:rgba(245,158,11,.35)">In-Memory Only</span>
+    </div>
   </div>
 
   <div class="op-nav">
@@ -726,9 +817,78 @@ document.getElementById('triageLightbox').addEventListener('click', () => {
   document.getElementById('triageLightbox').classList.remove('open');
 });
 
+// ===== ECOSYSTEM SWITCHER =====
+// Public App / Dispatch Queue are plain <a> links (real navigation, no
+// "active" state makes sense for a route you're leaving). The other 3 tabs
+// scroll to + briefly highlight a real section further down this page, and
+// stay highlighted as the "active module" until another tab is picked.
+document.querySelectorAll('.eco-tab[data-eco-target]').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const targetId = tab.dataset.ecoTarget;
+    const el = document.getElementById(targetId);
+    document.querySelectorAll('.eco-tab[data-eco-target]').forEach(t => t.classList.toggle('active', t === tab));
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    el.classList.remove('eco-section-flash');
+    void el.offsetWidth; // restart the flash animation on repeat clicks
+    el.classList.add('eco-section-flash');
+  });
+});
+
+// ===== REGIONAL HEATMAPS — real per-district coverage from the same
+// national rollup endpoint the web Dashboard's National Network tab reads.
+function heatColor(pct){
+  if (pct >= 70) return { bg: 'rgba(0,230,153,.16)', border: 'rgba(0,230,153,.4)', text: 'var(--mint2)' };
+  if (pct >= 35) return { bg: 'rgba(245,158,11,.16)', border: 'rgba(245,158,11,.4)', text: '#f59e0b' };
+  return { bg: 'rgba(248,113,113,.16)', border: 'rgba(248,113,113,.4)', text: '#f87171' };
+}
+async function loadRegionalHeatmap(){
+  const grid = document.getElementById('heatmapGrid');
+  try {
+    const res = await fetch('/api/coverage/national');
+    if (!res.ok) throw new Error('bad status ' + res.status);
+    const data = await res.json();
+    const muni = data.municipalities || [];
+    if (!muni.length) { grid.innerHTML = '<div class="qa-stream-empty">No districts on file yet.</div>'; return; }
+    grid.innerHTML = muni.map(m => {
+      const c = heatColor(m.coveragePct);
+      return '<div class="heatmap-tile" style="background:' + c.bg + ';border-color:' + c.border + '">' +
+        '<div class="heatmap-tile-city">' + esc(m.cityName) + ', ' + esc(String(m.state || '').toUpperCase()) + '</div>' +
+        '<div class="heatmap-tile-ward">' + esc(m.wardName) + '</div>' +
+        '<div class="heatmap-tile-pct" style="color:' + c.text + '">' + m.coveragePct + '%</div>' +
+        '<div class="heatmap-tile-sub">' + m.coveredCount + ' / ' + m.totalCells + ' grid cells logged</div>' +
+      '</div>';
+    }).join('');
+  } catch (e) {
+    grid.innerHTML = '<div class="qa-stream-empty">Could not reach the national coverage endpoint.</div>';
+  }
+}
+
+// ===== SYSTEM CONFIG — a live, honest read of this warm instance's actual
+// in-memory record counts, never a fabricated "database connected" status.
+async function loadBackendStatus(){
+  const note = document.getElementById('cfgBackendNote');
+  try {
+    const [ticketsRes, feedbackRes] = await Promise.all([fetch('/api/coverage/tickets'), fetch('/api/operator/feedback')]);
+    const tickets = ticketsRes.ok ? (await ticketsRes.json()).tickets || [] : [];
+    const feedback = feedbackRes.ok ? (await feedbackRes.json()).items || [] : [];
+    note.textContent = tickets.length + ' tickets, ' + feedback.length + ' feedback items in this instance’s memory — no Supabase/database configured, resets on cold start.';
+  } catch (e) {
+    note.textContent = 'Could not reach the store to read live counts.';
+  }
+}
+
 loadOperatorStats();
 loadTriageQueue();
 triagePollTimer = setInterval(loadTriageQueue, 5000);
+loadRegionalHeatmap();
+loadBackendStatus();
+
+// ===== GLOBAL FLOATING ALPHA FEEDBACK BADGE (Patch 4.7) =====
+// Same shared widget as app.html/dispatch.html — see
+// shared/global-feedback.js. This page has no toast() of its own, so the
+// module falls back to its own built-in one.
+if (window.CitixenGlobalFeedback) window.CitixenGlobalFeedback.init();
 </script>
 </body>
 </html>

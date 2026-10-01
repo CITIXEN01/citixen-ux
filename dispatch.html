@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>CITIXEN UX™ — Municipal Dispatch Command Center</title>
+<link rel="stylesheet" href="/shared/global-feedback.css?v=patch-4.7">
+<script src="/shared/global-feedback.js?v=patch-4.7"></script>
 <meta name="theme-color" content="#00ff88">
 <meta name="referrer" content="no-referrer">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
@@ -753,6 +755,12 @@ function buildAndPrintWardReport(){
   window.print();
 }
 document.getElementById('printWardReport').addEventListener('click',buildAndPrintWardReport);
+
+// ===== GLOBAL FLOATING ALPHA FEEDBACK BADGE (Patch 4.7) =====
+// Same shared widget as app.html/operator.html — see shared/global-feedback.js.
+// Reuses this page's own real toast() so submissions here match the look of
+// every other confirmation on this page.
+if (window.CitixenGlobalFeedback) window.CitixenGlobalFeedback.init({ toast });
 </script>
 </body>
 </html>
