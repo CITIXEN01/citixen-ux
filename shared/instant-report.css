@@ -268,6 +268,10 @@
 .cx-drawer-key-title{display:block;font-size:.74rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#FFFFFF}
 .cx-drawer-key-sub{display:block;font-size:.66rem;color:#94A3B8;margin-top:2px}
 .cx-drawer-key-arrow{color:#00E699;font-weight:700;flex-shrink:0}
+/* Single-line action keys (Quick Export/Share): no subtitle, so the title,
+   icon and arrow share one vertical center line. */
+.cx-drawer-key-single .cx-drawer-key-text{display:flex;align-items:center;min-height:22px}
+.cx-drawer-key-single .cx-icon,.cx-drawer-key-single .cx-drawer-key-arrow{display:block;align-self:center;line-height:1}
 .cx-drawer-foot{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;padding:12px;
   border-top:1px solid rgba(255,255,255,.08);font-size:.7rem;color:#94A3B8}
 
