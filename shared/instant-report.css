@@ -81,30 +81,36 @@
 .cx-mast-brand b{color:#00E699}
 .cx-mast-label{font-size:.6rem;letter-spacing:.16em;color:#94A3B8;text-transform:uppercase;margin-top:2px}
 .cx-mast-time{margin-left:auto;text-align:right;font-size:.58rem;color:#94A3B8;line-height:1.4;font-variant-numeric:tabular-nums}
-.cx-paper-juris{padding:10px 14px 0;font-size:.72rem;font-weight:700;color:#334155}
+.cx-geo-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px 0}
+.cx-geo-title{font-size:.78rem;font-weight:800;color:#090D16}
+.cx-snapshot-pill{font-size:.56rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;
+  padding:3px 9px;border-radius:999px;background:rgba(0,230,153,.1);border:1px solid rgba(0,230,153,.3);color:#00A876}
 .cx-sec{padding:12px 14px;border-bottom:1px solid #E2E8F0}
 .cx-sec:last-of-type{border-bottom:none}
 .cx-sec-title{font-size:.62rem;font-weight:800;letter-spacing:.14em;color:#090D16;margin-bottom:8px;display:flex;align-items:center;gap:8px}
 .cx-sec-title span{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;
   background:#090D16;color:#00E699;font-size:.58rem;letter-spacing:0}
 .cx-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.cx-metrics-4{grid-template-columns:repeat(4,1fr)}
-@media (max-width:480px){.cx-metrics-4{grid-template-columns:repeat(2,1fr)}}
-.cx-bench{margin:10px 0 0;font-size:.66rem;line-height:1.5;color:#475569}
-.cx-bench b{color:#090D16}
 .cx-metric{border:1px solid #E2E8F0;border-radius:10px;padding:8px 6px;text-align:center}
 .cx-metric-val{font-size:1.05rem;font-weight:800;color:#047857;font-variant-numeric:tabular-nums}
+.cx-metric-sub{font-size:.58rem;font-weight:600;color:#475569;margin-top:1px}
 .cx-metric-lbl{font-size:.56rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748B;margin-top:2px}
 .cx-cip{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
 .cx-cip li{display:flex;align-items:center;gap:8px;font-size:.74rem;min-width:0}
 .cx-cip-name{flex:1;min-width:0;overflow-wrap:anywhere}
 .cx-cip-when{color:#64748B;font-size:.66rem;white-space:nowrap;font-variant-numeric:tabular-nums}
-.cx-pill{font-size:.58rem;font-weight:800;letter-spacing:.04em;padding:2px 8px;border-radius:999px;white-space:nowrap;flex-shrink:0}
+.cx-cip-grid{display:flex;flex-direction:column;gap:2px}
+.cx-cip-row{display:grid;grid-template-columns:1fr 72px auto;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #F1F5F9}
+.cx-cip-row:last-child{border-bottom:none}
+.cx-cip-grid-name{font-size:.74rem;font-weight:700;color:#090D16;min-width:0;overflow-wrap:anywhere}
+.cx-cip-grid-when{font-size:.66rem;color:#64748B;text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums}
+.cx-pill{font-size:.58rem;font-weight:800;letter-spacing:.04em;padding:2px 8px;border-radius:999px;white-space:nowrap;flex-shrink:0;justify-self:end}
 .cx-pill-ontime{background:#D1FAE5;color:#065F46}
 .cx-pill-progress{background:#E0F2FE;color:#075985}
 .cx-pill-delayed{background:#FEF3C7;color:#92400E}
 .cx-empty{font-size:.72rem;color:#64748B}
-.cx-note{padding:10px 14px 12px;font-size:.58rem;line-height:1.5;color:#64748B;background:#F8FAFC}
+.cx-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px 12px;
+  font-size:.58rem;color:#64748B;background:#F8FAFC;font-variant-numeric:tabular-nums}
 
 /* Dark-surface variant of the CIP list (Capital Projects deep-dive panels) */
 .cx-cip-dark li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);color:#E2E8F0}

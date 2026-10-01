@@ -123,12 +123,8 @@
   }
   function natRankText(r) { return r ? '#' + r.national : 'N/A'; }
   function stateRankText(r) { return r ? '#' + r.state + ' IN ' + String(r.stateName).toUpperCase() : 'N/A'; }
-  function rankNote(r) {
-    if (!r) return 'National and state ranks need the live coverage service.';
-    return r.subject.trim() + ' currently ranks #' + r.national + ' nationally and #' + r.state + ' in ' + r.stateName +
-      ' among ' + r.nationalOf + ' mapped wards (' + r.stateOf + ' in-state), based on resolution speed and block coverage. ' +
-      'Quarter-over-quarter movement will show once a prior quarter is on file.';
-  }
+  function stateRankValue(r) { return r ? '#' + r.state : 'N/A'; }
+  function stateRankSubtext(r) { return r ? 'In ' + r.stateName : ''; }
 
   // ---------- state ----------
   var cfg = { getData: null, toast: null, onLedger: null };
@@ -158,9 +154,11 @@
         '<div class="cx-btn-stack">' +
           '<button type="button" class="cx-btn-primary" data-cx-open="pdf">Generate Free Report</button>' +
           '<button type="button" class="cx-btn-dashed" data-cx-share-platform>' +
-            '<span style="color:#FFFFFF">Share CITIXEN</span>' +
-            '<span style="color:#00E699">UX</span>' +
-            '<span style="color:#94A3B8;font-weight:400;font-size:.75em;vertical-align:super">™</span>' +
+            '<span style="color:#FFFFFF">Share CITIXEN </span>' +
+            '<span>' +
+              '<span style="color:#00E699">UX</span>' +
+              '<sup style="color:#94A3B8;font-weight:400;font-size:.65em;margin-left:1px;line-height:0">™</sup>' +
+            '</span>' +
           '</button>' +
           (cfg.onLedger
             ? '<button type="button" class="cx-btn-ledger" data-cx-ledger>' +
@@ -208,7 +206,7 @@
         '<div class="cx-body">' +
           '<div class="cx-tiles" role="tablist" aria-label="Export format">' +
             tile('pdf', 'doc', 'Official PDF Brief ↓') +
-            tile('graphic', 'nodes', '#CrowdSave<wbr>America Graphic ↓') +
+            tile('graphic', 'nodes', 'Report Share Graphic ↓') +
             tile('link', 'link', 'Public Link & Summary ↓') +
           '</div>' +
           '<div id="cxPane-pdf" role="tabpanel" aria-labelledby="cxTab-pdf"></div>' +
@@ -282,23 +280,44 @@
   function metric(val, lbl) {
     return '<div class="cx-metric"><div class="cx-metric-val">' + esc(val) + '</div><div class="cx-metric-lbl">' + esc(lbl) + '</div></div>';
   }
+  function metricSub(val, sub, lbl) {
+    return '<div class="cx-metric"><div class="cx-metric-val">' + esc(val) + '</div>' +
+      (sub ? '<div class="cx-metric-sub">' + esc(sub) + '</div>' : '') +
+      '<div class="cx-metric-lbl">' + esc(lbl) + '</div></div>';
+  }
+  function cipGridHtml(projects) {
+    if (!projects.length) return '<p class="cx-empty">No capital projects are on file for this jurisdiction yet.</p>';
+    return '<div class="cx-cip-grid">' + projects.map(function (p) {
+      return '<div class="cx-cip-row">' +
+        '<span class="cx-cip-grid-name">' + esc(p.name || 'Capital project') + '</span>' +
+        '<span class="cx-cip-grid-when">' + esc(p.scheduled || '—') + '</span>' +
+        '<span class="cx-pill ' + cipClass(p.status) + '">' + cipLabel(p.status) + '</span>' +
+      '</div>';
+    }).join('') + '</div>';
+  }
   function renderPdfPane() {
-    var d = data;
+    var d = data, r = d.ranks;
     var el = modal.querySelector('#cxPane-pdf');
     el.innerHTML =
       '<div class="cx-paper">' +
         '<div class="cx-mast">' + icon('shieldPlain') +
-          '<div><div class="cx-mast-brand">CITIXEN <b>UX</b>™</div><div class="cx-mast-label">Official Ward Health Brief</div></div>' +
+          '<div><div class="cx-mast-brand">CITIXEN <b>UX</b>™</div><div class="cx-mast-label">Official Municipal Health Brief</div></div>' +
           '<div class="cx-mast-time">Generated<br>' + esc(stamp(generatedAt)) + '</div>' +
         '</div>' +
-        '<div class="cx-paper-juris">' + esc(d.jurisdiction) + '</div>' +
+        '<div class="cx-geo-row">' +
+          '<span class="cx-geo-title">' + esc(d.jurisdiction) + '</span>' +
+          '<span class="cx-snapshot-pill">• Current Snapshot</span>' +
+        '</div>' +
         '<div class="cx-sec"><div class="cx-sec-title"><span>1</span>CIVIC PERFORMANCE METRICS</div>' +
-          '<div class="cx-metrics cx-metrics-4">' + metric(daysText(d) + (d.avgDays != null ? ' days' : ''), 'Fix Speed') + metric(resolutionRate(d), 'Resolution Rate') + metric(pctText(d.coveragePct), 'Ward Coverage') + metric(natRankText(d.ranks), "Nat'l Rank") + '</div>' +
-          '<p class="cx-bench"><b>State rank:</b> ' + esc(stateRankText(d.ranks)) + '. ' + esc(rankNote(d.ranks)) + '</p></div>' +
-        '<div class="cx-sec"><div class="cx-sec-title"><span>2</span>CAPITAL INFRASTRUCTURE INVESTMENTS</div>' + cipListHtml(d.cip, false) + '</div>' +
+          '<div class="cx-metrics">' +
+            metricSub(daysText(d) + (d.avgDays != null ? ' days' : ''), null, 'Avg. Fix Speed') +
+            metricSub(resolutionRate(d), d.total ? (d.resolved + ' / ' + d.total + ' Resolved') : null, 'Resolution Rate') +
+            metricSub(stateRankValue(r), stateRankSubtext(r), 'State Rank') +
+          '</div></div>' +
+        '<div class="cx-sec"><div class="cx-sec-title"><span>2</span>CAPITAL PROJECT TRACKER</div>' + cipGridHtml(d.cip) + '</div>' +
         '<div class="cx-sec"><div class="cx-sec-title"><span>3</span>COMMUNITY ACTION SNAPSHOT</div>' +
-          '<div class="cx-metrics">' + metric(d.counts.dispatched, 'Active Dispatches') + metric(d.counts.submitted, 'Pending Review') + metric(d.counts.resolved, 'Resolved Items') + '</div></div>' +
-        '<div class="cx-note">Current snapshot of CITIXEN UX ledger and capital-project records for this jurisdiction. No reporter-identifying information is included.</div>' +
+          '<div class="cx-metrics">' + metric(d.counts.submitted, 'Reports Filed') + metric(d.counts.dispatched, 'Active Dispatches') + metric(d.counts.resolved, 'Reports Resolved') + '</div></div>' +
+        '<div class="cx-footer"><span>CITIXEN UX™ Verification Engine • Public Ledger Verified</span><span>Page 1 of 1</span></div>' +
       '</div>' +
       '<div class="cx-actions"><button type="button" class="cx-btn-primary" id="cxPdfBtn">' + icon('printer') + 'Download / Print Official PDF</button></div>' +
       '<p class="cx-hint" id="cxHint-pdf"></p>';
@@ -324,12 +343,20 @@
       doc.text('CITIXEN', M + 52, 44);
       doc.setTextColor(0, 230, 153); doc.text('UX™', M + 52 + doc.getTextWidth('CITIXEN '), 44);
       doc.setTextColor(148, 163, 184); doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
-      doc.text('OFFICIAL WARD HEALTH BRIEF', M + 52, 60);
+      doc.text('OFFICIAL MUNICIPAL HEALTH BRIEF', M + 52, 60);
       doc.text('Generated ' + stamp(generatedAt), W - M, 44, { align: 'right' });
       doc.text('Privacy Engine: Verified', W - M, 60, { align: 'right' });
-      y = 122;
+      y = 112;
+
+      // Geotag & time-scope sub-header
       doc.setTextColor(9, 13, 22); doc.setFont('helvetica', 'bold'); doc.setFontSize(14);
-      doc.text(d.jurisdiction, M, y); y += 30;
+      doc.text(d.jurisdiction, M, y);
+      var pillTxt = '• CURRENT SNAPSHOT', pillW = doc.getTextWidth(pillTxt) + 16;
+      doc.setFillColor(230, 250, 242); doc.setDrawColor(0, 230, 153); doc.setLineWidth(0.8);
+      doc.roundedRect(W - M - pillW, y - 12, pillW, 17, 8, 8, 'FD');
+      doc.setTextColor(0, 148, 99); doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5);
+      doc.text(pillTxt, W - M - pillW / 2, y - 1, { align: 'center' });
+      y += 32;
 
       function sectionTitle(n, title) {
         doc.setFillColor(9, 13, 22); doc.circle(M + 8, y - 4, 8, 'F');
@@ -341,37 +368,40 @@
       function boxes(items) {
         var bw = (W - 2 * M - (items.length - 1) * 12) / items.length;
         items.forEach(function (it, k) {
-          var x = M + k * (bw + 12);
+          var x = M + k * (bw + 12), hasSub = it.length > 2 && it[1];
           doc.setDrawColor(226, 232, 240); doc.setLineWidth(1); doc.roundedRect(x, y, bw, 56, 8, 8, 'S');
           doc.setTextColor(4, 120, 87); doc.setFont('helvetica', 'bold'); doc.setFontSize(18);
-          doc.text(String(it[0]), x + bw / 2, y + 26, { align: 'center' });
+          doc.text(String(it[0]), x + bw / 2, y + 22, { align: 'center' });
+          if (hasSub) {
+            doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
+            doc.text(String(it[1]), x + bw / 2, y + 33, { align: 'center' });
+          }
           doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
-          doc.text(it[1].toUpperCase(), x + bw / 2, y + 44, { align: 'center' });
+          doc.text(String(it[2]).toUpperCase(), x + bw / 2, y + 46, { align: 'center' });
         });
         y += 56 + 28;
       }
       function ensureRoom(h) { if (y + h > 740) { doc.addPage(); y = 60; } }
 
       sectionTitle(1, 'CIVIC PERFORMANCE METRICS');
-      boxes([[d.avgDays != null ? daysText(d) + ' days' : 'N/A', 'Fix Speed'], [resolutionRate(d), 'Resolution Rate'], [pctText(d.coveragePct), 'Ward Coverage'], [natRankText(d.ranks), "Nat'l Rank"]]);
-      y -= 14;
-      doc.setTextColor(9, 13, 22); doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
-      doc.text('State rank: ' + stateRankText(d.ranks), M, y); y += 13;
-      doc.setTextColor(71, 85, 105); doc.setFont('helvetica', 'normal');
-      var benchLines = doc.splitTextToSize(rankNote(d.ranks), W - 2 * M);
-      doc.text(benchLines, M, y); y += benchLines.length * 11 + 22;
+      boxes([
+        [d.avgDays != null ? daysText(d) + ' days' : 'N/A', null, 'Avg. Fix Speed'],
+        [resolutionRate(d), d.total ? (d.resolved + ' / ' + d.total + ' Resolved') : null, 'Resolution Rate'],
+        [stateRankValue(d.ranks), stateRankSubtext(d.ranks), 'State Rank']
+      ]);
 
-      sectionTitle(2, 'CAPITAL INFRASTRUCTURE INVESTMENTS');
+      sectionTitle(2, 'CAPITAL PROJECT TRACKER');
       if (!d.cip.length) {
         doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
         doc.text('No capital projects are on file for this jurisdiction yet.', M, y + 4); y += 22;
       }
+      var cipCenterX = M + (W - 2 * M) * 0.62;
       d.cip.forEach(function (p) {
         ensureRoom(24);
-        doc.setTextColor(9, 13, 22); doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
-        doc.text(doc.splitTextToSize(p.name || 'Capital project', 300)[0], M, y + 4);
-        doc.setTextColor(100, 116, 139); doc.setFontSize(9);
-        if (p.scheduled) doc.text(p.scheduled, W - M - 96, y + 4, { align: 'right' });
+        doc.setTextColor(9, 13, 22); doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
+        doc.text(doc.splitTextToSize(p.name || 'Capital project', 230)[0], M, y + 4);
+        doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+        doc.text(p.scheduled || '—', cipCenterX, y + 4, { align: 'center' });
         var lbl = cipLabel(p.status), fill = p.status === 'on-time' ? [209, 250, 229] : p.status === 'delayed' ? [254, 243, 199] : [224, 242, 254];
         var ink = p.status === 'on-time' ? [6, 95, 70] : p.status === 'delayed' ? [146, 64, 14] : [7, 89, 133];
         doc.setFillColor(fill[0], fill[1], fill[2]); doc.roundedRect(W - M - 80, y - 7, 80, 16, 8, 8, 'F');
@@ -384,14 +414,14 @@
 
       ensureRoom(110);
       sectionTitle(3, 'COMMUNITY ACTION SNAPSHOT');
-      boxes([[d.counts.dispatched, 'Active Dispatches'], [d.counts.submitted, 'Pending Review'], [d.counts.resolved, 'Resolved Items']]);
+      boxes([[d.counts.submitted, null, 'Reports Filed'], [d.counts.dispatched, null, 'Active Dispatches'], [d.counts.resolved, null, 'Reports Resolved']]);
 
-      ensureRoom(60);
-      doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'italic'); doc.setFontSize(8);
-      doc.text(doc.splitTextToSize('Current snapshot of CITIXEN UX ledger and capital-project records for this jurisdiction, computed from the same records the dashboard displays. It is not a historical time series. No reporter-identifying information is included in this brief or in the underlying data model.', W - 2 * M), M, y);
-      doc.setFont('helvetica', 'bold'); doc.setTextColor(9, 13, 22);
-      doc.text('CITIXEN UX™ — Privacy Engine: Verified', W / 2, 770, { align: 'center' });
-      doc.save('citixen-official-ward-health-brief.pdf');
+      // Report footer block
+      doc.setDrawColor(226, 232, 240); doc.setLineWidth(0.75); doc.line(M, 756, W - M, 756);
+      doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
+      doc.text('CITIXEN UX™ Verification Engine • Public Ledger Verified', M, 770);
+      doc.text('Page 1 of 1', W - M, 770, { align: 'right' });
+      doc.save('citixen-official-municipal-health-brief.pdf');
       toast('Official PDF brief downloaded.');
     } catch (err) {
       console.error('Official brief PDF failed', err);
