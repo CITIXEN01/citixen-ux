@@ -5,7 +5,7 @@
    - Cross-origin requests (map tiles, Leaflet CDN, QR images) pass straight through:
      they are not cached here, so no third-party responses are stored on the device.
    Bump VERSION to roll out a new shell; old caches are deleted on activate. */
-const VERSION = 'citixen-v3';
+const VERSION = 'citixen-v4';
 const SHELL = [
   '/app',
   '/',
@@ -45,7 +45,10 @@ self.addEventListener('fetch', event => {
   if (url.pathname.startsWith('/dispatch')) return;   // staff console is never cached on device
   if (url.pathname.startsWith('/rep')) return;        // rep tools gate is never cached on device
 
-  if (req.mode === 'navigate') {
+  // Pages and the shared Dashboard modules (/shared/*.js, *.css) are
+  // network-first, so a new deploy shows up on the very next load; the
+  // cached copy is only the offline fallback.
+  if (req.mode === 'navigate' || url.pathname.startsWith('/shared/')) {
     event.respondWith((async () => {
       const cache = await caches.open(VERSION);
       try {
@@ -54,7 +57,7 @@ self.addEventListener('fetch', event => {
         return fresh;
       } catch (err) {
         return (await cache.match(req, { ignoreSearch: true }))
-            || (await cache.match('/app'))
+            || (req.mode === 'navigate' ? await cache.match('/app') : null)
             || Response.error();
       }
     })());

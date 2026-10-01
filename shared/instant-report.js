@@ -111,6 +111,7 @@
   function renderModule(mount) {
     mount.innerHTML =
       '<section class="cx-export" aria-labelledby="cxExportTitle">' +
+        '<div class="cx-export-kicker">[ EXPORT &amp; SHARE ]</div>' +
         '<h3 class="cx-export-title" id="cxExportTitle">Reports &amp; Easy Share</h3>' +
         '<button type="button" class="cx-btn-primary" data-cx-open="pdf">Generate Free Report ↗</button>' +
         '<button type="button" class="cx-btn-dashed" data-cx-share-platform>Share CITIXEN UX™</button>' +
