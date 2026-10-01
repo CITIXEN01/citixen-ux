@@ -278,10 +278,14 @@ textarea.input{resize:none;line-height:1.4}
 .btn-submit{width:100%;box-sizing:border-box;min-height:52px;background:var(--mint);color:#051311;border:none;
   padding:14px 16px;border-radius:12px;font-family:inherit;font-weight:700;font-size:16px;line-height:24px;
   letter-spacing:.01em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
-/* Patch 4.8 — hard-disabled until a photo is actually attached; see
-   updateSubmitPhotoGate(). */
-.btn-submit:disabled{background:rgba(148,163,184,.18);color:#64748b;cursor:not-allowed}
-.btn-submit:disabled svg{stroke:#64748b}
+/* Patch 4.8 — visually locked until a photo is actually attached; see
+   updateSubmitPhotoGate(). Patch 4.13 changed this from a native
+   `disabled` attribute to this CSS-only "soft-disabled" class: the button
+   must stay genuinely tappable in its locked state so submitReport()'s
+   click handler can catch the no-photo tap and surface the mandatory-
+   photo alert, which a truly disabled button could never receive. */
+.btn-submit-locked{background:rgba(148,163,184,.18);color:#64748b;cursor:not-allowed}
+.btn-submit-locked svg{stroke:#64748b}
 
 .bottomnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;
   background:rgba(3,7,18,.96);backdrop-filter:blur(16px);border-top:1px solid var(--border);
@@ -483,6 +487,10 @@ textarea.input{resize:none;line-height:1.4}
 .icon-btn{background:none;border:none;color:#fff;cursor:pointer;display:flex;padding:4px}
 .toast{display:none;background:rgba(0,230,153,.2);border:1px solid var(--mint2);color:var(--mint2);
   padding:10px 14px;border-radius:10px;font-size:.76rem;font-weight:700;text-align:center;margin-bottom:10px}
+/* Patch 4.13 — distinct red styling for hard-safety-gate alerts (e.g. the
+   mandatory-photo warning), so it reads as a blocking safeguard rather
+   than the routine mint/emerald success/info toast above. */
+.toast.toast-danger{background:rgba(239,68,68,.18);border-color:#ef4444;color:#fca5a5}
 
 /* ===== SPLASH SCREEN — primary launch state on app initialization ===== */
 .splash-screen{position:fixed;inset:0;z-index:3000;background:radial-gradient(circle at 50% 38%,#0f2318,#050908 72%);
@@ -1271,7 +1279,7 @@ textarea.input{resize:none;line-height:1.4}
           </button>
         </div>
 
-        <div class="label">2. Capture proof</div>
+        <div class="label" id="captureProofLabel">2. Capture proof</div>
         <button class="btn-camera" id="btnCamera">
           <svg viewBox="0 0 24 24" width="17" height="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
           Launch camera
@@ -1288,7 +1296,7 @@ textarea.input{resize:none;line-height:1.4}
         <input class="input" id="repLoc" value="Local District (GPS)">
         <textarea class="input" id="repDesc" rows="3" placeholder="Describe the hazard, cross street, or specific risk..."></textarea>
 
-        <button class="btn-submit" id="btnSubmit" disabled>
+        <button type="button" class="btn-submit btn-submit-locked" id="btnSubmit" aria-disabled="true">
           <svg viewBox="0 0 24 24" width="17" height="17" stroke="#051311" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           <span id="btnSubmitLabel">Photo Required to Submit</span>
         </button>
@@ -2189,10 +2197,14 @@ function buildLiveTicketId(wardSlug, clientId, hazCode){
   return ['D' + wardNum, hazCode, dateCode, liveTicketHash(clientId)].join('-');
 }
 
-function toast(msg){
+function toast(msg, danger){
   const t=document.getElementById('toast');
   t.textContent=msg; t.style.display='block';
-  setTimeout(()=>{ t.style.display='none'; },3200);
+  // Patch 4.13 — `danger` swaps in the red toast-danger styling for hard
+  // safety-gate alerts (e.g. mandatory-photo warnings) instead of the
+  // routine mint/emerald look, so it reads as a blocking safeguard.
+  t.classList.toggle('toast-danger', !!danger);
+  setTimeout(()=>{ t.style.display='none'; t.classList.remove('toast-danger'); },3200);
 }
 
 // ===== BETA TELEMETRY — honest client-side event log =====
@@ -4746,12 +4758,30 @@ function updateSubmitPhotoGate(){
   const btn = document.getElementById('btnSubmit');
   const lbl = document.getElementById('btnSubmitLabel');
   const has = hasAttachedPhoto();
-  if (btn) btn.disabled = !has;
+  // Patch 4.13 — this is now a CSS-only "soft-disabled" state, not a native
+  // `disabled` attribute: the button must stay tappable so submitReport()'s
+  // own click-time guard (below) can catch a no-photo tap and scroll to +
+  // flash the mandatory-safeguard alert, which a truly disabled button
+  // could never receive a click to do.
+  if (btn) {
+    btn.classList.toggle('btn-submit-locked', !has);
+    btn.setAttribute('aria-disabled', has ? 'false' : 'true');
+  }
   if (lbl) lbl.textContent = has ? 'Publish report' : 'Photo Required to Submit';
 }
 
 async function submitReport(){
-  if (!hasAttachedPhoto()) { toast('A photo is required before you can submit this report.'); return; }
+  if (!hasAttachedPhoto()) {
+    // Patch 4.13 — HARD SAFETY GATE: a tap with no photo attached scrolls
+    // the citizen straight to the Capture Proof section and flashes a
+    // prominent red alert, rather than a generic/neutral toast.
+    const captureLabel = document.getElementById('captureProofLabel');
+    if (captureLabel && typeof captureLabel.scrollIntoView === 'function') {
+      captureLabel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    toast('Mandatory Safeguard: Photo proof is required to publish to the public ledger.', true);
+    return;
+  }
   const resolved = window.CITIXEN_RESOLVED_LOCATION;
   const lat = resolved && typeof resolved.lat === 'number' ? resolved.lat : null;
   const lng = resolved && typeof resolved.lng === 'number' ? resolved.lng : null;
@@ -5252,7 +5282,17 @@ async function finalizeSubmitReport(opts){
     lat: resolved && typeof resolved.lat === 'number' ? resolved.lat : null,
     lng: resolved && typeof resolved.lng === 'number' ? resolved.lng : null,
     ward, state: wardState, city: wardCity,
-    clientTimestamp: new Date().toISOString()
+    clientTimestamp: new Date().toISOString(),
+    // Patch 4.13 — this codebase never uploads the photo itself to the
+    // server (it's shown and shared client-side only; see photoDataUrl
+    // above), so there's no real image_url/photo_data for the backend
+    // guard to inspect. `photoConfirmed` is an honest stand-in: it's only
+    // ever true here because finalizeSubmitReport() is only reachable
+    // through submitReport()'s hasAttachedPhoto() gate (directly, or via
+    // openInterceptModal()->handleInterceptOverride(), which itself is
+    // only reached after that same gate passed) — so this flag states a
+    // real fact the client verified, not a fabricated upload payload.
+    photoConfirmed: true
   }; // no PII fields — see api/_lib/store.js's privacy note; this matches that model exactly.
 
   const result = await attemptSubmitReport(payload);

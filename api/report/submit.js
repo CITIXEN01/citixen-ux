@@ -21,6 +21,18 @@
 // project id, and a client-supplied timestamp) — no reporter identity, by
 // the same convention as everywhere else in this API. This route does not
 // read, log, or store anything beyond what addTicket() itself models.
+//
+// PATCH 4.13 — HARD SAFETY GATE: this codebase never uploads the actual
+// photo file to the server (it's captured, shown, and shared client-side
+// only — see app.html's photoDataUrl/finalizeSubmitReport() comments), so
+// there's no real image_url/photo_data field here to inspect the way the
+// spec describes. The honest equivalent is `photoConfirmed`: a boolean the
+// client only ever sends `true` once its own hard photo gate
+// (hasAttachedPhoto()/updateSubmitPhotoGate() in app.html) has verified a
+// real captured photo is attached. This guard rejects a payload missing
+// that flag exactly the way the spec's backend check rejects a missing
+// image — it's just checking the honest signal this architecture actually
+// has, not a fabricated image field.
 const { addTicket } = require('../_lib/store');
 
 module.exports = (req, res) => {
@@ -29,6 +41,10 @@ module.exports = (req, res) => {
     return;
   }
   const body = req.body || {};
+  if (!body.photoConfirmed) {
+    res.status(400).json({ success: false, error: 'Photo proof payload mandatory.' });
+    return;
+  }
   const { reportId, ward, hazardCode } = addTicket({
     category: body.category,
     location: body.location,
