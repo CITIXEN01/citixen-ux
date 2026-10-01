@@ -96,6 +96,12 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
 /* ===== APP MENU BUTTON + SLIDE-OUT PROFILE DRAWER ===== */
 .menu-btn{background:transparent;border:1px solid var(--border);color:var(--text);width:34px;height:34px;
   border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+/* Beta lockdown (this round): the hamburger no longer opens #appDrawer —
+   see hamburgerMenuLocked() — dimmed so the locked state reads visually.
+   No aria-disabled/disabled attribute here: the button still needs to
+   receive the click/keyboard-activate that shows the toast explaining
+   why, same pattern as #civicStackBtn below. */
+.cx-beta-locked{opacity:.45;cursor:not-allowed}
 .app-drawer{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:2800;display:none}
 .app-drawer.open{display:flex;justify-content:flex-end}
 .app-drawer-panel{width:min(400px,86vw);height:100%;box-sizing:border-box;padding-top:env(safe-area-inset-top, 44px);background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));border-left:var(--surface-card-border);
@@ -746,7 +752,7 @@ textarea.input{resize:none;line-height:1.4}
         <button class="menu-btn" id="appHelpBtn" type="button" aria-label="Quick help: how your report moves" aria-controls="appInfoModal" aria-expanded="false">
           <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         </button>
-        <button class="menu-btn" id="appMenuBtn" type="button" aria-label="Open menu" aria-controls="appDrawer" aria-expanded="false">
+        <button class="menu-btn cx-beta-locked" id="appMenuBtn" type="button" aria-label="Menu — unlocks post-beta" aria-haspopup="false">
           <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
       </div>
@@ -1466,6 +1472,15 @@ function trackEvent(name, detail){
 // modal/drawer breakout, just this toast.
 function civicStackLocked(){
   toast('Civic Intelligence Stack features unlock post-beta.');
+}
+
+// ===== BETA LOCKDOWN — header hamburger (#appMenuBtn) =====
+// This round locks the whole menu drawer for beta: the button no longer
+// calls openAppDrawer() — #appDrawer and everything inside it (Export/
+// Share, Civic Operations, the Explore section) stay in the markup
+// unchanged for post-beta, just unreachable from the header for now.
+function hamburgerMenuLocked(){
+  toast('Menu features unlock post-beta.');
 }
 
 function switchTab(id,btn){
@@ -3888,7 +3903,7 @@ function closeAppDrawer(){
   document.getElementById('appMenuBtn').setAttribute('aria-expanded', 'false');
 }
 document.getElementById('appHelpBtn').addEventListener('click', () => openAppInfoModal('quickHelp'));
-document.getElementById('appMenuBtn').addEventListener('click', openAppDrawer);
+document.getElementById('appMenuBtn').addEventListener('click', hamburgerMenuLocked);
 document.getElementById('appDrawerCloseBtn').addEventListener('click', closeAppDrawer);
 document.getElementById('appDrawer').addEventListener('click', (e) => { if (e.target.id === 'appDrawer') closeAppDrawer(); });
 
