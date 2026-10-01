@@ -51,9 +51,14 @@
      this round's item 1: every card wrapper and category block below
      draws from the same translucent glass fill + Fresh Mint hairline, and
      every input/inset box from the same near-black input fill, instead of
-     each hardcoding its own #111827/rgba(7,12,14,...) value. ===== */
-  --surface-card-bg:rgba(11,15,25,0.85) !important;
-  --surface-card-border:1px solid rgba(0,230,153,0.22) !important;
+     each hardcoding its own #111827/rgba(7,12,14,...) value.
+     This round's "Global Hyper-Transparent Obsidian Glass System" pushes
+     the fill more transparent (rgba(5,11,20,.8), the spec's exact hex)
+     and the blur up to 16px (--surface-blur) so every card sitting on the
+     #030712 obsidian base reads as dimensional glass, not a flat block. ===== */
+  --surface-card-bg:rgba(5,11,20,0.8) !important;
+  --surface-card-border:1px solid rgba(0,230,153,0.2) !important;
+  --surface-blur:16px !important;
   --surface-input-bg:rgba(3,7,18,0.95) !important;
   --surface-input-border:1px solid rgba(255,255,255,0.08) !important;
   /* legacy aliases — every existing var(--mint)/var(--card)/etc. usage below inherits
@@ -93,7 +98,7 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
   border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .app-drawer{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:2800;display:none}
 .app-drawer.open{display:flex;justify-content:flex-end}
-.app-drawer-panel{width:min(400px,86vw);height:100%;box-sizing:border-box;padding-top:env(safe-area-inset-top, 44px);background:var(--surface-card-bg);backdrop-filter:blur(12px);border-left:var(--surface-card-border);
+.app-drawer-panel{width:min(400px,86vw);height:100%;box-sizing:border-box;padding-top:env(safe-area-inset-top, 44px);background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));border-left:var(--surface-card-border);
   display:flex;flex-direction:column}
 .app-drawer-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--border)}
 .app-drawer-title{font-weight:800;text-transform:uppercase;color:#FFFFFF;font-size:16px;letter-spacing:.5px}
@@ -116,12 +121,12 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
   background:rgba(0,230,153,.05);border:1px solid var(--border);border-radius:10px;padding:8px 12px}
 .privacy-note svg{color:var(--mint2);flex-shrink:0}
 
-.card{background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);border-radius:12px;padding:16px}
+.card{background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));border:var(--surface-card-border);border-radius:12px;padding:16px}
 .label{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);
   margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
 
 .chip-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
-.chip{background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);color:var(--text);padding:13px 12px;
+.chip{background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));border:var(--surface-card-border);color:var(--text);padding:13px 12px;
   border-radius:12px;font-size:.76rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:9px;
   transition:border-color .15s,background .15s}
 .chip.active{border-color:var(--mint2);background:rgba(0,230,153,.12);color:var(--mint2)}
@@ -341,7 +346,7 @@ textarea.input{resize:none;line-height:1.4}
 
 /* ===== BIG 3 STAT ROW (reusable across app.html/index.html) ===== */
 .big3-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.big3-tile{background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);border-radius:12px;padding:12px 8px;text-align:center}
+.big3-tile{background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));border:var(--surface-card-border);border-radius:12px;padding:12px 8px;text-align:center}
 .big3-val{font-size:1.2rem;font-weight:900;color:var(--mint2)}
 .big3-lbl{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-top:3px;line-height:1.3}
 .big3-note{font-size:.66rem;color:var(--muted);margin-top:8px;text-align:center}
@@ -434,7 +439,7 @@ textarea.input{resize:none;line-height:1.4}
 .intercept-drawer{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:2700;display:none;
   align-items:center;justify-content:center;padding:18px}
 .intercept-drawer.open{display:flex}
-.intercept-card{background:var(--surface-card-bg);backdrop-filter:blur(12px);border:1px solid var(--brand-amber);border-radius:16px;padding:20px;
+.intercept-card{background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));border:1px solid var(--brand-amber);border-radius:16px;padding:20px;
   max-width:440px;width:100%}
 .intercept-title{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;
   color:var(--brand-amber);display:flex;align-items:center;gap:6px;margin-bottom:12px}
@@ -563,7 +568,7 @@ textarea.input{resize:none;line-height:1.4}
 .matrix-summary-section{padding-top:12px}
 .hub-row{display:flex;flex-direction:column;max-width:920px;margin:0 auto 26px;padding:0;box-sizing:border-box}
 .hub-card{position:relative;display:flex;align-items:center;justify-content:space-between;width:100%;
-  background:var(--surface-card-bg);backdrop-filter:blur(12px);
+  background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));
   border:var(--surface-card-border);border-radius:12px;padding:12px 18px;
   margin-bottom:14px;box-sizing:border-box;cursor:pointer;color:var(--text);text-align:left;
   transition:border-color .15s;font-family:inherit;min-width:0;gap:10px}
@@ -611,14 +616,14 @@ textarea.input{resize:none;line-height:1.4}
   color:#00E699;font-size:.8rem;font-weight:700;cursor:pointer;text-decoration:underline;flex-shrink:0}
 .citixen-trust-badge{display:flex;align-items:flex-start;gap:12px;max-width:640px;width:100%;
   box-sizing:border-box;margin:0 auto 18px;
-  background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);
+  background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));border:var(--surface-card-border);
   border-radius:12px;padding:14px 16px}
 .citixen-trust-badge svg{flex-shrink:0;margin-top:2px}
 .citixen-trust-badge-title{color:#00E699;font-weight:800;font-size:.78rem;letter-spacing:.02em;
   text-transform:uppercase;line-height:1.4;margin-bottom:4px}
 .citixen-trust-badge-sub{color:var(--muted);font-size:.76rem;line-height:1.45}
 .citixen-feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.citixen-feature-tile{background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);
+.citixen-feature-tile{background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));border:var(--surface-card-border);
   border-radius:12px;padding:20px 10px;display:flex;flex-direction:column;align-items:center;gap:10px;
   cursor:pointer;font-family:inherit;transition:border-color .15s,filter .15s,background .15s}
 .citixen-feature-tile:hover{border-color:#00E699;filter:brightness(1.08)}
@@ -628,7 +633,7 @@ textarea.input{resize:none;line-height:1.4}
 .citixen-feature-tile-label{color:var(--text);font-weight:700;font-size:.78rem;text-transform:uppercase;
   letter-spacing:.05em}
 .citixen-feature-accordion{max-width:100%;max-height:0;overflow:hidden;opacity:0;
-  background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);
+  background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));border:var(--surface-card-border);
   border-radius:12px;transition:max-height .3s ease,opacity .25s ease,margin .3s ease;margin-top:0}
 .citixen-feature-accordion.open{max-height:600px;opacity:1;margin-top:12px;padding:16px 18px}
 .citixen-feature-accordion h4{color:var(--text);font-size:.82rem;margin:12px 0 4px}
@@ -647,8 +652,13 @@ textarea.input{resize:none;line-height:1.4}
   animation:csa-ping-ring 1.1s ease-out forwards;pointer-events:none}
 @keyframes csa-ping-ring{0%{transform:scale(1);opacity:.85}100%{transform:scale(2.6);opacity:0}}
 /* Unified Crowd Save America™ hero card — the whole card is the button. */
+/* Obsidian glass hero (Global Hyper-Transparent Obsidian Glass System):
+   the flat #0B132B navy fill is gone — this now draws from the same
+   translucent --surface-card-bg + --surface-blur tokens as every other
+   card, so the dark app canvas shows faintly through. */
 .csa-hero{display:flex;flex-direction:column;align-items:stretch;max-width:640px;margin:0 auto 18px;box-sizing:border-box;
-  background:#0B132B;border:1px solid rgba(0,230,153,.2);border-radius:16px;padding:20px;text-align:center;cursor:pointer;
+  background:var(--surface-card-bg);-webkit-backdrop-filter:blur(var(--surface-blur));backdrop-filter:blur(var(--surface-blur));
+  border:1px solid rgba(0,230,153,.2);border-radius:16px;padding:20px;text-align:center;cursor:pointer;
   box-shadow:0 0 28px rgba(0,230,153,.08);-webkit-tap-highlight-color:transparent;
   transition:border-color .2s ease,box-shadow .2s ease,transform .12s ease}
 .csa-hero:hover{border-color:rgba(0,230,153,.45);box-shadow:0 0 36px rgba(0,230,153,.16)}
@@ -658,7 +668,9 @@ textarea.input{resize:none;line-height:1.4}
 .csa-hero-sub{font-size:.84rem;color:#94A3B8;margin:6px 0 14px}
 .csa-hero-badge{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-size:11px;font-weight:800;letter-spacing:.14em;color:#00E699}
 .csa-hero-count{margin:4px 0 14px}
-.csa-hero-map{border:1px solid rgba(0,230,153,.18);border-radius:12px;padding:14px 8px;background:#081022}
+/* No inner solid box: the map sits directly on the hero's own obsidian
+   glass surface, not a nested #081022 navy block. */
+.csa-hero-map{padding:14px 8px}
 .csa-hero-progress{margin-top:16px;text-align:left}
 .csa-hero-target{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#94A3B8;text-align:center;margin-bottom:12px}
 .csa-hero-zone-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:8px}
@@ -675,7 +687,8 @@ textarea.input{resize:none;line-height:1.4}
 .csap-title{font-size:22px;font-weight:800;color:#00E699;letter-spacing:.06em;margin:0;text-shadow:0 0 14px rgba(0,230,153,.4)}
 .csap-tm{font-size:.5em;vertical-align:super;margin-left:2px;color:#94A3B8;font-weight:400;text-shadow:none}
 .csap-sub{font-size:.84rem;color:#cbd5e1;margin:8px 0 0;line-height:1.45}
-.csap-ticker{background:#0B0E14;border:1px solid #1E293B;border-radius:18px;padding:20px 18px 18px;
+.csap-ticker{background:var(--surface-card-bg);-webkit-backdrop-filter:blur(var(--surface-blur));backdrop-filter:blur(var(--surface-blur));
+  border:1px solid #1E293B;border-radius:18px;padding:20px 18px 18px;
   box-shadow:0 0 28px rgba(0,230,153,.08) inset}
 .csap-live{display:inline-flex;align-items:center;gap:7px;font-size:.62rem;font-weight:800;letter-spacing:.14em;
   text-transform:uppercase;color:#94A3B8;margin-bottom:8px}
@@ -697,13 +710,14 @@ textarea.input{resize:none;line-height:1.4}
   text-shadow:0 0 10px rgba(0,230,153,.65),0 0 20px rgba(0,230,153,.3)}
 .csap-p{font-size:.8rem;line-height:1.6;color:#cbd5e1;margin:0}
 .csap-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.csap-metric{background:#0B0E14;border:1px solid #00E69922;border-radius:12px;padding:10px 4px;text-align:center;box-shadow:0 0 14px rgba(0,230,153,.06)}
+.csap-metric{background:var(--surface-card-bg);-webkit-backdrop-filter:blur(var(--surface-blur));backdrop-filter:blur(var(--surface-blur));
+  border:1px solid #00E69922;border-radius:12px;padding:10px 4px;text-align:center;box-shadow:0 0 14px rgba(0,230,153,.06)}
 .csap-metric-val{font-size:1.05rem;font-weight:800;color:#FFFFFF;font-variant-numeric:tabular-nums}
 .csap-metric-lbl{font-size:.55rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94A3B8;margin-top:4px}
 .csap-note{font-size:.72rem;color:#94A3B8;margin:10px 0 0}
 .csap-note strong{color:#E2E8F0}
 .csap-road{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
-.csap-road li{display:flex;gap:12px;align-items:flex-start;background:#0B0E14;border:1px solid #1E293B;border-radius:12px;padding:12px}
+.csap-road li{display:flex;gap:12px;align-items:flex-start;background:var(--surface-card-bg);-webkit-backdrop-filter:blur(var(--surface-blur));backdrop-filter:blur(var(--surface-blur));border:1px solid #1E293B;border-radius:12px;padding:12px}
 .csap-road li strong{display:block;color:#FFFFFF;font-size:.82rem}
 .csap-road li p{margin:3px 0 0;font-size:.74rem;line-height:1.5;color:#94A3B8}
 .csap-road-tag{flex-shrink:0;width:78px;box-sizing:border-box;text-align:center;font-size:.58rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
@@ -722,7 +736,7 @@ textarea.input{resize:none;line-height:1.4}
 #appHelpBtn,#appMenuBtn{display:flex;align-items:center;justify-content:center}
 #appHelpBtn svg,#appMenuBtn svg{display:block}
 .civic-triad-section{max-width:640px;margin:0 auto 20px;padding:0}
-.civic-triad-card{background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);border-radius:12px;
+.civic-triad-card{background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));border:var(--surface-card-border);border-radius:12px;
   padding:18px 16px;text-align:center}
 .civic-triad-header{color:#00E699;font-weight:800;font-size:.9rem;letter-spacing:.06em;
   text-transform:uppercase;margin-bottom:14px}
@@ -1507,6 +1521,44 @@ function toast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg; t.style.display='block';
   setTimeout(()=>{ t.style.display='none'; },3200);
+}
+
+// ===== BETA TELEMETRY — honest client-side event log =====
+// This codebase has no analytics backend/vendor wired up (no gtag, no
+// /api/track endpoint) — so rather than silently call a request that would
+// 404, or fake a "sent to analytics" claim, this logs each real event to
+// an inspectable rolling window in localStorage (key below) and to the
+// console. That's genuinely queryable today (open devtools or read
+// localStorage.citixenTelemetryLog) and is the real, honest hook a beta
+// analytics pipeline would attach to once one exists — see where
+// trackEvent() is called from report submission, ledger search, and the
+// PDF/graphic/copy export actions.
+const TELEMETRY_LOG_KEY = 'citixenTelemetryLog';
+const TELEMETRY_LOG_MAX = 200;
+function trackEvent(name, detail){
+  const entry = { name, detail: detail || {}, ts: new Date().toISOString() };
+  try {
+    const log = JSON.parse(localStorage.getItem(TELEMETRY_LOG_KEY) || '[]');
+    log.push(entry);
+    while (log.length > TELEMETRY_LOG_MAX) log.shift();
+    localStorage.setItem(TELEMETRY_LOG_KEY, JSON.stringify(log));
+  } catch (e) { /* storage unavailable — event still reaches the console below */ }
+  console.info('[telemetry]', entry.name, entry.detail);
+}
+
+// ===== BETA LOCKDOWN — "Civic Intelligence™ Stack" dummy lock =====
+// Per the beta-readiness directive: the Civic Intelligence™ Stack content
+// (U.S. Citixenship™ / Civic Memory™ / CITIXEN UX™ Protocol — the
+// narrative-funnel cards, the hero stack's "Civic Intelligence™ Stack"
+// shortcut, and the Quick Keys drawer's matching quick-key section) stays
+// fully visible for design-polish purposes but no longer opens its
+// modal/drawer breakout during the beta window. Every other quick key
+// (Export/Share, Civic Operations, Security & Grid) — and every other path
+// to the real Public Ledger (the hero stack's "View Living Public Ledger"
+// button, the Map & Feed tab) — is untouched and stays fully live.
+function civicStackLocked(){
+  if (typeof closeAppDrawer === 'function') closeAppDrawer();
+  toast('Civic Intelligence Stack features will unlock post-beta.');
 }
 
 function switchTab(id,btn){
@@ -3901,6 +3953,7 @@ async function finalizeSubmitReport(opts){
   const result = await attemptSubmitReport(payload);
   if (result.ok) {
     toast(urgentOverride ? '✓ Published as urgent — routed to ' + dept : '✓ Published — routed to ' + dept);
+    trackEvent('report_submit', { ok: true, category: cat, dept, ward, urgentOverride });
     // Now that the ticket actually landed in the shared store (see
     // api/report/submit.js -> addTicket()), pull the Big 3 again so this
     // device's own Analytics tab reflects it immediately — no refresh, no
@@ -3913,6 +3966,7 @@ async function finalizeSubmitReport(opts){
     // 'online' event (see flushOfflineQueue()) — not just described as such.
     await queueOfflineSubmission({ id: 'sub-' + Date.now() + '-' + Math.random().toString(36).slice(2), payload });
     toast('Saved offline — will submit when you\'re back online.');
+    trackEvent('report_submit', { ok: false, queuedOffline: true, category: cat, dept, ward, urgentOverride });
   }
 
   // If this report started from tapping a dark block on the coverage grid,
@@ -4013,9 +4067,16 @@ window.addEventListener('DOMContentLoaded',()=>{
     if (e.target.id === 'ledgerDrawer') closeLedgerDrawer();
   });
   const ledgerSearchInput = document.getElementById('ledgerSearchInput');
+  let ledgerSearchTrackTimer = null;
   if (ledgerSearchInput) ledgerSearchInput.addEventListener('input', () => {
     ledgerFilters.q = ledgerSearchInput.value.trim();
     renderLedgerResults();
+    // Debounced so telemetry logs one query per pause-in-typing, not one
+    // event per keystroke.
+    clearTimeout(ledgerSearchTrackTimer);
+    ledgerSearchTrackTimer = setTimeout(() => {
+      if (ledgerFilters.q) trackEvent('ledger_query', { q: ledgerFilters.q, radius: ledgerFilters.radius });
+    }, 500);
   });
 
   document.getElementById('btnInterceptCancel').addEventListener('click', handleInterceptCancel);
@@ -4030,9 +4091,13 @@ window.addEventListener('DOMContentLoaded',()=>{
   // each node opens the same real, already-wired feature its equivalent
   // Quick Keys drawer key opens (see the drawer's "Civic Intelligence™
   // Stack" section below).
-  document.getElementById('appNodeCodexBtn').addEventListener('click', () => openAppInfoModal('citixenship'));
-  document.getElementById('appNodeLedgerBtn').addEventListener('click', () => openLedgerDrawer());
-  document.getElementById('appNodeProtocolBtn').addEventListener('click', () => openAppInfoModal('citixenProtocol'));
+  // Locked for beta (civicStackLocked(), see its definition near toast())
+  // — these three cards keep their full visual rendering but no longer
+  // open their modal/drawer breakout. Was: openAppInfoModal('citixenship'),
+  // openLedgerDrawer(), openAppInfoModal('citixenProtocol').
+  document.getElementById('appNodeCodexBtn').addEventListener('click', civicStackLocked);
+  document.getElementById('appNodeLedgerBtn').addEventListener('click', civicStackLocked);
+  document.getElementById('appNodeProtocolBtn').addEventListener('click', civicStackLocked);
   // Capital Projects and City Action Tracker keep their full deep-dive
   // panels and real data loads — they moved into the Quick Keys drawer's
   // new "Civic Operations" section (data-cx-key="capitalProjects" /
@@ -4126,13 +4191,15 @@ function initInstantReportAndQuickKeys(){
   // layout: Button 1 = PDF (unchanged action), Button 2 = the real Ledger
   // (ledgerAsSecondary moves it into the dashed slot that used to be
   // "Share CITIXEN UX™" — Share itself is still reachable from the Export
-  // Quick Keys drawer section), Button 3 = opens the Civic Intelligence
-  // Stack™ drawer via a real click on #appMenuBtn.
+  // Quick Keys drawer section), Button 3 = "Civic Intelligence™ Stack" —
+  // locked for beta (civicStackLocked()) rather than opening the drawer;
+  // the drawer's own Export/Share, Civic Operations and Security sections
+  // stay reachable from the header's hamburger menu button directly.
   IR.init({
-    getData: appInstantReportData, toast,
+    getData: appInstantReportData, toast, trackEvent,
     onLedger: openLedgerDrawer,
     ledgerAsSecondary: true,
-    onStack: () => document.getElementById('appMenuBtn').click()
+    onStack: civicStackLocked
   });
 
   // Crowd Save America™ hero — the whole card (header, counter, map,
@@ -4172,15 +4239,15 @@ function initInstantReportAndQuickKeys(){
     // repository (State Constitution Reference, Spatial Hashing
     // Architecture, Public Ledger & Standards), with its own real CTA
     // into the Living Ledger below.
-    civicMemory: () => { closeAppDrawer(); openAppInfoModal('citixenship'); },
-    // Living Ledger™ — the real, searchable #ledgerDrawer (live dispatch
-    // work orders + the public ledger record), not a text panel.
-    livingLedger: () => { closeAppDrawer(); openLedgerDrawer(); },
-    // CITIXEN UX™ Protocol — honest overview of the real client-side
-    // routing/classification + Capital Project intercept logic that
-    // actually runs on every submitted report (see parseDepartment() and
-    // the CIP intercept flow).
-    protocol: () => { closeAppDrawer(); openAppInfoModal('citixenProtocol'); },
+    // Locked for beta (see civicStackLocked() above) — was:
+    // closeAppDrawer(); openAppInfoModal('citixenship');
+    civicMemory: civicStackLocked,
+    // Locked for beta — was: closeAppDrawer(); openLedgerDrawer();
+    // The real Public Ledger stays fully reachable elsewhere: the hero
+    // stack's "View Living Public Ledger" button and the Map & Feed tab.
+    livingLedger: civicStackLocked,
+    // Locked for beta — was: closeAppDrawer(); openAppInfoModal('citixenProtocol');
+    protocol: civicStackLocked,
     security: () => { closeAppDrawer(); openAppInfoModal('privacyEngine'); },
     grid: () => {
       closeAppDrawer();

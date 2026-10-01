@@ -168,7 +168,7 @@
   function stateRankHeaderLabel(r) { return (stateRankSubtext(r) ? stateRankSubtext(r) + ' ' : '') + 'State Rank'; }
 
   // ---------- state ----------
-  var cfg = { getData: null, toast: null, onLedger: null, onStack: null, ledgerAsSecondary: false };
+  var cfg = { getData: null, toast: null, onLedger: null, onStack: null, ledgerAsSecondary: false, trackEvent: null };
   var data = null, generatedAt = null, modal = null, lastFocus = null;
   // Whether the "+ Append Living Ledger™ Audit Summary" checkbox in the
   // Share & Export drawer is checked. Reset to false each time the Brief
@@ -190,6 +190,15 @@
     }
     el.textContent = msg; el.classList.add('show');
     clearTimeout(el._t); el._t = setTimeout(function () { el.classList.remove('show'); }, 4000);
+  }
+
+  // Beta telemetry hook for export actions (PDF download, share graphic,
+  // copy text & link) — a no-op unless the host page passes a real
+  // trackEvent() in init() (app.html does; index.html currently doesn't,
+  // so this stays a harmless no-op there rather than fabricating a sink
+  // that doesn't exist on that page).
+  function trackEvent(name, detail) {
+    if (typeof cfg.trackEvent === 'function') cfg.trackEvent(name, detail || {});
   }
 
   // ---------- Export & Share hero module ----------
@@ -563,6 +572,7 @@
       var ok = await copyText(modal.querySelector('#cxTextPreview').value);
       if (ok) mintToast('Text & direct link copied to clipboard');
       else { var ta = modal.querySelector('#cxTextPreview'); ta.focus(); ta.select(); toast('Copy is blocked here — the text is selected, copy it manually.'); }
+      trackEvent('export_copy_link', { ok: ok });
     });
   }
   function showSheet(ov) {
@@ -957,6 +967,7 @@
         }
       }
       if (!shared) { doc.save(PDF_NAME); mintToast('Official PDF brief downloaded'); }
+      trackEvent('export_pdf', { shared: shared, appendedLedgerSummary: appendLedgerSummary });
     } catch (err) {
       console.error('Official brief PDF failed', err);
       toast('Could not generate the PDF — please try again.');
@@ -1166,6 +1177,7 @@
     var blobPromise = new Promise(function (res) { canvas.toBlob(res, 'image/png'); });
     function done() { if (btn) { btn.disabled = false; btn.innerHTML = label; } }
     if (btn) { btn.disabled = true; btn.textContent = 'Rendering…'; }
+    trackEvent('export_graphic', { nativeShare: canShareImageFiles() });
 
     // Tier 2a — native share sheet with the graphic + pre-populated text/link.
     if (canShareImageFiles()) {
@@ -1232,6 +1244,7 @@
       cfg.onLedger = options.onLedger || null;
       cfg.onStack = options.onStack || null;
       cfg.ledgerAsSecondary = !!options.ledgerAsSecondary;
+      cfg.trackEvent = options.trackEvent || null;
       document.querySelectorAll('[data-cx-export-module]').forEach(renderModule);
     },
     open: open,

@@ -81,8 +81,14 @@
      A per-component breathing box-shadow glow used to layer on top of this
      hairline on several cards; this round's "Zero Neon Bloom" spec retired
      all of that in favor of the plain, calm 1px keyline seen here. */
-  --surface-card-bg:rgba(11,16,29,0.85) !important;
-  --surface-card-border:1px solid rgba(0,230,153,0.22) !important;
+  /* This round's "Global Hyper-Transparent Obsidian Glass System" — synced
+     with app.html's identical tokens: more transparent fill (the spec's
+     exact rgba(5,11,20,.8) hex) and blur raised to 16px via --surface-blur,
+     so cards read as dimensional glass over the obsidian base rather than a
+     flat solid block, on every screen. */
+  --surface-card-bg:rgba(5,11,20,0.8) !important;
+  --surface-card-border:1px solid rgba(0,230,153,0.2) !important;
+  --surface-blur:16px !important;
   --surface-input-bg:rgba(3,7,18,0.95) !important;
   --surface-input-border:1px solid rgba(255,255,255,0.08) !important;
   /* legacy aliases — every existing var(--mint)/var(--card)/etc. usage below inherits
@@ -261,7 +267,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
    literal spec. ===== */
 .hub-row{display:flex;flex-direction:column;max-width:920px;margin:0 auto 26px;padding:0 16px;box-sizing:border-box}
 .hub-card{position:relative;display:flex;align-items:center;justify-content:space-between;width:100%;
-  background:var(--surface-card-bg);backdrop-filter:blur(12px);
+  background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));
   border:var(--surface-card-border);border-radius:12px;padding:12px 18px;
   margin-bottom:14px;box-sizing:border-box;cursor:pointer;color:var(--text);text-align:left;
   transition:border-color .15s;font-family:inherit;min-width:0;gap:10px}
@@ -313,14 +319,14 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   color:#00E699;font-size:.8rem;font-weight:700;cursor:pointer;text-decoration:underline;flex-shrink:0}
 .citixen-trust-badge{display:flex;align-items:flex-start;gap:12px;max-width:640px;width:calc(100% - 32px);
   box-sizing:border-box;margin:0 auto 18px;
-  background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);
+  background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));border:var(--surface-card-border);
   border-radius:12px;padding:14px 16px}
 .citixen-trust-badge svg{flex-shrink:0;margin-top:2px}
 .citixen-trust-badge-title{color:#00E699;font-weight:800;font-size:.78rem;letter-spacing:.02em;
   text-transform:uppercase;line-height:1.4;margin-bottom:4px}
 .citixen-trust-badge-sub{color:var(--muted);font-size:.76rem;line-height:1.45}
 .citixen-feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.citixen-feature-tile{background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);
+.citixen-feature-tile{background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));border:var(--surface-card-border);
   border-radius:12px;padding:20px 10px;display:flex;flex-direction:column;align-items:center;gap:10px;
   cursor:pointer;font-family:inherit;transition:border-color .15s,filter .15s,background .15s}
 .citixen-feature-tile:hover{border-color:#00E699;filter:brightness(1.08)}
@@ -330,7 +336,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .citixen-feature-tile-label{color:var(--text);font-weight:700;font-size:.78rem;text-transform:uppercase;
   letter-spacing:.05em}
 .citixen-feature-accordion{max-width:100%;max-height:0;overflow:hidden;opacity:0;
-  background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);
+  background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));border:var(--surface-card-border);
   border-radius:12px;transition:max-height .3s ease,opacity .25s ease,margin .3s ease;margin-top:0}
 .citixen-feature-accordion.open{max-height:600px;opacity:1;margin-top:12px;padding:16px 18px}
 .citixen-feature-accordion h4{color:var(--text);font-size:.82rem;margin:12px 0 4px}
@@ -456,7 +462,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
    references them and renaming risked an unrelated diff. Same glass card
    surface token as every other container this round. ===== */
 .civic-triad-section{max-width:640px;margin:0 auto 20px;padding:0 24px}
-.civic-triad-card{background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);border-radius:12px;
+.civic-triad-card{background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));border:var(--surface-card-border);border-radius:12px;
   padding:18px 16px;text-align:center}
 .civic-triad-header{color:#00E699;font-weight:800;font-size:.9rem;letter-spacing:.06em;
   text-transform:uppercase;margin-bottom:14px}
@@ -492,7 +498,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 #dashboardLiveView.active{min-height:560px}
 .sidebar{width:380px;flex-shrink:0;min-height:0;padding:20px;display:flex;flex-direction:column;gap:16px;
   border-right:1px solid var(--border);overflow-y:auto;max-height:calc(100vh - 64px);position:relative;z-index:1}
-.card{background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);border-radius:12px;padding:16px}
+.card{background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));border:var(--surface-card-border);border-radius:12px;padding:16px}
 .label{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);
   margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
 .stat-big{font-size:2.2rem;font-weight:900;color:var(--mint2)}
@@ -582,7 +588,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
   padding:12px 16px;border-radius:10px;font-size:.84rem;outline:none}
 .frontier-search-bar input:focus{border-color:var(--mint2)}
 .frontier-search-note{font-size:.66rem;color:var(--muted);margin-top:6px}
-.frontier-ticker-inline{background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);border-radius:12px;
+.frontier-ticker-inline{background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));border:var(--surface-card-border);border-radius:12px;
   padding:10px 18px;text-align:center;min-width:170px}
 .frontier-ticker-inline .ticker-value{font-size:1.5rem;margin:2px 0}
 .frontier-mapwrap{position:relative;height:460px;border-radius:16px;overflow:hidden;border:1px solid var(--border)}
@@ -710,7 +716,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:3000;display:none;
   align-items:center;justify-content:center;padding:20px}
 .modal-overlay.open{display:flex}
-.modal-box{background:var(--surface-card-bg);backdrop-filter:blur(12px);box-shadow:0 0 12px rgba(0,230,153,.08);
+.modal-box{background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));box-shadow:0 0 12px rgba(0,230,153,.08);
   border:var(--surface-card-border);border-radius:12px;padding:24px;
   max-width:480px;width:100%;max-height:80vh;overflow-y:auto}
 .modal-box h3{font-size:1.05rem;margin-bottom:14px;color:var(--mint2)}
@@ -758,7 +764,7 @@ header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);ba
    fill). ===== */
 .pw-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:3200;display:none}
 .pw-overlay.open{display:flex;justify-content:flex-end}
-.pw-panel{width:min(480px,100vw);height:100%;background:var(--surface-card-bg);backdrop-filter:blur(12px);box-shadow:0 0 12px rgba(0,230,153,.08);border-left:var(--surface-card-border);
+.pw-panel{width:min(480px,100vw);height:100%;background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));box-shadow:0 0 12px rgba(0,230,153,.08);border-left:var(--surface-card-border);
   overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
 .pw-head{display:flex;justify-content:space-between;align-items:center}
 .pw-head h3{color:var(--mint2);font-size:1.05rem}
@@ -877,7 +883,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
    purge" (retires the earlier rgba(15,23,42,.75) frosted-glass fill). ===== */
 .ledger-drawer{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:2800;display:none}
 .ledger-drawer.open{display:flex;justify-content:flex-end}
-.ledger-drawer-panel{width:min(520px,100vw);height:100%;background:var(--surface-card-bg);backdrop-filter:blur(12px);box-shadow:0 0 12px rgba(0,230,153,.08);border-left:var(--surface-card-border);
+.ledger-drawer-panel{width:min(520px,100vw);height:100%;background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));box-shadow:0 0 12px rgba(0,230,153,.08);border-left:var(--surface-card-border);
   display:flex;flex-direction:column}
 .ledger-drawer-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--border)}
 .ledger-drawer-body{flex:1;overflow-y:auto;padding:16px 18px 32px}
@@ -972,7 +978,7 @@ audio.pw-audio-el{width:100%;margin-top:4px}
    silhouette. Padding widened this round (20px top/sides) so the header
    and graphic both sit comfortably inside the frame with clear breathing
    room rather than crowding it. */
-.pixel-map-card{position:relative;display:flex;flex-direction:column;background:var(--surface-card-bg);backdrop-filter:blur(12px);border:var(--surface-card-border);border-radius:16px;overflow:hidden;box-shadow:0 0 12px rgba(0,230,153,.08);padding:20px 20px 0}
+.pixel-map-card{position:relative;display:flex;flex-direction:column;background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));border:var(--surface-card-border);border-radius:16px;overflow:hidden;box-shadow:0 0 12px rgba(0,230,153,.08);padding:20px 20px 0}
 .pixel-map-svg{width:100%;height:210px;display:block;flex-shrink:0;margin:0 auto;cursor:pointer}
 .pixel-map-dot{opacity:.2;transition:fill .25s,opacity .4s}
 /* Grid fills pivoted from Emerald Green (#00E699) to Fresh Mint (#00E699)
