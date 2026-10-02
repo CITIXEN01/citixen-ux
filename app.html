@@ -1210,7 +1210,7 @@ textarea.input{resize:none;line-height:1.4}
   border:1px solid rgba(255,255,255,.15);padding:8px 16px;border-radius:12px;
   display:flex;align-items:center;gap:10px;
   box-shadow:0 10px 25px -5px rgba(0,0,0,.4),0 8px 10px -6px rgba(0,0,0,.3)}
-.video-intro-watermark-shield{width:20px;height:20px;flex-shrink:0;color:#34d399}
+.video-intro-watermark-shield{width:26px;height:26px;flex-shrink:0;color:#34d399}
 .video-intro-watermark-name{font-size:.875rem;font-weight:700;color:#fff;letter-spacing:.04em}
 .video-intro-watermark-ux{font-size:.7rem;font-weight:800;color:#34d399;
   background:rgba(2,44,34,.8);border:1px solid rgba(16,185,129,.3);
@@ -2207,15 +2207,40 @@ textarea.input{resize:none;line-height:1.4}
   const soundBtn = document.getElementById('btnIntroSound');
   if (!modal || !video || !skipBtn || !soundBtn) return;
 
-  // UNMUTED PLAYBACK & AUTOPLAY FALLBACK — try full unmuted audio first;
-  // if the browser's autoplay policy rejects that (NotAllowedError, the
-  // common case on first visit with no prior user gesture), fall back to
-  // a muted autoplay and surface the pulsing "TAP FOR SOUND" pill so a
-  // single tap turns the audio on. Skip Intro and the watermark keep
-  // working either way even if a browser blocks both play() attempts.
+  // UNMUTED PLAYBACK & AUTOPLAY FALLBACK — try full unmuted audio first,
+  // via video.muted = false + video.play() called synchronously within
+  // whatever triggered showIntro() (page load, or the Replay Intro click's
+  // own event stack). If the browser's autoplay policy rejects that
+  // (NotAllowedError — the common case on a cold load with no prior
+  // gesture), fall back to muted playback, surface the pulsing "TAP FOR
+  // SOUND" pill, AND arm a one-time capture-phase listener for the user's
+  // very first gesture anywhere on screen (pointerdown/click/keydown) that
+  // unmutes immediately — so sound kicks in on the first tap/click/key
+  // even if it lands nowhere near the pill itself. Skip Intro and the
+  // watermark keep working either way even if both play() attempts and
+  // the gesture unmute are all blocked.
+  const GESTURE_EVENTS = ['pointerdown', 'click', 'keydown'];
+  function removeGestureUnmuteListeners(){
+    GESTURE_EVENTS.forEach(evt => document.removeEventListener(evt, onFirstGestureUnmute, true));
+  }
+  function onFirstGestureUnmute(){
+    removeGestureUnmuteListeners();
+    if (!video.muted) return; // already unmuted via the pill or elsewhere
+    video.muted = false;
+    soundBtn.classList.remove('video-intro-sound-pulse');
+    soundBtn.style.display = 'none';
+    const p = video.play();
+    if (p && typeof p.catch === 'function') p.catch(() => {});
+  }
+  function armGestureUnmuteListeners(){
+    removeGestureUnmuteListeners(); // avoid stacking duplicates across replays
+    GESTURE_EVENTS.forEach(evt => document.addEventListener(evt, onFirstGestureUnmute, true));
+  }
+
   function attemptUnmutedPlay(){
     soundBtn.classList.remove('video-intro-sound-pulse');
     soundBtn.style.display = 'none';
+    removeGestureUnmuteListeners();
     video.muted = false;
     try { video.currentTime = 0; } catch (e) {}
     const playPromise = video.play();
@@ -2225,6 +2250,7 @@ textarea.input{resize:none;line-height:1.4}
       soundBtn.textContent = 'TAP FOR SOUND';
       soundBtn.style.display = 'inline-block';
       soundBtn.classList.add('video-intro-sound-pulse');
+      armGestureUnmuteListeners();
       const retryPromise = video.play();
       if (retryPromise && typeof retryPromise.catch === 'function') retryPromise.catch(() => {});
     });
@@ -2237,11 +2263,14 @@ textarea.input{resize:none;line-height:1.4}
 
   // Fades the modal out, marks the intro seen, then fully hides it once
   // the 700ms transition (see .video-intro-fade in <style>) finishes —
-  // shared by both the 'ended' event and the Skip Intro button.
+  // shared by both the 'ended' event and the Skip Intro button. Also
+  // disarms the gesture-unmute listener so a stray tap/click/key after
+  // the intro is gone doesn't reach into a hidden, paused video.
   let dismissing = false;
   function dismissIntro(){
     if (dismissing) return;
     dismissing = true;
+    removeGestureUnmuteListeners();
     modal.classList.add('video-intro-fade');
     try { localStorage.setItem('citixen_welcome_seen', 'true'); } catch (e) {}
     setTimeout(() => {
@@ -2262,6 +2291,7 @@ textarea.input{resize:none;line-height:1.4}
   video.addEventListener('ended', dismissIntro);
   skipBtn.addEventListener('click', dismissIntro);
   soundBtn.addEventListener('click', () => {
+    removeGestureUnmuteListeners();
     video.muted = false;
     soundBtn.classList.remove('video-intro-sound-pulse');
     soundBtn.style.display = 'none';
