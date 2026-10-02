@@ -1218,11 +1218,17 @@ textarea.input{resize:none;line-height:1.4}
      CINEMATIC WELCOME INTRO MODAL INTEGRATION round. Shown once per
      browser (localStorage 'citixen_welcome_seen'), before even the
      passcode gate below. See initVideoIntro() near the end of <body> for
-     the show/skip/replay logic. citizen_infra_slowed.mp4 is CITUX.mp4 with
-     its final 3s (the ward-metrics dashboard + aerial view) slowed to 0.5x
-     (now 6s) — see the repo root for the ffmpeg command used. ===== -->
+     the show/skip/replay logic. citizen_infra_final_audio.mp4 is
+     citizen_infra_slowed.mp4 (CITUX.mp4 with its final 3s slowed to 0.5x)
+     mixed with a synthesized cinematic ambient pad track — see the repo
+     root for the ffmpeg commands used. NOTE: this sandbox has no TTS
+     engine and no network access to any TTS API (ElevenLabs/OpenAI/pip/
+     apt/npm all blocked), so the spoken narration track could not be
+     generated here; this ships with the ambient music bed only. Swap in
+     a narration mix later by re-running the documented ffmpeg amix step
+     with a supplied voiceover.mp3. ===== -->
 <div class="video-intro-modal" id="videoIntroModal">
-  <video class="video-intro-video" id="introVideo" src="/citizen_infra_slowed.mp4"
+  <video class="video-intro-video" id="introVideo" src="/citizen_infra_final_audio.mp4"
     autoplay muted playsinline preload="auto"></video>
   <button type="button" class="video-intro-skip" id="btnSkipIntro">Skip Intro</button>
   <button type="button" class="video-intro-sound" id="btnIntroSound" aria-label="Tap for sound">MUTED</button>
