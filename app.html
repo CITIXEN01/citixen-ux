@@ -1436,8 +1436,21 @@ textarea.input{resize:none;line-height:1.4}
         </div>
         <div id="reportStep2Locked" style="display:none;">
           <div class="label">3. Location &amp; details</div>
-          <input class="input" id="repLoc" value="Local District (GPS)">
+          <input class="input" id="repLoc" value="Waiting for GPS fix…">
           <textarea class="input" id="repDesc" rows="3" placeholder="Describe the hazard, cross street, or specific risk..."></textarea>
+
+          <!-- STRICT GPS HARD-LOCK (Patch 5.1) — a report can no longer publish
+               on a guessed/anchor location. hasValidGps() is the single source
+               of truth; updateSubmitPhotoGate() disables/hides this hint the
+               same way it gates the photo requirement, so the two gates can
+               never drift apart. There is intentionally no "continue anyway"
+               path here — see finalizeSubmitReport()'s own removal of the old
+               jittered-anchor-coordinate fallback. -->
+          <div id="reportGpsLockHint" style="display:none;background:rgba(255,68,68,.08);border:1px solid var(--danger);border-radius:10px;padding:12px 14px;margin:4px 0 12px;text-align:center;">
+            <div class="small" style="color:#fca5a5;font-weight:700;margin-bottom:6px;">Location required to publish</div>
+            <div class="small" style="color:var(--muted);margin-bottom:10px;line-height:1.4;">CITIXEN OS requires an active, validated GPS fix to route this report to the correct ward. There is no fallback location — reports cannot be filed without it.</div>
+            <button type="button" class="chip" id="btnRetryGps" style="display:inline-flex;">Enable location &amp; retry</button>
+          </div>
 
           <button type="button" class="btn-submit" id="btnSubmit" disabled>
             <svg viewBox="0 0 24 24" width="17" height="17" stroke="#051311" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
@@ -2010,6 +2023,27 @@ textarea.input{resize:none;line-height:1.4}
       <div class="confirm-actions">
         <button type="button" class="btn-confirm-lock" id="btnConfirmLock" disabled>Submit to Ledger</button>
         <button type="button" class="btn-confirm-cancel" id="btnConfirmCancel">Cancel / Retake Photo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== STRICT GPS HARD-LOCK MODAL (Patch 5.1) — reuses .confirm-drawer/
+       .confirm-card for the overlay + card chrome, same convention as every
+       other modal here. Opened by triggerLocationRequiredModal(), which is
+       the defense-in-depth path submitReport() falls back to if it's ever
+       reached with no resolved GPS fix (the primary gate is the hidden
+       Publish button + #reportGpsLockHint above). "Try Again" re-runs the
+       same resolveDisplayLocation() the page calls on load — this never
+       fabricates a location, it only re-asks the device for a real one. ===== -->
+  <div id="locationRequiredModal" class="confirm-drawer">
+    <div class="confirm-card">
+      <div class="confirm-title">Location Required to Post</div>
+      <div class="small" style="color:var(--muted);line-height:1.5;margin-bottom:4px;">
+        CITIXEN OS requires active GPS location to route your report to the correct municipal ward. Please enable location services for this site, then try again — reports can't publish on a guessed or default location.
+      </div>
+      <div class="confirm-actions">
+        <button type="button" class="btn-confirm-lock" id="btnLocationRetry">Try Again</button>
+        <button type="button" class="btn-confirm-cancel" id="btnLocationDismiss">Dismiss</button>
       </div>
     </div>
   </div>
@@ -3600,7 +3634,12 @@ function storeJurisdiction(j){
    ===================================================================== */
 function pickDefaultWardMeta(){
   const resolved = window.CITIXEN_RESOLVED_LOCATION;
-  if (resolved && coverageDirectory) {
+  // A resolved fix can now carry real lat/lng with city/stateCode left null
+  // (reverse-geocoding failed or is unreachable, but the GPS coordinates
+  // themselves are still real — see resolveDisplayLocation()). That's a
+  // valid, submittable location under the Strict GPS Hard-Lock, it just
+  // can't be name-matched against the seeded directory here.
+  if (resolved && resolved.city && resolved.stateCode && coverageDirectory) {
     const st = coverageDirectory.states.find(s => s.slug === resolved.stateCode.toLowerCase());
     const city = st && st.cities.find(c => c.name.toLowerCase() === resolved.city.toLowerCase());
     const ward = city && city.wards[0];
@@ -4068,10 +4107,26 @@ async function resolveDisplayLocation(){
   if (labelEl) labelEl.textContent = DEFAULT_LOCATION_LABEL;
   if (!isNativeCapacitorRuntime() && !('geolocation' in navigator)) { onLocationResolved(null); return; }
 
+  let latitude, longitude;
   try {
     const pos = await citixenGetCurrentPosition({ timeout: GEO_TIMEOUT_MS, maximumAge: 300000 });
+    latitude = pos.coords.latitude;
+    longitude = pos.coords.longitude;
+  } catch (err) {
+    // Denied, unavailable, or timed out — no real device fix at all. This is
+    // the only branch that reports "no GPS": there is no anchor/default
+    // coordinate substituted here (Patch 5.1 — Strict GPS Hard-Lock).
+    onLocationResolved(null);
+    return;
+  }
 
-    const { latitude, longitude } = pos.coords;
+  // A real device fix exists from here on. Reverse-geocoding only adds a
+  // human-readable city/state label and feeds the ward-name lookup — its
+  // failure (offline, endpoint blocked/down, no match for these coordinates)
+  // must never discard the real coordinates themselves, or an outage in a
+  // third-party geocoder would wrongly re-trigger the GPS hard-lock despite
+  // the device having given us a perfectly valid fix.
+  try {
     const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`);
     if (!res.ok) throw new Error('reverse-geocode failed: ' + res.status);
     const data = await res.json();
@@ -4080,17 +4135,16 @@ async function resolveDisplayLocation(){
     const stateCode = (data.principalSubdivisionCode || '').split('-').pop();
     if (city && stateCode) {
       if (labelEl) labelEl.textContent = `${esc(city)}, ${esc(stateCode)}`;
-      // lat/lng are the device's own real GPS coordinates (not a guess) — kept
-      // here so the dispatch map can drop a "you are here" beacon; nothing
-      // else about the resolved-location contract changes.
       onLocationResolved({ city, stateCode: stateCode.toUpperCase(), lat: latitude, lng: longitude });
       return;
     }
-    onLocationResolved(null);
-    // else: leave the default fallback — never render a partial/undefined location.
+    // No usable city/state in the response — still a real, valid GPS fix,
+    // just without a friendly label (hasValidGps() only looks at lat/lng).
+    onLocationResolved({ city: null, stateCode: null, lat: latitude, lng: longitude });
   } catch (err) {
-    // Denied, unavailable, timed out, or lookup failed — keep the fallback.
-    onLocationResolved(null);
+    // Reverse-geocode lookup failed or is unreachable — the coordinates are
+    // still real and valid, so they're kept, not discarded.
+    onLocationResolved({ city: null, stateCode: null, lat: latitude, lng: longitude });
   }
 }
 
@@ -4113,21 +4167,30 @@ function formatCoordPrecision(lat, lng){
 function onLocationResolved(loc){
   window.CITIXEN_RESOLVED_LOCATION = loc;
   const repLoc = document.getElementById('repLoc');
+  const hasGps = !!(loc && typeof loc.lat === 'number' && typeof loc.lng === 'number');
   if (repLoc && !repLoc.dataset.userEdited) {
     // District only appears once a real match exists (currentWardMeta) —
     // never guessed ahead of that confirmation.
     const districtPart = (loc && currentWardMeta && currentWardMeta.isGpsMatch) ? ' (' + currentWardMeta.wardName + ')' : '';
-    repLoc.value = loc
-      ? `${formatCoordPrecision(loc.lat, loc.lng)}${districtPart} · ${loc.city}, ${loc.stateCode}`
-      : 'Local District (GPS unavailable)';
+    const cityStatePart = (loc && loc.city && loc.stateCode) ? ` · ${loc.city}, ${loc.stateCode}` : '';
+    repLoc.value = hasGps
+      ? `${formatCoordPrecision(loc.lat, loc.lng)}${districtPart}${cityStatePart}`
+      // Strict GPS Hard-Lock (Patch 5.1) — no anchor/default coordinate is
+      // ever shown as if it were the citizen's real location; this state
+      // means Publish is locked (see updateSubmitPhotoGate()).
+      : 'GPS unavailable — location required to publish';
   }
   updateSmartLocationBanner(loc);
+  // STRICT GPS HARD-LOCK — re-evaluate the Publish gate every time the
+  // resolved location changes (first resolve, a later retry, or a fix that
+  // drops out), so the gate can never go stale relative to the real state.
+  updateSubmitPhotoGate();
   if (analyticsInitialized && coverageDirectory) {
     applyWardMeta(pickDefaultWardMeta());
     coverageLoaded = false;
     animateCoverage();
   }
-  if (loc && typeof loc.lat === 'number' && typeof loc.lng === 'number') {
+  if (hasGps) {
     plotUserLocationMarker(loc.lat, loc.lng);
   }
 }
@@ -4141,12 +4204,21 @@ function updateSmartLocationBanner(loc){
   const textEl = document.getElementById('smartLocationText');
   const statusEl = document.getElementById('smartLocationStatus');
   if (!banner || !textEl || !statusEl) return;
-  if (loc) {
+  const hasGps = !!(loc && typeof loc.lat === 'number' && typeof loc.lng === 'number');
+  if (hasGps && loc.city && loc.stateCode) {
     textEl.textContent = `${loc.city}, ${loc.stateCode} — reports route to this jurisdiction`;
     statusEl.textContent = 'GPS resolved';
     banner.classList.add('resolved');
+  } else if (hasGps) {
+    // Real coordinates, no reverse-geocoded city/state label — still a
+    // valid, submittable fix under the Strict GPS Hard-Lock.
+    textEl.textContent = `${formatCoordPrecision(loc.lat, loc.lng)} — reports route by coordinate`;
+    statusEl.textContent = 'GPS resolved';
+    banner.classList.add('resolved');
   } else {
-    textEl.textContent = 'Local District — GPS unavailable, using citywide default';
+    // No fallback location exists (Patch 5.1 — Strict GPS Hard-Lock):
+    // reports cannot be filed in this state, and this banner says so.
+    textEl.textContent = 'GPS unavailable — location required to publish a report';
     statusEl.textContent = 'Unresolved';
     banner.classList.remove('resolved');
   }
@@ -5050,21 +5122,36 @@ function hasAttachedPhoto(){
   const img = document.getElementById('photoImg');
   return !!(img && img.style.display !== 'none' && img.src);
 }
-// HARDWARE CAMERA FIREWALL LOCK — hides the entire Section 3 (location &
-// details) + Publish button block, not just the button, until a real photo
-// is attached. `disabled` goes back to a true native HTML attribute (not
-// Patch 4.13's tappable CSS-only lock) since there's no longer a visible
-// locked button for that workaround to apply to.
+// STRICT GPS HARD-LOCK (Patch 5.1) — single source of truth for "do we have
+// a real, validated device GPS fix right now". A resolved-but-null value
+// (denied/unavailable/timed out — see resolveDisplayLocation()) counts as
+// no fix, same as never having resolved at all. There is no anchor/default
+// coordinate anywhere in this check on purpose.
+function hasValidGps(){
+  const r = window.CITIXEN_RESOLVED_LOCATION;
+  return !!(r && typeof r.lat === 'number' && typeof r.lng === 'number' &&
+    isFinite(r.lat) && isFinite(r.lng));
+}
+// HARDWARE CAMERA FIREWALL LOCK + STRICT GPS HARD-LOCK — hides the entire
+// Section 3 (location & details) + Publish button block, not just the
+// button, until a real photo is attached; once that section is visible,
+// Publish itself stays disabled (and #reportGpsLockHint shown) until a real
+// GPS fix also resolves. `disabled` is a true native HTML attribute (not
+// Patch 4.13's tappable CSS-only lock) since there's no visible locked
+// button for that workaround to apply to.
 function updateSubmitPhotoGate(){
   const btn = document.getElementById('btnSubmit');
   const lbl = document.getElementById('btnSubmitLabel');
   const lockedSection = document.getElementById('reportStep2Locked');
   const lockHint = document.getElementById('reportCameraLockHint');
-  const has = hasAttachedPhoto();
-  if (btn) btn.disabled = !has;
+  const gpsHint = document.getElementById('reportGpsLockHint');
+  const hasPhoto = hasAttachedPhoto();
+  const hasGps = hasValidGps();
+  if (btn) btn.disabled = !(hasPhoto && hasGps);
   if (lbl) lbl.textContent = 'Publish report';
-  if (lockedSection) lockedSection.style.display = has ? '' : 'none';
-  if (lockHint) lockHint.style.display = has ? 'none' : '';
+  if (lockedSection) lockedSection.style.display = hasPhoto ? '' : 'none';
+  if (lockHint) lockHint.style.display = hasPhoto ? 'none' : '';
+  if (gpsHint) gpsHint.style.display = (hasPhoto && !hasGps) ? '' : 'none';
 }
 
 async function submitReport(){
@@ -5079,6 +5166,16 @@ async function submitReport(){
       captureLabel.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
     toast('Mandatory Safeguard: Photo proof is required to publish to the public ledger.', true);
+    return;
+  }
+  // STRICT GPS HARD-LOCK (Patch 5.1) — defense in depth, same reasoning as
+  // the photo check above: the button is both hardware-disabled and the
+  // #reportGpsLockHint is shown while no GPS fix is resolved, so this guard
+  // should be unreachable through the normal UI. Kept anyway in case
+  // submitReport() is ever invoked some other way. No fallback coordinate
+  // is ever substituted here — if GPS isn't resolved, submission stops.
+  if (!hasValidGps()) {
+    triggerLocationRequiredModal();
     return;
   }
   const resolved = window.CITIXEN_RESOLVED_LOCATION;
@@ -5149,6 +5246,44 @@ document.getElementById('btnConfirmCancel').addEventListener('click', () => {
   document.getElementById('photoBox').style.display = 'none';
   updateSubmitPhotoGate();
 });
+
+// ===== STRICT GPS HARD-LOCK MODAL (Patch 5.1) =====
+// Opened either by submitReport()'s defense-in-depth check or by the
+// visible #btnRetryGps inside #reportGpsLockHint — both routes just
+// re-request a real device fix via resolveDisplayLocation(); neither ever
+// substitutes an anchor/default coordinate.
+let locationRetryInFlight = false;
+function triggerLocationRequiredModal(){
+  document.getElementById('locationRequiredModal').classList.add('open');
+}
+function closeLocationRequiredModal(){
+  document.getElementById('locationRequiredModal').classList.remove('open');
+}
+async function retryGpsResolution(btn){
+  if (locationRetryInFlight) return;
+  locationRetryInFlight = true;
+  const originalLabel = btn ? btn.textContent : null;
+  if (btn) { btn.textContent = 'Locating…'; btn.disabled = true; }
+  try {
+    await resolveDisplayLocation();
+  } finally {
+    locationRetryInFlight = false;
+    if (btn) { btn.textContent = originalLabel; btn.disabled = false; }
+    updateSubmitPhotoGate();
+    if (!hasValidGps()) {
+      toast('Still no GPS fix — check that location access is allowed for this site in your device/browser settings.', true);
+    } else {
+      toast('Location resolved — you can publish now.');
+    }
+  }
+}
+document.getElementById('btnLocationRetry').addEventListener('click', async () => {
+  const btn = document.getElementById('btnLocationRetry');
+  await retryGpsResolution(btn);
+  if (hasValidGps()) closeLocationRequiredModal();
+});
+document.getElementById('btnLocationDismiss').addEventListener('click', closeLocationRequiredModal);
+document.getElementById('btnRetryGps').addEventListener('click', () => retryGpsResolution(document.getElementById('btnRetryGps')));
 
 // ===== POST-SUBMISSION DISPATCH RECEIPT MODAL — see finalizeSubmitReport(),
 // the only place that opens this (right after auto-routing to Map & Feed).
@@ -5561,6 +5696,20 @@ function markGridCellLit(cityCode){
 // submission always tags urgentOverride:false with no project.
 async function finalizeSubmitReport(opts){
   opts = opts || {};
+  // STRICT GPS HARD-LOCK (Patch 5.1) — defense in depth. This function is
+  // only ever reached via the Publish flow, which is already gated on
+  // hasValidGps() (submitReport() and the disabled #btnSubmit itself). The
+  // check is repeated here so finalizeSubmitReport() can never be invoked
+  // some other way and silently invent a location: there is no anchor or
+  // jittered-coordinate fallback left anywhere in this file. If GPS truly
+  // isn't resolved at this point, publishing stops instead of fabricating
+  // a ticket location.
+  const resolved = window.CITIXEN_RESOLVED_LOCATION;
+  if (!resolved || typeof resolved.lat !== 'number' || typeof resolved.lng !== 'number') {
+    toast('Location Required to Post: a validated GPS fix is required to publish this report.', true);
+    triggerLocationRequiredModal();
+    return;
+  }
   const rawDesc=document.getElementById('repDesc').value.trim() || 'Hazard reported.';
   const rawLoc=document.getElementById('repLoc').value.trim() || 'Local District';
   const hz=classifyHazard(rawDesc, cat);
@@ -5571,7 +5720,12 @@ async function finalizeSubmitReport(opts){
     : '';
   const nc={
     id:'c'+Date.now(), title:cat, category:cat, loc:rawLoc,
-    lat:43.8150+(Math.random()-.5)*.01, lng:-91.2500+(Math.random()-.5)*.01,
+    // Real device GPS coordinates only. The previous fallback here — a
+    // fixed La Crosse, WI anchor point plus random jitter, used whenever
+    // GPS hadn't actually resolved — has been removed entirely per the
+    // Strict GPS Hard-Lock policy; `resolved` is guaranteed real by the
+    // check above.
+    lat: resolved.lat, lng: resolved.lng,
     status: window.CitixenSeverity
       ? window.CitixenSeverity.classify({ category: cat, title: cat, desc: rawDesc, urgentOverride })
       : (urgentOverride ? 'Critical' : 'Standard'),
@@ -5599,7 +5753,8 @@ async function finalizeSubmitReport(opts){
   if (photoImgForReceipt) { photoImgForReceipt.removeAttribute('src'); photoImgForReceipt.style.display = 'none'; }
   updateSubmitPhotoGate();
 
-  const resolved = window.CITIXEN_RESOLVED_LOCATION;
+  // `resolved` was already captured and validated at the top of this
+  // function (Strict GPS Hard-Lock) — reused here, not re-read.
   // Jurisdiction routing: currentWardMeta is only set once the coverage
   // grid has initialized (tab-map visit or initAnalytics()) — if a report
   // is published before that (e.g. straight from the splash/Report tab),
