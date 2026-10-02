@@ -1439,17 +1439,28 @@ textarea.input{resize:none;line-height:1.4}
           <input class="input" id="repLoc" value="Waiting for GPS fix…">
           <textarea class="input" id="repDesc" rows="3" placeholder="Describe the hazard, cross street, or specific risk..."></textarea>
 
-          <!-- STRICT GPS HARD-LOCK (Patch 5.1) — a report can no longer publish
-               on a guessed/anchor location. hasValidGps() is the single source
-               of truth; updateSubmitPhotoGate() disables/hides this hint the
-               same way it gates the photo requirement, so the two gates can
-               never drift apart. There is intentionally no "continue anyway"
-               path here — see finalizeSubmitReport()'s own removal of the old
-               jittered-anchor-coordinate fallback. -->
+          <!-- STRICT GPS HARD-LOCK (Patch 5.1, extended Patch 5.2) — a report
+               can no longer publish on a guessed/anchor location.
+               hasValidLocation() (GPS OR a geocoded manual address) is the
+               single source of truth; updateSubmitPhotoGate() disables/hides
+               this hint the same way it gates the photo requirement, so the
+               two gates can never drift apart. Patch 5.2 adds the manual
+               street-address path below for desktop browsers with no
+               hardware GPS — the address is only ever accepted once
+               geocodeAddress() has resolved it to real coordinates via a
+               third-party geocoder; a bare typed string is never treated
+               as a valid location, and a failed lookup never falls back to
+               an anchor/default coordinate. -->
           <div id="reportGpsLockHint" style="display:none;background:rgba(255,68,68,.08);border:1px solid var(--danger);border-radius:10px;padding:12px 14px;margin:4px 0 12px;text-align:center;">
             <div class="small" style="color:#fca5a5;font-weight:700;margin-bottom:6px;">Location required to publish</div>
-            <div class="small" style="color:var(--muted);margin-bottom:10px;line-height:1.4;">CITIXEN OS requires an active, validated GPS fix to route this report to the correct ward. There is no fallback location — reports cannot be filed without it.</div>
+            <div class="small" style="color:var(--muted);margin-bottom:10px;line-height:1.4;">CITIXEN OS requires an active GPS fix — or a validated street address — to route this report to the correct ward. There is no default/anchor location; reports can't be filed without one or the other.</div>
             <button type="button" class="chip" id="btnRetryGps" style="display:inline-flex;">Enable location &amp; retry</button>
+            <div class="small" style="color:var(--muted);margin:12px 0 6px;">or enter your street address</div>
+            <div style="display:flex;gap:8px;">
+              <input class="input" id="repManualAddress" placeholder="e.g. 351 W Hubbard St" style="flex:1;margin:0;">
+              <button type="button" class="chip" id="btnUseManualAddress" style="display:inline-flex;white-space:nowrap;">Use address</button>
+            </div>
+            <div id="repManualAddressStatus" class="small" style="margin-top:8px;display:none;"></div>
           </div>
 
           <button type="button" class="btn-submit" id="btnSubmit" disabled>
@@ -2027,22 +2038,29 @@ textarea.input{resize:none;line-height:1.4}
     </div>
   </div>
 
-  <!-- ===== STRICT GPS HARD-LOCK MODAL (Patch 5.1) — reuses .confirm-drawer/
-       .confirm-card for the overlay + card chrome, same convention as every
-       other modal here. Opened by triggerLocationRequiredModal(), which is
-       the defense-in-depth path submitReport() falls back to if it's ever
-       reached with no resolved GPS fix (the primary gate is the hidden
-       Publish button + #reportGpsLockHint above). "Try Again" re-runs the
-       same resolveDisplayLocation() the page calls on load — this never
-       fabricates a location, it only re-asks the device for a real one. ===== -->
+  <!-- ===== STRICT GPS HARD-LOCK MODAL (Patch 5.1, extended Patch 5.2) —
+       reuses .confirm-drawer/.confirm-card for the overlay + card chrome,
+       same convention as every other modal here. Opened by
+       triggerLocationRequiredModal(), which is the defense-in-depth path
+       submitReport() falls back to if it's ever reached with no valid
+       location (the primary gate is the hidden Publish button +
+       #reportGpsLockHint above). "Try Again" re-runs the same
+       resolveDisplayLocation() the page calls on load; the address field
+       below geocodes a manually-typed street address instead. Neither path
+       ever fabricates a location. ===== -->
   <div id="locationRequiredModal" class="confirm-drawer">
     <div class="confirm-card">
       <div class="confirm-title">Location Required to Post</div>
       <div class="small" style="color:var(--muted);line-height:1.5;margin-bottom:4px;">
-        CITIXEN OS requires active GPS location to route your report to the correct municipal ward. Please enable location services for this site, then try again — reports can't publish on a guessed or default location.
+        CITIXEN OS requires active GPS location — or a validated street address — to route your report to the correct municipal ward. Reports can't publish on a guessed or default location.
       </div>
+      <div style="display:flex;gap:8px;margin:14px 0 4px;">
+        <input class="input" id="modalManualAddress" placeholder="e.g. 351 W Hubbard St" style="flex:1;margin:0;">
+        <button type="button" class="chip" id="btnModalUseManualAddress" style="display:inline-flex;white-space:nowrap;">Use address</button>
+      </div>
+      <div id="modalManualAddressStatus" class="small" style="margin:0 0 4px;display:none;"></div>
       <div class="confirm-actions">
-        <button type="button" class="btn-confirm-lock" id="btnLocationRetry">Try Again</button>
+        <button type="button" class="btn-confirm-lock" id="btnLocationRetry">Try Again (GPS)</button>
         <button type="button" class="btn-confirm-cancel" id="btnLocationDismiss">Dismiss</button>
       </div>
     </div>
@@ -5132,13 +5150,37 @@ function hasValidGps(){
   return !!(r && typeof r.lat === 'number' && typeof r.lng === 'number' &&
     isFinite(r.lat) && isFinite(r.lng));
 }
-// HARDWARE CAMERA FIREWALL LOCK + STRICT GPS HARD-LOCK — hides the entire
-// Section 3 (location & details) + Publish button block, not just the
-// button, until a real photo is attached; once that section is visible,
+// MANUAL STREET-ADDRESS FALLBACK (Patch 5.2) — beta feedback diagnostic:
+// desktop browsers have no hardware GPS, so hasValidGps() alone hard-blocks
+// virtually every desktop citizen. A manually-typed address only ever
+// counts once geocodeAddress() (defined earlier, same Nominatim call the
+// Public Ledger's address search already uses) has resolved it to real
+// coordinates through a third-party geocoder — a bare typed string is never
+// treated as "validated," and a failed/ambiguous geocode never falls back
+// to an anchor or default coordinate.
+window.CITIXEN_MANUAL_ADDRESS = null; // { address, lat, lng } once geocoded
+function hasValidManualAddress(){
+  const m = window.CITIXEN_MANUAL_ADDRESS;
+  return !!(m && typeof m.lat === 'number' && typeof m.lng === 'number' &&
+    isFinite(m.lat) && isFinite(m.lng));
+}
+// Single source of truth for "do we have ANY real, validated location" —
+// a live device GPS fix OR a geocoded manual address. Still no anchor or
+// default coordinate anywhere in this check.
+function hasValidLocation(){
+  return hasValidGps() || hasValidManualAddress();
+}
+// Forward geocoding for this manual-address path reuses geocodeAddress()
+// (defined earlier, already powering the Public Ledger's address-radius
+// search) rather than duplicating another Nominatim call — same "real
+// geocoder, honest failure, never a guessed coordinate" contract.
+// HARDWARE CAMERA FIREWALL LOCK + STRICT LOCATION HARD-LOCK — hides the
+// entire Section 3 (location & details) + Publish button block, not just
+// the button, until a real photo is attached; once that section is visible,
 // Publish itself stays disabled (and #reportGpsLockHint shown) until a real
-// GPS fix also resolves. `disabled` is a true native HTML attribute (not
-// Patch 4.13's tappable CSS-only lock) since there's no visible locked
-// button for that workaround to apply to.
+// location also resolves (GPS fix or geocoded manual address). `disabled`
+// is a true native HTML attribute (not Patch 4.13's tappable CSS-only lock)
+// since there's no visible locked button for that workaround to apply to.
 function updateSubmitPhotoGate(){
   const btn = document.getElementById('btnSubmit');
   const lbl = document.getElementById('btnSubmitLabel');
@@ -5146,12 +5188,12 @@ function updateSubmitPhotoGate(){
   const lockHint = document.getElementById('reportCameraLockHint');
   const gpsHint = document.getElementById('reportGpsLockHint');
   const hasPhoto = hasAttachedPhoto();
-  const hasGps = hasValidGps();
-  if (btn) btn.disabled = !(hasPhoto && hasGps);
+  const hasLoc = hasValidLocation();
+  if (btn) btn.disabled = !(hasPhoto && hasLoc);
   if (lbl) lbl.textContent = 'Publish report';
   if (lockedSection) lockedSection.style.display = hasPhoto ? '' : 'none';
   if (lockHint) lockHint.style.display = hasPhoto ? 'none' : '';
-  if (gpsHint) gpsHint.style.display = (hasPhoto && !hasGps) ? '' : 'none';
+  if (gpsHint) gpsHint.style.display = (hasPhoto && !hasLoc) ? '' : 'none';
 }
 
 async function submitReport(){
@@ -5168,19 +5210,23 @@ async function submitReport(){
     toast('Mandatory Safeguard: Photo proof is required to publish to the public ledger.', true);
     return;
   }
-  // STRICT GPS HARD-LOCK (Patch 5.1) — defense in depth, same reasoning as
-  // the photo check above: the button is both hardware-disabled and the
-  // #reportGpsLockHint is shown while no GPS fix is resolved, so this guard
-  // should be unreachable through the normal UI. Kept anyway in case
-  // submitReport() is ever invoked some other way. No fallback coordinate
-  // is ever substituted here — if GPS isn't resolved, submission stops.
-  if (!hasValidGps()) {
+  // STRICT LOCATION HARD-LOCK (Patch 5.1, extended Patch 5.2) — defense in
+  // depth, same reasoning as the photo check above: the button is both
+  // hardware-disabled and the #reportGpsLockHint is shown while no valid
+  // location is resolved, so this guard should be unreachable through the
+  // normal UI. Kept anyway in case submitReport() is ever invoked some
+  // other way. No fallback coordinate is ever substituted here — if
+  // neither a real GPS fix nor a geocoded manual address exists, submission
+  // stops.
+  if (!hasValidLocation()) {
     triggerLocationRequiredModal();
     return;
   }
   const resolved = window.CITIXEN_RESOLVED_LOCATION;
-  const lat = resolved && typeof resolved.lat === 'number' ? resolved.lat : null;
-  const lng = resolved && typeof resolved.lng === 'number' ? resolved.lng : null;
+  const manual = window.CITIXEN_MANUAL_ADDRESS;
+  const usingGps = hasValidGps();
+  const lat = usingGps ? resolved.lat : (manual ? manual.lat : null);
+  const lng = usingGps ? resolved.lng : (manual ? manual.lng : null);
   const projects = await ensureCipProjects();
   const match = findInterceptMatch(cat, lat, lng, projects);
   if (match) {
@@ -5247,11 +5293,13 @@ document.getElementById('btnConfirmCancel').addEventListener('click', () => {
   updateSubmitPhotoGate();
 });
 
-// ===== STRICT GPS HARD-LOCK MODAL (Patch 5.1) =====
+// ===== STRICT LOCATION HARD-LOCK MODAL (Patch 5.1, extended Patch 5.2) =====
 // Opened either by submitReport()'s defense-in-depth check or by the
-// visible #btnRetryGps inside #reportGpsLockHint — both routes just
-// re-request a real device fix via resolveDisplayLocation(); neither ever
-// substitutes an anchor/default coordinate.
+// visible #btnRetryGps inside #reportGpsLockHint — both GPS routes just
+// re-request a real device fix via resolveDisplayLocation(); the manual
+// address inputs below instead forward-geocode a typed street address via
+// geocodeAddress(). None of these paths ever substitutes an anchor/default
+// coordinate.
 let locationRetryInFlight = false;
 function triggerLocationRequiredModal(){
   document.getElementById('locationRequiredModal').classList.add('open');
@@ -5270,8 +5318,8 @@ async function retryGpsResolution(btn){
     locationRetryInFlight = false;
     if (btn) { btn.textContent = originalLabel; btn.disabled = false; }
     updateSubmitPhotoGate();
-    if (!hasValidGps()) {
-      toast('Still no GPS fix — check that location access is allowed for this site in your device/browser settings.', true);
+    if (!hasValidLocation()) {
+      toast('Still no GPS fix — enable location access, or enter your street address below.', true);
     } else {
       toast('Location resolved — you can publish now.');
     }
@@ -5280,10 +5328,67 @@ async function retryGpsResolution(btn){
 document.getElementById('btnLocationRetry').addEventListener('click', async () => {
   const btn = document.getElementById('btnLocationRetry');
   await retryGpsResolution(btn);
-  if (hasValidGps()) closeLocationRequiredModal();
+  if (hasValidLocation()) closeLocationRequiredModal();
 });
 document.getElementById('btnLocationDismiss').addEventListener('click', closeLocationRequiredModal);
 document.getElementById('btnRetryGps').addEventListener('click', () => retryGpsResolution(document.getElementById('btnRetryGps')));
+
+// MANUAL STREET-ADDRESS FALLBACK (Patch 5.2) — shared handler for both the
+// inline #reportGpsLockHint address field and the #locationRequiredModal
+// address field. Forward-geocodes via the existing geocodeAddress() (same
+// Nominatim call the Public Ledger's address search already uses). Only on
+// a real geocode match does window.CITIXEN_MANUAL_ADDRESS get set — a typed
+// string that fails to geocode is reported as an error and never treated as
+// a valid location, matching "never default to La Crosse or anchor
+// coordinates."
+async function submitManualAddress(inputEl, statusEl, btn){
+  const address = inputEl ? inputEl.value.trim() : '';
+  if (address.length < 6) {
+    if (statusEl) {
+      statusEl.textContent = 'Enter a full street address (e.g. 351 W Hubbard St).';
+      statusEl.style.color = 'var(--danger)';
+      statusEl.style.display = '';
+    }
+    return;
+  }
+  const originalLabel = btn ? btn.textContent : null;
+  if (btn) { btn.textContent = 'Locating…'; btn.disabled = true; }
+  if (statusEl) {
+    statusEl.textContent = 'Looking up address…';
+    statusEl.style.color = 'var(--muted)';
+    statusEl.style.display = '';
+  }
+  try {
+    const geocoded = await geocodeAddress(address);
+    if (!geocoded) {
+      if (statusEl) { statusEl.textContent = "Couldn't validate that address — check it and try again."; statusEl.style.color = 'var(--danger)'; }
+      return;
+    }
+    window.CITIXEN_MANUAL_ADDRESS = { address, lat: geocoded.lat, lng: geocoded.lng };
+    const repLoc = document.getElementById('repLoc');
+    if (repLoc) { repLoc.value = geocoded.label || address; repLoc.dataset.userEdited = '1'; }
+    if (statusEl) { statusEl.textContent = '✓ Address validated — you can publish now.'; statusEl.style.color = 'var(--mint2)'; }
+    updateSubmitPhotoGate();
+    toast('Address validated — you can publish now.');
+    if (hasValidLocation()) closeLocationRequiredModal();
+  } finally {
+    if (btn) { btn.textContent = originalLabel; btn.disabled = false; }
+  }
+}
+document.getElementById('btnUseManualAddress').addEventListener('click', () => {
+  submitManualAddress(
+    document.getElementById('repManualAddress'),
+    document.getElementById('repManualAddressStatus'),
+    document.getElementById('btnUseManualAddress')
+  );
+});
+document.getElementById('btnModalUseManualAddress').addEventListener('click', () => {
+  submitManualAddress(
+    document.getElementById('modalManualAddress'),
+    document.getElementById('modalManualAddressStatus'),
+    document.getElementById('btnModalUseManualAddress')
+  );
+});
 
 // ===== POST-SUBMISSION DISPATCH RECEIPT MODAL — see finalizeSubmitReport(),
 // the only place that opens this (right after auto-routing to Map & Feed).
@@ -5696,22 +5801,29 @@ function markGridCellLit(cityCode){
 // submission always tags urgentOverride:false with no project.
 async function finalizeSubmitReport(opts){
   opts = opts || {};
-  // STRICT GPS HARD-LOCK (Patch 5.1) — defense in depth. This function is
-  // only ever reached via the Publish flow, which is already gated on
-  // hasValidGps() (submitReport() and the disabled #btnSubmit itself). The
-  // check is repeated here so finalizeSubmitReport() can never be invoked
-  // some other way and silently invent a location: there is no anchor or
-  // jittered-coordinate fallback left anywhere in this file. If GPS truly
-  // isn't resolved at this point, publishing stops instead of fabricating
-  // a ticket location.
+  // STRICT LOCATION HARD-LOCK (Patch 5.1, extended Patch 5.2) — defense in
+  // depth. This function is only ever reached via the Publish flow, which
+  // is already gated on hasValidLocation() (submitReport() and the
+  // disabled #btnSubmit itself). The check is repeated here so
+  // finalizeSubmitReport() can never be invoked some other way and silently
+  // invent a location: there is no anchor or jittered-coordinate fallback
+  // left anywhere in this file. GPS is preferred when both are present; a
+  // geocoded manual address is used only when no real GPS fix exists. If
+  // neither is resolved at this point, publishing stops instead of
+  // fabricating a ticket location.
   const resolved = window.CITIXEN_RESOLVED_LOCATION;
-  if (!resolved || typeof resolved.lat !== 'number' || typeof resolved.lng !== 'number') {
-    toast('Location Required to Post: a validated GPS fix is required to publish this report.', true);
+  const manualAddr = window.CITIXEN_MANUAL_ADDRESS;
+  const usingGps = hasValidGps();
+  const usingManual = !usingGps && hasValidManualAddress();
+  if (!usingGps && !usingManual) {
+    toast('Location Required to Post: enable GPS or enter a validated street address to publish this report.', true);
     triggerLocationRequiredModal();
     return;
   }
+  const finalLat = usingGps ? resolved.lat : manualAddr.lat;
+  const finalLng = usingGps ? resolved.lng : manualAddr.lng;
   const rawDesc=document.getElementById('repDesc').value.trim() || 'Hazard reported.';
-  const rawLoc=document.getElementById('repLoc').value.trim() || 'Local District';
+  const rawLoc=document.getElementById('repLoc').value.trim() || (usingManual ? manualAddr.address : 'Local District');
   const hz=classifyHazard(rawDesc, cat);
   const dept=hz.department;
   const urgentOverride = !!opts.urgentOverride;
@@ -5720,12 +5832,13 @@ async function finalizeSubmitReport(opts){
     : '';
   const nc={
     id:'c'+Date.now(), title:cat, category:cat, loc:rawLoc,
-    // Real device GPS coordinates only. The previous fallback here — a
-    // fixed La Crosse, WI anchor point plus random jitter, used whenever
-    // GPS hadn't actually resolved — has been removed entirely per the
-    // Strict GPS Hard-Lock policy; `resolved` is guaranteed real by the
-    // check above.
-    lat: resolved.lat, lng: resolved.lng,
+    // Real coordinates only — either a device GPS fix or a geocoded manual
+    // street address. The previous fallback here — a fixed La Crosse, WI
+    // anchor point plus random jitter, used whenever GPS hadn't actually
+    // resolved — has been removed entirely per the Strict Location
+    // Hard-Lock policy; finalLat/finalLng are guaranteed real by the check
+    // above.
+    lat: finalLat, lng: finalLng,
     status: window.CitixenSeverity
       ? window.CitixenSeverity.classify({ category: cat, title: cat, desc: rawDesc, urgentOverride })
       : (urgentOverride ? 'Critical' : 'Standard'),
