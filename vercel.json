@@ -38,6 +38,18 @@
       "destination": "/report.html?id=:id"
     },
     {
+      "source": "/careers",
+      "destination": "/careers.html"
+    },
+    {
+      "source": "/careers/:id",
+      "destination": "/careers-dispatch.html?id=:id"
+    },
+    {
+      "source": "/join/:id",
+      "destination": "/careers-dispatch.html?id=:id"
+    },
+    {
       "source": "/operator/feedback",
       "destination": "/operator-feedback.html"
     },

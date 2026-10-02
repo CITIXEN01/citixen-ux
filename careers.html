@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Join CITIXEN UX™ — Careers &amp; Open Dispatches</title>
+<meta name="description" content="Open roles and the onboarding protocol for CITIXEN UX — the civic operating system replacing municipal bureaucracy with a real-time spatial ledger.">
+<meta name="theme-color" content="#0B132B">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" type="image/x-icon" href="/favicon.ico?v=5">
+<style>
+:root{
+  --obsidian:#0B132B; --obsidian-2:#111c3d; --card:#131d3f; --border:rgba(148,163,184,.16);
+  --cyan:#00B4D8; --cyan-dim:rgba(0,180,216,.12); --mint:#10B981; --mint-dim:rgba(16,185,129,.12);
+  --text:#f1f5f9; --muted:#8fa0c0; --muted-2:#5b6c8e;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--obsidian); color:var(--text); min-height:100vh; display:flex; justify-content:center;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background-image:radial-gradient(65% 40% at 50% 0%, rgba(0,180,216,.1), transparent 70%);
+}
+.shell{width:100%;max-width:720px;padding:20px 18px calc(48px + env(safe-area-inset-bottom,0px));}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+
+.topline{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.brand-wordmark{font-weight:800;font-size:.95rem;letter-spacing:.3px;text-decoration:none;color:var(--text)}
+.brand-cyan{color:var(--cyan)}
+.back-link{font-size:.72rem;color:var(--muted);text-decoration:none;border-bottom:1px dashed var(--border)}
+.back-link:hover{color:var(--cyan)}
+
+.hero-eyebrow{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--mint)}
+h1{font-size:1.9rem;font-weight:800;margin:10px 0 10px;line-height:1.15}
+.hero-body{font-size:.9rem;line-height:1.65;color:#d7e0f0;max-width:56ch}
+
+.section{margin-top:34px}
+.section-title{font-size:1.05rem;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-title .count{font-size:.68rem;color:var(--muted-2);font-weight:600}
+
+.role-grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media (min-width:560px){ .role-grid{grid-template-columns:1fr 1fr} }
+
+.role-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;text-decoration:none;color:var(--text);
+  display:flex;flex-direction:column;gap:8px;transition:border-color .15s ease}
+.role-card:hover{border-color:var(--cyan)}
+.role-tag{display:inline-flex;align-self:flex-start;font-size:.6rem;font-weight:800;letter-spacing:.06em;color:var(--mint);
+  background:var(--mint-dim);border-radius:999px;padding:3px 9px}
+.role-card h3{font-size:1.02rem;margin:0}
+.role-card p{font-size:.78rem;color:var(--muted);line-height:1.5;margin:0}
+.role-card .pacing{font-size:.7rem;color:var(--cyan);margin-top:2px}
+.role-card .view{font-size:.74rem;font-weight:700;color:var(--cyan);margin-top:4px}
+
+.empty-note{font-size:.82rem;color:var(--muted);background:var(--card);border:1px dashed var(--border);border-radius:12px;padding:16px;}
+
+.apply-card{background:linear-gradient(160deg, var(--card), var(--obsidian-2));border:1px solid rgba(0,180,216,.3);border-radius:16px;padding:22px}
+.apply-card p.lead{font-size:.84rem;color:var(--muted);line-height:1.6;margin:6px 0 18px}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.field label{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted-2);font-weight:700}
+.field input, .field textarea{
+  background:var(--obsidian-2); border:1px solid var(--border); border-radius:9px; color:var(--text);
+  font-size:.86rem; padding:10px 12px; font-family:inherit; resize:vertical;
+}
+.field input:focus, .field textarea:focus{ outline:none; border-color:var(--cyan); }
+.btn{text-align:center;text-decoration:none;padding:13px;border-radius:10px;font-weight:800;font-size:.82rem;border:none;cursor:pointer;width:100%;display:block}
+.btn-primary{background:var(--mint);color:#04120c}
+.btn-primary:disabled{opacity:.5;cursor:default}
+.apply-note{font-size:.7rem;color:var(--muted-2);margin-top:10px;line-height:1.5}
+
+.footnote{text-align:center;font-size:.72rem;color:var(--muted-2);margin-top:36px}
+.footnote a{color:var(--muted)}
+[hidden]{display:none !important}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="topline">
+    <a class="brand-wordmark" href="/app">CITIXEN<span class="brand-cyan">UX</span>™</a>
+    <a class="back-link" href="/app">&larr; Back to app</a>
+  </div>
+
+  <div class="hero-eyebrow">Onboarding &amp; Role Dispatch</div>
+  <h1>Join the protocol.</h1>
+  <p class="hero-body">
+    CITIXEN OS is replacing municipal bureaucracy with a real-time spatial ledger — closed-loop local
+    sourcing, platform treasury self-insurance, and revenue reinvested straight back into the cities
+    running it. Below are the roles currently open, plus a direct line in if you don't see a fit yet.
+  </p>
+
+  <div class="section">
+    <div class="section-title">Open roles <span class="count mono" id="roleCount"></span></div>
+    <div class="role-grid" id="roleGrid"></div>
+    <div class="empty-note" id="emptyNote" hidden>No open roles posted right now — send us a note below and we'll reach out when something fits.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">How can I help?</div>
+    <div class="apply-card">
+      <p class="lead">Not seeing your role above? Tell us what you'd bring and we'll route it to the right person. This opens your email client with the message pre-filled — nothing is sent automatically.</p>
+      <div class="field">
+        <label for="appName">Name</label>
+        <input id="appName" type="text" placeholder="Your name" autocomplete="name">
+      </div>
+      <div class="field">
+        <label for="appEmail">Email</label>
+        <input id="appEmail" type="email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="appMsg">How can you help?</label>
+        <textarea id="appMsg" rows="4" placeholder="What you're good at, what you'd want to work on, and roughly how many hours/week you've got."></textarea>
+      </div>
+      <button class="btn btn-primary" id="btnApply">Open email to apply</button>
+      <p class="apply-note">Prefer not to use email? Mention it in the message and we'll find another way to connect.</p>
+    </div>
+  </div>
+
+  <p class="footnote">Already have a dispatch link? It looks like <span class="mono">/careers/your-id</span> — open it directly.</p>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  fetch('/careers-roles.json', { cache: 'no-store' })
+    .then(function(res){ if (!res.ok) throw new Error('roles fetch failed: ' + res.status); return res.json(); })
+    .then(function(data){ renderRoles((data.roles || []).filter(function(r){ return r.public; })); })
+    .catch(function(){ renderRoles([]); }); // honest empty state — never fabricated roles
+
+  function renderRoles(roles){
+    var grid = document.getElementById('roleGrid');
+    var countEl = document.getElementById('roleCount');
+    var emptyEl = document.getElementById('emptyNote');
+    countEl.textContent = roles.length ? '(' + roles.length + ')' : '';
+    if (!roles.length) { emptyEl.hidden = false; return; }
+    grid.innerHTML = roles.map(function(r){
+      return '<a class="role-card" href="/careers/' + encodeURIComponent(r.id) + '">' +
+        '<span class="role-tag">' + esc(r.citizenId || 'OPEN ROLE') + '</span>' +
+        '<h3>' + esc(r.roleTitle) + '</h3>' +
+        '<p>' + esc(r.blurb || '') + '</p>' +
+        '<span class="pacing mono">' + esc(r.pacing || '') + '</span>' +
+        '<span class="view">View dispatch &rarr;</span>' +
+      '</a>';
+    }).join('');
+  }
+
+  document.getElementById('btnApply').addEventListener('click', function(){
+    var name = document.getElementById('appName').value.trim();
+    var email = document.getElementById('appEmail').value.trim();
+    var msg = document.getElementById('appMsg').value.trim();
+    var body = 'Name: ' + name + '\nEmail: ' + email + '\n\n' + msg;
+    window.location.href = 'mailto:join@citixenux.com?subject=' + encodeURIComponent('How I can help — CITIXEN UX') + '&body=' + encodeURIComponent(body);
+  });
+})();
+</script>
+</body>
+</html>

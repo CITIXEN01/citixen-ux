@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- DYNAMIC ROLE DISPATCH TEMPLATE — one static file serves every
+     /careers/:id URL (see vercel.json's rewrite: /careers/:id ->
+     /careers-dispatch.html?id=:id, the same pattern report.html already
+     uses for /report/:id). All per-person content — citizen ID, title,
+     directives, pacing, equity slices — lives in careers-roles.json and is
+     fetched + rendered client-side below, so a new dispatch page is just a
+     new JSON object, never a new file or a new serverless function. -->
+<title>CITIZEN Dispatch — CITIXEN UX™</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0B132B">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" type="image/x-icon" href="/favicon.ico?v=5">
+<style>
+:root{
+  --obsidian:#0B132B; --obsidian-2:#111c3d; --card:#131d3f; --border:rgba(148,163,184,.16);
+  --cyan:#00B4D8; --cyan-dim:rgba(0,180,216,.12); --mint:#10B981; --mint-dim:rgba(16,185,129,.12);
+  --text:#f1f5f9; --muted:#8fa0c0; --muted-2:#5b6c8e; --danger:#f2607a;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--obsidian); color:var(--text); min-height:100vh; display:flex; justify-content:center;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background-image:radial-gradient(60% 45% at 50% 0%, rgba(0,180,216,.09), transparent 70%);
+}
+.shell{width:100%;max-width:640px;padding:20px 18px calc(48px + env(safe-area-inset-bottom,0px));}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+
+.topline{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.brand-wordmark{font-weight:800;font-size:.95rem;letter-spacing:.3px;text-decoration:none;color:var(--text)}
+.brand-cyan{color:var(--cyan)}
+.back-link{font-size:.72rem;color:var(--muted);text-decoration:none;border-bottom:1px dashed var(--border)}
+.back-link:hover{color:var(--cyan)}
+
+/* PROTOCOL HEADER */
+.status-pill{display:inline-flex;align-items:center;gap:7px;font-size:.68rem;font-weight:800;letter-spacing:.06em;
+  color:var(--cyan);background:var(--cyan-dim);border:1px solid rgba(0,180,216,.3);border-radius:999px;padding:6px 12px;}
+.status-pill .dot{width:6px;height:6px;border-radius:999px;background:var(--cyan)}
+.role-title{font-size:1.7rem;font-weight:800;margin:14px 0 4px;line-height:1.15}
+.role-subtitle{font-size:.86rem;color:var(--muted);font-style:italic}
+
+/* SECTION SHELL */
+.section{margin-top:26px}
+.section-eyebrow{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--mint);margin-bottom:8px}
+.section-title{font-size:1.1rem;font-weight:700;margin-bottom:10px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px}
+.body-copy{font-size:.86rem;line-height:1.65;color:#d7e0f0}
+
+/* 02 — OPERATIONAL RADIUS */
+.radius-grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media (min-width:520px){ .radius-grid{grid-template-columns:1.4fr 1fr} }
+.directive-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.directive-list li{display:flex;gap:10px;font-size:.84rem;line-height:1.5}
+.directive-list .bullet{flex:none;width:18px;height:18px;border-radius:5px;background:var(--mint-dim);color:var(--mint);
+  font-size:.64rem;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:2px}
+.pacing-card{display:flex;flex-direction:column;justify-content:center;gap:4px;text-align:center}
+.pacing-label{font-size:.64rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted-2)}
+.pacing-value{font-size:1.3rem;font-weight:800;color:var(--cyan)}
+
+/* 03 — SOVEREIGN SLICE */
+.slice-row{display:flex;flex-direction:column;gap:10px}
+.slice-item{display:flex;flex-direction:column;gap:4px;padding:12px 0;border-top:1px solid var(--border)}
+.slice-item:first-child{border-top:none;padding-top:0}
+.slice-name{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted-2);font-weight:700}
+.slice-value{font-size:.9rem;font-weight:700;color:var(--mint);line-height:1.4}
+@media (min-width:480px){
+  .slice-item{flex-direction:row;justify-content:space-between;align-items:flex-start;gap:14px}
+  .slice-name{max-width:40%;padding-top:2px}
+  .slice-value{text-align:right}
+}
+
+/* CTA */
+.cta-card{background:linear-gradient(160deg, var(--card), var(--obsidian-2));border:1px solid rgba(0,180,216,.3)}
+.cta-note{font-size:.72rem;color:var(--muted);line-height:1.5;margin-bottom:16px}
+.cta-row{display:flex;flex-direction:column;gap:10px}
+.btn{text-align:center;text-decoration:none;padding:13px;border-radius:10px;font-weight:800;font-size:.82rem;border:none;cursor:pointer;width:100%}
+.btn-primary{background:var(--mint);color:#04120c}
+.btn-primary:disabled{opacity:.55;cursor:default}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--cyan);color:var(--cyan)}
+.accepted-banner{display:none;align-items:center;gap:10px;background:var(--mint-dim);border:1px solid rgba(16,185,129,.35);
+  border-radius:10px;padding:12px 14px;margin-top:14px;font-size:.78rem;color:#a7f3d0}
+.accepted-banner.show{display:flex}
+.accepted-banner a{color:var(--mint);font-weight:700}
+
+.footnote{text-align:center;font-size:.68rem;color:var(--muted-2);margin-top:28px}
+
+.notfound{text-align:center;padding:80px 20px}
+.notfound h1{font-size:1.2rem;margin-bottom:8px}
+.notfound p{font-size:.84rem;color:var(--muted);margin-bottom:18px}
+
+[hidden]{display:none !important}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="topline">
+    <a class="brand-wordmark" href="/app">CITIXEN<span class="brand-cyan">UX</span>™</a>
+    <a class="back-link" href="/careers">&larr; All roles</a>
+  </div>
+
+  <div id="loadingState" class="body-copy">Loading dispatch…</div>
+
+  <div id="notFoundState" class="notfound" hidden>
+    <h1>Dispatch not found</h1>
+    <p>This invitation link doesn't match an active role. Check the link, or see what's currently open.</p>
+    <a class="back-link" href="/careers">&larr; View open roles</a>
+  </div>
+
+  <div id="dispatchRoot" hidden>
+
+    <span class="status-pill mono"><span class="dot"></span><span id="statusPillText">DISPATCH PROTOCOL</span></span>
+    <h1 class="role-title" id="roleTitle"></h1>
+    <p class="role-subtitle">Your Role &amp; Mission — If You Choose to Accept</p>
+
+    <div class="section">
+      <div class="section-eyebrow" id="preContextEyebrow">01 // Pre-Context</div>
+      <div class="card">
+        <div class="section-title" id="preContextTitle"></div>
+        <p class="body-copy" id="preContextBody"></p>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-eyebrow">02 // Operational Radius</div>
+      <div class="radius-grid">
+        <div class="card">
+          <div class="section-title" style="font-size:.95rem">Primary Directives</div>
+          <ul class="directive-list" id="directiveList"></ul>
+        </div>
+        <div class="card pacing-card">
+          <span class="pacing-label">Committed Pacing</span>
+          <span class="pacing-value" id="pacingValue"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-eyebrow">03 // The Sovereign Slice</div>
+      <div class="card">
+        <div class="slice-row" id="sliceRow"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="card cta-card">
+        <div class="section-title">Mission Initialization</div>
+        <p class="cta-note">This is a non-binding offer of intent to test mutual alignment on the Living Ledger. Nothing here is a contract or an employment offer — it's a starting point for a real conversation.</p>
+        <div class="cta-row">
+          <button class="btn btn-primary" id="btnAccept">Accept Mission &amp; Initialize</button>
+          <a class="btn btn-outline" id="btnSchedule" href="mailto:join@citixenux.com">Schedule Alignment Call</a>
+        </div>
+        <div class="accepted-banner" id="acceptedBanner">
+          ✓ Marked as accepted on this device. To make it official, <a id="confirmMailLink" href="#">send a quick confirmation email</a> — nothing is submitted to us automatically.
+        </div>
+      </div>
+    </div>
+
+    <p class="footnote mono" id="idFootnote"></p>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  // Vercel rewrites are invisible to the client: a request to /careers/:id
+  // is routed server-side to /careers-dispatch.html?id=:id, but the
+  // browser's own window.location never changes — it stays at the
+  // original /careers/:id (or /join/:id), with no query string at all.
+  // So the id has to come from the path itself for the real pretty-URL
+  // case; the ?id= query is only honored as a fallback, for someone
+  // bookmarking/testing this file directly.
+  var params = new URLSearchParams(window.location.search);
+  var id = params.get('id');
+  if (!id) {
+    var segs = window.location.pathname.split('/').filter(Boolean);
+    if (segs.length >= 2 && (segs[0] === 'careers' || segs[0] === 'join')) {
+      id = decodeURIComponent(segs[1]);
+    }
+  }
+
+  var loadingEl = document.getElementById('loadingState');
+  var notFoundEl = document.getElementById('notFoundState');
+  var rootEl = document.getElementById('dispatchRoot');
+
+  function showNotFound(){
+    loadingEl.hidden = true;
+    notFoundEl.hidden = false;
+  }
+
+  if (!id) { showNotFound(); return; }
+
+  fetch('/careers-roles.json', { cache: 'no-store' })
+    .then(function(res){ if (!res.ok) throw new Error('roles fetch failed: ' + res.status); return res.json(); })
+    .then(function(data){
+      var role = (data.roles || []).find(function(r){ return r.id === id; });
+      if (!role) { showNotFound(); return; }
+      renderRole(role, data.preContext || {});
+    })
+    .catch(function(){
+      // Honest failure — no fabricated role content is ever shown in its
+      // place; an unreachable data file reads the same as an unknown id.
+      showNotFound();
+    });
+
+  function renderRole(role, preContext){
+    document.title = (role.name ? role.name + ' — ' : '') + role.roleTitle + ' — CITIXEN UX™';
+
+    document.getElementById('statusPillText').textContent = 'DISPATCH PROTOCOL: ' + role.citizenId;
+    document.getElementById('roleTitle').textContent = role.name
+      ? role.roleTitle + ' — ' + role.name
+      : role.roleTitle;
+
+    document.getElementById('preContextEyebrow').textContent = preContext.eyebrow || '01 // Pre-Context';
+    document.getElementById('preContextTitle').textContent = preContext.title || 'The Living Ledger';
+    document.getElementById('preContextBody').textContent = preContext.body || '';
+
+    var list = document.getElementById('directiveList');
+    list.innerHTML = '';
+    (role.directives || []).forEach(function(d, i){
+      var li = document.createElement('li');
+      li.innerHTML = '<span class="bullet">' + (i + 1) + '</span><span>' + esc(d) + '</span>';
+      list.appendChild(li);
+    });
+
+    document.getElementById('pacingValue').textContent = role.pacing || '—';
+
+    var sliceRow = document.getElementById('sliceRow');
+    sliceRow.innerHTML = '';
+    var equity = role.equity || {};
+    [
+      ['Class A Equity Stake', equity.classA],
+      ['Contract Revenue Slice', equity.revenueSlice],
+      ['Patent / IP Royalty', equity.patentRoyalty]
+    ].forEach(function(pair){
+      if (!pair[1]) return;
+      var row = document.createElement('div');
+      row.className = 'slice-item';
+      row.innerHTML = '<span class="slice-name">' + esc(pair[0]) + '</span><span class="slice-value">' + esc(pair[1]) + '</span>';
+      sliceRow.appendChild(row);
+    });
+
+    document.getElementById('idFootnote').textContent = 'REF: ' + role.id.toUpperCase();
+
+    var mailBody = encodeURIComponent(
+      "Confirming alignment on the \"" + role.roleTitle + "\" dispatch (" + role.citizenId + ", ref " + role.id + ").\n\n" +
+      "This isn't a binding commitment — just flagging that I've accepted on my end and I'm ready to talk next steps."
+    );
+    document.getElementById('confirmMailLink').href =
+      'mailto:join@citixenux.com?subject=' + encodeURIComponent('Mission accepted — ' + role.citizenId) + '&body=' + mailBody;
+    document.getElementById('btnSchedule').href =
+      'mailto:join@citixenux.com?subject=' + encodeURIComponent('Schedule alignment call — ' + role.citizenId);
+
+    // ACCEPTANCE STATE — stored locally per role id, per device. This is
+    // intentionally not submitted anywhere on its own (no backend function
+    // exists for this route) — the confirmation email link above is the
+    // actual notification path.
+    var lsKey = 'citixen_careers_accept_' + role.id;
+    var acceptBtn = document.getElementById('btnAccept');
+    var banner = document.getElementById('acceptedBanner');
+
+    function paintAccepted(on){
+      if (on) {
+        acceptBtn.textContent = '✓ Mission Accepted';
+        acceptBtn.disabled = true;
+        banner.classList.add('show');
+      } else {
+        acceptBtn.textContent = 'Accept Mission & Initialize';
+        acceptBtn.disabled = false;
+        banner.classList.remove('show');
+      }
+    }
+
+    var already = false;
+    try { already = localStorage.getItem(lsKey) === '1'; } catch(e) { /* private mode, etc — fails open */ }
+    paintAccepted(already);
+
+    acceptBtn.addEventListener('click', function(){
+      try { localStorage.setItem(lsKey, '1'); } catch(e) { /* non-fatal — state just won't persist on reload */ }
+      paintAccepted(true);
+    });
+
+    loadingEl.hidden = true;
+    rootEl.hidden = false;
+  }
+})();
+</script>
+</body>
+</html>

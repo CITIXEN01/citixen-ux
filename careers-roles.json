@@ -1,0 +1,85 @@
+{
+  "_comment": "Central role/dispatch data for /careers (hub) and /careers/:id (dispatch pages). Add a new object to generate a new dispatch page — no code changes needed. 'public: true' roles also appear in the open-roles grid on /careers itself.",
+
+  "preContext": {
+    "eyebrow": "01 // Pre-Context",
+    "title": "The Living Ledger",
+    "body": "CITIXEN OS replaces municipal bureaucracy with a real-time spatial ledger: every report, dispatch, and closeout is verified and timestamped in one shared record instead of scattered paper trails. Work is sourced to local tradespeople first (closed-loop local sourcing), the platform self-insures its own treasury against claims instead of paying a third-party underwriter, and the margin that used to go to legacy software vendors gets reinvested straight back into the cities running it."
+  },
+
+  "roles": [
+    {
+      "id": "citizen-02",
+      "public": false,
+      "citizenId": "CITIZEN #02",
+      "name": "Chris",
+      "roleTitle": "Platform Architect",
+      "directives": [
+        "Own the core ledger schema and the dispatch/escrow state machine end to end",
+        "Ship and harden the citizen-facing app (app.html) against real beta traffic",
+        "Pair directly with municipal IT contacts during pilot onboarding"
+      ],
+      "pacing": "Pilot Sprint: 20–25 hrs/week",
+      "equity": {
+        "classA": "Class A Equity Stake — 4-year vest, 1-year cliff",
+        "revenueSlice": "3.0% direct slice of active municipal SaaS contract revenue",
+        "patentRoyalty": "1.5% of commercial patent / platform IP licensing revenue"
+      }
+    },
+    {
+      "id": "citizen-03",
+      "public": false,
+      "citizenId": "CITIZEN #03",
+      "name": "Jordy",
+      "roleTitle": "Field Operations Lead",
+      "directives": [
+        "Run the La Crosse pilot's day-to-day dispatch queue and contractor escrow approvals",
+        "Build the playbook that turns a city's permit/311 feed into a working intake pipeline",
+        "Be the first call for pilot-city staff when something in the field breaks"
+      ],
+      "pacing": "Pilot Sprint: 15–20 hrs/week",
+      "equity": {
+        "classA": "Class A Equity Stake — 4-year vest, 1-year cliff",
+        "revenueSlice": "2.0% direct slice of active municipal SaaS contract revenue",
+        "patentRoyalty": "1.0% of commercial patent / platform IP licensing revenue"
+      }
+    },
+    {
+      "id": "sourcing-lead-amy",
+      "public": false,
+      "citizenId": "SPECIALIZED CONTRIBUTOR",
+      "name": "Amy",
+      "roleTitle": "Sourcing Lead",
+      "directives": [
+        "Build the closed-loop local-vendor network each new pilot city routes dispatch work through",
+        "Negotiate and onboard the first cohort of local trade contractors per city",
+        "Own vendor vetting, rates, and the escrow payout checklist"
+      ],
+      "pacing": "Pilot Sprint: 10–15 hrs/week",
+      "equity": {
+        "classA": "Class A Equity Stake — 4-year vest, 1-year cliff",
+        "revenueSlice": "1.5% direct slice of active municipal SaaS contract revenue",
+        "patentRoyalty": "0.5% of commercial patent / platform IP licensing revenue"
+      }
+    },
+    {
+      "id": "civic-ops-generalist",
+      "public": true,
+      "citizenId": "OPEN ROLE",
+      "name": null,
+      "roleTitle": "Civic Ops Generalist",
+      "blurb": "General-purpose operator role — triage, light ops, and pilot-city support. Good entry point if you're not sure yet where you fit.",
+      "directives": [
+        "Triage incoming citizen reports and flag anything that needs an urgent override",
+        "Support pilot-city onboarding calls and follow-up documentation",
+        "Help keep the public ledger and coverage directory accurate"
+      ],
+      "pacing": "Flexible: 5–15 hrs/week to start",
+      "equity": {
+        "classA": "Class A Equity Stake — 4-year vest, 1-year cliff",
+        "revenueSlice": "0.5% direct slice of active municipal SaaS contract revenue",
+        "patentRoyalty": "0.25% of commercial patent / platform IP licensing revenue"
+      }
+    }
+  ]
+}
