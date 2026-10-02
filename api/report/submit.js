@@ -46,12 +46,18 @@
 //   - category/location/description non-empty strings — catches a request
 //     with the right shape but empty/whitespace-only content, which
 //     addTicket() would otherwise happily append as a blank-looking ticket.
-const { addTicket } = require('../_lib/store');
+const { addTicket, recordIngestionAttempt } = require('../_lib/store');
 
 function isNonEmptyString(v) {
   return typeof v === 'string' && v.trim().length > 0;
 }
 
+// FINAL ALPHA LAUNCH ADDITIONS — every real POST here (not a stray
+// non-POST method call) is one "photo upload attempt" for the Command
+// Center's Ingestion Success Rate widget; see
+// api/_lib/store.js's recordIngestionAttempt()/getIngestionStats() for why
+// this is the honest stand-in for a real upload-attempts counter in an
+// architecture that never uploads the photo file itself.
 module.exports = (req, res) => {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'POST only' });
@@ -59,14 +65,17 @@ module.exports = (req, res) => {
   }
   const body = req.body || {};
   if (!body.photoConfirmed) {
+    recordIngestionAttempt(false);
     res.status(400).json({ success: false, error: 'Photo proof payload mandatory.' });
     return;
   }
   if (!body.rightOfWayConfirmed) {
+    recordIngestionAttempt(false);
     res.status(400).json({ success: false, error: 'Right-of-way confirmation is mandatory.' });
     return;
   }
   if (!isNonEmptyString(body.category) || !isNonEmptyString(body.location) || !isNonEmptyString(body.description)) {
+    recordIngestionAttempt(false);
     res.status(400).json({ success: false, error: 'Report is missing required category, location, or description.' });
     return;
   }
@@ -80,5 +89,6 @@ module.exports = (req, res) => {
     lng: body.lng,
     ward: body.ward
   });
+  recordIngestionAttempt(true);
   res.status(200).json({ ok: true, receivedAt: new Date().toISOString(), reportId, ward, hazardCode });
 };

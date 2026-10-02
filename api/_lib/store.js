@@ -598,9 +598,39 @@ function updateFeedbackStatus(id, status) {
   return item;
 }
 
+// ===== BETA TESTING ANALYTICS — INGESTION SUCCESS RATE =====
+// FINAL ALPHA LAUNCH ADDITIONS: the Command Center's "BETA TESTING
+// ANALYTICS (LIVE)" banner wants a Photo Upload Attempts vs. Successfully
+// Committed Ledger Entries rate. This codebase never uploads a real photo
+// file to the server (see submit.js's own PATCH 4.13 note) — the honest
+// equivalent is every real POST /api/report/submit call: each one IS a
+// photo-gated submission attempt (hasAttachedPhoto()'s client-side gate
+// already guarantees a real photo was attached before this request can
+// ever fire), and "successfully committed" means it passed every
+// server-side check and actually landed in WARD_TICKETS via addTicket()
+// below. A rejected attempt (missing photoConfirmed/rightOfWayConfirmed,
+// or an empty required field) still counts as an attempt, just not a
+// commit — that's the real signal this metric is meant to show. Pinned to
+// globalThis exactly like WARD_TICKETS/FEEDBACK_SUBMISSIONS above, with
+// the same honest in-memory-only, this-warm-instance-only limitation.
+const INGESTION_STATS = globalThis.__CITIXEN_INGESTION_STATS__ || (globalThis.__CITIXEN_INGESTION_STATS__ = { attempts: 0, committed: 0 });
+function recordIngestionAttempt(success) {
+  INGESTION_STATS.attempts += 1;
+  if (success) INGESTION_STATS.committed += 1;
+  return Object.assign({}, INGESTION_STATS);
+}
+function getIngestionStats() {
+  return {
+    attempts: INGESTION_STATS.attempts,
+    committed: INGESTION_STATS.committed,
+    successRatePct: INGESTION_STATS.attempts ? +(INGESTION_STATS.committed / INGESTION_STATS.attempts * 100).toFixed(1) : null
+  };
+}
+
 module.exports = {
   DB, getWard, getCity, summarize, allWards, CATEGORIES,
   allTickets, getTicketByReportId, makeReportId, addTicket, updateTicketStage,
   CAPEX_PROJECTS, capExAdherencePct, bigThree, bigThreeTrend, WARD_NAMES, WARD_JURISDICTION,
-  addFeedbackSubmission, allFeedbackSubmissions, updateFeedbackStatus
+  addFeedbackSubmission, allFeedbackSubmissions, updateFeedbackStatus,
+  recordIngestionAttempt, getIngestionStats
 };

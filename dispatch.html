@@ -31,8 +31,32 @@
 html,body{height:100%}
 body{background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
 
+/* ===== BETA TESTING ANALYTICS BANNER — FINAL ALPHA LAUNCH ADDITIONS.
+   Sticky row pinned above the main topbar (see --beta-banner-h, used below
+   to offset header.topbar's own sticky `top` so the two stack instead of
+   overlapping once both are stuck). Three live widgets wired directly to
+   backend store state via GET /api/coverage/tickets (geographic
+   breakdown + ingestion stats) and GET /api/operator/feedback (the
+   Instant Feedback stream) — see renderBetaAnalyticsBanner() below. ===== */
+:root{ --beta-banner-h:40px; }
+@media (max-width:860px){ :root{ --beta-banner-h:76px; } }
+.beta-banner{position:sticky;top:0;z-index:1001;background:#021b12;border-bottom:1px solid rgba(0,255,136,.4);
+  display:flex;align-items:center;gap:18px;padding:8px 24px;flex-wrap:wrap;min-height:var(--beta-banner-h);
+  box-sizing:border-box}
+.beta-banner-label{font-size:.68rem;font-weight:800;letter-spacing:.08em;color:var(--mint2);white-space:nowrap;
+  display:flex;align-items:center;gap:6px}
+.beta-banner-label-dot{width:6px;height:6px;border-radius:50%;background:var(--mint2);box-shadow:0 0 6px var(--mint2);
+  animation:betaBannerPulse 1.8s ease-in-out infinite}
+@keyframes betaBannerPulse{0%,100%{opacity:.35}50%{opacity:1}}
+@media (prefers-reduced-motion: reduce){.beta-banner-label-dot{animation:none}}
+.beta-banner-widgets{display:flex;align-items:center;gap:22px;flex-wrap:wrap;font-size:.72rem;color:var(--text)}
+.beta-widget{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.beta-widget-title{color:var(--muted);font-weight:700;text-transform:uppercase;font-size:.62rem;letter-spacing:.04em}
+.beta-widget-value{font-weight:800;color:var(--mint2)}
+.beta-widget-sub{color:var(--muted)}
+
 /* ===== HEADER (same visual identity, mint console badge) ===== */
-header.topbar{position:sticky;top:0;z-index:1000;background:rgba(7,12,14,.94);backdrop-filter:blur(12px);
+header.topbar{position:sticky;top:var(--beta-banner-h);z-index:1000;background:rgba(7,12,14,.94);backdrop-filter:blur(12px);
   border-bottom:1px solid var(--border);padding:14px 24px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .brand-logo{display:flex;align-items:center;gap:10px}
@@ -228,6 +252,27 @@ function renderBriefing(list){
       <button type="submit">Unlock console</button>
       <div id="gateErr" aria-live="polite"></div>
     </form>
+  </div>
+
+  <!-- ===== BETA TESTING ANALYTICS (LIVE) — FINAL ALPHA LAUNCH ADDITIONS.
+       Sticky banner above the main topbar; see renderBetaAnalyticsBanner()
+       for the fetches that fill it in. ===== -->
+  <div class="beta-banner" id="betaAnalyticsBanner" aria-label="Beta testing analytics">
+    <div class="beta-banner-label"><span class="beta-banner-label-dot"></span>BETA TESTING ANALYTICS (LIVE)</div>
+    <div class="beta-banner-widgets">
+      <div class="beta-widget">
+        <span class="beta-widget-title">Geographic Coverage</span>
+        <span class="beta-widget-value" id="betaGeoValue">—</span>
+      </div>
+      <div class="beta-widget">
+        <span class="beta-widget-title">Ingestion Success Rate</span>
+        <span class="beta-widget-value" id="betaIngestValue">—</span>
+      </div>
+      <div class="beta-widget">
+        <span class="beta-widget-title">Instant Feedback Stream</span>
+        <span class="beta-widget-value" id="betaFeedbackValue">—</span>
+      </div>
+    </div>
   </div>
 
   <header class="topbar">
@@ -672,10 +717,77 @@ document.getElementById('copilotConfirm').addEventListener('click',()=>{
   pendingCopilotId=null;
 });
 
+// ===== BETA TESTING ANALYTICS (LIVE) — FINAL ALPHA LAUNCH ADDITIONS =====
+// Three widgets wired directly to backend store state:
+//  a) Geographic Coverage  — GET /api/coverage/tickets, grouped client-side
+//     by city/ward. Every ticket in this store already passed the hard
+//     photo gate (see api/report/submit.js's PATCH 4.13 note), so "total
+//     photo submission counts per city/ward" is just a ticket count per
+//     jurisdiction — the honest reading of that metric in an architecture
+//     that never uploads the photo file itself.
+//  b) Ingestion Success Rate — the same GET /api/coverage/tickets response
+//     also carries `ingestion` (api/_lib/store.js's getIngestionStats()):
+//     real attempts vs. real commits, tracked server-side in
+//     api/report/submit.js.
+//  c) Instant Feedback Stream — GET /api/operator/feedback, the same
+//     backing store the top-right Instant Feedback badge
+//     (shared/global-feedback.js) posts into.
+// Polls every 15s so "(LIVE)" stays true without a manual refresh.
+async function renderBetaAnalyticsBanner(){
+  try {
+    const [ticketsRes, feedbackRes] = await Promise.all([
+      fetch('/api/coverage/tickets'),
+      fetch('/api/operator/feedback')
+    ]);
+    const ticketsData = await ticketsRes.json();
+    const feedbackData = await feedbackRes.json();
+
+    // (a) Geographic Coverage — city -> submission count, biggest first.
+    const byCity = {};
+    (ticketsData.tickets || []).forEach(t => {
+      byCity[t.cityName] = (byCity[t.cityName] || 0) + 1;
+    });
+    const cityEntries = Object.entries(byCity).sort((a, b) => b[1] - a[1]);
+    const geoEl = document.getElementById('betaGeoValue');
+    if (geoEl) {
+      geoEl.textContent = cityEntries.length
+        ? cityEntries.map(([city, n]) => `${city}: ${n}`).join(' · ')
+        : 'No submissions yet';
+    }
+
+    // (b) Ingestion Success Rate.
+    const ing = ticketsData.ingestion || { attempts: 0, committed: 0, successRatePct: null };
+    const ingestEl = document.getElementById('betaIngestValue');
+    if (ingestEl) {
+      ingestEl.textContent = ing.successRatePct === null
+        ? 'No attempts yet'
+        : `${ing.successRatePct}% (${ing.committed}/${ing.attempts})`;
+    }
+
+    // (c) Instant Feedback Stream — most recent note, total count.
+    const items = feedbackData.items || [];
+    const feedbackEl = document.getElementById('betaFeedbackValue');
+    if (feedbackEl) {
+      if (!items.length) {
+        feedbackEl.textContent = 'No messages yet';
+      } else {
+        const latest = items[0]; // allFeedbackSubmissions() returns newest first
+        const preview = latest.note ? latest.note.slice(0, 60) : '(no note)';
+        feedbackEl.textContent = `${items.length} total — latest: "${preview}"`;
+      }
+    }
+  } catch (e) {
+    // Network hiccup — leave the banner showing its last good values
+    // rather than blanking a live console mid-shift.
+  }
+}
+
 window.addEventListener('DOMContentLoaded',()=>{
   renderDeptFilters();
   renderTickets();
   initMap();
+  renderBetaAnalyticsBanner();
+  setInterval(renderBetaAnalyticsBanner, 15000);
 });
 </script>
 <script>

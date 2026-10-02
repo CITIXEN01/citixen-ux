@@ -28,12 +28,17 @@
      the bypass this would protect against doesn't exist here.
      PATCH 4.11.1 — HARD RESET: this gate no longer remembers a previous
      unlock across visits (the old citixen_auth_token read is gone from
-     here entirely), and Step 2's onboarding carousel no longer remembers
+     here entirely), and Step 2's security screen no longer remembers
      being seen either (see startPostUnlockLanding()/closeFrontDoorOnboarding()
      further down — the old ONBOARDING_SEEN_KEY check/write is gone too).
      Every single pageview — first-time or returning — runs the full
-     4-step sequence (Gate -> Onboarding -> Welcome Hero -> Intake Form)
-     from scratch, for the duration of this alpha. -->
+     3-step sequence (Gate -> Confidential Alpha Security Screen -> Intake
+     Form) from scratch, for the duration of this alpha. FINAL ALPHA LAUNCH
+     ADDITIONS collapsed the old 4-step sequence (which used to run a
+     "what to report" slide before the security notice, then a separate
+     branded Welcome Hero splash after it) down to this single security
+     screen, so Step 2's "Got it" now lands the citizen directly in the
+     camera-gated intake form instead of an intermediate splash. -->
 <script>
 (function(){
   // ?reset=true (e.g. citixenux.com/app?reset=true) — manual testing
@@ -498,7 +503,12 @@ textarea.input{resize:none;line-height:1.4}
    than the routine mint/emerald success/info toast above. */
 .toast.toast-danger{background:rgba(239,68,68,.18);border-color:#ef4444;color:#fca5a5}
 
-/* ===== SPLASH SCREEN — primary launch state on app initialization ===== */
+/* ===== SPLASH SCREEN — FINAL ALPHA LAUNCH ADDITIONS retired this as a
+   gated step of the entrance sequencer (see the <head> comment and
+   startPostUnlockLanding()/closeFrontDoorOnboarding() further down): the
+   #splashScreen markup itself was removed from <body>, so these rules
+   have nothing left to target. Left in place, unused, rather than pulled,
+   in case a future round restores the Welcome Hero step. ===== */
 .splash-screen{position:fixed;inset:0;z-index:3000;background:radial-gradient(circle at 50% 38%,#0f2318,#050908 72%);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
   transition:opacity .5s ease,visibility .5s ease}
@@ -1146,22 +1156,14 @@ textarea.input{resize:none;line-height:1.4}
   </form>
 </div>
 
-<!-- ===== STEP 3 OF 4 — WELCOME HERO (Patch 4.11 strict alpha entrance
-     sequencer). The shield below is this Hero's own inline-SVG rendering
-     of the exact same glowing green shield published as
-     /apple-touch-icon.png (see that file) — drawn inline rather than
-     embedding the PNG directly because that file bakes in its own square
-     dark background tile, which would show as a visible box against this
-     screen's own different background gradient; same shape and color,
-     just composited cleanly here instead. "Enter App" is the only way
-     through to Step 4 — see btnEnterApp's handler and hideSplash()'s own
-     comment for why there's no tap-anywhere-to-dismiss any more. ===== -->
-<div class="splash-screen" id="splashScreen">
-  <svg class="splash-logo" viewBox="0 0 24 24" width="64" height="64" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-  <div class="splash-word"><span class="brand-white">CITIXEN</span> <span class="brand-lime">UX</span><sup class="brand-tm">™</sup></div>
-  <div class="splash-tag">Improve Your Civic Experience</div>
-  <button type="button" class="splash-cta" id="btnEnterApp">Enter App</button>
-</div>
+<!-- The old "STEP 3 OF 4 — WELCOME HERO" branded splash (#splashScreen,
+     btnEnterApp) that used to sit here between the onboarding deck and the
+     camera-gated intake form was removed by the FINAL ALPHA LAUNCH
+     ADDITIONS round, which collapsed the entrance sequencer to a strict
+     3 steps: Passcode -> Confidential Alpha Security Screen -> Intake
+     Form. See startPostUnlockLanding()/closeFrontDoorOnboarding() further
+     down — closing the security screen now switches straight into the
+     report tab itself. -->
 
 <div class="shell">
 
@@ -2013,12 +2015,14 @@ textarea.input{resize:none;line-height:1.4}
        ONBOARDING_SEEN_KEY gate is gone entirely (see
        startPostUnlockLanding()'s own comment). Opens immediately on unlock
        — no auto-timer — and, per "enforce strict" sequencing, has no skip
-       path: no backdrop-dismiss, no dot-jump, no "✕" (all removed in
-       Patch 4.11). The only way through is slide A's "Continue" and slide
-       B's "Got it", each a deliberate, completion-gated step. Slide A
-       covers what to report and the real state of photo privacy; slide B
-       covers what the 10-person alpha cohort is expected to do.
-       See openFrontDoorOnboarding()/closeFrontDoorOnboarding(). ===== -->
+       path: no backdrop-dismiss, no dot-jump, no "✕".
+       FINAL ALPHA LAUNCH ADDITIONS made this Step 2 of a strict 3-step
+       entrance sequence (Passcode -> this dedicated Confidential Alpha
+       security screen -> camera-gated intake), removing the old two-slide
+       carousel's first "what to report" slide so this screen is the
+       security notice alone. Its "Got it" is the only way through, and it
+       lands the citizen directly in the report tab — see
+       openFrontDoorOnboarding()/closeFrontDoorOnboarding(). ===== -->
   <div id="frontDoorOnboardingModal" class="confirm-drawer">
     <div class="confirm-card onboarding-card">
       <div class="onboarding-header-bar">
@@ -2026,29 +2030,10 @@ textarea.input{resize:none;line-height:1.4}
       </div>
 
       <div class="onboarding-slides" id="onboardingSlides">
-        <!-- Slide A — reporting guidance + the real, honest state of photo
-             privacy: EXIF/GPS scrubbing is real (same claim the privacy
-             card elsewhere in this app makes); automatic face/license-plate
-             blurring is NOT live in this beta (same honest "Not Yet
-             Implemented" status the Operator QA panel shows), so this
-             slide asks the citizen to avoid capturing bystanders directly
-             rather than claiming a blur pipeline that doesn't exist yet. -->
-        <div class="onboarding-slide onboarding-centered active" data-slide="0">
-          <span class="onboarding-badge-pill">WHAT TO REPORT</span>
-          <h2 class="onboarding-headline onboarding-headline-xl">Report Real Infrastructure Hazards</h2>
-          <p class="onboarding-body">Potholes, dark streetlights, damaged signage, broken sidewalks, blocked drainage — anything that's an actual hazard in your neighborhood.</p>
-          <div class="onboarding-warning">
-            <svg class="onboarding-warning-icon" viewBox="0 0 24 24" width="16" height="16" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-            <span class="onboarding-warning-text">Every photo is scrubbed of GPS &amp; file metadata before it reaches the public ledger. Automatic face &amp; license-plate blurring isn't live in this beta yet — please avoid capturing bystanders, faces, or plates directly.</span>
-          </div>
-          <button type="button" class="btn-onboarding-cta" id="btnOnboardingNext">Continue</button>
-        </div>
-
-        <!-- Slide B — expectations for the 10-person alpha cohort: the
-             confidentiality notice (moved here from the old slide A) plus
-             the real 3-step test process, now framed as what's expected
-             of each tester rather than a generic "how it works". -->
-        <div class="onboarding-slide" data-slide="1">
+        <!-- The sole slide — confidentiality notice for the 10-person
+             alpha cohort plus the real 3-step test process, framed as what
+             each tester is being asked to do. -->
+        <div class="onboarding-slide active" data-slide="0">
           <span class="onboarding-badge-pill">CONFIDENTIAL • PRIVATE ALPHA</span>
           <h2 class="onboarding-headline" style="font-size:1.1rem">You're One of 10 Alpha Testers</h2>
           <p class="onboarding-body" style="margin-top:0">This access is strictly private — please don't forward or share this link. As one of this beta's 10-person cohort, here's what we're asking of you:</p>
@@ -2067,13 +2052,6 @@ textarea.input{resize:none;line-height:1.4}
             </div>
           </div>
           <button type="button" class="btn-onboarding-cta" id="btnOnboardingStart">Got it</button>
-        </div>
-      </div>
-
-      <div class="onboarding-footer">
-        <div class="onboarding-dots" id="onboardingDots" role="tablist" aria-label="Onboarding progress">
-          <span class="onboarding-dot active" data-dot="0"></span>
-          <span class="onboarding-dot" data-dot="1"></span>
         </div>
       </div>
     </div>
@@ -5432,32 +5410,21 @@ function applyJurisdictionFromQueryString(){
   if (params.get('claim') === 'admin') pendingAdminClaimFromLink = true;
 }
 
-// CITIXEN UX™ Welcome Hero — Step 3 of the Patch 4.11 strict 4-step alpha
-// entrance sequencer (Step 1 Passcode Gate -> Step 2 Front Door Onboarding
-// carousel -> Step 3 this Hero -> Step 4 the intake form). It never shows
-// at the same time as Step 2, and never auto-advances on a timer: only an
-// explicit action moves the sequence forward (the onboarding deck's own
-// "Continue"/"Got it" buttons finish Step 2 and reveal this Hero; this
-// Hero's own "Enter App" CTA, handled below, is the only thing that
-// advances it into Step 4).
-function hideSplash(){
-  const splash = document.getElementById('splashScreen');
-  if (splash) splash.classList.add('hide');
-}
-function showWelcomeHero(){
-  const splash = document.getElementById('splashScreen');
-  if (splash) splash.classList.remove('hide');
-}
+// FINAL ALPHA LAUNCH ADDITIONS collapsed the old Patch 4.11 strict 4-step
+// alpha entrance sequencer (Passcode Gate -> Front Door Onboarding
+// carousel -> Welcome Hero splash -> intake form) down to a strict 3
+// steps: Passcode Gate -> this dedicated Confidential Alpha Security
+// Screen -> straight into the camera-gated intake form. The Welcome Hero
+// splash (#splashScreen/btnEnterApp) was removed outright rather than kept
+// as a hidden middle step — the security screen's own "Got it" now does
+// what that Hero's "Enter App" used to do.
 
-// Drives Steps 2 and 3 of the sequencer the moment Step 1 (the passcode
-// gate) succeeds — called from initCitixenGate()'s submit handler the
-// instant CITIXEN01 is accepted. No timers anywhere in this function: Step
-// 2 opens immediately and Step 3 only appears once Step 2 reports itself
-// complete (see closeFrontDoorOnboarding()) — the two screens are never
-// shown together.
+// Drives Step 2 of the sequencer the moment Step 1 (the passcode gate)
+// succeeds — called from initCitixenGate()'s submit handler the instant
+// CITIXEN01 is accepted.
 // PATCH 4.11.1: Step 2 is no longer skippable on a "seen before" basis —
 // there is no stored flag left to check here at all, so every single
-// unlock (first-time or returning tester) runs the onboarding carousel in
+// unlock (first-time or returning tester) runs the security screen in
 // full, for the duration of this alpha.
 let postUnlockLandingStarted = false;
 function startPostUnlockLanding(){
@@ -5469,63 +5436,33 @@ function startPostUnlockLanding(){
     // — open the Admin Light claim flow directly. This is a separate,
     // staff-only entrance, not a step in the citizen alpha sequencer: an
     // official clicking that link already knows what this app is, so the
-    // beta-tester onboarding/Hero steps would just be clutter for them.
-    hideSplash();
+    // beta-tester security screen would just be clutter for them.
     openAdminLightClaim();
   } else {
-    // Step 2: Front Door Onboarding carousel, shown immediately, every
-    // time — the Hero (Step 3) is kept hidden until Step 2 reports
-    // completion.
-    hideSplash();
+    // Step 2: the Confidential Alpha Security Screen, shown immediately,
+    // every time.
     openFrontDoorOnboarding();
   }
 }
 
-// ===== FRONT DOOR ONBOARDING — "Private Beta" 2-card notice =====
+// ===== CONFIDENTIAL ALPHA SECURITY SCREEN =====
 // PATCH 4.11.1: no longer gated by a "seen it" flag — shown in full on
 // every unlock, every visit, for the duration of this alpha (see
-// startPostUnlockLanding()'s own comment for why).
-const ONBOARDING_SLIDE_COUNT = 2;
-let onboardingSlideIndex = 0;
-function renderOnboardingSlide(){
-  document.querySelectorAll('.onboarding-slide').forEach(el => {
-    el.classList.toggle('active', Number(el.dataset.slide) === onboardingSlideIndex);
-  });
-  // Dots are a pure progress indicator now (Patch 4.11 strict sequencer) —
-  // they no longer have click handlers to jump ahead or back.
-  document.querySelectorAll('.onboarding-dot').forEach(el => {
-    el.classList.toggle('active', Number(el.dataset.dot) === onboardingSlideIndex);
-  });
-}
+// startPostUnlockLanding()'s own comment for why). FINAL ALPHA LAUNCH
+// ADDITIONS reduced this from a 2-slide carousel to this single dedicated
+// security screen.
 function openFrontDoorOnboarding(){
-  onboardingSlideIndex = 0;
-  renderOnboardingSlide();
   document.getElementById('frontDoorOnboardingModal').classList.add('open');
 }
-// Step 2 -> Step 3 of the Patch 4.11 sequencer: completing the onboarding
-// deck (its only exit — slide B's "Got it") reveals the Welcome Hero.
-// There is no other way to close this modal: no "✕", no backdrop-dismiss,
-// no dot-jump — see the markup's own comment for why ("enforce strict"
-// sequencing means completion-gated, not skippable). Patch 4.11.1: no
-// longer takes a markSeen param or writes anything to storage — closing
-// never "remembers" this deck for next time any more.
+// Step 2 -> Step 3 of the sequencer: completing the security screen (its
+// only exit — "Got it") switches straight into the camera-gated report
+// tab. There is no other way to close this modal: no "✕", no
+// backdrop-dismiss — "enforce strict" sequencing means completion-gated,
+// not skippable. Patch 4.11.1: no longer takes a markSeen param or writes
+// anything to storage — closing never "remembers" this screen for next
+// time any more.
 function closeFrontDoorOnboarding(){
   document.getElementById('frontDoorOnboardingModal').classList.remove('open');
-  showWelcomeHero();
-}
-// Slide A's "Continue" — the only other id this button needs; slide B's
-// "Got it" (btnOnboardingStart below) is the deck's sole completion exit.
-document.getElementById('btnOnboardingNext').addEventListener('click', () => {
-  if (onboardingSlideIndex < ONBOARDING_SLIDE_COUNT - 1) { onboardingSlideIndex++; renderOnboardingSlide(); }
-});
-document.getElementById('btnOnboardingStart').addEventListener('click', () => {
-  closeFrontDoorOnboarding();
-});
-// Welcome Hero CTA (Step 3 -> Step 4) — "Enter App" is now the only way
-// off the Hero (Patch 4.11 removed the old tap-anywhere-to-dismiss
-// affordance to keep the sequencer strict/completion-gated throughout).
-document.getElementById('btnEnterApp').addEventListener('click', () => {
-  hideSplash();
   switchTab('tab-report', document.querySelector('.navtab[data-target="tab-report"]'));
   // HARDWARE CAMERA FIREWALL LOCK removed the auto-focus into #repDesc that
   // used to live here: that field is now hidden behind #reportStep2Locked
@@ -5533,6 +5470,9 @@ document.getElementById('btnEnterApp').addEventListener('click', () => {
   // is also exactly the mobile Safari/Chrome auto-zoom pattern this round
   // asked to eliminate — the citizen taps into it themselves once it's
   // actually visible.
+}
+document.getElementById('btnOnboardingStart').addEventListener('click', () => {
+  closeFrontDoorOnboarding();
 });
 
 // ===== GLOBAL FLOATING ALPHA FEEDBACK BADGE =====
