@@ -1164,9 +1164,73 @@ textarea.input{resize:none;line-height:1.4}
 #appInfoModalBody h4{color:var(--text);font-size:.82rem;margin:14px 0 4px}
 #appInfoModalBody h4:first-child{margin-top:0}
 #appInfoModalBody p{color:var(--muted);font-size:.78rem;line-height:1.55}
+
+/* ===== CINEMATIC WELCOME INTRO VIDEO MODAL (#videoIntroModal) =====
+   VIDEO SPEED EDITING & CINEMATIC WELCOME INTRO MODAL INTEGRATION round.
+   Sits ABOVE even the passcode gate (that's z-index 99999, see above) so a
+   first-time visitor sees the intro before anything else, including the
+   gate itself — the gate is already rendered underneath and simply
+   becomes visible once this modal fades out. Plain CSS translation of the
+   round's Tailwind-shorthand spec (fixed inset-0 z-50 bg-black flex
+   items-center justify-center, etc.) against this file's own real classes/
+   variables, the same convention every instruction round in this repo has
+   used since there's no Tailwind/build step here. */
+.video-intro-modal{position:fixed;inset:0;z-index:999999;background:#000;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+  opacity:1;transition:opacity .7s ease}
+.video-intro-modal.video-intro-fade{opacity:0;pointer-events:none}
+.video-intro-modal.video-intro-hidden{display:none}
+.video-intro-video{width:100%;height:100%;object-fit:cover;display:block}
+.video-intro-skip{position:absolute;top:calc(20px + env(safe-area-inset-top,0px));
+  right:calc(20px + env(safe-area-inset-right,0px));z-index:10;
+  background:rgba(255,255,255,.1);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  color:#fff;padding:10px 18px;border-radius:999px;border:1px solid rgba(255,255,255,.2);
+  font-family:inherit;font-weight:700;font-size:.78rem;cursor:pointer;transition:background .15s}
+.video-intro-skip:hover{background:rgba(255,255,255,.2)}
+.video-intro-sound{position:absolute;bottom:calc(20px + env(safe-area-inset-bottom,0px));
+  left:calc(20px + env(safe-area-inset-left,0px));z-index:10;
+  background:rgba(255,255,255,.1);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  color:#fff;padding:9px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.2);
+  font-family:inherit;font-weight:800;font-size:.68rem;letter-spacing:.08em;cursor:pointer;
+  transition:background .15s}
+.video-intro-sound:hover{background:rgba(255,255,255,.2)}
+.video-intro-watermark{position:absolute;bottom:calc(20px + env(safe-area-inset-bottom,0px));
+  right:calc(20px + env(safe-area-inset-right,0px));z-index:10;
+  background:rgba(0,0,0,.4);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.1);padding:7px 13px;border-radius:10px;
+  display:flex;align-items:center;gap:8px}
+.video-intro-watermark-dot{width:8px;height:8px;border-radius:50%;background:#34d399;
+  box-shadow:0 0 8px rgba(52,211,153,.8);flex-shrink:0;animation:videoIntroPulse 1.8s ease-in-out infinite}
+@keyframes videoIntroPulse{0%,100%{opacity:.4}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.video-intro-watermark-dot{animation:none;opacity:1}}
+.video-intro-watermark-text{font-size:.7rem;font-weight:700;color:rgba(255,255,255,.9);
+  letter-spacing:.15em;text-transform:uppercase}
+/* Footer "Replay Intro" trigger (Report tab's Privacy Engine card) — see
+   #btnReplayIntro's handler near initVideoIntro(). */
+.btn-replay-intro{background:none;border:none;color:var(--mint2);font-family:inherit;
+  font-size:.7rem;font-weight:700;letter-spacing:.02em;cursor:pointer;padding:2px 4px;
+  text-decoration:underline;text-underline-offset:2px}
 </style>
 </head>
 <body>
+
+<!-- ===== CINEMATIC WELCOME INTRO VIDEO MODAL — VIDEO SPEED EDITING &
+     CINEMATIC WELCOME INTRO MODAL INTEGRATION round. Shown once per
+     browser (localStorage 'citixen_welcome_seen'), before even the
+     passcode gate below. See initVideoIntro() near the end of <body> for
+     the show/skip/replay logic. citizen_infra_slowed.mp4 is CITUX.mp4 with
+     its final 3s (the ward-metrics dashboard + aerial view) slowed to 0.5x
+     (now 6s) — see the repo root for the ffmpeg command used. ===== -->
+<div class="video-intro-modal" id="videoIntroModal">
+  <video class="video-intro-video" id="introVideo" src="/citizen_infra_slowed.mp4"
+    autoplay muted playsinline preload="auto"></video>
+  <button type="button" class="video-intro-skip" id="btnSkipIntro">Skip Intro</button>
+  <button type="button" class="video-intro-sound" id="btnIntroSound" aria-label="Tap for sound">MUTED</button>
+  <div class="video-intro-watermark" aria-hidden="true">
+    <span class="video-intro-watermark-dot"></span>
+    <span class="video-intro-watermark-text">CITIXEN UX</span>
+  </div>
+</div>
 
 <!-- ===== PASSCODE GATE — see the <head> anti-flash script and the CSS block
      at the top of <style> for how this stays hidden once unlocked. Plain
@@ -1359,6 +1423,7 @@ textarea.input{resize:none;line-height:1.4}
       <div class="card" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:4px;">
         <svg viewBox="0 0 24 24" width="18" height="18" stroke="#00E699" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         <div class="small" style="color:var(--muted)">CITIXEN UX<sup class="tm-symbol">™</sup> — Privacy Engine: Verified</div>
+        <button type="button" class="btn-replay-intro">Replay Intro</button>
       </div>
     </section>
 
@@ -1413,6 +1478,7 @@ textarea.input{resize:none;line-height:1.4}
       <div class="card" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:4px;">
         <svg viewBox="0 0 24 24" width="18" height="18" stroke="#00E699" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         <div class="small" style="color:var(--muted)">CITIXEN UX<sup class="tm-symbol">™</sup> — Privacy Engine: Verified</div>
+        <button type="button" class="btn-replay-intro">Replay Intro</button>
       </div>
     </section>
 
@@ -1604,12 +1670,15 @@ textarea.input{resize:none;line-height:1.4}
            Map & Feed, Dashboard) and in the Quick Help modal, not just
            here. Same real brand shield + verification seal copy as
            index.html's footer; the "modal re-trigger link" there (reopens
-           the Crowd Save America™ entry pop-up) has no equivalent here —
-           this app shell uses a splash screen, not that entry modal — so
-           it's left out rather than wired to something it doesn't do. -->
+           the Crowd Save America™ entry pop-up) has no equivalent here.
+           VIDEO SPEED EDITING & CINEMATIC WELCOME INTRO MODAL INTEGRATION
+           round added its own equivalent instead — "Replay Intro" below
+           re-opens #videoIntroModal via window.CitixenReplayIntro(), see
+           initVideoIntro() near the end of <body>. -->
       <div class="card" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:4px;">
         <svg viewBox="0 0 24 24" width="18" height="18" stroke="#00E699" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         <div class="small" style="color:var(--muted)">CITIXEN UX<sup class="tm-symbol">™</sup> — Privacy Engine: Verified</div>
+        <button type="button" class="btn-replay-intro">Replay Intro</button>
       </div>
 
     </section>
@@ -2104,6 +2173,78 @@ textarea.input{resize:none;line-height:1.4}
 
 <script>
 'use strict';
+
+// ===== CINEMATIC WELCOME INTRO VIDEO MODAL — see #videoIntroModal's
+// markup near the top of <body> for the overlay/skip/sound/watermark
+// elements this wires up. Runs before the passcode gate's own init below
+// (though the two are otherwise independent — the gate is always rendered
+// underneath this modal; dismissing the intro just reveals it, it doesn't
+// unlock it). Persisted via localStorage 'citixen_welcome_seen': once a
+// browser has seen the intro (play-through or Skip Intro), it won't show
+// again on a later visit from that same browser — "Replay Intro" (the
+// footer link added this round, see its own handler below) is the only
+// way back in short of clearing site data.
+(function initVideoIntro(){
+  const modal = document.getElementById('videoIntroModal');
+  const video = document.getElementById('introVideo');
+  const skipBtn = document.getElementById('btnSkipIntro');
+  const soundBtn = document.getElementById('btnIntroSound');
+  if (!modal || !video || !skipBtn || !soundBtn) return;
+
+  function showIntro(){
+    modal.classList.remove('video-intro-hidden', 'video-intro-fade');
+    video.muted = true;
+    soundBtn.textContent = 'MUTED';
+    try { video.currentTime = 0; } catch (e) {}
+    // autoplay (muted) can still be blocked by some browsers/embedded
+    // webviews — Skip Intro and the watermark/sound controls all still
+    // work on a frozen first frame, so a rejected play() isn't fatal here.
+    const playPromise = video.play();
+    if (playPromise && typeof playPromise.catch === 'function') playPromise.catch(() => {});
+  }
+
+  // Fades the modal out, marks the intro seen, then fully hides it once
+  // the 700ms transition (see .video-intro-fade in <style>) finishes —
+  // shared by both the 'ended' event and the Skip Intro button.
+  let dismissing = false;
+  function dismissIntro(){
+    if (dismissing) return;
+    dismissing = true;
+    modal.classList.add('video-intro-fade');
+    try { localStorage.setItem('citixen_welcome_seen', 'true'); } catch (e) {}
+    setTimeout(() => {
+      modal.classList.add('video-intro-hidden');
+      video.pause();
+      dismissing = false;
+    }, 700);
+  }
+
+  let alreadySeen = false;
+  try { alreadySeen = localStorage.getItem('citixen_welcome_seen') === 'true'; } catch (e) {}
+  if (alreadySeen) {
+    modal.classList.add('video-intro-hidden');
+  } else {
+    showIntro();
+  }
+
+  video.addEventListener('ended', dismissIntro);
+  skipBtn.addEventListener('click', dismissIntro);
+  soundBtn.addEventListener('click', () => {
+    video.muted = !video.muted;
+    soundBtn.textContent = video.muted ? 'MUTED' : 'UNMUTE';
+  });
+
+  // ===== REPLAY INTRO — footer trigger (Report/Map & Feed/Dashboard tabs
+  // + Quick Help modal, see .btn-replay-intro's markup) clears the seen
+  // flag and re-opens the modal from scratch. Event-delegated on document
+  // since the Quick Help modal's copy of this button is only ever built
+  // into the DOM when that modal is opened (see APP_MODAL_DATA above).
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.btn-replay-intro')) return;
+    try { localStorage.removeItem('citixen_welcome_seen'); } catch (e2) {}
+    showIntro();
+  });
+})();
 
 // ===== PASSCODE GATE — see the <head> anti-flash script (adds
 // html.citixen-gate-locked unconditionally now) and the #citixenGate
@@ -3714,6 +3855,7 @@ const APP_MODAL_DATA = {
     '<div class="card" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:18px;">' +
       '<svg viewBox="0 0 24 24" width="18" height="18" stroke="#00E699" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>' +
       '<div class="small" style="color:var(--muted)">CITIXEN UX<sup class="tm-symbol">™</sup> — Privacy Engine: Verified</div>' +
+      '<button type="button" class="btn-replay-intro">Replay Intro</button>' +
     '</div>' }
 };
 function openAppInfoModal(key){
