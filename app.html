@@ -125,11 +125,19 @@
 <script src="/shared/global-feedback.js?v=patch-4.7"></script>
 <script src="/shared/severity.js?v=master-release"></script>
 <style>
-/* ALPHA LAUNCH FINAL PATCH moved the Global Floating Alpha Feedback Badge
-   (shared/global-feedback.css) to a shared top-right position on every
-   host page, so the old per-page override that used to tuck it up above
-   app.html's bottom tab bar (.bottomnav) no longer applies — the top
-   corner never overlaps that bar, so there's nothing to clear here. */
+/* UI FINESSE & OVERLAY FIX moved the Global Floating Alpha Feedback Badge
+   back off the top header bar on this page specifically — the shared
+   top-right position (shared/global-feedback.css) was overlapping
+   app.html's own top-of-screen location indicator pill. This is a
+   per-page override, scoped to app.html only (operator.html/dispatch.html
+   keep the shared top-right position, which doesn't have that pill to
+   collide with); the shared file's base rule is untouched. Anchored above
+   .bottomnav (its own height + safe-area inset, see that class below)
+   rather than a hand-tuned pixel guess, so it stays clear of the tab bar
+   even if that bar's height ever changes. */
+.cgf-badge{top:auto;
+  bottom:calc(85px + env(safe-area-inset-bottom,0px));
+  right:16px}
 
 /* ===== PASSCODE GATE — full-page Obsidian Glass blur blocking every route
    until the tester enters citixen_01. Locked by default on every single
@@ -823,7 +831,8 @@ textarea.input{resize:none;line-height:1.4}
    slate-950/80 fill + heavy blur + a slate-800 hairline, distinct from
    the emerald-tinted glass the rest of this file uses elsewhere. ===== */
 .onboarding-card{background:rgba(2,6,23,.8);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-  border:1px solid rgba(30,41,59,.85);box-shadow:0 0 32px rgba(0,0,0,.5);padding:24px 32px}
+  border:1px solid rgba(30,41,59,.85);box-shadow:0 0 32px rgba(0,0,0,.5);padding:28px 24px;
+  max-height:88vh;overflow-y:auto}
 .onboarding-header-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
 .onboarding-brand{font-weight:800;font-size:.8rem;letter-spacing:.3px;color:var(--mint2)}
 .onboarding-header-right{display:flex;align-items:center;gap:10px}
@@ -841,7 +850,7 @@ textarea.input{resize:none;line-height:1.4}
    element's own margin-bottom, per this round's polish pass. Card 2's grid
    layout is untouched and keeps its own left-aligned classes below. */
 .onboarding-slide.onboarding-centered.active{display:flex;flex-direction:column;align-items:center;
-  text-align:center;gap:24px}
+  text-align:center;gap:18px}
 .onboarding-badge-pill{display:inline-block;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   font-size:.62rem;font-weight:800;letter-spacing:.08em;color:var(--mint2);text-transform:uppercase;
   background:rgba(0,230,153,.1);border:1px solid rgba(0,230,153,.35);border-radius:9999px;padding:5px 14px}
@@ -852,6 +861,10 @@ textarea.input{resize:none;line-height:1.4}
 .onboarding-centered .onboarding-headline{margin-bottom:0}
 .onboarding-headline-xl{font-size:1.5rem;font-weight:800;color:#f1f5f9}
 .onboarding-subtitle{font-size:.8rem;font-weight:700;color:var(--mint2);margin-bottom:12px}
+/* Vibrant neon-green sub-headline — same #00FF94 accent as the Instant
+   Feedback badge/Beta Testing Analytics banner, so this screen's one
+   colored line of copy reads as "important" rather than decorative. */
+.onboarding-subtitle-neon{font-size:.88rem;font-weight:800;line-height:1.5;color:#00FF94;max-width:300px}
 .onboarding-body{font-size:.84rem;line-height:1.55;color:var(--muted)}
 .onboarding-centered .onboarding-body{margin-bottom:0;font-size:.875rem;color:#cbd5e1;line-height:1.6}
 .onboarding-warning{display:flex;gap:10px;align-items:flex-start;background:rgba(15,23,42,.9);
@@ -860,15 +873,23 @@ textarea.input{resize:none;line-height:1.4}
   box-sizing:border-box}
 .onboarding-warning-icon{flex-shrink:0;font-size:.9rem;line-height:1;display:flex;align-items:center}
 .onboarding-warning-text{font-size:.76rem;line-height:1.45;color:var(--muted);font-weight:600}
-.onboarding-grid{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
-.onboarding-grid-item{display:flex;gap:12px;align-items:flex-start;padding:12px;background:rgba(255,255,255,.03);
-  border:1px solid rgba(255,255,255,.07);border-radius:12px}
-.onboarding-grid-num{flex-shrink:0;width:28px;height:28px;border-radius:9px;background:rgba(0,230,153,.12);
-  border:1px solid rgba(0,230,153,.4);color:var(--mint2);font-weight:800;font-size:.72rem;
-  display:flex;align-items:center;justify-content:center;letter-spacing:.02em}
-.onboarding-grid-text{display:flex;flex-direction:column;gap:3px}
-.onboarding-grid-text b{font-size:.82rem;color:var(--text);letter-spacing:.02em}
-.onboarding-grid-text span{font-size:.76rem;color:var(--muted);line-height:1.4}
+/* UI FINESSE & OVERLAY FIX — the 3 numbered step cards became icon-driven
+   cards matching the 3 bottom-nav tabs (Report/Map &amp; Feed/Dashboard),
+   each reusing that exact tab's own inline SVG so a tester associates the
+   card with the real tab it's describing. .onboarding-grid now lives
+   inside the centered slide, so it needs an explicit full width + its own
+   left-aligned text (the slide's own text-align:center is for the
+   headline/sub-copy above it, not these rows). */
+.onboarding-centered .onboarding-grid{width:100%;box-sizing:border-box;text-align:left}
+.onboarding-grid{display:flex;flex-direction:column;gap:14px;margin:4px 0 4px}
+.onboarding-grid-item{display:flex;gap:14px;align-items:center;padding:16px;background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.08);border-radius:14px}
+.onboarding-icon-badge{flex-shrink:0;width:40px;height:40px;border-radius:12px;background:rgba(0,255,148,.12);
+  border:1px solid rgba(0,255,148,.4);color:#00FF94;display:flex;align-items:center;justify-content:center}
+.onboarding-icon-badge svg{width:20px;height:20px}
+.onboarding-grid-text{display:flex;flex-direction:column;gap:4px;min-width:0}
+.onboarding-grid-text b{font-size:.8rem;color:var(--text);letter-spacing:.04em;text-transform:uppercase}
+.onboarding-grid-text span{font-size:.78rem;color:var(--muted);line-height:1.5}
 .btn-onboarding-cta{width:100%;box-sizing:border-box;min-height:52px;background:var(--mint);color:#051311;
   border:none;padding:14px 16px;border-radius:12px;font-family:inherit;font-weight:700;font-size:16px;cursor:pointer}
 .onboarding-footer{display:flex;flex-direction:column;gap:16px;margin-top:20px}
@@ -2008,21 +2029,21 @@ textarea.input{resize:none;line-height:1.4}
     </div>
   </div>
 
-  <!-- ===== FRONT DOOR ONBOARDING — Step 2 of the strict 4-step alpha
-       entrance sequencer (Gate -> this carousel -> Welcome Hero -> intake
-       form). Patch 4.11.1: shown in FULL on every single unlock, every
-       visit, for the duration of this alpha — the old once-per-device
-       ONBOARDING_SEEN_KEY gate is gone entirely (see
-       startPostUnlockLanding()'s own comment). Opens immediately on unlock
-       — no auto-timer — and, per "enforce strict" sequencing, has no skip
-       path: no backdrop-dismiss, no dot-jump, no "✕".
-       FINAL ALPHA LAUNCH ADDITIONS made this Step 2 of a strict 3-step
-       entrance sequence (Passcode -> this dedicated Confidential Alpha
-       security screen -> camera-gated intake), removing the old two-slide
-       carousel's first "what to report" slide so this screen is the
-       security notice alone. Its "Got it" is the only way through, and it
-       lands the citizen directly in the report tab — see
-       openFrontDoorOnboarding()/closeFrontDoorOnboarding(). ===== -->
+  <!-- ===== FRONT DOOR ONBOARDING — Step 2 of the strict 3-step alpha
+       entrance sequencer (Gate -> this security screen -> camera-gated
+       intake form, see FINAL ALPHA LAUNCH ADDITIONS). Patch 4.11.1: shown
+       in FULL on every single unlock, every visit, for the duration of
+       this alpha — the old once-per-device ONBOARDING_SEEN_KEY gate is
+       gone entirely (see startPostUnlockLanding()'s own comment). Opens
+       immediately on unlock — no auto-timer — and, per "enforce strict"
+       sequencing, has no skip path: no backdrop-dismiss, no dot-jump, no
+       "✕". Its "Got it" is the only way through, and it lands the citizen
+       directly in the report tab — see
+       openFrontDoorOnboarding()/closeFrontDoorOnboarding().
+       UI FINESSE & OVERLAY FIX revised copy + replaced the 3 numbered step
+       cards with icon-driven cards, each reusing the exact SVG its matching
+       bottom-nav tab uses (Report/Map & Feed/Dashboard below) so a tester
+       recognizes which tab each card is pointing at. ===== -->
   <div id="frontDoorOnboardingModal" class="confirm-drawer">
     <div class="confirm-card onboarding-card">
       <div class="onboarding-header-bar">
@@ -2033,22 +2054,29 @@ textarea.input{resize:none;line-height:1.4}
         <!-- The sole slide — confidentiality notice for the 10-person
              alpha cohort plus the real 3-step test process, framed as what
              each tester is being asked to do. -->
-        <div class="onboarding-slide active" data-slide="0">
+        <div class="onboarding-slide onboarding-centered active" data-slide="0">
           <span class="onboarding-badge-pill">CONFIDENTIAL • PRIVATE ALPHA</span>
-          <h2 class="onboarding-headline" style="font-size:1.1rem">You're One of 10 Alpha Testers</h2>
-          <p class="onboarding-body" style="margin-top:0">This access is strictly private — please don't forward or share this link. As one of this beta's 10-person cohort, here's what we're asking of you:</p>
+          <h2 class="onboarding-headline onboarding-headline-xl">CITIXEN UX<sup class="tm-symbol">™</sup> Beta Testing</h2>
+          <p class="onboarding-subtitle-neon">For your eyes only — please do not forward or share this link.</p>
+          <p class="onboarding-body">All feedback is welcome.</p>
           <div class="onboarding-grid">
             <div class="onboarding-grid-item">
-              <div class="onboarding-grid-num">1</div>
-              <div class="onboarding-grid-text"><b>SNAP</b><span>Tap the glowing green camera button to capture or upload a real photo.</span></div>
+              <div class="onboarding-icon-badge" aria-hidden="true">
+                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+              </div>
+              <div class="onboarding-grid-text"><b>Report</b><span>Use the camera feature to capture and record a problem that needs to be fixed.</span></div>
             </div>
             <div class="onboarding-grid-item">
-              <div class="onboarding-grid-num">2</div>
-              <div class="onboarding-grid-text"><b>REPORT</b><span>Submit at least one test report — no logins, no forms, no friction.</span></div>
+              <div class="onboarding-icon-badge" aria-hidden="true">
+                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
+              </div>
+              <div class="onboarding-grid-text"><b>Follow</b><span>Get your receipt and check the map/ledger.</span></div>
             </div>
             <div class="onboarding-grid-item">
-              <div class="onboarding-grid-num">3</div>
-              <div class="onboarding-grid-text"><b>FLAG ISSUES</b><span>Use the floating feedback badge to flag any bugs, UX friction, or ideas as you go.</span></div>
+              <div class="onboarding-icon-badge" aria-hidden="true">
+                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="20" x2="5" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="19" y1="20" x2="19" y2="15"/></svg>
+              </div>
+              <div class="onboarding-grid-text"><b>Dashboard</b><span>Explore analytics, export reports, and export analytics.</span></div>
             </div>
           </div>
           <button type="button" class="btn-onboarding-cta" id="btnOnboardingStart">Got it</button>
