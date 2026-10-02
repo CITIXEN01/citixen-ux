@@ -14,6 +14,28 @@
      static file request that bypasses the Vercel rewrite). -->
 <meta http-equiv="refresh" content="0; url=/app">
 <link rel="canonical" href="/app">
+<!-- OG META IMAGE POLISH & SCALE FIX — this file is also what Vercel's
+     catch-all rewrite (see vercel.json) serves, as real markup (not a
+     redirect), for any shared link that doesn't match one of the app's
+     known routes. A link-preview crawler reading THAT raw HTML (crawlers
+     don't execute the JS redirect above or follow a meta-refresh) would
+     otherwise see no OG tags at all, so this carries the same preview card
+     as app.html — same og-preview-large.png asset, same cache-busting
+     query string — rather than leaving this entry point with the gray-box
+     fallback app.html's own OG tags were added to fix. -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://citixenux.com/app">
+<meta property="og:title" content="CITIXEN UX™">
+<meta property="og:description" content="Improve Your Civic Experience">
+<meta property="og:image" content="https://citixenux.com/og-preview-large.png?v=1000">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="CITIXEN UX™ - Improve Your Civic Experience">
+<meta property="og:image:type" content="image/png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CITIXEN UX™">
+<meta name="twitter:description" content="Improve Your Civic Experience">
+<meta name="twitter:image" content="https://citixenux.com/og-preview-large.png?v=1000">
 <script>window.location.replace('/app');</script>
 </head>
 <body>

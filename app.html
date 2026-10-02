@@ -58,25 +58,30 @@
 <title>CITIXEN UX™</title>
 <meta name="description" content="Improve Your Civic Experience">
 <!-- Open Graph / Twitter preview card — fixes the gray-box fallback iMessage/
-     SMS showed for citixenux.com/app. og-v4.png (Patch #4.10.2 — renamed
-     from og-preview.png, which no longer exists in this repo) is a real
-     pre-rendered 1200x630 PNG (glowing emerald shield scaled prominently on
-     a #090D16 background), not a generated-on-the-fly placeholder — see
-     /tmp/.../og-v4-source.html used to render it. Absolute URLs throughout
-     (the metadataBase equivalent for a plain static site — there's no
-     Next.js metadataBase config to set here, so every URL below is just
+     SMS showed for citixenux.com/app. OG META IMAGE POLISH & SCALE FIX round
+     replaced og-v4.png (Patch #4.10.2's rename of the original og-preview.png,
+     neither of which exist in this repo any more) with og-preview-large.png:
+     the shield + wordmark are scaled up substantially (the old asset left a
+     lot of dead dark space, which read as a tiny illegible logo once iMessage/
+     SMS downscales a 1200x630 image into its small preview thumbnail) — see
+     /tmp/.../og-preview-large-source.html used to render it. Absolute URLs
+     throughout (the metadataBase equivalent for a plain static site — there's
+     no Next.js metadataBase config to set here, so every URL below is just
      written out in full against https://citixenux.com instead): relative
      og:image/icon URLs are unreliable for link-preview crawlers. -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://citixenux.com/app">
 <meta property="og:title" content="CITIXEN UX™">
 <meta property="og:description" content="Improve Your Civic Experience">
-<!-- BREAK APPLE IMESSAGE CACHE round: explicit "?v=999" query-string
-     cache-buster on top of the og-v4.png rename, since iMessage/Applebot
-     and other link-preview crawlers are known to cache stubbornly even
-     across a URL rename — belt-and-suspenders with Patch 4.10.1's same
-     "bump the version string on any future content change" convention. -->
-<meta property="og:image" content="https://citixenux.com/og-v4.png?v=999">
+<!-- Cache-busting query string on top of the filename change itself —
+     belt-and-suspenders, same convention the BREAK APPLE IMESSAGE CACHE
+     round used for the og-v4.png rename, since iMessage/Applebot/Slack and
+     other link-preview crawlers are known to cache stubbornly even across
+     a URL rename. Continues that round's "?v=999" counter forward to
+     "?v=1000" for this content change, per Patch 4.10.1's own "bump the
+     version string on any future content change" convention, rather than
+     resetting it. -->
+<meta property="og:image" content="https://citixenux.com/og-preview-large.png?v=1000">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="CITIXEN UX™ - Improve Your Civic Experience">
@@ -86,7 +91,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="CITIXEN UX™">
 <meta name="twitter:description" content="Improve Your Civic Experience">
-<meta name="twitter:image" content="https://citixenux.com/og-v4.png?v=999">
+<meta name="twitter:image" content="https://citixenux.com/og-preview-large.png?v=1000">
 <meta name="theme-color" content="#00E699">
 <meta name="referrer" content="no-referrer">
 <meta name="apple-mobile-web-app-capable" content="yes">
