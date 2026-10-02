@@ -42,7 +42,7 @@
       "destination": "/operator.html"
     },
     {
-      "source": "/((?!api/|app$|dispatch$|admin$|rep$|operator$|operator/feedback$|icons/|shared/|manifest.json|sw.js|favicon.ico|apple-touch-icon\\.png|og-preview-large\\.png|citizen_infra_final_audio\\.mp4|CITIXEN_UX_Executive_Deck\\.pptx).*)",
+      "source": "/((?!api/|app$|dispatch$|admin$|rep$|operator$|operator/feedback$|icons/|shared/|manifest.json|sw.js|favicon.ico|apple-touch-icon\\.png|og-preview-large\\.png|citizen_infra_final\\.mp4|CITIXEN_UX_Executive_Deck\\.pptx).*)",
       "destination": "/index.html"
     }
   ],

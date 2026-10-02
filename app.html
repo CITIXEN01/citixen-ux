@@ -1187,24 +1187,34 @@ textarea.input{resize:none;line-height:1.4}
   color:#fff;padding:10px 18px;border-radius:999px;border:1px solid rgba(255,255,255,.2);
   font-family:inherit;font-weight:700;font-size:.78rem;cursor:pointer;transition:background .15s}
 .video-intro-skip:hover{background:rgba(255,255,255,.2)}
+/* UNMUTED PLAYBACK FALLBACK — hidden by default; JS reveals this only when
+   an unmuted autoplay attempt is rejected by the browser, as the prominent
+   "TAP FOR SOUND" pill (see attemptUnmutedPlay() in initVideoIntro()). */
 .video-intro-sound{position:absolute;bottom:calc(20px + env(safe-area-inset-bottom,0px));
-  left:calc(20px + env(safe-area-inset-left,0px));z-index:10;
+  left:calc(20px + env(safe-area-inset-left,0px));z-index:10;display:none;
   background:rgba(255,255,255,.1);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   color:#fff;padding:9px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.2);
   font-family:inherit;font-weight:800;font-size:.68rem;letter-spacing:.08em;cursor:pointer;
   transition:background .15s}
 .video-intro-sound:hover{background:rgba(255,255,255,.2)}
+.video-intro-sound-pulse{background:rgba(52,211,153,.18);border-color:rgba(52,211,153,.55);
+  animation:videoIntroSoundPulse 1.4s ease-in-out infinite}
+@keyframes videoIntroSoundPulse{0%,100%{box-shadow:0 0 0 0 rgba(52,211,153,.5)}
+  50%{box-shadow:0 0 0 10px rgba(52,211,153,0)}}
+@media (prefers-reduced-motion:reduce){.video-intro-sound-pulse{animation:none}}
+/* UPDATED BRANDING OVERLAY — dark glass badge, shield icon + CITIXEN / UX
+   wordmark (replaces the earlier pulsing-dot watermark). */
 .video-intro-watermark{position:absolute;bottom:calc(20px + env(safe-area-inset-bottom,0px));
   right:calc(20px + env(safe-area-inset-right,0px));z-index:10;
-  background:rgba(0,0,0,.4);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  border:1px solid rgba(255,255,255,.1);padding:7px 13px;border-radius:10px;
-  display:flex;align-items:center;gap:8px}
-.video-intro-watermark-dot{width:8px;height:8px;border-radius:50%;background:#34d399;
-  box-shadow:0 0 8px rgba(52,211,153,.8);flex-shrink:0;animation:videoIntroPulse 1.8s ease-in-out infinite}
-@keyframes videoIntroPulse{0%,100%{opacity:.4}50%{opacity:1}}
-@media (prefers-reduced-motion:reduce){.video-intro-watermark-dot{animation:none;opacity:1}}
-.video-intro-watermark-text{font-size:.7rem;font-weight:700;color:rgba(255,255,255,.9);
-  letter-spacing:.15em;text-transform:uppercase}
+  background:rgba(0,0,0,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.15);padding:8px 16px;border-radius:12px;
+  display:flex;align-items:center;gap:10px;
+  box-shadow:0 10px 25px -5px rgba(0,0,0,.4),0 8px 10px -6px rgba(0,0,0,.3)}
+.video-intro-watermark-shield{width:20px;height:20px;flex-shrink:0;color:#34d399}
+.video-intro-watermark-name{font-size:.875rem;font-weight:700;color:#fff;letter-spacing:.04em}
+.video-intro-watermark-ux{font-size:.7rem;font-weight:800;color:#34d399;
+  background:rgba(2,44,34,.8);border:1px solid rgba(16,185,129,.3);
+  padding:2px 6px;border-radius:6px;letter-spacing:.03em;text-transform:uppercase;margin-left:6px}
 /* Footer "Replay Intro" trigger (Report tab's Privacy Engine card) — see
    #btnReplayIntro's handler near initVideoIntro(). */
 .btn-replay-intro{background:none;border:none;color:var(--mint2);font-family:inherit;
@@ -1214,27 +1224,27 @@ textarea.input{resize:none;line-height:1.4}
 </head>
 <body>
 
-<!-- ===== CINEMATIC WELCOME INTRO VIDEO MODAL — VIDEO SPEED EDITING &
-     CINEMATIC WELCOME INTRO MODAL INTEGRATION round. Shown once per
-     browser (localStorage 'citixen_welcome_seen'), before even the
-     passcode gate below. See initVideoIntro() near the end of <body> for
-     the show/skip/replay logic. citizen_infra_final_audio.mp4 is
-     citizen_infra_slowed.mp4 (CITUX.mp4 with its final 3s slowed to 0.5x)
-     mixed with a synthesized cinematic ambient pad track — see the repo
-     root for the ffmpeg commands used. NOTE: this sandbox has no TTS
-     engine and no network access to any TTS API (ElevenLabs/OpenAI/pip/
-     apt/npm all blocked), so the spoken narration track could not be
-     generated here; this ships with the ambient music bed only. Swap in
-     a narration mix later by re-running the documented ffmpeg amix step
-     with a supplied voiceover.mp3. ===== -->
+<!-- ===== CINEMATIC WELCOME INTRO VIDEO MODAL — SWAP FINAL INTRO VIDEO &
+     UPDATE OVERLAY BRANDING + UNMUTED LOGIC round. Shown once per browser
+     (localStorage 'citixen_welcome_seen'), before even the passcode gate
+     below. See initVideoIntro() near the end of <body> for the
+     show/skip/replay/unmute-fallback logic. citizen_infra_final.mp4 is the
+     finished 49s cut with mixed Foley/voiceover/music audio, supplied
+     directly (faststart-remuxed here for progressive playback; no other
+     re-encoding). Playback now attempts unmuted autoplay first and only
+     falls back to muted + the "TAP FOR SOUND" pill if the browser rejects
+     that (NotAllowedError). ===== -->
 <div class="video-intro-modal" id="videoIntroModal">
-  <video class="video-intro-video" id="introVideo" src="/citizen_infra_final_audio.mp4"
-    autoplay muted playsinline preload="auto"></video>
+  <video class="video-intro-video" id="introVideo" src="/citizen_infra_final.mp4"
+    playsinline preload="auto"></video>
   <button type="button" class="video-intro-skip" id="btnSkipIntro">Skip Intro</button>
-  <button type="button" class="video-intro-sound" id="btnIntroSound" aria-label="Tap for sound">MUTED</button>
+  <button type="button" class="video-intro-sound" id="btnIntroSound" aria-label="Tap for sound">TAP FOR SOUND</button>
   <div class="video-intro-watermark" aria-hidden="true">
-    <span class="video-intro-watermark-dot"></span>
-    <span class="video-intro-watermark-text">CITIXEN UX</span>
+    <svg class="video-intro-watermark-shield" viewBox="0 0 24 24" fill="rgba(52,211,153,0.2)" stroke="#34d399" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M12 2.5l7.5 3v5.6c0 5.4-3.3 9.2-7.5 10.9-4.2-1.7-7.5-5.5-7.5-10.9V5.5l7.5-3z"/>
+    </svg>
+    <span class="video-intro-watermark-name">CITIXEN</span>
+    <span class="video-intro-watermark-ux">UX</span>
   </div>
 </div>
 
@@ -2197,16 +2207,32 @@ textarea.input{resize:none;line-height:1.4}
   const soundBtn = document.getElementById('btnIntroSound');
   if (!modal || !video || !skipBtn || !soundBtn) return;
 
+  // UNMUTED PLAYBACK & AUTOPLAY FALLBACK — try full unmuted audio first;
+  // if the browser's autoplay policy rejects that (NotAllowedError, the
+  // common case on first visit with no prior user gesture), fall back to
+  // a muted autoplay and surface the pulsing "TAP FOR SOUND" pill so a
+  // single tap turns the audio on. Skip Intro and the watermark keep
+  // working either way even if a browser blocks both play() attempts.
+  function attemptUnmutedPlay(){
+    soundBtn.classList.remove('video-intro-sound-pulse');
+    soundBtn.style.display = 'none';
+    video.muted = false;
+    try { video.currentTime = 0; } catch (e) {}
+    const playPromise = video.play();
+    if (!playPromise || typeof playPromise.then !== 'function') return;
+    playPromise.catch(() => {
+      video.muted = true;
+      soundBtn.textContent = 'TAP FOR SOUND';
+      soundBtn.style.display = 'inline-block';
+      soundBtn.classList.add('video-intro-sound-pulse');
+      const retryPromise = video.play();
+      if (retryPromise && typeof retryPromise.catch === 'function') retryPromise.catch(() => {});
+    });
+  }
+
   function showIntro(){
     modal.classList.remove('video-intro-hidden', 'video-intro-fade');
-    video.muted = true;
-    soundBtn.textContent = 'MUTED';
-    try { video.currentTime = 0; } catch (e) {}
-    // autoplay (muted) can still be blocked by some browsers/embedded
-    // webviews — Skip Intro and the watermark/sound controls all still
-    // work on a frozen first frame, so a rejected play() isn't fatal here.
-    const playPromise = video.play();
-    if (playPromise && typeof playPromise.catch === 'function') playPromise.catch(() => {});
+    attemptUnmutedPlay();
   }
 
   // Fades the modal out, marks the intro seen, then fully hides it once
@@ -2236,8 +2262,11 @@ textarea.input{resize:none;line-height:1.4}
   video.addEventListener('ended', dismissIntro);
   skipBtn.addEventListener('click', dismissIntro);
   soundBtn.addEventListener('click', () => {
-    video.muted = !video.muted;
-    soundBtn.textContent = video.muted ? 'MUTED' : 'UNMUTE';
+    video.muted = false;
+    soundBtn.classList.remove('video-intro-sound-pulse');
+    soundBtn.style.display = 'none';
+    const playPromise = video.play();
+    if (playPromise && typeof playPromise.catch === 'function') playPromise.catch(() => {});
   });
 
   // ===== REPLAY INTRO — footer trigger (Report/Map & Feed/Dashboard tabs
