@@ -30,6 +30,10 @@
       "destination": "/rep.html"
     },
     {
+      "source": "/api/pass",
+      "destination": "/api/passbook?mode=site"
+    },
+    {
       "source": "/report/:id",
       "destination": "/report.html?id=:id"
     },
