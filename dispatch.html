@@ -6,98 +6,102 @@
 <title>CITIXEN UX™ — Municipal Dispatch Command Center</title>
 <link rel="stylesheet" href="/shared/global-feedback.css?v=patch-4.7">
 <script src="/shared/global-feedback.js?v=patch-4.7"></script>
-<meta name="theme-color" content="#00ff88">
+<meta name="theme-color" content="#09090b">
 <meta name="referrer" content="no-referrer">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
+<!-- REFACTOR TO FUNCTIONAL/MINIMALIST COMMAND CENTER — favicon was a 🏛️ OS
+     emoji; replaced with the same vector shield mark used site-wide,
+     per "eliminate all standard emojis" below. -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2310b981%22 stroke-width=%222.4%22><path d=%22M12 2l8 3v6c0 6-4 9.6-8 11-4-1.4-8-5-8-11V5l8-3z%22/></svg>">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
+/* =====================================================================
+   REFACTOR TO FUNCTIONAL & MINIMALIST OPERATIONAL DASHBOARD
+   Design philosophy shift: decorative/cinematic -> Bloomberg-terminal-
+   style utility. Monochrome zinc backdrop, single-accent status colors
+   (emerald=active/dispatched, amber=pending, zinc=resolved/closed),
+   square corners (no border-radius on structural chrome), 1px muted
+   borders, monospaced numerics. No CSS transitions on interactive
+   filter/status controls — state changes are immediate DOM updates, not
+   animated, per the "no smooth animation delays" requirement. The real
+   backend wiring underneath (tickets, map, gate, audit stream, beta
+   analytics fetches) is unchanged; only the visual/structural layer and
+   the queue/fleet/log data model around it are new.
+   ===================================================================== */
 :root{
-  --brand-mint:#00ff88 !important;
-  --brand-mint-hover:#00e077 !important;
-  --brand-mint-dim:rgba(0,255,136,0.12) !important;
-  --brand-amber:#ffbb00 !important;
-  --brand-red:#ff4444 !important;
-  --bg-obsidian:#080c0a !important;
-  --bg-card:#0f1713 !important;
-  --border-muted:rgba(255,255,255,0.08) !important;
-  /* legacy aliases — every existing var(--mint)/var(--card)/etc. usage below inherits
-     the brand tokens above unchanged, so there is one source of truth for color. */
-  --bg:var(--bg-obsidian); --card:var(--bg-card); --border:var(--border-muted); --hover:#162529;
-  --mint:var(--brand-mint); --mint2:var(--brand-mint-hover); --text:#f8fafc; --muted:#8e9fa8;
-  --danger:var(--brand-red); --warn:var(--brand-amber); --amber:var(--brand-amber);
+  --zinc-950:#09090b; --zinc-900:#18181b; --zinc-850:#141417; --zinc-800:#27272a;
+  --zinc-700:#3f3f46; --zinc-500:#71717a; --zinc-400:#a1a1aa; --zinc-100:#f4f4f5;
+  --emerald-500:#10b981; --emerald-400:#34d399; --amber-500:#f59e0b; --red-500:#ef4444;
+  /* legacy aliases so untouched helper CSS below (gate box, drawers) keeps working */
+  --bg:var(--zinc-950); --card:var(--zinc-900); --border:var(--zinc-800); --hover:var(--zinc-850);
+  --mint:var(--emerald-500); --mint2:var(--emerald-400); --text:var(--zinc-100); --muted:var(--zinc-400);
+  --danger:var(--red-500); --warn:var(--amber-500); --amber:var(--amber-500);
 }
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
 html,body{height:100%}
-body{background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+body{background:var(--zinc-950);color:var(--zinc-100);min-height:100vh;display:flex;flex-direction:column}
+.mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace}
 
-/* ===== BETA TESTING ANALYTICS BANNER — FINAL ALPHA LAUNCH ADDITIONS.
-   Sticky row pinned above the main topbar (see --beta-banner-h, used below
-   to offset header.topbar's own sticky `top` so the two stack instead of
-   overlapping once both are stuck). Three live widgets wired directly to
-   backend store state via GET /api/coverage/tickets (geographic
-   breakdown + ingestion stats) and GET /api/operator/feedback (the
-   Instant Feedback stream) — see renderBetaAnalyticsBanner() below. ===== */
-:root{ --beta-banner-h:40px; }
-@media (max-width:860px){ :root{ --beta-banner-h:76px; } }
-.beta-banner{position:sticky;top:0;z-index:1001;background:#021b12;border-bottom:1px solid rgba(0,255,136,.4);
-  display:flex;align-items:center;gap:18px;padding:8px 24px;flex-wrap:wrap;min-height:var(--beta-banner-h);
+/* ===== BETA TESTING ANALYTICS STRIP — real data (unchanged fetches, see
+   renderBetaAnalyticsBanner()), restyled flat/monochrome and de-animated
+   (static dot, not a pulse) to match the new "no decorative flourish"
+   direction. Kept rather than removed: it's live backend-wired data, not
+   decoration, and nothing asked for it to go away. ===== */
+:root{ --beta-banner-h:34px; }
+@media (max-width:860px){ :root{ --beta-banner-h:68px; } }
+.beta-banner{position:sticky;top:0;z-index:1001;background:var(--zinc-900);border-bottom:1px solid var(--zinc-800);
+  display:flex;align-items:center;gap:18px;padding:6px 20px;flex-wrap:wrap;min-height:var(--beta-banner-h);
   box-sizing:border-box}
-.beta-banner-label{font-size:.68rem;font-weight:800;letter-spacing:.08em;color:var(--mint2);white-space:nowrap;
-  display:flex;align-items:center;gap:6px}
-.beta-banner-label-dot{width:6px;height:6px;border-radius:50%;background:var(--mint2);box-shadow:0 0 6px var(--mint2);
-  animation:betaBannerPulse 1.8s ease-in-out infinite}
-@keyframes betaBannerPulse{0%,100%{opacity:.35}50%{opacity:1}}
-@media (prefers-reduced-motion: reduce){.beta-banner-label-dot{animation:none}}
-.beta-banner-widgets{display:flex;align-items:center;gap:22px;flex-wrap:wrap;font-size:.72rem;color:var(--text)}
-.beta-widget{display:flex;align-items:center;gap:8px;white-space:nowrap}
-.beta-widget-title{color:var(--muted);font-weight:700;text-transform:uppercase;font-size:.62rem;letter-spacing:.04em}
-.beta-widget-value{font-weight:800;color:var(--mint2)}
-.beta-widget-sub{color:var(--muted)}
+.beta-banner-label{font-size:.62rem;font-weight:800;letter-spacing:.08em;color:var(--zinc-400);white-space:nowrap;
+  display:flex;align-items:center;gap:6px;text-transform:uppercase}
+.beta-banner-label-dot{width:6px;height:6px;background:var(--emerald-500);flex-shrink:0}
+.beta-banner-widgets{display:flex;align-items:center;gap:20px;flex-wrap:wrap;font-size:.68rem;color:var(--zinc-100)}
+.beta-widget{display:flex;align-items:center;gap:7px;white-space:nowrap}
+.beta-widget-title{color:var(--zinc-500);font-weight:700;text-transform:uppercase;font-size:.6rem;letter-spacing:.04em}
+.beta-widget-value{font-weight:700;color:var(--zinc-100)}
 
-/* ===== HEADER (same visual identity, mint console badge) ===== */
-header.topbar{position:sticky;top:var(--beta-banner-h);z-index:1000;background:rgba(7,12,14,.94);backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--border);padding:14px 24px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-.brand{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.brand-logo{display:flex;align-items:center;gap:10px}
-/* ===== UNIFIED LOGO LOCKUP (identical markup/classes across index.html, dispatch.html, app.html) ===== */
-.brand-wordmark{font-weight:800;font-size:1.05rem;letter-spacing:.3px}
+/* ===== TOPBAR ===== */
+header.topbar{position:sticky;top:var(--beta-banner-h);z-index:1000;background:var(--zinc-950);
+  border-bottom:1px solid var(--zinc-800);padding:10px 20px;display:flex;justify-content:space-between;
+  align-items:center;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand-logo{display:flex;align-items:center;gap:9px}
+.brand-wordmark{font-weight:800;font-size:.95rem;letter-spacing:.3px}
 .brand-white{color:#ffffff}
-.brand-lime{color:var(--brand-mint)}
+.brand-lime{color:var(--emerald-500)}
 .brand-tm{font-size:.55em;opacity:.4;margin-left:1px}
-.badge-mint{font-size:.65rem;background:rgba(0,255,136,.12);color:var(--mint2);border:1px solid rgba(0,255,136,.4);
-  padding:4px 10px;border-radius:20px;font-weight:700;letter-spacing:.4px;display:flex;align-items:center;gap:6px}
-.badge-dot-mint{width:6px;height:6px;border-radius:50%;background:var(--mint2)}
-.operator{font-size:.7rem;color:var(--muted);display:flex;align-items:center;gap:6px}
-.operator-dot{width:7px;height:7px;border-radius:50%;background:var(--mint2);box-shadow:0 0 6px var(--mint2)}
-.staff-link{font-size:.78rem;color:var(--muted);text-decoration:none;border-bottom:1px dashed var(--border);
+.badge-mint{font-size:.6rem;background:transparent;color:var(--emerald-400);border:1px solid var(--zinc-800);
+  padding:3px 9px;font-weight:700;letter-spacing:.05em;display:flex;align-items:center;gap:6px;text-transform:uppercase}
+.badge-dot-mint{width:5px;height:5px;background:var(--emerald-500)}
+.operator{font-size:.66rem;color:var(--zinc-400);display:flex;align-items:center;gap:6px}
+.operator-dot{width:5px;height:5px;background:var(--emerald-500)}
+.staff-link{font-size:.7rem;color:var(--zinc-400);text-decoration:none;border-bottom:1px solid var(--zinc-800);
   padding-bottom:2px}
-.staff-link:hover{color:var(--mint2);border-color:var(--mint2)}
-.grid-select{background:rgba(7,12,14,.8);border:1px solid var(--border);color:var(--text);
-  padding:7px 11px;border-radius:8px;font-size:.74rem;font-weight:700;outline:none}
-.grid-select:focus{border-color:var(--mint2)}
-.toast{display:none;position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:2500;
-  background:rgba(0,255,136,.2);border:1px solid var(--mint2);color:var(--mint2);
-  padding:10px 16px;border-radius:10px;font-size:.78rem;font-weight:700;text-align:center}
+.staff-link:hover{color:var(--emerald-400);border-color:var(--emerald-400)}
+.grid-select{background:var(--zinc-900);border:1px solid var(--zinc-800);color:var(--zinc-100);
+  padding:6px 10px;font-size:.68rem;font-weight:700;outline:none;border-radius:0}
+.grid-select:focus{border-color:var(--emerald-500)}
+.toast{display:none;position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:2500;
+  background:var(--zinc-900);border:1px solid var(--emerald-500);color:var(--emerald-400);
+  padding:9px 15px;font-size:.74rem;font-weight:700;text-align:center;border-radius:0}
 
-/* ===== OPERATIONAL OVERVIEW ===== */
-.overview{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-bottom:1px solid var(--border)}
-.metric{background:var(--bg);padding:16px 18px}
-.metric .label{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:8px}
-.metric .value{font-size:1.7rem;font-weight:900;color:var(--mint2)}
-.metric.warn .value{color:var(--warn)}
-.severity-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
-.sev-chip{font-size:.68rem;font-weight:700;padding:3px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px}
-.sev-chip b{font-size:.82rem}
-.sev-chip.critical{background:rgba(255,68,68,.15);color:#fca5a5}
-.sev-chip.high{background:rgba(255,187,0,.15);color:#fde68a}
-.sev-chip.standard{background:rgba(0,255,136,.15);color:#7ffcd4}
-.metric .sub{font-size:.68rem;color:var(--muted);margin-top:4px}
+/* ===== ALDERMAN BRIEFING — collapsed by default (native <details>, zero
+   JS/animation cost) so the primary 3-column workspace is what's visible
+   on load, per the "high-density, minimalist" direction. Still fully
+   functional (district/severity/stage/SLA filters + Print District
+   Report) for the persona that needs it. ===== */
+.briefing{border-bottom:1px solid var(--zinc-800)}
+.briefing summary{padding:8px 20px;font-size:.68rem;font-weight:700;letter-spacing:.04em;color:var(--zinc-400);
+  cursor:pointer;text-transform:uppercase;list-style:none}
+.briefing summary::-webkit-details-marker{display:none}
+.briefing summary::before{content:'[+] ';color:var(--emerald-500)}
+.briefing[open] summary::before{content:'[-] '}
+.briefing-body{padding:4px 20px 12px;display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.briefing-body label{font-size:.66rem;color:var(--zinc-400);display:flex;align-items:center;gap:6px}
+.briefing-body .grid-select{padding:5px 8px}
+#briefSummary{flex-basis:100%;font-size:.7rem;color:var(--zinc-100);line-height:1.55;font-family:ui-monospace,Menlo,Consolas,monospace}
 
-/* ===== NUMERIC OVERVIEW METRICS (replaces the gas-gauge dials with dense readouts) ===== */
-.metric .sub-lg{font-size:.72rem;color:var(--muted);margin-top:4px}
-
-/* ===== PRINTABLE WARD REPORT (built from live DOM values, isolated via @media print) ===== */
+/* ===== PRINTABLE WARD REPORT (unchanged) ===== */
 #printReportArea{display:none}
 #printReportArea table{width:100%;border-collapse:collapse;margin:10px 0 18px;font-size:12px}
 #printReportArea th,#printReportArea td{border:1px solid #999;padding:5px 9px;text-align:left}
@@ -110,116 +114,134 @@ header.topbar{position:sticky;top:var(--beta-banner-h);z-index:1000;background:r
   #printReportArea{display:block;position:absolute;top:0;left:0;width:100%;padding:28px;color:#000;background:#fff}
 }
 
-/* ===== DENSE OPERATIONS ANALYTICS STRIP (tight industrial layout, below the metrics) ===== */
-.analytics-dense{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-bottom:1px solid var(--border)}
-.dense-cell{background:var(--bg);padding:10px 14px}
-.dense-cell .dense-label{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);
-  margin-bottom:6px;display:flex;align-items:center;gap:5px}
-.dense-cell .dense-label::before{content:'▸';color:var(--brand-mint);font-size:.68rem;line-height:1}
-.dense-cell .value{font-size:1.25rem}
-.dense-cell .sub{margin-top:3px}
-.ops-table{width:100%;border-collapse:collapse;font-size:.72rem;margin:2px 0 6px}
-.ops-table td{padding:3px 0;border-bottom:1px solid var(--border)}
-.ops-table td:first-child{color:var(--muted);font-weight:700}
-.ops-table td:last-child{text-align:right;font-weight:800;color:var(--mint2)}
+/* =====================================================================
+   THREE-COLUMN COMMAND CENTER — rigid split, zero rounded corners, 1px
+   zinc-800 borders between panes. flex:1/min-height:0 so each column
+   scrolls independently inside a fixed-height workspace rather than the
+   whole page scrolling.
+   ===================================================================== */
+.command-grid{flex:1;display:flex;min-height:0}
+.col-label{font-size:.6rem;font-weight:800;letter-spacing:.08em;color:var(--zinc-400);text-transform:uppercase;
+  padding:10px 12px 8px;border-bottom:1px solid var(--zinc-800)}
 
-/* ===== WORKSPACE ===== */
-.workspace{flex:1;display:flex;min-height:600px}
-.triage{width:420px;flex-shrink:0;padding:18px;display:flex;flex-direction:column;gap:12px;
-  border-right:1px solid var(--border);overflow-y:auto;max-height:calc(100vh - 190px)}
-.dept-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px}
-.dept-filter{background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--muted);
-  font-size:.66rem;font-weight:700;padding:5px 10px;border-radius:20px;cursor:pointer}
-.dept-filter.active{border-color:var(--mint2);background:rgba(0,255,136,.14);color:var(--mint2)}
+/* ----- COLUMN 1 — TICKET QUEUE & REAL-TIME FEED (30%) ----- */
+.col-queue{width:30%;min-width:260px;flex-shrink:0;border-right:1px solid var(--zinc-800);
+  display:flex;flex-direction:column;min-height:0}
+.queue-controls{padding:10px 12px;border-bottom:1px solid var(--zinc-800);display:flex;flex-direction:column;gap:8px}
+.queue-search{width:100%;background:var(--zinc-900);border:1px solid var(--zinc-800);color:var(--zinc-100);
+  padding:7px 9px;font-size:.72rem;outline:none;border-radius:0}
+.queue-search:focus{border-color:var(--emerald-500)}
+.status-filter-row{display:flex;gap:0;border:1px solid var(--zinc-800)}
+.status-filter{flex:1;background:var(--zinc-950);border:none;border-right:1px solid var(--zinc-800);color:var(--zinc-400);
+  font-size:.62rem;font-weight:700;letter-spacing:.03em;padding:6px 4px;cursor:pointer;text-transform:uppercase}
+.status-filter:last-child{border-right:none}
+.status-filter.active{background:var(--zinc-800);color:var(--zinc-100)}
+.dept-filters{display:flex;gap:6px;flex-wrap:wrap}
+.dept-filter{background:var(--zinc-950);border:1px solid var(--zinc-800);color:var(--zinc-400);
+  font-size:.6rem;font-weight:700;padding:4px 8px;cursor:pointer;border-radius:0;text-transform:uppercase}
+.dept-filter.active{border-color:var(--emerald-500);color:var(--emerald-400)}
+.queue-rows{flex:1;overflow-y:auto;min-height:0}
+.queue-empty{padding:18px 12px;font-size:.72rem;color:var(--zinc-500)}
 
-.ticket{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--border);border-radius:12px;padding:14px}
-.priority-group-label{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);
-  margin:14px 0 6px;display:flex;align-items:center;gap:6px}
-.priority-group-label:first-child{margin-top:0}
-.priority-group-label .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.priority-badge{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.4px;
-  padding:2px 8px;border-radius:5px;display:inline-flex;align-items:center;gap:5px;flex-shrink:0}
-.priority-badge.critical{background:rgba(255,68,68,.18);color:#fca5a5;border:1px solid rgba(255,68,68,.4)}
-.priority-badge.high{background:rgba(255,187,0,.18);color:#fde68a;border:1px solid rgba(255,187,0,.4)}
-.priority-badge.standard{background:rgba(0,255,136,.18);color:#7ffcd4;border:1px solid rgba(0,255,136,.4)}
-.action-btn.workorder{background:var(--mint);color:#051311;border-color:var(--mint);font-weight:800}
-.ticket-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px}
-.ticket-head strong{font-size:.86rem}
-.pill{padding:2px 7px;border-radius:5px;font-size:.62rem;font-weight:700;text-transform:uppercase;flex-shrink:0}
-.pill-crit{background:rgba(255,68,68,.2);color:#fca5a5}
-.pill-warn{background:rgba(255,187,0,.2);color:#fde68a}
-.pill-ok{background:rgba(0,255,136,.2);color:#86f7cd}
-.sla-badge{font-size:.66rem;font-weight:700;padding:3px 8px;border-radius:6px;background:rgba(255,187,0,.12);
-  color:var(--warn);border:1px solid rgba(255,187,0,.35);display:inline-flex;align-items:center;gap:5px;margin-top:6px}
-.sla-badge.ok{background:rgba(0,255,136,.12);color:var(--mint2);border-color:rgba(0,255,136,.3)}
-.ticket-meta{font-size:.72rem;color:var(--muted);margin:6px 0 10px}
-.status-select{width:100%;background:rgba(7,12,14,.8);border:1px solid var(--border);color:var(--text);
-  padding:7px 10px;border-radius:8px;font-size:.74rem;font-weight:700;margin-bottom:8px}
-.ticket-actions{display:flex;gap:6px;flex-wrap:wrap}
-.action-btn{background:rgba(0,255,136,.1);color:var(--mint2);border:1px solid var(--mint);
-  border-radius:6px;padding:6px 9px;font-size:.66rem;font-weight:700;cursor:pointer}
-.action-btn.escalate{background:rgba(0,255,136,.1);color:var(--mint2);border-color:var(--mint2)}
-.action-btn.close{background:rgba(255,68,68,.08);color:#fca5a5;border-color:rgba(255,68,68,.4)}
-.action-btn.copilot{background:var(--mint);color:#051311;border-color:var(--mint);font-weight:800}
+.q-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--zinc-800);font-size:.7rem}
+.q-row:hover{background:var(--zinc-900)}
+.q-dot{width:7px;height:7px;flex-shrink:0}
+.q-dot.pending{background:var(--amber-500)}
+.q-dot.dispatched{background:var(--emerald-500)}
+.q-dot.closed{background:var(--zinc-500)}
+.q-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.q-top-line{display:flex;align-items:baseline;gap:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.q-id{color:var(--zinc-100);font-weight:700}
+.q-cat{color:var(--emerald-400)}
+.q-bottom-line{display:flex;align-items:baseline;gap:7px;color:var(--zinc-500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.q-age{flex-shrink:0;margin-left:auto}
+.q-dispatch-btn{flex-shrink:0;background:transparent;border:1px solid var(--emerald-500);color:var(--emerald-400);
+  font-size:.6rem;font-weight:800;letter-spacing:.04em;padding:5px 8px;cursor:pointer;border-radius:0}
+.q-dispatch-btn:disabled{border-color:var(--zinc-700);color:var(--zinc-500);cursor:default}
 
-.gis{flex:1;position:relative}
-#map{position:absolute;inset:0;background:#0d1518}
-.leaflet-container{background:#0d1518}
-.leaflet-tile-pane{filter:invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);}
-.route-line{stroke:var(--mint2);stroke-width:2;stroke-dasharray:6 5;opacity:.75}
+/* ----- COLUMN 2 — SPATIAL ROUTING MATRIX / MAP CANVAS (45%) ----- */
+.col-map{width:45%;flex:1;display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--zinc-800)}
+.telemetry-bar{display:flex;flex-wrap:wrap;gap:0;border-bottom:1px solid var(--zinc-800)}
+.telemetry-cell{flex:1;min-width:140px;padding:8px 14px;border-right:1px solid var(--zinc-800)}
+.telemetry-cell:last-child{border-right:none}
+.telemetry-label{font-size:.58rem;font-weight:800;letter-spacing:.06em;color:var(--zinc-500);text-transform:uppercase}
+.telemetry-value{font-size:1rem;font-weight:800;color:var(--zinc-100);margin-top:2px}
+.telemetry-value.ok{color:var(--emerald-400)}
+.telemetry-value.warn{color:var(--amber-500)}
+.map-controls{display:flex;gap:0;border-bottom:1px solid var(--zinc-800)}
+.map-ctrl-btn{flex:1;background:var(--zinc-950);border:none;border-right:1px solid var(--zinc-800);color:var(--zinc-400);
+  font-size:.62rem;font-weight:700;letter-spacing:.03em;padding:7px 4px;cursor:pointer;text-transform:uppercase}
+.map-ctrl-btn:last-child{border-right:none}
+.map-ctrl-btn.active{background:var(--zinc-800);color:var(--emerald-400)}
+.gis{flex:1;position:relative;min-height:260px}
+#map{position:absolute;inset:0;background:var(--zinc-900)}
+.leaflet-container{background:var(--zinc-900)}
+.leaflet-tile-pane{filter:grayscale(100%) invert(92%) brightness(90%) contrast(100%);}
+.route-line{stroke:var(--emerald-500);stroke-width:2;stroke-dasharray:6 5;opacity:.85}
 
-/* ===== LOGGING DRAWER ===== */
-.drawer{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:2000;display:none;align-items:center;justify-content:center;padding:18px}
-.drawer.open{display:flex}
-.drawer-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;max-width:420px;width:100%}
-.drawer-box h3{font-size:.95rem;margin-bottom:4px}
-.drawer-box .small{font-size:.74rem;color:var(--muted);margin-bottom:14px}
-.drop-zone{border:2px dashed var(--mint2);border-radius:10px;padding:22px;text-align:center;color:var(--muted);
-  font-size:.76rem;margin-bottom:14px}
-.drawer-actions{display:flex;gap:8px;justify-content:flex-end}
-.btn{border:none;border-radius:8px;font-weight:800;font-size:.78rem;padding:9px 15px;cursor:pointer}
-.btn-mint{background:var(--mint);color:#051311}
-.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+/* ----- COLUMN 3 — UNIT DISPATCH & AUDIT LOG (25%) ----- */
+.col-fleet{width:25%;min-width:220px;flex-shrink:0;display:flex;flex-direction:column;min-height:0}
+.fleet-status{border-bottom:1px solid var(--zinc-800);max-height:42%;display:flex;flex-direction:column;min-height:0}
+.fleet-rows{overflow-y:auto;min-height:0}
+.fleet-row{display:flex;flex-direction:column;gap:3px;padding:8px 12px;border-bottom:1px solid var(--zinc-800);font-size:.68rem}
+.fleet-top{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+.fleet-id{color:var(--zinc-100);font-weight:700}
+.fleet-status-tag{font-size:.58rem;font-weight:800;letter-spacing:.04em;padding:1px 6px}
+.fleet-status-tag.en-route{background:rgba(16,185,129,.14);color:var(--emerald-400)}
+.fleet-status-tag.idle{background:rgba(113,113,122,.18);color:var(--zinc-400)}
+.fleet-status-tag.on-site{background:rgba(245,158,11,.14);color:var(--amber-500)}
+.fleet-assign{color:var(--zinc-400);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fleet-meter-row{display:flex;align-items:center;gap:6px}
+.fleet-meter{flex:1;height:3px;background:var(--zinc-800);position:relative}
+.fleet-meter-fill{position:absolute;left:0;top:0;bottom:0;background:var(--emerald-500)}
+.fleet-meter-fill.low{background:var(--amber-500)}
+.fleet-meter-pct{color:var(--zinc-500);flex-shrink:0;min-width:28px;text-align:right}
+
+.audit-terminal{flex:1;display:flex;flex-direction:column;min-height:0}
+.terminal{flex:1;overflow-y:auto;background:var(--zinc-950);padding:8px 12px;font-size:.66rem;line-height:1.6;
+  color:var(--emerald-400);min-height:0}
+.terminal-line{white-space:pre-wrap;word-break:break-word}
+.terminal-line .t-time{color:var(--zinc-500)}
+.terminal-empty{color:var(--zinc-500)}
 
 @media (max-width:1000px){
-  .workspace{flex-direction:column}
-  .triage{width:100%;border-right:none;border-bottom:1px solid var(--border);max-height:none}
-  .gis{height:420px}
-  .overview{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .command-grid{flex-direction:column}
+  .col-queue,.col-map,.col-fleet{width:100%;border-right:none;border-bottom:1px solid var(--zinc-800)}
+  .gis{height:360px}
+  .fleet-status{max-height:none}
 }
-@media (max-width:768px){
-  .overview{grid-template-columns:1fr}
-  .metric{padding:12px 10px;min-width:0}
-  .metric .label{font-size:.6rem;letter-spacing:.3px;white-space:normal;overflow-wrap:break-word;margin-bottom:6px}
-  .metric .value{font-size:1.3rem;line-height:1.15;overflow-wrap:break-word}
-  .metric .sub{font-size:.62rem}
-  .analytics-dense{grid-template-columns:1fr}
-  .dense-cell{padding:10px}
-}
-/* CITIXEN-FIXPACK:gate */
+
+/* ===== LOGGING DRAWER (restyled square/monochrome, same markup/logic) ===== */
+.drawer{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:2000;display:none;align-items:center;justify-content:center;padding:18px}
+.drawer.open{display:flex}
+.drawer-box{background:var(--zinc-900);border:1px solid var(--zinc-800);border-radius:0;padding:20px;max-width:420px;width:100%}
+.drawer-box h3{font-size:.9rem;margin-bottom:4px;font-weight:800}
+.drawer-box .small{font-size:.72rem;color:var(--zinc-400);margin-bottom:14px}
+.drop-zone{border:1px dashed var(--zinc-700);border-radius:0;padding:20px;text-align:center;color:var(--zinc-400);
+  font-size:.74rem;margin-bottom:14px}
+.drawer-actions{display:flex;gap:8px;justify-content:flex-end}
+.btn{border:1px solid var(--zinc-800);border-radius:0;font-weight:800;font-size:.76rem;padding:9px 15px;cursor:pointer}
+.btn-mint{background:var(--emerald-500);color:#051311;border-color:var(--emerald-500)}
+.btn-ghost{background:transparent;border:1px solid var(--zinc-800);color:var(--zinc-100)}
+
+/* ===== STAFF ACCESS GATE (restyled square/monochrome, same logic) ===== */
 html.locked body>*:not(#accessGate){visibility:hidden}
-#accessGate{position:fixed;inset:0;z-index:5000;background:rgba(3,6,7,.96);display:flex;align-items:center;justify-content:center;padding:20px}
+#accessGate{position:fixed;inset:0;z-index:5000;background:var(--zinc-950);display:flex;align-items:center;justify-content:center;padding:20px}
 html:not(.locked) #accessGate{display:none}
-.gate-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:26px;width:100%;max-width:380px}
-.gate-box h2{font-size:1.05rem;color:var(--mint2);margin-bottom:6px}
-.gate-box p{font-size:.76rem;color:var(--muted);line-height:1.5;margin-bottom:16px}
-.gate-box input{width:100%;padding:11px 13px;background:rgba(7,12,14,.8);border:1px solid var(--border);color:var(--text);
-  border-radius:10px;font-size:.9rem;letter-spacing:.08em;outline:none;margin-bottom:10px}
-.gate-box input:focus{border-color:var(--mint2)}
-.gate-box button{width:100%;background:var(--mint);color:#051311;border:none;padding:12px;border-radius:10px;font-weight:800;cursor:pointer}
+.gate-box{background:var(--zinc-900);border:1px solid var(--zinc-800);border-radius:0;padding:26px;width:100%;max-width:380px}
+.gate-box h2{font-size:1rem;color:var(--emerald-400);margin-bottom:6px;font-weight:800}
+.gate-box p{font-size:.74rem;color:var(--zinc-400);line-height:1.5;margin-bottom:16px}
+.gate-box input{width:100%;padding:11px 13px;background:var(--zinc-950);border:1px solid var(--zinc-800);color:var(--zinc-100);
+  border-radius:0;font-size:.9rem;letter-spacing:.08em;outline:none;margin-bottom:10px;font-family:ui-monospace,Menlo,Consolas,monospace}
+.gate-box input:focus{border-color:var(--emerald-500)}
+.gate-box button{width:100%;background:var(--emerald-500);color:#051311;border:none;padding:12px;border-radius:0;font-weight:800;cursor:pointer}
 #gateErr{font-size:.72rem;color:#fca5a5;min-height:1.1em;margin-top:8px}
-/* Alderman briefing */
-.briefing{border-bottom:1px solid var(--border);padding:12px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:10px}
-.briefing h3{font-size:.8rem;color:var(--mint2);margin-right:6px}
-.briefing label{font-size:.68rem;color:var(--muted);display:flex;align-items:center;gap:6px}
-.briefing .grid-select{padding:6px 9px}
-#briefSummary{flex-basis:100%;font-size:.74rem;color:var(--text);line-height:1.55}
 </style>
 </head>
 <body>
   <script>
 document.documentElement.classList.add('locked');
-/* Alderman briefing filters */
+/* Alderman briefing filters (unchanged logic) */
 function briefingFilter(list){
   if(!document.getElementById('fWard')) return list;
   const ward=document.getElementById('fWard').value,
@@ -254,23 +276,21 @@ function renderBriefing(list){
     </form>
   </div>
 
-  <!-- ===== BETA TESTING ANALYTICS (LIVE) — FINAL ALPHA LAUNCH ADDITIONS.
-       Sticky banner above the main topbar; see renderBetaAnalyticsBanner()
-       for the fetches that fill it in. ===== -->
+  <!-- ===== BETA TESTING ANALYTICS (LIVE) — see renderBetaAnalyticsBanner(). ===== -->
   <div class="beta-banner" id="betaAnalyticsBanner" aria-label="Beta testing analytics">
-    <div class="beta-banner-label"><span class="beta-banner-label-dot"></span>BETA TESTING ANALYTICS (LIVE)</div>
+    <div class="beta-banner-label"><span class="beta-banner-label-dot"></span>BETA ANALYTICS (LIVE)</div>
     <div class="beta-banner-widgets">
       <div class="beta-widget">
-        <span class="beta-widget-title">Geographic Coverage</span>
-        <span class="beta-widget-value" id="betaGeoValue">—</span>
+        <span class="beta-widget-title">Coverage</span>
+        <span class="beta-widget-value mono" id="betaGeoValue">—</span>
       </div>
       <div class="beta-widget">
-        <span class="beta-widget-title">Ingestion Success Rate</span>
-        <span class="beta-widget-value" id="betaIngestValue">—</span>
+        <span class="beta-widget-title">Ingestion</span>
+        <span class="beta-widget-value mono" id="betaIngestValue">—</span>
       </div>
       <div class="beta-widget">
-        <span class="beta-widget-title">Instant Feedback Stream</span>
-        <span class="beta-widget-value" id="betaFeedbackValue">—</span>
+        <span class="beta-widget-title">Feedback</span>
+        <span class="beta-widget-value mono" id="betaFeedbackValue">—</span>
       </div>
     </div>
   </div>
@@ -278,98 +298,109 @@ function renderBriefing(list){
   <header class="topbar">
     <div class="brand">
       <div class="brand-logo">
-        <svg viewBox="0 0 24 24" width="21" height="21" stroke="var(--brand-mint)" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <svg viewBox="0 0 24 24" width="19" height="19" stroke="var(--emerald-500)" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         <span class="brand-wordmark"><span class="brand-white">CITIXEN</span> <span class="brand-lime">UX</span><sup class="brand-tm">™</sup></span>
       </div>
-      <div class="badge-mint"><span class="badge-dot-mint"></span> MUNICIPAL DISPATCH COMMAND CENTER</div>
-      <div class="operator"><span class="operator-dot"></span> Operator: J. Kowalski — Public Works, on duty</div>
+      <div class="badge-mint"><span class="badge-dot-mint"></span> DISPATCH COMMAND CENTER</div>
+      <div class="operator mono"><span class="operator-dot"></span> OPERATOR: J.KOWALSKI — PUBLIC WORKS</div>
       <select class="grid-select" id="gridConfig" aria-label="Municipal grid taxonomy">
         <option value="standard">Standard Public Works</option>
         <option value="transit">Metropolitan Transit & Roads</option>
         <option value="code">Code Enforcement & Sanitation</option>
       </select>
     </div>
-    <a class="staff-link" href="/index.html">← Return to Public Portal</a>
+    <a class="staff-link" href="/index.html">&larr; Return to Public Portal</a>
   </header>
 
   <div id="toast" class="toast"></div>
 
-  <section class="briefing" id="briefing" aria-label="Alderman briefing">
-    <h3>Alderman briefing</h3>
-    <label>District
-      <select class="grid-select" id="fWard"><option value="All">All districts</option><option>District 4</option></select></label>
-    <label>Severity
-      <select class="grid-select" id="fStatus"><option>All</option><option>Critical</option><option>Warning</option><option>Resolved</option></select></label>
-    <label>Stage
-      <select class="grid-select" id="fStage"><option>All</option><option>Critical</option><option>Assigned to Public Works</option><option>In Progress</option><option>Resolved</option><option>RESOLVED &amp; AUDITED</option></select></label>
-    <label><input type="checkbox" id="fSlaRisk"> SLA at risk only</label>
-    <button class="btn btn-ghost" id="printWardReport" type="button">Print My District Report</button>
-    <div id="briefSummary"></div>
-  </section>
+  <!-- ===== ALDERMAN BRIEFING — collapsed by default; see .briefing CSS. ===== -->
+  <details class="briefing" id="briefing" aria-label="Alderman briefing">
+    <summary>Alderman Briefing &amp; District Report</summary>
+    <div class="briefing-body">
+      <label>District
+        <select class="grid-select" id="fWard"><option value="All">All districts</option><option>District 4</option></select></label>
+      <label>Severity
+        <select class="grid-select" id="fStatus"><option>All</option><option>Critical</option><option>Warning</option><option>Resolved</option></select></label>
+      <label>Stage
+        <select class="grid-select" id="fStage"><option>All</option><option>Critical</option><option>Assigned to Public Works</option><option>In Progress</option><option>Resolved</option><option>RESOLVED &amp; AUDITED</option></select></label>
+      <label><input type="checkbox" id="fSlaRisk"> SLA at risk only</label>
+      <button class="btn btn-ghost" id="printWardReport" type="button">Print District Report</button>
+      <div id="briefSummary"></div>
+    </div>
+  </details>
 
-  <div class="overview">
-    <div class="metric">
-      <div class="label">District Health Index</div>
-      <div class="value" id="wardHealthValue">88%</div>
-      <div class="sub" id="wardHealthSub">District 4 — Stable</div>
-    </div>
-    <div class="metric">
-      <div class="label">Active Dispatch Capacity</div>
-      <div class="value" id="capValue">0%</div>
-      <div class="sub" id="capSub">0 of 8 crew slots committed</div>
-    </div>
-    <div class="metric">
-      <div class="label" style="color:var(--mint2)">Weekly Resolve Rate</div>
-      <div class="value" id="resolveFraction" style="font-size:1.9rem;">84<span style="color:var(--muted);font-size:1.1rem;">/91</span></div>
-      <div class="sub">Resolved this week, District 4</div>
-    </div>
-  </div>
+  <!-- =====================================================================
+       THREE-COLUMN COMMAND CENTER
+       ===================================================================== -->
+  <div class="command-grid">
 
-  <div class="analytics-dense" aria-label="Dense operations analytics">
-    <div class="dense-cell">
-      <div class="dense-label">Dispatch Severity Queues</div>
-      <table class="ops-table">
-        <tr><td>Critical</td><td id="sevCritical">0</td></tr>
-        <tr><td>High</td><td id="sevHigh">0</td></tr>
-        <tr><td>Standard</td><td id="sevStandard">0</td></tr>
-      </table>
-      <div class="sub" id="sevTotal">0 tickets in queue</div>
-    </div>
-    <div class="dense-cell">
-      <div class="dense-label">CapEx Scoping Ledger — Track 2</div>
-      <div class="value" id="capexTotal">$482,600</div>
-      <div class="sub">Scoped capital spend — current cycle</div>
-    </div>
-    <div class="dense-cell">
-      <div class="dense-label" style="color:var(--mint2)">Crew / Vendor Routing</div>
-      <div class="value" id="woActive">0 <span style="font-size:.8rem;color:var(--muted);">active</span></div>
-      <div class="sub" id="woSub">No routes approved this session</div>
-    </div>
-  </div>
-
-  <div class="workspace">
-    <aside class="triage">
-      <div class="dept-filters">
-        <button class="dept-filter active" data-dept="All">All</button>
-        <button class="dept-filter" data-dept="Roads & Potholes">Roads & Potholes</button>
-        <button class="dept-filter" data-dept="Electrical/Lighting">Electrical/Lighting</button>
-        <button class="dept-filter" data-dept="Sanitation/Waste">Sanitation/Waste</button>
+    <!-- ===== COLUMN 1 — TICKET QUEUE & REAL-TIME FEED (30%) ===== -->
+    <aside class="col-queue">
+      <div class="col-label">Ticket Queue &amp; Real-Time Feed</div>
+      <div class="queue-controls">
+        <input type="search" class="queue-search mono" id="queueSearch" placeholder="Search ID, category, location...">
+        <div class="status-filter-row" id="statusFilterRow">
+          <button type="button" class="status-filter active" data-qstatus="ALL">All</button>
+          <button type="button" class="status-filter" data-qstatus="PENDING">Pending</button>
+          <button type="button" class="status-filter" data-qstatus="DISPATCHED">Dispatched</button>
+          <button type="button" class="status-filter" data-qstatus="CLOSED">Closed</button>
+        </div>
+        <div class="dept-filters" id="deptFilters"></div>
       </div>
-      <div id="ticketList"></div>
+      <div id="ticketList" class="queue-rows"></div>
     </aside>
 
-    <div class="gis"><div id="map"></div></div>
+    <!-- ===== COLUMN 2 — SPATIAL ROUTING MATRIX / MAP CANVAS (45%) ===== -->
+    <section class="col-map">
+      <div class="telemetry-bar mono" id="telemetryBar">
+        <div class="telemetry-cell">
+          <div class="telemetry-label">Active Units</div>
+          <div class="telemetry-value" id="telActiveUnits">—</div>
+        </div>
+        <div class="telemetry-cell">
+          <div class="telemetry-label">Unassigned Tickets</div>
+          <div class="telemetry-value" id="telUnassigned">—</div>
+        </div>
+        <div class="telemetry-cell">
+          <div class="telemetry-label">Avg Dispatch Time</div>
+          <div class="telemetry-value" id="telAvgDispatch">—</div>
+        </div>
+        <div class="telemetry-cell">
+          <div class="telemetry-label">System</div>
+          <div class="telemetry-value ok" id="telSystem">—</div>
+        </div>
+      </div>
+      <div class="map-controls">
+        <button type="button" class="map-ctrl-btn active" id="btnToggleNodes">[ Toggle Nodes ]</button>
+        <button type="button" class="map-ctrl-btn active" id="btnToggleFleet">[ Toggle Fleet ]</button>
+        <button type="button" class="map-ctrl-btn" id="btnOptimizeRoute">[ Optimize Route ]</button>
+      </div>
+      <div class="gis"><div id="map"></div></div>
+    </section>
+
+    <!-- ===== COLUMN 3 — UNIT DISPATCH & AUDIT LOG (25%) ===== -->
+    <aside class="col-fleet">
+      <div class="fleet-status">
+        <div class="col-label">Field Crew Fleet Status</div>
+        <div class="fleet-rows" id="fleetRows"></div>
+      </div>
+      <div class="audit-terminal">
+        <div class="col-label">Audit / Action Terminal Log</div>
+        <div class="terminal mono" id="terminalLog"></div>
+      </div>
+    </aside>
   </div>
 
   <!-- DISPATCH LOGGING DRAWER -->
   <div id="logDrawer" class="drawer">
     <div class="drawer-box">
-      <h3 id="logTitle">Close Incident & Verify EXIF Proof</h3>
+      <h3 id="logTitle">Close Incident &amp; Verify EXIF Proof</h3>
       <p class="small" id="logSub">Upload resolution proof and push an automated status update to the public live feed.</p>
       <div class="drop-zone">Drop resolution photo here, or tap to simulate capture — EXIF/GPS stripped automatically.</div>
       <div class="drawer-actions">
         <button class="btn btn-ghost" id="logCancel">Cancel</button>
-        <button class="btn btn-mint" id="logConfirm">Confirm & Push to Public Feed</button>
+        <button class="btn btn-mint" id="logConfirm">Confirm &amp; Push to Public Feed</button>
       </div>
     </div>
   </div>
@@ -379,14 +410,14 @@ function renderBriefing(list){
   <!-- COPILOT QUICK-RESOLVE DRAWER -->
   <div id="copilotDrawer" class="drawer">
     <div class="drawer-box">
-      <h3>⚡ Copilot Quick-Resolve</h3>
+      <h3>[+] Copilot Quick-Resolve</h3>
       <p class="small" id="copilotSub">AI-drafted resolution ready for review.</p>
-      <div class="label" style="margin-bottom:6px;">AI Resolution Notes</div>
-      <textarea id="copilotNotes" class="status-select" style="height:60px;resize:vertical;"></textarea>
-      <div class="drop-zone">✓ Proof photo captured — device ID and GPS scrubbed from EXIF automatically.</div>
+      <div class="label" style="margin-bottom:6px;font-size:.7rem;color:var(--zinc-400);">AI Resolution Notes</div>
+      <textarea id="copilotNotes" class="queue-search mono" style="height:60px;resize:vertical;width:100%;"></textarea>
+      <div class="drop-zone">[&#10003;] Proof photo captured — device ID and GPS scrubbed from EXIF automatically.</div>
       <div class="drawer-actions">
         <button class="btn btn-ghost" id="copilotCancel">Cancel</button>
-        <button class="btn btn-mint" id="copilotConfirm">Confirm & Push to Audit Stream</button>
+        <button class="btn btn-mint" id="copilotConfirm">Confirm &amp; Push to Audit Stream</button>
       </div>
     </div>
   </div>
@@ -405,21 +436,28 @@ const gridConfigs={
 };
 let activeGrid='standard';
 
+// ===== TICKET MODEL — added ticketNo/createdAt/dispatchedAt/wardDisplay
+// for the new dense queue rows + telemetry (Avg Dispatch Time) without
+// changing any of the existing status/stage/sla semantics the rest of
+// this console (briefing filters, map popups, print report) relies on.
+const NOW = Date.now();
 let tickets=[
-  {id:'t1',title:'Deep Pothole - Right Lane',loc:'Main St & 4th Ave',lat:43.8138,lng:-91.2519,status:'Critical',stage:'Critical',sla:'42m remaining',slaOk:false},
-  {id:'t2',title:'Streetlight Outage',loc:'Grand Ave & 7th St',lat:43.8180,lng:-91.2480,status:'Warning',stage:'Assigned to Public Works',sla:'1h 10m remaining',slaOk:true},
-  {id:'t3',title:'Overfilled Trash Bin',loc:'Pine St Alley',lat:43.8100,lng:-91.2550,status:'Warning',stage:'In Progress',sla:'25m remaining',slaOk:false}
+  {id:'t1',ticketNo:8402,title:'Deep Pothole - Right Lane',loc:'Main St & 4th Ave',wardDisplay:'Ward 4',lat:43.8138,lng:-91.2519,status:'Critical',stage:'Critical',sla:'42m remaining',slaOk:false,createdAt:NOW-12*60000,dispatchedAt:null},
+  {id:'t2',ticketNo:8403,title:'Streetlight Outage',loc:'Grand Ave & 7th St',wardDisplay:'Ward 4',lat:43.8180,lng:-91.2480,status:'Warning',stage:'Assigned to Public Works',sla:'1h 10m remaining',slaOk:true,createdAt:NOW-46*60000,dispatchedAt:NOW-31*60000},
+  {id:'t3',ticketNo:8404,title:'Overfilled Trash Bin',loc:'Pine St Alley',wardDisplay:'Ward 4',lat:43.8100,lng:-91.2550,status:'Warning',stage:'In Progress',sla:'25m remaining',slaOk:false,createdAt:NOW-8*60000,dispatchedAt:NOW-3*60000}
 ];
 tickets.forEach(t=>t.category=categoryOf(t.title));
 let activeDept='All';
+let activeQueueStatus='ALL';
+let queueSearchTerm='';
 
 function deptLabel(category){ return gridConfigs[activeGrid].labels[category]; }
 
 function renderDeptFilters(){
-  const wrap=document.querySelector('.dept-filters');
+  const wrap=document.getElementById('deptFilters');
   const labels=Object.values(gridConfigs[activeGrid].labels);
-  wrap.innerHTML = '<button class="dept-filter active" data-dept="All">All</button>' +
-    labels.map(l=>`<button class="dept-filter" data-dept="${esc(l)}">${esc(l)}</button>`).join('');
+  wrap.innerHTML = '<button type="button" class="dept-filter active" data-dept="All">All</button>' +
+    labels.map(l=>`<button type="button" class="dept-filter" data-dept="${esc(l)}">${esc(l)}</button>`).join('');
   wrap.querySelectorAll('.dept-filter').forEach(btn=>{
     btn.addEventListener('click',()=>{
       wrap.querySelectorAll('.dept-filter').forEach(b=>b.classList.remove('active'));
@@ -438,18 +476,47 @@ document.getElementById('gridConfig').addEventListener('change',(e)=>{
 });
 
 function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function statusColor(status){ return status==='Critical' ? '#ff4444' : status==='Warning' ? '#00ff88' : '#00ff88'; }
+function statusColor(status){ return status==='Critical' ? '#ef4444' : '#10b981'; }
 function statusPill(status){ return status==='Critical' ? 'pill-crit' : status==='Warning' ? 'pill-warn' : 'pill-ok'; }
 
-let map, markers={};
+// ===== QUEUE STATUS — maps the existing 5-value `stage` field onto the
+// 3-state Pending/Dispatched/Closed model the new queue filter uses.
+// "Critical" as a STAGE (distinct from status==='Critical' severity) is
+// this data model's pre-existing label for "reported, not yet actioned".
+function queueStatus(t){
+  if (t.stage==='Resolved' || t.stage==='RESOLVED & AUDITED') return 'CLOSED';
+  if (t.stage==='Critical') return 'PENDING';
+  return 'DISPATCHED';
+}
+function formatAge(ms){
+  const mins = Math.max(0, Math.round((Date.now()-ms)/60000));
+  if (mins < 1) return 'just now';
+  if (mins < 60) return mins+'m ago';
+  const hrs = Math.floor(mins/60);
+  if (hrs < 24) return hrs+'h '+(mins%60)+'m ago';
+  return Math.floor(hrs/24)+'d ago';
+}
+const CATEGORY_TAG = { roads:'Pothole', lighting:'Lighting', sanitation:'Drainage' };
+
+document.getElementById('statusFilterRow').querySelectorAll('.status-filter').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('#statusFilterRow .status-filter').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    activeQueueStatus = btn.dataset.qstatus;
+    renderTickets();
+  });
+});
+document.getElementById('queueSearch').addEventListener('input', (e)=>{
+  queueSearchTerm = e.target.value.trim().toLowerCase();
+  renderTickets();
+});
+
+let map, markers={}, nodesLayer, fleetLayer, optimizeLayer;
+const DEPOT = [43.8120, -91.2500];
 // Standard OpenStreetMap tiles, no API key required. Only the tile PANE is filtered
-// dark (see .leaflet-tile-pane) so markers, the Ward 4 boundary and routes stay true
-// mint/red — inverting the whole map would wash those colors out too.
+// (see .leaflet-tile-pane) so markers/routes keep their real emerald/amber/red colors
+// instead of being washed out by a full-page invert.
 function initMap(){
-  // Leaflet loads from a CDN (see <head>); a blocked network, offline device, or
-  // ad-blocker can leave `L` undefined. Guarding this means a failed map load
-  // degrades to "no map" instead of throwing and aborting the rest of dispatch
-  // console init — matching the same guard already used in index.html/app.html.
   if (typeof L === 'undefined') {
     console.warn('Leaflet failed to load — the dispatch map is unavailable, but the rest of the console still works.');
     return;
@@ -459,21 +526,19 @@ function initMap(){
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
       maxZoom:19, subdomains:'abc', crossOrigin:true
     }).addTo(map);
-    // Ward 4 boundary — approximate polygon around the pilot ward, mint dashed outline
-    // so dispatch can see at a glance which hazard nodes are in-ward vs. adjacent.
     L.polygon([
       [43.8210,-91.2640],[43.8210,-91.2400],[43.8060,-91.2400],[43.8060,-91.2640]
-    ],{color:'#00ff88',weight:2,dashArray:'8 6',fillColor:'#00ff88',fillOpacity:.04,opacity:.6})
-      .addTo(map).bindTooltip('District 4 boundary',{sticky:true});
-    // Simulated active service-vehicle route overlay between two ticket locations.
-    L.polyline([[43.8138,-91.2519],[43.8180,-91.2480]],{color:'#00ff88',weight:2,dashArray:'6 5',opacity:.75}).addTo(map);
+    ],{color:'#10b981',weight:2,dashArray:'8 6',fillColor:'#10b981',fillOpacity:.04,opacity:.6})
+      .addTo(map).bindTooltip('Ward 4 boundary',{sticky:true});
+    nodesLayer = L.layerGroup().addTo(map);
+    fleetLayer = L.layerGroup().addTo(map);
+    optimizeLayer = L.layerGroup().addTo(map);
     tickets.forEach(plotTicket);
+    plotFleet();
   } catch (err) {
     console.warn('Dispatch map initialization failed — continuing without the live map.', err);
     return;
   }
-  // Delegated handler for the popup action buttons (built as an HTML string in
-  // plotTicket below) — avoids inline click-handler attributes on generated markup.
   map.on('popupopen', (e) => {
     const el = e.popup.getElement();
     if (!el) return;
@@ -490,27 +555,33 @@ function initMap(){
 }
 function plotTicket(t){
   const col=statusColor(t.status);
-  const icon=L.divIcon({html:`<div style="background:${col};width:14px;height:14px;border-radius:50%;border:2px solid #fff"></div>`,iconSize:[14,14]});
-  const m=L.marker([t.lat,t.lng],{icon}).addTo(map);
+  const icon=L.divIcon({html:`<div style="background:${col};width:12px;height:12px;border:2px solid #09090b"></div>`,iconSize:[12,12]});
+  const m=L.marker([t.lat,t.lng],{icon}).addTo(nodesLayer);
   m.bindPopup(`
-    <strong>${esc(t.title)}</strong><br>
+    <strong>#TK-${t.ticketNo} — ${esc(t.title)}</strong><br>
     <span style="font-size:.7rem">${esc(t.loc)} • ${esc(t.stage)}</span><br>
     <div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;">
-      <button data-popup-action="assign" data-id="${esc(t.id)}" style="font-size:.65rem;padding:4px 7px;border-radius:5px;border:1px solid #00ff88;background:rgba(0,255,136,.12);color:#00ff88;cursor:pointer;">Assign Crew</button>
-      <button data-popup-action="escalate" data-id="${esc(t.id)}" style="font-size:.65rem;padding:4px 7px;border-radius:5px;border:1px solid #00ff88;background:rgba(0,255,136,.12);color:#00ff88;cursor:pointer;">Escalate</button>
-      <button data-popup-action="close" data-id="${esc(t.id)}" style="font-size:.65rem;padding:4px 7px;border-radius:5px;border:1px solid #ff4444;background:rgba(255,68,68,.1);color:#fca5a5;cursor:pointer;">Close & Verify</button>
+      <button data-popup-action="assign" data-id="${esc(t.id)}" style="font-size:.65rem;padding:4px 7px;border:1px solid #10b981;background:rgba(16,185,129,.12);color:#10b981;cursor:pointer;">Assign Crew</button>
+      <button data-popup-action="escalate" data-id="${esc(t.id)}" style="font-size:.65rem;padding:4px 7px;border:1px solid #10b981;background:rgba(16,185,129,.12);color:#10b981;cursor:pointer;">Escalate</button>
+      <button data-popup-action="close" data-id="${esc(t.id)}" style="font-size:.65rem;padding:4px 7px;border:1px solid #ef4444;background:rgba(239,68,68,.1);color:#fca5a5;cursor:pointer;">Close & Verify</button>
     </div>`);
   markers[t.id]=m;
 }
+function plotFleet(){
+  if (!fleetLayer) return;
+  fleetLayer.clearLayers();
+  FLEET.forEach(u=>{
+    const col = u.status==='EN_ROUTE' ? '#10b981' : u.status==='ON_SITE' ? '#f59e0b' : '#71717a';
+    const icon = L.divIcon({html:`<div style="width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:11px solid ${col}"></div>`, iconSize:[12,11]});
+    L.marker([u.lat,u.lng],{icon}).addTo(fleetLayer).bindTooltip(`${u.id} — ${u.status}`,{sticky:true});
+  });
+}
 
-// ===== SLA PRIORITY TIERS =====
-// Critical status -> Critical/red. Warning status -> High/amber. Everything else
-// (In Progress w/ healthy SLA, Resolved, RESOLVED & AUDITED) -> Standard/mint.
-// Tiles are grouped under a header per tier so priority is visually unmistakable.
+// ===== SLA PRIORITY TIERS (unchanged semantics) =====
 const PRIORITY_TIERS={
-  Critical:{ order:0, label:'Critical', tone:'critical', border:'#ff4444', dot:'#ff4444' },
-  High:{     order:1, label:'High',     tone:'high',     border:'#ffbb00', dot:'#ffbb00' },
-  Standard:{ order:2, label:'Standard', tone:'standard', border:'#00ff88', dot:'#00ff88' }
+  Critical:{ order:0, label:'Critical', tone:'critical', border:'#ef4444', dot:'#ef4444' },
+  High:{     order:1, label:'High',     tone:'high',     border:'#f59e0b', dot:'#f59e0b' },
+  Standard:{ order:2, label:'Standard', tone:'standard', border:'#10b981', dot:'#10b981' }
 };
 function priorityOf(t){
   if(t.status==='Critical') return PRIORITY_TIERS.Critical;
@@ -518,119 +589,159 @@ function priorityOf(t){
   return PRIORITY_TIERS.Standard;
 }
 
+// ===== COLUMN 1 — dense tabular queue rows (replaces the old card list) =====
 function renderTickets(){
-  const list=document.getElementById('ticketList'); list.innerHTML='';
-  const visible = briefingFilter(activeDept==='All' ? tickets : tickets.filter(t=>deptLabel(t.category)===activeDept));
-  renderBriefing(visible);
-  updateOverviewWidgets();
+  const list=document.getElementById('ticketList');
+  let visible = briefingFilter(activeDept==='All' ? tickets : tickets.filter(t=>deptLabel(t.category)===activeDept));
+  if (activeQueueStatus !== 'ALL') visible = visible.filter(t => queueStatus(t) === activeQueueStatus);
+  if (queueSearchTerm) {
+    visible = visible.filter(t =>
+      ('tk-'+t.ticketNo).includes(queueSearchTerm) ||
+      t.title.toLowerCase().includes(queueSearchTerm) ||
+      t.loc.toLowerCase().includes(queueSearchTerm) ||
+      deptLabel(t.category).toLowerCase().includes(queueSearchTerm)
+    );
+  }
+  renderBriefing(briefingFilter(activeDept==='All' ? tickets : tickets.filter(t=>deptLabel(t.category)===activeDept)));
+  updateTelemetry();
+
+  if (!visible.length) {
+    list.innerHTML = '<div class="queue-empty mono">[ NO TICKETS MATCH CURRENT FILTERS ]</div>';
+    return;
+  }
   const sorted=[...visible].sort((a,b)=>priorityOf(a).order-priorityOf(b).order);
-  let lastTier=null;
-  sorted.forEach(t=>{
-    const pr=priorityOf(t);
-    if(pr.label!==lastTier){
-      lastTier=pr.label;
-      const count=sorted.filter(x=>priorityOf(x).label===pr.label).length;
-      const head=document.createElement('div');
-      head.className='priority-group-label';
-      head.innerHTML=`<span class="dot" style="background:${pr.dot}"></span>${esc(pr.label)} SLA priority (${count})`;
-      list.appendChild(head);
-    }
-    const el=document.createElement('div');
-    el.className='ticket';
-    el.style.borderLeftColor=pr.border;
-    const resolvedAudited = t.stage==='RESOLVED & AUDITED';
-    el.innerHTML=`
-      <div class="ticket-head"><strong>${esc(t.title)}</strong>
-        <span style="display:flex;gap:5px;flex-shrink:0;">
-          <span class="priority-badge ${pr.tone}">${esc(pr.label)}</span>
-          <span class="pill ${statusPill(t.status)}">${esc(resolvedAudited?'Resolved':t.status)}</span>
-        </span>
-      </div>
-      <div class="ticket-meta">${esc(t.loc)} — ${esc(deptLabel(t.category))}</div>
-      <select class="status-select" data-id="${t.id}">
-        <option ${t.stage==='Critical'?'selected':''}>Critical</option>
-        <option ${t.stage==='Assigned to Public Works'?'selected':''}>Assigned to Public Works</option>
-        <option ${t.stage==='In Progress'?'selected':''}>In Progress</option>
-        <option ${t.stage==='Resolved'?'selected':''}>Resolved</option>
-        <option ${resolvedAudited?'selected':''}>RESOLVED & AUDITED</option>
-      </select>
-      <div class="sla-badge ${t.slaOk||resolvedAudited?'ok':''}">SLA: ${esc(resolvedAudited?'Closed within window':t.sla)}</div>
-      <div class="ticket-actions" style="margin-top:10px;">
-        <button class="action-btn" data-action="assign" data-id="${t.id}">Assign Crew</button>
-        <button class="action-btn escalate" data-action="escalate" data-id="${t.id}">Escalate Hazard</button>
-        <button class="action-btn close" data-action="close" data-id="${t.id}">Close & Verify EXIF</button>
-        <button class="action-btn copilot" data-action="copilot" data-id="${t.id}">⚡ Copilot Quick-Resolve</button>
-        <button class="action-btn workorder" data-action="workorder" data-id="${t.id}">✓ Approve Route / Create Work Order</button>
-      </div>`;
-    el.querySelector('.status-select').addEventListener('change',(e)=>{
-      const t2=tickets.find(x=>x.id===t.id); t2.stage=e.target.value;
-    });
-    el.querySelectorAll('.action-btn').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        const action=btn.dataset.action, id=btn.dataset.id;
-        if(action==='assign') assignCrew(id);
-        else if(action==='escalate') escalateHazard(id);
-        else if(action==='copilot') openCopilotDrawer(id);
-        else if(action==='workorder') approveRouteWorkOrder(id);
-        else openLogDrawer(id);
-      });
-    });
-    list.appendChild(el);
+  list.innerHTML = sorted.map(t => {
+    const qs = queueStatus(t);
+    const dotClass = qs==='PENDING' ? 'pending' : qs==='DISPATCHED' ? 'dispatched' : 'closed';
+    const dispatchDisabled = qs !== 'PENDING';
+    const btnLabel = qs==='PENDING' ? 'DISPATCH' : qs==='DISPATCHED' ? 'EN ROUTE' : 'CLOSED';
+    return `<div class="q-row" data-id="${esc(t.id)}">
+      <span class="q-dot ${dotClass}"></span>
+      <span class="q-main">
+        <span class="q-top-line mono"><span class="q-id">#TK-${t.ticketNo}</span><span class="q-cat">[${esc(CATEGORY_TAG[t.category])}]</span></span>
+        <span class="q-bottom-line mono">${esc(t.wardDisplay)} | La Crosse<span class="q-age">${esc(formatAge(t.createdAt))}</span></span>
+      </span>
+      <button type="button" class="q-dispatch-btn mono" data-dispatch-id="${esc(t.id)}" ${dispatchDisabled?'disabled':''}>${btnLabel}</button>
+    </div>`;
+  }).join('');
+  list.querySelectorAll('[data-dispatch-id]').forEach(btn=>{
+    btn.addEventListener('click', ()=> approveRouteWorkOrder(btn.dataset.dispatchId));
   });
 }
 
-// ===== OVERVIEW WIDGETS =====
-// Active Dispatch Queue by Severity is computed live from the same priority tiers
-// used to group the ticket list, so the two are always in sync.
-let workOrderCount=0, lastWorkOrderNum=null;
-const WARD_HEALTH_PCT=88;      // Ward 4 health score — kept consistent with index.html/app.html
-const CREW_CAPACITY_SLOTS=8;   // assumed max concurrent tickets the on-duty crew can carry
+// ===== FIELD CREW FLEET (Column 3) — unit count/status derived from real
+// dispatch state: one unit per currently-DISPATCHED ticket (assignment =
+// that ticket), remainder IDLE up to fleet size. Fuel/battery % is fixed
+// per unit at load (illustrative telemetry, not recomputed per render —
+// there's no real vehicle-telemetry backend here), not a live reading.
+const FLEET_SIZE = 4;
+const FLEET = Array.from({length:FLEET_SIZE}, (_, i) => ({
+  id:'UNIT-0'+(i+1),
+  lat: DEPOT[0] + (Math.random()-0.5)*0.012,
+  lng: DEPOT[1] + (Math.random()-0.5)*0.012,
+  fuel: [87,54,91,33][i] ?? 70,
+  status: 'IDLE',
+  assignment: '—'
+}));
+function syncFleetAssignments(){
+  const dispatched = tickets.filter(t => queueStatus(t)==='DISPATCHED');
+  FLEET.forEach((u,i)=>{
+    const t = dispatched[i];
+    if (t) { u.status = t.status==='Critical' ? 'EN_ROUTE' : 'ON_SITE'; u.assignment = `#TK-${t.ticketNo} ${t.title}`; }
+    else { u.status = 'IDLE'; u.assignment = '—'; }
+  });
+}
+function renderFleet(){
+  syncFleetAssignments();
+  const wrap = document.getElementById('fleetRows');
+  wrap.innerHTML = FLEET.map(u => {
+    const tagClass = u.status==='EN_ROUTE' ? 'en-route' : u.status==='ON_SITE' ? 'on-site' : 'idle';
+    const low = u.fuel < 35;
+    return `<div class="fleet-row">
+      <div class="fleet-top">
+        <span class="fleet-id mono">${esc(u.id)}</span>
+        <span class="fleet-status-tag ${tagClass} mono">${esc(u.status)}</span>
+      </div>
+      <div class="fleet-assign mono">${esc(u.assignment)}</div>
+      <div class="fleet-meter-row">
+        <div class="fleet-meter"><div class="fleet-meter-fill${low?' low':''}" style="width:${u.fuel}%"></div></div>
+        <span class="fleet-meter-pct mono">${u.fuel}%</span>
+      </div>
+    </div>`;
+  }).join('');
+  plotFleet();
+}
 
-function updateOverviewWidgets(){
-  const counts={ Critical:0, High:0, Standard:0 };
-  tickets.forEach(t=>{ counts[priorityOf(t).label]++; });
-  const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
-  set('sevCritical', counts.Critical);
-  set('sevHigh', counts.High);
-  set('sevStandard', counts.Standard);
-  set('sevTotal', tickets.length+' ticket'+(tickets.length===1?'':'s')+' in queue');
-  set('woActive', workOrderCount+' active');
-  set('woSub', workOrderCount===0 ? 'No routes approved this session' : `Last: ${lastWorkOrderNum}`);
+// ===== AUDIT / ACTION TERMINAL LOG (Column 3) — appends a real line for
+// every state-changing dispatch action taken in this session (not a
+// fabricated stream); capped at 60 lines, newest at top.
+let TERMINAL_LOG = [];
+function hhmmss(){ return new Date().toTimeString().slice(0,8); }
+function logEvent(msg){
+  TERMINAL_LOG.unshift({ time: hhmmss(), msg });
+  if (TERMINAL_LOG.length > 60) TERMINAL_LOG.length = 60;
+  renderTerminal();
+}
+function renderTerminal(){
+  const el = document.getElementById('terminalLog');
+  if (!TERMINAL_LOG.length) { el.innerHTML = '<div class="terminal-empty">[ NO EVENTS LOGGED THIS SESSION ]</div>'; return; }
+  el.innerHTML = TERMINAL_LOG.map(l => `<div class="terminal-line">[<span class="t-time">${esc(l.time)}</span>] ${esc(l.msg)}</div>`).join('');
+}
 
-  set('wardHealthValue', WARD_HEALTH_PCT+'%');
-  set('wardHealthSub', 'District 4 — '+(WARD_HEALTH_PCT>=90?'Nominal':WARD_HEALTH_PCT>=75?'Stable':'Degraded'));
+// ===== ACTIVE NODE TELEMETRY BAR (Column 2 top) — all 4 values computed
+// from real session state, not hardcoded. Avg Dispatch Time only covers
+// tickets that have actually been dispatched (dispatchedAt set); shows
+// "—" rather than inventing a number when none have been yet.
+function updateTelemetry(){
+  const activeUnits = FLEET.filter(u => u.status !== 'IDLE').length;
+  document.getElementById('telActiveUnits').textContent = FLEET.length + ' (' + activeUnits + ' active)';
 
-  const activeCount=tickets.filter(t=>t.stage!=='Resolved' && t.stage!=='RESOLVED & AUDITED').length;
-  const capPct=Math.round((activeCount/CREW_CAPACITY_SLOTS)*100);
-  set('capValue', capPct+'%');
-  set('capSub', `${activeCount} of ${CREW_CAPACITY_SLOTS} crew slots committed`);
+  const unassigned = tickets.filter(t => queueStatus(t)==='PENDING').length;
+  document.getElementById('telUnassigned').textContent = String(unassigned);
+
+  const dispatchedWithTimes = tickets.filter(t => t.dispatchedAt);
+  const avgEl = document.getElementById('telAvgDispatch');
+  if (dispatchedWithTimes.length) {
+    const avgMs = dispatchedWithTimes.reduce((sum,t)=>sum+(t.dispatchedAt - t.createdAt), 0) / dispatchedWithTimes.length;
+    avgEl.textContent = (avgMs/60000).toFixed(1) + 'm';
+  } else {
+    avgEl.textContent = '—';
+  }
+
+  const anyOverdueCritical = tickets.some(t => queueStatus(t)==='PENDING' && !t.slaOk);
+  const sysEl = document.getElementById('telSystem');
+  sysEl.textContent = anyOverdueCritical ? 'DEGRADED' : 'OPTIMAL';
+  sysEl.className = 'telemetry-value ' + (anyOverdueCritical ? 'warn' : 'ok');
 }
 
 // Converts a dispatch packet into an assigned crew route: sets the ticket in motion,
-// draws a mint dashed route from the depot to the hazard on the map, and stamps a
-// work-order number the crew can reference in the field.
+// draws a route from the depot to the hazard, stamps dispatchedAt + a work order number.
+let workOrderCount=0, lastWorkOrderNum=null;
 function approveRouteWorkOrder(id){
   const t=tickets.find(x=>x.id===id);
-  if(!t) return;
+  if(!t || queueStatus(t)!=='PENDING') return;
   t.stage='Assigned to Public Works';
+  t.dispatchedAt = Date.now();
   const woNum='WO-'+Math.floor(10000+Math.random()*89999);
   workOrderCount++;
   lastWorkOrderNum=woNum;
   if(map){
-    L.polyline([[43.8138,-91.2519],[t.lat,t.lng]],{color:'#00ff88',weight:2,dashArray:'6 5',opacity:.8}).addTo(map);
+    L.polyline([DEPOT,[t.lat,t.lng]],{color:'#10b981',weight:2,dashArray:'6 5',opacity:.85}).addTo(nodesLayer);
     if(markers[id]) markers[id].openPopup();
   }
   renderTickets();
-  toast(`✓ Route approved — ${woNum} created for "${t.title}"`);
+  renderFleet();
+  logEvent(`TICKET #TK-${t.ticketNo} ROUTED TO ${FLEET.find(u=>u.assignment.includes('#TK-'+t.ticketNo))?.id || 'UNIT-0?'}`);
+  toast(`Route approved — ${woNum} created for "${t.title}"`);
 }
 
 function assignCrew(id){
   const t=tickets.find(x=>x.id===id);
-  if(t){ t.stage='Assigned to Public Works'; renderTickets(); }
+  if(t && queueStatus(t)==='PENDING'){ approveRouteWorkOrder(id); }
 }
 function escalateHazard(id){
   const t=tickets.find(x=>x.id===id);
-  if(t){ t.status='Critical'; renderTickets(); if(markers[id]) markers[id].openPopup(); }
+  if(t){ t.status='Critical'; renderTickets(); if(markers[id]) markers[id].openPopup(); logEvent(`TICKET #TK-${t.ticketNo} ESCALATED TO CRITICAL`); }
 }
 
 let pendingCloseId=null;
@@ -648,7 +759,7 @@ document.getElementById('logCancel').addEventListener('click',()=>{
 });
 document.getElementById('logConfirm').addEventListener('click',()=>{
   const t=tickets.find(x=>x.id===pendingCloseId);
-  if(t){ t.stage='Resolved'; t.status='Resolved'; renderTickets(); }
+  if(t){ t.stage='Resolved'; t.status='Resolved'; renderTickets(); renderFleet(); logEvent(`TICKET #TK-${t.ticketNo} CLOSED & VERIFIED`); }
   document.getElementById('logDrawer').classList.remove('open');
   pendingCloseId=null;
 });
@@ -670,12 +781,9 @@ function genHash(){
   return '0x'+h()+'...'+h();
 }
 
-// Pushes a resolved entry to the shared 'citixen_audit_stream' localStorage key.
-// This genuinely syncs to index.html's Immutable Audit Stream once both files are
-// deployed under the same origin (e.g. citixenux.com) — localStorage is shared
-// same-origin storage. In this preview, dispatch.html and index.html are served as
-// separate artifact links (different origins), so the sync won't be visible here,
-// but the mechanism itself is real, not a fake toast-only simulation.
+// Pushes a resolved entry to the shared 'citixen_audit_stream' localStorage key —
+// same-origin sync with index.html's Immutable Audit Stream once both are deployed
+// under one origin (e.g. citixenux.com); not visible across separate preview links.
 function pushToAuditStream(entry){
   try{
     const key='citixen_audit_stream';
@@ -702,6 +810,8 @@ document.getElementById('copilotConfirm').addEventListener('click',()=>{
   if(t){
     t.stage='RESOLVED & AUDITED'; t.status='Resolved';
     renderTickets();
+    renderFleet();
+    logEvent(`TICKET #TK-${t.ticketNo} RESOLVED & AUDITED (COPILOT)`);
     pushToAuditStream({
       id:'audit-'+Date.now(),
       title:t.title,
@@ -711,28 +821,54 @@ document.getElementById('copilotConfirm').addEventListener('click',()=>{
       hash:genHash(),
       notes:document.getElementById('copilotNotes').value
     });
-    toast('✓ Resolved & pushed to Immutable Audit Stream');
+    toast('Resolved & pushed to Immutable Audit Stream');
   }
   document.getElementById('copilotDrawer').classList.remove('open');
   pendingCopilotId=null;
 });
 
-// ===== BETA TESTING ANALYTICS (LIVE) — FINAL ALPHA LAUNCH ADDITIONS =====
-// Three widgets wired directly to backend store state:
-//  a) Geographic Coverage  — GET /api/coverage/tickets, grouped client-side
-//     by city/ward. Every ticket in this store already passed the hard
-//     photo gate (see api/report/submit.js's PATCH 4.13 note), so "total
-//     photo submission counts per city/ward" is just a ticket count per
-//     jurisdiction — the honest reading of that metric in an architecture
-//     that never uploads the photo file itself.
-//  b) Ingestion Success Rate — the same GET /api/coverage/tickets response
-//     also carries `ingestion` (api/_lib/store.js's getIngestionStats()):
-//     real attempts vs. real commits, tracked server-side in
-//     api/report/submit.js.
-//  c) Instant Feedback Stream — GET /api/operator/feedback, the same
-//     backing store the top-right Instant Feedback badge
-//     (shared/global-feedback.js) posts into.
-// Polls every 15s so "(LIVE)" stays true without a manual refresh.
+// ===== MAP OVERLAY CONTROLS — Toggle Nodes / Toggle Fleet / Optimize Route =====
+document.getElementById('btnToggleNodes').addEventListener('click', (e)=>{
+  if (!map || !nodesLayer) return;
+  const showing = e.target.classList.toggle('active');
+  if (showing) map.addLayer(nodesLayer); else map.removeLayer(nodesLayer);
+});
+document.getElementById('btnToggleFleet').addEventListener('click', (e)=>{
+  if (!map || !fleetLayer) return;
+  const showing = e.target.classList.toggle('active');
+  if (showing) map.addLayer(fleetLayer); else map.removeLayer(fleetLayer);
+});
+// Real nearest-neighbor routing (not decorative): starting at the depot,
+// repeatedly jumps to the closest remaining PENDING ticket, drawing one
+// connected route through all of them — a genuine (if simple) route
+// optimization, not a random line.
+function haversine(a,b){
+  const R=3958.8, toRad = d=>d*Math.PI/180;
+  const dLat=toRad(b[0]-a[0]), dLng=toRad(b[1]-a[1]);
+  const la1=toRad(a[0]), la2=toRad(b[0]);
+  const h=Math.sin(dLat/2)**2 + Math.cos(la1)*Math.cos(la2)*Math.sin(dLng/2)**2;
+  return 2*R*Math.asin(Math.sqrt(h));
+}
+document.getElementById('btnOptimizeRoute').addEventListener('click', ()=>{
+  if (!map) return;
+  const pending = tickets.filter(t=>queueStatus(t)==='PENDING');
+  optimizeLayer.clearLayers();
+  if (!pending.length) { toast('No pending tickets to route.'); return; }
+  const remaining = pending.slice();
+  const path = [DEPOT];
+  let current = DEPOT;
+  while (remaining.length) {
+    remaining.sort((a,b)=>haversine(current,[a.lat,a.lng]) - haversine(current,[b.lat,b.lng]));
+    const next = remaining.shift();
+    path.push([next.lat,next.lng]);
+    current = [next.lat,next.lng];
+  }
+  L.polyline(path, {color:'#f59e0b', weight:3, dashArray:'2 6', opacity:.9}).addTo(optimizeLayer);
+  logEvent(`ROUTE OPTIMIZED — ${pending.length} PENDING NODE${pending.length===1?'':'S'} SEQUENCED FROM DEPOT`);
+  toast(`Optimized route computed for ${pending.length} pending ticket${pending.length===1?'':'s'}.`);
+});
+
+// ===== BETA TESTING ANALYTICS (LIVE) — unchanged fetches/semantics =====
 async function renderBetaAnalyticsBanner(){
   try {
     const [ticketsRes, feedbackRes] = await Promise.all([
@@ -742,7 +878,6 @@ async function renderBetaAnalyticsBanner(){
     const ticketsData = await ticketsRes.json();
     const feedbackData = await feedbackRes.json();
 
-    // (a) Geographic Coverage — city -> submission count, biggest first.
     const byCity = {};
     (ticketsData.tickets || []).forEach(t => {
       byCity[t.cityName] = (byCity[t.cityName] || 0) + 1;
@@ -755,7 +890,6 @@ async function renderBetaAnalyticsBanner(){
         : 'No submissions yet';
     }
 
-    // (b) Ingestion Success Rate.
     const ing = ticketsData.ingestion || { attempts: 0, committed: 0, successRatePct: null };
     const ingestEl = document.getElementById('betaIngestValue');
     if (ingestEl) {
@@ -764,30 +898,31 @@ async function renderBetaAnalyticsBanner(){
         : `${ing.successRatePct}% (${ing.committed}/${ing.attempts})`;
     }
 
-    // (c) Instant Feedback Stream — most recent note, total count.
     const items = feedbackData.items || [];
     const feedbackEl = document.getElementById('betaFeedbackValue');
     if (feedbackEl) {
       if (!items.length) {
         feedbackEl.textContent = 'No messages yet';
       } else {
-        const latest = items[0]; // allFeedbackSubmissions() returns newest first
+        const latest = items[0];
         const preview = latest.note ? latest.note.slice(0, 60) : '(no note)';
         feedbackEl.textContent = `${items.length} total — latest: "${preview}"`;
       }
     }
   } catch (e) {
-    // Network hiccup — leave the banner showing its last good values
-    // rather than blanking a live console mid-shift.
+    // Network hiccup — leave the banner showing its last good values.
   }
 }
 
 window.addEventListener('DOMContentLoaded',()=>{
   renderDeptFilters();
+  renderFleet();
+  renderTerminal();
   renderTickets();
   initMap();
   renderBetaAnalyticsBanner();
   setInterval(renderBetaAnalyticsBanner, 15000);
+  setInterval(renderTickets, 30000); // keeps "Xm ago" ages fresh
 });
 </script>
 <script>
@@ -806,7 +941,7 @@ async function sha256(s){
 function unlock(session){
   document.documentElement.classList.remove('locked');
   const op=document.querySelector('.operator');
-  if(op && op.lastChild) op.lastChild.textContent=' Signed in: '+session.role;
+  if(op && op.lastChild) op.lastChild.textContent=' OPERATOR: '+session.role.toUpperCase();
   const w=document.getElementById('fWard'); if(w){ w.value=session.ward; }
   if(typeof renderTickets==='function') renderTickets();
   if(typeof map!=='undefined' && map) setTimeout(()=>map.invalidateSize(),60);
@@ -828,39 +963,30 @@ document.getElementById('gateForm').addEventListener('submit',async e=>{
 
 ['fWard','fStatus','fStage','fSlaRisk'].forEach(id=>document.getElementById(id).addEventListener('change',()=>renderTickets()));
 
-// Builds a clean printable Ward Report from the live DOM readouts (so the printed
-// numbers always match what's on screen) and hands it to the browser's print stream.
+// Builds a clean printable District Report from live state (unchanged logic,
+// just reading the new telemetry IDs where the old overview tiles used to be).
 function buildAndPrintWardReport(){
   const ward=document.getElementById('fWard').value;
   const list=briefingFilter(activeDept==='All' ? tickets : tickets.filter(t=>deptLabel(t.category)===activeDept));
-  const get=(id)=>{ const el=document.getElementById(id); return el ? el.textContent : ''; };
-  const rows=list.map(t=>`<tr><td>${esc(t.title)}</td><td>${esc(t.status)}</td><td>${esc(t.stage||'')}</td><td>${esc(t.sla||'')}</td></tr>`).join('')
-    || '<tr><td colspan="4">No tickets match the current filters.</td></tr>';
+  const rows=list.map(t=>`<tr><td>#TK-${t.ticketNo}</td><td>${esc(t.title)}</td><td>${esc(t.status)}</td><td>${esc(t.stage||'')}</td><td>${esc(t.sla||'')}</td></tr>`).join('')
+    || '<tr><td colspan="5">No tickets match the current filters.</td></tr>';
   const area=document.getElementById('printReportArea');
   area.innerHTML=`
     <h2>CITIXEN UX — District Report</h2>
     <div class="meta">${esc(ward==='All'?'All districts':ward)} · Generated ${esc(new Date().toLocaleString())}</div>
     <h3>Dispatch Summary</h3>
     <div>${esc(document.getElementById('briefSummary').textContent || briefingText(list))}</div>
-    <h3>SLA &amp; Operational Metrics</h3>
+    <h3>Operational Telemetry</h3>
     <table>
       <tr><th>Metric</th><th>Value</th></tr>
-      <tr><td>District Health Index</td><td>${esc(get('wardHealthValue'))} — ${esc(get('wardHealthSub'))}</td></tr>
-      <tr><td>Active Dispatch Capacity</td><td>${esc(get('capValue'))} — ${esc(get('capSub'))}</td></tr>
-      <tr><td>Weekly Resolve Rate</td><td>${esc(get('resolveFraction'))}</td></tr>
-      <tr><td>CapEx Scoping Ledger</td><td>${esc(get('capexTotal'))}</td></tr>
-      <tr><td>Crew / Vendor Routing</td><td>${esc(get('woActive'))} — ${esc(get('woSub'))}</td></tr>
-    </table>
-    <h3>Dispatch Severity Queues</h3>
-    <table>
-      <tr><th>Severity</th><th>Count</th></tr>
-      <tr><td>Critical</td><td>${esc(get('sevCritical'))}</td></tr>
-      <tr><td>High</td><td>${esc(get('sevHigh'))}</td></tr>
-      <tr><td>Standard</td><td>${esc(get('sevStandard'))}</td></tr>
+      <tr><td>Active Units</td><td>${esc(document.getElementById('telActiveUnits').textContent)}</td></tr>
+      <tr><td>Unassigned Tickets</td><td>${esc(document.getElementById('telUnassigned').textContent)}</td></tr>
+      <tr><td>Avg Dispatch Time</td><td>${esc(document.getElementById('telAvgDispatch').textContent)}</td></tr>
+      <tr><td>System Status</td><td>${esc(document.getElementById('telSystem').textContent)}</td></tr>
     </table>
     <h3>Active Dispatch Queue</h3>
     <table>
-      <tr><th>Issue</th><th>Status</th><th>Stage</th><th>SLA</th></tr>
+      <tr><th>Ticket</th><th>Issue</th><th>Status</th><th>Stage</th><th>SLA</th></tr>
       ${rows}
     </table>
   `;
@@ -868,10 +994,7 @@ function buildAndPrintWardReport(){
 }
 document.getElementById('printWardReport').addEventListener('click',buildAndPrintWardReport);
 
-// ===== GLOBAL FLOATING ALPHA FEEDBACK BADGE (Patch 4.7) =====
-// Same shared widget as app.html/operator.html — see shared/global-feedback.js.
-// Reuses this page's own real toast() so submissions here match the look of
-// every other confirmation on this page.
+// ===== GLOBAL FLOATING ALPHA FEEDBACK BADGE (unchanged) =====
 if (window.CitixenGlobalFeedback) window.CitixenGlobalFeedback.init({ toast });
 </script>
 </body>
