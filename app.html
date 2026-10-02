@@ -2153,11 +2153,19 @@ let map, mapInit=false, markers={}, cat='Pothole / Road', userMarker=null;
 // value. `projectId` marks a case as escalated/"Tagged to Project" and
 // links out to the web project ledger; its absence means the case is
 // still just "Open".
-const cases=[
-  {id:'c1',title:'Deep Pothole - Right Lane',loc:'Main St & 4th Ave',lat:43.8138,lng:-91.2519,status:'Critical',time:'12m ago',ageMin:12,desc:'Severe pavement gap.',category:'Pothole / Road'},
-  {id:'c2',title:'Streetlight Outage',loc:'Grand Ave & 7th St',lat:43.8180,lng:-91.2480,status:'Warning',time:'45m ago',ageMin:45,desc:'Dark corner, visibility issue.',projectId:'PRJ-1042',category:'Power / Lighting'},
-  {id:'c3',title:'Overfilled Trash Bin',loc:'Pine St Alley',lat:43.8100,lng:-91.2550,status:'Resolved',time:'2h ago',ageMin:120,desc:'Debris blocking access.',category:'Waste / Litter'}
-];
+// FINAL ALPHA LAUNCH POLISH — MOCK DATA PURGE: this used to seed 3
+// hand-written demo pins (a pothole, a streetlight outage, a trash bin) so
+// the Civic Dispatch Map/Live Dispatch Feed/Triage gauge had something to
+// render before any real citizen had submitted anything this session. Per
+// this round's explicit request, that seed is wiped — every case this
+// array ever holds from here on is one this device's own session actually
+// added (see finalizeSubmitReport()'s cases.unshift(nc) below), the same
+// "hard reset" the backend's WARD_TICKETS already got in the ALPHA LAUNCH
+// FINAL PATCH round. Every reader of this array (forEach/filter/find/
+// some/map in renderFeed()/renderTriageGauge()/initMap() etc.) already
+// handles a genuinely empty array safely — see renderFeed()'s own new
+// empty-state message below.
+const cases=[];
 // Seed data runs through the same 3-tier severity matrix as new reports.
 if (window.CitixenSeverity) window.CitixenSeverity.applyTo(cases);
 
@@ -3028,9 +3036,18 @@ function renderLedgerResults(){
   });
   container.innerHTML = '';
   if (!filtered.length) {
-    container.innerHTML = ledgerFilters.hasPhoto
-      ? '<div class="ledger-empty">No photo-backed reports yet — citizen report photos aren\'t stored server-side in this beta, so this filter can\'t surface any yet.</div>'
-      : '<div class="ledger-empty">No reports match these filters.</div>';
+    // FINAL ALPHA LAUNCH POLISH — a genuinely empty ledger (no tickets at
+    // all yet, post mock-data purge) gets its own inviting copy rather
+    // than the generic "doesn't match your filters" message below, which
+    // is for when real tickets exist but this specific filter combination
+    // excludes all of them.
+    if (!ledgerTickets.length) {
+      container.innerHTML = '<div class="ledger-empty">No active civic tickets. Be the first to log a report!</div>';
+    } else {
+      container.innerHTML = ledgerFilters.hasPhoto
+        ? '<div class="ledger-empty">No photo-backed reports yet — citizen report photos aren\'t stored server-side in this beta, so this filter can\'t surface any yet.</div>'
+        : '<div class="ledger-empty">No reports match these filters.</div>';
+    }
     return;
   }
   filtered.forEach(t => {
@@ -4533,7 +4550,16 @@ function renderFeed(){
   // green burst-and-unmount in resolveMapCase() and the Resolved Today
   // counter) — the live list itself now shows active/in-progress work only,
   // same real `cases` data, just filtered rather than a second query.
-  cases.filter(item => triageBucket(item) !== 'resolved').forEach(item=>{
+  const activeCases = cases.filter(item => triageBucket(item) !== 'resolved');
+  // FINAL ALPHA LAUNCH POLISH — same genuinely-empty-ledger treatment as
+  // the Live Public Ledger's renderLedgerResults(): a clean, inviting
+  // message once the mock seed above is gone, rather than just a blank list.
+  if (!activeCases.length) {
+    c.innerHTML = '<div class="ledger-empty">No active civic tickets. Be the first to log a report!</div>';
+    renderTriageGauge();
+    return;
+  }
+  activeCases.forEach(item=>{
     const pill=statusPill(item.status);
     const el=document.createElement('div');
     el.className='feed-item';
