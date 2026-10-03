@@ -3303,22 +3303,48 @@ function formatGeocodedLabel(r){
   const parts = [street, city, stateAbbr].filter(Boolean);
   return parts.length >= 2 ? parts.join(', ') : r.display_name;
 }
+// Continental-US bounding box, shared by every geocoder call below
+// (Nominatim's viewbox, Photon's bbox) — moved above geocodeAddress() so
+// it's declared before its first use (Patch 13-10/03/26 hard-bounding).
+const US_CONTINENTAL_BBOX = '-125.0,24.39,-66.93,49.38';
+// HARD US BOUNDING + POST-FILTER GUARD (Patch 13-10/03/26): belt-and-
+// suspenders against any non-US match slipping through — the query-string
+// params below restrict what the upstream API is asked for, and
+// looksNonUS() independently re-checks the actual response fields it sends
+// back, so a result is rejected if either layer flags it, never trusted on
+// the query params alone. NON_US_REJECT_TERMS is intentionally small and
+// literal (no fuzzy matching) so it only catches genuine non-US responses,
+// never a US place that happens to share a word with one.
+const NON_US_REJECT_TERMS = ['canada', 'ontario', 'quebec'];
+function looksNonUS(fields){
+  fields = fields || {};
+  const code = fields.countryCode ? String(fields.countryCode).trim().toLowerCase() : '';
+  if (code && code !== 'us') return true;
+  const haystack = [fields.country, fields.state].filter(Boolean).join(' ').toLowerCase();
+  return NON_US_REJECT_TERMS.some(term => haystack.includes(term));
+}
 // Forward geocoding via OpenStreetMap's free Nominatim search API — no key
 // required, real results for a real address. Returns null (never a guessed
 // coordinate) on no match, network failure, or an implausible/empty query.
 // STRICT US COUNTRY FILTER (Patch 7-10/03/26): countrycodes=us restricts
 // every match to US addresses only — this app routes to US municipal wards,
 // so a real match outside the US is still the wrong answer, never a usable
-// fallback.
+// fallback. HARD BOUNDING (Patch 13-10/03/26) adds viewbox+bounded=1 (the
+// same continental-US box Photon's bbox already uses below) so Nominatim
+// enforces the box itself rather than just biasing toward it, on top of
+// the existing countrycodes filter; looksNonUS() then independently
+// re-checks the one result Nominatim actually returns.
 async function geocodeAddress(query){
   const q = String(query || '').trim();
   if (q.length < 4) return null;
   try {
-    const res = await fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(q) + '&countrycodes=us&addressdetails=1&limit=1');
+    const res = await fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(q) + '&countrycodes=us&viewbox=' + US_CONTINENTAL_BBOX + '&bounded=1&addressdetails=1&limit=1');
     if (!res.ok) return null;
     const results = await res.json();
     if (!Array.isArray(results) || !results.length) return null;
     const r = results[0];
+    const addr = r.address || {};
+    if (looksNonUS({ countryCode: addr.country_code, country: addr.country, state: addr.state })) return null;
     return { lat: parseFloat(r.lat), lng: parseFloat(r.lon), label: formatGeocodedLabel(r) };
   } catch (e) {
     return null;
@@ -3342,17 +3368,25 @@ async function geocodeAddress(query){
 //
 // STRICT US + STREET-LEVEL FILTER (Patch 7-10/03/26): Photon has no
 // documented country-code query param of its own (unlike Nominatim's
-// countrycodes=us below) — the reliable way to constrain it to the US is
-// the continental-US bounding box, so every query carries one. A match
-// missing either a house number or a street name is an administrative
-// region/city/country-level result, not something this app can route a
-// report to, so formatPhotonSuggestion() returns null for it and
-// photonSearch() drops it from the dropdown entirely rather than showing a
-// suggestion that can't actually resolve to a street address.
-const US_CONTINENTAL_BBOX = '-125.0,24.39,-66.93,49.38';
+// countrycodes=us) — the reliable way to constrain it to the US is the
+// continental-US bounding box, so every query carries one via bbox=. A
+// match missing either a house number or a street name is an
+// administrative region/city/country-level result, not something this app
+// can route a report to, so formatPhotonSuggestion() returns null for it
+// and photonSearch() drops it from the dropdown entirely rather than
+// showing a suggestion that can't actually resolve to a street address.
+// HARD BOUNDING (Patch 13-10/03/26): also appends countrycodes=us,
+// viewbox=<bbox> and bounded=1 to this URL per spec, alongside the
+// existing bbox= param. Photon's own API doesn't document support for
+// those three (they're Nominatim params), so it silently ignores them —
+// they're harmless here, but they don't add real restriction on top of
+// Photon's existing bbox. The actual hard guard for Photon responses is
+// looksNonUS() below, applied to every suggestion's real country/
+// countrycode/state fields regardless of what the query asked for.
 function formatPhotonSuggestion(props){
   props = props || {};
   if (!props.housenumber || !props.street) return null; // not a street-level US match
+  if (looksNonUS({ countryCode: props.countrycode, country: props.country, state: props.state })) return null;
   const street = props.housenumber + ' ' + props.street;
   const city = props.city || props.town || props.village || props.district || '';
   const stateAbbr = props.state ? (US_STATE_ABBR[props.state.toLowerCase()] || props.state) : '';
@@ -3366,9 +3400,11 @@ async function photonSearch(query){
   if (q.length < 3) return [];
   // Biases (never restricts) results toward the citizen's own real GPS fix
   // when one exists — still an honestly-sourced hint, never a guessed
-  // anchor/default location. The bbox below is the actual restriction (US
-  // only); location_bias_scale only nudges ranking within that box.
-  let url = 'https://photon.komoot.io/api/?limit=5&lang=en&bbox=' + US_CONTINENTAL_BBOX + '&q=' + encodeURIComponent(q);
+  // anchor/default location. The bbox/countrycodes/viewbox/bounded params
+  // below are the actual restriction (US only); location_bias_scale only
+  // nudges ranking within that box.
+  let url = 'https://photon.komoot.io/api/?limit=5&lang=en&bbox=' + US_CONTINENTAL_BBOX +
+    '&countrycodes=us&viewbox=' + US_CONTINENTAL_BBOX + '&bounded=1&q=' + encodeURIComponent(q);
   const gps = window.CITIXEN_RESOLVED_LOCATION;
   if (gps && typeof gps.lat === 'number' && typeof gps.lng === 'number') {
     url += '&lat=' + gps.lat + '&lon=' + gps.lng + '&location_bias_scale=0.2';
