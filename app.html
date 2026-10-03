@@ -897,31 +897,29 @@ textarea.input{resize:none;line-height:1.4}
   letter-spacing:.04em;text-transform:uppercase;background:rgba(0,230,153,.14);color:var(--mint2);border:1px solid rgba(0,230,153,.4)}
 .receipt-status-pill.offline{background:rgba(245,158,11,.14);color:var(--warn);border-color:rgba(245,158,11,.4)}
 .receipt-actions{display:flex;flex-direction:column;gap:10px}
-.receipt-action-row{display:flex;gap:10px}
-.btn-receipt-secondary{flex:1;background:rgba(3,7,18,.6);border:1px solid rgba(255,255,255,.08);color:var(--text);
-  padding:11px 8px;border-radius:10px;font-weight:700;font-size:.68rem;cursor:pointer;display:flex;
-  align-items:center;justify-content:center;gap:6px;transition:border-color .15s,color .15s}
-/* Patch 16-10/03/26: Easy Share's arrow sits right-aligned (label left,
-   arrow flush right), unlike its sibling Copy Direct Link button, which
-   stays centered — scoped by id so Copy Direct Link's layout is untouched. */
-#btnReceiptGraphic{justify-content:space-between}
-.btn-receipt-secondary:hover{border-color:rgba(255,255,255,.18)}
-.btn-receipt-secondary svg{color:var(--mint2);flex-shrink:0}
-.btn-receipt-secondary.copied{color:#34d399;border-color:rgba(52,211,153,.5)}
-.btn-receipt-secondary.copied svg{color:#34d399}
-/* HEAD TO FEED (Patch 8-10/03/26) — the receipt's one real primary action,
-   moved up into the slot the old "Logged To Ledger" wallet-row button used
-   to occupy (see the markup's own comment). Bright #00FF87 per spec — a
-   deliberately different, louder green than the rest of this file's
-   --mint/#00E699 accent, since this is the single thing on the card meant
-   to pull the eye after the ticket ID itself.
+/* .receipt-action-row / .btn-receipt-secondary (the "Easy Share" +
+   "Copy Direct Link" secondary row) — REMOVED (Patch 25-10/03/26) per
+   spec: "Delete the secondary button container." The matching markup and
+   its shareReceiptDirectly()/btnReceiptCopyLink click-handler JS were
+   removed along with it — see the receipt-actions markup's own comment
+   below for what replaced this slot. */
+/* DOWNLOAD RECEIPT (Patch 8-10/03/26, consolidated to the card's one
+   primary action + renamed "Download Receipt" Patch 25-10/03/26) — now
+   the single primary CTA on this card (#btnReceiptDownloadTicket below).
+   Bright #00FF87 per spec — a deliberately different, louder green than
+   the rest of this file's --mint/#00E699 accent, since this is the single
+   thing on the card meant to pull the eye after the ticket ID itself.
+   "Head To Feed" no longer uses this class — Patch 25 converts it to a
+   plain centered text link (.founder-continue-link, reused as-is from the
+   Founder modal per spec) directly below this button instead; see the
+   receipt-actions markup's own comment.
    Patch 21-10/03/26: text-transform:uppercase removed and justify-content
    back to center — Patch 21's "Title Case, not all-caps" + "centered"
    rules apply app-wide to every refreshed mint button, and this was the
    only one of them still forcing an uppercase visual transform (the others
    — #btnSubmit, .citixen-gate-btn, .founder-cta, #btnSgpDownload — never
-   had one), which would otherwise still render "Head To Feed" as "HEAD TO
-   FEED" regardless of the markup's real casing. */
+   had one), which would otherwise still render this button's label in
+   all-caps regardless of the markup's real casing. */
 .btn-receipt-feed{width:100%;box-sizing:border-box;min-height:52px;background:#00FF87;color:#051311;
   border:none;padding:14px 20px;border-radius:12px;font-family:inherit;font-weight:800;font-size:15px;
   letter-spacing:.02em;cursor:pointer;display:flex;align-items:center;
@@ -948,6 +946,12 @@ textarea.input{resize:none;line-height:1.4}
 .sge-brand{font-size:44px;font-weight:900;letter-spacing:.01em}
 .sge-brand-citixen{color:#FFFFFF}
 .sge-brand-ux{color:#00FF87}
+/* BRAND HEADER ™ STYLING (Patch 25-10/03/26) — scoped to this card's own
+   header only, deliberately separate from the shared .tm-symbol class used
+   everywhere else in this file (that one stays green/.55em/vertical-super
+   for its own contexts): here the spec wants the ™ specifically smaller,
+   unbolded, and a muted gray, distinct from "UX"'s own bright #00FF87. */
+.sge-tm{font-size:.7em;font-weight:normal;color:#8A99AD}
 .sge-jurisdiction{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:20px;
   font-weight:700;color:#94a3b8;letter-spacing:.05em}
 /* Patch 8-10/03/26: the photo used to be position:absolute;inset:0 — a
@@ -971,10 +975,14 @@ textarea.input{resize:none;line-height:1.4}
 /* Patch 16-10/03/26: split into a small label line + a larger, legible URL
    line (was one 16px line with the URL and the "ANONYMOUS & SOVEREIGN"
    label the same size) — the URL is now the one readers actually need to
-   type back in. */
+   type back in.
+   Patch 25-10/03/26: "ANONYMOUS & SOVEREIGN" removed outright (its markup
+   and .sge-footer-label rule are both gone — nothing references that class
+   anymore), and the URL line enlarged further (24px → 34px) now that it's
+   the footer's only line, so it actually reads as real social-sharing
+   real estate rather than fine print. */
 .sge-footer{position:absolute;bottom:48px;left:0;right:0;text-align:center;color:#64748b}
-.sge-footer-label{font-size:14px;font-weight:700;letter-spacing:.08em}
-.sge-footer-url{font-size:24px;font-weight:800;letter-spacing:.03em;margin-top:5px;color:#94a3b8}
+.sge-footer-url{font-size:34px;font-weight:800;letter-spacing:.03em;color:#94a3b8}
 
 /* ===== SOCIAL GRAPHIC PREVIEW MODAL — full-screen rendered-image review
    with a loading state while html2canvas works, then Download/Share.
@@ -1007,9 +1015,8 @@ textarea.input{resize:none;line-height:1.4}
 @keyframes sgpSpin{to{transform:rotate(360deg)}}
 .sgp-loading-text{font-size:.76rem;font-weight:700;color:var(--muted);letter-spacing:.02em}
 .sgp-actions{display:flex;flex-direction:column;gap:10px}
-.btn-sgp-share{width:100%;box-sizing:border-box;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.12);
-  color:var(--text);padding:13px;border-radius:12px;font-weight:700;font-size:.84rem;cursor:pointer}
-.btn-sgp-share:disabled{opacity:.4;cursor:not-allowed}
+/* .btn-sgp-share ("Easy Share" inside the Social Card preview) — REMOVED
+   (Patch 25-10/03/26) along with its button; see the markup's own comment. */
 /* GLOBAL MINT GREEN BUTTON DESIGN SYSTEM ENFORCEMENT (Patch 20-10/03/26,
    re-centered Patch 21-10/03/26) — #btnSgpDownload scoped to the exact
    #00FF87 unified mint pill (was the dimmer var(--mint)=#00E699
@@ -2625,50 +2632,33 @@ textarea.input{resize:none;line-height:1.4}
       </div>
 
       <div class="receipt-actions">
-        <div class="receipt-action-row">
-          <!-- Patch 20-10/03/26: RECEIPT & SOCIAL CARD BUTTON ARCHITECTURE
-               RESTRUCTURE. This button used to be "Easy Share" opening the
-               Social Card preview modal first (renderAndShowSocialGraphic())
-               — that destination moved to the new #btnReceiptDownloadTicket
-               primary below, which is this spec's real "Download Ticket ->
-               opens the 1:1 Social Card preview/download modal" action.
-               This button keeps the "Easy Share" label but now fires the
-               real native Web Share directly from the receipt (see
-               shareReceiptDirectly()) — same canonical payload/fallback
-               #btnSgpShare already uses, just with no rendered PNG attached
-               yet, since nothing has been rasterized at this point. -->
-          <button type="button" class="btn-receipt-secondary" id="btnReceiptGraphic">
-            <span id="btnReceiptGraphicLabel">Easy Share</span>
-            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
-          </button>
-          <button type="button" class="btn-receipt-secondary" id="btnReceiptCopyLink">
-            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-            <span id="btnReceiptCopyLinkLabel">Copy Direct Link</span>
-          </button>
-        </div>
-        <!-- HEAD TO FEED (Patch 8-10/03/26) — the receipt's real "go look at
-             your report" navigation. Patch 20-10/03/26 moved the card's
-             bottom-most primary slot to the new Download Ticket button
-             below (per this round's spec), so this stays a real, fully
-             functional mint-pill action — just no longer the very last
-             element — rather than being removed or demoted to a plain
-             link; nothing about this button's destination changed. -->
-        <button type="button" class="btn-receipt-feed" id="btnHeadToFeed">
-          <span>Head To Feed</span>
-          <svg viewBox="0 0 24 24" width="16" height="16" stroke="#051311" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
-        </button>
+        <!-- RECEIPT LAYOUT CLEANUP (Patch 25-10/03/26) — the old secondary
+             button row ("Easy Share" / "Copy Direct Link",
+             .receipt-action-row/.btn-receipt-secondary) is gone outright
+             per spec, along with its shareReceiptDirectly()/
+             btnReceiptCopyLink click handlers below in the script. This
+             card now has exactly one primary action. -->
 
-        <!-- DOWNLOAD TICKET — RECEIPT MODAL PRIMARY (Patch 20-10/03/26) —
-             new bottom-most primary CTA per this round's spec. Reuses
-             .btn-receipt-feed (same #00FF87 mint pill as Head to Feed
-             above) and triggers the exact same destination the old "Easy
-             Share" button used to (renderAndShowSocialGraphic()), opening
-             the 1:1 Social Card preview/download modal. Down-right arrow
-             (↘) per spec, distinct from Head to Feed's horizontal arrow. -->
+        <!-- DOWNLOAD RECEIPT — RECEIPT MODAL'S ONE PRIMARY CTA
+             (Patch 20-10/03/26, consolidated + relabeled "Download Receipt"
+             Patch 25-10/03/26). Same destination as before
+             (renderAndShowSocialGraphic() — the 1:1 Social Card preview/
+             download modal) and the same id (#btnReceiptDownloadTicket,
+             unchanged so existing click wiring/tests keep working) — only
+             the visible label and this card's layout changed. -->
         <button type="button" class="btn-receipt-feed" id="btnReceiptDownloadTicket">
-          <span>Download Ticket</span>
+          <span>Download Receipt</span>
           <svg viewBox="0 0 24 24" width="16" height="16" stroke="#051311" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="7" y1="7" x2="17" y2="17"/><polyline points="17 9 17 17 9 17"/></svg>
         </button>
+
+        <!-- HEAD TO FEED (Patch 8-10/03/26) — the receipt's real "go look at
+             your report" navigation; destination unchanged (headToFeed()).
+             Patch 25-10/03/26: demoted from a mint pill button to a plain
+             centered text link below the one primary CTA, reusing
+             .founder-continue-link as-is (same class, same styling) rather
+             than duplicating it under a new name — "matching the founder
+             modal secondary text link styling" per spec, literally. -->
+        <button type="button" class="founder-continue-link" id="btnHeadToFeed">Head To Feed</button>
 
         <!-- STAGED "SUPPORT THE LEDGER" CIVIC MODULE (Patch 5.5) — hidden
              unless ?preview=support is in the URL or
@@ -2768,7 +2758,11 @@ textarea.input{resize:none;line-height:1.4}
        the citizen adds after downloading, before reposting it. ===== -->
   <div id="socialGraphicExportCard" class="social-graphic-export-card" aria-hidden="true">
     <div class="sge-header">
-      <span class="sge-brand"><span class="sge-brand-citixen">CITIXEN</span> <span class="sge-brand-ux">UX™</span></span>
+      <!-- SOCIAL CARD REDESIGN (Patch 25-10/03/26): the ™ gets its own span
+           so it can be styled smaller/unbolded/muted independently of "UX"
+           — see .sge-tm below; .sge-brand-ux itself (the "UX" text color)
+           is unchanged. -->
+      <span class="sge-brand"><span class="sge-brand-citixen">CITIXEN</span> <span class="sge-brand-ux">UX<span class="sge-tm">™</span></span></span>
       <span class="sge-jurisdiction" id="sgeJurisdiction">LOCAL DISTRICT</span>
     </div>
     <div class="sge-photo-frame" id="sgePhotoFrame">
@@ -2784,8 +2778,11 @@ textarea.input{resize:none;line-height:1.4}
         <span id="sgeTimestamp">—</span>
       </div>
     </div>
+    <!-- CARD FOOTER CLEANUP (Patch 25-10/03/26): "ANONYMOUS & SOVEREIGN"
+         removed outright per spec — the footer is now just the brand URL,
+         enlarged (see .sge-footer-url below) to actually read at social
+         thumbnail sizes instead of competing with a second line of text. -->
     <div class="sge-footer">
-      <div class="sge-footer-label">ANONYMOUS &amp; SOVEREIGN</div>
       <div class="sge-footer-url">citixenux.com/app</div>
     </div>
   </div>
@@ -2820,13 +2817,21 @@ textarea.input{resize:none;line-height:1.4}
              design system — the shared .btn-onboarding-cta class itself is
              untouched since it's also used by other CTAs (Beta Welcome's
              "Got it", Quick Help's "Got It — View Live Feed"). Down-right
-             arrow (↘) added to match the receipt modal's own new Download
-             Ticket button. -->
+             arrow (↘) added to match the receipt modal's own Download
+             Receipt button.
+             Patch 25-10/03/26: relabeled "Download Ticket" → "Download
+             Receipt" to match the receipt modal's own primary CTA wording,
+             and this card's redundant "Easy Share" button (#btnSgpShare)
+             was removed outright per spec — this is now the one real CTA
+             in this preview. Its click handler (and the now-unreachable
+             #easyShareFallbackModal it used to open on desktop browsers
+             with no navigator.share) are left in place elsewhere in the
+             script, documented as orphaned, same convention this file
+             already uses for handleAddToWallet(). -->
         <button type="button" class="btn-onboarding-cta" id="btnSgpDownload" disabled>
-          <span>Download Ticket</span>
+          <span>Download Receipt</span>
           <svg viewBox="0 0 24 24" width="16" height="16" stroke="#051311" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="7" y1="7" x2="17" y2="17"/><polyline points="17 9 17 17 9 17"/></svg>
         </button>
-        <button type="button" class="btn-sgp-share" id="btnSgpShare">Easy Share</button>
       </div>
     </div>
   </div>
@@ -2834,8 +2839,11 @@ textarea.input{resize:none;line-height:1.4}
   <!-- ===== EASY SHARE FALLBACK (Patch 14-10/03/26) — shown only when
        navigator.share doesn't exist at all (most desktop browsers); real
        X/WhatsApp intent links plus a plain clipboard copy, all three
-       carrying the identical canonical CITIXEN_SHARE_COMBINED string. See
-       #btnSgpShare's click handler. ===== -->
+       carrying the identical canonical CITIXEN_SHARE_COMBINED string.
+       UNREACHABLE as of Patch 25-10/03/26: both real openers (the receipt's
+       old "Easy Share" button and this card's #btnSgpShare) were removed
+       per spec. Left in place, documented, rather than torn out — see the
+       script's own comment near where #btnSgpShare's handler used to be. -->
   <div id="easyShareFallbackModal" class="confirm-drawer">
     <div class="confirm-card">
       <div class="onboarding-header-bar">
@@ -6794,21 +6802,11 @@ document.getElementById('receiptTicketBadge').addEventListener('click', async ()
     toast('Could not copy — select and copy manually');
   }
 });
-document.getElementById('btnReceiptCopyLink').addEventListener('click', async () => {
-  const id = document.getElementById('receiptTicketId').textContent;
-  const url = location.origin + '/app?report=' + encodeURIComponent(id);
-  const ok = await copyTextToClipboard(url);
-  const btn = document.getElementById('btnReceiptCopyLink');
-  const labelEl = document.getElementById('btnReceiptCopyLinkLabel');
-  if (ok) {
-    const prevText = labelEl.textContent;
-    labelEl.textContent = 'Link Copied!';
-    btn.classList.add('copied');
-    setTimeout(() => { labelEl.textContent = prevText; btn.classList.remove('copied'); }, 2000);
-  } else {
-    toast('Could not copy — try again');
-  }
-});
+// #btnReceiptCopyLink ("Copy Direct Link") — REMOVED along with the rest of
+// the secondary button row (Patch 25-10/03/26); see the receipt markup's
+// own comment. Its clipboard logic is intentionally not kept around
+// unreferenced (unlike handleAddToWallet() below) since there's no
+// plausible future entry point for it once the row itself is gone.
 // ALPHA LAUNCH FINAL PATCH — restores this button with neutral copy
 // ("Logged To Ledger" on the button itself, see markup) instead of
 // branding it as "Add to Apple Wallet": a real .pkpass requires a signed
@@ -7100,7 +7098,6 @@ document.getElementById('founderContributionReceiptModal').addEventListener('cli
 // replaces the old hand-drawn-canvas version, which never embedded the
 // photo and produced a generic, near-empty PNG.
 let lastSocialGraphicDataUrl = null;
-let lastSocialGraphicFile = null;
 let lastSocialGraphicTicketId = null;
 async function renderAndShowSocialGraphic(opts){
   opts = opts || {};
@@ -7110,20 +7107,20 @@ async function renderAndShowSocialGraphic(opts){
   const loadingTextEl = document.getElementById('sgpLoadingText');
   const guardEl = document.getElementById('sgpBlurGuard');
   const downloadBtn = document.getElementById('btnSgpDownload');
-  const shareBtn = document.getElementById('btnSgpShare');
   lastSocialGraphicDataUrl = null;
-  lastSocialGraphicFile = null;
   lastSocialGraphicTicketId = opts.ticketId || null;
   imgEl.style.display = 'none';
   imgEl.removeAttribute('src');
   loadingTextEl.textContent = 'Rendering 1:1 Social Card...';
   loadingEl.style.display = 'flex';
   // IMAGE SCREENING / BLUR GUARD (Patch 8-10/03/26) — reset to "screened" on
-  // every open; Download/Easy Share start disabled and only unlock once the
-  // citizen actually taps through the guard below (see its click handler).
+  // every open; Download starts disabled and only unlocks once the citizen
+  // actually taps through the guard below (see its click handler). Patch
+  // 25-10/03/26: this card's "Easy Share" button (and the shareBtn this
+  // function used to also disable/enable alongside it) was removed — see
+  // the markup's own comment — so Download is the only action gated here.
   guardEl.style.display = 'none';
   downloadBtn.disabled = true;
-  shareBtn.disabled = true;
   modal.classList.add('open');
 
   // Populate the hidden export card with this exact ticket's real data —
@@ -7175,60 +7172,30 @@ async function renderAndShowSocialGraphic(opts){
       guardEl.style.display = 'flex';
     } else {
       downloadBtn.disabled = false;
-      shareBtn.disabled = false;
-    }
-
-    // Web Share API with file support is spotty across browsers — prepare
-    // the shareable file when supported so Easy Share can use it directly;
-    // otherwise it falls back to copying the ticket's direct link (see its
-    // click handler) rather than disappearing outright.
-    if (navigator.share && navigator.canShare) {
-      try {
-        const blob = await (await fetch(dataUrl)).blob();
-        const file = new File([blob], 'citixen-ux-social-card.png', { type: 'image/png' });
-        if (navigator.canShare({ files: [file] })) {
-          lastSocialGraphicFile = file;
-        }
-      } catch (e) { /* share-file support check failed — Easy Share still falls back to copy-link */ }
     }
   } catch (err) {
     loadingTextEl.textContent = 'Could not render the social card — try again.';
     toast('Could not render the social card.');
   }
 }
-// EASY SHARE — RECEIPT MODAL (Patch 20-10/03/26) — now a direct native Web
-// Share trigger straight from the receipt itself; opening the Social Card
-// preview modal first (the old behavior) moved to the new "Download
-// Ticket" button below. Shares the same canonical payload
-// (CITIXEN_SHARE_TITLE/TEXT/URL, defined further down this script) the
-// Social Card modal's own Easy Share (#btnSgpShare) uses — no rendered PNG
-// attached, since nothing has been rasterized yet at this point in the
-// flow; same honest "only attach what's real" rule that button follows.
-async function shareReceiptDirectly(){
-  if (navigator.share) {
-    try {
-      await navigator.share({ title: CITIXEN_SHARE_TITLE, text: CITIXEN_SHARE_TEXT, url: CITIXEN_SHARE_URL });
-    } catch (e) { /* citizen cancelled the native share sheet — not an error */ }
-    return;
-  }
-  document.getElementById('easyShareFallbackModal').classList.add('open');
-}
-document.getElementById('btnReceiptGraphic').addEventListener('click', shareReceiptDirectly);
-// DOWNLOAD TICKET — RECEIPT MODAL PRIMARY (Patch 20-10/03/26) — takes over
-// the Social Card preview/download destination the old "Easy Share" button
-// used to trigger.
+// shareReceiptDirectly() / #btnReceiptGraphic ("Easy Share" on the receipt
+// itself) — REMOVED (Patch 25-10/03/26) along with the rest of the
+// receipt's secondary button row. See the receipt markup's own comment.
+// DOWNLOAD RECEIPT — RECEIPT MODAL'S ONE PRIMARY CTA (Patch 20-10/03/26,
+// relabeled Patch 25-10/03/26) — opens the Social Card preview/download
+// modal.
 document.getElementById('btnReceiptDownloadTicket').addEventListener('click', () => {
   renderAndShowSocialGraphic(pendingReceiptOpts || {});
 });
 // IMAGE SCREENING / BLUR GUARD (Patch 8-10/03/26) — this blurs the real
 // rendered image sitting underneath it (backdrop-filter, not a separate
-// blurred copy), so tapping through reveals exactly what Download/Easy
-// Share would send out. Both actions stay disabled until this fires once
-// per render (see renderAndShowSocialGraphic() resetting it on open).
+// blurred copy), so tapping through reveals exactly what Download would
+// send out. Patch 25-10/03/26: only gates Download now — this card's
+// "Easy Share" button (#btnSgpShare) was removed, see the markup's own
+// comment.
 document.getElementById('sgpBlurGuard').addEventListener('click', () => {
   document.getElementById('sgpBlurGuard').style.display = 'none';
   document.getElementById('btnSgpDownload').disabled = false;
-  document.getElementById('btnSgpShare').disabled = false;
 });
 document.getElementById('btnSgpDownload').addEventListener('click', () => {
   if (!lastSocialGraphicDataUrl) return;
@@ -7249,28 +7216,18 @@ const CITIXEN_SHARE_TEXT = 'Verified Civic Report on CITIXEN UX™ Living Ledger
 const CITIXEN_SHARE_URL = 'https://citixenux.com/app';
 const CITIXEN_SHARE_COMBINED = CITIXEN_SHARE_TEXT + ' ' + CITIXEN_SHARE_URL;
 
-// EASY SHARE (Patch 8-10/03/26, was "Share") — uses the real Web Share API
-// (with the rendered image file attached when the browser supports sharing
-// files — lastSocialGraphicFile is only ever set once renderAndShowSocialGraphic()
-// has confirmed navigator.canShare({files}) actually passes) with the
-// canonical payload above. PLATFORM FALLBACK INTENTS (Patch 14-10/03/26):
-// this app never had a Twitter/X or WhatsApp share option before — browsers
-// with no Web Share API at all (most desktop browsers) now get a real
-// fallback drawer offering both as genuine intent links, plus a plain
-// clipboard copy, all three carrying the identical canonical string —
-// never a fabricated "share succeeded" state and never silently doing
-// nothing just because the device lacks navigator.share.
-document.getElementById('btnSgpShare').addEventListener('click', async () => {
-  if (navigator.share) {
-    try {
-      const payload = { title: CITIXEN_SHARE_TITLE, text: CITIXEN_SHARE_TEXT, url: CITIXEN_SHARE_URL };
-      if (lastSocialGraphicFile) payload.files = [lastSocialGraphicFile];
-      await navigator.share(payload);
-    } catch (e) { /* citizen cancelled the native share sheet — not an error, nothing else to do */ }
-    return;
-  }
-  document.getElementById('easyShareFallbackModal').classList.add('open');
-});
+// #btnSgpShare ("Easy Share" inside the Social Card preview) — REMOVED
+// (Patch 25-10/03/26) per spec: "Remove any redundant Easy Share buttons
+// inside this card preview container." #btnSgpDownload is this card's one
+// remaining action. Its click handler (and the lastSocialGraphicFile prep
+// it used) were removed along with it — see renderAndShowSocialGraphic()'s
+// own comment above. The X/WhatsApp/Copy-link fallback handlers just below
+// still exist and still work on their own terms, but #easyShareFallbackModal
+// is now unreachable from this card: both of its real openers
+// (#btnReceiptGraphic above and #btnSgpShare here) are gone. Left in place,
+// documented, rather than torn out — same "orphaned but harmless, in case a
+// future entry point wants it back" convention this file already uses for
+// handleAddToWallet().
 document.getElementById('btnShareFallbackClose').addEventListener('click', () => {
   document.getElementById('easyShareFallbackModal').classList.remove('open');
 });
