@@ -362,6 +362,18 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
 .map-howitworks-btn:hover{background:rgba(0,255,135,.16)}
 .map-howitworks-btn svg{flex-shrink:0}
 .map-label-right{display:flex;align-items:center;gap:8px}
+/* Patch 37-10/03/26: the inline pill (.map-howitworks-btn above) was removed from the
+   Civic Dispatch Map's header row and replaced with this full-width block, placed as
+   its own flex child between the map .card and the Live Dispatch Feed .card (the
+   #tab-map <section> is already a flex column with gap:12px, so no extra margin is
+   needed to space it from the cards on either side). */
+#howItWorksFullWrapper{width:100%}
+.map-howitworks-btn-full{width:100%;display:flex;align-items:center;justify-content:center;gap:.5rem;
+  padding:.85rem 1rem;border-radius:8px;background:rgba(0,255,135,.08);border:1px solid #00FF87;
+  color:#00FF87;font-weight:700;letter-spacing:.04em;text-transform:uppercase;font-size:.78rem;
+  cursor:pointer;font-family:inherit}
+.map-howitworks-btn-full:hover{background:rgba(0,255,135,.16)}
+.map-howitworks-btn-full svg{flex-shrink:0}
 
 .chip-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
 .chip{background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));border:var(--surface-card-border);color:var(--text);padding:13px 12px;
@@ -2030,14 +2042,23 @@ textarea.input{resize:none;line-height:1.4}
         <div class="label">
           <span>Civic Dispatch Map</span>
           <span class="map-label-right">
-            <button type="button" class="map-howitworks-btn" id="btnMapHowItWorks" aria-controls="appInfoModal" aria-expanded="false">
-              <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-              How It Works
-            </button>
             <span id="mCount" style="color:var(--mint2)">3 active</span>
           </span>
         </div>
         <div id="map"></div>
+      </div>
+
+      <!-- Patch 37-10/03/26: "How It Works" trigger relocated out of the Civic Dispatch
+           Map's header row (removed above, next to #mCount) into its own full-width
+           block between the map card and the Live Dispatch Feed card. Still the same
+           real #btnMapHowItWorks element/id (kept as-is so the existing
+           openAppInfoModal('quickHelp') click listener below needs no change) — the
+           spec names it #btnHowItWorks, which doesn't exist in this file. -->
+      <div id="howItWorksFullWrapper">
+        <button type="button" class="map-howitworks-btn-full" id="btnMapHowItWorks" aria-controls="appInfoModal" aria-expanded="false">
+          <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          How It Works
+        </button>
       </div>
 
       <div class="card">
