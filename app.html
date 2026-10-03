@@ -3387,6 +3387,30 @@ function looksNonUS(fields){
   const haystack = [fields.country, fields.state].filter(Boolean).join(' ').toLowerCase();
   return NON_US_REJECT_TERMS.some(term => haystack.includes(term));
 }
+// ADDRESS DISPLAY PURGE & SANITIZATION (Patch 15-10/03/26): a DOM-facing
+// text scrubber, distinct from looksNonUS() above — that function checks
+// the structured country/state fields a geocoder response actually
+// returns, before this app ever builds a label from them (see
+// resolveDisplayLocation()'s bigdatacloud fix). This one is belt-and-
+// suspenders for plain strings that reach a render call with no such
+// structured fields attached at all — a ticket's free-text "loc" fetched
+// from the backend API, a stale pre-Patch-13/15 value, or any other text
+// this app didn't just build from a geocoder object itself. Word-bounded
+// matching against the same NON_US_REJECT_TERMS list, so it won't catch a
+// genuine US place name that happens to contain one of these words as part
+// of a longer, unrelated word. If scrubbing the matched fragment(s) out
+// would leave nothing meaningful behind, this returns the neutral fallback
+// label instead of a mangled remainder (a lone comma, trailing "and", etc).
+const NON_US_LOCATION_FALLBACK = 'Verified US Location';
+function sanitizeLocationText(text){
+  const s = String(text == null ? '' : text).trim();
+  if (!s) return s;
+  const testPattern = new RegExp('\\b(' + NON_US_REJECT_TERMS.join('|') + ')\\b', 'i');
+  if (!testPattern.test(s)) return s;
+  const scrubPattern = new RegExp('\\b(' + NON_US_REJECT_TERMS.join('|') + ')\\b', 'ig');
+  const scrubbed = s.replace(scrubPattern, '').replace(/,\s*,/g, ',').replace(/^[\s,._-]+|[\s,._-]+$/g, '').trim();
+  return scrubbed.length >= 3 ? scrubbed : NON_US_LOCATION_FALLBACK;
+}
 // Forward geocoding via OpenStreetMap's free Nominatim search API — no key
 // required, real results for a real address. Returns null (never a guessed
 // coordinate) on no match, network failure, or an implausible/empty query.
@@ -3780,7 +3804,11 @@ async function fetchLedgerTickets(){
     const res = await fetch('/api/coverage/tickets');
     if (!res.ok) throw new Error('tickets returned ' + res.status);
     const data = await res.json();
-    return data.tickets;
+    // Patch 15-10/03/26: sanitize every ticket's free-text "loc" the
+    // moment it enters this app from the backend — a single choke point
+    // that covers every later render of this array (feed rows, map
+    // popups, admin list, etc.) rather than patching each render site.
+    return (Array.isArray(data.tickets) ? data.tickets : []).map(t => (t && t.loc != null) ? Object.assign({}, t, { loc: sanitizeLocationText(t.loc) }) : t);
   } catch (err) {
     return fallbackLedgerTickets();
   }
@@ -4759,15 +4787,33 @@ async function resolveDisplayLocation(){
     if (!res.ok) throw new Error('reverse-geocode failed: ' + res.status);
     const data = await res.json();
 
+    // ADDRESS DISPLAY PURGE & SANITIZATION (Patch 15-10/03/26): this is the
+    // one reverse-geocoder in this file that was never US-restricted (it's
+    // bigdatacloud, a different API than Nominatim/Photon — Patch 13's
+    // countrycodes/viewbox/bounded/looksNonUS() guards never touched it,
+    // and data.principalSubdivisionCode's own "CA-ON"/"US-WI" prefix was
+    // being discarded by the .split('-').pop() below before anything could
+    // check it). A GPS fix near the border (or a spoofed/VPN location) could
+    // reverse-geocode to a real Canadian city — e.g. the exact "Welland,
+    // Ontario" / "...Orford, Quebec" cases this patch was written for — and
+    // that would then flow into the header pill, the report-location field,
+    // and the submitted ticket's own location text. looksNonUS() (Patch 13)
+    // is reused here against the response's real country fields before any
+    // city/state is accepted, so a non-US result is treated exactly like
+    // "no usable label" below — the real coordinates are still kept, only
+    // the place name is discarded, same honest behavior as every other
+    // no-match branch in this function.
     const city = data.city || data.locality;
     const stateCode = (data.principalSubdivisionCode || '').split('-').pop();
-    if (city && stateCode) {
+    const nonUS = looksNonUS({ countryCode: data.countryCode, country: data.countryName, state: data.principalSubdivision });
+    if (city && stateCode && !nonUS) {
       if (labelEl) labelEl.textContent = `${esc(city)}, ${esc(stateCode)}`;
       onLocationResolved({ city, stateCode: stateCode.toUpperCase(), lat: latitude, lng: longitude });
       return;
     }
-    // No usable city/state in the response — still a real, valid GPS fix,
-    // just without a friendly label (hasValidGps() only looks at lat/lng).
+    // No usable (or non-US) city/state in the response — still a real,
+    // valid GPS fix, just without a friendly label (hasValidGps() only
+    // looks at lat/lng).
     onLocationResolved({ city: null, stateCode: null, lat: latitude, lng: longitude });
   } catch (err) {
     // Reverse-geocode lookup failed or is unreachable — the coordinates are
@@ -6137,16 +6183,22 @@ function openDispatchReceiptModal(opts){
   // Location: a real GPS fix renders as two clean lines (coords + district ·
   // city, state); otherwise fall back to whatever the citizen typed/left in
   // the location field as a single line — never a guessed coordinate.
+  // Patch 15-10/03/26: both text lines go through sanitizeLocationText()
+  // before binding — resolvedLoc.city/stateCode should already be US-only
+  // post the Patch 15 resolveDisplayLocation() fix, and wardMeta comes from
+  // this app's own trusted ward directory, but `loc` can be a free-text
+  // value the citizen typed or a pre-fix/legacy value, so it's sanitized
+  // here as defense-in-depth regardless of source.
   const coordsEl = document.getElementById('receiptLocCoords');
   const districtEl = document.getElementById('receiptLocDistrict');
   if (resolvedLoc && typeof resolvedLoc.lat === 'number' && typeof resolvedLoc.lng === 'number') {
     coordsEl.textContent = formatCoordPrecision(resolvedLoc.lat, resolvedLoc.lng);
     const districtPart = (wardMeta && wardMeta.wardName) ? wardMeta.wardName + ' · ' : '';
     const cityPart = wardMeta ? wardMeta.cityName + ', ' + wardMeta.state.toUpperCase() : resolvedLoc.city + ', ' + resolvedLoc.stateCode;
-    districtEl.textContent = districtPart + cityPart;
+    districtEl.textContent = sanitizeLocationText(districtPart + cityPart);
     districtEl.style.display = '';
   } else {
-    coordsEl.textContent = loc || 'Local District';
+    coordsEl.textContent = sanitizeLocationText(loc) || 'Local District';
     districtEl.textContent = '';
     districtEl.style.display = 'none';
   }
@@ -6866,7 +6918,13 @@ async function finalizeSubmitReport(opts){
   const finalLat = usingGps ? resolved.lat : manualAddr.lat;
   const finalLng = usingGps ? resolved.lng : manualAddr.lng;
   const rawDesc=document.getElementById('repDesc').value.trim() || 'Hazard reported.';
-  const rawLoc=document.getElementById('repLoc').value.trim() || (usingManual ? manualAddr.address : 'Local District');
+  // Patch 15-10/03/26: sanitized at the moment this ticket is built, not
+  // just when it's later rendered — this is the one place a ticket's
+  // location text is created, and it feeds the offline-queue record
+  // (IndexedDB) and the real API submission below, so scrubbing here means
+  // every later read of this exact ticket (receipt, feed, map popup) is
+  // already clean without relying on each of those render sites alone.
+  const rawLoc=sanitizeLocationText(document.getElementById('repLoc').value.trim()) || (usingManual ? manualAddr.address : 'Local District');
   const hz=classifyHazard(rawDesc, cat);
   const dept=hz.department;
   const urgentOverride = !!opts.urgentOverride;
