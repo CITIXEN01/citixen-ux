@@ -1491,9 +1491,17 @@ textarea.input{resize:none;line-height:1.4}
 .civic-triad-svg{width:100%;height:auto;max-width:320px;margin:0 auto;display:block}
 .civic-triad-node-label{fill:#FFFFFF;font-size:10.5px;font-weight:700;text-anchor:middle}
 .civic-triad-node-sub{fill:#9CA3AF;font-size:8px;text-anchor:middle}
-.civic-triad-spoke{stroke:#00E699;stroke-width:1.6;opacity:.75;stroke-dasharray:4,4}
-.civic-triad-node-circle{fill:rgba(0,230,153,.1);stroke:#00E699;stroke-width:1.5}
-.civic-triad-root-circle{fill:rgba(0,230,153,.16);stroke:#00E699;stroke-width:1.8}
+/* Patch 143(v150)-10/03/26: these 3 base rules used to be a static, always-on
+   #00E699 ambient glow (opacity .75/.1/.16) — the "static/subtle green state"
+   this patch's objective calls out. Now that the sequence below actually lights
+   each node/path up in turn, the resting state is dim instead, so the sequence
+   reads as something happening rather than a diagram that always looks half-lit. */
+.civic-triad-spoke{stroke:#2A364F;stroke-width:1.6;opacity:.3;stroke-dasharray:6,6;
+  transition:stroke .3s ease,opacity .3s ease}
+.civic-triad-node-circle{fill:#0D1117;stroke:#2A364F;stroke-width:1.5;opacity:.35;
+  transition:stroke .3s ease,fill .3s ease,opacity .3s ease,filter .3s ease}
+.civic-triad-root-circle{fill:#0D1117;stroke:#2A364F;stroke-width:1.8;opacity:.35;
+  transition:stroke .3s ease,fill .3s ease,opacity .3s ease,filter .3s ease}
 .civic-triad-outer-ring{fill:none;stroke:#00E699;stroke-width:1.2;opacity:.55}
 .civic-triad-root-label-center{fill:#00E699;font-size:6.2px;font-weight:800;text-anchor:middle;letter-spacing:.02em}
 .civic-triad-nucleus-halo{fill:none;stroke:#00E699;stroke-width:2;opacity:.3;
@@ -1511,67 +1519,49 @@ textarea.input{resize:none;line-height:1.4}
 .civic-triad-ux-text{fill:#00FF87}
 .civic-triad-nucleus-icon{stroke:#00E699}
 
-/* ===== "HOW YOUR REPORT MOVES" SEQUENTIAL FLOW (Patch 18-10/03/26) =====
-   Replaces the old continuous, independent pulse-dot loop (3 dots each
-   looping on their own timer, telling no particular story) with an
-   explicit 4-phase sequence driven by runTriadFlowSequence() toggling
-   data-phase on the <svg.civic-triad-svg> root: (1) the Resident node
-   highlights, (2) a green camera flash (#00FF87) fires on that same node,
-   (3) the CITIXEN UX™ nucleus enters a "processing" state, (4) a ticket
-   pulses back out to Resident while two more broadcast outward to Public
-   Ledger + Municipal Portal at once — then a short rest before it repeats.
-   Every affected element has a defined resting (no-phase) style here, so
-   nothing is left mid-transition if the sequence is stopped (Quick Help
-   closed) between phases. */
-.civic-triad-node-resident circle.civic-triad-node-circle{transition:fill .35s ease,stroke-width .35s ease,filter .35s ease}
-.civic-triad-svg[data-phase="resident"] .civic-triad-node-resident circle.civic-triad-node-circle{
-  fill:rgba(0,255,135,.22);stroke:#00FF87;stroke-width:2.4;filter:drop-shadow(0 0 6px rgba(0,255,135,.7))}
+/* ===== "HOW YOUR REPORT MOVES" SEQUENTIAL FLOW (Patch 143(v150)-10/03/26) =====
+   Full replacement of the Patch 18 data-phase system above (4 phases, 6000ms
+   loop, Ledger+Municipal broadcasting simultaneously) with 5 sequential stages
+   over a 6800ms loop, Ledger sealing strictly before Municipal dispatches, and
+   real SVG icon overlays (camera/receipt/shield/lock/dispatch-truck) injected
+   as <text> glyphs instead of a plain color-only transition. Classes (not the
+   old [data-phase="..."] attribute selectors) are added/removed directly by
+   runTriadFlowSequence() in the script below, since this version needs several
+   elements lit independently and holding at once (stage 5's "all lit" hold)
+   rather than one mutually-exclusive phase name at a time. */
+@keyframes svg-icon-boom{
+  0%{transform:scale(0);opacity:0}
+  60%{transform:scale(1.3);opacity:1}
+  100%{transform:scale(1.0);opacity:1}
+}
+.icon-boom{transform-box:fill-box;transform-origin:center;
+  animation:svg-icon-boom .35s cubic-bezier(.175,.885,.32,1.275) forwards}
+.icon-boom text{fill:#00FF9D;text-anchor:middle;font-weight:700}
 
-.civic-triad-camera-flash{fill:#00FF87;opacity:0}
-.civic-triad-svg[data-phase="camera"] .civic-triad-camera-flash{animation:triadCameraFlash .8s ease-out 1}
-@keyframes triadCameraFlash{
-  0%{opacity:0;r:4px}
-  25%{opacity:1;r:30px}
-  100%{opacity:0;r:34px}
-}
+@keyframes svg-path-pulse{to{stroke-dashoffset:-20}}
+.svg-path-active{stroke:#00FF9D !important;stroke-dasharray:8 4 !important;
+  animation:svg-path-pulse .8s linear infinite !important;opacity:1 !important}
+/* Reduced-motion equivalent of .svg-path-active with no running dash
+   animation — used only by applyTriadStaticLitState() below, so a
+   prefers-reduced-motion visitor still sees the paths as "connected/lit"
+   rather than losing that information outright. */
+.svg-path-static-lit{stroke:#00FF9D !important;stroke-dasharray:none !important;opacity:1 !important}
 
-.civic-triad-root-circle{transition:fill .4s ease,stroke-width .4s ease}
-.civic-triad-nucleus-icon{transition:stroke .4s ease}
-.civic-triad-svg[data-phase="nucleus"] .civic-triad-root-circle{fill:rgba(0,255,135,.26);stroke:#00FF87;stroke-width:2.4}
-.civic-triad-svg[data-phase="nucleus"] .civic-triad-nucleus-icon{stroke:#00FF87}
-.civic-triad-svg[data-phase="nucleus"] .civic-triad-ux-text,
-.civic-triad-svg[data-phase="nucleus"] .civic-triad-citixen-text{filter:drop-shadow(0 0 4px rgba(0,255,135,.85))}
+.svg-node-active{stroke:#00FF9D !important;fill:rgba(0,255,157,.18) !important;
+  filter:drop-shadow(0 0 10px rgba(0,255,157,.85)) !important;opacity:1 !important;
+  transition:all .3s ease}
+.svg-node-dim{stroke:#2A364F !important;fill:#0D1117 !important;filter:none !important;
+  opacity:.35 !important;transition:all .4s ease}
 
-.civic-triad-spoke{transition:stroke .4s ease,opacity .4s ease}
-.civic-triad-svg[data-phase="receipt"] .civic-triad-spoke{stroke:#00FF87;opacity:1}
-.civic-triad-flow-pulse{fill:#00FF87;opacity:0;filter:drop-shadow(0 0 3px rgba(0,255,135,.9)) drop-shadow(0 0 7px rgba(0,255,135,.55))}
-.civic-triad-svg[data-phase="receipt"] .civic-triad-flow-pulse-resident{animation:triadFlowToResident 1.1s ease-out 1}
-.civic-triad-svg[data-phase="receipt"] .civic-triad-flow-pulse-ledger{animation:triadFlowToLedger 1.1s ease-out 1}
-.civic-triad-svg[data-phase="receipt"] .civic-triad-flow-pulse-municipal{animation:triadFlowToMunicipal 1.1s ease-out 1}
-/* Deltas below are each pulse's own spoke endpoint minus its start point
-   (see the circles' cx/cy in appTriadDiagramHtml() — same geometry, just
-   expressed as a CSS translate instead of a second coordinate). */
-@keyframes triadFlowToResident{
-  0%{opacity:0;transform:translate(0,0)}
-  12%{opacity:1}
-  88%{opacity:1}
-  100%{opacity:0;transform:translate(0,-21px)}
-}
-@keyframes triadFlowToLedger{
-  0%{opacity:0;transform:translate(0,0)}
-  12%{opacity:1}
-  88%{opacity:1}
-  100%{opacity:0;transform:translate(-18.16px,10.63px)}
-}
-@keyframes triadFlowToMunicipal{
-  0%{opacity:0;transform:translate(0,0)}
-  12%{opacity:1}
-  88%{opacity:1}
-  100%{opacity:0;transform:translate(18.16px,10.63px)}
-}
 @media (prefers-reduced-motion: reduce){
-  .civic-triad-camera-flash,.civic-triad-flow-pulse-resident,.civic-triad-flow-pulse-ledger,.civic-triad-flow-pulse-municipal{
-    animation:none !important;opacity:0 !important}
+  /* The sequence's own timers are never started under reduced motion (see
+     the openAppInfoModal() call site) — applyTriadStaticLitState() sets the
+     final "all lit" classes directly instead, so no animation needs to run
+     to reach that state. This block only guarantees nothing here can
+     animate even if one of these classes is ever applied some other way. */
+  .svg-node-active,.svg-node-dim{transition:none}
+  .icon-boom{animation:none}
+  .svg-path-active{animation:none}
 }
 .tm-symbol{font-weight:300 !important;font-size:.55em !important;margin-left:3px !important;color:#00E699;opacity:.9;vertical-align:super}
 .hub-deepdive-panel{display:none;max-width:920px;margin:0 auto 18px;padding:0}
@@ -5095,23 +5085,24 @@ function appTriadDiagramHtml(idPrefix) {
   return '<div class="civic-triad-section">' +
   '<div class="civic-triad-card">' +
     '<div class="civic-triad-header">How Your Report Moves</div>' +
-    '<svg class="civic-triad-svg" viewBox="0 0 320 310" role="img" aria-label="Diagram: a central CITIXEN UX nucleus radiates equally to Resident, Public Ledger, and Municipal Portal">' +
+    '<svg class="civic-triad-svg" viewBox="0 0 320 310" role="img" aria-label="Diagram: a citizen report moves from Resident intake to the CITIXEN UX nucleus, seals to the Public Ledger, then dispatches to the Municipal Portal">' +
       /* Connecting pathways (node edge to hub edge, same geometry/dash
          style as the original stub lines, just extended to actually
          span the gap). Patch 18-10/03/26: the 3 traveling dots below
          used to loop independently and continuously on their own timer
-         (no particular story); they now only animate during the
-         "receipt" phase of runTriadFlowSequence() (data-phase on this
-         <svg>'s own root), moving in the direction that phase represents
-         — one back up to Resident (the generated ticket), two outward to
-         Public Ledger + Municipal Portal at once (the broadcast). See
-         the .civic-triad-flow-pulse-* keyframes. */
-      '<path id="' + idPrefix + 'FlowResidentHub" d="M160,106 L160,127" class="civic-triad-spoke"/>' +
-      '<path id="' + idPrefix + 'FlowHubLedger" d="M118.59,199.24 L100.43,209.87" class="civic-triad-spoke"/>' +
-      '<path id="' + idPrefix + 'FlowHubMunicipal" d="M201.41,199.24 L219.57,209.87" class="civic-triad-spoke"/>' +
-      '<circle cx="160" cy="127" r="3" class="civic-triad-flow-pulse civic-triad-flow-pulse-resident"/>' +
-      '<circle cx="118.59" cy="199.24" r="3" class="civic-triad-flow-pulse civic-triad-flow-pulse-ledger"/>' +
-      '<circle cx="201.41" cy="199.24" r="3" class="civic-triad-flow-pulse civic-triad-flow-pulse-municipal"/>' +
+         (no particular story); Patch 18 then made them only animate during
+         a "receipt" broadcast phase; Patch 143(v150) replaces the traveling-
+         dot approach entirely — the real pulse now runs as a marching-dash
+         animation (.svg-path-active, see the CSS block above) on these same
+         3 path elements, which is why each gets its own -resident/-ledger/
+         -municipal class below (the old shared .civic-triad-flow-pulse dot
+         circles are gone; runTriadFlowSequence() now selects paths and node
+         circles by these classes, scoped per mounted <svg>, instead of by
+         id — idPrefix-based ids stay on the <g> wrappers below only for
+         any external reference, in case a second copy is ever mounted). */
+      '<path id="' + idPrefix + 'FlowResidentHub" d="M160,106 L160,127" class="civic-triad-spoke civic-triad-spoke-resident"/>' +
+      '<path id="' + idPrefix + 'FlowHubLedger" d="M118.59,199.24 L100.43,209.87" class="civic-triad-spoke civic-triad-spoke-ledger"/>' +
+      '<path id="' + idPrefix + 'FlowHubMunicipal" d="M201.41,199.24 L219.57,209.87" class="civic-triad-spoke civic-triad-spoke-municipal"/>' +
       '<g id="' + idPrefix + 'TriadNucleus">' +
         '<circle cx="160" cy="175" r="48" class="civic-triad-nucleus-halo"/>' +
         '<circle cx="160" cy="175" r="36" class="civic-triad-outer-ring"/>' +
@@ -5125,19 +5116,16 @@ function appTriadDiagramHtml(idPrefix) {
         '<circle cx="160" cy="80" r="26" class="civic-triad-node-circle"/>' +
         '<path d="M160 68a6 6 0 1 0 0.001 0z" fill="none" stroke="#00E699" stroke-width="1.6"/>' +
         '<path d="M148 94c2-7 7-11 12-11s10 4 12 11" fill="none" stroke="#00E699" stroke-width="1.6" stroke-linecap="round"/>' +
-        /* The green camera-flash cue (phase b) — hidden (opacity:0) at
-           rest, flashes to exact #00FF87 only during data-phase="camera". */
-        '<circle cx="160" cy="80" r="4" class="civic-triad-camera-flash"/>' +
         '<text x="160" y="30" class="civic-triad-node-label">Resident</text>' +
         '<text x="160" y="16" class="civic-triad-node-sub">Mobile report capture</text>' +
       '</g>' +
-      '<g id="' + idPrefix + 'TriadNodeLedger">' +
+      '<g id="' + idPrefix + 'TriadNodeLedger" class="civic-triad-node-ledger">' +
         '<circle cx="78" cy="223" r="26" class="civic-triad-node-circle"/>' +
         '<path d="M66 215h24M66 223h24M66 231h16" fill="none" stroke="#00E699" stroke-width="1.6" stroke-linecap="round"/>' +
         '<text x="78" y="273" class="civic-triad-node-label">Public Ledger</text>' +
         '<text x="78" y="287" class="civic-triad-node-sub">Live, searchable record</text>' +
       '</g>' +
-      '<g id="' + idPrefix + 'TriadNodeMunicipal">' +
+      '<g id="' + idPrefix + 'TriadNodeMunicipal" class="civic-triad-node-municipal">' +
         '<circle cx="242" cy="223" r="26" class="civic-triad-node-circle"/>' +
         '<path d="M230 235v-14l12-8 12 8v14z" fill="none" stroke="#00E699" stroke-width="1.6" stroke-linejoin="round"/>' +
         '<path d="M236 235v-8h12v8" fill="none" stroke="#00E699" stroke-width="1.6"/>' +
@@ -5149,41 +5137,109 @@ function appTriadDiagramHtml(idPrefix) {
 '</div>';
 }
 
-// ===== "HOW YOUR REPORT MOVES" SEQUENTIAL FLOW (Patch 18-10/03/26) =====
-// Drives the 4-phase story described in appTriadDiagramHtml()'s CSS
-// comment by toggling data-phase on every mounted .civic-triad-svg (only
-// ever one today, inside the Quick Help modal — see openAppInfoModal()/
-// closeAppInfoModal() below, which (re)start and stop this; idPrefix stays
-// in place in case a second copy is ever mounted again). Each phase is a
-// plain {phase, duration} step; advance() sets the attribute, waits that
-// phase's duration, then moves to the next step, wrapping back to the
-// start — a small recursive setTimeout chain rather than setInterval, so
-// stopping mid-phase (modal closed) never leaves a stray tick in flight.
-const TRIAD_FLOW_PHASES = [
-  { phase: 'resident', duration: 1000 },   // a) Resident node highlights
-  { phase: 'camera', duration: 800 },      // b) Green camera flash (#00FF87)
-  { phase: 'nucleus', duration: 1600 },    // c) CITIXEN UX™ nucleus processing
-  { phase: 'receipt', duration: 1200 },    // d) Ticket back to Resident + broadcast to Ledger/Municipal
-  { phase: 'idle', duration: 1400 },       // brief rest before the loop repeats
+// ===== "HOW YOUR REPORT MOVES" SEQUENTIAL FLOW (Patch 143(v150)-10/03/26) =====
+// Full replacement of the Patch 18 data-phase system (see the CSS block's own
+// comment above for what changed and why). 5 sequential stages over a 6800ms
+// loop: Resident capture -> receipt travels to the CITIXEN UX nucleus -> the
+// nucleus seals it to Public Ledger -> *then* dispatches to Municipal Portal
+// (was simultaneous) -> a 2.1s full-hold before the loop resets. idPrefix on
+// the <g> wrappers in appTriadDiagramHtml() still allows more than one mounted
+// copy (only ever one today, inside Quick Help), so every lookup below is
+// scoped to one mounted <svg.civic-triad-svg> at a time via querySelector,
+// never a bare getElementById on a hardcoded id.
+//
+// Correctness fix versus the original patch draft: that draft's JS scheduled
+// each phase as its own independent setTimeout inside one stepSequence() call
+// but only ever tracked/cleared the *last* one (the loop-repeat timer) in
+// stopTriadFlowSequence() — closing Quick Help mid-sequence would have left
+// up to 4 earlier per-phase timeouts still pending, which then fire later and
+// mutate (or inject icons into) a diagram that's since been rebuilt or torn
+// down by the next openAppInfoModal() call. Every timeout id from a pass is
+// collected in triadFlowTimeoutIds and cleared together instead, preserving
+// the original Patch 18 guarantee that stopping mid-phase never leaves a
+// stray tick in flight.
+function triadNodeCircle(svg, key){
+  return key === 'nucleus'
+    ? svg.querySelector('.civic-triad-root-circle')
+    : svg.querySelector('.civic-triad-node-' + key + ' .civic-triad-node-circle');
+}
+function triadPath(svg, key){
+  return svg.querySelector('.civic-triad-spoke-' + key);
+}
+function triadInjectIcon(svg, key, glyph){
+  const circle = triadNodeCircle(svg, key);
+  if (!circle) return;
+  const cx = circle.getAttribute('cx'), cy = circle.getAttribute('cy');
+  const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  g.setAttribute('class', 'icon-boom');
+  g.innerHTML = '<text x="' + cx + '" y="' + (parseFloat(cy) - 34) + '" font-size="16">' + glyph + '</text>';
+  circle.parentNode.appendChild(g);
+}
+function triadResetSvg(svg){
+  svg.querySelectorAll('.icon-boom').forEach(el => el.remove());
+  ['resident', 'nucleus', 'ledger', 'municipal'].forEach(key => {
+    const el = triadNodeCircle(svg, key);
+    if (el) { el.classList.remove('svg-node-active'); el.classList.add('svg-node-dim'); }
+  });
+  ['resident', 'ledger', 'municipal'].forEach(key => {
+    const el = triadPath(svg, key);
+    if (el) el.classList.remove('svg-path-active', 'svg-path-static-lit');
+  });
+}
+// {at: ms-into-the-6800ms-loop, run: (svg) => ...} — exact timings from the
+// approved spec (Phase 1: 500ms; Phase 2: 1300ms + 2100ms; Phase 3: 2900ms +
+// 3600ms; Phase 4: 4000ms + 4700ms; Phase 5 is simply "nothing scheduled
+// between 4700ms and the 6800ms loop repeat," which holds everything lit for
+// that 2.1s span for free).
+const TRIAD_FLOW_STEPS = [
+  { at: 500,  run: (svg) => { const el = triadNodeCircle(svg, 'resident'); if (el) { el.classList.remove('svg-node-dim'); el.classList.add('svg-node-active'); } triadInjectIcon(svg, 'resident', '📷'); } },
+  { at: 1300, run: (svg) => { svg.querySelectorAll('.icon-boom').forEach(el => el.remove()); triadInjectIcon(svg, 'resident', '🧾'); const el = triadPath(svg, 'resident'); if (el) el.classList.add('svg-path-active'); } },
+  { at: 2100, run: (svg) => { const el = triadNodeCircle(svg, 'nucleus'); if (el) { el.classList.remove('svg-node-dim'); el.classList.add('svg-node-active'); } triadInjectIcon(svg, 'nucleus', '🛡'); } },
+  { at: 2900, run: (svg) => { const el = triadPath(svg, 'ledger'); if (el) el.classList.add('svg-path-active'); } },
+  { at: 3600, run: (svg) => { const el = triadNodeCircle(svg, 'ledger'); if (el) { el.classList.remove('svg-node-dim'); el.classList.add('svg-node-active'); } triadInjectIcon(svg, 'ledger', '🔒'); } },
+  { at: 4000, run: (svg) => { const el = triadPath(svg, 'municipal'); if (el) el.classList.add('svg-path-active'); } },
+  { at: 4700, run: (svg) => { const el = triadNodeCircle(svg, 'municipal'); if (el) { el.classList.remove('svg-node-dim'); el.classList.add('svg-node-active'); } triadInjectIcon(svg, 'municipal', '🚛'); } },
 ];
-let triadFlowTimeoutId = null;
-let triadFlowStopped = true;
+const TRIAD_LOOP_MS = 6800;
+let triadFlowTimeoutIds = [];
 function runTriadFlowSequence(){
-  triadFlowStopped = false;
-  let step = 0;
-  const advance = () => {
-    if (triadFlowStopped) return;
-    const current = TRIAD_FLOW_PHASES[step];
-    document.querySelectorAll('.civic-triad-svg').forEach(svg => svg.setAttribute('data-phase', current.phase));
-    step = (step + 1) % TRIAD_FLOW_PHASES.length;
-    triadFlowTimeoutId = setTimeout(advance, current.duration);
+  stopTriadFlowSequence();
+  const svgs = document.querySelectorAll('.civic-triad-svg');
+  if (!svgs.length) return;
+  const stepSequence = () => {
+    svgs.forEach(triadResetSvg);
+    TRIAD_FLOW_STEPS.forEach((step) => {
+      triadFlowTimeoutIds.push(setTimeout(() => svgs.forEach((svg) => step.run(svg)), step.at));
+    });
+    triadFlowTimeoutIds.push(setTimeout(stepSequence, TRIAD_LOOP_MS));
   };
-  advance();
+  stepSequence();
 }
 function stopTriadFlowSequence(){
-  triadFlowStopped = true;
-  if (triadFlowTimeoutId) { clearTimeout(triadFlowTimeoutId); triadFlowTimeoutId = null; }
-  document.querySelectorAll('.civic-triad-svg').forEach(svg => svg.removeAttribute('data-phase'));
+  triadFlowTimeoutIds.forEach((id) => clearTimeout(id));
+  triadFlowTimeoutIds = [];
+  document.querySelectorAll('.civic-triad-svg').forEach(triadResetSvg);
+}
+// Reduced-motion path: openAppInfoModal() below never calls
+// runTriadFlowSequence() when prefers-reduced-motion is set (unchanged from
+// Patch 18), which — now that the resting state is dim instead of a visible
+// ambient green (see the base .civic-triad-node-circle/.civic-triad-spoke
+// comment above) — would otherwise leave reduced-motion visitors looking at
+// an all-dim, seemingly-broken diagram. This sets the equivalent "fully
+// resolved" end state directly, with no animation or injected icons, so the
+// diagram still reads as complete rather than empty.
+function applyTriadStaticLitState(){
+  document.querySelectorAll('.civic-triad-svg').forEach((svg) => {
+    svg.querySelectorAll('.icon-boom').forEach((el) => el.remove());
+    ['resident', 'nucleus', 'ledger', 'municipal'].forEach((key) => {
+      const el = triadNodeCircle(svg, key);
+      if (el) { el.classList.remove('svg-node-dim'); el.classList.add('svg-node-active'); }
+    });
+    ['resident', 'ledger', 'municipal'].forEach((key) => {
+      const el = triadPath(svg, key);
+      if (el) { el.classList.remove('svg-path-active'); el.classList.add('svg-path-static-lit'); }
+    });
+  });
 }
 
 /* Features/Safety/Security accordion copy + the Civic Memory/Anonymity
@@ -5293,11 +5349,18 @@ function openAppInfoModal(key){
   // Patch 18-10/03/26: (re)start the "How Your Report Moves" sequence now
   // that the diagram's fresh DOM nodes exist (the innerHTML write above
   // just rebuilt them, every time this modal opens) — stop any previous
-  // run first so reopening Quick Help never stacks two timers. Skipped
-  // entirely under prefers-reduced-motion, matching the diagram's own CSS.
+  // run first so reopening Quick Help never stacks two timers.
+  // Patch 143(v150)-10/03/26: under prefers-reduced-motion, the sequence
+  // still never runs (unchanged), but now calls applyTriadStaticLitState()
+  // instead of leaving the diagram at its new dim resting state — see that
+  // function's own comment for why.
   stopTriadFlowSequence();
-  if (document.querySelector('.civic-triad-svg') && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    runTriadFlowSequence();
+  if (document.querySelector('.civic-triad-svg')) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      applyTriadStaticLitState();
+    } else {
+      runTriadFlowSequence();
+    }
   }
 }
 function closeAppInfoModal(){
