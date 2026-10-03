@@ -188,14 +188,16 @@ html.citixen-gate-locked .citixen-gate{display:flex}
   text-align:center;letter-spacing:.1em;margin-bottom:12px;font-family:inherit}
 .citixen-gate-input:focus{outline:none;border-color:rgba(0,230,153,.5)}
 .citixen-gate-error{font-size:.7rem;color:#f87171;font-weight:700;margin-bottom:10px;min-height:14px}
-/* GLOBAL MINT GREEN BUTTON DESIGN SYSTEM ENFORCEMENT (Patch 20-10/03/26) —
-   UNLOCK brought onto the same exact #00FF87 + 12px unified radius the
-   other primary pills use (was #00E699 / 10px), and given the same
-   trailing right-aligned directional arrow those other pills carry — see
-   the markup's own comment next to this button. */
+/* GLOBAL MINT GREEN BUTTON DESIGN SYSTEM ENFORCEMENT (Patch 20-10/03/26,
+   re-centered + Title Case Patch 21-10/03/26) — brought onto the same
+   exact #00FF87 + 12px unified radius the other primary pills use (was
+   #00E699 / 10px). Content centered (was space-between/right-aligned
+   arrow, superseded app-wide by Patch 21 — see #btnSubmit's own comment);
+   label changed from all-caps "UNLOCK" to Title Case "Unlock" per this
+   round's casing rule, applied in the markup below. */
 .citixen-gate-btn{width:100%;box-sizing:border-box;background:#00FF87;color:#051311;border:none;padding:13px 16px;
   border-radius:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit;
-  display:flex;align-items:center;justify-content:space-between;gap:8px}
+  display:flex;align-items:center;justify-content:center;gap:8px}
 :root{
   /* Green unification + obsidian canvas brought in line with index.html
      this round: the app used to run its own slightly different "Emerald
@@ -404,17 +406,19 @@ textarea.input{resize:none;line-height:1.4}
    updateSubmitPhotoGate(). */
 .btn-submit:disabled{background:rgba(148,163,184,.18);color:#64748b;cursor:not-allowed}
 .btn-submit:disabled svg{stroke:#64748b}
-/* GLOBAL MINT GREEN BUTTON DESIGN SYSTEM ENFORCEMENT (Patch 20-10/03/26) —
-   #btnSubmit ("Publish Report") brought onto the same exact #00FF87 the
-   other unified primary pills use (was the dimmer var(--mint)=#00E699 the
-   shared .btn-submit class still carries for other buttons, e.g. the
-   analytics link at the bottom of this file) and its leading send icon
-   moved to a trailing, right-aligned position (space-between) to match the
-   "consistent right-aligned icon" rule. :not(:disabled) keeps the existing
-   .btn-submit:disabled gray-out intact — a plain #btnSubmit{...} rule would
-   otherwise outrank it (an id beats a class+pseudo-class) and the button
-   would stay bright green even while disabled. */
-#btnSubmit:not(:disabled){background:#00FF87;font-weight:800;justify-content:space-between;
+/* GLOBAL MINT GREEN BUTTON DESIGN SYSTEM ENFORCEMENT (Patch 20-10/03/26,
+   re-centered Patch 21-10/03/26) — #btnSubmit ("Publish Report") brought
+   onto the same exact #00FF87 the other unified primary pills use (was the
+   dimmer var(--mint)=#00E699 the shared .btn-submit class still carries for
+   other buttons, e.g. the analytics link at the bottom of this file).
+   Patch 21 supersedes Patch 20's trailing-icon/space-between treatment
+   app-wide: content is centered (justify-content:center) on every refreshed
+   mint button now, icon included, per this round's spec. :not(:disabled)
+   keeps the existing .btn-submit:disabled gray-out intact — a plain
+   #btnSubmit{...} rule would otherwise outrank it (an id beats a
+   class+pseudo-class) and the button would stay bright green even while
+   disabled. */
+#btnSubmit:not(:disabled){background:#00FF87;font-weight:800;justify-content:center;
   box-shadow:0 0 18px rgba(0,255,135,.35)}
 #btnSubmit:not(:disabled):hover{box-shadow:0 0 26px rgba(0,255,135,.5)}
 
@@ -877,14 +881,18 @@ textarea.input{resize:none;line-height:1.4}
    to occupy (see the markup's own comment). Bright #00FF87 per spec — a
    deliberately different, louder green than the rest of this file's
    --mint/#00E699 accent, since this is the single thing on the card meant
-   to pull the eye after the ticket ID itself. */
+   to pull the eye after the ticket ID itself.
+   Patch 21-10/03/26: text-transform:uppercase removed and justify-content
+   back to center — Patch 21's "Title Case, not all-caps" + "centered"
+   rules apply app-wide to every refreshed mint button, and this was the
+   only one of them still forcing an uppercase visual transform (the others
+   — #btnSubmit, .citixen-gate-btn, .founder-cta, #btnSgpDownload — never
+   had one), which would otherwise still render "Head To Feed" as "HEAD TO
+   FEED" regardless of the markup's real casing. */
 .btn-receipt-feed{width:100%;box-sizing:border-box;min-height:52px;background:#00FF87;color:#051311;
   border:none;padding:14px 20px;border-radius:12px;font-family:inherit;font-weight:800;font-size:15px;
-  text-transform:uppercase;letter-spacing:.02em;cursor:pointer;display:flex;align-items:center;
-  /* Patch 16-10/03/26: was justify-content:center with the arrow leading the
-     label; now the label sits left and the arrow is pushed to the button's
-     right edge (see the markup's own comment for the matching order swap). */
-  justify-content:space-between;gap:8px;box-shadow:0 0 18px rgba(0,255,135,.35);transition:box-shadow .15s,transform .1s}
+  letter-spacing:.02em;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;gap:8px;box-shadow:0 0 18px rgba(0,255,135,.35);transition:box-shadow .15s,transform .1s}
 .btn-receipt-feed:hover{box-shadow:0 0 26px rgba(0,255,135,.5)}
 .btn-receipt-feed:active{transform:scale(.98)}
 
@@ -969,14 +977,17 @@ textarea.input{resize:none;line-height:1.4}
 .btn-sgp-share{width:100%;box-sizing:border-box;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.12);
   color:var(--text);padding:13px;border-radius:12px;font-weight:700;font-size:.84rem;cursor:pointer}
 .btn-sgp-share:disabled{opacity:.4;cursor:not-allowed}
-/* GLOBAL MINT GREEN BUTTON DESIGN SYSTEM ENFORCEMENT (Patch 20-10/03/26) —
-   #btnSgpDownload scoped to the exact #00FF87 unified mint pill (was the
-   dimmer var(--mint)=#00E699 .btn-onboarding-cta shares with other CTAs);
-   kept scoped to this id rather than touching that shared class. Disabled
-   look is unaffected — .btn-onboarding-cta:disabled already dims via
-   opacity, which works regardless of the background color underneath. */
+/* GLOBAL MINT GREEN BUTTON DESIGN SYSTEM ENFORCEMENT (Patch 20-10/03/26,
+   re-centered Patch 21-10/03/26) — #btnSgpDownload scoped to the exact
+   #00FF87 unified mint pill (was the dimmer var(--mint)=#00E699
+   .btn-onboarding-cta shares with other CTAs); kept scoped to this id
+   rather than touching that shared class. Disabled look is unaffected —
+   .btn-onboarding-cta:disabled already dims via opacity, which works
+   regardless of the background color underneath. justify-content back to
+   center per Patch 21 (supersedes Patch 20's right-aligned arrow app-wide
+   — see #btnSubmit's own comment). */
 #btnSgpDownload{background:#00FF87;font-weight:800;display:flex;align-items:center;
-  justify-content:space-between;gap:8px;box-shadow:0 0 18px rgba(0,255,135,.35)}
+  justify-content:center;gap:8px;box-shadow:0 0 18px rgba(0,255,135,.35)}
 #btnSgpDownload:hover{box-shadow:0 0 26px rgba(0,255,135,.5)}
 
 /* ===== ADMIN LIGHT CLAIM/PANEL =====
@@ -1516,27 +1527,32 @@ textarea.input{resize:none;line-height:1.4}
   border-radius:10px;font-family:inherit;font-weight:700;font-size:.82rem;cursor:pointer;
   transition:background .15s}
 .sl-cta:hover{background:#00c8f0}
-/* GLOBAL MINT GREEN BUTTON DESIGN SYSTEM ENFORCEMENT (Patch 20-10/03/26) —
-   .founder-cta ("Support Founder / Public Ledger") scoped to the exact
-   #00FF87 unified mint pill + 12px radius + bold 800 weight + trailing
-   right-aligned arrow; the shared .sl-cta class above stays its existing
-   blue #00B4D8 for the staged, preview-gated #btnSupportLedgerCta ("Support
+/* GLOBAL MINT GREEN BUTTON DESIGN SYSTEM ENFORCEMENT (Patch 20-10/03/26,
+   re-centered Patch 21-10/03/26) — .founder-cta ("I Support", was "Support
+   Founder / Public Ledger") scoped to the exact #00FF87 unified mint pill +
+   12px radius + bold 800 weight; justify-content back to center (Patch 21
+   supersedes Patch 20's right-aligned/space-between arrow treatment across
+   every refreshed mint button, not just this one — see #btnSubmit's own
+   comment). The shared .sl-cta class above stays its existing blue
+   #00B4D8 for the staged, preview-gated #btnSupportLedgerCta ("Support
    District Ledger"), which this round's spec doesn't name. */
 .founder-cta{background:#00FF87;border-radius:12px;font-weight:800;display:flex;align-items:center;
-  justify-content:space-between;gap:8px;box-shadow:0 0 18px rgba(0,255,135,.35);transition:box-shadow .15s}
+  justify-content:center;gap:8px;box-shadow:0 0 18px rgba(0,255,135,.35);transition:box-shadow .15s}
 .founder-cta:hover{background:#00FF87;box-shadow:0 0 26px rgba(0,255,135,.5)}
 
 /* ONE-TIME POST-SUBMISSION FOUNDER MODAL (Patch 8-10/03/26) — see the
-   markup's own comment. Reuses .sl-tier-row/.sl-tier-btn/.sl-onetime-*/
-   .sl-cta above for the tier grid, toggle and CTA look; these rules only
-   add what's unique to this modal (header, copy blocks, the custom-amount
-   input, and the plain-link dismiss). */
+   markup's own comment. Reuses .sl-cta above for the primary CTA look; the
+   .sl-tier-row/.sl-tier-btn/.sl-onetime-*/.founder-custom-amount rules this
+   comment used to mention were removed in Patch 21-10/03/26 along with the
+   tier-selector/toggle/custom-amount markup itself. */
 .founder-card{text-align:center}
 /* Patch 17-10/03/26: headline enlarged (1.05rem -> 1.5rem) and replaced
    with the single-line "SUPPORT THE MISSION" (was two lines, "Support the
-   Mission" / "How You Can"). */
+   Mission" / "How You Can"). Patch 21-10/03/26: explicit text-align:center
+   added (was already inheriting it from .founder-card) per this round's
+   "all text elements are text-align:center" spec. */
 .founder-header{font-size:1.5rem;font-weight:900;line-height:1.25;color:var(--text);margin-bottom:12px;
-  letter-spacing:.02em}
+  letter-spacing:.02em;text-align:center}
 /* Patch 17-10/03/26: brand tagline split into white "CITIXEN" + neon-green
    "UX™" (see the markup's own spans below) — was one flat var(--mint2)-
    colored run. Explicit text-align:center added (was already inheriting
@@ -1545,13 +1561,17 @@ textarea.input{resize:none;line-height:1.4}
 .founder-brand-citixen{color:#FFFFFF}
 .founder-brand-ux{color:#00FF87}
 /* Patch 17-10/03/26: was text-align:left — the core body copy describing
-   the public ledger initiative is now centered like the rest of the card. */
-.founder-note{color:var(--muted);line-height:1.5;margin-bottom:16px;text-align:center}
-.founder-tier-row{text-align:left}
-.founder-custom-amount{margin-bottom:14px}
+   the public ledger initiative is now centered like the rest of the card.
+   Patch 21-10/03/26: now a real <p> tag per spec ("Body text (p tag)") —
+   margin:0 explicitly set (was margin-bottom only) so the UA stylesheet's
+   default <p> top margin can't reintroduce extra spacing above it. The
+   old .founder-tier-row/.founder-custom-amount rules (tier selector grid +
+   custom-amount input) were removed along with that markup — this modal
+   no longer has either. */
+.founder-note{color:var(--muted);line-height:1.5;margin:0 0 16px;text-align:center}
 .founder-continue-link{width:100%;background:transparent;border:none;color:var(--muted);
   font-family:inherit;font-size:.76rem;font-weight:600;text-decoration:underline;
-  text-underline-offset:3px;cursor:pointer;padding:10px 0 0;margin-top:2px}
+  text-underline-offset:3px;cursor:pointer;padding:10px 0 0;margin-top:2px;text-align:center}
 .founder-continue-link:hover{color:var(--text)}
 </style>
 </head>
@@ -1598,12 +1618,13 @@ textarea.input{resize:none;line-height:1.4}
     <input type="password" class="citixen-gate-input" id="citixenGateInput" placeholder="••••••••"
       autocomplete="off" autocapitalize="off" spellcheck="false">
     <div class="citixen-gate-error" id="citixenGateError"></div>
-    <!-- Patch 19-10/03/26: "Unlock" -> "UNLOCK" -->
-    <!-- Patch 20-10/03/26: trailing right-aligned arrow added to match the
-         unified mint-pill design system's "consistent directional icon"
-         rule (see .citixen-gate-btn's own comment). -->
+    <!-- Patch 19-10/03/26: "Unlock" -> "UNLOCK". Patch 21-10/03/26: back to
+         Title Case "Unlock" per this round's global casing rule. -->
+    <!-- Patch 20-10/03/26: trailing arrow icon added to match the unified
+         mint-pill design system's "consistent directional icon" rule (see
+         .citixen-gate-btn's own comment); content re-centered in Patch 21. -->
     <button type="submit" class="citixen-gate-btn">
-      <span>UNLOCK</span>
+      <span>Unlock</span>
       <svg viewBox="0 0 24 24" width="16" height="16" stroke="#051311" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
     </button>
   </form>
@@ -2600,7 +2621,7 @@ textarea.input{resize:none;line-height:1.4}
              element — rather than being removed or demoted to a plain
              link; nothing about this button's destination changed. -->
         <button type="button" class="btn-receipt-feed" id="btnHeadToFeed">
-          <span>Head to Feed</span>
+          <span>Head To Feed</span>
           <svg viewBox="0 0 24 24" width="16" height="16" stroke="#051311" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
         </button>
 
@@ -2646,49 +2667,37 @@ textarea.input{resize:none;line-height:1.4}
   </div>
 
   <!-- ===== ONE-TIME POST-SUBMISSION FOUNDER MODAL (Patch 8-10/03/26;
-       retimed Patch 17-10/03/26) — shown exactly once per session, 30s
-       after the citizen actually enters the app (see
-       scheduleFounderModalAutoShow() in the script below), no longer tied
-       to any specific button tap. Reuses the same .sl-* tier/toggle/CTA classes the
-       staged, preview-gated #support-ledger-module above already uses, for
-       one consistent look, but is wired up separately (scoped to
-       #founderModal, never the global .sl-tier-btn selector) so the two
-       never cross-wire each other's state — this modal is NOT preview-
-       gated, unlike that staged module: it's the real one-time ask shown to
-       every real citizen. The CTA shares the same STRIPE_PAYMENT_LINK
-       placeholder/honesty pattern as that module (see handleFounderCta()) —
-       it stays a no-op toast+warning, never a broken/fake payment
+       retimed Patch 17-10/03/26; content + timing overhauled Patch
+       21-10/03/26) — shown at most once per session. Patch 21 stripped
+       this down to the exact 5-element layout its spec calls for (headline,
+       brand row, one body sentence, one primary CTA, one plain text link)
+       and removed the tier-selector/one-time-toggle/custom-amount UI
+       entirely — see handleFounderCta's own comment for what "I Support"
+       does now that there's no amount selection left. Timing: the old
+       30-second from-page-load timer is gone; see
+       scheduleFounderModalAutoShow()'s own comment in the script below for
+       the new post-submission-only trigger. Still wired up separately
+       (scoped to #founderModal, never any shared selector) from the
+       preview-gated #support-ledger-module above, so the two never
+       cross-wire each other's state — this modal is NOT preview-gated: it's
+       the real one-time ask shown to every real citizen. The CTA shares the
+       same STRIPE_PAYMENT_LINK placeholder/honesty pattern as that module
+       — it stays a no-op toast+warning, never a broken/fake payment
        destination, until a real Stripe Payment Link is supplied. ===== -->
   <div id="founderModal" class="confirm-drawer">
     <div class="confirm-card founder-card">
       <div class="founder-header">SUPPORT THE MISSION</div>
-      <div class="small founder-brand-copy"><span class="founder-brand-citixen">CITIXEN</span> <span class="founder-brand-ux">UX<sup class="tm-symbol">™</sup></span> operates with zero ads and total data privacy.</div>
-      <div class="small founder-note">This is the project of a lifetime. If you can, please support with a micro-contribution — it directly covers server/ledger run-rate and helps get these tools to market faster.</div>
+      <div class="small founder-brand-copy"><span class="founder-brand-citixen">CITIXEN</span> <span class="founder-brand-ux">UX<sup class="tm-symbol">™</sup></span> operates with zero ads.</div>
+      <p class="founder-note">This is the project of a lifetime.</p>
 
-      <div class="sl-tier-row founder-tier-row" id="founderTierRowMonthly">
-        <button type="button" class="sl-tier-btn founder-tier-btn active" data-founder-tier="5">$5/mo</button>
-        <button type="button" class="sl-tier-btn founder-tier-btn" data-founder-tier="20">$20/mo</button>
-        <button type="button" class="sl-tier-btn founder-tier-btn" data-founder-tier="50">$50/mo</button>
-      </div>
-      <div class="sl-tier-row founder-tier-row" id="founderTierRowOnetime" style="display:none;">
-        <button type="button" class="sl-tier-btn founder-tier-btn active" data-founder-tier="100">$100</button>
-        <button type="button" class="sl-tier-btn founder-tier-btn" data-founder-tier="500">$500</button>
-        <button type="button" class="sl-tier-btn founder-tier-btn" data-founder-tier="other">Other</button>
-      </div>
-      <input type="number" inputmode="decimal" min="1" step="1" class="input founder-custom-amount" id="founderCustomAmount" placeholder="Enter a custom amount ($)" style="display:none;">
-
-      <div class="sl-onetime-row">
-        <span class="sl-onetime-label">One-time contribution</span>
-        <button type="button" class="sl-switch" id="founderOnetimeToggle" role="switch" aria-checked="false" aria-label="One-time contribution"></button>
-      </div>
-
-      <!-- Patch 20-10/03/26: trailing right-aligned arrow added to match
-           the unified mint-pill design system (see .founder-cta's comment). -->
+      <!-- Centered content per Patch 21 (was a trailing right-aligned arrow
+           from Patch 20 — see .founder-cta's own CSS comment for why that
+           changed back). -->
       <button type="button" class="sl-cta founder-cta" id="btnFounderCta">
-        <span>Support Founder / Public Ledger</span>
+        <span>I Support</span>
         <svg viewBox="0 0 24 24" width="15" height="15" stroke="#051311" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
       </button>
-      <button type="button" class="founder-continue-link" id="btnFounderContinue">Continue to Feed</button>
+      <button type="button" class="founder-continue-link" id="btnFounderContinue">Head To Feed</button>
     </div>
   </div>
 
@@ -6634,8 +6643,15 @@ function openDispatchReceiptModal(opts){
   if (typeof applySupportLedgerPreviewState === 'function') applySupportLedgerPreviewState();
   document.getElementById('dispatchReceiptModal').classList.add('open');
 }
+// Patch 21-10/03/26: this is the real "the citizen is done with the report
+// and ticket flow" signal the Founder Modal's 45s countdown now binds to —
+// see scheduleFounderModalAutoShow()'s own comment further down this
+// script for the full reasoning. Calling it here (rather than from
+// headToFeed() specifically) also covers a citizen who dismisses this
+// modal by tapping its backdrop instead of the "Head To Feed" button.
 function closeDispatchReceiptModal(){
   document.getElementById('dispatchReceiptModal').classList.remove('open');
+  scheduleFounderModalAutoShow();
 }
 document.getElementById('dispatchReceiptModal').addEventListener('click', (e) => {
   if (e.target.id === 'dispatchReceiptModal') closeDispatchReceiptModal();
@@ -6879,7 +6895,7 @@ if (btnSupportLedgerPreviewToggle) {
 }
 
 // ===== ONE-TIME POST-SUBMISSION FOUNDER MODAL (Patch 8-10/03/26; retimed
-// Patch 17-10/03/26) =====
+// Patch 17-10/03/26; content + timing overhauled Patch 21-10/03/26) =====
 // See #founderModal's own HTML comment for why this is wired separately
 // from the preview-gated #support-ledger-module above (scoped queries
 // against #founderModal only, never the bare .sl-tier-btn selector that
@@ -6889,107 +6905,66 @@ if (btnSupportLedgerPreviewToggle) {
 // Patch 17-10/03/26 RETIMING: this modal used to be gated behind the very
 // first "Head to Feed" tap each session, popping open the instant that
 // button was clicked — directly on top of the still-open Dispatch Receipt
-// modal (headToFeed() itself is what closes that modal, but it was never
-// reached until the Founder Modal was dismissed), i.e. two modals stacked
-// at once. It now fires on its own, once per session, from a 30-second
-// background timer started the moment the citizen actually enters the app
-// (see scheduleFounderModalAutoShow(), called from
-// closeFrontDoorOnboarding()) — completely decoupled from Head to Feed.
+// modal. It was then moved to a 30-second timer from app entry, fully
+// decoupled from the submission flow.
+// Patch 21-10/03/26 RETIMING (this round): that 30s-from-page-load timer is
+// gone — it could fire during report creation, inside the post-photo
+// confirmation step, or while a citizen was still looking at their receipt
+// or the Social Card modal, exactly what this round's spec forbids. The
+// countdown now starts ONLY from closeDispatchReceiptModal() — the one real
+// function that means "the citizen is done with the report+ticket flow,"
+// since finalizeSubmitReport() already switches the active tab to Map &
+// Feed in the background the moment a report is filed (see headToFeed()'s
+// own comment), so by the time this modal closes (whether via the "Head To
+// Feed" button, or a backdrop tap) the citizen is already sitting on that
+// view. founderModalTimerScheduled guards against scheduling more than one
+// 45s timer if the receipt modal happens to close more than once in a
+// session (it can't actually reopen today, but this costs nothing and
+// removes the assumption). A citizen who never files a report this session
+// never sees this modal — that's the intended, honest behavior of a
+// "post-submission" ask, not a bug.
 let founderModalShownThisSession = false;
-let founderSelectedTier = '5';
-let founderOneTime = false;
-function resetFounderModalState(){
-  founderSelectedTier = '5';
-  founderOneTime = false;
-  document.getElementById('founderTierRowMonthly').style.display = '';
-  document.getElementById('founderTierRowOnetime').style.display = 'none';
-  document.getElementById('founderOnetimeToggle').classList.remove('on');
-  document.getElementById('founderOnetimeToggle').setAttribute('aria-checked', 'false');
-  document.getElementById('founderCustomAmount').style.display = 'none';
-  document.getElementById('founderCustomAmount').value = '';
-  document.querySelectorAll('#founderTierRowMonthly .founder-tier-btn').forEach(b => b.classList.toggle('active', b.dataset.founderTier === '5'));
-  document.querySelectorAll('#founderTierRowOnetime .founder-tier-btn').forEach(b => b.classList.toggle('active', b.dataset.founderTier === '100'));
-}
-// Started once from closeFrontDoorOnboarding() — fires 30s after the
-// citizen lands in the app, independent of anything they do in the
-// meantime (submitting a report, switching tabs, etc.).
+let founderModalTimerScheduled = false;
 function scheduleFounderModalAutoShow(){
-  setTimeout(showFounderModalIfDue, 30000);
+  if (founderModalTimerScheduled || founderModalShownThisSession) return;
+  founderModalTimerScheduled = true;
+  setTimeout(showFounderModalIfDue, 45000);
 }
-// If some other modal happens to be open right at the 30s mark (mid-
-// submission, viewing a receipt, etc.), wait for it to clear instead of
-// popping this one open on top of it — re-check every 3s rather than
-// firing blind into whatever's already on screen.
+// STRICT GUARD (Patch 21-10/03/26) — if ANY overlay is open right at the
+// 45s mark (mid-submission on a second report, viewing a receipt, the
+// camera, Quick Help, the app drawer, a ledger drawer, etc.), defer instead
+// of popping this one open on top of it — re-check every 3s until the
+// citizen is back on a clean screen. Broadened from the old
+// `.confirm-drawer.open, .cx-modal.open` (the second half of that selector
+// never matched any element in this file — .cx-modal isn't a real class
+// here) to cover every real overlay container this app uses.
 function showFounderModalIfDue(){
   if (founderModalShownThisSession) return;
-  if (document.querySelector('.confirm-drawer.open, .cx-modal.open')) {
+  if (document.querySelector('.confirm-drawer.open, .drawer.open, .ledger-drawer.open, .ledger-report-modal.open, .app-drawer.open')) {
     setTimeout(showFounderModalIfDue, 3000);
     return;
   }
   founderModalShownThisSession = true;
-  resetFounderModalState();
   document.getElementById('founderModal').classList.add('open');
 }
 function closeFounderModal(){
   document.getElementById('founderModal').classList.remove('open');
 }
-document.querySelectorAll('#founderTierRowMonthly .founder-tier-btn, #founderTierRowOnetime .founder-tier-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const row = btn.closest('.founder-tier-row');
-    row.querySelectorAll('.founder-tier-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    founderSelectedTier = btn.dataset.founderTier;
-    const customInput = document.getElementById('founderCustomAmount');
-    if (founderSelectedTier === 'other') {
-      customInput.style.display = '';
-      customInput.focus();
-    } else {
-      customInput.style.display = 'none';
-    }
-  });
-});
-document.getElementById('founderOnetimeToggle').addEventListener('click', () => {
-  founderOneTime = !founderOneTime;
-  const toggle = document.getElementById('founderOnetimeToggle');
-  toggle.classList.toggle('on', founderOneTime);
-  toggle.setAttribute('aria-checked', String(founderOneTime));
-  document.getElementById('founderTierRowMonthly').style.display = founderOneTime ? 'none' : '';
-  document.getElementById('founderTierRowOnetime').style.display = founderOneTime ? '' : 'none';
-  // Re-sync the selected tier/custom-amount state to whichever row is now
-  // showing, rather than leaving a stale monthly selection in place while a
-  // one-time row is visible (or vice versa).
-  const activeRow = founderOneTime ? document.getElementById('founderTierRowOnetime') : document.getElementById('founderTierRowMonthly');
-  const activeBtn = activeRow.querySelector('.founder-tier-btn.active') || activeRow.querySelector('.founder-tier-btn');
-  activeRow.querySelectorAll('.founder-tier-btn').forEach(b => b.classList.toggle('active', b === activeBtn));
-  founderSelectedTier = activeBtn.dataset.founderTier;
-  document.getElementById('founderCustomAmount').style.display = (founderOneTime && founderSelectedTier === 'other') ? '' : 'none';
-});
 document.getElementById('btnFounderCta').addEventListener('click', () => {
-  // "Other" needs a real, positive custom amount before this can mean
-  // anything — same spirit as every other hard-lock in this file: no
-  // guessed/default value stands in for one the citizen hasn't actually
-  // given.
-  let amount = founderSelectedTier;
-  if (founderSelectedTier === 'other') {
-    const customInput = document.getElementById('founderCustomAmount');
-    const customVal = parseFloat(customInput.value);
-    if (!customVal || customVal <= 0) {
-      customInput.focus();
-      toast('Enter a contribution amount first.', true);
-      return;
-    }
-    amount = String(customVal);
-  }
+  // Patch 21-10/03/26: the tier/one-time/custom-amount selector is gone —
+  // "I Support" is now a single real action with nothing to pick first, so
+  // it either opens the real Stripe Payment Link directly or, honestly,
+  // tells the citizen support isn't live yet (same STRIPE_PAYMENT_LINK
+  // placeholder pattern every other CTA in this file follows — never a
+  // broken/fake payment destination).
   if (!STRIPE_PAYMENT_LINK) {
-    console.warn('[CITIXEN] "Support Founder / Public Ledger" has no STRIPE_PAYMENT_LINK configured yet — set the constant near the top of this module\'s script before this goes live.');
+    console.warn('[CITIXEN] "I Support" has no STRIPE_PAYMENT_LINK configured yet — set the constant near the top of this module\'s script before this goes live.');
     toast('Founder support is in preview — payment isn\'t live yet.', true);
     closeFounderModal();
     return;
   }
   try {
-    const url = new URL(STRIPE_PAYMENT_LINK);
-    url.searchParams.set('client_reference_id', (founderOneTime ? 'onetime_' : 'monthly_') + amount);
-    window.open(url.toString(), '_blank', 'noopener');
+    window.open(STRIPE_PAYMENT_LINK, '_blank', 'noopener');
   } catch (e) {
     console.warn('[CITIXEN] STRIPE_PAYMENT_LINK is not a valid URL:', STRIPE_PAYMENT_LINK);
     toast('Founder support is in preview — payment isn\'t live yet.', true);
@@ -7001,17 +6976,16 @@ document.getElementById('btnFounderCta').addEventListener('click', () => {
   // straight back to whatever the citizen was looking at. See
   // showFounderContributionReceipt()'s own comment on why this is scoped
   // to "checkout launched," never a claimed completed payment.
-  showFounderContributionReceipt(amount, founderOneTime);
+  showFounderContributionReceipt();
 });
 document.getElementById('btnFounderContinue').addEventListener('click', closeFounderModal);
 document.getElementById('founderModal').addEventListener('click', (e) => {
   if (e.target.id === 'founderModal') closeFounderModal();
 });
-function showFounderContributionReceipt(amount, isOneTime){
+function showFounderContributionReceipt(){
   closeFounderModal();
-  const label = isOneTime ? ('$' + amount + ' one-time contribution') : ('$' + amount + '/mo contribution');
   document.getElementById('founderReceiptSub').textContent =
-    label + ' checkout opened in a new tab — thank you for supporting the ledger. ' +
+    'Checkout opened in a new tab — thank you for supporting the ledger. ' +
     'This confirms the Stripe checkout was launched, not a completed charge.';
   document.getElementById('founderContributionReceiptModal').classList.add('open');
 }
@@ -7662,12 +7636,13 @@ function closeFrontDoorOnboarding(){
   // actually visible.
   focusReportCategoryFromQueryString();
   maybeAutoOpenSupportLedgerPreview();
-  // Patch 17-10/03/26: this is "app entry" — the moment the citizen has
-  // actually passed Gate -> Security Screen -> Onboarding and landed on the
-  // report tab. Starts the Founder Modal's 30s auto-show timer; see
-  // scheduleFounderModalAutoShow()'s own comment for why it was moved here
-  // off the Head to Feed button.
-  scheduleFounderModalAutoShow();
+  // Patch 21-10/03/26: the Founder Modal's old 30s-from-app-entry timer
+  // (started right here) is removed — it could fire mid-report-creation,
+  // inside the post-photo confirmation step, or while a receipt/Social Card
+  // was still open, which this round's spec explicitly forbids. The
+  // countdown now starts only once a real report has actually been
+  // submitted and its receipt closed — see closeDispatchReceiptModal() and
+  // scheduleFounderModalAutoShow()'s own comments.
 }
 // PREVIEW MODE AUTO-RENDER (Patch 6-10/03/26) — ?preview=support already
 // unhides the Support Ledger module wherever it lives (applySupportLedgerPreviewState()),
