@@ -297,6 +297,30 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
 .input:focus{border-color:var(--mint2)}
 textarea.input{resize:none;line-height:1.4}
 
+/* ADDRESS AUTOCOMPLETE (Patch 5.4) — live Photon (OpenStreetMap) suggestions
+   as the citizen types a manual street address, so the typed-then-geocoded
+   fallback becomes type-and-pick. The dropdown is positioned relative to its
+   own wrapper (one per manual-address field — inline hint + the
+   location-required modal — never the whole form) so it never overlaps a
+   sibling field. See attachAddressAutocomplete() for the fetch/debounce/pick
+   logic; the actual geocode-confirmed selection still flows through the same
+   window.CITIXEN_MANUAL_ADDRESS state as a typed-then-"Use address" submit,
+   so there is only ever one source of truth for "do we have a real manual
+   address." */
+.address-suggest-wrap{position:relative;flex:1}
+.address-suggest-wrap .input{margin-bottom:0}
+.address-suggest-list{position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--card);
+  border:1px solid var(--surface-input-border);border-radius:10px;max-height:228px;overflow-y:auto;
+  z-index:60;box-shadow:0 10px 28px rgba(0,0,0,.45);display:none}
+.address-suggest-list.open{display:block}
+.address-suggest-item{padding:10px 12px;font-size:.76rem;color:var(--text);cursor:pointer;
+  border-bottom:1px solid var(--surface-input-border);line-height:1.35}
+.address-suggest-item:last-child{border-bottom:none}
+.address-suggest-item:hover,.address-suggest-item.active{background:rgba(0,230,153,.12);color:var(--mint2)}
+.address-suggest-item .small{display:block;color:var(--muted);font-size:.66rem;margin-top:2px}
+.address-suggest-item.active .small{color:var(--mint2);opacity:.8}
+.address-suggest-status{padding:9px 12px;font-size:.72rem;color:var(--muted)}
+
 /* Primary CTA spec — shared 1:1 with .cx-btn-primary (shared/instant-report.css):
    52px tall, 14px/16px padding, 12px radius (rounded-xl), 16px/700 (font-bold text-base). */
 .btn-submit{width:100%;box-sizing:border-box;min-height:52px;background:var(--mint);color:#051311;border:none;
@@ -1447,7 +1471,10 @@ textarea.input{resize:none;line-height:1.4}
               <button type="button" class="link-btn gps-help-link" data-help-target="reportGpsLockHint" style="background:none;border:none;padding:0;color:var(--mint2);font:inherit;font-size:.68rem;text-decoration:underline;text-underline-offset:2px;cursor:pointer;">How to unblock GPS</button>
             </div>
             <div style="display:flex;gap:8px;">
-              <input class="input manual-address-input" id="repManualAddress" placeholder="e.g. 351 W Hubbard St" style="flex:1;margin:0;">
+              <div class="address-suggest-wrap">
+                <input class="input manual-address-input" id="repManualAddress" type="text" autocomplete="street-address" enterkeyhint="search" placeholder="e.g. 351 W Hubbard St" style="margin:0;">
+                <div class="address-suggest-list" id="repManualAddressSuggest"></div>
+              </div>
               <button type="button" class="chip" id="btnUseManualAddress" style="display:inline-flex;white-space:nowrap;">Use address</button>
             </div>
             <div id="repManualAddressStatus" class="small" style="margin-top:8px;display:none;"></div>
@@ -2054,7 +2081,10 @@ textarea.input{resize:none;line-height:1.4}
         <button type="button" class="link-btn gps-help-link" data-help-target="locationRequiredModal" style="background:none;border:none;padding:0;color:var(--mint2);font:inherit;font-size:.68rem;text-decoration:underline;text-underline-offset:2px;cursor:pointer;">How to unblock GPS</button>
       </div>
       <div style="display:flex;gap:8px;margin:6px 0 4px;">
-        <input class="input manual-address-input" id="modalManualAddress" placeholder="e.g. 351 W Hubbard St" style="flex:1;margin:0;">
+        <div class="address-suggest-wrap">
+          <input class="input manual-address-input" id="modalManualAddress" type="text" autocomplete="street-address" enterkeyhint="search" placeholder="e.g. 351 W Hubbard St" style="margin:0;">
+          <div class="address-suggest-list" id="modalManualAddressSuggest"></div>
+        </div>
         <button type="button" class="chip" id="btnModalUseManualAddress" style="display:inline-flex;white-space:nowrap;">Use address</button>
       </div>
       <div id="modalManualAddressStatus" class="small" style="margin:0 0 4px;display:none;"></div>
@@ -3042,6 +3072,162 @@ async function geocodeAddress(query){
     return null;
   }
 }
+
+// ===== ADDRESS AUTOCOMPLETE (Patch 5.4) =====
+// Live-suggests as the citizen types in either manual-address field, via
+// OpenStreetMap's free Photon API (photon.komoot.io — no key required, same
+// no-key posture as the Nominatim geocoder above). Photon's own GeoJSON
+// property names (housenumber/street/city/state), reusing US_STATE_ABBR so
+// the dropdown reads in the same "351 W Hubbard St / Chicago, IL" style as
+// the rest of this file. This is a public demo instance with no uptime
+// guarantee, so every failure path here (network error, non-OK response, no
+// features) degrades silently to an empty list rather than an error toast —
+// the citizen can always still type the full address and tap "Use address"
+// to forward-geocode it via the existing Nominatim path below, which this
+// never replaces.
+function formatPhotonSuggestion(props){
+  props = props || {};
+  const street = [props.housenumber, props.street].filter(Boolean).join(' ');
+  const primary = street || props.name || '';
+  const city = props.city || props.town || props.village || props.district || '';
+  const stateAbbr = props.state ? (US_STATE_ABBR[props.state.toLowerCase()] || props.state) : '';
+  const secondary = [city, stateAbbr].filter(Boolean).join(', ');
+  const label = [primary, secondary].filter(Boolean).join(', ') || primary || secondary;
+  return { primary: primary || label, secondary, label };
+}
+async function photonSearch(query){
+  const q = String(query || '').trim();
+  if (q.length < 3) return [];
+  // Biases (never restricts) results toward the citizen's own real GPS fix
+  // when one exists — still an honestly-sourced hint, never a guessed
+  // anchor/default location.
+  let url = 'https://photon.komoot.io/api/?limit=5&lang=en&q=' + encodeURIComponent(q);
+  const gps = window.CITIXEN_RESOLVED_LOCATION;
+  if (gps && typeof gps.lat === 'number' && typeof gps.lng === 'number') {
+    url += '&lat=' + gps.lat + '&lon=' + gps.lng + '&location_bias_scale=0.2';
+  }
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return [];
+    const data = await res.json();
+    const feats = Array.isArray(data.features) ? data.features : [];
+    return feats.map(f => {
+      const coords = f.geometry && f.geometry.coordinates;
+      if (!coords || coords.length < 2 || typeof coords[0] !== 'number' || typeof coords[1] !== 'number') return null;
+      const sug = formatPhotonSuggestion(f.properties);
+      if (!sug.label) return null;
+      return { lat: coords[1], lng: coords[0], primary: sug.primary, secondary: sug.secondary, label: sug.label };
+    }).filter(Boolean);
+  } catch (e) {
+    return [];
+  }
+}
+// Wires one manual-address <input> to its own dropdown <div> (listEl) and
+// status line. Debounces 300ms after typing pauses. Picking a suggestion
+// sets window.CITIXEN_MANUAL_ADDRESS and re-runs updateSubmitPhotoGate()/
+// closeLocationRequiredModal() — the exact same "Location required" clear-
+// out submitManualAddress() does below on a successful geocode — so a
+// picked suggestion and a typed-then-"Use address" submit both ever only
+// write that one piece of state.
+function attachAddressAutocomplete(inputEl, listEl, statusEl){
+  if (!inputEl || !listEl) return;
+  let debounceTimer = null;
+  let requestToken = 0;
+  let results = [];
+  let activeIndex = -1;
+
+  function closeList(){
+    listEl.classList.remove('open');
+    listEl.innerHTML = '';
+    results = [];
+    activeIndex = -1;
+  }
+  function renderResults(items){
+    results = items;
+    activeIndex = -1;
+    if (!items.length) {
+      listEl.innerHTML = '<div class="address-suggest-status">No matches — try a different address or cross-street.</div>';
+      listEl.classList.add('open');
+      return;
+    }
+    listEl.innerHTML = items.map((item, i) =>
+      '<div class="address-suggest-item" data-idx="' + i + '">' + esc(item.primary || item.label) +
+      (item.secondary ? '<span class="small">' + esc(item.secondary) + '</span>' : '') + '</div>'
+    ).join('');
+    listEl.classList.add('open');
+  }
+  function setActive(idx){
+    const items = listEl.querySelectorAll('.address-suggest-item');
+    items.forEach(el => el.classList.remove('active'));
+    if (idx >= 0 && items[idx]) {
+      items[idx].classList.add('active');
+      items[idx].scrollIntoView({ block: 'nearest' });
+    }
+    activeIndex = idx;
+  }
+  function selectResult(item){
+    if (!item) return;
+    inputEl.value = item.label;
+    closeList();
+    window.CITIXEN_MANUAL_ADDRESS = { address: item.label, lat: item.lat, lng: item.lng };
+    const repLoc = document.getElementById('repLoc');
+    if (repLoc) { repLoc.value = item.label; repLoc.dataset.userEdited = '1'; }
+    if (statusEl) {
+      statusEl.textContent = '✓ Address selected — you can publish now.';
+      statusEl.style.color = 'var(--mint2)';
+      statusEl.style.display = '';
+    }
+    updateSubmitPhotoGate();
+    toast('Address selected — you can publish now.');
+    if (hasValidLocation()) closeLocationRequiredModal();
+  }
+
+  inputEl.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    const q = inputEl.value.trim();
+    if (q.length < 3) { closeList(); return; }
+    const myToken = ++requestToken;
+    debounceTimer = setTimeout(async () => {
+      const items = await photonSearch(q);
+      if (myToken !== requestToken) return; // superseded by a newer keystroke
+      renderResults(items);
+    }, 300);
+  });
+  inputEl.addEventListener('keydown', (e) => {
+    const open = listEl.classList.contains('open') && results.length;
+    if (e.key === 'ArrowDown' && open) {
+      e.preventDefault();
+      setActive(Math.min(activeIndex + 1, results.length - 1));
+    } else if (e.key === 'ArrowUp' && open) {
+      e.preventDefault();
+      setActive(Math.max(activeIndex - 1, 0));
+    } else if (e.key === 'Enter' && open && activeIndex >= 0) {
+      e.preventDefault();
+      selectResult(results[activeIndex]);
+    } else if (e.key === 'Escape') {
+      closeList();
+    }
+  });
+  listEl.addEventListener('click', (e) => {
+    const row = e.target.closest('.address-suggest-item[data-idx]');
+    if (!row) return;
+    selectResult(results[Number(row.dataset.idx)]);
+  });
+  document.addEventListener('click', (e) => {
+    if (e.target === inputEl || listEl.contains(e.target)) return;
+    closeList();
+  });
+}
+attachAddressAutocomplete(
+  document.getElementById('repManualAddress'),
+  document.getElementById('repManualAddressSuggest'),
+  document.getElementById('repManualAddressStatus')
+);
+attachAddressAutocomplete(
+  document.getElementById('modalManualAddress'),
+  document.getElementById('modalManualAddressSuggest'),
+  document.getElementById('modalManualAddressStatus')
+);
 
 // Distance pills: when a real address has been geocoded this round (search
 // origin set below), tickets carrying their own seeded/submitted lat/lng
