@@ -3971,6 +3971,19 @@ function attachAddressAutocomplete(inputEl, listEl, statusEl){
     if (hasValidLocation()) closeLocationRequiredModal();
   }
 
+  // MOBILE KEYBOARD VISIBILITY (Patch 26-10/03/26): the on-screen keyboard
+  // can cover this input — and the suggestion list rendered just below it —
+  // on short mobile viewports. Nudge the field into view once the keyboard
+  // has finished animating in, so both the input and its dropdown stay
+  // visible. The delay matters: the viewport doesn't actually resize until
+  // the keyboard's own open animation completes, so scrolling immediately
+  // on focus would compute against the pre-keyboard layout.
+  inputEl.addEventListener('focus', () => {
+    setTimeout(() => {
+      inputEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }, 300);
+  });
+
   // EXPLICIT-CLICK-TO-COMMIT (Patch 22-10/03/26): typing alone never assigns
   // coordinates or a city/state tag to the report — it only drives the
   // Photon dropdown below. The old "auto-validate" fallback that used to
@@ -4008,7 +4021,29 @@ function attachAddressAutocomplete(inputEl, listEl, statusEl){
       closeList();
     }
   });
+  // MOBILE TAP SUPPORT (Patch 26-10/03/26): 'click' alone is unreliable for
+  // picking a suggestion on a touch device. A tap's click event is a
+  // synthetic one the browser fires ~300ms after touchend, and by then the
+  // input has already lost focus (the keyboard dismisses the instant the
+  // finger lifts) — on some mobile browsers that blur lets the document-level
+  // 'click' listener below (or a layout reflow from the closing keyboard)
+  // close the list before the synthetic click ever arrives, so the tap
+  // silently selects nothing. touchstart fires immediately and
+  // synchronously, before any of that, so committing the pick there (and
+  // suppressing the trailing synthetic click with preventDefault) makes a
+  // tapped suggestion commit every time. 'click' stays wired below for
+  // mouse/trackpad use, guarded against double-firing on devices that still
+  // send both.
+  let lastTouchSelectAt = 0;
+  listEl.addEventListener('touchstart', (e) => {
+    const row = e.target.closest('.address-suggest-item[data-idx]');
+    if (!row) return;
+    e.preventDefault();
+    lastTouchSelectAt = Date.now();
+    selectResult(results[Number(row.dataset.idx)]);
+  }, { passive: false });
   listEl.addEventListener('click', (e) => {
+    if (Date.now() - lastTouchSelectAt < 500) return; // already handled by touchstart above
     const row = e.target.closest('.address-suggest-item[data-idx]');
     if (!row) return;
     selectResult(results[Number(row.dataset.idx)]);
