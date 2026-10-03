@@ -926,11 +926,27 @@ textarea.input{resize:none;line-height:1.4}
 .onboarding-headline{font-size:1.28rem;font-weight:900;line-height:1.25;color:var(--text);margin-bottom:10px}
 .onboarding-centered .onboarding-headline{margin-bottom:0}
 .onboarding-headline-xl{font-size:1.5rem;font-weight:800;color:#f1f5f9}
+/* Patch 12-10/03/26: the "UX™" half of the welcome headline's brand
+   wordmark — bright #00FF87 (the same louder accent as the Got it CTA and
+   .btn-receipt-feed), not brand-lime's dimmer #34d399. */
+.onboarding-ux-accent{color:#00FF87}
 .onboarding-subtitle{font-size:.8rem;font-weight:700;color:var(--mint2);margin-bottom:12px}
-/* Vibrant neon-green sub-headline — same #00FF94 accent as the Instant
-   Feedback badge/Beta Testing Analytics banner, so this screen's one
-   colored line of copy reads as "important" rather than decorative. */
+/* Vibrant neon-green sub-headline — same #00FF94 accent as the former
+   Instant Feedback badge/Beta Testing Analytics banner, so this screen's
+   one colored line of copy reads as "important" rather than decorative. */
 .onboarding-subtitle-neon{font-size:.88rem;font-weight:800;line-height:1.5;color:#00FF94;max-width:300px}
+/* Patch 12-10/03/26: typewriter reveal on just the "For your eyes only"
+   label (18 characters) — a fixed-width monospace-style reveal rather than
+   animating to an unreliable "auto" width, with a blinking caret that
+   settles after a few cycles instead of blinking forever. Reduced-motion
+   gets the finished text immediately, no caret. */
+.onboarding-typewriter{display:inline-block;overflow:hidden;white-space:nowrap;vertical-align:bottom;
+  width:18ch;border-right:2px solid #00FF87;
+  animation:onboardingTypewriterReveal 1.3s steps(18,end) 1 both,
+    onboardingTypewriterCaret .7s step-end 4;}
+@keyframes onboardingTypewriterReveal{from{width:0}}
+@keyframes onboardingTypewriterCaret{50%{border-color:transparent}}
+@media (prefers-reduced-motion:reduce){.onboarding-typewriter{animation:none;width:18ch;border-right:none}}
 .onboarding-body{font-size:.84rem;line-height:1.55;color:var(--muted)}
 .onboarding-centered .onboarding-body{margin-bottom:0;font-size:.875rem;color:#cbd5e1;line-height:1.6}
 .onboarding-warning{display:flex;gap:10px;align-items:flex-start;background:rgba(15,23,42,.9);
@@ -943,19 +959,29 @@ textarea.input{resize:none;line-height:1.4}
    cards matching the 3 bottom-nav tabs (Report/Map &amp; Feed/Dashboard),
    each reusing that exact tab's own inline SVG so a tester associates the
    card with the real tab it's describing. .onboarding-grid now lives
-   inside the centered slide, so it needs an explicit full width + its own
-   left-aligned text (the slide's own text-align:center is for the
-   headline/sub-copy above it, not these rows). */
-.onboarding-centered .onboarding-grid{width:100%;box-sizing:border-box;text-align:left}
+   inside the centered slide, so it needs an explicit full width.
+   Patch 12-10/03/26 switched this from left-aligned icon+text rows to
+   fully centered, stacked cards (see .onboarding-grid-item below) to match
+   the rest of the slide's centered alignment. */
+.onboarding-centered .onboarding-grid{width:100%;box-sizing:border-box;text-align:center}
 .onboarding-grid{display:flex;flex-direction:column;gap:14px;margin:4px 0 4px}
-.onboarding-grid-item{display:flex;gap:14px;align-items:center;padding:16px;background:rgba(255,255,255,.03);
-  border:1px solid rgba(255,255,255,.08);border-radius:14px}
-.onboarding-icon-badge{flex-shrink:0;width:40px;height:40px;border-radius:12px;background:rgba(0,255,148,.12);
-  border:1px solid rgba(0,255,148,.4);color:#00FF94;display:flex;align-items:center;justify-content:center}
-.onboarding-icon-badge svg{width:20px;height:20px}
-.onboarding-grid-text{display:flex;flex-direction:column;gap:4px;min-width:0}
-.onboarding-grid-text b{font-size:.8rem;color:var(--text);letter-spacing:.04em;text-transform:uppercase}
-.onboarding-grid-text span{font-size:.78rem;color:var(--muted);line-height:1.5}
+/* Patch 12-10/03/26 "scaled up" cards: icon on top, centered section title
+   and description below, more generous padding/radius than the old
+   left-aligned icon+text row. */
+.onboarding-grid-item{display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center;
+  padding:22px 18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:18px}
+/* Icon slot enlarged to roughly a third of the card's own width (clamped
+   so it neither disappears on a 320px viewport nor balloons on a wide
+   desktop card) instead of a fixed 40px badge, per this round's "bold
+   visual balance across device sizes" spec. aspect-ratio keeps it square
+   as its width scales; the svg inside scales with it via % sizing. */
+.onboarding-icon-badge{flex-shrink:0;width:34%;max-width:104px;min-width:64px;aspect-ratio:1/1;
+  border-radius:20px;background:rgba(0,255,148,.12);border:1px solid rgba(0,255,148,.4);color:#00FF94;
+  display:flex;align-items:center;justify-content:center}
+.onboarding-icon-badge svg{width:44%;height:44%}
+.onboarding-grid-text{display:flex;flex-direction:column;gap:5px;min-width:0;align-items:center}
+.onboarding-grid-text b{font-size:.92rem;color:var(--text);letter-spacing:.04em;text-transform:uppercase}
+.onboarding-grid-text span{font-size:.8rem;color:var(--muted);line-height:1.5}
 .btn-onboarding-cta{width:100%;box-sizing:border-box;min-height:52px;background:var(--mint);color:#051311;
   border:none;padding:14px 16px;border-radius:12px;font-family:inherit;font-weight:700;font-size:16px;cursor:pointer}
 .btn-onboarding-cta:disabled{opacity:.4;cursor:not-allowed}
@@ -2499,8 +2525,15 @@ textarea.input{resize:none;line-height:1.4}
              each tester is being asked to do. -->
         <div class="onboarding-slide onboarding-centered active" data-slide="0">
           <span class="onboarding-badge-pill">CONFIDENTIAL • PRIVATE ALPHA</span>
-          <h2 class="onboarding-headline onboarding-headline-xl">CITIXEN UX<sup class="tm-symbol">™</sup> Beta Testing</h2>
-          <p class="onboarding-subtitle-neon">For your eyes only — please do not forward or share this link.</p>
+          <!-- Patch 12-10/03/26: solid white "CITIXEN" + bright #00FF87
+               "UX™" (a different, louder green than brand-lime's #34d399,
+               matching the Got it CTA's Patch 11 accent) instead of the
+               single flat #f1f5f9 headline color; " Beta Testing" is
+               unchanged. -->
+          <h2 class="onboarding-headline onboarding-headline-xl"><span class="brand-white">CITIXEN</span> <span class="onboarding-ux-accent">UX<sup class="tm-symbol">™</sup></span> Beta Testing</h2>
+          <!-- Typewriter reveal on the "For your eyes only" label only —
+               the rest of the sentence renders normally right after it. -->
+          <p class="onboarding-subtitle-neon"><span class="onboarding-typewriter">For your eyes only</span> — please do not forward or share this link.</p>
           <p class="onboarding-body">All feedback is welcome.</p>
           <div class="onboarding-grid">
             <div class="onboarding-grid-item">
