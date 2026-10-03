@@ -336,7 +336,21 @@ async function init(){
     const segs = window.location.pathname.split('/').filter(Boolean);
     if (segs.length >= 2 && segs[0] === 'report') id = decodeURIComponent(segs[1]);
   }
-  if (!id) { renderNotFound(id); return; }
+  // NULL/INVALID REPORT ID ROUTING FIX (Patch 1.1-10/03/26) — a missing id
+  // (no /report/:id segment and no ?id=), a literal null, or the literal
+  // string "none" (e.g. a bad/placeholder link such as /report/none) all
+  // mean there is no real ticket to look up at all, which is a different
+  // situation from a real id that simply doesn't match a known ticket (that
+  // case still renders the honest "Report not found" card below — there IS
+  // an id, it's just wrong). For the no-id case, a dead-end "Report not
+  // found" card serves nobody; redirect straight to the real report-filing
+  // flow (app.html's Report tab, already its default/only tab) with a clean
+  // focus on "1. Choose Category" instead — see
+  // focusReportCategoryFromQueryString() in app.html.
+  if (!id || String(id).trim().toLowerCase() === 'none') {
+    window.location.replace('/app?focus=category');
+    return;
+  }
   const ticket = await fetchTicket(id);
   if (!ticket) { renderNotFound(id); return; }
   renderTicket(ticket);
