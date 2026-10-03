@@ -793,6 +793,14 @@ textarea.input{resize:none;line-height:1.4}
 .receipt-icon-wrap{display:flex;justify-content:center;margin-bottom:10px}
 .receipt-title{font-size:1rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em;color:var(--mint2);margin-bottom:4px}
 .receipt-sub{font-size:.76rem;color:var(--muted);margin-bottom:18px;line-height:1.4}
+/* ===== PHOTO VALIDATION ERROR MODAL (#photoValidationModal) — Patch
+   4-10/03/26. Reuses .confirm-drawer/.confirm-card/.receipt-* chrome
+   (already high-contrast: rgba(0,0,0,.92) backdrop) but scoped to this
+   id gets its own exact #00FF87 accent border/glow instead of the shared
+   --mint2 (#00E699) every other receipt-style modal uses, per this
+   round's brand spec — left .confirm-card itself untouched since
+   #postPhotoConfirmModal and the others still want --mint2. */
+#photoValidationModal .confirm-card{border-color:#00FF87;box-shadow:0 0 18px rgba(0,255,135,.14)}
 .receipt-ticket-badge{width:100%;background:rgba(0,230,153,.08);border:1px solid rgba(0,230,153,.4);
   border-radius:14px;padding:16px;margin-bottom:16px;cursor:pointer;font-family:inherit}
 .receipt-ticket-id{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:1.22rem;
@@ -2099,6 +2107,31 @@ textarea.input{resize:none;line-height:1.4}
       <svg viewBox="0 0 24 24" width="17" height="17" stroke="#051311" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.2"/></svg>
       Capture proof
     </button>
+  </div>
+
+  <!-- ===== PHOTO VALIDATION ERROR MODAL (#photoValidationModal) — Patch
+       4-10/03/26: replaces the inline toast-danger "mandatory-photo
+       warning" banner (toast(msg, true) — see toast()'s own Patch 4.13
+       comment) with a centered overlay modal for every real photo-
+       validation failure: camera access denied/unavailable, a failed
+       live capture, a non-image file picked, or a file that couldn't be
+       read. Reuses .confirm-drawer/.confirm-card/.receipt-* chrome (same
+       high-contrast rgba(0,0,0,.92) backdrop every modal here already
+       uses) with its own exact #00FF87 accent. "Take Photo" closes this
+       modal and calls openCamera() directly so a citizen can retry in one
+       tap; "Got it" just dismisses. -->
+  <div id="photoValidationModal" class="confirm-drawer">
+    <div class="confirm-card receipt-card">
+      <div class="receipt-icon-wrap">
+        <svg viewBox="0 0 24 24" width="40" height="40" stroke="#00FF87" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <div class="receipt-title" style="color:#00FF87"><span style="color:#FFFFFF">CITIXEN</span> UX<sup class="tm-symbol">™</sup> — Photo Required</div>
+      <div class="receipt-sub" id="photoValidationMsg">—</div>
+      <div class="confirm-actions" style="margin-top:0;">
+        <button type="button" class="btn-submit" id="btnPhotoValidationTakePhoto" style="background:#00FF87;box-shadow:0 0 18px rgba(0,255,135,.35);">Take Photo</button>
+        <button type="button" class="btn-confirm-cancel" id="btnPhotoValidationGotIt">Got it</button>
+      </div>
+    </div>
   </div>
 
   <!-- ===== DASHBOARD TAB GENERIC INFO MODAL — reuses this file's own
@@ -5864,7 +5897,7 @@ async function handleCameraButtonClick(){
     photoImg.style.display = 'none';
     photoIconFallback.style.display = 'none';
     document.getElementById('photoBox').style.display = 'none';
-    toast('Camera unavailable or permission denied — a photo is required to submit.');
+    showPhotoValidationModal('Camera unavailable or permission denied — a photo is required to submit.');
   }
   updateSubmitPhotoGate();
 }
@@ -5907,6 +5940,28 @@ function closeCamera(){
   document.getElementById('camModal').classList.remove('open');
   stopCameraStream();
 }
+// PHOTO VALIDATION ERROR MODAL (Patch 4-10/03/26) — single entry point for
+// every real photo-validation failure below (camera denied/unavailable,
+// failed capture, bad file type, unreadable file), replacing the old
+// toast(msg, true) "mandatory-photo warning" banner with this centered
+// overlay. Sits on top of #camModal (z-index 2750 vs 2000) when both are
+// open, so a failure mid-capture still shows clearly.
+function showPhotoValidationModal(msg){
+  const msgEl = document.getElementById('photoValidationMsg');
+  if (msgEl) msgEl.textContent = msg;
+  document.getElementById('photoValidationModal').classList.add('open');
+}
+function closePhotoValidationModal(){
+  document.getElementById('photoValidationModal').classList.remove('open');
+}
+document.getElementById('btnPhotoValidationGotIt').addEventListener('click', closePhotoValidationModal);
+document.getElementById('btnPhotoValidationTakePhoto').addEventListener('click', () => {
+  closePhotoValidationModal();
+  openCamera();
+});
+document.getElementById('photoValidationModal').addEventListener('click', (e) => {
+  if (e.target.id === 'photoValidationModal') closePhotoValidationModal();
+});
 // DESKTOP FILE UPLOAD FALLBACK (Patch 6-10/03/26) — "Upload Photo Instead"
 // only appears once openCamera() has confirmed live capture isn't working
 // (see above); it hands off to the browser's native file picker
@@ -5926,7 +5981,7 @@ document.getElementById('photoFileInput').addEventListener('change', (e) => {
   e.target.value = ''; // allow picking the same file again later
   if (!file) return;
   if (!file.type || !file.type.startsWith('image/')) {
-    toast('Please choose an image file.', true);
+    showPhotoValidationModal('Please choose an image file — a photo is required to submit.');
     return;
   }
   const reader = new FileReader();
@@ -5954,12 +6009,12 @@ document.getElementById('photoFileInput').addEventListener('change', (e) => {
       updateSubmitPhotoGate();
     };
     img.onerror = () => {
-      toast('Could not read that image — try a different file.', true);
+      showPhotoValidationModal('Could not read that image — try a different file.');
     };
     img.src = reader.result;
   };
   reader.onerror = () => {
-    toast('Could not read that file — try a different image.', true);
+    showPhotoValidationModal('Could not read that file — try a different image.');
   };
   reader.readAsDataURL(file);
 });
@@ -5983,7 +6038,7 @@ function capturePhoto(){
     photoImg.style.display='none';
     document.getElementById('photoIconFallback').style.display='none';
     document.getElementById('photoBox').style.display='none';
-    toast('Could not capture a photo — a photo is required to submit.');
+    showPhotoValidationModal('Could not capture a photo — a photo is required to submit.');
   }
   closeCamera();
   updateSubmitPhotoGate();
