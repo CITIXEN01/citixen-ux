@@ -75,7 +75,36 @@ h1{font-size:1.3rem;margin:10px 0 4px}
 .btn{flex:1;text-align:center;text-decoration:none;padding:12px;border-radius:10px;font-weight:800;font-size:.8rem}
 .btn-primary{background:var(--mint);color:#051311}
 .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
-.notfound{text-align:center;padding:60px 20px}
+/* ===== INVALID GATEWAY SCREEN (Patch 2-10/03/26) — replaces the old plain
+   .card/.notfound "Report not found" block (two CTA buttons, muted/quiet
+   styling consistent with the rest of this page) with a dedicated,
+   high-contrast full-screen takeover: a bold "NON-EXISTENT GATEWAY"
+   headline, the brand wordmark in the exact white/#00FF87 split used
+   across the rest of this codebase's recent patches (this page's own
+   --brand-mint token is #00ff88, one digit off — kept as-is for every
+   other element on this page, but this screen uses the exact brand green
+   directly since this patch calls for it explicitly), and a single
+   reset CTA pointing at the real canonical URL rather than a relative
+   path. Scoped to its own classes below so renderNotFound() is the only
+   thing that changes — the ticket-found view's own .cta-row/.btn-primary/
+   .btn-outline (used further down for "File a similar report" / "View
+   full ledger") are untouched. */
+.invalid-gateway-screen{min-height:65vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:48px 20px}
+.invalid-gateway-brand{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:22px}
+.invalid-gateway-brand-citixen{color:#FFFFFF;font-weight:800;font-size:.95rem;letter-spacing:.2px}
+.invalid-gateway-brand-ux{color:#00FF87;font-weight:800;font-size:.95rem;letter-spacing:.2px}
+.invalid-gateway-headline{font-size:1.5rem;font-weight:900;letter-spacing:.04em;color:#FFFFFF;
+  text-transform:uppercase;margin-bottom:12px}
+.invalid-gateway-sub{font-size:.84rem;color:var(--muted);line-height:1.55;max-width:380px;margin-bottom:10px}
+.invalid-gateway-id{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.76rem;color:#00FF87;
+  background:rgba(0,255,135,.08);border:1px solid rgba(0,255,135,.3);border-radius:8px;padding:4px 10px;
+  display:inline-block;margin:6px 0 30px}
+.btn-invalid-gateway-reset{display:inline-block;background:#00FF87;color:#051311;text-decoration:none;
+  font-weight:800;font-size:.86rem;text-transform:uppercase;letter-spacing:.03em;padding:15px 34px;
+  border-radius:9999px;box-shadow:0 0 24px rgba(0,255,135,.4);transition:box-shadow .15s,transform .1s}
+.btn-invalid-gateway-reset:hover{box-shadow:0 0 32px rgba(0,255,135,.6)}
+.btn-invalid-gateway-reset:active{transform:scale(.98)}
 
 /* Connect with Citixen UX — city official wedge, same quiet/secondary
    treatment as app.html's version (see .official-wedge-* there); this
@@ -189,15 +218,24 @@ function stagePillClass(stage){
   return stage === 'resolved' ? 'pill-resolved' : stage === 'dispatched' ? 'pill-dispatched' : 'pill-submitted';
 }
 
+// INVALID GATEWAY SCREEN (Patch 2-10/03/26) — was a quiet .card with a
+// "Report not found" label and two CTA buttons (File a report / Back to
+// dashboard). Redesigned into a single high-contrast screen: one headline,
+// one reset action, pointed at the real canonical app URL
+// (https://citixenux.com/app) rather than a relative /app.html link, since
+// this page can be opened from a shared link on any host.
 function renderNotFound(id){
   document.getElementById('reportRoot').innerHTML = `
-    <div class="card notfound">
-      <div class="label">Report not found</div>
-      <p style="color:var(--muted);font-size:.85rem;margin-top:8px">No seeded report matches id <strong>${esc(id || '(none)')}</strong>.</p>
-      <div class="cta-row">
-        <a class="btn btn-primary" href="/app.html">File a report</a>
-        <a class="btn btn-outline" href="/">Back to dashboard</a>
+    <div class="invalid-gateway-screen">
+      <svg viewBox="0 0 24 24" width="52" height="52" stroke="#00FF87" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-bottom:18px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div class="invalid-gateway-brand">
+        <span class="invalid-gateway-brand-citixen">CITIXEN</span>
+        <span class="invalid-gateway-brand-ux">UX™</span>
       </div>
+      <div class="invalid-gateway-headline">Non-Existent Gateway</div>
+      <p class="invalid-gateway-sub">This report link doesn't lead anywhere on the public ledger — the id is wrong, expired, or was never a real report.</p>
+      <div class="invalid-gateway-id">${esc(id || '(none)')}</div>
+      <a class="btn-invalid-gateway-reset" href="https://citixenux.com/app">Return to Safety</a>
     </div>`;
 }
 
