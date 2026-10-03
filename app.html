@@ -3168,11 +3168,15 @@ function formatGeocodedLabel(r){
 // Forward geocoding via OpenStreetMap's free Nominatim search API — no key
 // required, real results for a real address. Returns null (never a guessed
 // coordinate) on no match, network failure, or an implausible/empty query.
+// STRICT US COUNTRY FILTER (Patch 7-10/03/26): countrycodes=us restricts
+// every match to US addresses only — this app routes to US municipal wards,
+// so a real match outside the US is still the wrong answer, never a usable
+// fallback.
 async function geocodeAddress(query){
   const q = String(query || '').trim();
   if (q.length < 4) return null;
   try {
-    const res = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&addressdetails=1&q=' + encodeURIComponent(q));
+    const res = await fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(q) + '&countrycodes=us&addressdetails=1&limit=1');
     if (!res.ok) return null;
     const results = await res.json();
     if (!Array.isArray(results) || !results.length) return null;
@@ -3183,35 +3187,50 @@ async function geocodeAddress(query){
   }
 }
 
-// ===== ADDRESS AUTOCOMPLETE (Patch 5.4) =====
+// ===== ADDRESS AUTOCOMPLETE (Patch 5.4, US-filtered + street-level-only
+// Patch 7-10/03/26) =====
 // Live-suggests as the citizen types in either manual-address field, via
 // OpenStreetMap's free Photon API (photon.komoot.io — no key required, same
 // no-key posture as the Nominatim geocoder above). Photon's own GeoJSON
-// property names (housenumber/street/city/state), reusing US_STATE_ABBR so
-// the dropdown reads in the same "351 W Hubbard St / Chicago, IL" style as
-// the rest of this file. This is a public demo instance with no uptime
-// guarantee, so every failure path here (network error, non-OK response, no
-// features) degrades silently to an empty list rather than an error toast —
-// the citizen can always still type the full address and tap "Use address"
-// to forward-geocode it via the existing Nominatim path below, which this
-// never replaces.
+// property names (housenumber/street/city/state/postcode), reusing
+// US_STATE_ABBR so the dropdown reads in the same "351 W Hubbard St /
+// Chicago, IL 60654" style as the rest of this file. This is a public demo
+// instance with no uptime guarantee, so every failure path here (network
+// error, non-OK response, no features) degrades silently to an empty list
+// rather than an error toast — the citizen can always still type the full
+// address, which auto-validates via the existing Nominatim path below (see
+// attachAddressAutocomplete()'s auto-validate debounce), which this never
+// replaces.
+//
+// STRICT US + STREET-LEVEL FILTER (Patch 7-10/03/26): Photon has no
+// documented country-code query param of its own (unlike Nominatim's
+// countrycodes=us below) — the reliable way to constrain it to the US is
+// the continental-US bounding box, so every query carries one. A match
+// missing either a house number or a street name is an administrative
+// region/city/country-level result, not something this app can route a
+// report to, so formatPhotonSuggestion() returns null for it and
+// photonSearch() drops it from the dropdown entirely rather than showing a
+// suggestion that can't actually resolve to a street address.
+const US_CONTINENTAL_BBOX = '-125.0,24.39,-66.93,49.38';
 function formatPhotonSuggestion(props){
   props = props || {};
-  const street = [props.housenumber, props.street].filter(Boolean).join(' ');
-  const primary = street || props.name || '';
+  if (!props.housenumber || !props.street) return null; // not a street-level US match
+  const street = props.housenumber + ' ' + props.street;
   const city = props.city || props.town || props.village || props.district || '';
   const stateAbbr = props.state ? (US_STATE_ABBR[props.state.toLowerCase()] || props.state) : '';
-  const secondary = [city, stateAbbr].filter(Boolean).join(', ');
-  const label = [primary, secondary].filter(Boolean).join(', ') || primary || secondary;
-  return { primary: primary || label, secondary, label };
+  const cityState = [city, stateAbbr].filter(Boolean).join(', ');
+  const secondary = [cityState, props.postcode].filter(Boolean).join(' '); // "City, State ZIP"
+  const label = [street, cityState].filter(Boolean).join(', ') || street;
+  return { primary: street, secondary, label };
 }
 async function photonSearch(query){
   const q = String(query || '').trim();
   if (q.length < 3) return [];
   // Biases (never restricts) results toward the citizen's own real GPS fix
   // when one exists — still an honestly-sourced hint, never a guessed
-  // anchor/default location.
-  let url = 'https://photon.komoot.io/api/?limit=5&lang=en&q=' + encodeURIComponent(q);
+  // anchor/default location. The bbox below is the actual restriction (US
+  // only); location_bias_scale only nudges ranking within that box.
+  let url = 'https://photon.komoot.io/api/?limit=5&lang=en&bbox=' + US_CONTINENTAL_BBOX + '&q=' + encodeURIComponent(q);
   const gps = window.CITIXEN_RESOLVED_LOCATION;
   if (gps && typeof gps.lat === 'number' && typeof gps.lng === 'number') {
     url += '&lat=' + gps.lat + '&lon=' + gps.lng + '&location_bias_scale=0.2';
@@ -3225,7 +3244,7 @@ async function photonSearch(query){
       const coords = f.geometry && f.geometry.coordinates;
       if (!coords || coords.length < 2 || typeof coords[0] !== 'number' || typeof coords[1] !== 'number') return null;
       const sug = formatPhotonSuggestion(f.properties);
-      if (!sug.label) return null;
+      if (!sug) return null; // administrative/city/country-only match — filtered out
       return { lat: coords[1], lng: coords[0], primary: sug.primary, secondary: sug.secondary, label: sug.label };
     }).filter(Boolean);
   } catch (e) {
