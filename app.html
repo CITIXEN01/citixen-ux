@@ -374,6 +374,19 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
   cursor:pointer;font-family:inherit}
 .map-howitworks-btn-full:hover{background:rgba(0,255,135,.16)}
 .map-howitworks-btn-full svg{flex-shrink:0}
+/* Patch 142(v146)-10/03/26: neon green pulse-glow on the relocated full-width How It
+   Works button (#btnMapHowItWorks), modeled on this file's existing box-shadow pulse
+   convention (see @keyframes shieldGlowPulse on .splash-logo) rather than inventing a
+   new animation style. prefers-reduced-motion gets the same static glow every other
+   pulse animation in this file falls back to, not a jarring instant cut to flat. */
+#btnMapHowItWorks{animation:pulseGlow 2.4s ease-in-out infinite}
+@keyframes pulseGlow{
+  0%,100%{box-shadow:0 0 6px rgba(0,255,135,.3),inset 0 0 0 1px rgba(0,255,135,.35)}
+  50%{box-shadow:0 0 22px rgba(0,255,135,.65),inset 0 0 0 1px rgba(0,255,135,.6)}
+}
+@media (prefers-reduced-motion: reduce){
+  #btnMapHowItWorks{animation:none;box-shadow:0 0 14px rgba(0,255,135,.45)}
+}
 
 .chip-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
 .chip{background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));border:var(--surface-card-border);color:var(--text);padding:13px 12px;
@@ -1011,7 +1024,12 @@ textarea.input{resize:none;line-height:1.4}
    the description block still starts just past the frame with its original ~40px gap. */
 .sge-photo-frame{position:absolute;top:150px;left:70px;right:70px;aspect-ratio:16/9;height:auto;
   border-radius:28px;overflow:hidden;background:#0b1220;display:none}
-.sge-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+/* Patch 142(v146)-10/03/26: object-fit:cover kept exactly as Patch 36 set it (still
+   crops to fill rather than letterboxing — the alternate spec draft that asked for
+   object-fit:contain + a 240px cap was explicitly dropped in favor of keeping this
+   216px-taller 16:9 frame intact); object-position:center added so an off-center
+   crop source photo is centered in the frame instead of defaulting to its top-left. */
+.sge-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
 .sge-photo-overlay{position:absolute;inset:0;
   background:linear-gradient(180deg,rgba(2,6,23,0) 60%,rgba(2,6,23,.65) 100%)}
 .sge-body{position:absolute;left:70px;right:70px;top:719px;display:flex;flex-direction:column;gap:16px}
@@ -1031,15 +1049,15 @@ textarea.input{resize:none;line-height:1.4}
    the footer's only line, so it actually reads as real social-sharing
    real estate rather than fine print. */
 .sge-footer{position:absolute;bottom:48px;left:0;right:0;text-align:center;color:#64748b}
-/* Patch 36-10/03/26 — applied exactly as specified (font-size:1.1rem;font-weight:700;
-   letter-spacing:.05em). Flagging honestly: every other size on this card is a hard px
-   value (this file sets no html{font-size}, so 1.1rem = 17.6px), and font-weight 700 is
-   lighter than the 800 already in place. Taken literally, this patch SHRINKS and
-   lightens the domain line versus Patch 25's prior 34px/800 enlargement — the opposite
-   of "maximum visibility". Implemented as written since it's valid CSS and explicitly
-   requested; flagging here in case the intent was "bigger than 34px/800" rather than
-   this literal value. */
-.sge-footer-url{font-size:1.1rem;font-weight:700;letter-spacing:.05em;color:#94a3b8}
+/* Patch 142(v146)-10/03/26: resolves the flag raised in Patch 36 — that patch's
+   literal font-size:1.1rem computed to 17.6px (this card has no html{font-size}
+   override, and every other size on it is a hard px value), shrinking the domain
+   line well below Patch 25's 34px/800. This round confirmed the actual intent is
+   "bold and clearly legible on exports", so it's set in px like the rest of the
+   card: 32px/800 (slightly below Patch 25's 34px, but far above the 17.6px the
+   literal 1.1rem produced), with brighter #cbd5e1 (was #94a3b8) for stronger
+   contrast against the card's #080C14 background at social-thumbnail sizes. */
+.sge-footer-url{font-size:32px;font-weight:800;letter-spacing:.04em;color:#cbd5e1}
 
 /* ===== SOCIAL GRAPHIC PREVIEW MODAL — full-screen rendered-image review
    with a loading state while html2canvas works, then Download/Share.
@@ -7574,10 +7592,16 @@ document.getElementById('btnSgpDownload').addEventListener('click', async () => 
       // elsewhere in this file.
       await navigator.share({ title: shareTitle, text: shareText, url: shareUrl });
     } else {
-      // No Web Share API at all (most desktop browsers) — the PNG is
-      // already downloaded via Step 1 above, so this is honest, not a
-      // dead end.
+      // Patch 142(v146)-10/03/26: STEP 3 — no Web Share API at all (most desktop
+      // browsers). The PNG is already downloaded via Step 1 above regardless, so this
+      // was never a dead end, but it used to just toast and stop. Reactivates the real
+      // #easyShareFallbackModal (the spec's "#socialShareModal" — this file has no
+      // element by that literal name) instead: it already has real X/Twitter intent,
+      // WhatsApp intent, and clipboard-copy buttons wired up (Patch 14, below), and has
+      // been sitting unreachable since Patch 25 removed its last two openers. This is
+      // its first real opener again.
       toast('Receipt saved to downloads.');
+      document.getElementById('easyShareFallbackModal').classList.add('open');
     }
   } catch (err) {
     // AbortError = the citizen closed the native share sheet themselves —
@@ -7608,12 +7632,10 @@ const CITIXEN_SHARE_COMBINED = CITIXEN_SHARE_TEXT + ' ' + CITIXEN_SHARE_URL;
 // remaining action. Its click handler (and the lastSocialGraphicFile prep
 // it used) were removed along with it — see renderAndShowSocialGraphic()'s
 // own comment above. The X/WhatsApp/Copy-link fallback handlers just below
-// still exist and still work on their own terms, but #easyShareFallbackModal
-// is now unreachable from this card: both of its real openers
-// (#btnReceiptGraphic above and #btnSgpShare here) are gone. Left in place,
-// documented, rather than torn out — same "orphaned but harmless, in case a
-// future entry point wants it back" convention this file already uses for
-// handleAddToWallet().
+// still exist and still work on their own terms; #easyShareFallbackModal
+// sat unreachable from Patch 25 (when both its prior openers were removed)
+// until Patch 142(v146)-10/03/26 gave it a new, real opener: #btnSgpDownload's
+// own Step 3 above, when the Web Share API isn't available at all.
 document.getElementById('btnShareFallbackClose').addEventListener('click', () => {
   document.getElementById('easyShareFallbackModal').classList.remove('open');
 });
