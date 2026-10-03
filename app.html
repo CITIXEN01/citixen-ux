@@ -1472,6 +1472,18 @@ textarea.input{resize:none;line-height:1.4}
           <div class="small" style="color:var(--mint2);margin-top:6px;">✓ Captured — device ID and GPS tags scrubbed from EXIF before upload</div>
         </div>
 
+        <!-- SAMPLE IMAGE DEV HELPER (Patch 6-10/03/26) — a real photo (live
+             capture or the upload fallback above) is always what a citizen
+             actually submits; this exists only to let a developer/tester
+             skip past that requirement instantly while exercising the rest
+             of the form, so it stays off by default and only ever appears
+             when preview/dev mode is already turned on (the same
+             ?preview=support / localStorage.citizen_preview flag the
+             staged Support Ledger module uses — see
+             isSupportLedgerPreviewEnabled()) on a non-touch (desktop)
+             pointer device, via applySampleImageDevButtonVisibility(). -->
+        <button type="button" class="chip" id="btnUseSampleImage" style="display:none;margin:0 0 12px;opacity:.6;font-size:.7rem;">Use Sample Image (Dev)</button>
+
         <!-- HARDWARE CAMERA FIREWALL LOCK — Section 3 (location & details)
              and the Publish button are now part of one camera-gated block,
              completely hidden (not just visually disabled) until a real
@@ -1840,6 +1852,20 @@ textarea.input{resize:none;line-height:1.4}
       <span id="cameraFallbackMsg" class="small">Requesting camera access…</span>
     </div>
     <canvas id="captureCanvas" style="display:none;"></canvas>
+    <!-- DESKTOP FILE UPLOAD FALLBACK (Patch 6-10/03/26) — shown by
+         openCamera() the moment getUserMedia is unsupported, denied, or
+         fails for any other reason (no camera hardware, a desktop browser
+         with the API but nothing to point it at, etc.), so a citizen
+         without a working live camera isn't stuck at a dead "using capture
+         mock instead" message with no way to actually attach a photo.
+         Picking a real image file here goes through the exact same
+         hasAttachedPhoto() gate as a live capture — it's a real file the
+         citizen chose, not a placeholder. -->
+    <button type="button" class="btn-camera" id="btnUploadPhotoFallback" style="display:none;margin-top:10px;">
+      <svg viewBox="0 0 24 24" width="17" height="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Upload Photo Instead
+    </button>
+    <input type="file" accept="image/*" id="photoFileInput" style="display:none;">
     <button class="btn-submit" id="btnCapture" style="margin-top:0;">
       <svg viewBox="0 0 24 24" width="17" height="17" stroke="#051311" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.2"/></svg>
       Capture proof
@@ -5249,12 +5275,15 @@ async function openCamera(){
   document.getElementById('camModal').classList.add('open');
   const video=document.getElementById('cameraVideo');
   const fallback=document.getElementById('cameraFallbackMsg');
+  const uploadFallbackBtn=document.getElementById('btnUploadPhotoFallback');
   video.style.display='none';
   fallback.style.display='block';
   fallback.textContent='Requesting camera access…';
+  if (uploadFallbackBtn) uploadFallbackBtn.style.display='none';
 
   if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-    fallback.textContent='Camera API unavailable on this device — using capture mock instead.';
+    fallback.textContent='Camera API unavailable on this device.';
+    if (uploadFallbackBtn) uploadFallbackBtn.style.display='inline-flex';
     return;
   }
   try{
@@ -5263,8 +5292,10 @@ async function openCamera(){
     video.style.display='block';
     fallback.style.display='none';
   }catch(err){
-    // NotAllowedError, NotFoundError, or any other getUserMedia failure — fall back to the mock capture flow.
-    fallback.textContent='Camera access denied or unavailable — using capture mock instead.';
+    // NotAllowedError, NotFoundError, or any other getUserMedia failure —
+    // offer the real file-upload fallback below instead of a dead end.
+    fallback.textContent='Camera access denied or unavailable.';
+    if (uploadFallbackBtn) uploadFallbackBtn.style.display='inline-flex';
   }
 }
 function stopCameraStream(){
@@ -5277,6 +5308,62 @@ function closeCamera(){
   document.getElementById('camModal').classList.remove('open');
   stopCameraStream();
 }
+// DESKTOP FILE UPLOAD FALLBACK (Patch 6-10/03/26) — "Upload Photo Instead"
+// only appears once openCamera() has confirmed live capture isn't working
+// (see above); it hands off to the browser's native file picker
+// (accept="image/*" constrains the picker itself, with a defensive
+// file.type re-check below since a citizen can still override that filter
+// on some platforms). A chosen file is read client-side via FileReader —
+// nothing uploads anywhere at this step, same "nothing leaves this device
+// until capture+submit" promise as the live-camera path — and goes through
+// the exact same hasAttachedPhoto()/updateSubmitPhotoGate() gate as a real
+// capture, because it is one: a real image file the citizen picked, never
+// a placeholder.
+document.getElementById('btnUploadPhotoFallback').addEventListener('click', () => {
+  document.getElementById('photoFileInput').click();
+});
+document.getElementById('photoFileInput').addEventListener('change', (e) => {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = ''; // allow picking the same file again later
+  if (!file) return;
+  if (!file.type || !file.type.startsWith('image/')) {
+    toast('Please choose an image file.', true);
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    // Re-encode through a canvas (same technique the live-camera path
+    // already uses) rather than keeping the file's own bytes — a canvas
+    // round-trip only ever carries decoded pixel data out the other side,
+    // so this genuinely strips EXIF (including any embedded GPS tag) from
+    // the original file instead of just reusing the claim from the capture
+    // path without actually doing the same thing.
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.getElementById('captureCanvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      canvas.getContext('2d').drawImage(img, 0, 0);
+      const photoImg = document.getElementById('photoImg');
+      const photoIconFallback = document.getElementById('photoIconFallback');
+      photoImg.src = canvas.toDataURL('image/jpeg', 0.85);
+      photoImg.style.display = 'block';
+      photoIconFallback.style.display = 'none';
+      document.getElementById('photoBox').style.display = 'block';
+      closeCamera();
+      toast('✓ Photo uploaded — device ID and GPS tags scrubbed from EXIF before upload');
+      updateSubmitPhotoGate();
+    };
+    img.onerror = () => {
+      toast('Could not read that image — try a different file.', true);
+    };
+    img.src = reader.result;
+  };
+  reader.onerror = () => {
+    toast('Could not read that file — try a different image.', true);
+  };
+  reader.readAsDataURL(file);
+});
 function capturePhoto(){
   const video=document.getElementById('cameraVideo');
   const photoImg=document.getElementById('photoImg');
@@ -5897,7 +5984,50 @@ function isSupportLedgerPreviewEnabled(){
 function applySupportLedgerPreviewState(){
   const mod = document.getElementById('support-ledger-module');
   if (mod) mod.classList.toggle('visible', isSupportLedgerPreviewEnabled());
+  applySampleImageDevButtonVisibility();
 }
+
+// SAMPLE IMAGE DEV HELPER (Patch 6-10/03/26) — see the button's own HTML
+// comment near #btnUseSampleImage. Gated on the same preview/dev flag as
+// the Support Ledger module (never shown to a real citizen by default) AND
+// a non-touch pointer, which is the closest reliable signal for "this is a
+// desktop/dev machine" without a user-agent sniff. Injects a small inline
+// SVG — clearly labeled as a sample, not a real hazard photo — directly as
+// the attached "photo" so a developer/tester can clear the photo gate
+// instantly instead of needing a working camera or a real image file on
+// hand. This is never sent anywhere on its own; it only lets the rest of
+// the (real) submission flow be exercised quickly.
+function isDesktopPointerDevice(){
+  try { return window.matchMedia('(hover: hover) and (pointer: fine)').matches; }
+  catch (e) { return false; }
+}
+function applySampleImageDevButtonVisibility(){
+  const btn = document.getElementById('btnUseSampleImage');
+  if (!btn) return;
+  btn.style.display = (isSupportLedgerPreviewEnabled() && isDesktopPointerDevice()) ? 'inline-flex' : 'none';
+}
+const SAMPLE_HAZARD_SVG_DATA_URL = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">' +
+    '<rect width="200" height="200" fill="#11151A"/>' +
+    '<polygon points="100,28 182,172 18,172" fill="none" stroke="#FFB020" stroke-width="9" stroke-linejoin="round"/>' +
+    '<text x="100" y="138" font-size="72" font-family="Arial, sans-serif" font-weight="bold" fill="#FFB020" text-anchor="middle">!</text>' +
+    '<text x="100" y="188" font-size="11" font-family="Arial, sans-serif" fill="#8A93A6" text-anchor="middle">SAMPLE IMAGE — DEV ONLY</text>' +
+  '</svg>'
+);
+const btnUseSampleImage = document.getElementById('btnUseSampleImage');
+if (btnUseSampleImage) {
+  btnUseSampleImage.addEventListener('click', () => {
+    const photoImg = document.getElementById('photoImg');
+    const photoIconFallback = document.getElementById('photoIconFallback');
+    photoImg.src = SAMPLE_HAZARD_SVG_DATA_URL;
+    photoImg.style.display = 'block';
+    photoIconFallback.style.display = 'none';
+    document.getElementById('photoBox').style.display = 'block';
+    toast('Dev: sample hazard image attached (not a real capture)');
+    updateSubmitPhotoGate();
+  });
+}
+applySampleImageDevButtonVisibility();
 
 let supportLedgerSelectedTier = '5';
 let supportLedgerOneTime = false;
@@ -6474,6 +6604,32 @@ function closeFrontDoorOnboarding(){
   // asked to eliminate — the citizen taps into it themselves once it's
   // actually visible.
   focusReportCategoryFromQueryString();
+  maybeAutoOpenSupportLedgerPreview();
+}
+// PREVIEW MODE AUTO-RENDER (Patch 6-10/03/26) — ?preview=support already
+// unhides the Support Ledger module wherever it lives (applySupportLedgerPreviewState()),
+// but that module only exists inside #dispatchReceiptModal, reachable
+// normally only after a real submission with a real photo and a real
+// resolved location. For "direct audit and testing" of the module itself,
+// that full round trip is unnecessary friction, so this opens the receipt
+// view straight away the moment the citizen lands on the Report tab with
+// preview mode on — it never touches category/photo/location state or
+// calls the real submit endpoint, so it can't leave anything on the actual
+// public ledger. Everything in it is honestly labeled as a preview, not a
+// real ticket (see "PREVIEW-MODE" below) — this never fabricates something
+// that could pass for a genuine citizen submission.
+function maybeAutoOpenSupportLedgerPreview(){
+  if (!isSupportLedgerPreviewEnabled()) return;
+  openDispatchReceiptModal({
+    ticketId: 'PREVIEW-MODE',
+    department: 'Preview / Audit',
+    type: 'Support Ledger Preview',
+    location: 'No real submission — preview mode only',
+    queuedOffline: false,
+    timestamp: new Date(),
+    wardMeta: null,
+    resolvedLoc: null
+  });
 }
 // NULL/INVALID REPORT ID ROUTING FIX (Patch 1.1-10/03/26) — report.html
 // redirects here with ?focus=category instead of rendering its own
