@@ -397,6 +397,15 @@ textarea.input{resize:none;line-height:1.4}
 .feed-item{background:rgba(7,12,14,.6);border:1px solid var(--border);border-radius:10px;padding:12px;
   margin-bottom:8px;cursor:pointer}
 .feed-item:hover{border-color:var(--mint2)}
+/* HEAD TO FEED (Patch 8-10/03/26) — same one-time highlight-pulse pattern
+   as .category-card-focus above, reused here to point at the exact feed
+   row for the report the citizen just submitted (see headToFeed()). */
+@keyframes feedItemFocusPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(0,255,135,0)}
+  30%{box-shadow:0 0 0 3px rgba(0,255,135,.5)}
+}
+.feed-item-focus{animation:feedItemFocusPulse 1.1s ease-out 2;border-color:#00FF87}
+@media (prefers-reduced-motion:reduce){.feed-item-focus{animation:none;box-shadow:0 0 0 3px rgba(0,255,135,.5)}}
 .row{display:flex;justify-content:space-between;align-items:center;font-size:.78rem;gap:8px}
 .small{font-size:.72rem;color:var(--muted)}
 .pill{padding:2px 7px;border-radius:5px;font-size:.62rem;font-weight:700;text-transform:uppercase;flex-shrink:0}
@@ -780,21 +789,18 @@ textarea.input{resize:none;line-height:1.4}
 .btn-receipt-secondary svg{color:var(--mint2);flex-shrink:0}
 .btn-receipt-secondary.copied{color:#34d399;border-color:rgba(52,211,153,.5)}
 .btn-receipt-secondary.copied svg{color:#34d399}
-.btn-receipt-dismiss{width:100%;box-sizing:border-box;min-height:52px;background:var(--mint);color:#051311;
-  border:none;padding:14px 16px;border-radius:12px;font-family:inherit;font-weight:700;font-size:16px;cursor:pointer}
-/* ALPHA LAUNCH FINAL PATCH — restores the wallet-row button Patch #4.14
-   removed, with neutral copy ("Logged To Ledger" — see the markup below)
-   instead of "Add to Apple Wallet": this still calls the real
-   /api/passbook endpoint and falls back to the same Copy Direct Link
-   behavior as before (see handleAddToWallet()), just without branding a
-   result that's always the honest fallback as an Apple Wallet pass. */
-.btn-receipt-wallet{width:100%;box-sizing:border-box;min-height:48px;background:#000;
-  border:1px solid #1e293b;color:#f1f5f9;padding:12px 16px;border-radius:10px;font-family:inherit;
-  font-weight:700;font-size:.74rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  gap:8px;transition:border-color .15s}
-.btn-receipt-wallet:hover{border-color:#334155}
-.btn-receipt-wallet svg{flex-shrink:0;color:#f1f5f9}
-.btn-receipt-wallet.copied{color:#34d399;border-color:rgba(52,211,153,.5)}
+/* HEAD TO FEED (Patch 8-10/03/26) — the receipt's one real primary action,
+   moved up into the slot the old "Logged To Ledger" wallet-row button used
+   to occupy (see the markup's own comment). Bright #00FF87 per spec — a
+   deliberately different, louder green than the rest of this file's
+   --mint/#00E699 accent, since this is the single thing on the card meant
+   to pull the eye after the ticket ID itself. */
+.btn-receipt-feed{width:100%;box-sizing:border-box;min-height:52px;background:#00FF87;color:#051311;
+  border:none;padding:14px 16px;border-radius:12px;font-family:inherit;font-weight:800;font-size:15px;
+  text-transform:uppercase;letter-spacing:.02em;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;gap:8px;box-shadow:0 0 18px rgba(0,255,135,.35);transition:box-shadow .15s,transform .1s}
+.btn-receipt-feed:hover{box-shadow:0 0 26px rgba(0,255,135,.5)}
+.btn-receipt-feed:active{transform:scale(.98)}
 
 /* ===== 1:1 SOCIAL GRAPHIC EXPORT — real DOM node rendered to PNG via
    html2canvas (see renderAndShowSocialGraphic()), not a hand-drawn canvas,
@@ -805,32 +811,60 @@ textarea.input{resize:none;line-height:1.4}
 .social-graphic-export-card{position:fixed;top:-20000px;left:-20000px;width:1080px;height:1080px;
   background:#020617;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
   color:#fff}
-.sge-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
-.sge-overlay{position:absolute;inset:0;
-  background:linear-gradient(180deg,rgba(2,6,23,.55) 0%,rgba(2,6,23,.72) 50%,rgba(2,6,23,.97) 100%)}
-.sge-header{position:absolute;top:70px;left:70px;right:70px;display:flex;justify-content:space-between;align-items:center}
-.sge-brand{font-size:30px;font-weight:900;color:#00E699;letter-spacing:.02em}
+.sge-header{position:absolute;top:60px;left:70px;right:70px;display:flex;justify-content:space-between;align-items:center;z-index:2}
+/* Patch 8-10/03/26: brand made larger + bolder (was 30px/900) so it reads
+   as the card's clear focal point now that the photo is no longer a
+   full-bleed background competing with it. */
+.sge-brand{font-size:44px;font-weight:900;color:#00E699;letter-spacing:.01em}
 .sge-jurisdiction{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:20px;
   font-weight:700;color:#94a3b8;letter-spacing:.05em}
-.sge-body{position:absolute;left:70px;right:70px;bottom:150px;display:flex;flex-direction:column;gap:16px}
-.sge-ticket{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:50px;font-weight:900;
+/* Patch 8-10/03/26: the photo used to be position:absolute;inset:0 — a
+   full-bleed 1080x1080 background with a dark gradient (.sge-overlay) laid
+   over the whole card to keep the text legible on top of it. Scaled down
+   into its own framed block instead, so the brand header stays prominent
+   and there's real blank space (between .sge-body and .sge-footer) left
+   for whatever caption/commentary the citizen adds after downloading. */
+.sge-photo-frame{position:absolute;top:150px;left:70px;right:70px;height:430px;
+  border-radius:28px;overflow:hidden;background:#0b1220;display:none}
+.sge-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.sge-photo-overlay{position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(2,6,23,0) 60%,rgba(2,6,23,.65) 100%)}
+.sge-body{position:absolute;left:70px;right:70px;top:620px;display:flex;flex-direction:column;gap:16px}
+.sge-ticket{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:46px;font-weight:900;
   color:#fff;letter-spacing:.01em;word-break:break-word}
-.sge-status{font-size:19px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#00E699}
-.sge-breadcrumb{font-size:25px;font-weight:700;color:#e2e8f0}
+.sge-status{font-size:18px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#00E699}
+.sge-breadcrumb{font-size:24px;font-weight:700;color:#e2e8f0}
 .sge-meta-row{display:flex;justify-content:space-between;gap:20px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   font-size:18px;color:#94a3b8;margin-top:4px}
 .sge-footer{position:absolute;bottom:58px;left:0;right:0;text-align:center;font-size:16px;font-weight:700;
   letter-spacing:.08em;color:#64748b}
 
 /* ===== SOCIAL GRAPHIC PREVIEW MODAL — full-screen rendered-image review
-   with a loading state while html2canvas works, then Download/Share. ===== */
+   with a loading state while html2canvas works, then Download/Share.
+   Patch 8-10/03/26: darker title bar (was a plain row on the card's own
+   background) and the blur guard described on #sgpBlurGuard below. ===== */
 .sgp-card{padding:18px}
-.sgp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.sgp-title{font-size:.92rem;font-weight:900;color:var(--text)}
+.sgp-header{display:flex;align-items:center;justify-content:space-between;
+  background:#05070A;margin:-18px -18px 14px -18px;padding:14px 18px;
+  border-radius:14px 14px 0 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.sgp-title{font-size:.78rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#e2e8f0}
 .sgp-image-wrap{position:relative;width:100%;aspect-ratio:1/1;border-radius:14px;overflow:hidden;
   background:#020617;border:1px solid rgba(30,41,59,.8);margin-bottom:16px}
 .sgp-image{width:100%;height:100%;object-fit:cover;display:none}
 .sgp-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+/* IMAGE SCREENING / BLUR GUARD (Patch 8-10/03/26) — covers the rendered
+   preview the moment it's ready (civic hazard photos can be graphic, and
+   this card is about to be posted somewhere public) until the citizen taps
+   through it. backdrop-filter blurs the real image sitting underneath,
+   never a separately-blurred copy, so what's revealed is exactly what gets
+   shared. Download/Easy Share stay disabled (see renderAndShowSocialGraphic()/
+   the guard's click handler) until this is dismissed, so nothing can be
+   shared unseen. */
+.sgp-blur-guard{position:absolute;inset:0;z-index:3;display:none;flex-direction:column;align-items:center;
+  justify-content:center;gap:10px;background:rgba(2,6,23,.4);backdrop-filter:blur(26px);
+  -webkit-backdrop-filter:blur(26px);border:none;color:#fff;font-family:inherit;font-size:.8rem;
+  font-weight:700;letter-spacing:.01em;cursor:pointer;padding:0}
+.sgp-blur-guard svg{opacity:.9}
 .sgp-spinner{width:34px;height:34px;border-radius:50%;border:3px solid rgba(0,230,153,.2);
   border-top-color:#00E699;animation:sgpSpin .8s linear infinite}
 @keyframes sgpSpin{to{transform:rotate(360deg)}}
@@ -838,6 +872,7 @@ textarea.input{resize:none;line-height:1.4}
 .sgp-actions{display:flex;flex-direction:column;gap:10px}
 .btn-sgp-share{width:100%;box-sizing:border-box;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.12);
   color:var(--text);padding:13px;border-radius:12px;font-weight:700;font-size:.84rem;cursor:pointer}
+.btn-sgp-share:disabled{opacity:.4;cursor:not-allowed}
 
 /* ===== ADMIN LIGHT CLAIM/PANEL =====
    The receipt modal's "Are you a City Official or District Rep?" upsell
@@ -938,6 +973,7 @@ textarea.input{resize:none;line-height:1.4}
 .onboarding-grid-text span{font-size:.78rem;color:var(--muted);line-height:1.5}
 .btn-onboarding-cta{width:100%;box-sizing:border-box;min-height:52px;background:var(--mint);color:#051311;
   border:none;padding:14px 16px;border-radius:12px;font-family:inherit;font-weight:700;font-size:16px;cursor:pointer}
+.btn-onboarding-cta:disabled{opacity:.4;cursor:not-allowed}
 .onboarding-footer{display:flex;flex-direction:column;gap:16px;margin-top:20px}
 .onboarding-dots{display:flex;justify-content:center;gap:8px}
 .onboarding-dot{width:7px;height:7px;border-radius:50%;background:rgba(148,163,184,.3);transition:all .2s ease}
@@ -1273,6 +1309,22 @@ textarea.input{resize:none;line-height:1.4}
   border-radius:10px;font-family:inherit;font-weight:700;font-size:.82rem;cursor:pointer;
   transition:background .15s}
 .sl-cta:hover{background:#00c8f0}
+
+/* ONE-TIME POST-SUBMISSION FOUNDER MODAL (Patch 8-10/03/26) — see the
+   markup's own comment. Reuses .sl-tier-row/.sl-tier-btn/.sl-onetime-*/
+   .sl-cta above for the tier grid, toggle and CTA look; these rules only
+   add what's unique to this modal (header, copy blocks, the custom-amount
+   input, and the plain-link dismiss). */
+.founder-card{text-align:center}
+.founder-header{font-size:1.05rem;font-weight:900;line-height:1.25;color:var(--text);margin-bottom:12px}
+.founder-brand-copy{color:var(--mint2);font-weight:700;margin-bottom:8px;line-height:1.4}
+.founder-note{color:var(--muted);line-height:1.5;margin-bottom:16px;text-align:left}
+.founder-tier-row{text-align:left}
+.founder-custom-amount{margin-bottom:14px}
+.founder-continue-link{width:100%;background:transparent;border:none;color:var(--muted);
+  font-family:inherit;font-size:.76rem;font-weight:600;text-decoration:underline;
+  text-underline-offset:3px;cursor:pointer;padding:10px 0 0;margin-top:2px}
+.founder-continue-link:hover{color:var(--text)}
 </style>
 </head>
 <body>
@@ -1549,13 +1601,13 @@ textarea.input{resize:none;line-height:1.4}
            the end of every tab's scrollable content. APPLE WALLET REPOSITION
            round: the "Add to Apple Wallet" badge that used to live in every
            one of these footers (incl. this one, on the active report form)
-           is removed from here — it now lives exclusively on the
-           post-submission Dispatch Receipt modal (#btnReceiptWallet, see
-           openDispatchReceiptModal()/handleAddToWallet()), since a wallet
-           pass only makes sense once a report actually exists to bind into
-           it (real Report ID/Timestamp/District — see buildPassJson() in
-           api/_lib/pkpass.js), not while the form is still being filled
-           out. -->
+           was removed from here. It briefly lived on the post-submission
+           Dispatch Receipt modal as a neutral "Logged To Ledger" button
+           (#btnReceiptWallet); Patch 8-10/03/26 removed that button too (see
+           its own comment near #btnHeadToFeed) in favor of the real
+           "Head to Feed" action — handleAddToWallet() and the real
+           /api/passbook integration it called are kept further down in case
+           a future entry point wants them back. -->
       <div class="card" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:4px;">
         <svg viewBox="0 0 24 24" width="18" height="18" stroke="#00E699" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         <div class="small" style="color:var(--muted)">CITIXEN UX<sup class="tm-symbol">™</sup> — Privacy Engine: Verified</div>
@@ -2233,16 +2285,24 @@ textarea.input{resize:none;line-height:1.4}
         <div class="receipt-action-row">
           <button type="button" class="btn-receipt-secondary" id="btnReceiptGraphic">
             <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            <span id="btnReceiptGraphicLabel">Download Graphic</span>
+            <span id="btnReceiptGraphicLabel">Download Receipt</span>
           </button>
           <button type="button" class="btn-receipt-secondary" id="btnReceiptCopyLink">
             <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
             <span id="btnReceiptCopyLinkLabel">Copy Direct Link</span>
           </button>
         </div>
-        <button type="button" class="btn-receipt-wallet" id="btnReceiptWallet">
-          <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
-          <span id="btnReceiptWalletLabel">Logged To Ledger</span>
+        <!-- HEAD TO FEED (Patch 8-10/03/26) — replaces the old static/
+             disabled "Logged To Ledger" wallet-row button (handleAddToWallet()
+             is kept, further down, in case a real signed Apple Wallet pass
+             ever has another entry point to come back to — see its own
+             comment — but this exact button is gone) with the actual
+             primary action, moved up into this slot: the receipt's real
+             "go look at your report" button, styled in the brand's bright
+             #00FF87 green. See headToFeed()/maybeShowFounderModal(). -->
+        <button type="button" class="btn-receipt-feed" id="btnHeadToFeed">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="#051311" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          Head to Feed
         </button>
 
         <!-- STAGED "SUPPORT THE LEDGER" CIVIC MODULE (Patch 5.5) — hidden
@@ -2270,42 +2330,92 @@ textarea.input{resize:none;line-height:1.4}
           </div>
           <button type="button" class="sl-cta" id="btnSupportLedgerCta">Support District Ledger</button>
         </div>
-
-        <button type="button" class="btn-receipt-dismiss" id="btnReceiptDismiss">Dismiss to Feed</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ===== ONE-TIME POST-SUBMISSION FOUNDER MODAL (Patch 8-10/03/26) —
+       shown exactly once per session, the very first time a citizen taps
+       "Head to Feed" on a fresh receipt (see maybeShowFounderModal() in the
+       script below). Reuses the same .sl-* tier/toggle/CTA classes the
+       staged, preview-gated #support-ledger-module above already uses, for
+       one consistent look, but is wired up separately (scoped to
+       #founderModal, never the global .sl-tier-btn selector) so the two
+       never cross-wire each other's state — this modal is NOT preview-
+       gated, unlike that staged module: it's the real one-time ask shown to
+       every real citizen. The CTA shares the same STRIPE_PAYMENT_LINK
+       placeholder/honesty pattern as that module (see handleFounderCta()) —
+       it stays a no-op toast+warning, never a broken/fake payment
+       destination, until a real Stripe Payment Link is supplied. ===== -->
+  <div id="founderModal" class="confirm-drawer">
+    <div class="confirm-card founder-card">
+      <div class="founder-header">Support the Mission<br>How You Can</div>
+      <div class="small founder-brand-copy">CITIXEN UX<sup class="tm-symbol">™</sup> operates with zero ads and total data privacy.</div>
+      <div class="small founder-note">This is the project of a lifetime. If you can, please support with a micro-contribution — it directly covers server/ledger run-rate and helps get these tools to market faster.</div>
+
+      <div class="sl-tier-row founder-tier-row" id="founderTierRowMonthly">
+        <button type="button" class="sl-tier-btn founder-tier-btn active" data-founder-tier="5">$5/mo</button>
+        <button type="button" class="sl-tier-btn founder-tier-btn" data-founder-tier="20">$20/mo</button>
+        <button type="button" class="sl-tier-btn founder-tier-btn" data-founder-tier="50">$50/mo</button>
+      </div>
+      <div class="sl-tier-row founder-tier-row" id="founderTierRowOnetime" style="display:none;">
+        <button type="button" class="sl-tier-btn founder-tier-btn active" data-founder-tier="100">$100</button>
+        <button type="button" class="sl-tier-btn founder-tier-btn" data-founder-tier="500">$500</button>
+        <button type="button" class="sl-tier-btn founder-tier-btn" data-founder-tier="other">Other</button>
+      </div>
+      <input type="number" inputmode="decimal" min="1" step="1" class="input founder-custom-amount" id="founderCustomAmount" placeholder="Enter a custom amount ($)" style="display:none;">
+
+      <div class="sl-onetime-row">
+        <span class="sl-onetime-label">One-time contribution</span>
+        <button type="button" class="sl-switch" id="founderOnetimeToggle" role="switch" aria-checked="false" aria-label="One-time contribution"></button>
+      </div>
+
+      <button type="button" class="sl-cta founder-cta" id="btnFounderCta">Support Founder / Ledger</button>
+      <button type="button" class="founder-continue-link" id="btnFounderContinue">Continue to Feed</button>
     </div>
   </div>
 
   <!-- ===== 1:1 SOCIAL GRAPHIC EXPORT CARD — off-screen real DOM node
        (never display:none) rasterized by html2canvas in
        renderAndShowSocialGraphic(). The citizen never sees this node
-       itself, only the resulting PNG in #socialGraphicPreviewModal. ===== -->
+       itself, only the resulting PNG in #socialGraphicPreviewModal.
+       Patch 8-10/03/26: the photo moved from a full-bleed background (the
+       whole 1080x1080 card) into its own framed, scaled-down block so the
+       brand header stays the clear focal point and there's real blank
+       space left near the bottom — room for whatever caption/commentary
+       the citizen adds after downloading, before reposting it. ===== -->
   <div id="socialGraphicExportCard" class="social-graphic-export-card" aria-hidden="true">
-    <img id="sgePhoto" class="sge-photo" alt="">
-    <div class="sge-overlay"></div>
     <div class="sge-header">
       <span class="sge-brand">CITIXEN UX™</span>
       <span class="sge-jurisdiction" id="sgeJurisdiction">LOCAL DISTRICT</span>
     </div>
+    <div class="sge-photo-frame" id="sgePhotoFrame">
+      <img id="sgePhoto" class="sge-photo" alt="">
+      <div class="sge-photo-overlay"></div>
+    </div>
     <div class="sge-body">
       <div class="sge-ticket" id="sgeTicket">—</div>
-      <div class="sge-status" id="sgeStatus">REPORT ACKNOWLEDGED · PUBLIC LEDGER</div>
+      <div class="sge-status" id="sgeStatus">REPORT ACKNOWLEDGED • PUBLIC LEDGER RECEIPT</div>
       <div class="sge-breadcrumb" id="sgeBreadcrumb">Public Works</div>
       <div class="sge-meta-row">
         <span id="sgeCoords">—</span>
         <span id="sgeTimestamp">—</span>
       </div>
     </div>
-    <div class="sge-footer">ANONYMOUS &amp; SOVEREIGN · CITIXENUX.COM/APP</div>
+    <div class="sge-footer">ANONYMOUS &amp; SOVEREIGN • CITIXENUX.COM/APP</div>
   </div>
 
   <!-- ===== SOCIAL GRAPHIC PREVIEW MODAL — shows the rasterized PNG with a
        loading state while html2canvas renders, then Download/Share.
-       See renderAndShowSocialGraphic(). ===== -->
+       See renderAndShowSocialGraphic(). Patch 8-10/03/26: darker title bar
+       + cleaner title, and an "Image Screening" blur guard over the photo
+       the citizen must tap through before Download/Easy Share unlock — a
+       deliberate pre-share look, since a civic hazard photo can be graphic
+       and this card is about to be posted somewhere public. ===== -->
   <div id="socialGraphicPreviewModal" class="confirm-drawer">
     <div class="confirm-card sgp-card">
       <div class="sgp-header">
-        <span class="sgp-title">Your Social Card</span>
+        <span class="sgp-title">Ledger Receipt Card</span>
         <button type="button" class="onboarding-close" id="btnSgpClose" aria-label="Close">✕</button>
       </div>
       <div class="sgp-image-wrap">
@@ -2314,10 +2424,14 @@ textarea.input{resize:none;line-height:1.4}
           <div class="sgp-spinner"></div>
           <div class="sgp-loading-text" id="sgpLoadingText">Rendering 1:1 Social Card...</div>
         </div>
+        <button type="button" class="sgp-blur-guard" id="sgpBlurGuard" style="display:none" aria-label="Tap to reveal photo">
+          <svg viewBox="0 0 24 24" width="26" height="26" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>Tap to reveal photo</span>
+        </button>
       </div>
       <div class="sgp-actions">
-        <button type="button" class="btn-onboarding-cta" id="btnSgpDownload">Download Image</button>
-        <button type="button" class="btn-sgp-share" id="btnSgpShare" style="display:none">Share</button>
+        <button type="button" class="btn-onboarding-cta" id="btnSgpDownload" disabled>Download Ticket</button>
+        <button type="button" class="btn-sgp-share" id="btnSgpShare">Easy Share</button>
       </div>
     </div>
   </div>
@@ -5237,6 +5351,7 @@ function renderFeed(){
     const pill=statusPill(item.status);
     const el=document.createElement('div');
     el.className='feed-item';
+    el.dataset.caseId = item.id; // lets headToFeed() find+pulse this exact row after submission
     // No dedicated per-project route exists on the deployed site (there is
     // no /projects/:id page) — link to the dashboard root rather than a
     // path that would 404, while still surfacing the project id as text.
@@ -5901,9 +6016,41 @@ function openDispatchReceiptModal(opts){
 function closeDispatchReceiptModal(){
   document.getElementById('dispatchReceiptModal').classList.remove('open');
 }
-document.getElementById('btnReceiptDismiss').addEventListener('click', closeDispatchReceiptModal);
 document.getElementById('dispatchReceiptModal').addEventListener('click', (e) => {
   if (e.target.id === 'dispatchReceiptModal') closeDispatchReceiptModal();
+});
+// HEAD TO FEED (Patch 8-10/03/26) — the receipt's one real primary action.
+// The Map & Feed tab is already switched-to behind this modal (see
+// finalizeSubmitReport()), so there's no navigation left to do beyond
+// closing the modal — what this adds is actually flying the map to this
+// exact report's real coordinates, opening its marker popup, and scrolling/
+// pulsing its row in the feed list so the citizen lands looking straight at
+// the ticket they just filed instead of the top of a long list. A one-time-
+// per-session Founder Modal (see maybeShowFounderModal()) interrupts the
+// very first tap of this button each session; every tap after that goes
+// straight through.
+function headToFeed(){
+  closeDispatchReceiptModal();
+  switchTab('tab-map', document.querySelector('.navtab[data-target="tab-map"]'));
+  const caseId = pendingReceiptOpts && pendingReceiptOpts.caseId;
+  if (!caseId) return;
+  const item = cases.find(c => c.id === caseId);
+  if (item) {
+    if (!mapInit) initMap();
+    if (map) {
+      map.flyTo([item.lat, item.lng], 16);
+      if (markers[caseId]) markers[caseId].openPopup();
+    }
+  }
+  const feedEl = document.querySelector('.feed-item[data-case-id="' + caseId + '"]');
+  if (feedEl) {
+    feedEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    feedEl.classList.add('feed-item-focus');
+    setTimeout(() => feedEl.classList.remove('feed-item-focus'), 2400);
+  }
+}
+document.getElementById('btnHeadToFeed').addEventListener('click', () => {
+  maybeShowFounderModal(headToFeed);
 });
 // Brief, glowing in-card confirmation (hint text swap) rather than relying
 // only on the toast — the citizen's eyes are already on the ticket badge
@@ -5977,7 +6124,11 @@ async function handleAddToWallet(){
   await copyTextToClipboard(url);
   toast('Saved to Ledger — link copied');
 }
-document.getElementById('btnReceiptWallet').addEventListener('click', handleAddToWallet);
+// Patch 8-10/03/26 removed #btnReceiptWallet (the "Logged To Ledger" button
+// this was wired to) from the receipt modal in favor of "Head to Feed" —
+// see that button's own comment. handleAddToWallet() and the real
+// /api/passbook integration above are kept, unreferenced, in case a future
+// entry point wants this real (if still 501-while-unsigned) pass flow back.
 
 // ===== STAGED "SUPPORT THE LEDGER" CIVIC MODULE (Patch 5.5) =====
 // Entirely staged/preview-gated — see the #support-ledger-module HTML
@@ -6101,6 +6252,114 @@ if (btnSupportLedgerPreviewToggle) {
   });
 }
 
+// ===== ONE-TIME POST-SUBMISSION FOUNDER MODAL (Patch 8-10/03/26) =====
+// See #founderModal's own HTML comment for why this is wired separately
+// from the preview-gated #support-ledger-module above (scoped queries
+// against #founderModal only, never the bare .sl-tier-btn selector that
+// module's own handlers use, so the two never cross-wire each other's
+// state even though they share the same CSS classes for a consistent
+// look).
+let founderModalShownThisSession = false;
+let founderModalContinueCallback = null;
+let founderSelectedTier = '5';
+let founderOneTime = false;
+function resetFounderModalState(){
+  founderSelectedTier = '5';
+  founderOneTime = false;
+  document.getElementById('founderTierRowMonthly').style.display = '';
+  document.getElementById('founderTierRowOnetime').style.display = 'none';
+  document.getElementById('founderOnetimeToggle').classList.remove('on');
+  document.getElementById('founderOnetimeToggle').setAttribute('aria-checked', 'false');
+  document.getElementById('founderCustomAmount').style.display = 'none';
+  document.getElementById('founderCustomAmount').value = '';
+  document.querySelectorAll('#founderTierRowMonthly .founder-tier-btn').forEach(b => b.classList.toggle('active', b.dataset.founderTier === '5'));
+  document.querySelectorAll('#founderTierRowOnetime .founder-tier-btn').forEach(b => b.classList.toggle('active', b.dataset.founderTier === '100'));
+}
+// Called from btnHeadToFeed's click handler — shows this modal once per
+// session (the citizen's very first "Head to Feed" tap) and holds the real
+// navigation (headToFeed itself) until they either support or dismiss;
+// every tap after the first just runs continueCallback() straight away.
+function maybeShowFounderModal(continueCallback){
+  if (founderModalShownThisSession) { continueCallback(); return; }
+  founderModalShownThisSession = true;
+  founderModalContinueCallback = continueCallback;
+  resetFounderModalState();
+  document.getElementById('founderModal').classList.add('open');
+}
+function closeFounderModalAndContinue(){
+  document.getElementById('founderModal').classList.remove('open');
+  const cb = founderModalContinueCallback;
+  founderModalContinueCallback = null;
+  if (typeof cb === 'function') cb();
+}
+document.querySelectorAll('#founderTierRowMonthly .founder-tier-btn, #founderTierRowOnetime .founder-tier-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const row = btn.closest('.founder-tier-row');
+    row.querySelectorAll('.founder-tier-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    founderSelectedTier = btn.dataset.founderTier;
+    const customInput = document.getElementById('founderCustomAmount');
+    if (founderSelectedTier === 'other') {
+      customInput.style.display = '';
+      customInput.focus();
+    } else {
+      customInput.style.display = 'none';
+    }
+  });
+});
+document.getElementById('founderOnetimeToggle').addEventListener('click', () => {
+  founderOneTime = !founderOneTime;
+  const toggle = document.getElementById('founderOnetimeToggle');
+  toggle.classList.toggle('on', founderOneTime);
+  toggle.setAttribute('aria-checked', String(founderOneTime));
+  document.getElementById('founderTierRowMonthly').style.display = founderOneTime ? 'none' : '';
+  document.getElementById('founderTierRowOnetime').style.display = founderOneTime ? '' : 'none';
+  // Re-sync the selected tier/custom-amount state to whichever row is now
+  // showing, rather than leaving a stale monthly selection in place while a
+  // one-time row is visible (or vice versa).
+  const activeRow = founderOneTime ? document.getElementById('founderTierRowOnetime') : document.getElementById('founderTierRowMonthly');
+  const activeBtn = activeRow.querySelector('.founder-tier-btn.active') || activeRow.querySelector('.founder-tier-btn');
+  activeRow.querySelectorAll('.founder-tier-btn').forEach(b => b.classList.toggle('active', b === activeBtn));
+  founderSelectedTier = activeBtn.dataset.founderTier;
+  document.getElementById('founderCustomAmount').style.display = (founderOneTime && founderSelectedTier === 'other') ? '' : 'none';
+});
+document.getElementById('btnFounderCta').addEventListener('click', () => {
+  // "Other" needs a real, positive custom amount before this can mean
+  // anything — same spirit as every other hard-lock in this file: no
+  // guessed/default value stands in for one the citizen hasn't actually
+  // given.
+  let amount = founderSelectedTier;
+  if (founderSelectedTier === 'other') {
+    const customInput = document.getElementById('founderCustomAmount');
+    const customVal = parseFloat(customInput.value);
+    if (!customVal || customVal <= 0) {
+      customInput.focus();
+      toast('Enter a contribution amount first.', true);
+      return;
+    }
+    amount = String(customVal);
+  }
+  if (!STRIPE_PAYMENT_LINK) {
+    console.warn('[CITIXEN] "Support Founder / Ledger" has no STRIPE_PAYMENT_LINK configured yet — set the constant near the top of this module\'s script before this goes live.');
+    toast('Founder support is in preview — payment isn\'t live yet.', true);
+    closeFounderModalAndContinue();
+    return;
+  }
+  try {
+    const url = new URL(STRIPE_PAYMENT_LINK);
+    url.searchParams.set('client_reference_id', (founderOneTime ? 'onetime_' : 'monthly_') + amount);
+    window.open(url.toString(), '_blank', 'noopener');
+  } catch (e) {
+    console.warn('[CITIXEN] STRIPE_PAYMENT_LINK is not a valid URL:', STRIPE_PAYMENT_LINK);
+    toast('Founder support is in preview — payment isn\'t live yet.', true);
+  }
+  closeFounderModalAndContinue();
+});
+document.getElementById('btnFounderContinue').addEventListener('click', closeFounderModalAndContinue);
+document.getElementById('founderModal').addEventListener('click', (e) => {
+  if (e.target.id === 'founderModal') closeFounderModalAndContinue();
+});
+
 // NOTE — APPLE WALLET REPOSITION round removed the standing "Add to Apple
 // Wallet" footer badge (.btn-add-to-wallet, formerly repeated on the Report/
 // Map & Feed/Dashboard tabs' footer card + the Quick Help modal) and its
@@ -6120,20 +6379,29 @@ if (btnSupportLedgerPreviewToggle) {
 // photo and produced a generic, near-empty PNG.
 let lastSocialGraphicDataUrl = null;
 let lastSocialGraphicFile = null;
+let lastSocialGraphicTicketId = null;
 async function renderAndShowSocialGraphic(opts){
   opts = opts || {};
   const modal = document.getElementById('socialGraphicPreviewModal');
   const imgEl = document.getElementById('sgpPreviewImg');
   const loadingEl = document.getElementById('sgpLoading');
   const loadingTextEl = document.getElementById('sgpLoadingText');
+  const guardEl = document.getElementById('sgpBlurGuard');
+  const downloadBtn = document.getElementById('btnSgpDownload');
   const shareBtn = document.getElementById('btnSgpShare');
   lastSocialGraphicDataUrl = null;
   lastSocialGraphicFile = null;
+  lastSocialGraphicTicketId = opts.ticketId || null;
   imgEl.style.display = 'none';
   imgEl.removeAttribute('src');
   loadingTextEl.textContent = 'Rendering 1:1 Social Card...';
   loadingEl.style.display = 'flex';
-  shareBtn.style.display = 'none';
+  // IMAGE SCREENING / BLUR GUARD (Patch 8-10/03/26) — reset to "screened" on
+  // every open; Download/Easy Share start disabled and only unlock once the
+  // citizen actually taps through the guard below (see its click handler).
+  guardEl.style.display = 'none';
+  downloadBtn.disabled = true;
+  shareBtn.disabled = true;
   modal.classList.add('open');
 
   // Populate the hidden export card with this exact ticket's real data —
@@ -6143,7 +6411,7 @@ async function renderAndShowSocialGraphic(opts){
     ? (opts.wardMeta.cityName + ', ' + opts.wardMeta.state.toUpperCase())
     : 'LOCAL DISTRICT';
   document.getElementById('sgeTicket').textContent = opts.ticketId || '—';
-  document.getElementById('sgeStatus').textContent = (opts.queuedOffline ? 'QUEUED OFFLINE' : 'REPORT ACKNOWLEDGED') + ' · PUBLIC LEDGER';
+  document.getElementById('sgeStatus').textContent = (opts.queuedOffline ? 'QUEUED OFFLINE' : 'REPORT ACKNOWLEDGED') + ' • PUBLIC LEDGER RECEIPT';
   document.getElementById('sgeBreadcrumb').textContent = formatDeptBreadcrumb(opts.department, opts.type);
   const coordsText = (opts.resolvedLoc && typeof opts.resolvedLoc.lat === 'number' && typeof opts.resolvedLoc.lng === 'number')
     ? formatCoordPrecision(opts.resolvedLoc.lat, opts.resolvedLoc.lng)
@@ -6153,12 +6421,14 @@ async function renderAndShowSocialGraphic(opts){
   document.getElementById('sgeTimestamp').textContent = ts.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 
   const photoEl = document.getElementById('sgePhoto');
-  if (opts.photoDataUrl) {
+  const photoFrameEl = document.getElementById('sgePhotoFrame');
+  const hasPhoto = !!opts.photoDataUrl;
+  if (hasPhoto) {
     photoEl.src = opts.photoDataUrl;
-    photoEl.style.display = 'block';
+    photoFrameEl.style.display = 'block';
   } else {
     photoEl.removeAttribute('src');
-    photoEl.style.display = 'none';
+    photoFrameEl.style.display = 'none';
   }
 
   try {
@@ -6174,18 +6444,30 @@ async function renderAndShowSocialGraphic(opts){
     imgEl.style.display = 'block';
     loadingEl.style.display = 'none';
 
-    // Web Share API with file support is spotty across browsers — only
-    // surface the Share button when this one actually supports sharing an
-    // image file; Download always works regardless.
+    // Only the photo itself needs screening before the citizen looks at it —
+    // a photo-less card (should be rare; a photo is required to submit a
+    // report at all, but this stays honest for the offline-queued/edge case
+    // where one somehow isn't attached) skips the guard and unlocks the
+    // action buttons immediately.
+    if (hasPhoto) {
+      guardEl.style.display = 'flex';
+    } else {
+      downloadBtn.disabled = false;
+      shareBtn.disabled = false;
+    }
+
+    // Web Share API with file support is spotty across browsers — prepare
+    // the shareable file when supported so Easy Share can use it directly;
+    // otherwise it falls back to copying the ticket's direct link (see its
+    // click handler) rather than disappearing outright.
     if (navigator.share && navigator.canShare) {
       try {
         const blob = await (await fetch(dataUrl)).blob();
         const file = new File([blob], 'citixen-ux-social-card.png', { type: 'image/png' });
         if (navigator.canShare({ files: [file] })) {
           lastSocialGraphicFile = file;
-          shareBtn.style.display = '';
         }
-      } catch (e) { /* share-file support check failed — download-only fallback stays available */ }
+      } catch (e) { /* share-file support check failed — Easy Share still falls back to copy-link */ }
     }
   } catch (err) {
     loadingTextEl.textContent = 'Could not render the social card — try again.';
@@ -6195,6 +6477,16 @@ async function renderAndShowSocialGraphic(opts){
 document.getElementById('btnReceiptGraphic').addEventListener('click', () => {
   renderAndShowSocialGraphic(pendingReceiptOpts || {});
 });
+// IMAGE SCREENING / BLUR GUARD (Patch 8-10/03/26) — this blurs the real
+// rendered image sitting underneath it (backdrop-filter, not a separate
+// blurred copy), so tapping through reveals exactly what Download/Easy
+// Share would send out. Both actions stay disabled until this fires once
+// per render (see renderAndShowSocialGraphic() resetting it on open).
+document.getElementById('sgpBlurGuard').addEventListener('click', () => {
+  document.getElementById('sgpBlurGuard').style.display = 'none';
+  document.getElementById('btnSgpDownload').disabled = false;
+  document.getElementById('btnSgpShare').disabled = false;
+});
 document.getElementById('btnSgpDownload').addEventListener('click', () => {
   if (!lastSocialGraphicDataUrl) return;
   const a = document.createElement('a');
@@ -6202,11 +6494,24 @@ document.getElementById('btnSgpDownload').addEventListener('click', () => {
   a.download = 'citixen-ux-social-card.png';
   document.body.appendChild(a); a.click(); a.remove();
 });
+// EASY SHARE (Patch 8-10/03/26, was "Share") — uses the real Web Share API
+// with the rendered image file when the browser supports sharing files;
+// otherwise falls back to copying this ticket's real direct link (same
+// URL format as Copy Direct Link on the receipt itself) rather than
+// disappearing outright or fabricating a hosted "image link" this app
+// doesn't actually have (the PNG only ever exists client-side/as a
+// download — there's no server upload to link to).
 document.getElementById('btnSgpShare').addEventListener('click', async () => {
-  if (!lastSocialGraphicFile) return;
-  try {
-    await navigator.share({ files: [lastSocialGraphicFile], title: 'Citixen UX Report', text: 'My civic report just went live on the public ledger.' });
-  } catch (e) { /* citizen cancelled the native share sheet, or it's unsupported here — Download still works */ }
+  if (lastSocialGraphicFile) {
+    try {
+      await navigator.share({ files: [lastSocialGraphicFile], title: 'Citixen UX Report', text: 'My civic report just went live on the public ledger.' });
+      return;
+    } catch (e) { /* citizen cancelled the native share sheet — fall through to the copy-link fallback below */ }
+  }
+  const id = lastSocialGraphicTicketId || document.getElementById('receiptTicketId').textContent;
+  const url = location.origin + '/app?report=' + encodeURIComponent(id);
+  const ok = await copyTextToClipboard(url);
+  toast(ok ? 'Link copied — share it anywhere' : 'Could not copy — select and copy manually');
 });
 document.getElementById('btnSgpClose').addEventListener('click', () => {
   document.getElementById('socialGraphicPreviewModal').classList.remove('open');
@@ -6515,7 +6820,8 @@ async function finalizeSubmitReport(opts){
   openDispatchReceiptModal({
     ticketId, department: dept, type: hz.type, location: rawLoc,
     queuedOffline: !result.ok, timestamp: new Date(),
-    wardMeta: currentWardMeta, resolvedLoc: resolved, photoDataUrl
+    wardMeta: currentWardMeta, resolvedLoc: resolved, photoDataUrl,
+    caseId: nc.id
   });
   switchTab('tab-map', document.querySelectorAll('.navtab')[1]);
 }
