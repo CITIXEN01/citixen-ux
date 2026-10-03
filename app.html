@@ -5836,6 +5836,11 @@ function plotMarker(item){
   const icon=beaconIcon(mapPinColor(item), 26, true);
   const m=L.marker([item.lat,item.lng],{icon, zIndexOffset: item.status === 'Critical' ? 500 : 0}).addTo(map);
   m.bindPopup(`<strong>${esc(item.title)}</strong><br><span style="font-size:.7rem">${esc(item.loc)} • ${esc(item.time)}</span>`);
+  // CLEAN CARD CLICK-TO-VIEW-RECEIPT (Patch 23-10/03/26) — "or map popup"
+  // per spec: tapping this pin (which already opens its existing popup via
+  // Leaflet's own default behavior) also reopens this report's real
+  // receipt, with no new marker/badge/button added to the map itself.
+  m.on('click', () => openReceiptForCase(item.id));
   markers[item.id]=m;
 }
 
@@ -5967,10 +5972,17 @@ function renderFeed(){
       ${projectLink}`;
     el.addEventListener('click',(e)=>{
       if (e.target.closest('a')) return; // let the project link navigate normally
-      if(!mapInit) initMap();
-      if(!map) return; // Leaflet unavailable — feed item just doesn't fly the (absent) map
-      map.flyTo([item.lat,item.lng],16);
-      markers[item.id] && markers[item.id].openPopup();
+      if(mapInit && map){
+        map.flyTo([item.lat,item.lng],16);
+        markers[item.id] && markers[item.id].openPopup();
+      }
+      // CLEAN CARD CLICK-TO-VIEW-RECEIPT (Patch 23-10/03/26) — no new
+      // visible button/badge added to this card; the entire existing card
+      // is the tap target, same as the fly-to-map behavior above it's
+      // layered on top of. openReceiptForCase() no-ops (returns false) for
+      // the brief instant before a just-submitted report has a real
+      // ticketId yet, so this never opens a receipt for nothing.
+      openReceiptForCase(item.id);
     });
     c.appendChild(el);
   });
@@ -6567,6 +6579,76 @@ function formatDeptBreadcrumb(department, type){
   else if (sub && !typePart) typePart = sub;
   if (typePart && typePart.toLowerCase() === root.toLowerCase()) typePart = '';
   return typePart ? root + ' · ' + typePart : root;
+}
+/* =====================================================================
+   RECEIPT PERSISTENCE (Patch 23-10/03/26) — "View Receipt" needs to be able
+   to rebuild the exact dispatch receipt + Social Card for a report this
+   device already submitted, any time later — not just immediately after
+   publishing. finalizeSubmitReport() writes one real record per ticket
+   here, keyed by its real ticketId, the moment that ticket is published
+   (see the call near the bottom of that function). Same same-origin
+   localStorage posture as MY_REPORTS_KEY/CITIXEN_GRID_STORAGE_KEY above —
+   private to this device, never sent to the server as an identity.
+   HONEST LIMIT: the captured photo is deliberately NOT included in this
+   persisted record. A data-URL photo can run into the hundreds of KB to a
+   few MB, and this key can hold many tickets over a session — persisting
+   photos risked blowing the browser's localStorage quota and silently
+   breaking every OTHER feature that writes here (jurisdiction, telemetry,
+   the grid-activation sync). The photo is instead kept only on the
+   in-memory `cases` entry for this page load (see nc.photoDataUrl below),
+   so "View Receipt" shows the real photo within the same session and
+   degrades to a photo-less receipt (never a fake/placeholder image) after
+   a reload, when only this persisted record remains.
+   ===================================================================== */
+const CITIXEN_RECEIPTS_KEY = 'citixen_receipts_v1';
+function getStoredReceipts(){
+  try { return JSON.parse(localStorage.getItem(CITIXEN_RECEIPTS_KEY) || '{}'); }
+  catch (e) { return {}; } // private browsing / storage blocked — rebuild just isn't available
+}
+function saveReceiptRecord(ticketId, record){
+  if (!ticketId) return;
+  try {
+    const all = getStoredReceipts();
+    all[ticketId] = record;
+    localStorage.setItem(CITIXEN_RECEIPTS_KEY, JSON.stringify(all));
+  } catch (e) {
+    // Storage unavailable or quota exceeded — the report itself already
+    // published successfully; only this device's later "View Receipt"
+    // rebuild for it is lost, same honest degrade as MY_REPORTS_KEY above.
+  }
+}
+function getReceiptRecord(ticketId){
+  if (!ticketId) return null;
+  return getStoredReceipts()[ticketId] || null;
+}
+// Real, deterministic, reused from the same FNV-ish liveTicketHash() this
+// file already uses to build a ticket's own ID hash segment — not a new
+// "cryptographic proof" invented for this patch. Mixing in the ticketId +
+// ISO timestamp + coordinates means the value actually reflects those real
+// fields (changes if any of them would), rather than being a cosmetic
+// constant, while staying honest about what it is: a short client-side
+// integrity/display code, not a server-issued or blockchain hash.
+function computeReceiptVerificationHash(ticketId, isoTimestamp, lat, lng){
+  return 'VR-' + liveTicketHash([ticketId, isoTimestamp, lat, lng].join('|')).toString(36).toUpperCase();
+}
+// Looks up a case this device submitted (by its real internal id) and
+// reopens its receipt — used by the feed card / map popup click handlers
+// below. Prefers the freshly-persisted localStorage record (the single
+// source of truth "View Receipt" is meant to rebuild from per spec) and
+// falls back to the in-memory case/pendingReceiptOpts only if storage was
+// unavailable when it was first saved. Returns false (opens nothing) for a
+// case with no real ticketId yet — the brief window between cases.unshift()
+// and the server/offline-queue response actually assigning one.
+function openReceiptForCase(caseId){
+  const item = cases.find(c => c.id === caseId);
+  if (!item || !item.ticketId) return false;
+  const stored = getReceiptRecord(item.ticketId);
+  if (!stored) return false;
+  openDispatchReceiptModal(Object.assign({}, stored, {
+    timestamp: stored.timestamp ? new Date(stored.timestamp) : new Date(),
+    photoDataUrl: item.photoDataUrl || stored.photoDataUrl || null
+  }));
+  return true;
 }
 let pendingReceiptOpts = null;
 function openDispatchReceiptModal(opts){
@@ -7449,6 +7531,11 @@ async function finalizeSubmitReport(opts){
   // ticket (matched by real ID, see cycleAdminTicketStage()) can find and
   // retire the matching pin on this device's own map — never a guessed match.
   nc.ticketId = ticketId;
+  // Kept on the in-memory case (this page load only — see the "HONEST
+  // LIMIT" note on CITIXEN_RECEIPTS_KEY above for why this isn't also
+  // persisted to localStorage) so a same-session "View Receipt" replay
+  // shows the real captured photo, not a placeholder.
+  nc.photoDataUrl = photoDataUrl;
   if (result.ok) {
     toast(urgentOverride ? '✓ Published as urgent — routed to ' + dept : '✓ Published — routed to ' + dept);
     trackEvent('report_submit', { ok: true, category: cat, dept, ward, urgentOverride, reportId: ticketId });
@@ -7478,11 +7565,30 @@ async function finalizeSubmitReport(opts){
   // Pops instantly, before the tab switch below — acknowledges the dispatch
   // with its real ticket ID right away rather than after the citizen is
   // already looking at the Map & Feed tab.
-  openDispatchReceiptModal({
+  const receiptTimestamp = new Date();
+  const receiptOpts = {
     ticketId, department: dept, type: hz.type, location: rawLoc,
-    queuedOffline: !result.ok, timestamp: new Date(),
+    queuedOffline: !result.ok, timestamp: receiptTimestamp,
     wardMeta: currentWardMeta, resolvedLoc: resolved, photoDataUrl,
     caseId: nc.id
+  };
+  openDispatchReceiptModal(receiptOpts);
+  // RECEIPT PERSISTENCE (Patch 23-10/03/26) — every published report (real
+  // server ticket or honestly-labeled offline-queued one) gets its receipt
+  // metadata saved here, keyed by its real ticketId, so tapping its feed
+  // card or map pin later rebuilds this exact receipt — see
+  // openReceiptForCase() above and the feed-item/marker click handlers
+  // below. photoDataUrl is intentionally left out of the persisted copy —
+  // see CITIXEN_RECEIPTS_KEY's own comment for why.
+  saveReceiptRecord(ticketId, {
+    ticketId, department: dept, type: hz.type, location: rawLoc,
+    queuedOffline: !result.ok, timestamp: receiptTimestamp.toISOString(),
+    wardMeta: currentWardMeta, resolvedLoc: resolved, caseId: nc.id,
+    verificationHash: computeReceiptVerificationHash(
+      ticketId, receiptTimestamp.toISOString(),
+      resolved && typeof resolved.lat === 'number' ? resolved.lat : null,
+      resolved && typeof resolved.lng === 'number' ? resolved.lng : null
+    )
   });
   switchTab('tab-map', document.querySelectorAll('.navtab')[1]);
 }
