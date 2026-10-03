@@ -870,15 +870,18 @@ textarea.input{resize:none;line-height:1.4}
    own text was already Title Case — so text-transform:none here is what
    makes the visible label match spec, not a text-content change.
    border-radius overridden from the base class's pill-shaped 9999px down
-   to a rounded rectangle within the requested 12-16px range. */
-#btnGpsBlockedRetry{background:#00FF87;color:#080C14;text-transform:none;border-radius:14px;
-  box-shadow:0 0 15px rgba(0,255,135,.25)}
+   to the exact 12px rounded rectangle the Brand Kit Primary CTA spec
+   calls for (Patch 28 re-spec, 10/03/26 — tightened from this same id's
+   first pass, which had picked 14px out of an earlier 12-16px range). */
+#btnGpsBlockedRetry{background:#00FF87;color:#080C14;text-transform:none;border-radius:12px;
+  border:none;box-shadow:0 0 15px rgba(0,255,135,.25)}
 /* Demoted from a bordered secondary button to a plain centered text link,
    muted gray per spec (close to but distinct from the shared --muted
    #8e9fa8 token, so this doesn't recolor --muted everywhere else it's
-   used). */
+   used). Spacing re-specced (10/03/26) from this id's first pass'
+   padding:10px 0 0 to an explicit margin-top:12px. */
 #btnGpsBlockedDismiss{background:transparent;border:none;color:#8A99AD;text-align:center;
-  text-decoration:underline;text-underline-offset:3px;padding:10px 0 0}
+  text-decoration:underline;text-underline-offset:3px;margin-top:12px}
 
 /* ===== POST-SUBMISSION DISPATCH RECEIPT MODAL (#dispatchReceiptModal) —
    reuses .confirm-drawer/.confirm-card for the overlay + card chrome,
