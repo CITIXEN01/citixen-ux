@@ -1506,31 +1506,21 @@ textarea.input{resize:none;line-height:1.4}
                specifically to a denied/blocked/timed-out permission instead
                of a generic toast — see retryGpsResolution(). -->
           <div id="reportGpsLockHint" style="display:none;background:rgba(255,68,68,.08);border:1px solid var(--danger);border-radius:10px;padding:12px 14px;margin:4px 0 12px;text-align:center;">
-            <div class="small" style="color:#fca5a5;font-weight:700;margin-bottom:6px;">Location required to publish</div>
-            <div class="small" style="color:var(--muted);margin-bottom:10px;line-height:1.4;">CITIXEN OS requires an active GPS fix — or a validated street address — to route this report to the correct ward. There is no default/anchor location; reports can't be filed without one or the other.</div>
-            <button type="button" class="chip" id="btnRetryGps" style="display:inline-flex;">Enable location &amp; retry</button>
-            <!-- GPS-BLOCKED GUIDANCE (Patch 5.3) — hidden until
-                 retryGpsResolution() sees a GeolocationPositionError whose
-                 code is PERMISSION_DENIED (1) or a timeout. A denied
-                 permission means the browser will silently re-deny every
-                 future retry without ever showing the native prompt again,
-                 so a generic "still no GPS" toast reads as the button doing
-                 nothing — this spells out the actual next step and moves
-                 focus straight to the address field instead of leaving the
-                 citizen on a dead end. -->
-            <div class="gps-denied-banner small" style="display:none;margin-top:10px;background:rgba(255,68,68,.12);border:1px solid var(--danger);border-radius:8px;padding:9px 11px;text-align:left;color:#fca5a5;line-height:1.4;">
-              GPS access disabled in browser. Enter a street address or cross-street below to route your report.
-            </div>
-            <div class="small" style="color:var(--muted);margin:12px 0 6px;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;">
-              <span>or enter your street address</span>
-              <button type="button" class="link-btn gps-help-link" data-help-target="reportGpsLockHint" style="background:none;border:none;padding:0;color:var(--mint2);font:inherit;font-size:.68rem;text-decoration:underline;text-underline-offset:2px;cursor:pointer;">How to unblock GPS</button>
-            </div>
-            <div style="display:flex;gap:8px;">
-              <div class="address-suggest-wrap">
-                <input class="input manual-address-input" id="repManualAddress" type="text" autocomplete="street-address" enterkeyhint="search" placeholder="e.g. 351 W Hubbard St" style="margin:0;">
-                <div class="address-suggest-list" id="repManualAddressSuggest"></div>
-              </div>
-              <button type="button" class="chip" id="btnUseManualAddress" style="display:inline-flex;white-space:nowrap;">Use address</button>
+            <div class="small" style="color:#fca5a5;font-weight:700;margin-bottom:6px;">Location Required to Publish</div>
+            <div class="small" style="color:var(--muted);margin-bottom:4px;line-height:1.4;">CITIXEN UX<sup class="tm-symbol">™</sup> requires an active GPS fix — or a validated street address — to route this report to the correct ward.</div>
+            <div class="small" style="color:#fff;font-weight:700;margin:10px 0 12px;line-height:1.4;">We can't file a report without a location.</div>
+            <button type="button" class="chip" id="btnRetryGps" style="display:inline-flex;">Use Location</button>
+            <!-- GPS-BLOCKED GUIDANCE (Patch 3-10/03/26) — a denied/blocked/
+                 timed-out GPS attempt no longer leaves permanent red text on
+                 this card (see retryGpsResolution()/openGpsBlockedModal());
+                 it opens #gpsBlockedModal instead, which carries its own
+                 "How to Unblock GPS" link to #gpsHelpModal. This card's own
+                 address field below stays the same either way — it's always
+                 visible, not just revealed on failure. -->
+            <div class="small" style="color:var(--muted);margin:14px 0 6px;">Or enter your address</div>
+            <div class="address-suggest-wrap">
+              <input class="input manual-address-input" id="repManualAddress" type="text" autocomplete="street-address" enterkeyhint="search" placeholder="e.g. 351 W Hubbard St" style="margin:0;">
+              <div class="address-suggest-list" id="repManualAddressSuggest"></div>
             </div>
             <div id="repManualAddressStatus" class="small" style="margin-top:8px;display:none;"></div>
           </div>
@@ -2118,30 +2108,46 @@ textarea.input{resize:none;line-height:1.4}
        ever fabricates a location. ===== -->
   <div id="locationRequiredModal" class="confirm-drawer">
     <div class="confirm-card">
-      <div class="confirm-title">Location Required to Post</div>
+      <div class="confirm-title">Location Required to Publish</div>
       <div class="small" style="color:var(--muted);line-height:1.5;margin-bottom:4px;">
-        CITIXEN OS requires active GPS location — or a validated street address — to route your report to the correct municipal ward. Reports can't publish on a guessed or default location.
+        CITIXEN UX<sup class="tm-symbol">™</sup> requires an active GPS fix — or a validated street address — to route this report to the correct ward.
       </div>
-      <!-- GPS-BLOCKED GUIDANCE (Patch 5.3) — same denied/timeout handling as
-           #reportGpsLockHint above; see retryGpsResolution(). -->
-      <div class="gps-denied-banner small" style="display:none;margin-top:10px;background:rgba(255,68,68,.12);border:1px solid var(--danger);border-radius:8px;padding:9px 11px;text-align:left;color:#fca5a5;line-height:1.4;">
-        GPS access disabled in browser. Enter a street address or cross-street below to route your report.
+      <div class="small" style="color:#fff;font-weight:700;margin:10px 0 4px;line-height:1.4;">We can't file a report without a location.</div>
+      <div class="small" style="color:var(--muted);margin:14px 0 6px;">Or enter your address</div>
+      <div class="address-suggest-wrap">
+        <input class="input manual-address-input" id="modalManualAddress" type="text" autocomplete="street-address" enterkeyhint="search" placeholder="e.g. 351 W Hubbard St" style="margin:0;">
+        <div class="address-suggest-list" id="modalManualAddressSuggest"></div>
       </div>
-      <div class="small" style="color:var(--muted);margin:14px 0 4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-        <span>Enter a street address instead</span>
-        <button type="button" class="link-btn gps-help-link" data-help-target="locationRequiredModal" style="background:none;border:none;padding:0;color:var(--mint2);font:inherit;font-size:.68rem;text-decoration:underline;text-underline-offset:2px;cursor:pointer;">How to unblock GPS</button>
-      </div>
-      <div style="display:flex;gap:8px;margin:6px 0 4px;">
-        <div class="address-suggest-wrap">
-          <input class="input manual-address-input" id="modalManualAddress" type="text" autocomplete="street-address" enterkeyhint="search" placeholder="e.g. 351 W Hubbard St" style="margin:0;">
-          <div class="address-suggest-list" id="modalManualAddressSuggest"></div>
-        </div>
-        <button type="button" class="chip" id="btnModalUseManualAddress" style="display:inline-flex;white-space:nowrap;">Use address</button>
-      </div>
-      <div id="modalManualAddressStatus" class="small" style="margin:0 0 4px;display:none;"></div>
+      <div id="modalManualAddressStatus" class="small" style="margin:8px 0 4px;display:none;"></div>
       <div class="confirm-actions">
-        <button type="button" class="btn-confirm-lock" id="btnLocationRetry">Try Again (GPS)</button>
+        <button type="button" class="btn-confirm-lock" id="btnLocationRetry">Use Location</button>
         <button type="button" class="btn-confirm-cancel" id="btnLocationDismiss">Dismiss</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== "GPS ACCESS BLOCKED" MODAL (Patch 3-10/03/26) — replaces the old
+       inline .gps-denied-banner red text that used to appear directly on
+       #reportGpsLockHint/#locationRequiredModal on a denied/timed-out GPS
+       attempt. Opened by openGpsBlockedModal() (see retryGpsResolution()),
+       which also closes #locationRequiredModal first if that's where the
+       failed attempt came from, so only one modal is ever on screen. "Retry
+       Location" re-attempts the same resolveDisplayLocation() as every GPS
+       path in this file; "How to Unblock GPS" opens #gpsHelpModal; dismissing
+       either way leaves the citizen on the main card, where the address
+       field is always visible (never hidden behind a failure state). ===== -->
+  <div id="gpsBlockedModal" class="confirm-drawer">
+    <div class="confirm-card">
+      <div class="confirm-title">GPS Access Blocked</div>
+      <div class="small" style="color:var(--muted);line-height:1.5;margin-bottom:4px;">
+        Your browser blocked location access for this site, or the request timed out. You can retry it, or just type your street address on the report form instead.
+      </div>
+      <div class="small" style="margin:14px 0 4px;">
+        <button type="button" class="link-btn gps-help-link" data-help-target="gpsBlockedModal" style="background:none;border:none;padding:0;color:var(--mint2);font:inherit;font-size:.72rem;text-decoration:underline;text-underline-offset:2px;cursor:pointer;">How to Unblock GPS</button>
+      </div>
+      <div class="confirm-actions">
+        <button type="button" class="btn-confirm-lock" id="btnGpsBlockedRetry">Retry Location</button>
+        <button type="button" class="btn-confirm-cancel" id="btnGpsBlockedDismiss">Dismiss</button>
       </div>
     </div>
   </div>
@@ -3210,9 +3216,26 @@ async function photonSearch(query){
 function attachAddressAutocomplete(inputEl, listEl, statusEl){
   if (!inputEl || !listEl) return;
   let debounceTimer = null;
+  let autoValidateTimer = null;
   let requestToken = 0;
   let results = [];
   let activeIndex = -1;
+  // The exact input string the last successful validation (a picked
+  // suggestion or an auto-geocoded full address) was confirmed against. If
+  // the citizen edits the field afterward, the stored lat/lng no longer
+  // describes what's on screen, so it's cleared rather than silently
+  // submitted stale (see Patch 3-10/03/26 item 2's auto-validate spec).
+  let validatedValue = null;
+
+  function invalidateStaleValidation(){
+    if (validatedValue === null) return;
+    if (inputEl.value.trim() === validatedValue) return;
+    validatedValue = null;
+    if (window.CITIXEN_MANUAL_ADDRESS) {
+      window.CITIXEN_MANUAL_ADDRESS = null;
+      updateSubmitPhotoGate();
+    }
+  }
 
   function closeList(){
     listEl.classList.remove('open');
@@ -3246,6 +3269,7 @@ function attachAddressAutocomplete(inputEl, listEl, statusEl){
   function selectResult(item){
     if (!item) return;
     inputEl.value = item.label;
+    validatedValue = item.label;
     closeList();
     window.CITIXEN_MANUAL_ADDRESS = { address: item.label, lat: item.lat, lng: item.lng };
     const repLoc = document.getElementById('repLoc');
@@ -3260,8 +3284,16 @@ function attachAddressAutocomplete(inputEl, listEl, statusEl){
     if (hasValidLocation()) closeLocationRequiredModal();
   }
 
+  // "Upon typing" auto-validate: there is no more "Use address" button to
+  // click, so once the citizen pauses typing with Photon returning no live
+  // suggestion to pick, this falls back on its own to a full-string geocode
+  // (submitManualAddress -> Nominatim) instead of leaving the field inert.
+  // Picking a dropdown suggestion (selectResult, above) already validates
+  // immediately and short-circuits this path via the requestToken check.
   inputEl.addEventListener('input', () => {
+    invalidateStaleValidation();
     clearTimeout(debounceTimer);
+    clearTimeout(autoValidateTimer);
     const q = inputEl.value.trim();
     if (q.length < 3) { closeList(); return; }
     const myToken = ++requestToken;
@@ -3269,6 +3301,20 @@ function attachAddressAutocomplete(inputEl, listEl, statusEl){
       const items = await photonSearch(q);
       if (myToken !== requestToken) return; // superseded by a newer keystroke
       renderResults(items);
+      if (!items.length && q.length >= 6) {
+        // No live suggestion to pick — give the citizen a brief extra pause
+        // (600ms on top of the 300ms debounce above) in case they're still
+        // typing, then auto-validate the full string they've entered.
+        autoValidateTimer = setTimeout(() => {
+          if (myToken !== requestToken) return;
+          if (inputEl.value.trim() !== q) return; // superseded by further typing
+          submitManualAddress(inputEl, statusEl, null).then(() => {
+            if (window.CITIXEN_MANUAL_ADDRESS && window.CITIXEN_MANUAL_ADDRESS.address === q) {
+              validatedValue = q;
+            }
+          });
+        }, 600);
+      }
     }, 300);
   });
   inputEl.addEventListener('keydown', (e) => {
@@ -5563,24 +5609,25 @@ function triggerLocationRequiredModal(){
 function closeLocationRequiredModal(){
   document.getElementById('locationRequiredModal').classList.remove('open');
 }
-// GPS-BLOCKED GUIDANCE (Patch 5.3) — reveals the container-scoped
-// .gps-denied-banner and moves focus to that same container's
-// .manual-address-input, so a denied/blocked permission (which the browser
-// will keep silently re-denying with no new native prompt) never reads as
-// "the button does nothing." Shared by both GPS retry entry points —
-// #btnRetryGps inside #reportGpsLockHint and #btnLocationRetry inside
-// #locationRequiredModal — found via btn.closest() so one function serves
-// both call sites without guessing which one fired.
-function showGpsBlockedGuidance(btn){
+// GPS-BLOCKED MODAL (Patch 3-10/03/26) — replaces the old inline
+// .gps-denied-banner red text that used to sit permanently in the DOM of
+// #reportGpsLockHint/#locationRequiredModal. A denied/blocked permission
+// means the browser will keep silently re-denying every retry with no new
+// native prompt, so this still has to say something more specific than a
+// toast — it just says it in a dedicated, dismissible popup instead of
+// leaving clutter on the main card. Shared by both GPS retry entry points
+// (#btnRetryGps inside #reportGpsLockHint and #btnLocationRetry inside
+// #locationRequiredModal) — gpsBlockedReturnContainerId remembers which one
+// triggered it, so Dismiss can send focus back to the right address field.
+let gpsBlockedReturnContainerId = null;
+function openGpsBlockedModal(btn){
   const container = btn && (btn.closest('#reportGpsLockHint') || btn.closest('#locationRequiredModal'));
-  if (!container) return;
-  const banner = container.querySelector('.gps-denied-banner');
-  if (banner) banner.style.display = 'block';
-  const addressInput = container.querySelector('.manual-address-input');
-  if (addressInput) {
-    addressInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    addressInput.focus({ preventScroll: true });
-  }
+  gpsBlockedReturnContainerId = container ? container.id : null;
+  closeLocationRequiredModal(); // never stack two confirm-drawer modals at once
+  document.getElementById('gpsBlockedModal').classList.add('open');
+}
+function closeGpsBlockedModal(){
+  document.getElementById('gpsBlockedModal').classList.remove('open');
 }
 async function retryGpsResolution(btn){
   if (locationRetryInFlight) return;
@@ -5595,16 +5642,16 @@ async function retryGpsResolution(btn){
     updateSubmitPhotoGate();
     if (!hasValidLocation()) {
       // A denied permission or a timeout both mean the citizen is stuck on
-      // the same dead end every retry — surface the banner + manual-address
-      // path instead of only the generic toast.
+      // the same dead end every retry — the blocked-GPS modal explains that
+      // and offers "How to Unblock GPS" + Retry, instead of only a toast.
       if (window.CITIXEN_LAST_GEO_FAILURE === 'denied' || window.CITIXEN_LAST_GEO_FAILURE === 'timeout') {
-        showGpsBlockedGuidance(btn);
-        toast('GPS access disabled in browser — enter your street address below.', true);
+        openGpsBlockedModal(btn);
       } else {
         toast('Still no GPS fix — enable location access, or enter your street address below.', true);
       }
     } else {
       toast('Location resolved — you can publish now.');
+      closeGpsBlockedModal();
     }
   }
 }
@@ -5615,11 +5662,21 @@ document.getElementById('btnLocationRetry').addEventListener('click', async () =
 });
 document.getElementById('btnLocationDismiss').addEventListener('click', closeLocationRequiredModal);
 document.getElementById('btnRetryGps').addEventListener('click', () => retryGpsResolution(document.getElementById('btnRetryGps')));
+document.getElementById('btnGpsBlockedRetry').addEventListener('click', () => retryGpsResolution(document.getElementById('btnGpsBlockedRetry')));
+document.getElementById('btnGpsBlockedDismiss').addEventListener('click', () => {
+  closeGpsBlockedModal();
+  const container = gpsBlockedReturnContainerId && document.getElementById(gpsBlockedReturnContainerId);
+  const addressInput = container && container.querySelector('.manual-address-input');
+  if (addressInput) {
+    addressInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    addressInput.focus({ preventScroll: true });
+  }
+});
 
-// "HOW TO UNBLOCK GPS" HELPER MODAL (Patch 5.3) — event-delegated since
-// .gps-help-link appears in two places (inline hint + location-required
-// modal); #btnGpsHelpClose is a single element so it gets a direct handler,
-// same convention as the other .confirm-drawer modals in this file.
+// "HOW TO UNBLOCK GPS" HELPER MODAL — event-delegated since .gps-help-link
+// appears inside #gpsBlockedModal; #btnGpsHelpClose is a single element so
+// it gets a direct handler, same convention as the other .confirm-drawer
+// modals in this file.
 document.addEventListener('click', e => {
   if (!e.target.closest('.gps-help-link')) return;
   document.getElementById('gpsHelpModal').classList.add('open');
@@ -5628,14 +5685,16 @@ document.getElementById('btnGpsHelpClose').addEventListener('click', () => {
   document.getElementById('gpsHelpModal').classList.remove('open');
 });
 
-// MANUAL STREET-ADDRESS FALLBACK (Patch 5.2) — shared handler for both the
-// inline #reportGpsLockHint address field and the #locationRequiredModal
-// address field. Forward-geocodes via the existing geocodeAddress() (same
+// MANUAL STREET-ADDRESS FALLBACK (Patch 5.2, button removed Patch
+// 3-10/03/26) — forward-geocodes via the existing geocodeAddress() (same
 // Nominatim call the Public Ledger's address search already uses). Only on
 // a real geocode match does window.CITIXEN_MANUAL_ADDRESS get set — a typed
 // string that fails to geocode is reported as an error and never treated as
 // a valid location, matching "never default to La Crosse or anchor
-// coordinates."
+// coordinates." There is no more "Use address" button to click — this is
+// now called automatically by attachAddressAutocomplete()'s auto-validate
+// debounce (see near geocodeAddress()) once the citizen pauses typing with
+// no live Photon suggestion to fall back on instead.
 async function submitManualAddress(inputEl, statusEl, btn){
   const address = inputEl ? inputEl.value.trim() : '';
   if (address.length < 6) {
@@ -5665,25 +5724,11 @@ async function submitManualAddress(inputEl, statusEl, btn){
     if (statusEl) { statusEl.textContent = '✓ Address validated — you can publish now.'; statusEl.style.color = 'var(--mint2)'; }
     updateSubmitPhotoGate();
     toast('Address validated — you can publish now.');
-    if (hasValidLocation()) closeLocationRequiredModal();
+    if (hasValidLocation()) { closeLocationRequiredModal(); closeGpsBlockedModal(); }
   } finally {
     if (btn) { btn.textContent = originalLabel; btn.disabled = false; }
   }
 }
-document.getElementById('btnUseManualAddress').addEventListener('click', () => {
-  submitManualAddress(
-    document.getElementById('repManualAddress'),
-    document.getElementById('repManualAddressStatus'),
-    document.getElementById('btnUseManualAddress')
-  );
-});
-document.getElementById('btnModalUseManualAddress').addEventListener('click', () => {
-  submitManualAddress(
-    document.getElementById('modalManualAddress'),
-    document.getElementById('modalManualAddressStatus'),
-    document.getElementById('btnModalUseManualAddress')
-  );
-});
 
 // ===== POST-SUBMISSION DISPATCH RECEIPT MODAL — see finalizeSubmitReport(),
 // the only place that opens this (right after auto-routing to Map & Feed).
