@@ -859,6 +859,26 @@ textarea.input{resize:none;line-height:1.4}
 .btn-confirm-lock:disabled{opacity:.4;cursor:not-allowed}
 .btn-confirm-cancel{width:100%;background:transparent;color:var(--muted);border:1px solid var(--border);
   padding:13px;border-radius:12px;font-weight:700;font-size:.8rem;cursor:pointer}
+/* Patch 28-10/03/26: #gpsBlockedModal — card chrome, primary "Retry
+   Location" CTA, and secondary "Dismiss" link, each scoped to this one
+   modal by id/selector so every other .confirm-card/.btn-confirm-lock/
+   .btn-confirm-cancel elsewhere (receipt modal, location-required modal,
+   photo confirm, etc.) keeps its existing look. */
+#gpsBlockedModal .confirm-card{background:#080C14;border:1px solid rgba(0,255,135,.3)}
+/* .btn-confirm-lock's base text-transform:uppercase is what actually
+   renders "Retry Location" as "RETRY LOCATION" on screen — the markup's
+   own text was already Title Case — so text-transform:none here is what
+   makes the visible label match spec, not a text-content change.
+   border-radius overridden from the base class's pill-shaped 9999px down
+   to a rounded rectangle within the requested 12-16px range. */
+#btnGpsBlockedRetry{background:#00FF87;color:#080C14;text-transform:none;border-radius:14px;
+  box-shadow:0 0 15px rgba(0,255,135,.25)}
+/* Demoted from a bordered secondary button to a plain centered text link,
+   muted gray per spec (close to but distinct from the shared --muted
+   #8e9fa8 token, so this doesn't recolor --muted everywhere else it's
+   used). */
+#btnGpsBlockedDismiss{background:transparent;border:none;color:#8A99AD;text-align:center;
+  text-decoration:underline;text-underline-offset:3px;padding:10px 0 0}
 
 /* ===== POST-SUBMISSION DISPATCH RECEIPT MODAL (#dispatchReceiptModal) —
    reuses .confirm-drawer/.confirm-card for the overlay + card chrome,
