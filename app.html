@@ -161,12 +161,26 @@
   padding:24px;box-sizing:border-box}
 html.citixen-gate-locked .citixen-gate{display:flex}
 .citixen-gate-card{width:100%;max-width:360px;background:rgba(2,6,23,.8);border:1px solid rgba(30,41,59,.85);
-  border-radius:18px;padding:32px 26px;text-align:center;box-shadow:0 0 40px rgba(0,0,0,.6);box-sizing:border-box}
+  border-radius:18px;padding:32px 26px;text-align:center;box-shadow:0 0 40px rgba(0,0,0,.6);box-sizing:border-box;
+  position:relative;z-index:0}
+/* Patch 19-10/03/26: subtle ambient glow behind the card — #00FF87 at
+   ~14% opacity (within the requested 12-15%), 120px blur, inset so it
+   bleeds softly past the card's edges rather than sitting flush behind
+   it. The card's own z-index:0 above establishes a stacking context, so
+   this ::before's z-index:-1 stays behind the card's background without
+   falling behind .citixen-gate's full-screen backdrop instead. */
+.citixen-gate-card::before{content:'';position:absolute;inset:-50px;
+  background:radial-gradient(circle, rgba(0,255,135,.14) 0%, rgba(0,255,135,0) 65%);
+  filter:blur(120px);z-index:-1;pointer-events:none}
 /* Split white/glowing-emerald treatment, same convention as the main
    header's .brand-wordmark (.brand-white/.brand-lime, defined globally
    below) — the gate card no longer renders "CITIXEN UX™" as one flat
-   mint color. */
-.citixen-gate-brand{font-weight:800;font-size:.9rem;letter-spacing:.3px;margin-bottom:20px}
+   mint color. Patch 19-10/03/26: now laid out as a centered icon+wordmark
+   row (shield icon + .brand-wordmark), matching the main header's own
+   .brand-logo layout (see <header class="topnav"> below) instead of a
+   bare text line with no icon. */
+.citixen-gate-brand{display:flex;align-items:center;justify-content:center;gap:10px;
+  font-weight:800;font-size:.9rem;letter-spacing:.3px;margin-bottom:20px}
 .citixen-gate-label{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;
   color:#94a3b8;margin-bottom:14px}
 .citixen-gate-input{width:100%;box-sizing:border-box;background:rgba(255,255,255,.03);
@@ -1510,12 +1524,19 @@ textarea.input{resize:none;line-height:1.4}
      client-side tester gate, not real access control (see that comment). ===== -->
 <div class="citixen-gate" id="citixenGate">
   <form class="citixen-gate-card" id="citixenGateForm" autocomplete="off">
-    <div class="citixen-gate-brand"><span class="brand-white">CITIXEN</span> <span class="brand-lime">UX</span><sup class="brand-tm">™</sup></div>
+    <!-- Patch 19-10/03/26: shield icon added so this matches the main
+         header's standard icon+wordmark layout (<header class="topnav">'s
+         .brand-logo) instead of rendering the wordmark alone. -->
+    <div class="citixen-gate-brand">
+      <svg viewBox="0 0 24 24" width="21" height="21" stroke="var(--brand-mint)" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span class="brand-wordmark"><span class="brand-white">CITIXEN</span> <span class="brand-lime">UX</span><sup class="brand-tm">™</sup></span>
+    </div>
     <div class="citixen-gate-label">Enter Access Passcode</div>
     <input type="password" class="citixen-gate-input" id="citixenGateInput" placeholder="••••••••"
       autocomplete="off" autocapitalize="off" spellcheck="false">
     <div class="citixen-gate-error" id="citixenGateError"></div>
-    <button type="submit" class="citixen-gate-btn">Unlock</button>
+    <!-- Patch 19-10/03/26: "Unlock" -> "UNLOCK" -->
+    <button type="submit" class="citixen-gate-btn">UNLOCK</button>
   </form>
 </div>
 
