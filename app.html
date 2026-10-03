@@ -1615,8 +1615,25 @@ textarea.input{resize:none;line-height:1.4}
    markup's own comment. Reuses .sl-cta above for the primary CTA look; the
    .sl-tier-row/.sl-tier-btn/.sl-onetime-*/.founder-custom-amount rules this
    comment used to mention were removed in Patch 21-10/03/26 along with the
-   tier-selector/toggle/custom-amount markup itself. */
+   tier-selector/toggle/custom-amount markup itself.
+   PATCH 31-10/03/26 re-adds a tier strip — new rules below, independent of
+   the old removed .sl-tier-row/.sl-tier-btn ones and of the still-live but
+   differently-colored (cyan, #00B4D8) .sl-tier-btn used by
+   #support-ledger-module, so neither old nor sibling styling leaks in. */
 .founder-card{text-align:center}
+#supportTierStrip{display:flex;gap:8px;margin-bottom:16px;width:100%}
+.founder-tier-pill{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);
+  color:#FFFFFF;font-weight:600;font-family:inherit;font-size:.8rem;border-radius:10px;
+  padding:10px 0;flex:1;text-align:center;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+.founder-tier-pill.active{background:rgba(0,255,135,.12);border:1px solid #00FF87;color:#00FF87;
+  box-shadow:0 0 10px rgba(0,255,135,.25)}
+#supportCustomAmountWrap{display:none;align-items:center;justify-content:center;gap:4px;
+  margin:-6px 0 16px;color:#00FF87;font-weight:700;font-size:.95rem}
+#supportCustomAmountWrap.open{display:flex}
+#customSupportAmount{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);
+  border-radius:10px;color:#fff;font-family:inherit;font-size:.9rem;padding:8px 10px;
+  width:100%;box-sizing:border-box;text-align:center}
+#btnFounderCta:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
 /* Patch 17-10/03/26: headline enlarged (1.05rem -> 1.5rem) and replaced
    with the single-line "SUPPORT THE MISSION" (was two lines, "Support the
    Mission" / "How You Can"). Patch 21-10/03/26: explicit text-align:center
@@ -2750,8 +2767,30 @@ textarea.input{resize:none;line-height:1.4}
   <div id="founderModal" class="confirm-drawer">
     <div class="confirm-card founder-card">
       <div class="founder-header">SUPPORT THE MISSION</div>
-      <div class="small founder-brand-copy"><span class="founder-brand-citixen">CITIXEN</span> <span class="founder-brand-ux">UX<sup class="tm-symbol">™</sup></span> operates with zero ads.</div>
+      <!-- Patch 31-10/03/26: "zero ads" highlighted in brand mint, per spec. -->
+      <div class="small founder-brand-copy"><span class="founder-brand-citixen">CITIXEN</span> <span class="founder-brand-ux">UX<sup class="tm-symbol">™</sup></span> operates with <span style="color: #00FF87; font-weight: 600;">zero ads</span>.</div>
       <p class="founder-note">This is the project of a lifetime.</p>
+
+      <!-- SUPPORT TIER SELECTOR (Patch 31-10/03/26) — reintroduces a
+           tier-pick UI that Patch 21 had deliberately stripped out of this
+           modal (see this modal's own top comment: "removed the
+           tier-selector/one-time-toggle/custom-amount UI entirely"). Kept
+           fully separate from #support-ledger-module's .sl-tier-btn system
+           above — new class name, new state variables (founderSelectedTier/
+           resolveFounderSupportAmount() in the script below) — so the two
+           never cross-wire, same convention this file already uses for its
+           other mint-vs-cyan button pairs. $15 is the default active tier;
+           "Other" reveals the custom-amount input below instead of
+           replacing the strip. -->
+      <div id="supportTierStrip">
+        <button type="button" class="founder-tier-pill" data-tier="5">$5</button>
+        <button type="button" class="founder-tier-pill active" data-tier="15">$15</button>
+        <button type="button" class="founder-tier-pill" data-tier="50">$50</button>
+        <button type="button" class="founder-tier-pill" data-tier="other">Other</button>
+      </div>
+      <div id="supportCustomAmountWrap">
+        <span class="support-custom-amount-prefix">$</span><input type="number" id="customSupportAmount" placeholder="100" min="1">
+      </div>
 
       <!-- Centered content per Patch 21 (was a trailing right-aligned arrow
            from Patch 20 — see .founder-cta's own CSS comment for why that
@@ -7153,13 +7192,56 @@ function showFounderModalIfDue(){
 function closeFounderModal(){
   document.getElementById('founderModal').classList.remove('open');
 }
+// SUPPORT TIER SELECTOR (Patch 31-10/03/26) — see the markup's own comment
+// above #supportTierStrip for why this re-adds a tier pick Patch 21
+// removed, and why it's wired independently of #support-ledger-module's
+// .sl-tier-btn system (different class, different state here).
+let founderSelectedTier = '15'; // default active tier per spec
+const founderTierPills = document.querySelectorAll('#supportTierStrip .founder-tier-pill');
+const supportCustomAmountWrap = document.getElementById('supportCustomAmountWrap');
+const customSupportAmountInput = document.getElementById('customSupportAmount');
+function updateFounderCtaEnabledState(){
+  const btn = document.getElementById('btnFounderCta');
+  if (founderSelectedTier === 'other') {
+    btn.disabled = !(parseFloat(customSupportAmountInput.value) > 0);
+  } else {
+    btn.disabled = false;
+  }
+}
+founderTierPills.forEach(btn => {
+  btn.addEventListener('click', () => {
+    founderTierPills.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    founderSelectedTier = btn.dataset.tier;
+    const isOther = founderSelectedTier === 'other';
+    supportCustomAmountWrap.classList.toggle('open', isOther);
+    if (isOther) customSupportAmountInput.focus();
+    updateFounderCtaEnabledState();
+  });
+});
+customSupportAmountInput.addEventListener('input', updateFounderCtaEnabledState);
+// Resolves the dollar figure to attribute to this click — a numeric string
+// for a fixed tier, the typed custom figure for "Other", or null if
+// "Other" is selected with nothing valid typed yet (shouldn't be reachable
+// since the CTA is disabled in that state, but checked again here as a
+// second guard rather than trusting the disabled attribute alone).
+function resolveFounderSupportAmount(){
+  if (founderSelectedTier === 'other') {
+    const n = parseFloat(customSupportAmountInput.value);
+    return (n > 0) ? String(n) : null;
+  }
+  return founderSelectedTier;
+}
 document.getElementById('btnFounderCta').addEventListener('click', () => {
-  // Patch 21-10/03/26: the tier/one-time/custom-amount selector is gone —
-  // "I Support" is now a single real action with nothing to pick first, so
-  // it either opens the real Stripe Payment Link directly or, honestly,
-  // tells the citizen support isn't live yet (same STRIPE_PAYMENT_LINK
-  // placeholder pattern every other CTA in this file follows — never a
-  // broken/fake payment destination).
+  // Patch 21-10/03/26 removed the old tier/one-time/custom-amount selector;
+  // Patch 31-10/03/26 brings tier selection back (see #supportTierStrip
+  // above), so "I Support" now has a chosen amount again — it either opens
+  // the real Stripe Payment Link (tagged with that choice) directly or,
+  // honestly, tells the citizen support isn't live yet (same
+  // STRIPE_PAYMENT_LINK placeholder pattern every other CTA in this file
+  // follows — never a broken/fake payment destination).
+  const amount = resolveFounderSupportAmount();
+  if (amount === null) return; // "Other" with no valid amount — CTA should be disabled already
   if (!STRIPE_PAYMENT_LINK) {
     console.warn('[CITIXEN] "I Support" has no STRIPE_PAYMENT_LINK configured yet — set the constant near the top of this module\'s script before this goes live.');
     toast('Founder support is in preview — payment isn\'t live yet.', true);
@@ -7167,7 +7249,17 @@ document.getElementById('btnFounderCta').addEventListener('click', () => {
     return;
   }
   try {
-    window.open(STRIPE_PAYMENT_LINK, '_blank', 'noopener');
+    const url = new URL(STRIPE_PAYMENT_LINK);
+    // Same real, already-shipped client_reference_id attribution pattern
+    // #support-ledger-module's handler above uses — honest about what it
+    // actually does: STRIPE_PAYMENT_LINK is one fixed Stripe Payment Link,
+    // not a separate Stripe Price per tier, so a URL param can't make
+    // Stripe charge a different amount by itself. This makes the citizen's
+    // tier/custom-amount choice attributable on the Stripe dashboard side,
+    // exactly like the sibling module already does — nothing more is
+    // claimed here.
+    url.searchParams.set('client_reference_id', 'founder_' + amount);
+    window.open(url.toString(), '_blank', 'noopener');
   } catch (e) {
     console.warn('[CITIXEN] STRIPE_PAYMENT_LINK is not a valid URL:', STRIPE_PAYMENT_LINK);
     toast('Founder support is in preview — payment isn\'t live yet.', true);
