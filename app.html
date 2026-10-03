@@ -299,12 +299,16 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
 .chip-other-row{display:flex;justify-content:center;margin-bottom:14px}
 .chip-other{min-width:150px;justify-content:center}
 
-.btn-camera{width:100%;background:rgba(6,78,59,.3);border:2px solid rgba(0,230,153,.6);color:#6ee7b7;padding:13px;
+/* Patch 16-10/03/26: camera accent unified to the exact brand green
+   (#00FF87) across all intake views — was a slightly different emerald
+   (#6ee7b7/rgba(0,230,153,...)/rgba(52,211,153,...)) that didn't match the
+   rest of the app's #00FF87 brand-green controls. */
+.btn-camera{width:100%;background:rgba(0,255,135,.1);border:2px solid #00FF87;color:#00FF87;padding:13px;
   border-radius:12px;font-weight:600;font-size:.8rem;letter-spacing:.3px;cursor:pointer;display:flex;
   align-items:center;justify-content:center;gap:8px;margin-bottom:12px;transition:all .3s ease;
-  filter:drop-shadow(0 0 15px rgba(52,211,153,.4));animation:btnCameraPulse 2s ease-in-out infinite}
-.btn-camera:hover{border-color:rgba(52,211,153,.9)}
-.btn-camera svg{color:#6ee7b7;filter:drop-shadow(0 0 6px rgba(52,211,153,.8))}
+  filter:drop-shadow(0 0 15px rgba(0,255,135,.4));animation:btnCameraPulse 2s ease-in-out infinite}
+.btn-camera:hover{border-color:#00FF87;filter:drop-shadow(0 0 20px rgba(0,255,135,.6))}
+.btn-camera svg{color:#00FF87;filter:drop-shadow(0 0 6px rgba(0,255,135,.8))}
 @keyframes btnCameraPulse{0%,100%{opacity:1}50%{opacity:.6}}
 @media (prefers-reduced-motion:reduce){.btn-camera{animation:none}}
 
@@ -325,6 +329,12 @@ textarea.input{resize:none;line-height:1.4}
    address." */
 .address-suggest-wrap{position:relative;flex:1}
 .address-suggest-wrap .input{margin-bottom:0}
+/* Patch 16-10/03/26: the manual-address input box on both the inline
+   Location Required card and its modal twin now carries the brand green
+   hairline at rest (not just on focus), so it reads as the card's primary
+   action input rather than a plain neutral field. */
+.manual-address-input{border:1px solid #00FF87}
+.manual-address-input:focus{border-color:#00FF87}
 .address-suggest-list{position:absolute;left:0;right:0;top:calc(100% + 4px);background:#0F172A;
   border:1px solid rgba(0,180,216,.3);border-radius:10px;max-height:228px;overflow-y:auto;
   z-index:60;box-shadow:0 10px 28px rgba(0,0,0,.45);display:none}
@@ -342,6 +352,12 @@ textarea.input{resize:none;line-height:1.4}
 .btn-submit{width:100%;box-sizing:border-box;min-height:52px;background:var(--mint);color:#051311;border:none;
   padding:14px 16px;border-radius:12px;font-family:inherit;font-weight:700;font-size:16px;line-height:24px;
   letter-spacing:.01em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+/* Patch 16-10/03/26: #btnCapture ("Capture proof", the shutter button
+   inside the camera view) scoped to the exact camera accent #00FF87,
+   same id-only-override pattern as #btnOnboardingStart (Patch 11) — left
+   the shared .btn-submit class (var(--mint) = #00E699) alone so the
+   unrelated "Publish report" button it's also used on doesn't shift color. */
+#btnCapture{background:#00FF87;box-shadow:0 0 18px rgba(0,255,135,.35)}
 /* HARDWARE CAMERA FIREWALL LOCK — reverted to a real native `disabled`
    attribute (Patch 4.13's tappable "soft-disabled" .btn-submit-locked
    class is gone): the button now lives inside #reportStep2Locked, which
@@ -789,6 +805,10 @@ textarea.input{resize:none;line-height:1.4}
 .btn-receipt-secondary{flex:1;background:rgba(3,7,18,.6);border:1px solid rgba(255,255,255,.08);color:var(--text);
   padding:11px 8px;border-radius:10px;font-weight:700;font-size:.68rem;cursor:pointer;display:flex;
   align-items:center;justify-content:center;gap:6px;transition:border-color .15s,color .15s}
+/* Patch 16-10/03/26: Easy Share's arrow sits right-aligned (label left,
+   arrow flush right), unlike its sibling Copy Direct Link button, which
+   stays centered — scoped by id so Copy Direct Link's layout is untouched. */
+#btnReceiptGraphic{justify-content:space-between}
 .btn-receipt-secondary:hover{border-color:rgba(255,255,255,.18)}
 .btn-receipt-secondary svg{color:var(--mint2);flex-shrink:0}
 .btn-receipt-secondary.copied{color:#34d399;border-color:rgba(52,211,153,.5)}
@@ -800,9 +820,12 @@ textarea.input{resize:none;line-height:1.4}
    --mint/#00E699 accent, since this is the single thing on the card meant
    to pull the eye after the ticket ID itself. */
 .btn-receipt-feed{width:100%;box-sizing:border-box;min-height:52px;background:#00FF87;color:#051311;
-  border:none;padding:14px 16px;border-radius:12px;font-family:inherit;font-weight:800;font-size:15px;
+  border:none;padding:14px 20px;border-radius:12px;font-family:inherit;font-weight:800;font-size:15px;
   text-transform:uppercase;letter-spacing:.02em;cursor:pointer;display:flex;align-items:center;
-  justify-content:center;gap:8px;box-shadow:0 0 18px rgba(0,255,135,.35);transition:box-shadow .15s,transform .1s}
+  /* Patch 16-10/03/26: was justify-content:center with the arrow leading the
+     label; now the label sits left and the arrow is pushed to the button's
+     right edge (see the markup's own comment for the matching order swap). */
+  justify-content:space-between;gap:8px;box-shadow:0 0 18px rgba(0,255,135,.35);transition:box-shadow .15s,transform .1s}
 .btn-receipt-feed:hover{box-shadow:0 0 26px rgba(0,255,135,.5)}
 .btn-receipt-feed:active{transform:scale(.98)}
 
@@ -819,7 +842,12 @@ textarea.input{resize:none;line-height:1.4}
 /* Patch 8-10/03/26: brand made larger + bolder (was 30px/900) so it reads
    as the card's clear focal point now that the photo is no longer a
    full-bleed background competing with it. */
-.sge-brand{font-size:44px;font-weight:900;color:#00E699;letter-spacing:.01em}
+/* Patch 16-10/03/26: brand rule enforced on this card's actual header —
+   "CITIXEN" pure white, "UX™" neon green (#00FF87) — was one flat
+   #00E699-colored run. */
+.sge-brand{font-size:44px;font-weight:900;letter-spacing:.01em}
+.sge-brand-citixen{color:#FFFFFF}
+.sge-brand-ux{color:#00FF87}
 .sge-jurisdiction{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:20px;
   font-weight:700;color:#94a3b8;letter-spacing:.05em}
 /* Patch 8-10/03/26: the photo used to be position:absolute;inset:0 — a
@@ -840,8 +868,13 @@ textarea.input{resize:none;line-height:1.4}
 .sge-breadcrumb{font-size:24px;font-weight:700;color:#e2e8f0}
 .sge-meta-row{display:flex;justify-content:space-between;gap:20px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   font-size:18px;color:#94a3b8;margin-top:4px}
-.sge-footer{position:absolute;bottom:58px;left:0;right:0;text-align:center;font-size:16px;font-weight:700;
-  letter-spacing:.08em;color:#64748b}
+/* Patch 16-10/03/26: split into a small label line + a larger, legible URL
+   line (was one 16px line with the URL and the "ANONYMOUS & SOVEREIGN"
+   label the same size) — the URL is now the one readers actually need to
+   type back in. */
+.sge-footer{position:absolute;bottom:48px;left:0;right:0;text-align:center;color:#64748b}
+.sge-footer-label{font-size:14px;font-weight:700;letter-spacing:.08em}
+.sge-footer-url{font-size:24px;font-weight:800;letter-spacing:.03em;margin-top:5px;color:#94a3b8}
 
 /* ===== SOCIAL GRAPHIC PREVIEW MODAL — full-screen rendered-image review
    with a loading state while html2canvas works, then Download/Share.
@@ -1610,8 +1643,10 @@ textarea.input{resize:none;line-height:1.4}
                of a generic toast — see retryGpsResolution(). -->
           <div id="reportGpsLockHint" style="display:none;background:rgba(255,68,68,.08);border:1px solid var(--danger);border-radius:10px;padding:12px 14px;margin:4px 0 12px;text-align:center;">
             <div class="small" style="color:#fca5a5;font-weight:700;margin-bottom:6px;">Location Required to Publish</div>
-            <div class="small" style="color:var(--muted);margin-bottom:4px;line-height:1.4;">CITIXEN UX<sup class="tm-symbol">™</sup> requires an active GPS fix — or a validated street address — to route this report to the correct ward.</div>
-            <div class="small" style="color:#fff;font-weight:700;margin:10px 0 12px;line-height:1.4;">We can't file a report without a location.</div>
+            <!-- Patch 16-10/03/26: the two explanatory sentences below were
+                 combined into one, so the body copy stays within 2 lines on
+                 mobile instead of three stacked single-sentence paragraphs. -->
+            <div class="small" style="color:var(--muted);margin:0 0 12px;line-height:1.4;">Enable GPS or enter your street address — required to route this report to the correct ward.</div>
             <button type="button" class="chip" id="btnRetryGps" style="display:inline-flex;">Use Location</button>
             <!-- GPS-BLOCKED GUIDANCE (Patch 3-10/03/26) — a denied/blocked/
                  timed-out GPS attempt no longer leaves permanent red text on
@@ -1932,13 +1967,16 @@ textarea.input{resize:none;line-height:1.4}
   </nav>
 
   <div id="camModal" class="drawer">
-    <div class="row"><strong style="color:var(--mint2)">CITIXEN Camera</strong>
+    <!-- Patch 16-10/03/26: camera accent unified to exact #00FF87 (was
+         var(--mint2) = #00E699) across this view — label + viewfinder
+         border, matching .btn-camera above and #btnCapture below. -->
+    <div class="row"><strong style="color:#00FF87">CITIXEN Camera</strong>
       <button class="icon-btn" id="btnCloseCam">
         <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
       </button>
     </div>
     <div class="small" style="margin-top:6px;color:var(--muted)">Nothing leaves this device until you capture and submit. Location and device identifiers are stripped automatically.</div>
-    <div id="viewfinderBox" style="flex:1;border:2px dashed var(--mint2);border-radius:14px;margin:14px 0;position:relative;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center;min-height:0;">
+    <div id="viewfinderBox" style="flex:1;border:2px dashed #00FF87;border-radius:14px;margin:14px 0;position:relative;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center;min-height:0;">
       <video id="cameraVideo" autoplay playsinline muted style="display:none;width:100%;height:100%;object-fit:cover;"></video>
       <span id="cameraFallbackMsg" class="small">Requesting camera access…</span>
     </div>
@@ -2226,11 +2264,12 @@ textarea.input{resize:none;line-height:1.4}
   <div id="locationRequiredModal" class="confirm-drawer">
     <div class="confirm-card">
       <div class="confirm-title">Location Required to Publish</div>
-      <div class="small" style="color:var(--muted);line-height:1.5;margin-bottom:4px;">
-        CITIXEN UX<sup class="tm-symbol">™</sup> requires an active GPS fix — or a validated street address — to route this report to the correct ward.
+      <!-- Patch 16-10/03/26: combined into one sentence (was two separate
+           paragraphs) to keep this card's body copy within 2 lines. -->
+      <div class="small" style="color:var(--muted);line-height:1.5;margin-bottom:10px;">
+        Enable GPS or enter your street address — required to route this report to the correct ward.
       </div>
-      <div class="small" style="color:#fff;font-weight:700;margin:10px 0 4px;line-height:1.4;">We can't file a report without a location.</div>
-      <div class="small" style="color:var(--muted);margin:14px 0 6px;">Or enter your address</div>
+      <div class="small" style="color:var(--muted);margin:4px 0 6px;">Or enter your address</div>
       <div class="address-suggest-wrap">
         <input class="input manual-address-input" id="modalManualAddress" type="text" autocomplete="street-address" enterkeyhint="search" placeholder="e.g. 351 W Hubbard St" style="margin:0;">
         <div class="address-suggest-list" id="modalManualAddressSuggest"></div>
@@ -2302,7 +2341,15 @@ textarea.input{resize:none;line-height:1.4}
       <div class="receipt-icon-wrap">
         <svg viewBox="0 0 24 24" width="40" height="40" stroke="#00E699" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
       </div>
-      <div class="receipt-title">Report Acknowledged</div>
+      <!-- Patch 16-10/03/26: modal title renamed "Report Acknowledged" ->
+           "Ledger Receipt" per spec. Checked the rest of this modal (title,
+           ticket badge, summary rows, actions) for any other raw "CITIXEN"/
+           "UX™" text the brand white/green split rule could apply to —
+           there isn't any here; receiptSub below is plain status copy with
+           no brand mention. The one place in this receipt flow that does
+           render a literal "CITIXEN UX™" header is the Social Graphic
+           Export Card's .sge-brand below, which now carries the split. -->
+      <div class="receipt-title">Ledger Receipt</div>
       <div class="receipt-sub" id="receiptSub">Your report has been logged to the public ledger.</div>
 
       <button type="button" class="receipt-ticket-badge" id="receiptTicketBadge" aria-label="Copy ticket ID">
@@ -2322,9 +2369,17 @@ textarea.input{resize:none;line-height:1.4}
 
       <div class="receipt-actions">
         <div class="receipt-action-row">
+          <!-- Patch 16-10/03/26: renamed "Download Receipt" -> "Easy Share"
+               (the button's actual destination, renderAndShowSocialGraphic(),
+               is unchanged — it still opens the preview modal, whose own
+               Download/Easy Share actions do the real work); the old
+               download-tray icon was swapped for a share-style up-right
+               arrow, moved after the label and right-aligned via
+               #btnReceiptGraphic's justify-content below, matching
+               .btn-receipt-feed's arrow treatment above. -->
           <button type="button" class="btn-receipt-secondary" id="btnReceiptGraphic">
-            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            <span id="btnReceiptGraphicLabel">Download Receipt</span>
+            <span id="btnReceiptGraphicLabel">Easy Share</span>
+            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
           </button>
           <button type="button" class="btn-receipt-secondary" id="btnReceiptCopyLink">
             <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
@@ -2339,9 +2394,12 @@ textarea.input{resize:none;line-height:1.4}
              primary action, moved up into this slot: the receipt's real
              "go look at your report" button, styled in the brand's bright
              #00FF87 green. See headToFeed()/maybeShowFounderModal(). -->
+        <!-- Patch 16-10/03/26: arrow moved after the label (was leading it)
+             so it right-aligns against the button edge — see .btn-receipt-feed's
+             justify-content:space-between above. -->
         <button type="button" class="btn-receipt-feed" id="btnHeadToFeed">
+          <span>Head to Feed</span>
           <svg viewBox="0 0 24 24" width="16" height="16" stroke="#051311" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
-          Head to Feed
         </button>
 
         <!-- STAGED "SUPPORT THE LEDGER" CIVIC MODULE (Patch 5.5) — hidden
@@ -2425,7 +2483,7 @@ textarea.input{resize:none;line-height:1.4}
        the citizen adds after downloading, before reposting it. ===== -->
   <div id="socialGraphicExportCard" class="social-graphic-export-card" aria-hidden="true">
     <div class="sge-header">
-      <span class="sge-brand">CITIXEN UX™</span>
+      <span class="sge-brand"><span class="sge-brand-citixen">CITIXEN</span> <span class="sge-brand-ux">UX™</span></span>
       <span class="sge-jurisdiction" id="sgeJurisdiction">LOCAL DISTRICT</span>
     </div>
     <div class="sge-photo-frame" id="sgePhotoFrame">
@@ -2441,7 +2499,10 @@ textarea.input{resize:none;line-height:1.4}
         <span id="sgeTimestamp">—</span>
       </div>
     </div>
-    <div class="sge-footer">ANONYMOUS &amp; SOVEREIGN • CITIXENUX.COM/APP</div>
+    <div class="sge-footer">
+      <div class="sge-footer-label">ANONYMOUS &amp; SOVEREIGN</div>
+      <div class="sge-footer-url">citixenux.com/app</div>
+    </div>
   </div>
 
   <!-- ===== SOCIAL GRAPHIC PREVIEW MODAL — shows the rasterized PNG with a
