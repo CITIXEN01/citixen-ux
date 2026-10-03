@@ -126,23 +126,8 @@
      index.html so the Dashboard renders from identical code on both. -->
 <link rel="stylesheet" href="/shared/instant-report.css?v=master-release">
 <script src="/shared/instant-report.js?v=master-release"></script>
-<link rel="stylesheet" href="/shared/global-feedback.css?v=patch-4.7">
-<script src="/shared/global-feedback.js?v=patch-4.7"></script>
 <script src="/shared/severity.js?v=master-release"></script>
 <style>
-/* UI FINESSE & OVERLAY FIX moved the Global Floating Alpha Feedback Badge
-   back off the top header bar on this page specifically — the shared
-   top-right position (shared/global-feedback.css) was overlapping
-   app.html's own top-of-screen location indicator pill. This is a
-   per-page override, scoped to app.html only (operator.html/dispatch.html
-   keep the shared top-right position, which doesn't have that pill to
-   collide with); the shared file's base rule is untouched. Anchored above
-   .bottomnav (its own height + safe-area inset, see that class below)
-   rather than a hand-tuned pixel guess, so it stays clear of the tab bar
-   even if that bar's height ever changes. */
-.cgf-badge{top:auto;
-  bottom:calc(85px + env(safe-area-inset-bottom,0px));
-  right:16px}
 
 /* ===== PASSCODE GATE — full-page Obsidian Glass blur blocking every route
    until the tester enters citixen_01. Locked by default on every single
@@ -2534,15 +2519,11 @@ textarea.input{resize:none;line-height:1.4}
     </div>
   </div>
 
-  <!-- The old per-page Floating Alpha Feedback Widget that used to live
-       here (markup + CSS + handlers) was replaced in Patch 4.7 by the
-       shared Global Floating Alpha Feedback Badge — see
-       shared/global-feedback.js/.css, included below and initialized by
-       CitixenGlobalFeedback.init() in this page's own script. It now
-       builds and injects its own button + drawer into document.body, the
-       same convention shared/instant-report.js already uses, so the exact
-       same widget can also run unmodified on operator.html and
-       dispatch.html. -->
+  <!-- Patch 10-10/03/26 removed the floating "Instant Feedback" badge
+       (shared/global-feedback.js/.css) from this page entirely. The shared
+       files are untouched and still power the same widget on
+       operator.html/dispatch.html; app.html no longer loads or
+       initializes them. -->
 
 </div>
 
@@ -7005,15 +6986,10 @@ document.getElementById('btnOnboardingStart').addEventListener('click', () => {
   closeFrontDoorOnboarding();
 });
 
-// ===== GLOBAL FLOATING ALPHA FEEDBACK BADGE =====
-// Patch 4.7 moved this from a per-page widget (with its own route/device
-// capture + modal) into shared/global-feedback.js, which now owns all of
-// that logic so the identical widget can run unmodified on operator.html
-// and dispatch.html too. See that file for shortDeviceLabel()/
-// captureRoute()/the submit flow — this page just initializes it with its
-// own toast() so submissions here use the same notification style as every
-// other action in this app.
-if (window.CitixenGlobalFeedback) window.CitixenGlobalFeedback.init({ toast });
+// Patch 10-10/03/26: the floating "Instant Feedback" badge
+// (CitixenGlobalFeedback.init()) has been removed from this page. The
+// shared/global-feedback.js/.css files are untouched and still initialize
+// on operator.html and dispatch.html.
 
 window.addEventListener('DOMContentLoaded',()=>{
   applyJurisdictionFromQueryString();
