@@ -3768,19 +3768,23 @@ async function geocodeAddress(query){
 }
 
 // ===== ADDRESS AUTOCOMPLETE (Patch 5.4, US-filtered + street-level-only
-// Patch 7-10/03/26) =====
+// Patch 7-10/03/26, explicit-click-to-commit + Nominatim path dropped
+// Patch 22-10/03/26) =====
 // Live-suggests as the citizen types in either manual-address field, via
-// OpenStreetMap's free Photon API (photon.komoot.io — no key required, same
-// no-key posture as the Nominatim geocoder above). Photon's own GeoJSON
-// property names (housenumber/street/city/state/postcode), reusing
-// US_STATE_ABBR so the dropdown reads in the same "351 W Hubbard St /
-// Chicago, IL 60654" style as the rest of this file. This is a public demo
-// instance with no uptime guarantee, so every failure path here (network
-// error, non-OK response, no features) degrades silently to an empty list
-// rather than an error toast — the citizen can always still type the full
-// address, which auto-validates via the existing Nominatim path below (see
-// attachAddressAutocomplete()'s auto-validate debounce), which this never
-// replaces.
+// OpenStreetMap's free Photon API (photon.komoot.io — no key required).
+// This is now the ONLY geocoder in the report-location path — the Nominatim
+// forward-geocode fallback that used to auto-commit a typed string once
+// Photon came back empty has been removed outright (see the "MANUAL
+// STREET-ADDRESS FALLBACK — REMOVED" note near submitManualAddress()'s old
+// location). Photon's own GeoJSON property names (housenumber/street/city/
+// state/postcode), reusing US_STATE_ABBR so the dropdown reads in the same
+// "351 W Hubbard St / Chicago, IL 60654" style as the rest of this file.
+// This is a public demo instance with no uptime guarantee, so every failure
+// path here (network error, non-OK response, no features) degrades silently
+// to an empty list rather than an error toast — but a citizen whose address
+// Photon doesn't surface is never auto-validated anymore either; they can
+// only proceed by using GPS or by getting a street-level suggestion to
+// actually tap.
 //
 // STRICT US + STREET-LEVEL FILTER (Patch 7-10/03/26): Photon has no
 // documented country-code query param of its own (unlike Nominatim's
@@ -3799,6 +3803,14 @@ async function geocodeAddress(query){
 // Photon's existing bbox. The actual hard guard for Photon responses is
 // looksNonUS() below, applied to every suggestion's real country/
 // countrycode/state fields regardless of what the query asked for.
+// LAYER FILTER (Patch 22-10/03/26): the patch spec asked for a `filter=place`
+// param; Photon has no `filter` param, and its real `place` layer value
+// means the opposite of what's wanted here (administrative places, not
+// street addresses). Photon's actual documented layer-restriction param is
+// `layer=`, so this app uses the real equivalent of the requested intent —
+// `layer=house` — to ask the server itself for house-level address results
+// only, on top of (not instead of) the existing client-side housenumber/
+// street check above, which still runs regardless of what the server sends.
 function formatPhotonSuggestion(props){
   props = props || {};
   if (!props.housenumber || !props.street) return null; // not a street-level US match
@@ -3819,7 +3831,7 @@ async function photonSearch(query){
   // anchor/default location. The bbox/countrycodes/viewbox/bounded params
   // below are the actual restriction (US only); location_bias_scale only
   // nudges ranking within that box.
-  let url = 'https://photon.komoot.io/api/?limit=5&lang=en&bbox=' + US_CONTINENTAL_BBOX +
+  let url = 'https://photon.komoot.io/api/?limit=5&lang=en&layer=house&bbox=' + US_CONTINENTAL_BBOX +
     '&countrycodes=us&viewbox=' + US_CONTINENTAL_BBOX + '&bounded=1&q=' + encodeURIComponent(q);
   const gps = window.CITIXEN_RESOLVED_LOCATION;
   if (gps && typeof gps.lat === 'number' && typeof gps.lng === 'number') {
@@ -3851,15 +3863,14 @@ async function photonSearch(query){
 function attachAddressAutocomplete(inputEl, listEl, statusEl){
   if (!inputEl || !listEl) return;
   let debounceTimer = null;
-  let autoValidateTimer = null;
   let requestToken = 0;
   let results = [];
   let activeIndex = -1;
-  // The exact input string the last successful validation (a picked
-  // suggestion or an auto-geocoded full address) was confirmed against. If
-  // the citizen edits the field afterward, the stored lat/lng no longer
-  // describes what's on screen, so it's cleared rather than silently
-  // submitted stale (see Patch 3-10/03/26 item 2's auto-validate spec).
+  // The exact input string the last explicitly-picked suggestion's label
+  // matched. If the citizen edits the field afterward, the stored lat/lng no
+  // longer describes what's on screen, so it's cleared rather than silently
+  // submitted stale (Patch 22-10/03/26: a suggestion pick is now the only
+  // way this ever gets set — see selectResult() below).
   let validatedValue = null;
 
   function invalidateStaleValidation(){
@@ -3882,7 +3893,7 @@ function attachAddressAutocomplete(inputEl, listEl, statusEl){
     results = items;
     activeIndex = -1;
     if (!items.length) {
-      listEl.innerHTML = '<div class="address-suggest-status">No matches — try a different address or cross-street.</div>';
+      listEl.innerHTML = '<div class="address-suggest-status">No matches yet — keep typing, or try a cross-street. Your address won’t be used until you pick a suggestion from this list.</div>';
       listEl.classList.add('open');
       return;
     }
@@ -3919,16 +3930,19 @@ function attachAddressAutocomplete(inputEl, listEl, statusEl){
     if (hasValidLocation()) closeLocationRequiredModal();
   }
 
-  // "Upon typing" auto-validate: there is no more "Use address" button to
-  // click, so once the citizen pauses typing with Photon returning no live
-  // suggestion to pick, this falls back on its own to a full-string geocode
-  // (submitManualAddress -> Nominatim) instead of leaving the field inert.
-  // Picking a dropdown suggestion (selectResult, above) already validates
-  // immediately and short-circuits this path via the requestToken check.
+  // EXPLICIT-CLICK-TO-COMMIT (Patch 22-10/03/26): typing alone never assigns
+  // coordinates or a city/state tag to the report — it only drives the
+  // Photon dropdown below. The old "auto-validate" fallback that used to
+  // silently forward-geocode the raw string via Nominatim once Photon came
+  // back empty (no suggestion for the citizen to actually pick) has been
+  // removed per spec: a typed address that matches nothing in the dropdown
+  // now simply stays an unvalidated, unaltered string in the field — real
+  // coordinates are set only by selectResult() below, which only runs when
+  // the citizen taps/clicks a suggestion (or presses Enter on one they've
+  // arrow-keyed to, still an explicit pick, never a timer).
   inputEl.addEventListener('input', () => {
     invalidateStaleValidation();
     clearTimeout(debounceTimer);
-    clearTimeout(autoValidateTimer);
     const q = inputEl.value.trim();
     if (q.length < 3) { closeList(); return; }
     const myToken = ++requestToken;
@@ -3936,20 +3950,6 @@ function attachAddressAutocomplete(inputEl, listEl, statusEl){
       const items = await photonSearch(q);
       if (myToken !== requestToken) return; // superseded by a newer keystroke
       renderResults(items);
-      if (!items.length && q.length >= 6) {
-        // No live suggestion to pick — give the citizen a brief extra pause
-        // (600ms on top of the 300ms debounce above) in case they're still
-        // typing, then auto-validate the full string they've entered.
-        autoValidateTimer = setTimeout(() => {
-          if (myToken !== requestToken) return;
-          if (inputEl.value.trim() !== q) return; // superseded by further typing
-          submitManualAddress(inputEl, statusEl, null).then(() => {
-            if (window.CITIXEN_MANUAL_ADDRESS && window.CITIXEN_MANUAL_ADDRESS.address === q) {
-              validatedValue = q;
-            }
-          });
-        }, 600);
-      }
     }, 300);
   });
   inputEl.addEventListener('keydown', (e) => {
@@ -6530,50 +6530,16 @@ document.getElementById('btnGpsHelpClose').addEventListener('click', () => {
   document.getElementById('gpsHelpModal').classList.remove('open');
 });
 
-// MANUAL STREET-ADDRESS FALLBACK (Patch 5.2, button removed Patch
-// 3-10/03/26) — forward-geocodes via the existing geocodeAddress() (same
-// Nominatim call the Public Ledger's address search already uses). Only on
-// a real geocode match does window.CITIXEN_MANUAL_ADDRESS get set — a typed
-// string that fails to geocode is reported as an error and never treated as
-// a valid location, matching "never default to La Crosse or anchor
-// coordinates." There is no more "Use address" button to click — this is
-// now called automatically by attachAddressAutocomplete()'s auto-validate
-// debounce (see near geocodeAddress()) once the citizen pauses typing with
-// no live Photon suggestion to fall back on instead.
-async function submitManualAddress(inputEl, statusEl, btn){
-  const address = inputEl ? inputEl.value.trim() : '';
-  if (address.length < 6) {
-    if (statusEl) {
-      statusEl.textContent = 'Enter a full street address (e.g. 351 W Hubbard St).';
-      statusEl.style.color = 'var(--danger)';
-      statusEl.style.display = '';
-    }
-    return;
-  }
-  const originalLabel = btn ? btn.textContent : null;
-  if (btn) { btn.textContent = 'Locating…'; btn.disabled = true; }
-  if (statusEl) {
-    statusEl.textContent = 'Looking up address…';
-    statusEl.style.color = 'var(--muted)';
-    statusEl.style.display = '';
-  }
-  try {
-    const geocoded = await geocodeAddress(address);
-    if (!geocoded) {
-      if (statusEl) { statusEl.textContent = "Couldn't validate that address — check it and try again."; statusEl.style.color = 'var(--danger)'; }
-      return;
-    }
-    window.CITIXEN_MANUAL_ADDRESS = { address, lat: geocoded.lat, lng: geocoded.lng };
-    const repLoc = document.getElementById('repLoc');
-    if (repLoc) { repLoc.value = geocoded.label || address; repLoc.dataset.userEdited = '1'; }
-    if (statusEl) { statusEl.textContent = '✓ Address validated — you can publish now.'; statusEl.style.color = 'var(--mint2)'; }
-    updateSubmitPhotoGate();
-    toast('Address validated — you can publish now.');
-    if (hasValidLocation()) { closeLocationRequiredModal(); closeGpsBlockedModal(); }
-  } finally {
-    if (btn) { btn.textContent = originalLabel; btn.disabled = false; }
-  }
-}
+// MANUAL STREET-ADDRESS FALLBACK — REMOVED (Patch 22-10/03/26). This used
+// to forward-geocode the raw typed string via Nominatim and silently commit
+// it to window.CITIXEN_MANUAL_ADDRESS once the citizen paused typing with no
+// live Photon suggestion to pick, with no click required. Patch 22 mandates
+// explicit click-to-commit (a report's location may only ever come from a
+// real GPS fix or a Photon suggestion the citizen actually tapped/clicked —
+// see selectResult() in attachAddressAutocomplete() above), so this silent
+// auto-commit path is gone outright rather than reworked: a typed address
+// that never matches a dropdown suggestion now simply stays an unvalidated
+// string in the field, and the report cannot publish on it alone.
 
 // ===== POST-SUBMISSION DISPATCH RECEIPT MODAL — see finalizeSubmitReport(),
 // the only place that opens this (right after auto-routing to Map & Feed).
