@@ -7369,6 +7369,11 @@ document.getElementById('founderContributionReceiptModal').addEventListener('cli
 // photo and produced a generic, near-empty PNG.
 let lastSocialGraphicDataUrl = null;
 let lastSocialGraphicTicketId = null;
+// Patch 35-10/03/26: the raw PNG Blob alongside the data URL above — the
+// data URL stays for the preview <img>'s src; the Blob is what the
+// download-then-share pipeline below actually uses (File()/ObjectURL need
+// a Blob, not a data: string).
+let lastSocialGraphicBlob = null;
 async function renderAndShowSocialGraphic(opts){
   opts = opts || {};
   const modal = document.getElementById('socialGraphicPreviewModal');
@@ -7379,6 +7384,7 @@ async function renderAndShowSocialGraphic(opts){
   const downloadBtn = document.getElementById('btnSgpDownload');
   lastSocialGraphicDataUrl = null;
   lastSocialGraphicTicketId = opts.ticketId || null;
+  lastSocialGraphicBlob = null;
   imgEl.style.display = 'none';
   imgEl.removeAttribute('src');
   loadingTextEl.textContent = 'Rendering 1:1 Social Card...';
@@ -7426,9 +7432,18 @@ async function renderAndShowSocialGraphic(opts){
     // Give the photo a tick to finish decoding before the snapshot, so a
     // just-set data: URL isn't captured mid-paint.
     await new Promise(r => setTimeout(r, 60));
-    const canvas = await html2canvas(card, { width: 1080, height: 1080, scale: 2, useCORS: true, backgroundColor: '#020617' });
+    // Patch 35-10/03/26: backgroundColor changed from #020617 to the
+    // app-wide Obsidian #080C14 (the same exact hex every other screen was
+    // unified to in Patch 24) — this card's own background CSS already
+    // matches it, so this only matters as a fallback fill behind any
+    // transparent/antialiased edge pixels html2canvas rasterizes.
+    const canvas = await html2canvas(card, { width: 1080, height: 1080, scale: 2, useCORS: true, backgroundColor: '#080C14' });
     const dataUrl = canvas.toDataURL('image/png');
     lastSocialGraphicDataUrl = dataUrl;
+    // Patch 35-10/03/26: also capture a real Blob (via the canvas's own
+    // toBlob(), not a data-URL-to-Blob conversion) for the download+share
+    // pipeline below — see #btnSgpDownload's click handler.
+    lastSocialGraphicBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
     imgEl.src = dataUrl;
     imgEl.style.display = 'block';
     loadingEl.style.display = 'none';
@@ -7467,12 +7482,66 @@ document.getElementById('sgpBlurGuard').addEventListener('click', () => {
   document.getElementById('sgpBlurGuard').style.display = 'none';
   document.getElementById('btnSgpDownload').disabled = false;
 });
-document.getElementById('btnSgpDownload').addEventListener('click', () => {
-  if (!lastSocialGraphicDataUrl) return;
+// DOWNLOAD -> NATIVE SHARE SHEET PIPELINE (Patch 35-10/03/26) — the repo
+// has no literal #btnDownloadReceipt/#receiptModal/#receiptCard; this is
+// the real "Download Receipt ↘" action (#btnSgpDownload, same label/arrow
+// the spec quotes) inside the real Social Card preview modal
+// (#socialGraphicPreviewModal), capturing the real off-screen export card
+// (#socialGraphicExportCard) already rasterized by renderAndShowSocialGraphic()
+// above — reused as-is rather than re-rendering a second canvas. The
+// existing image-screening blur guard (Patch 8) still gates this button
+// exactly as before: nothing here bypasses it.
+document.getElementById('btnSgpDownload').addEventListener('click', async () => {
+  if (!lastSocialGraphicBlob) return;
+  const ticketId = lastSocialGraphicTicketId || 'unknown';
+  const filename = 'citixen-receipt-' + ticketId + '.png';
+
+  // STEP 1: automatic device download (unchanged for every browser,
+  // mobile or desktop — this always happens first).
+  const objectUrl = URL.createObjectURL(lastSocialGraphicBlob);
   const a = document.createElement('a');
-  a.href = lastSocialGraphicDataUrl;
-  a.download = 'citixen-ux-social-card.png';
-  document.body.appendChild(a); a.click(); a.remove();
+  a.href = objectUrl;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(objectUrl);
+
+  // STEP 2: native OS share sheet, immediately after — own payload copy
+  // for this flow specifically (kept separate from the CITIXEN_SHARE_*
+  // canonical constants just below, which belong to the X/WhatsApp/
+  // copy-link fallback flow on #easyShareFallbackModal; changing this
+  // button's wording shouldn't silently change that other flow's).
+  const shareTitle = 'CITIXEN UX™ Public Ledger Receipt';
+  const shareText = 'Verified Civic Receipt ' + ticketId + ' — Published to Public Ledger.';
+  const shareUrl = 'https://citixenux.com/app';
+  try {
+    const file = new File([lastSocialGraphicBlob], filename, { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ title: shareTitle, text: shareText, url: shareUrl, files: [file] });
+    } else if (navigator.share) {
+      // Real share API present but this browser/OS won't share files
+      // (common on desktop Web Share implementations) — still share the
+      // title/text/link, same honest "do what's actually supported"
+      // pattern as resolveFounderSupportAmount()/STRIPE_PAYMENT_LINK
+      // elsewhere in this file.
+      await navigator.share({ title: shareTitle, text: shareText, url: shareUrl });
+    } else {
+      // No Web Share API at all (most desktop browsers) — the PNG is
+      // already downloaded via Step 1 above, so this is honest, not a
+      // dead end.
+      toast('Receipt saved to downloads.');
+    }
+  } catch (err) {
+    // AbortError = the citizen closed the native share sheet themselves —
+    // not a failure, nothing to report. Any other error still leaves the
+    // citizen with a real downloaded file from Step 1, so this stays a
+    // quiet no-op rather than an alarming error toast for something that
+    // already partially succeeded.
+    if (err && err.name !== 'AbortError') {
+      console.warn('[CITIXEN] navigator.share failed:', err);
+    }
+  }
 });
 // CANONICAL SHARE PAYLOAD (Patch 14-10/03/26) — the exact title/text/url
 // every share channel below uses, so the native share sheet, the X/
