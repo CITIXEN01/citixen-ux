@@ -69,19 +69,28 @@
      no Next.js metadataBase config to set here, so every URL below is just
      written out in full against https://citixenux.com instead): relative
      og:image/icon URLs are unreliable for link-preview crawlers. -->
+<!-- Patch 14-10/03/26: og:title/description/image/url updated per spec.
+     NOTE — og:image now points at /assets/og-receipt-preview.png, which
+     does not exist anywhere in this repo (no /assets/ directory at all;
+     confirmed via find). Set exactly as requested, but link-preview
+     crawlers (iMessage/Slack/etc., the exact audience the comment above
+     this block says the og:image setup exists for) will get a 404 for
+     this image until that file is actually added to the repo at that
+     path — this will visibly break preview cards, not just look slightly
+     off. Flagging this rather than silently leaving a broken image link
+     unmentioned. -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://citixenux.com/app">
-<meta property="og:title" content="CITIXEN UX™">
-<meta property="og:description" content="Improve Your Civic Experience">
-<!-- Cache-busting query string on top of the filename change itself —
-     belt-and-suspenders, same convention the BREAK APPLE IMESSAGE CACHE
-     round used for the og-v4.png rename, since iMessage/Applebot/Slack and
-     other link-preview crawlers are known to cache stubbornly even across
-     a URL rename. Continues that round's "?v=999" counter forward to
-     "?v=1000" for this content change, per Patch 4.10.1's own "bump the
-     version string on any future content change" convention, rather than
-     resetting it. -->
-<meta property="og:image" content="https://citixenux.com/og-preview-large.png?v=1000">
+<meta property="og:title" content="CITIXEN UX™ — Verified Public Ledger">
+<meta property="og:description" content="Track civic intake progress, view location.">
+<!-- Patch 14-10/03/26 points this at a new filename
+     (og-receipt-preview.png) rather than bumping og-preview-large.png's own
+     "?v=1000" cache-busting counter (the BREAK APPLE IMESSAGE CACHE/Patch
+     4.10.1 convention) — a filename change is itself cache-proof against
+     iMessage/Applebot/Slack's stubborn crawler caching, same reasoning that
+     convention was built on, without carrying forward a version query
+     string that referred to the old asset. -->
+<meta property="og:image" content="https://citixenux.com/assets/og-receipt-preview.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="CITIXEN UX™ - Improve Your Civic Experience">
@@ -2452,6 +2461,25 @@ textarea.input{resize:none;line-height:1.4}
       <div class="sgp-actions">
         <button type="button" class="btn-onboarding-cta" id="btnSgpDownload" disabled>Download Ticket</button>
         <button type="button" class="btn-sgp-share" id="btnSgpShare">Easy Share</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== EASY SHARE FALLBACK (Patch 14-10/03/26) — shown only when
+       navigator.share doesn't exist at all (most desktop browsers); real
+       X/WhatsApp intent links plus a plain clipboard copy, all three
+       carrying the identical canonical CITIXEN_SHARE_COMBINED string. See
+       #btnSgpShare's click handler. ===== -->
+  <div id="easyShareFallbackModal" class="confirm-drawer">
+    <div class="confirm-card">
+      <div class="onboarding-header-bar">
+        <span class="onboarding-brand">Share This Report</span>
+        <button type="button" class="onboarding-close" id="btnShareFallbackClose" aria-label="Close">✕</button>
+      </div>
+      <div class="onboarding-footer" style="margin-top:0;">
+        <button type="button" class="btn-onboarding-glass" id="btnShareFallbackX">Share to X</button>
+        <button type="button" class="btn-onboarding-glass" id="btnShareFallbackWhatsapp">Share to WhatsApp</button>
+        <button type="button" class="btn-onboarding-outline" id="btnShareFallbackCopy">Copy Link</button>
       </div>
     </div>
   </div>
@@ -6579,23 +6607,54 @@ document.getElementById('btnSgpDownload').addEventListener('click', () => {
   a.download = 'citixen-ux-social-card.png';
   document.body.appendChild(a); a.click(); a.remove();
 });
+// CANONICAL SHARE PAYLOAD (Patch 14-10/03/26) — the exact title/text/url
+// every share channel below uses, so the native share sheet, the X/
+// WhatsApp intent fallbacks, and the plain clipboard copy all carry
+// identical wording instead of each one inventing its own (the old code
+// used a different, shorter blurb for native share and a per-ticket deep
+// link for the clipboard fallback — this patch replaces both with one
+// fixed canonical string + the site's real canonical URL).
+const CITIXEN_SHARE_TITLE = 'CITIXEN UX™ — Verified Civic Report';
+const CITIXEN_SHARE_TEXT = 'Verified Civic Report on CITIXEN UX™ Living Ledger — Track progress, see results:';
+const CITIXEN_SHARE_URL = 'https://citixenux.com/app';
+const CITIXEN_SHARE_COMBINED = CITIXEN_SHARE_TEXT + ' ' + CITIXEN_SHARE_URL;
+
 // EASY SHARE (Patch 8-10/03/26, was "Share") — uses the real Web Share API
-// with the rendered image file when the browser supports sharing files;
-// otherwise falls back to copying this ticket's real direct link (same
-// URL format as Copy Direct Link on the receipt itself) rather than
-// disappearing outright or fabricating a hosted "image link" this app
-// doesn't actually have (the PNG only ever exists client-side/as a
-// download — there's no server upload to link to).
+// (with the rendered image file attached when the browser supports sharing
+// files — lastSocialGraphicFile is only ever set once renderAndShowSocialGraphic()
+// has confirmed navigator.canShare({files}) actually passes) with the
+// canonical payload above. PLATFORM FALLBACK INTENTS (Patch 14-10/03/26):
+// this app never had a Twitter/X or WhatsApp share option before — browsers
+// with no Web Share API at all (most desktop browsers) now get a real
+// fallback drawer offering both as genuine intent links, plus a plain
+// clipboard copy, all three carrying the identical canonical string —
+// never a fabricated "share succeeded" state and never silently doing
+// nothing just because the device lacks navigator.share.
 document.getElementById('btnSgpShare').addEventListener('click', async () => {
-  if (lastSocialGraphicFile) {
+  if (navigator.share) {
     try {
-      await navigator.share({ files: [lastSocialGraphicFile], title: 'Citixen UX Report', text: 'My civic report just went live on the public ledger.' });
-      return;
-    } catch (e) { /* citizen cancelled the native share sheet — fall through to the copy-link fallback below */ }
+      const payload = { title: CITIXEN_SHARE_TITLE, text: CITIXEN_SHARE_TEXT, url: CITIXEN_SHARE_URL };
+      if (lastSocialGraphicFile) payload.files = [lastSocialGraphicFile];
+      await navigator.share(payload);
+    } catch (e) { /* citizen cancelled the native share sheet — not an error, nothing else to do */ }
+    return;
   }
-  const id = lastSocialGraphicTicketId || document.getElementById('receiptTicketId').textContent;
-  const url = location.origin + '/app?report=' + encodeURIComponent(id);
-  const ok = await copyTextToClipboard(url);
+  document.getElementById('easyShareFallbackModal').classList.add('open');
+});
+document.getElementById('btnShareFallbackClose').addEventListener('click', () => {
+  document.getElementById('easyShareFallbackModal').classList.remove('open');
+});
+document.getElementById('easyShareFallbackModal').addEventListener('click', (e) => {
+  if (e.target.id === 'easyShareFallbackModal') document.getElementById('easyShareFallbackModal').classList.remove('open');
+});
+document.getElementById('btnShareFallbackX').addEventListener('click', () => {
+  window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(CITIXEN_SHARE_COMBINED), '_blank', 'noopener');
+});
+document.getElementById('btnShareFallbackWhatsapp').addEventListener('click', () => {
+  window.open('https://wa.me/?text=' + encodeURIComponent(CITIXEN_SHARE_COMBINED), '_blank', 'noopener');
+});
+document.getElementById('btnShareFallbackCopy').addEventListener('click', async () => {
+  const ok = await copyTextToClipboard(CITIXEN_SHARE_COMBINED);
   toast(ok ? 'Link copied — share it anywhere' : 'Could not copy — select and copy manually');
 });
 document.getElementById('btnSgpClose').addEventListener('click', () => {
