@@ -144,12 +144,22 @@
    unconditionally — Patch 4.11.1 removed the old localStorage check that
    used to skip this for a returning tester). The gate's own submit handler
    is the only thing that ever removes the class again, and only for the
-   current page view. See initCitixenGate() near the end of <body>. ===== */
+   current page view. See initCitixenGate() near the end of <body>. =====
+   SCROLL LOCK & TOUCH FIX (Patch 12-10/03/26 re-execution): removed the
+   html.citixen-gate-locked body{overflow:hidden} rule that used to sit
+   here — the only body-level scroll trap anywhere in this file (checked:
+   no other overflow:hidden/touchmove preventDefault/body.style.overflow
+   JS exists on body or document.documentElement). The gate itself is a
+   position:fixed, inset:0 overlay that already fully covers the viewport,
+   so locking the (invisible, fully-covered) body underneath it added no
+   real protection — it only blocked two-way vertical scroll. Every modal
+   drawer in this file (.confirm-drawer/.onboarding-card) already scrolls
+   its own content via its own overflow-y:auto, so removing this body-level
+   lock doesn't affect any modal's internal scrolling. */
 .citixen-gate{display:none;position:fixed;inset:0;z-index:99999;align-items:center;justify-content:center;
   background:rgba(2,6,23,.92);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
   padding:24px;box-sizing:border-box}
 html.citixen-gate-locked .citixen-gate{display:flex}
-html.citixen-gate-locked body{overflow:hidden}
 .citixen-gate-card{width:100%;max-width:360px;background:rgba(2,6,23,.8);border:1px solid rgba(30,41,59,.85);
   border-radius:18px;padding:32px 26px;text-align:center;box-shadow:0 0 40px rgba(0,0,0,.6);box-sizing:border-box}
 /* Split white/glowing-emerald treatment, same convention as the main
@@ -905,8 +915,13 @@ textarea.input{resize:none;line-height:1.4}
    (#frontDoorOnboardingModal). Obsidian Glass per spec: translucent
    slate-950/80 fill + heavy blur + a slate-800 hairline, distinct from
    the emerald-tinted glass the rest of this file uses elsewhere. ===== */
+/* Patch 12-10/03/26 re-execution: trimmed padding (was 28px 24px) as part
+   of the fit-to-screen pass — max-height/overflow-y:auto stays as a safety
+   net (never removed; see the Patch 12 SCROLL LOCK & TOUCH FIX note on
+   .citixen-gate above), but the goal is for real content to fit above the
+   fold on a 320–390px phone without ever needing it. */
 .onboarding-card{background:rgba(2,6,23,.8);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-  border:1px solid rgba(30,41,59,.85);box-shadow:0 0 32px rgba(0,0,0,.5);padding:28px 24px;
+  border:1px solid rgba(30,41,59,.85);box-shadow:0 0 32px rgba(0,0,0,.5);padding:20px 18px;
   max-height:88vh;overflow-y:auto}
 .onboarding-header-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
 .onboarding-brand{font-weight:800;font-size:.8rem;letter-spacing:.3px;color:var(--mint2)}
@@ -925,7 +940,7 @@ textarea.input{resize:none;line-height:1.4}
    element's own margin-bottom, per this round's polish pass. Card 2's grid
    layout is untouched and keeps its own left-aligned classes below. */
 .onboarding-slide.onboarding-centered.active{display:flex;flex-direction:column;align-items:center;
-  text-align:center;gap:18px}
+  text-align:center;gap:12px}
 .onboarding-badge-pill{display:inline-block;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   font-size:.62rem;font-weight:800;letter-spacing:.08em;color:var(--mint2);text-transform:uppercase;
   background:rgba(0,230,153,.1);border:1px solid rgba(0,230,153,.35);border-radius:9999px;padding:5px 14px}
@@ -940,22 +955,12 @@ textarea.input{resize:none;line-height:1.4}
    .btn-receipt-feed), not brand-lime's dimmer #34d399. */
 .onboarding-ux-accent{color:#00FF87}
 .onboarding-subtitle{font-size:.8rem;font-weight:700;color:var(--mint2);margin-bottom:12px}
-/* Vibrant neon-green sub-headline — same #00FF94 accent as the former
-   Instant Feedback badge/Beta Testing Analytics banner, so this screen's
-   one colored line of copy reads as "important" rather than decorative. */
-.onboarding-subtitle-neon{font-size:.88rem;font-weight:800;line-height:1.5;color:#00FF94;max-width:300px}
-/* Patch 12-10/03/26: typewriter reveal on just the "For your eyes only"
-   label (18 characters) — a fixed-width monospace-style reveal rather than
-   animating to an unreliable "auto" width, with a blinking caret that
-   settles after a few cycles instead of blinking forever. Reduced-motion
-   gets the finished text immediately, no caret. */
-.onboarding-typewriter{display:inline-block;overflow:hidden;white-space:nowrap;vertical-align:bottom;
-  width:18ch;border-right:2px solid #00FF87;
-  animation:onboardingTypewriterReveal 1.3s steps(18,end) 1 both,
-    onboardingTypewriterCaret .7s step-end 4;}
-@keyframes onboardingTypewriterReveal{from{width:0}}
-@keyframes onboardingTypewriterCaret{50%{border-color:transparent}}
-@media (prefers-reduced-motion:reduce){.onboarding-typewriter{animation:none;width:18ch;border-right:none}}
+/* Patch 12-10/03/26 re-execution removed .onboarding-subtitle-neon and
+   .onboarding-typewriter (the "For your eyes only" line + its typewriter
+   reveal) from here — that notice now lives in its own nested
+   #onboardingNoticeModal popup (see .onboarding-notice-* below) instead
+   of the main welcome card, so these two classes had no markup left
+   referencing them and were removed rather than left as dead CSS. */
 .onboarding-body{font-size:.84rem;line-height:1.55;color:var(--muted)}
 .onboarding-centered .onboarding-body{margin-bottom:0;font-size:.875rem;color:#cbd5e1;line-height:1.6}
 .onboarding-warning{display:flex;gap:10px;align-items:flex-start;background:rgba(15,23,42,.9);
@@ -969,28 +974,22 @@ textarea.input{resize:none;line-height:1.4}
    each reusing that exact tab's own inline SVG so a tester associates the
    card with the real tab it's describing. .onboarding-grid now lives
    inside the centered slide, so it needs an explicit full width.
-   Patch 12-10/03/26 switched this from left-aligned icon+text rows to
-   fully centered, stacked cards (see .onboarding-grid-item below) to match
-   the rest of the slide's centered alignment. */
-.onboarding-centered .onboarding-grid{width:100%;box-sizing:border-box;text-align:center}
-.onboarding-grid{display:flex;flex-direction:column;gap:14px;margin:4px 0 4px}
-/* Patch 12-10/03/26 "scaled up" cards: icon on top, centered section title
-   and description below, more generous padding/radius than the old
-   left-aligned icon+text row. */
-.onboarding-grid-item{display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center;
-  padding:22px 18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:18px}
-/* Icon slot enlarged to roughly a third of the card's own width (clamped
-   so it neither disappears on a 320px viewport nor balloons on a wide
-   desktop card) instead of a fixed 40px badge, per this round's "bold
-   visual balance across device sizes" spec. aspect-ratio keeps it square
-   as its width scales; the svg inside scales with it via % sizing. */
-.onboarding-icon-badge{flex-shrink:0;width:34%;max-width:104px;min-width:64px;aspect-ratio:1/1;
-  border-radius:20px;background:rgba(0,255,148,.12);border:1px solid rgba(0,255,148,.4);color:#00FF94;
-  display:flex;align-items:center;justify-content:center}
-.onboarding-icon-badge svg{width:44%;height:44%}
-.onboarding-grid-text{display:flex;flex-direction:column;gap:5px;min-width:0;align-items:center}
-.onboarding-grid-text b{font-size:.92rem;color:var(--text);letter-spacing:.04em;text-transform:uppercase}
-.onboarding-grid-text span{font-size:.8rem;color:var(--muted);line-height:1.5}
+   Patch 12-10/03/26 RE-EXECUTION: reverted from the previous round's
+   enlarged, centered, stacked (icon-over-text) cards back to a compact
+   left-aligned icon+text row — required to fit all 3 numbered steps above
+   the fold on a 320–390px phone with no scrolling, which the stacked/
+   enlarged layout could not do. Sizes below were verified against real
+   rendered heights at 320x568/375x667/390x844 viewports. */
+.onboarding-centered .onboarding-grid{width:100%;box-sizing:border-box;text-align:left}
+.onboarding-grid{display:flex;flex-direction:column;gap:8px;margin:2px 0}
+.onboarding-grid-item{display:flex;flex-direction:row;gap:10px;align-items:center;text-align:left;
+  padding:9px 11px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px}
+.onboarding-icon-badge{flex-shrink:0;width:30px;height:30px;border-radius:9px;background:rgba(0,255,148,.12);
+  border:1px solid rgba(0,255,148,.4);color:#00FF94;display:flex;align-items:center;justify-content:center}
+.onboarding-icon-badge svg{width:16px;height:16px}
+.onboarding-grid-text{display:flex;flex-direction:column;gap:2px;min-width:0;align-items:flex-start}
+.onboarding-grid-text b{font-size:.68rem;color:var(--text);letter-spacing:.03em;text-transform:uppercase}
+.onboarding-grid-text span{font-size:.68rem;color:var(--muted);line-height:1.35}
 .btn-onboarding-cta{width:100%;box-sizing:border-box;min-height:52px;background:var(--mint);color:#051311;
   border:none;padding:14px 16px;border-radius:12px;font-family:inherit;font-weight:700;font-size:16px;cursor:pointer}
 .btn-onboarding-cta:disabled{opacity:.4;cursor:not-allowed}
@@ -1003,6 +1002,17 @@ textarea.input{resize:none;line-height:1.4}
    Inherits .btn-onboarding-cta's width:100%/box-sizing:border-box/padding,
    so the label stays clear of the card edge at any mobile viewport width. */
 #btnOnboardingStart{background:#00FF87;box-shadow:0 0 18px rgba(0,255,135,.35)}
+/* Patch 12-10/03/26 re-execution: nested confidentiality-notice popup
+   (#onboardingNoticeModal) — small, centered card, its own #00FF87 "Got
+   it" CTA (same accent as #btnOnboardingStart above), and a higher
+   z-index than the welcome card's own .confirm-drawer (2750) so it
+   renders on top when both are open. */
+.onboarding-notice-drawer{z-index:2760}
+.onboarding-notice-card{display:flex;flex-direction:column;align-items:center;text-align:center;
+  gap:14px;max-width:320px}
+.onboarding-notice-icon{font-size:2.1rem;line-height:1;filter:drop-shadow(0 0 10px rgba(0,255,135,.65))}
+.onboarding-notice-text{font-size:.88rem;font-weight:700;line-height:1.5;color:#e2e8f0}
+#btnOnboardingNoticeGotIt{background:#00FF87;box-shadow:0 0 18px rgba(0,255,135,.35)}
 .onboarding-footer{display:flex;flex-direction:column;gap:16px;margin-top:20px}
 .onboarding-dots{display:flex;justify-content:center;gap:8px}
 .onboarding-dot{width:7px;height:7px;border-radius:50%;background:rgba(148,163,184,.3);transition:all .2s ease}
@@ -2543,8 +2553,13 @@ textarea.input{resize:none;line-height:1.4}
        recognizes which tab each card is pointing at. ===== -->
   <div id="frontDoorOnboardingModal" class="confirm-drawer">
     <div class="confirm-card onboarding-card">
+      <!-- Patch 12-10/03/26 (re-executed): brand wordmark lives here, in
+           the top-left header bar, instead of repeated inside the big
+           centered headline below — solid white "CITIXEN" + bright
+           #00FF87 "UX™" (a louder green than brand-lime's #34d399,
+           matching the Got it CTA's accent). -->
       <div class="onboarding-header-bar">
-        <span class="onboarding-brand">CITIXEN UX<sup class="tm-symbol">™</sup></span>
+        <span class="onboarding-brand"><span class="brand-white">CITIXEN</span> <span class="onboarding-ux-accent">UX<sup class="tm-symbol">™</sup></span></span>
       </div>
 
       <div class="onboarding-slides" id="onboardingSlides">
@@ -2552,40 +2567,61 @@ textarea.input{resize:none;line-height:1.4}
              alpha cohort plus the real 3-step test process, framed as what
              each tester is being asked to do. -->
         <div class="onboarding-slide onboarding-centered active" data-slide="0">
-          <span class="onboarding-badge-pill">CONFIDENTIAL • PRIVATE ALPHA</span>
-          <!-- Patch 12-10/03/26: solid white "CITIXEN" + bright #00FF87
-               "UX™" (a different, louder green than brand-lime's #34d399,
-               matching the Got it CTA's Patch 11 accent) instead of the
-               single flat #f1f5f9 headline color; " Beta Testing" is
-               unchanged. -->
-          <h2 class="onboarding-headline onboarding-headline-xl"><span class="brand-white">CITIXEN</span> <span class="onboarding-ux-accent">UX<sup class="tm-symbol">™</sup></span> Beta Testing</h2>
-          <!-- Typewriter reveal on the "For your eyes only" label only —
-               the rest of the sentence renders normally right after it. -->
-          <p class="onboarding-subtitle-neon"><span class="onboarding-typewriter">For your eyes only</span> — please do not forward or share this link.</p>
+          <span class="onboarding-badge-pill">CONFIDENTIAL • PATENT PENDING</span>
+          <!-- The wordmark now lives only in the header bar above, so this
+               headline no longer repeats "CITIXEN UX™" — just the plain
+               "Beta Testing" label, which also helps the fit-to-screen
+               goal below. -->
+          <h2 class="onboarding-headline onboarding-headline-xl">Beta Testing</h2>
           <p class="onboarding-body">All feedback is welcome.</p>
+          <!-- Compact, numbered step rows (Patch 12-10/03/26 re-execution)
+               — sized to fit all 3 above the fold on a 320–390px phone
+               without scrolling; see .onboarding-grid-item etc. below. -->
           <div class="onboarding-grid">
             <div class="onboarding-grid-item">
               <div class="onboarding-icon-badge" aria-hidden="true">
                 <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
               </div>
-              <div class="onboarding-grid-text"><b>Report</b><span>Use the camera feature to capture and record a problem that needs to be fixed.</span></div>
+              <div class="onboarding-grid-text"><b>Step 1: Report</b><span>Use the camera feature to capture and record a problem that needs to be fixed.</span></div>
             </div>
             <div class="onboarding-grid-item">
               <div class="onboarding-icon-badge" aria-hidden="true">
                 <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
               </div>
-              <div class="onboarding-grid-text"><b>Follow</b><span>Get your receipt and check the map/ledger.</span></div>
+              <div class="onboarding-grid-text"><b>Step 2: Follow</b><span>Get your receipt and check the map/ledger.</span></div>
             </div>
             <div class="onboarding-grid-item">
               <div class="onboarding-icon-badge" aria-hidden="true">
                 <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="20" x2="5" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="19" y1="20" x2="19" y2="15"/></svg>
               </div>
-              <div class="onboarding-grid-text"><b>Dashboard</b><span>Explore analytics, export reports, and search ledger.</span></div>
+              <div class="onboarding-grid-text"><b>Step 3: Dashboard</b><span>Explore analytics, export reports, and search ledger.</span></div>
             </div>
           </div>
           <button type="button" class="btn-onboarding-cta" id="btnOnboardingStart">Got it</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ===== CONFIDENTIALITY NOTICE (Patch 12-10/03/26 re-execution) —
+       split out of the main welcome card into its own nested popup,
+       auto-opened on top of it by openFrontDoorOnboarding() (see that
+       function) and dismissed independently via its own "Got it". The
+       welcome card underneath stays open and still needs its own "Got it"
+       to actually enter the report tab — this notice is a one-time extra
+       step in front of it, not a replacement for it. No backdrop-dismiss,
+       matching the welcome card's own "no skip path" convention.
+       The 🔒 emoji is a real emoji glyph rendered by the OS/browser's own
+       emoji font — its color isn't literally a single swappable value
+       (it's a multi-color glyph, not a CSS-colorable icon), so "green
+       lock" is carried by a neon-green glow around it rather than faking
+       a recolored emoji that wouldn't render consistently across
+       platforms anyway. -->
+  <div id="onboardingNoticeModal" class="confirm-drawer onboarding-notice-drawer">
+    <div class="confirm-card onboarding-notice-card">
+      <div class="onboarding-notice-icon" aria-hidden="true">🔒</div>
+      <p class="onboarding-notice-text">For your eyes only — please do not forward or share this link.</p>
+      <button type="button" class="btn-onboarding-cta" id="btnOnboardingNoticeGotIt">Got it</button>
     </div>
   </div>
 
@@ -7055,6 +7091,13 @@ function startPostUnlockLanding(){
 // security screen.
 function openFrontDoorOnboarding(){
   document.getElementById('frontDoorOnboardingModal').classList.add('open');
+  // Patch 12-10/03/26 re-execution: the confidentiality notice is now a
+  // separate nested popup, auto-opened on top of the welcome card every
+  // time this runs (every unlock, same "shown in full every visit" rule
+  // as the welcome card itself per PATCH 4.11.1 above) — dismissed via its
+  // own "Got it" (see btnOnboardingNoticeGotIt below), independently of
+  // the welcome card's own "Got it".
+  document.getElementById('onboardingNoticeModal').classList.add('open');
 }
 // Step 2 -> Step 3 of the sequencer: completing the security screen (its
 // only exit — "Got it") switches straight into the camera-gated report
@@ -7121,6 +7164,14 @@ function focusReportCategoryFromQueryString(){
 }
 document.getElementById('btnOnboardingStart').addEventListener('click', () => {
   closeFrontDoorOnboarding();
+});
+// Confidentiality notice popup (Patch 12-10/03/26 re-execution) — its own
+// "Got it" only closes this nested popup, revealing the welcome card
+// underneath (still open, still needing its own "Got it" above to actually
+// proceed into the report tab). No backdrop-dismiss, matching the welcome
+// card's own no-skip-path convention.
+document.getElementById('btnOnboardingNoticeGotIt').addEventListener('click', () => {
+  document.getElementById('onboardingNoticeModal').classList.remove('open');
 });
 
 // Patch 10-10/03/26: the floating "Instant Feedback" badge
