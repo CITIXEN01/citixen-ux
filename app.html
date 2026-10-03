@@ -157,10 +157,15 @@
    its own content via its own overflow-y:auto, so removing this body-level
    lock doesn't affect any modal's internal scrolling. */
 .citixen-gate{display:none;position:fixed;inset:0;z-index:99999;align-items:center;justify-content:center;
-  background:rgba(2,6,23,.92);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+  /* GLOBAL BACKGROUND OBSIDIAN THEME UNIFICATION (Patch 24-10/03/26): this
+     screen's own near-black (rgba(2,6,23,...), ~#020617) was a visibly
+     different hex from the shared #030712/#080C14 obsidian canvas every
+     other screen uses — the real "screen-to-screen color shift" this item
+     targets. Moved onto the same (8,12,20) triplet as the rest of the app. */
+  background:rgba(8,12,20,.92);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
   padding:24px;box-sizing:border-box}
 html.citixen-gate-locked .citixen-gate{display:flex}
-.citixen-gate-card{width:100%;max-width:360px;background:rgba(2,6,23,.8);border:1px solid rgba(30,41,59,.85);
+.citixen-gate-card{width:100%;max-width:360px;background:rgba(8,12,20,.8);border:1px solid rgba(30,41,59,.85);
   border-radius:18px;padding:32px 26px;text-align:center;box-shadow:0 0 40px rgba(0,0,0,.6);box-sizing:border-box;
   position:relative;z-index:0}
 /* Patch 19-10/03/26: subtle ambient glow behind the card — #00FF87 at
@@ -202,14 +207,21 @@ html.citixen-gate-locked .citixen-gate{display:flex}
   /* Green unification + obsidian canvas brought in line with index.html
      this round: the app used to run its own slightly different "Emerald
      Green" (#00ff88/#00e077) and a dark-green-tinted canvas (#080c0a/
-     #0f1713); both now match the dashboard's Fresh Mint (#00E699) and
-     pitch obsidian (#030712) tokens exactly. */
+     #0f1713); both now match the dashboard's Fresh Mint (#00E699) tokens
+     exactly. GLOBAL BACKGROUND OBSIDIAN THEME UNIFICATION (Patch
+     24-10/03/26): the single shared canvas token below moved from
+     #030712 to the exact Obsidian #080C14 this round specifies — every
+     screen (body, the tab panes, the Unlock gate, the Map & Feed canvas,
+     top/bottom nav) draws from this one token, so there was never a
+     second, different "Map & Feed-only" base color to match — moving
+     this one value moves all of them in lockstep, with nothing left to
+     drift out of sync between tabs. */
   --brand-mint:#00E699 !important;
   --brand-mint-hover:#00E699 !important;
   --brand-mint-dim:rgba(0,230,153,0.12) !important;
   --brand-amber:#ffbb00 !important;
   --brand-red:#ff4444 !important;
-  --bg-obsidian:#030712 !important;
+  --bg-obsidian:#080C14 !important;
   --bg-card:#111827 !important;
   --border-muted:rgba(255,255,255,0.08) !important;
   --fow-amber:#F59E0B !important; /* this round's "11,000,000 Block Base Matrix" spec's exact Pending amber hex */
@@ -221,7 +233,10 @@ html.citixen-gate-locked .citixen-gate{display:flex}
      This round's "Global Hyper-Transparent Obsidian Glass System" pushes
      the fill more transparent (rgba(5,11,20,.8), the spec's exact hex)
      and the blur up to 16px (--surface-blur) so every card sitting on the
-     #030712 obsidian base reads as dimensional glass, not a flat block. ===== */
+     #080C14 obsidian base reads as dimensional glass, not a flat block.
+     These card/input surfaces are deliberately NOT part of Patch
+     24-10/03/26's screen-background sweep below — they're foreground
+     components layered on top of a screen, not a screen themselves. ===== */
   --surface-card-bg:rgba(5,11,20,0.8) !important;
   --surface-card-border:1px solid rgba(0,230,153,0.2) !important;
   --surface-blur:16px !important;
@@ -234,17 +249,35 @@ html.citixen-gate-locked .citixen-gate{display:flex}
   --danger:var(--brand-red); --warn:var(--brand-amber); --amber:var(--brand-amber);
 }
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+/* GLOBAL BACKGROUND OBSIDIAN THEME UNIFICATION (Patch 24-10/03/26): body is
+   this app's one real "#app" root — there's no separate #app/.tab-content/
+   #unlockView/#reportView/#dashboardView/#feedView element in this
+   codebase (the real screens are #citixenGate for Unlock, and
+   #tab-report/#tab-map/#tab-analytics — the .tabpane elements — for
+   Report/Map & Feed/Dashboard). .shell and .tabpane below get the same
+   #080C14 set explicitly, even though neither previously overrode body's
+   background (so this was already true pixel-for-pixel) — explicit here
+   means it stays true even if either rule ever gains its own background
+   later, which is the actual "cause of screen-to-screen shifting" this
+   item guards against. */
 body{background:var(--bg);color:var(--text);display:flex;justify-content:center;min-height:100vh}
 .shell{width:100%;max-width:520px;min-height:100vh;display:flex;flex-direction:column;
+  background:#080C14;
   padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(80px + env(safe-area-inset-bottom,0px))}
 
 /* This round's item 1 expands the color purge to "navigation elements":
    .topnav and .bottomnav below previously carried their own dark-teal
    tints (rgba(7,12,14,...) / rgba(11,18,21,...)) instead of the shared
-   Pitch Obsidian canvas — both now use rgba(3,7,18,...), the same
-   #030712 obsidian value at the translucency each already had, so the
-   sticky top bar and the tab bar match every other purged surface. */
-.topnav{position:sticky;top:0;z-index:1000;background:rgba(3,7,18,.95);backdrop-filter:blur(12px);
+   Pitch Obsidian canvas — both used rgba(3,7,18,...), the old #030712
+   obsidian value, at the translucency each already had. Patch
+   24-10/03/26 moves that RGB triplet to (8,12,20) — the new #080C14 — so
+   the sticky top bar and the tab bar still match every other purged
+   surface. Kept translucent + blurred (not made fully opaque): since
+   body/.tabpane directly behind it are the exact same #080C14, any alpha
+   composited over an identical color still renders as that exact color
+   with zero visible seam — the blur is a deliberate glass effect, not a
+   leftover mismatched tint. */
+.topnav{position:sticky;top:0;z-index:1000;background:rgba(8,12,20,.95);backdrop-filter:blur(12px);
   border-bottom:1px solid var(--border);padding:14px 16px}
 .brand{display:flex;justify-content:space-between;align-items:center}
 .brand-logo{display:flex;align-items:center;gap:10px}
@@ -283,7 +316,7 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
 .bridge-banner-text{font-size:.84rem;font-weight:700;line-height:1.5;margin-bottom:14px}
 
 .main{padding:14px;display:flex;flex-direction:column;gap:12px;flex:1}
-.tabpane{display:none;flex-direction:column;gap:12px}
+.tabpane{display:none;flex-direction:column;gap:12px;background:#080C14}
 .tabpane.active{display:flex}
 
 .notice-banner{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);color:#fca5a5;border-radius:12px;
@@ -423,7 +456,7 @@ textarea.input{resize:none;line-height:1.4}
 #btnSubmit:not(:disabled):hover{box-shadow:0 0 26px rgba(0,255,135,.5)}
 
 .bottomnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;
-  background:rgba(3,7,18,.96);backdrop-filter:blur(16px);border-top:1px solid var(--border);
+  background:rgba(8,12,20,.96);backdrop-filter:blur(16px);border-top:1px solid var(--border);
   display:grid;grid-template-columns:repeat(3,1fr);padding:8px 4px;z-index:1000;
   padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))}
 .navtab{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;
@@ -435,11 +468,11 @@ textarea.input{resize:none;line-height:1.4}
    every other card/pill/modal frame per this round's "absolute blue
    purge" item 3 (previously a dark teal #0d1518 with a plain muted
    border). */
-#map{height:220px;width:100%;border-radius:12px;border:1px solid rgba(0,230,153,.25);background:#030712;box-shadow:0 0 12px rgba(0,230,153,.08);overflow:hidden}
+#map{height:220px;width:100%;border-radius:12px;border:1px solid rgba(0,230,153,.25);background:#080C14;box-shadow:0 0 12px rgba(0,230,153,.08);overflow:hidden}
 .dark-tiles{filter:invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);}
-.leaflet-container{background:#030712}
+.leaflet-container{background:#080C14}
 .leaflet-div-icon{background:transparent;border:none}
-.leaflet-control-attribution{background:rgba(3,7,18,.72)!important;color:#6b7280!important;font-size:9px!important;line-height:1.4}
+.leaflet-control-attribution{background:rgba(8,12,20,.72)!important;color:#6b7280!important;font-size:9px!important;line-height:1.4}
 .leaflet-control-attribution a{color:#9ca3af!important}
 
 /* ===== MAP BEACONS (CartoDB Dark Matter basemap) ===== */
@@ -465,9 +498,9 @@ textarea.input{resize:none;line-height:1.4}
 
 /* ===== DARK POPUPS — flat obsidian per this round's "absolute blue
    purge" (previously a dark teal #12141c). ===== */
-.leaflet-popup-content-wrapper{background:#030712;border:1px solid #00E699;border-radius:10px;color:#ffffff}
+.leaflet-popup-content-wrapper{background:#080C14;border:1px solid #00E699;border-radius:10px;color:#ffffff}
 .leaflet-popup-content{color:#ffffff;margin:10px 12px}
-.leaflet-popup-tip{background:#030712;border:1px solid #00E699}
+.leaflet-popup-tip{background:#080C14;border:1px solid #00E699}
 .leaflet-popup-close-button{color:#ffffff !important}
 .feed-item{background:rgba(7,12,14,.6);border:1px solid var(--border);border-radius:10px;padding:12px;
   margin-bottom:8px;cursor:pointer}
@@ -5698,10 +5731,14 @@ function selectCat(el){
 // GL inside Leaflet. Fallback: the previous filtered OSM raster tiles, used
 // when WebGL, the MapLibre scripts, or the style request are unavailable.
 const VECTOR_STYLE_URL = 'https://tiles.openfreemap.org/styles/dark';
+// GLOBAL BACKGROUND OBSIDIAN THEME UNIFICATION (Patch 24-10/03/26): bg/
+// labelHalo moved from the old #030712 to the same #080C14 every other
+// screen now uses, so the Map & Feed canvas itself — not just #map's CSS
+// fallback color above, which only shows before tiles paint — matches too.
 const BASEMAP_COLORS = {
-  bg:'#030712', land:'#060b16', water:'#0a1726', park:'#071a14',
+  bg:'#080C14', land:'#060b16', water:'#0a1726', park:'#071a14',
   building:'#0d1424', road:'#151d2b', roadMajor:'#1e2a3a', highway:'#2a2a1f',
-  boundary:'#1f2937', label:'#6b7280', labelHalo:'#030712'
+  boundary:'#1f2937', label:'#6b7280', labelHalo:'#080C14'
 };
 const OSM_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
