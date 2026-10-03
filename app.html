@@ -959,6 +959,15 @@ textarea.input{resize:none;line-height:1.4}
 .btn-onboarding-cta{width:100%;box-sizing:border-box;min-height:52px;background:var(--mint);color:#051311;
   border:none;padding:14px 16px;border-radius:12px;font-family:inherit;font-weight:700;font-size:16px;cursor:pointer}
 .btn-onboarding-cta:disabled{opacity:.4;cursor:not-allowed}
+/* Patch 11-10/03/26: the Beta Welcome modal's "Got it" CTA gets the
+   standard bright #00FF87 brand green accent (same token as
+   .btn-receipt-feed's "Head to Feed" button) instead of the dimmer
+   --mint/#00E699 the shared .btn-onboarding-cta class uses elsewhere
+   (Download Ticket, Quick Help's "Got It — View Live Feed") — scoped to
+   this one button by id so those other CTAs keep their existing look.
+   Inherits .btn-onboarding-cta's width:100%/box-sizing:border-box/padding,
+   so the label stays clear of the card edge at any mobile viewport width. */
+#btnOnboardingStart{background:#00FF87;box-shadow:0 0 18px rgba(0,255,135,.35)}
 .onboarding-footer{display:flex;flex-direction:column;gap:16px;margin-top:20px}
 .onboarding-dots{display:flex;justify-content:center;gap:8px}
 .onboarding-dot{width:7px;height:7px;border-radius:50%;background:rgba(148,163,184,.3);transition:all .2s ease}
@@ -2510,7 +2519,7 @@ textarea.input{resize:none;line-height:1.4}
               <div class="onboarding-icon-badge" aria-hidden="true">
                 <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="20" x2="5" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="19" y1="20" x2="19" y2="15"/></svg>
               </div>
-              <div class="onboarding-grid-text"><b>Dashboard</b><span>Explore analytics, export reports, and export analytics.</span></div>
+              <div class="onboarding-grid-text"><b>Dashboard</b><span>Explore analytics, export reports, and search ledger.</span></div>
             </div>
           </div>
           <button type="button" class="btn-onboarding-cta" id="btnOnboardingStart">Got it</button>
