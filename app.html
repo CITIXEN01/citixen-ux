@@ -419,6 +419,13 @@ textarea.input{resize:none;line-height:1.4}
 .address-suggest-item .small{display:block;color:var(--muted);font-size:.66rem;margin-top:2px}
 .address-suggest-item.active .small{color:#00B4D8;opacity:.8}
 .address-suggest-status{padding:9px 12px;font-size:.72rem;color:var(--muted)}
+/* Patch 32-10/03/26: physical "Use Address" submit button for the
+   #repAddressForm/#modalAddressForm wrappers around #repManualAddress/
+   #modalManualAddress — gives mobile virtual keyboards a real tappable
+   "Go" equivalent alongside the Enter-key path, both routed through the
+   same real commitTypedAddress() geocode pipeline (see the script). */
+.btn-use-address{width:100%;margin-top:10px;padding:12px;background:#00FF87;color:#080C14;
+  font-weight:700;border-radius:10px;border:none;cursor:pointer;font-family:inherit;font-size:.85rem}
 
 /* Primary CTA spec — shared 1:1 with .cx-btn-primary (shared/instant-report.css):
    52px tall, 14px/16px padding, 12px radius (rounded-xl), 16px/700 (font-bold text-base). */
@@ -1934,10 +1941,24 @@ textarea.input{resize:none;line-height:1.4}
                  address field below stays the same either way — it's always
                  visible, not just revealed on failure. -->
             <div class="small" style="color:var(--muted);margin:14px 0 6px;">Or enter your address</div>
-            <div class="address-suggest-wrap">
-              <input class="input manual-address-input" id="repManualAddress" type="text" autocomplete="street-address" enterkeyhint="search" placeholder="e.g. 351 W Hubbard St" style="margin:0;">
-              <div class="address-suggest-list" id="repManualAddressSuggest"></div>
-            </div>
+            <!-- PATCH 32-10/03/26: real <form> wrapper so a mobile virtual
+                 keyboard's "Go/Search" action (which fires a genuine
+                 'submit' event, not always a 'keydown' Enter) reaches the
+                 same real geocode path as pressing Enter on a hardware
+                 keyboard — action="javascript:void(0)" plus the submit
+                 listener's own preventDefault() below means this never
+                 actually navigates/reloads the page. -->
+            <form id="repAddressForm" action="javascript:void(0);">
+              <div class="address-suggest-wrap">
+                <input class="input manual-address-input" id="repManualAddress" type="text" autocomplete="street-address" enterkeyhint="search" placeholder="e.g. 351 W Hubbard St" style="margin:0;">
+                <div class="address-suggest-list" id="repManualAddressSuggest"></div>
+              </div>
+              <!-- Real submit button — wired to the form's 'submit' event
+                   (see attachAddressAutocomplete() in the script below),
+                   which runs the exact same commitTypedAddress() real-
+                   geocode pipeline as pressing Enter. -->
+              <button type="submit" class="btn-use-address">Use Address →</button>
+            </form>
             <!-- REVISED PATCH 29-10/03/26: static usage hint — Enter now runs
                  a real geocode of the typed string (see commitTypedAddress()
                  in attachAddressAutocomplete()), in addition to picking a
@@ -2588,10 +2609,15 @@ textarea.input{resize:none;line-height:1.4}
         Enable GPS or enter your street address — required to route this report to the correct ward.
       </div>
       <div class="small" style="color:var(--muted);margin:4px 0 6px;">Or enter your address</div>
-      <div class="address-suggest-wrap">
-        <input class="input manual-address-input" id="modalManualAddress" type="text" autocomplete="street-address" enterkeyhint="search" placeholder="e.g. 351 W Hubbard St" style="margin:0;">
-        <div class="address-suggest-list" id="modalManualAddressSuggest"></div>
-      </div>
+      <!-- PATCH 32-10/03/26: real <form> wrapper — see the matching comment
+           on #repManualAddress's form above. -->
+      <form id="modalAddressForm" action="javascript:void(0);">
+        <div class="address-suggest-wrap">
+          <input class="input manual-address-input" id="modalManualAddress" type="text" autocomplete="street-address" enterkeyhint="search" placeholder="e.g. 351 W Hubbard St" style="margin:0;">
+          <div class="address-suggest-list" id="modalManualAddressSuggest"></div>
+        </div>
+        <button type="submit" class="btn-use-address">Use Address →</button>
+      </form>
       <!-- REVISED PATCH 29-10/03/26: static usage hint — see the matching
            comment on #repManualAddress above. -->
       <div class="small" style="color:var(--muted);margin-top:6px;">Press Enter to search address, or pick a suggestion from the list.</div>
@@ -4103,9 +4129,25 @@ function attachAddressAutocomplete(inputEl, listEl, statusEl){
   // #locationRequiredModal and geocodeAddress()'s own comment above): it
   // blocks progression and tells the citizen honestly that nothing matched.
   let geocodeToken = 0;
+  // PATCH 32-10/03/26: the no-match/empty-input message text below was
+  // re-specced from Patch 29's original wording to this exact copy — the
+  // real geocode pipeline (Photon, then Nominatim) and the "never fabricate
+  // a coordinate" guarantee are unchanged, only the honest-failure copy
+  // itself was updated.
+  const NO_MATCH_MESSAGE = 'No verified US address found. Please check spelling or select a suggestion.';
   async function commitTypedAddress(){
     const q = inputEl.value.trim();
-    if (q.length < 3) return;
+    if (q.length < 3) {
+      // Empty/too-short input submitted via the "Use Address →" button or
+      // Enter — tell the citizen honestly rather than doing nothing with no
+      // feedback at all.
+      if (statusEl) {
+        statusEl.textContent = NO_MATCH_MESSAGE;
+        statusEl.style.color = 'var(--danger)';
+        statusEl.style.display = '';
+      }
+      return;
+    }
     const myToken = ++geocodeToken;
     if (statusEl) {
       statusEl.textContent = 'Searching for a match…';
@@ -4122,10 +4164,26 @@ function attachAddressAutocomplete(inputEl, listEl, statusEl){
     if (match) {
       selectResult({ lat: match.lat, lng: match.lng, label: match.label });
     } else if (statusEl) {
-      statusEl.textContent = 'No match found — please try a nearby cross street or select a suggestion from the list.';
+      statusEl.textContent = NO_MATCH_MESSAGE;
       statusEl.style.color = 'var(--danger)';
       statusEl.style.display = '';
     }
+  }
+  // PATCH 32-10/03/26: the real <form> wrapper (#repAddressForm/
+  // #modalAddressForm) around this input — its 'submit' event fires both
+  // for the physical "Use Address →" button (type="submit") and for a
+  // mobile virtual keyboard's "Go/Search" action, which doesn't always
+  // dispatch a plain 'keydown' Enter the way a hardware keyboard does.
+  // Routed through the exact same commitTypedAddress() real-geocode
+  // pipeline as the keydown handler below — action="javascript:void(0)"
+  // on the form plus this preventDefault() means it never actually
+  // navigates/reloads.
+  const addressForm = inputEl.closest('form');
+  if (addressForm) {
+    addressForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      commitTypedAddress();
+    });
   }
   inputEl.addEventListener('keydown', (e) => {
     const open = listEl.classList.contains('open') && results.length;
