@@ -35,35 +35,58 @@ const ASSET_DIR = path.join(__dirname, 'pass-assets');
 const ASSET_FILES = ['icon.png', 'icon@2x.png', 'icon@3x.png', 'logo.png', 'logo@2x.png', 'logo@3x.png'];
 
 // ===== PASS SPECIFICATIONS (per the Oct 2026 wallet-pass task) =====
+// Two shapes share this one builder (see api/passbook.js's two branches):
+//   - site-wide pass: no opts.reportId — generic "Public Ledger Access" copy,
+//     unchanged from the original round.
+//   - per-ticket receipt pass: opts.reportId set — binds the real reportId,
+//     timestamp, and ward/district the citizen's own submission produced
+//     (passed through from api/passbook.js's ?ticket= branch, itself fed by
+//     the client's real pendingReceiptOpts at the moment of submission —
+//     see handleAddToWallet() in app.html) into the pass fields, rather than
+//     the generic site-wide copy. Never a guessed/placeholder ticket value:
+//     if reportId is set but timestamp/ward are missing, those two fields are
+//     simply left out rather than backfilled with something invented.
 function buildPassJson(opts){
   opts = opts || {};
+  const isTicket = !!opts.reportId;
+  const primaryFields = [
+    { key: 'primary', label: isTicket ? 'Report ID' : '', value: isTicket ? opts.reportId : 'Public Ledger Access' }
+  ];
+  const secondaryFields = [
+    { key: 'secondary', label: isTicket ? 'District' : '', value: opts.ward || 'La Crosse, WI Ward Node' }
+  ];
+  const auxiliaryFields = (isTicket && opts.timestamp)
+    ? [{ key: 'timestamp', label: 'Logged', value: opts.timestamp, dateStyle: 'PKDateStyleMedium', timeStyle: 'PKDateStyleShort', isRelative: false }]
+    : undefined;
+  const barcodeMessage = isTicket
+    ? 'https://citixenux.com/report/' + encodeURIComponent(opts.reportId)
+    : 'https://citixenux.com';
   return {
     formatVersion: 1,
     passTypeIdentifier: process.env.APPLE_PASS_TYPE_ID || 'pass.com.citixenux.wallet',
     teamIdentifier: process.env.APPLE_TEAM_ID || 'TEAMIDPLACEHOLDER',
     organizationName: 'CITIXEN UX',
     serialNumber: opts.serialNumber || crypto.randomUUID(),
-    description: 'CITIXEN UX Public Ledger Access',
+    description: isTicket ? 'CITIXEN UX Civic Report Receipt' : 'CITIXEN UX Public Ledger Access',
     backgroundColor: 'rgb(9,10,15)',    // #090A0F
     foregroundColor: 'rgb(255,255,255)', // #FFFFFF
     labelColor: 'rgb(0,255,135)',        // #00FF87
-    generic: {
-      headerFields: [
-        { key: 'header', label: '', value: 'CITIXEN UX' }
-      ],
-      primaryFields: [
-        { key: 'primary', label: '', value: 'Public Ledger Access' }
-      ],
-      secondaryFields: [
-        { key: 'secondary', label: '', value: 'La Crosse, WI Ward Node' }
-      ]
-    },
+    generic: Object.assign(
+      {
+        headerFields: [
+          { key: 'header', label: '', value: 'CITIXEN UX' }
+        ],
+        primaryFields,
+        secondaryFields
+      },
+      auxiliaryFields ? { auxiliaryFields } : {}
+    ),
     barcodes: [
       {
         format: 'PKBarcodeFormatQR',
-        message: 'https://citixenux.com',
+        message: barcodeMessage,
         messageEncoding: 'iso-8859-1',
-        altText: 'citixenux.com'
+        altText: isTicket ? opts.reportId : 'citixenux.com'
       }
     ]
   };

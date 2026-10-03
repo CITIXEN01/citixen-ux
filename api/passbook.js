@@ -51,9 +51,22 @@ module.exports = (req, res) => {
     return;
   }
   const ticket = getTicketByReportId(String(ticketId));
+  // Timestamp and ward/district display name come from the citizen's own
+  // submission (app.html's pendingReceiptOpts, passed through by
+  // handleAddToWallet() as query params) rather than re-derived here — the
+  // server's ticket record tracks a relative "submittedAgo" string, not a
+  // precise moment, so the client's real Date at submission is the more
+  // honest source. Both are optional: a wallet-pass request for a ticket
+  // whose receipt context isn't available (e.g. a bare link) still gets a
+  // valid per-ticket pass, just without those two fields (see buildPassJson()
+  // in api/_lib/pkpass.js) — never a guessed/placeholder value standing in.
+  const timestamp = req.query && req.query.ts ? String(req.query.ts) : null;
+  const ward = req.query && req.query.ward ? String(req.query.ward) : null;
+  const passOpts = { reportId: String(ticketId), timestamp, ward };
   res.status(501).json({
     error: 'passbook_unavailable',
     message: 'Apple Wallet pass generation is not available in this beta — it requires a signed Apple Pass Type ID certificate this environment does not have.',
-    ticketFound: !!ticket
+    ticketFound: !!ticket,
+    passPreview: JSON.parse(buildBundleFiles(passOpts)['pass.json'].toString('utf8'))
   });
 };
