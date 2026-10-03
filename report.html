@@ -321,8 +321,21 @@ async function loadBig3(wardSlug){
 }
 
 async function init(){
+  // Vercel's "/report/:id -> /report.html?id=:id" rewrite (see vercel.json)
+  // is invisible to this script: a rewrite only changes which file the
+  // server returns, never what the browser shows as window.location — so
+  // visiting the real pretty URL /report/<id> (the only form app.html ever
+  // links to; see its "Copy Direct Link" / receipt-modal code) left
+  // window.location.search empty and silently fell through to the
+  // not-found state below. The id is read from the path first for that
+  // real case; the ?id= query is kept only as a fallback for someone
+  // opening this file directly.
   const params = new URLSearchParams(window.location.search);
-  const id = params.get('id');
+  let id = params.get('id');
+  if (!id) {
+    const segs = window.location.pathname.split('/').filter(Boolean);
+    if (segs.length >= 2 && segs[0] === 'report') id = decodeURIComponent(segs[1]);
+  }
   if (!id) { renderNotFound(id); return; }
   const ticket = await fetchTicket(id);
   if (!ticket) { renderNotFound(id); return; }
