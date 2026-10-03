@@ -1898,6 +1898,12 @@ textarea.input{resize:none;line-height:1.4}
               <input class="input manual-address-input" id="repManualAddress" type="text" autocomplete="street-address" enterkeyhint="search" placeholder="e.g. 351 W Hubbard St" style="margin:0;">
               <div class="address-suggest-list" id="repManualAddressSuggest"></div>
             </div>
+            <!-- REVISED PATCH 29-10/03/26: static usage hint — Enter now runs
+                 a real geocode of the typed string (see commitTypedAddress()
+                 in attachAddressAutocomplete()), in addition to picking a
+                 rendered suggestion; #repManualAddressStatus right below
+                 stays the dynamic searching/success/no-match line. -->
+            <div class="small" style="color:var(--muted);margin-top:6px;">Press Enter to search address, or pick a suggestion from the list.</div>
             <div id="repManualAddressStatus" class="small" style="margin-top:8px;display:none;"></div>
           </div>
 
@@ -2546,6 +2552,9 @@ textarea.input{resize:none;line-height:1.4}
         <input class="input manual-address-input" id="modalManualAddress" type="text" autocomplete="street-address" enterkeyhint="search" placeholder="e.g. 351 W Hubbard St" style="margin:0;">
         <div class="address-suggest-list" id="modalManualAddressSuggest"></div>
       </div>
+      <!-- REVISED PATCH 29-10/03/26: static usage hint — see the matching
+           comment on #repManualAddress above. -->
+      <div class="small" style="color:var(--muted);margin-top:6px;">Press Enter to search address, or pick a suggestion from the list.</div>
       <div id="modalManualAddressStatus" class="small" style="margin:8px 0 4px;display:none;"></div>
       <div class="confirm-actions">
         <button type="button" class="btn-confirm-lock" id="btnLocationRetry">Use Location</button>
@@ -4017,6 +4026,44 @@ function attachAddressAutocomplete(inputEl, listEl, statusEl){
       renderResults(items);
     }, 300);
   });
+  // REVISED PATCH 29-10/03/26: pressing Enter with no suggestion arrow-keyed
+  // to (the branch below, not the "open && activeIndex >= 0" one above it)
+  // now runs an immediate, explicit geocode of the raw typed string instead
+  // of doing nothing. This is still a real network lookup against a real
+  // address — Photon first (the same API the dropdown itself already
+  // queries, so a match here is exactly as precise as a picked suggestion),
+  // falling back to the Nominatim-backed geocodeAddress() for anything
+  // Photon's stricter house-level filter misses — gated behind an explicit
+  // keypress, never an auto-commit of the bare typed text on its own. A
+  // failed lookup NEVER substitutes a fabricated/hardcoded coordinate (see
+  // the "Neither path ever fabricates a location" note on
+  // #locationRequiredModal and geocodeAddress()'s own comment above): it
+  // blocks progression and tells the citizen honestly that nothing matched.
+  let geocodeToken = 0;
+  async function commitTypedAddress(){
+    const q = inputEl.value.trim();
+    if (q.length < 3) return;
+    const myToken = ++geocodeToken;
+    if (statusEl) {
+      statusEl.textContent = 'Searching for a match…';
+      statusEl.style.color = 'var(--muted)';
+      statusEl.style.display = '';
+    }
+    const photonResults = await photonSearch(q);
+    if (myToken !== geocodeToken) return; // superseded by a newer Enter/keystroke
+    let match = photonResults.length ? photonResults[0] : null;
+    if (!match) {
+      match = await geocodeAddress(q);
+      if (myToken !== geocodeToken) return;
+    }
+    if (match) {
+      selectResult({ lat: match.lat, lng: match.lng, label: match.label });
+    } else if (statusEl) {
+      statusEl.textContent = 'No match found — please try a nearby cross street or select a suggestion from the list.';
+      statusEl.style.color = 'var(--danger)';
+      statusEl.style.display = '';
+    }
+  }
   inputEl.addEventListener('keydown', (e) => {
     const open = listEl.classList.contains('open') && results.length;
     if (e.key === 'ArrowDown' && open) {
@@ -4028,6 +4075,9 @@ function attachAddressAutocomplete(inputEl, listEl, statusEl){
     } else if (e.key === 'Enter' && open && activeIndex >= 0) {
       e.preventDefault();
       selectResult(results[activeIndex]);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      commitTypedAddress();
     } else if (e.key === 'Escape') {
       closeList();
     }
