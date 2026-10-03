@@ -1152,8 +1152,16 @@ textarea.input{resize:none;line-height:1.4}
    (Download Ticket, Quick Help's "Got It — View Live Feed") — scoped to
    this one button by id so those other CTAs keep their existing look.
    Inherits .btn-onboarding-cta's width:100%/box-sizing:border-box/padding,
-   so the label stays clear of the card edge at any mobile viewport width. */
-#btnOnboardingStart{background:#00FF87;box-shadow:0 0 18px rgba(0,255,135,.35)}
+   so the label stays clear of the card edge at any mobile viewport width.
+   PATCH 27-10/03/26: relabeled "Got it" -> "Let's Go!" and brought onto
+   the standard Primary Command CTA spec — text recolored from the base
+   class's dimmer #051311 to the spec's #080C14 Bold Obsidian (scoped to
+   this id only, same pattern as the background override above, so the
+   other .btn-onboarding-cta buttons keep their existing #051311 text),
+   and the glow softened from 18px/.35 alpha to the spec's
+   0 0 15px rgba(0,255,135,.25). border-radius stays the inherited 12px
+   from .btn-onboarding-cta, already within the requested 12-16px range. */
+#btnOnboardingStart{background:#00FF87;color:#080C14;box-shadow:0 0 15px rgba(0,255,135,.25)}
 /* Patch 12-10/03/26 re-execution: nested confidentiality-notice popup
    (#onboardingNoticeModal) — small, centered card, its own #00FF87 "Got
    it" CTA (same accent as #btnOnboardingStart above), and a higher
@@ -2961,7 +2969,10 @@ textarea.input{resize:none;line-height:1.4}
               <div class="onboarding-grid-text"><b>Step 3: Dashboard</b><span>Explore analytics, export reports, and search ledger.</span></div>
             </div>
           </div>
-          <button type="button" class="btn-onboarding-cta" id="btnOnboardingStart">Got it</button>
+          <!-- Patch 27-10/03/26: relabeled "Got it" -> "Let's Go!" per the
+               standard Primary Command CTA copy; see the id-scoped CSS
+               override above (Patch 11/27) for its color spec. -->
+          <button type="button" class="btn-onboarding-cta" id="btnOnboardingStart">Let's Go!</button>
         </div>
       </div>
     </div>
