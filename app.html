@@ -188,8 +188,14 @@ html.citixen-gate-locked .citixen-gate{display:flex}
   text-align:center;letter-spacing:.1em;margin-bottom:12px;font-family:inherit}
 .citixen-gate-input:focus{outline:none;border-color:rgba(0,230,153,.5)}
 .citixen-gate-error{font-size:.7rem;color:#f87171;font-weight:700;margin-bottom:10px;min-height:14px}
-.citixen-gate-btn{width:100%;box-sizing:border-box;background:#00E699;color:#051311;border:none;padding:13px;
-  border-radius:10px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit}
+/* GLOBAL MINT GREEN BUTTON DESIGN SYSTEM ENFORCEMENT (Patch 20-10/03/26) —
+   UNLOCK brought onto the same exact #00FF87 + 12px unified radius the
+   other primary pills use (was #00E699 / 10px), and given the same
+   trailing right-aligned directional arrow those other pills carry — see
+   the markup's own comment next to this button. */
+.citixen-gate-btn{width:100%;box-sizing:border-box;background:#00FF87;color:#051311;border:none;padding:13px 16px;
+  border-radius:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;justify-content:space-between;gap:8px}
 :root{
   /* Green unification + obsidian canvas brought in line with index.html
      this round: the app used to run its own slightly different "Emerald
@@ -303,6 +309,24 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
 @media (prefers-reduced-motion:reduce){.category-card-focus{animation:none;box-shadow:0 0 0 3px rgba(0,230,153,.45)}}
 .label{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);
   margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+/* MAP & FEED PERMANENT "HOW IT WORKS" TRIGGER (Patch 20-10/03/26) — this
+   view's own header row (the "Civic Dispatch Map" card label) has no
+   dedicated top bar of its own; the actual sticky header above it is the
+   app shell's shared <header class="topnav"> (see that section's own
+   comment), already carrying #appHelpBtn, an icon-only "?" button that
+   opens this exact same modal. That button is unlabeled and shared across
+   all 3 tabs, so it doesn't read as a Map & Feed-specific, textually
+   labeled control — this adds a real, permanent, clearly labeled "How It
+   Works" trigger right on this view instead, wired to the identical
+   openAppInfoModal('quickHelp') call (same 4-phase animated diagram,
+   restarted fresh on every open — see that function). */
+.map-howitworks-btn{background:rgba(0,255,135,.08);border:1px solid rgba(0,255,135,.35);color:#00FF87;
+  font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:5px 10px 5px 8px;
+  border-radius:9999px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;
+  flex-shrink:0;font-family:inherit}
+.map-howitworks-btn:hover{background:rgba(0,255,135,.16)}
+.map-howitworks-btn svg{flex-shrink:0}
+.map-label-right{display:flex;align-items:center;gap:8px}
 
 .chip-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
 .chip{background:var(--surface-card-bg);backdrop-filter:blur(var(--surface-blur));border:var(--surface-card-border);color:var(--text);padding:13px 12px;
@@ -380,6 +404,19 @@ textarea.input{resize:none;line-height:1.4}
    updateSubmitPhotoGate(). */
 .btn-submit:disabled{background:rgba(148,163,184,.18);color:#64748b;cursor:not-allowed}
 .btn-submit:disabled svg{stroke:#64748b}
+/* GLOBAL MINT GREEN BUTTON DESIGN SYSTEM ENFORCEMENT (Patch 20-10/03/26) —
+   #btnSubmit ("Publish Report") brought onto the same exact #00FF87 the
+   other unified primary pills use (was the dimmer var(--mint)=#00E699 the
+   shared .btn-submit class still carries for other buttons, e.g. the
+   analytics link at the bottom of this file) and its leading send icon
+   moved to a trailing, right-aligned position (space-between) to match the
+   "consistent right-aligned icon" rule. :not(:disabled) keeps the existing
+   .btn-submit:disabled gray-out intact — a plain #btnSubmit{...} rule would
+   otherwise outrank it (an id beats a class+pseudo-class) and the button
+   would stay bright green even while disabled. */
+#btnSubmit:not(:disabled){background:#00FF87;font-weight:800;justify-content:space-between;
+  box-shadow:0 0 18px rgba(0,255,135,.35)}
+#btnSubmit:not(:disabled):hover{box-shadow:0 0 26px rgba(0,255,135,.5)}
 
 .bottomnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;
   background:rgba(3,7,18,.96);backdrop-filter:blur(16px);border-top:1px solid var(--border);
@@ -932,6 +969,15 @@ textarea.input{resize:none;line-height:1.4}
 .btn-sgp-share{width:100%;box-sizing:border-box;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.12);
   color:var(--text);padding:13px;border-radius:12px;font-weight:700;font-size:.84rem;cursor:pointer}
 .btn-sgp-share:disabled{opacity:.4;cursor:not-allowed}
+/* GLOBAL MINT GREEN BUTTON DESIGN SYSTEM ENFORCEMENT (Patch 20-10/03/26) —
+   #btnSgpDownload scoped to the exact #00FF87 unified mint pill (was the
+   dimmer var(--mint)=#00E699 .btn-onboarding-cta shares with other CTAs);
+   kept scoped to this id rather than touching that shared class. Disabled
+   look is unaffected — .btn-onboarding-cta:disabled already dims via
+   opacity, which works regardless of the background color underneath. */
+#btnSgpDownload{background:#00FF87;font-weight:800;display:flex;align-items:center;
+  justify-content:space-between;gap:8px;box-shadow:0 0 18px rgba(0,255,135,.35)}
+#btnSgpDownload:hover{box-shadow:0 0 26px rgba(0,255,135,.5)}
 
 /* ===== ADMIN LIGHT CLAIM/PANEL =====
    The receipt modal's "Are you a City Official or District Rep?" upsell
@@ -1470,6 +1516,15 @@ textarea.input{resize:none;line-height:1.4}
   border-radius:10px;font-family:inherit;font-weight:700;font-size:.82rem;cursor:pointer;
   transition:background .15s}
 .sl-cta:hover{background:#00c8f0}
+/* GLOBAL MINT GREEN BUTTON DESIGN SYSTEM ENFORCEMENT (Patch 20-10/03/26) —
+   .founder-cta ("Support Founder / Public Ledger") scoped to the exact
+   #00FF87 unified mint pill + 12px radius + bold 800 weight + trailing
+   right-aligned arrow; the shared .sl-cta class above stays its existing
+   blue #00B4D8 for the staged, preview-gated #btnSupportLedgerCta ("Support
+   District Ledger"), which this round's spec doesn't name. */
+.founder-cta{background:#00FF87;border-radius:12px;font-weight:800;display:flex;align-items:center;
+  justify-content:space-between;gap:8px;box-shadow:0 0 18px rgba(0,255,135,.35);transition:box-shadow .15s}
+.founder-cta:hover{background:#00FF87;box-shadow:0 0 26px rgba(0,255,135,.5)}
 
 /* ONE-TIME POST-SUBMISSION FOUNDER MODAL (Patch 8-10/03/26) — see the
    markup's own comment. Reuses .sl-tier-row/.sl-tier-btn/.sl-onetime-*/
@@ -1544,7 +1599,13 @@ textarea.input{resize:none;line-height:1.4}
       autocomplete="off" autocapitalize="off" spellcheck="false">
     <div class="citixen-gate-error" id="citixenGateError"></div>
     <!-- Patch 19-10/03/26: "Unlock" -> "UNLOCK" -->
-    <button type="submit" class="citixen-gate-btn">UNLOCK</button>
+    <!-- Patch 20-10/03/26: trailing right-aligned arrow added to match the
+         unified mint-pill design system's "consistent directional icon"
+         rule (see .citixen-gate-btn's own comment). -->
+    <button type="submit" class="citixen-gate-btn">
+      <span>UNLOCK</span>
+      <svg viewBox="0 0 24 24" width="16" height="16" stroke="#051311" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+    </button>
   </form>
 </div>
 
@@ -1772,8 +1833,8 @@ textarea.input{resize:none;line-height:1.4}
           </div>
 
           <button type="button" class="btn-submit" id="btnSubmit" disabled>
+            <span id="btnSubmitLabel">Publish Report</span>
             <svg viewBox="0 0 24 24" width="17" height="17" stroke="#051311" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-            <span id="btnSubmitLabel">Publish report</span>
           </button>
         </div>
       </div>
@@ -1815,7 +1876,16 @@ textarea.input{resize:none;line-height:1.4}
          removed in an earlier round. -->
     <section id="tab-map" class="tabpane">
       <div class="card">
-        <div class="label"><span>Civic Dispatch Map</span><span id="mCount" style="color:var(--mint2)">3 active</span></div>
+        <div class="label">
+          <span>Civic Dispatch Map</span>
+          <span class="map-label-right">
+            <button type="button" class="map-howitworks-btn" id="btnMapHowItWorks" aria-controls="appInfoModal" aria-expanded="false">
+              <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              How It Works
+            </button>
+            <span id="mCount" style="color:var(--mint2)">3 active</span>
+          </span>
+        </div>
         <div id="map"></div>
       </div>
 
@@ -2502,14 +2572,17 @@ textarea.input{resize:none;line-height:1.4}
 
       <div class="receipt-actions">
         <div class="receipt-action-row">
-          <!-- Patch 16-10/03/26: renamed "Download Receipt" -> "Easy Share"
-               (the button's actual destination, renderAndShowSocialGraphic(),
-               is unchanged — it still opens the preview modal, whose own
-               Download/Easy Share actions do the real work); the old
-               download-tray icon was swapped for a share-style up-right
-               arrow, moved after the label and right-aligned via
-               #btnReceiptGraphic's justify-content below, matching
-               .btn-receipt-feed's arrow treatment above. -->
+          <!-- Patch 20-10/03/26: RECEIPT & SOCIAL CARD BUTTON ARCHITECTURE
+               RESTRUCTURE. This button used to be "Easy Share" opening the
+               Social Card preview modal first (renderAndShowSocialGraphic())
+               — that destination moved to the new #btnReceiptDownloadTicket
+               primary below, which is this spec's real "Download Ticket ->
+               opens the 1:1 Social Card preview/download modal" action.
+               This button keeps the "Easy Share" label but now fires the
+               real native Web Share directly from the receipt (see
+               shareReceiptDirectly()) — same canonical payload/fallback
+               #btnSgpShare already uses, just with no rendered PNG attached
+               yet, since nothing has been rasterized at this point. -->
           <button type="button" class="btn-receipt-secondary" id="btnReceiptGraphic">
             <span id="btnReceiptGraphicLabel">Easy Share</span>
             <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
@@ -2519,21 +2592,28 @@ textarea.input{resize:none;line-height:1.4}
             <span id="btnReceiptCopyLinkLabel">Copy Direct Link</span>
           </button>
         </div>
-        <!-- HEAD TO FEED (Patch 8-10/03/26) — replaces the old static/
-             disabled "Logged To Ledger" wallet-row button (handleAddToWallet()
-             is kept, further down, in case a real signed Apple Wallet pass
-             ever has another entry point to come back to — see its own
-             comment — but this exact button is gone) with the actual
-             primary action, moved up into this slot: the receipt's real
-             "go look at your report" button, styled in the brand's bright
-             #00FF87 green. See headToFeed() (Patch 17-10/03/26: no longer
-             gated behind the Founder Modal — see scheduleFounderModalAutoShow()). -->
-        <!-- Patch 16-10/03/26: arrow moved after the label (was leading it)
-             so it right-aligns against the button edge — see .btn-receipt-feed's
-             justify-content:space-between above. -->
+        <!-- HEAD TO FEED (Patch 8-10/03/26) — the receipt's real "go look at
+             your report" navigation. Patch 20-10/03/26 moved the card's
+             bottom-most primary slot to the new Download Ticket button
+             below (per this round's spec), so this stays a real, fully
+             functional mint-pill action — just no longer the very last
+             element — rather than being removed or demoted to a plain
+             link; nothing about this button's destination changed. -->
         <button type="button" class="btn-receipt-feed" id="btnHeadToFeed">
           <span>Head to Feed</span>
           <svg viewBox="0 0 24 24" width="16" height="16" stroke="#051311" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+        </button>
+
+        <!-- DOWNLOAD TICKET — RECEIPT MODAL PRIMARY (Patch 20-10/03/26) —
+             new bottom-most primary CTA per this round's spec. Reuses
+             .btn-receipt-feed (same #00FF87 mint pill as Head to Feed
+             above) and triggers the exact same destination the old "Easy
+             Share" button used to (renderAndShowSocialGraphic()), opening
+             the 1:1 Social Card preview/download modal. Down-right arrow
+             (↘) per spec, distinct from Head to Feed's horizontal arrow. -->
+        <button type="button" class="btn-receipt-feed" id="btnReceiptDownloadTicket">
+          <span>Download Ticket</span>
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="#051311" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="7" y1="7" x2="17" y2="17"/><polyline points="17 9 17 17 9 17"/></svg>
         </button>
 
         <!-- STAGED "SUPPORT THE LEDGER" CIVIC MODULE (Patch 5.5) — hidden
@@ -2602,7 +2682,12 @@ textarea.input{resize:none;line-height:1.4}
         <button type="button" class="sl-switch" id="founderOnetimeToggle" role="switch" aria-checked="false" aria-label="One-time contribution"></button>
       </div>
 
-      <button type="button" class="sl-cta founder-cta" id="btnFounderCta">Support Founder / Public Ledger</button>
+      <!-- Patch 20-10/03/26: trailing right-aligned arrow added to match
+           the unified mint-pill design system (see .founder-cta's comment). -->
+      <button type="button" class="sl-cta founder-cta" id="btnFounderCta">
+        <span>Support Founder / Public Ledger</span>
+        <svg viewBox="0 0 24 24" width="15" height="15" stroke="#051311" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+      </button>
       <button type="button" class="founder-continue-link" id="btnFounderContinue">Continue to Feed</button>
     </div>
   </div>
@@ -2688,7 +2773,17 @@ textarea.input{resize:none;line-height:1.4}
         </button>
       </div>
       <div class="sgp-actions">
-        <button type="button" class="btn-onboarding-cta" id="btnSgpDownload" disabled>Download Ticket</button>
+        <!-- Patch 20-10/03/26: id-scoped override (#btnSgpDownload below)
+             brings this button to the exact #00FF87 unified mint-pill
+             design system — the shared .btn-onboarding-cta class itself is
+             untouched since it's also used by other CTAs (Beta Welcome's
+             "Got it", Quick Help's "Got It — View Live Feed"). Down-right
+             arrow (↘) added to match the receipt modal's own new Download
+             Ticket button. -->
+        <button type="button" class="btn-onboarding-cta" id="btnSgpDownload" disabled>
+          <span>Download Ticket</span>
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="#051311" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="7" y1="7" x2="17" y2="17"/><polyline points="17 9 17 17 9 17"/></svg>
+        </button>
         <button type="button" class="btn-sgp-share" id="btnSgpShare">Easy Share</button>
       </div>
     </div>
@@ -6233,7 +6328,7 @@ function updateSubmitPhotoGate(){
   const hasPhoto = hasAttachedPhoto();
   const hasLoc = hasValidLocation();
   if (btn) btn.disabled = !(hasPhoto && hasLoc);
-  if (lbl) lbl.textContent = 'Publish report';
+  if (lbl) lbl.textContent = 'Publish Report';
   if (lockedSection) lockedSection.style.display = hasPhoto ? '' : 'none';
   if (lockHint) lockHint.style.display = hasPhoto ? 'none' : '';
   if (gpsHint) gpsHint.style.display = (hasPhoto && !hasLoc) ? '' : 'none';
@@ -7042,7 +7137,28 @@ async function renderAndShowSocialGraphic(opts){
     toast('Could not render the social card.');
   }
 }
-document.getElementById('btnReceiptGraphic').addEventListener('click', () => {
+// EASY SHARE — RECEIPT MODAL (Patch 20-10/03/26) — now a direct native Web
+// Share trigger straight from the receipt itself; opening the Social Card
+// preview modal first (the old behavior) moved to the new "Download
+// Ticket" button below. Shares the same canonical payload
+// (CITIXEN_SHARE_TITLE/TEXT/URL, defined further down this script) the
+// Social Card modal's own Easy Share (#btnSgpShare) uses — no rendered PNG
+// attached, since nothing has been rasterized yet at this point in the
+// flow; same honest "only attach what's real" rule that button follows.
+async function shareReceiptDirectly(){
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: CITIXEN_SHARE_TITLE, text: CITIXEN_SHARE_TEXT, url: CITIXEN_SHARE_URL });
+    } catch (e) { /* citizen cancelled the native share sheet — not an error */ }
+    return;
+  }
+  document.getElementById('easyShareFallbackModal').classList.add('open');
+}
+document.getElementById('btnReceiptGraphic').addEventListener('click', shareReceiptDirectly);
+// DOWNLOAD TICKET — RECEIPT MODAL PRIMARY (Patch 20-10/03/26) — takes over
+// the Social Card preview/download destination the old "Easy Share" button
+// used to trigger.
+document.getElementById('btnReceiptDownloadTicket').addEventListener('click', () => {
   renderAndShowSocialGraphic(pendingReceiptOpts || {});
 });
 // IMAGE SCREENING / BLUR GUARD (Patch 8-10/03/26) — this blurs the real
@@ -7447,6 +7563,10 @@ function closeAppDrawer(){
   document.getElementById('appMenuBtn').setAttribute('aria-expanded', 'false');
 }
 document.getElementById('appHelpBtn').addEventListener('click', () => openAppInfoModal('quickHelp'));
+// MAP & FEED PERMANENT "HOW IT WORKS" TRIGGER (Patch 20-10/03/26) — see the
+// markup/CSS comment on .map-howitworks-btn; opens the identical modal as
+// the header "?" icon above.
+document.getElementById('btnMapHowItWorks').addEventListener('click', () => openAppInfoModal('quickHelp'));
 document.getElementById('appMenuBtn').addEventListener('click', hamburgerMenuLocked);
 document.getElementById('appDrawerCloseBtn').addEventListener('click', closeAppDrawer);
 document.getElementById('appDrawer').addEventListener('click', (e) => { if (e.target.id === 'appDrawer') closeAppDrawer(); });
