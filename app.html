@@ -2825,6 +2825,7 @@ function switchTab(id,btn){
     initCoverageGrid().then(updateAppTelemetryScorecard);
     // Force Leaflet to recalculate container dimensions once unhidden
     setTimeout(()=>{ if(map) map.invalidateSize(); },200);
+    maybeShowFeedIntroModal();
   }
   if(id==='tab-analytics'){
     initAnalytics();
@@ -4432,6 +4433,14 @@ const APP_MODAL_DATA = {
       '<h4 style="color:#00E699">2. Automated Dispatch</h4><p><span class="brand-white">CITIXEN</span> <span class="brand-lime">UX</span><sup class="tm-symbol">™</sup> routes it to municipal teams and logs it to the Public Ledger.</p>' +
       '<h4 style="color:#00E699">3. Track Impact</h4><p>Monitor resolution speed and active capital project timelines in real time.</p>' +
     '</div>' +
+    // FIRST-TIME MAP & FEED POP-UP (Patch 9-10/03/26) — this exact button
+    // also appears when Quick Help is opened manually via the header "?"
+    // icon; closing it always goes to (or stays on) the Map & Feed tab and
+    // scrolls the Live Dispatch Feed card into view, same one-time
+    // highlight-pulse convention as focusReportCategoryFromQueryString()/
+    // headToFeed() elsewhere in this file. See maybeShowFeedIntroModal()/
+    // the delegated click handler on #appInfoModalBody.
+    '<button type="button" id="btnQuickHelpViewFeed" class="btn-onboarding-cta" style="margin-top:18px;">Got It — View Live Feed</button>' +
     // Footer — verbatim reuse of the app shell's own persistent footer
     // (same brand shield + "Privacy Engine: Verified" seal, centered
     // column), not a paraphrased trust line, per this round's request.
@@ -4449,6 +4458,23 @@ function openAppInfoModal(key){
 }
 function closeAppInfoModal(){
   document.getElementById('appInfoModal').classList.remove('open');
+}
+// FIRST-TIME MAP & FEED "QUICK HELP" POP-UP (Patch 9-10/03/26) — auto-opens
+// the exact same Quick Help modal the header "?" icon opens manually, the
+// first time a citizen lands on the Map & Feed tab on this device. A real,
+// persisted localStorage flag (not a session var) means it only interrupts
+// once ever per device, exactly like every other "show once" flag in this
+// file (e.g. citizen_preview) — a disabled/unavailable localStorage (private
+// browsing, etc.) just means it shows every time rather than throwing, same
+// fail-open posture as the rest of this file's localStorage reads. The "?"
+// icon (openAppInfoModal('quickHelp') via #appHelpBtn) is untouched and
+// stays reachable at any time regardless of this flag.
+function maybeShowFeedIntroModal(){
+  let seen = false;
+  try { seen = localStorage.getItem('citixen_feed_intro_seen') === 'true'; } catch (e) { seen = false; }
+  if (seen) return;
+  try { localStorage.setItem('citixen_feed_intro_seen', 'true'); } catch (e) { /* can't persist — still show it this once */ }
+  openAppInfoModal('quickHelp');
 }
 // toggleAppFeatureAccordion() was removed along with the Features/Safety/
 // Security tile grid — that same copy (ciFeatures/ciSafety/ciSecurity,
@@ -7085,6 +7111,16 @@ window.addEventListener('DOMContentLoaded',()=>{
   // on every call), so a direct listener can't be attached once at load.
   document.getElementById('appInfoModalBody').addEventListener('click', (e) => {
     if (e.target.closest('#civicMemoryLedgerBtn')) { closeAppInfoModal(); openLedgerDrawer(); }
+    if (e.target.closest('#btnQuickHelpViewFeed')) {
+      closeAppInfoModal();
+      switchTab('tab-map', document.querySelector('.navtab[data-target="tab-map"]'));
+      const feedCard = document.getElementById('feed') && document.getElementById('feed').closest('.card');
+      if (feedCard) {
+        feedCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        feedCard.classList.add('feed-item-focus');
+        setTimeout(() => feedCard.classList.remove('feed-item-focus'), 2400);
+      }
+    }
   });
 
   initInstantReportAndQuickKeys();
