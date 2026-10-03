@@ -1388,9 +1388,21 @@ textarea.input{resize:none;line-height:1.4}
    add what's unique to this modal (header, copy blocks, the custom-amount
    input, and the plain-link dismiss). */
 .founder-card{text-align:center}
-.founder-header{font-size:1.05rem;font-weight:900;line-height:1.25;color:var(--text);margin-bottom:12px}
-.founder-brand-copy{color:var(--mint2);font-weight:700;margin-bottom:8px;line-height:1.4}
-.founder-note{color:var(--muted);line-height:1.5;margin-bottom:16px;text-align:left}
+/* Patch 17-10/03/26: headline enlarged (1.05rem -> 1.5rem) and replaced
+   with the single-line "SUPPORT THE MISSION" (was two lines, "Support the
+   Mission" / "How You Can"). */
+.founder-header{font-size:1.5rem;font-weight:900;line-height:1.25;color:var(--text);margin-bottom:12px;
+  letter-spacing:.02em}
+/* Patch 17-10/03/26: brand tagline split into white "CITIXEN" + neon-green
+   "UX™" (see the markup's own spans below) — was one flat var(--mint2)-
+   colored run. Explicit text-align:center added (was already inheriting
+   center from .founder-card, now made explicit per spec). */
+.founder-brand-copy{font-weight:700;margin-bottom:8px;line-height:1.4;text-align:center}
+.founder-brand-citixen{color:#FFFFFF}
+.founder-brand-ux{color:#00FF87}
+/* Patch 17-10/03/26: was text-align:left — the core body copy describing
+   the public ledger initiative is now centered like the rest of the card. */
+.founder-note{color:var(--muted);line-height:1.5;margin-bottom:16px;text-align:center}
 .founder-tier-row{text-align:left}
 .founder-custom-amount{margin-bottom:14px}
 .founder-continue-link{width:100%;background:transparent;border:none;color:var(--muted);
@@ -2393,7 +2405,8 @@ textarea.input{resize:none;line-height:1.4}
              comment — but this exact button is gone) with the actual
              primary action, moved up into this slot: the receipt's real
              "go look at your report" button, styled in the brand's bright
-             #00FF87 green. See headToFeed()/maybeShowFounderModal(). -->
+             #00FF87 green. See headToFeed() (Patch 17-10/03/26: no longer
+             gated behind the Founder Modal — see scheduleFounderModalAutoShow()). -->
         <!-- Patch 16-10/03/26: arrow moved after the label (was leading it)
              so it right-aligns against the button edge — see .btn-receipt-feed's
              justify-content:space-between above. -->
@@ -2431,10 +2444,11 @@ textarea.input{resize:none;line-height:1.4}
     </div>
   </div>
 
-  <!-- ===== ONE-TIME POST-SUBMISSION FOUNDER MODAL (Patch 8-10/03/26) —
-       shown exactly once per session, the very first time a citizen taps
-       "Head to Feed" on a fresh receipt (see maybeShowFounderModal() in the
-       script below). Reuses the same .sl-* tier/toggle/CTA classes the
+  <!-- ===== ONE-TIME POST-SUBMISSION FOUNDER MODAL (Patch 8-10/03/26;
+       retimed Patch 17-10/03/26) — shown exactly once per session, 30s
+       after the citizen actually enters the app (see
+       scheduleFounderModalAutoShow() in the script below), no longer tied
+       to any specific button tap. Reuses the same .sl-* tier/toggle/CTA classes the
        staged, preview-gated #support-ledger-module above already uses, for
        one consistent look, but is wired up separately (scoped to
        #founderModal, never the global .sl-tier-btn selector) so the two
@@ -2446,8 +2460,8 @@ textarea.input{resize:none;line-height:1.4}
        destination, until a real Stripe Payment Link is supplied. ===== -->
   <div id="founderModal" class="confirm-drawer">
     <div class="confirm-card founder-card">
-      <div class="founder-header">Support the Mission<br>How You Can</div>
-      <div class="small founder-brand-copy">CITIXEN UX<sup class="tm-symbol">™</sup> operates with zero ads and total data privacy.</div>
+      <div class="founder-header">SUPPORT THE MISSION</div>
+      <div class="small founder-brand-copy"><span class="founder-brand-citixen">CITIXEN</span> <span class="founder-brand-ux">UX<sup class="tm-symbol">™</sup></span> operates with zero ads and total data privacy.</div>
       <div class="small founder-note">This is the project of a lifetime. If you can, please support with a micro-contribution — it directly covers server/ledger run-rate and helps get these tools to market faster.</div>
 
       <div class="sl-tier-row founder-tier-row" id="founderTierRowMonthly">
@@ -2467,8 +2481,31 @@ textarea.input{resize:none;line-height:1.4}
         <button type="button" class="sl-switch" id="founderOnetimeToggle" role="switch" aria-checked="false" aria-label="One-time contribution"></button>
       </div>
 
-      <button type="button" class="sl-cta founder-cta" id="btnFounderCta">Support Founder / Ledger</button>
+      <button type="button" class="sl-cta founder-cta" id="btnFounderCta">Support Founder / Public Ledger</button>
       <button type="button" class="founder-continue-link" id="btnFounderContinue">Continue to Feed</button>
+    </div>
+  </div>
+
+  <!-- ===== FOUNDER CONTRIBUTION RECEIPT (Patch 17-10/03/26) — shown after
+       #btnFounderCta genuinely launches the real Stripe Payment Link in a
+       new tab (see showFounderContributionReceipt()). Scoped honestly: this
+       confirms the Stripe checkout was opened, never a completed charge —
+       this page has no way to know whether the citizen actually finishes
+       paying in that other tab, so the copy never claims "payment
+       received." Reuses the same receipt-icon-wrap/receipt-title/
+       receipt-sub/btn-receipt-feed classes as #dispatchReceiptModal for a
+       consistent look, wired up separately so the two never cross-wire. ===== -->
+  <div id="founderContributionReceiptModal" class="confirm-drawer">
+    <div class="confirm-card receipt-card">
+      <div class="receipt-icon-wrap">
+        <svg viewBox="0 0 24 24" width="40" height="40" stroke="#00FF87" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+      </div>
+      <div class="receipt-title">Contribution Initiated</div>
+      <div class="receipt-sub" id="founderReceiptSub">—</div>
+      <button type="button" class="btn-receipt-feed" id="btnFounderReceiptContinue">
+        <span>Continue to Feed</span>
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="#051311" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+      </button>
     </div>
   </div>
 
@@ -6287,10 +6324,10 @@ document.getElementById('dispatchReceiptModal').addEventListener('click', (e) =>
 // closing the modal — what this adds is actually flying the map to this
 // exact report's real coordinates, opening its marker popup, and scrolling/
 // pulsing its row in the feed list so the citizen lands looking straight at
-// the ticket they just filed instead of the top of a long list. A one-time-
-// per-session Founder Modal (see maybeShowFounderModal()) interrupts the
-// very first tap of this button each session; every tap after that goes
-// straight through.
+// the ticket they just filed instead of the top of a long list. (Patch
+// 17-10/03/26: this button no longer has anything to do with the Founder
+// Modal — see scheduleFounderModalAutoShow() for that modal's own,
+// decoupled timing.)
 function headToFeed(){
   closeDispatchReceiptModal();
   switchTab('tab-map', document.querySelector('.navtab[data-target="tab-map"]'));
@@ -6311,9 +6348,14 @@ function headToFeed(){
     setTimeout(() => feedEl.classList.remove('feed-item-focus'), 2400);
   }
 }
-document.getElementById('btnHeadToFeed').addEventListener('click', () => {
-  maybeShowFounderModal(headToFeed);
-});
+// Patch 17-10/03/26: no longer gates on the Founder Modal — that modal used
+// to interrupt the very first tap of this button each session (holding
+// headToFeed() until dismissed), which meant it could pop open directly on
+// top of the still-open Dispatch Receipt modal at the exact moment this
+// click was about to close it. The Founder Modal now fires on its own from
+// a background timer (see scheduleFounderModalAutoShow()), completely
+// decoupled from this button.
+document.getElementById('btnHeadToFeed').addEventListener('click', headToFeed);
 // Brief, glowing in-card confirmation (hint text swap) rather than relying
 // only on the toast — the citizen's eyes are already on the ticket badge
 // they just tapped.
@@ -6514,15 +6556,24 @@ if (btnSupportLedgerPreviewToggle) {
   });
 }
 
-// ===== ONE-TIME POST-SUBMISSION FOUNDER MODAL (Patch 8-10/03/26) =====
+// ===== ONE-TIME POST-SUBMISSION FOUNDER MODAL (Patch 8-10/03/26; retimed
+// Patch 17-10/03/26) =====
 // See #founderModal's own HTML comment for why this is wired separately
 // from the preview-gated #support-ledger-module above (scoped queries
 // against #founderModal only, never the bare .sl-tier-btn selector that
 // module's own handlers use, so the two never cross-wire each other's
 // state even though they share the same CSS classes for a consistent
 // look).
+// Patch 17-10/03/26 RETIMING: this modal used to be gated behind the very
+// first "Head to Feed" tap each session, popping open the instant that
+// button was clicked — directly on top of the still-open Dispatch Receipt
+// modal (headToFeed() itself is what closes that modal, but it was never
+// reached until the Founder Modal was dismissed), i.e. two modals stacked
+// at once. It now fires on its own, once per session, from a 30-second
+// background timer started the moment the citizen actually enters the app
+// (see scheduleFounderModalAutoShow(), called from
+// closeFrontDoorOnboarding()) — completely decoupled from Head to Feed.
 let founderModalShownThisSession = false;
-let founderModalContinueCallback = null;
 let founderSelectedTier = '5';
 let founderOneTime = false;
 function resetFounderModalState(){
@@ -6537,22 +6588,28 @@ function resetFounderModalState(){
   document.querySelectorAll('#founderTierRowMonthly .founder-tier-btn').forEach(b => b.classList.toggle('active', b.dataset.founderTier === '5'));
   document.querySelectorAll('#founderTierRowOnetime .founder-tier-btn').forEach(b => b.classList.toggle('active', b.dataset.founderTier === '100'));
 }
-// Called from btnHeadToFeed's click handler — shows this modal once per
-// session (the citizen's very first "Head to Feed" tap) and holds the real
-// navigation (headToFeed itself) until they either support or dismiss;
-// every tap after the first just runs continueCallback() straight away.
-function maybeShowFounderModal(continueCallback){
-  if (founderModalShownThisSession) { continueCallback(); return; }
+// Started once from closeFrontDoorOnboarding() — fires 30s after the
+// citizen lands in the app, independent of anything they do in the
+// meantime (submitting a report, switching tabs, etc.).
+function scheduleFounderModalAutoShow(){
+  setTimeout(showFounderModalIfDue, 30000);
+}
+// If some other modal happens to be open right at the 30s mark (mid-
+// submission, viewing a receipt, etc.), wait for it to clear instead of
+// popping this one open on top of it — re-check every 3s rather than
+// firing blind into whatever's already on screen.
+function showFounderModalIfDue(){
+  if (founderModalShownThisSession) return;
+  if (document.querySelector('.confirm-drawer.open, .cx-modal.open')) {
+    setTimeout(showFounderModalIfDue, 3000);
+    return;
+  }
   founderModalShownThisSession = true;
-  founderModalContinueCallback = continueCallback;
   resetFounderModalState();
   document.getElementById('founderModal').classList.add('open');
 }
-function closeFounderModalAndContinue(){
+function closeFounderModal(){
   document.getElementById('founderModal').classList.remove('open');
-  const cb = founderModalContinueCallback;
-  founderModalContinueCallback = null;
-  if (typeof cb === 'function') cb();
 }
 document.querySelectorAll('#founderTierRowMonthly .founder-tier-btn, #founderTierRowOnetime .founder-tier-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -6602,9 +6659,9 @@ document.getElementById('btnFounderCta').addEventListener('click', () => {
     amount = String(customVal);
   }
   if (!STRIPE_PAYMENT_LINK) {
-    console.warn('[CITIXEN] "Support Founder / Ledger" has no STRIPE_PAYMENT_LINK configured yet — set the constant near the top of this module\'s script before this goes live.');
+    console.warn('[CITIXEN] "Support Founder / Public Ledger" has no STRIPE_PAYMENT_LINK configured yet — set the constant near the top of this module\'s script before this goes live.');
     toast('Founder support is in preview — payment isn\'t live yet.', true);
-    closeFounderModalAndContinue();
+    closeFounderModal();
     return;
   }
   try {
@@ -6614,12 +6671,34 @@ document.getElementById('btnFounderCta').addEventListener('click', () => {
   } catch (e) {
     console.warn('[CITIXEN] STRIPE_PAYMENT_LINK is not a valid URL:', STRIPE_PAYMENT_LINK);
     toast('Founder support is in preview — payment isn\'t live yet.', true);
+    closeFounderModal();
+    return;
   }
-  closeFounderModalAndContinue();
+  // Patch 17-10/03/26: a real Stripe checkout was just launched in a new
+  // tab — show the contribution receipt view instead of silently closing
+  // straight back to whatever the citizen was looking at. See
+  // showFounderContributionReceipt()'s own comment on why this is scoped
+  // to "checkout launched," never a claimed completed payment.
+  showFounderContributionReceipt(amount, founderOneTime);
 });
-document.getElementById('btnFounderContinue').addEventListener('click', closeFounderModalAndContinue);
+document.getElementById('btnFounderContinue').addEventListener('click', closeFounderModal);
 document.getElementById('founderModal').addEventListener('click', (e) => {
-  if (e.target.id === 'founderModal') closeFounderModalAndContinue();
+  if (e.target.id === 'founderModal') closeFounderModal();
+});
+function showFounderContributionReceipt(amount, isOneTime){
+  closeFounderModal();
+  const label = isOneTime ? ('$' + amount + ' one-time contribution') : ('$' + amount + '/mo contribution');
+  document.getElementById('founderReceiptSub').textContent =
+    label + ' checkout opened in a new tab — thank you for supporting the ledger. ' +
+    'This confirms the Stripe checkout was launched, not a completed charge.';
+  document.getElementById('founderContributionReceiptModal').classList.add('open');
+}
+document.getElementById('btnFounderReceiptContinue').addEventListener('click', () => {
+  document.getElementById('founderContributionReceiptModal').classList.remove('open');
+  switchTab('tab-map', document.querySelector('.navtab[data-target="tab-map"]'));
+});
+document.getElementById('founderContributionReceiptModal').addEventListener('click', (e) => {
+  if (e.target.id === 'founderContributionReceiptModal') document.getElementById('founderContributionReceiptModal').classList.remove('open');
 });
 
 // NOTE — APPLE WALLET REPOSITION round removed the standing "Add to Apple
@@ -7236,6 +7315,12 @@ function closeFrontDoorOnboarding(){
   // actually visible.
   focusReportCategoryFromQueryString();
   maybeAutoOpenSupportLedgerPreview();
+  // Patch 17-10/03/26: this is "app entry" — the moment the citizen has
+  // actually passed Gate -> Security Screen -> Onboarding and landed on the
+  // report tab. Starts the Founder Modal's 30s auto-show timer; see
+  // scheduleFounderModalAutoShow()'s own comment for why it was moved here
+  // off the Head to Feed button.
+  scheduleFounderModalAutoShow();
 }
 // PREVIEW MODE AUTO-RENDER (Patch 6-10/03/26) — ?preview=support already
 // unhides the Support Ledger module wherever it lives (applySupportLedgerPreviewState()),
