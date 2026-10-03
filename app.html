@@ -1185,41 +1185,13 @@ textarea.input{resize:none;line-height:1.4}
   opacity:1;transition:opacity .7s ease}
 .video-intro-modal.video-intro-fade{opacity:0;pointer-events:none}
 .video-intro-modal.video-intro-hidden{display:none}
-.video-intro-video{width:100%;height:100%;object-fit:cover;display:block}
+.video-intro-video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
 .video-intro-skip{position:absolute;top:calc(20px + env(safe-area-inset-top,0px));
   right:calc(20px + env(safe-area-inset-right,0px));z-index:10;
   background:rgba(255,255,255,.1);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   color:#fff;padding:10px 18px;border-radius:999px;border:1px solid rgba(255,255,255,.2);
   font-family:inherit;font-weight:700;font-size:.78rem;cursor:pointer;transition:background .15s}
 .video-intro-skip:hover{background:rgba(255,255,255,.2)}
-/* UNMUTED PLAYBACK FALLBACK — hidden by default; JS reveals this only when
-   an unmuted autoplay attempt is rejected by the browser, as the prominent
-   "TAP FOR SOUND" pill (see attemptUnmutedPlay() in initVideoIntro()). */
-.video-intro-sound{position:absolute;bottom:calc(20px + env(safe-area-inset-bottom,0px));
-  left:calc(20px + env(safe-area-inset-left,0px));z-index:10;display:none;
-  background:rgba(255,255,255,.1);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  color:#fff;padding:9px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.2);
-  font-family:inherit;font-weight:800;font-size:.68rem;letter-spacing:.08em;cursor:pointer;
-  transition:background .15s}
-.video-intro-sound:hover{background:rgba(255,255,255,.2)}
-.video-intro-sound-pulse{background:rgba(52,211,153,.18);border-color:rgba(52,211,153,.55);
-  animation:videoIntroSoundPulse 1.4s ease-in-out infinite}
-@keyframes videoIntroSoundPulse{0%,100%{box-shadow:0 0 0 0 rgba(52,211,153,.5)}
-  50%{box-shadow:0 0 0 10px rgba(52,211,153,0)}}
-@media (prefers-reduced-motion:reduce){.video-intro-sound-pulse{animation:none}}
-/* UPDATED BRANDING OVERLAY — dark glass badge, shield icon + CITIXEN / UX
-   wordmark (replaces the earlier pulsing-dot watermark). */
-.video-intro-watermark{position:absolute;bottom:calc(20px + env(safe-area-inset-bottom,0px));
-  right:calc(20px + env(safe-area-inset-right,0px));z-index:10;
-  background:rgba(0,0,0,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  border:1px solid rgba(255,255,255,.15);padding:8px 16px;border-radius:12px;
-  display:flex;align-items:center;gap:10px;
-  box-shadow:0 10px 25px -5px rgba(0,0,0,.4),0 8px 10px -6px rgba(0,0,0,.3)}
-.video-intro-watermark-shield{width:26px;height:26px;flex-shrink:0;color:#34d399}
-.video-intro-watermark-name{font-size:.875rem;font-weight:700;color:#fff;letter-spacing:.04em}
-.video-intro-watermark-ux{font-size:.7rem;font-weight:800;color:#34d399;
-  background:rgba(2,44,34,.8);border:1px solid rgba(16,185,129,.3);
-  padding:2px 6px;border-radius:6px;letter-spacing:.03em;text-transform:uppercase;margin-left:6px}
 /* Footer "Replay Intro" trigger (Report tab's Privacy Engine card) — see
    #btnReplayIntro's handler near initVideoIntro(). */
 .btn-replay-intro{background:none;border:none;color:var(--mint2);font-family:inherit;
@@ -1238,28 +1210,29 @@ textarea.input{resize:none;line-height:1.4}
 </head>
 <body>
 
-<!-- ===== CINEMATIC WELCOME INTRO VIDEO MODAL — SWAP FINAL INTRO VIDEO &
-     UPDATE OVERLAY BRANDING + UNMUTED LOGIC round. Shown once per browser
-     (localStorage 'citixen_welcome_seen'), before even the passcode gate
-     below. See initVideoIntro() near the end of <body> for the
-     show/skip/replay/unmute-fallback logic. citizen_infra_final.mp4 is the
-     finished 49s cut with mixed Foley/voiceover/music audio, supplied
-     directly (faststart-remuxed here for progressive playback; no other
-     re-encoding). Playback now attempts unmuted autoplay first and only
-     falls back to muted + the "TAP FOR SOUND" pill if the browser rejects
-     that (NotAllowedError). ===== -->
+<!-- ===== CINEMATIC WELCOME INTRO VIDEO MODAL — SILENT LOOPING BACKGROUND
+     ROUND. Shown once per browser (localStorage 'citixen_welcome_seen'),
+     before even the passcode gate below. See initVideoIntro() near the end
+     of <body> for the show/skip/replay logic. citizen_infra_final.mp4 now
+     plays as a muted, looping, non-interactive background — no unmuted-
+     audio attempt, no "tap for sound" fallback, and no watermark text
+     overlay (all retired this round; see git history for the prior
+     mixed-audio version). Skip Intro is the only way to dismiss it now,
+     since `loop` means the video's own 'ended' event never fires. -->
 <div class="video-intro-modal" id="videoIntroModal">
-  <video class="video-intro-video" id="introVideo" src="/citizen_infra_final.mp4"
-    playsinline preload="auto"></video>
+  <video
+    id="introVideo"
+    class="video-intro-video"
+    src="/citizen_infra_final.mp4"
+    autoplay
+    muted
+    loop
+    playsinline
+    disablepictureinpicture
+    preload="auto"
+    style="width: 100%; height: 100%; object-fit: cover; pointer-events: none;">
+  </video>
   <button type="button" class="video-intro-skip" id="btnSkipIntro">Skip Intro</button>
-  <button type="button" class="video-intro-sound" id="btnIntroSound" aria-label="Tap for sound">TAP FOR SOUND</button>
-  <div class="video-intro-watermark" aria-hidden="true">
-    <svg class="video-intro-watermark-shield" viewBox="0 0 24 24" fill="rgba(52,211,153,0.2)" stroke="#34d399" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
-      <path d="M12 2.5l7.5 3v5.6c0 5.4-3.3 9.2-7.5 10.9-4.2-1.7-7.5-5.5-7.5-10.9V5.5l7.5-3z"/>
-    </svg>
-    <span class="video-intro-watermark-name">CITIXEN</span>
-    <span class="video-intro-watermark-ux">UX</span>
-  </div>
 </div>
 
 <!-- ===== PASSCODE GATE — see the <head> anti-flash script and the CSS block
@@ -2288,73 +2261,31 @@ textarea.input{resize:none;line-height:1.4}
   const modal = document.getElementById('videoIntroModal');
   const video = document.getElementById('introVideo');
   const skipBtn = document.getElementById('btnSkipIntro');
-  const soundBtn = document.getElementById('btnIntroSound');
-  if (!modal || !video || !skipBtn || !soundBtn) return;
+  if (!modal || !video || !skipBtn) return;
 
-  // UNMUTED PLAYBACK & AUTOPLAY FALLBACK — try full unmuted audio first,
-  // via video.muted = false + video.play() called synchronously within
-  // whatever triggered showIntro() (page load, or the Replay Intro click's
-  // own event stack). If the browser's autoplay policy rejects that
-  // (NotAllowedError — the common case on a cold load with no prior
-  // gesture), fall back to muted playback, surface the pulsing "TAP FOR
-  // SOUND" pill, AND arm a one-time capture-phase listener for the user's
-  // very first gesture anywhere on screen (pointerdown/click/keydown) that
-  // unmutes immediately — so sound kicks in on the first tap/click/key
-  // even if it lands nowhere near the pill itself. Skip Intro and the
-  // watermark keep working either way even if both play() attempts and
-  // the gesture unmute are all blocked.
-  const GESTURE_EVENTS = ['pointerdown', 'click', 'keydown'];
-  function removeGestureUnmuteListeners(){
-    GESTURE_EVENTS.forEach(evt => document.removeEventListener(evt, onFirstGestureUnmute, true));
-  }
-  function onFirstGestureUnmute(){
-    removeGestureUnmuteListeners();
-    if (!video.muted) return; // already unmuted via the pill or elsewhere
-    video.muted = false;
-    soundBtn.classList.remove('video-intro-sound-pulse');
-    soundBtn.style.display = 'none';
-    const p = video.play();
-    if (p && typeof p.catch === 'function') p.catch(() => {});
-  }
-  function armGestureUnmuteListeners(){
-    removeGestureUnmuteListeners(); // avoid stacking duplicates across replays
-    GESTURE_EVENTS.forEach(evt => document.addEventListener(evt, onFirstGestureUnmute, true));
-  }
-
-  function attemptUnmutedPlay(){
-    soundBtn.classList.remove('video-intro-sound-pulse');
-    soundBtn.style.display = 'none';
-    removeGestureUnmuteListeners();
-    video.muted = false;
-    try { video.currentTime = 0; } catch (e) {}
-    const playPromise = video.play();
-    if (!playPromise || typeof playPromise.then !== 'function') return;
-    playPromise.catch(() => {
-      video.muted = true;
-      soundBtn.textContent = 'TAP FOR SOUND';
-      soundBtn.style.display = 'inline-block';
-      soundBtn.classList.add('video-intro-sound-pulse');
-      armGestureUnmuteListeners();
-      const retryPromise = video.play();
-      if (retryPromise && typeof retryPromise.catch === 'function') retryPromise.catch(() => {});
-    });
-  }
-
+  // SILENT LOOPING BACKGROUND — the video element's own `autoplay muted
+  // loop` attributes do the actual playback work now (muted autoplay needs
+  // no user gesture in any browser, so there's no rejection path left to
+  // handle). video.play() is still called explicitly on show/replay as a
+  // defensive no-op for the one real edge case autoplay alone doesn't
+  // cover: a browser that paused this element while its modal ancestor was
+  // display:none and doesn't auto-resume it on becoming visible again.
   function showIntro(){
     modal.classList.remove('video-intro-hidden', 'video-intro-fade');
-    attemptUnmutedPlay();
+    try { video.currentTime = 0; } catch (e) {}
+    const playPromise = video.play();
+    if (playPromise && typeof playPromise.catch === 'function') playPromise.catch(() => {});
   }
 
-  // Fades the modal out, marks the intro seen, then fully hides it once
-  // the 700ms transition (see .video-intro-fade in <style>) finishes —
-  // shared by both the 'ended' event and the Skip Intro button. Also
-  // disarms the gesture-unmute listener so a stray tap/click/key after
-  // the intro is gone doesn't reach into a hidden, paused video.
+  // Fades the modal out, marks the intro seen, then fully hides it and
+  // pauses the video once the 700ms transition (see .video-intro-fade in
+  // <style>) finishes — there's no 'ended' event to share this with any
+  // more now that the video loops forever, so Skip Intro is the only
+  // caller.
   let dismissing = false;
   function dismissIntro(){
     if (dismissing) return;
     dismissing = true;
-    removeGestureUnmuteListeners();
     modal.classList.add('video-intro-fade');
     try { localStorage.setItem('citixen_welcome_seen', 'true'); } catch (e) {}
     setTimeout(() => {
@@ -2368,20 +2299,12 @@ textarea.input{resize:none;line-height:1.4}
   try { alreadySeen = localStorage.getItem('citixen_welcome_seen') === 'true'; } catch (e) {}
   if (alreadySeen) {
     modal.classList.add('video-intro-hidden');
+    video.pause();
   } else {
     showIntro();
   }
 
-  video.addEventListener('ended', dismissIntro);
   skipBtn.addEventListener('click', dismissIntro);
-  soundBtn.addEventListener('click', () => {
-    removeGestureUnmuteListeners();
-    video.muted = false;
-    soundBtn.classList.remove('video-intro-sound-pulse');
-    soundBtn.style.display = 'none';
-    const playPromise = video.play();
-    if (playPromise && typeof playPromise.catch === 'function') playPromise.catch(() => {});
-  });
 
   // ===== REPLAY INTRO — footer trigger (Report/Map & Feed/Dashboard tabs
   // + Quick Help modal, see .btn-replay-intro's markup) clears the seen
