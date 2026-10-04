@@ -1189,7 +1189,15 @@ textarea.input{resize:none;line-height:1.4}
    of the main welcome card, so these two classes had no markup left
    referencing them and were removed rather than left as dead CSS. */
 .onboarding-body{font-size:.84rem;line-height:1.55;color:var(--muted)}
-.onboarding-centered .onboarding-body{margin-bottom:0;font-size:.875rem;color:#cbd5e1;line-height:1.6}
+/* "All feedback is welcome." recolored to the brand accent green to match
+   the "UX™" in the header wordmark (.onboarding-ux-accent, #00FF87) — was
+   #cbd5e1 (near-white). Note: the "CONFIDENTIAL • PATENTS PENDING" pill
+   above it is actually a different, slightly more teal green
+   (.onboarding-badge-pill uses var(--mint2), which resolves to #00E699,
+   not #00FF87) — the two weren't the same color to begin with. This now
+   matches the logo exactly; it's a close but not pixel-identical match to
+   the pill. */
+.onboarding-centered .onboarding-body{margin-bottom:0;font-size:.875rem;color:#00FF87;line-height:1.6}
 .onboarding-warning{display:flex;gap:10px;align-items:flex-start;background:rgba(15,23,42,.9);
   border:1px solid rgba(16,185,129,.3);border-radius:12px;padding:12px 14px;margin-bottom:14px}
 .onboarding-centered .onboarding-warning{align-items:center;justify-content:center;margin-bottom:0;width:100%;
