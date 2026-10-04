@@ -891,6 +891,19 @@ textarea.input{resize:none;line-height:1.4}
 .btn-confirm-lock:disabled{opacity:.4;cursor:not-allowed}
 .btn-confirm-cancel{width:100%;background:transparent;color:var(--muted);border:1px solid var(--border);
   padding:13px;border-radius:12px;font-weight:700;font-size:.8rem;cursor:pointer}
+/* Patch 146-10/04/26: #postPhotoConfirmModal ("Confirm Before Publishing")
+   brand-compliance pass — scoped to this modal's own ids, not the shared
+   .btn-confirm-lock/.btn-confirm-cancel base classes, so every other modal
+   reusing that chrome (location-required, GPS-blocked, photo-validation,
+   admin sign-out, etc. — see the #gpsBlockedModal comment just below) keeps
+   its existing look, same convention #btnGpsBlockedRetry already used.
+   Spec named #submitToLedgerBtn/.btn-submit-ledger and
+   #confirmRightOfWayCheck; the real elements are #btnConfirmLock
+   (.btn-confirm-lock) and #confirmRowCheckbox — mapped here. */
+#btnConfirmLock{background:#00FF87;color:#0A0D14;font-weight:700}
+#btnConfirmLock:hover,#btnConfirmLock:active{box-shadow:0 0 16px rgba(0,255,135,.4)}
+#btnConfirmCancel{background:rgba(17,22,37,.6);border:1px solid rgba(255,255,255,.1);color:#FFFFFF}
+#confirmRowCheckbox{accent-color:#00FF87}
 /* Patch 28-10/03/26: #gpsBlockedModal — card chrome, primary "Retry
    Location" CTA, and secondary "Dismiss" link, each scoped to this one
    modal by id/selector so every other .confirm-card/.btn-confirm-lock/
@@ -1032,6 +1045,19 @@ textarea.input{resize:none;line-height:1.4}
    Not applying it again here for the same reason. border-radius alone
    (28px -> 12px) is a real, non-conflicting style change from this round's
    spec, applied below. */
+/* Patch 146-10/04/26: this round's spec asked for aspect-ratio:4/3 on this
+   same frame instead of the existing 16/9. Declined — not a style
+   preference, a layout break: at this frame's fixed 940px width, 4:3 makes
+   the photo ~705px tall (vs 16:9's ~529px), pushing the frame's bottom edge
+   to ~855px. .sge-body below it needs ~180px for its own content (ticket +
+   status + breadcrumb + meta row) plus the requested extra spacing, which
+   would land its bottom edge past 1030px — overlapping or overflowing this
+   card's fixed 1080px total height and its footer (.sge-footer, bottom:48px).
+   16/9 is kept (already deliberately tuned and tested across Patches 36,
+   142 and 144) so the metadata block below still has room to breathe. Happy
+   to redo this card's whole vertical layout for a true 4:3 photo if that's
+   wanted — flagging rather than silently keeping the old ratio or silently
+   breaking the card. */
 .sge-photo-frame{position:absolute;top:150px;left:70px;right:70px;aspect-ratio:16/9;height:auto;
   border-radius:12px;overflow:hidden;background:#0b1220;display:none}
 /* Patch 142(v146)-10/03/26: object-fit:cover kept exactly as Patch 36 set it (still
@@ -1046,8 +1072,13 @@ textarea.input{resize:none;line-height:1.4}
    (already pushed well clear of the photo frame since Patch 36) — a small
    extra nudge of breathing room into the card's remaining bottom space, as
    asked, on top of the positioning fix that already shipped rather than in
-   place of it. */
-.sge-body{position:absolute;left:70px;right:70px;top:719px;margin-top:24px;display:flex;flex-direction:column;gap:16px}
+   place of it.
+   Patch 146-10/04/26: margin-top increased 24px -> 32px per this round's
+   spec (still additive on top of top:719px, not instead of it — same
+   reasoning as Patch 144). Checked against the fixed 1080px card height and
+   .sge-footer at bottom:48px: body content now spans roughly 719+32=751px
+   to ~930px, comfortably clear of the footer. */
+.sge-body{position:absolute;left:70px;right:70px;top:719px;margin-top:32px;display:flex;flex-direction:column;gap:16px}
 .sge-ticket{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:46px;font-weight:900;
   color:#fff;letter-spacing:.01em;word-break:break-word}
 .sge-status{font-size:18px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#00E699}
@@ -1108,18 +1139,27 @@ textarea.input{resize:none;line-height:1.4}
 /* .btn-sgp-share ("Easy Share" inside the Social Card preview) — REMOVED
    (Patch 25-10/03/26) along with its button; see the markup's own comment. */
 
-/* ===== RECEIPT EXPORT OPTIONS SHEET (Patch 144-10/04/26) — bottom-aligned
-   action sheet opened by "Download Receipt" (#btnSgpDownload) instead of
-   immediately downloading; see #receiptExportSheet's own markup comment.
-   align-items:flex-end overrides the shared .confirm-drawer's centered
-   layout so this one sheet docks to the bottom of the screen; the slide-up
-   motion is a plain keyframe (not a transition) since the element goes
-   straight from display:none to painted — nothing to transition from. */
-.export-sheet{align-items:flex-end !important}
-.export-sheet-card{background:#0A0D14;border:1px solid rgba(0,255,135,.3);
-  border-radius:16px 16px 0 0;width:100%;max-width:440px;display:flex;flex-direction:column;
-  gap:10px;animation:exportSheetSlideUp .25s ease-out}
-@keyframes exportSheetSlideUp{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}
+/* ===== RECEIPT EXPORT OPTIONS SHEET (Patch 144-10/04/26) — action sheet
+   opened by "Download Receipt" (#btnSgpDownload) instead of immediately
+   downloading; see #receiptExportSheet's own markup comment.
+   Patch 146-10/04/26: converted from a bottom-docked slide-up sheet to a
+   centered modal popup per this round's spec (spec named
+   #receiptExportModal/.receipt-export-modal; real element is
+   #receiptExportSheet/.export-sheet, mapped here). The old
+   align-items:flex-end !important override is gone, so the shared
+   .confirm-drawer's own centered flex layout applies again; .export-sheet-card
+   also gets its own explicit fixed/translate centering per spec so it stays
+   centered even if .confirm-drawer's layout ever changes. border-radius is
+   now a full 16px (was 16px 16px 0 0, the bottom-sheet-only shape), and the
+   slide-up keyframe is replaced with a scale+fade pop-in that actually suits
+   a centered dialog. max-height/overflow-y added defensively (matching
+   .confirm-card's own pattern) in case this renders on a short viewport. */
+.export-sheet-card{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:90%;max-width:420px;max-height:90vh;overflow-y:auto;background:#0A0D14;
+  border:1px solid rgba(0,255,135,.3);border-radius:16px;
+  box-shadow:0 0 24px rgba(0,0,0,.8),0 0 16px rgba(0,255,135,.2);z-index:9999;
+  display:flex;flex-direction:column;gap:10px;animation:exportSheetPopIn .2s ease-out}
+@keyframes exportSheetPopIn{from{opacity:0;transform:translate(-50%,-50%) scale(.96)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
 @media (prefers-reduced-motion: reduce){.export-sheet-card{animation:none}}
 .export-sheet-option{display:flex;align-items:center;gap:12px;width:100%;text-align:left;
   background:rgba(0,255,135,.06);border:1px solid rgba(0,255,135,.25);border-radius:12px;
