@@ -1022,8 +1022,18 @@ textarea.input{resize:none;line-height:1.4}
    left - 70 right), which works out to ~529px tall (was 430px, +99px of photo real
    estate). .sge-body's top is pushed down by that same +99px (620px -> 719px) below so
    the description block still starts just past the frame with its original ~40px gap. */
+/* Patch 144-10/04/26: this spec round asked for the same aspect-ratio:16/9 +
+   object-fit:cover already in place here, PLUS a new max-height:220px cap.
+   That cap is self-contradictory with aspect-ratio:16/9 at this frame's real
+   940px width (16:9 of 940px is ~529px tall; capping to 220px makes the
+   rendered box roughly 4.3:1, not 16:9) and, more importantly, is the same
+   shrink-the-photo-back-down ask already raised and explicitly dropped once
+   in Patch 142 (that round's draft wanted object-fit:contain + a 240px cap).
+   Not applying it again here for the same reason. border-radius alone
+   (28px -> 12px) is a real, non-conflicting style change from this round's
+   spec, applied below. */
 .sge-photo-frame{position:absolute;top:150px;left:70px;right:70px;aspect-ratio:16/9;height:auto;
-  border-radius:28px;overflow:hidden;background:#0b1220;display:none}
+  border-radius:12px;overflow:hidden;background:#0b1220;display:none}
 /* Patch 142(v146)-10/03/26: object-fit:cover kept exactly as Patch 36 set it (still
    crops to fill rather than letterboxing — the alternate spec draft that asked for
    object-fit:contain + a 240px cap was explicitly dropped in favor of keeping this
@@ -1032,7 +1042,12 @@ textarea.input{resize:none;line-height:1.4}
 .sge-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
 .sge-photo-overlay{position:absolute;inset:0;
   background:linear-gradient(180deg,rgba(2,6,23,0) 60%,rgba(2,6,23,.65) 100%)}
-.sge-body{position:absolute;left:70px;right:70px;top:719px;display:flex;flex-direction:column;gap:16px}
+/* Patch 144-10/04/26: margin-top:24px added on top of the existing top:719px
+   (already pushed well clear of the photo frame since Patch 36) — a small
+   extra nudge of breathing room into the card's remaining bottom space, as
+   asked, on top of the positioning fix that already shipped rather than in
+   place of it. */
+.sge-body{position:absolute;left:70px;right:70px;top:719px;margin-top:24px;display:flex;flex-direction:column;gap:16px}
 .sge-ticket{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:46px;font-weight:900;
   color:#fff;letter-spacing:.01em;word-break:break-word}
 .sge-status{font-size:18px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#00E699}
@@ -1092,6 +1107,31 @@ textarea.input{resize:none;line-height:1.4}
 .sgp-actions{display:flex;flex-direction:column;gap:10px}
 /* .btn-sgp-share ("Easy Share" inside the Social Card preview) — REMOVED
    (Patch 25-10/03/26) along with its button; see the markup's own comment. */
+
+/* ===== RECEIPT EXPORT OPTIONS SHEET (Patch 144-10/04/26) — bottom-aligned
+   action sheet opened by "Download Receipt" (#btnSgpDownload) instead of
+   immediately downloading; see #receiptExportSheet's own markup comment.
+   align-items:flex-end overrides the shared .confirm-drawer's centered
+   layout so this one sheet docks to the bottom of the screen; the slide-up
+   motion is a plain keyframe (not a transition) since the element goes
+   straight from display:none to painted — nothing to transition from. */
+.export-sheet{align-items:flex-end !important}
+.export-sheet-card{background:#0A0D14;border:1px solid rgba(0,255,135,.3);
+  border-radius:16px 16px 0 0;width:100%;max-width:440px;display:flex;flex-direction:column;
+  gap:10px;animation:exportSheetSlideUp .25s ease-out}
+@keyframes exportSheetSlideUp{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}
+@media (prefers-reduced-motion: reduce){.export-sheet-card{animation:none}}
+.export-sheet-option{display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+  background:rgba(0,255,135,.06);border:1px solid rgba(0,255,135,.25);border-radius:12px;
+  padding:12px 14px;cursor:pointer;font-family:inherit;transition:background .15s ease}
+.export-sheet-option:hover{background:rgba(0,255,135,.12)}
+.export-sheet-option-icon{font-size:22px;flex-shrink:0;line-height:1}
+.export-sheet-option-text{display:flex;flex-direction:column;gap:2px;min-width:0}
+.export-sheet-option-title{color:#00FF87;font-weight:800;font-size:.86rem}
+.export-sheet-option-sub{color:var(--muted);font-size:.72rem;line-height:1.4}
+.export-sheet-back{background:none;border:none;color:var(--muted);font-size:.78rem;
+  text-decoration:underline;text-underline-offset:3px;cursor:pointer;margin-top:4px;
+  font-family:inherit;padding:4px 0;align-self:center}
 /* GLOBAL MINT GREEN BUTTON DESIGN SYSTEM ENFORCEMENT (Patch 20-10/03/26,
    re-centered Patch 21-10/03/26) — #btnSgpDownload scoped to the exact
    #00FF87 unified mint pill (was the dimmer var(--mint)=#00E699
@@ -2993,6 +3033,41 @@ textarea.input{resize:none;line-height:1.4}
           <svg viewBox="0 0 24 24" width="16" height="16" stroke="#051311" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="7" y1="7" x2="17" y2="17"/><polyline points="17 9 17 17 9 17"/></svg>
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- ===== RECEIPT EXPORT OPTIONS (Patch 144-10/04/26) — the spec's
+       "#ledgerReceiptModal" is this file's real "Ledger Receipt Card"
+       modal (#socialGraphicPreviewModal — see its own <span
+       class="sgp-title"> above, which literally reads "Ledger Receipt
+       Card"); "Download Receipt" (#btnSgpDownload) used to run the whole
+       download+native-share pipeline (Patch 35/142) in one click. This
+       sheet now sits in between: Download opens this instead, and the
+       two real actions below — doReceiptSaveToDevice()/
+       doReceiptShareToSocial(), defined with the rest of this script —
+       split that same pipeline into explicit, separately-triggerable
+       choices rather than always doing both at once. ===== -->
+  <div id="receiptExportSheet" class="confirm-drawer export-sheet">
+    <div class="confirm-card export-sheet-card">
+      <div class="onboarding-header-bar">
+        <span class="onboarding-brand">Receipt Export Options</span>
+        <button type="button" class="onboarding-close" id="btnExportSheetClose" aria-label="Close">✕</button>
+      </div>
+      <button type="button" class="export-sheet-option" id="btnExportSaveDevice">
+        <span class="export-sheet-option-icon" aria-hidden="true">📲</span>
+        <span class="export-sheet-option-text">
+          <span class="export-sheet-option-title">Save to Device</span>
+          <span class="export-sheet-option-sub">Save high-res PNG card directly to your camera roll or files.</span>
+        </span>
+      </button>
+      <button type="button" class="export-sheet-option" id="btnExportShareSocial">
+        <span class="export-sheet-option-icon" aria-hidden="true">🚀</span>
+        <span class="export-sheet-option-text">
+          <span class="export-sheet-option-title">Share to Social Media</span>
+          <span class="export-sheet-option-sub">Post to X, Instagram, or local feeds to build civic momentum.</span>
+        </span>
+      </button>
+      <button type="button" class="export-sheet-back" id="btnExportSheetBack">← Back to Receipt</button>
     </div>
   </div>
 
@@ -7616,22 +7691,34 @@ document.getElementById('sgpBlurGuard').addEventListener('click', () => {
   document.getElementById('sgpBlurGuard').style.display = 'none';
   document.getElementById('btnSgpDownload').disabled = false;
 });
-// DOWNLOAD -> NATIVE SHARE SHEET PIPELINE (Patch 35-10/03/26) — the repo
-// has no literal #btnDownloadReceipt/#receiptModal/#receiptCard; this is
-// the real "Download Receipt ↘" action (#btnSgpDownload, same label/arrow
-// the spec quotes) inside the real Social Card preview modal
-// (#socialGraphicPreviewModal), capturing the real off-screen export card
-// (#socialGraphicExportCard) already rasterized by renderAndShowSocialGraphic()
-// above — reused as-is rather than re-rendering a second canvas. The
-// existing image-screening blur guard (Patch 8) still gates this button
-// exactly as before: nothing here bypasses it.
-document.getElementById('btnSgpDownload').addEventListener('click', async () => {
+// RECEIPT EXPORT OPTIONS SHEET (Patch 144-10/04/26) — "Download Receipt"
+// (#btnSgpDownload) used to always run download-then-native-share in one
+// click (Patch 35, extended Patch 142). It now opens #receiptExportSheet
+// instead, and the two real choices there — doReceiptSaveToDevice() /
+// doReceiptShareToSocial() below — are that same pipeline split into two
+// explicit, separately-triggerable actions. The existing image-screening
+// blur guard (Patch 8) still gates this button exactly as before: nothing
+// here bypasses it.
+document.getElementById('btnSgpDownload').addEventListener('click', () => {
+  if (!lastSocialGraphicBlob) return;
+  document.getElementById('receiptExportSheet').classList.add('open');
+});
+document.getElementById('btnExportSheetClose').addEventListener('click', () => {
+  document.getElementById('receiptExportSheet').classList.remove('open');
+});
+document.getElementById('btnExportSheetBack').addEventListener('click', () => {
+  document.getElementById('receiptExportSheet').classList.remove('open');
+});
+document.getElementById('receiptExportSheet').addEventListener('click', (e) => {
+  if (e.target.id === 'receiptExportSheet') document.getElementById('receiptExportSheet').classList.remove('open');
+});
+// CHOICE 1 — "Save to Device" — exactly Step 1 of the old combined handler:
+// a real canvas-derived blob, already rasterized by renderAndShowSocialGraphic()
+// above, written to a real download via a throwaway <a download> link.
+function doReceiptSaveToDevice(){
   if (!lastSocialGraphicBlob) return;
   const ticketId = lastSocialGraphicTicketId || 'unknown';
   const filename = 'citixen-receipt-' + ticketId + '.png';
-
-  // STEP 1: automatic device download (unchanged for every browser,
-  // mobile or desktop — this always happens first).
   const objectUrl = URL.createObjectURL(lastSocialGraphicBlob);
   const a = document.createElement('a');
   a.href = objectUrl;
@@ -7640,17 +7727,23 @@ document.getElementById('btnSgpDownload').addEventListener('click', async () => 
   a.click();
   a.remove();
   URL.revokeObjectURL(objectUrl);
-
-  // STEP 2: native OS share sheet, immediately after — own payload copy
-  // for this flow specifically (kept separate from the CITIXEN_SHARE_*
-  // canonical constants just below, which belong to the X/WhatsApp/
-  // copy-link fallback flow on #easyShareFallbackModal; changing this
-  // button's wording shouldn't silently change that other flow's).
-  // Patch 36-10/03/26: title/text copy updated per spec. The spec's new text already
-  // folds the URL into the string itself ('... — https://citixenux.com/app'); the
-  // separate `url` field below is kept alongside it (unchanged) since share targets
-  // that read `url` as its own field (rather than parsing it back out of `text`) still
-  // need it, and passing both is harmless — Web Share API callers commonly use both.
+  toast('Receipt saved to downloads.');
+}
+document.getElementById('btnExportSaveDevice').addEventListener('click', () => {
+  doReceiptSaveToDevice();
+  document.getElementById('receiptExportSheet').classList.remove('open');
+});
+// CHOICE 2 — "Share to Social Media" — exactly Steps 2-3 of the old combined
+// handler: real navigator.share with the rasterized PNG (falling back to
+// title/text/url-only share, then to the real #easyShareFallbackModal — the
+// spec's "#socialGraphicExportCard preview pre-filled with the ticket hash"
+// is already true without any extra work here: #socialGraphicExportCard was
+// rasterized with this exact ticket's real id/district the moment
+// renderAndShowSocialGraphic() ran, well before this button exists to click).
+async function doReceiptShareToSocial(){
+  if (!lastSocialGraphicBlob) return;
+  const ticketId = lastSocialGraphicTicketId || 'unknown';
+  const filename = 'citixen-receipt-' + ticketId + '.png';
   const shareTitle = 'CITIXEN UX™ Verified Civic Receipt';
   const shareText = 'CITIXEN UX™ Verified Civic Receipt (' + ticketId + ') — https://citixenux.com/app';
   const shareUrl = 'https://citixenux.com/app';
@@ -7666,27 +7759,23 @@ document.getElementById('btnSgpDownload').addEventListener('click', async () => 
       // elsewhere in this file.
       await navigator.share({ title: shareTitle, text: shareText, url: shareUrl });
     } else {
-      // Patch 142(v146)-10/03/26: STEP 3 — no Web Share API at all (most desktop
-      // browsers). The PNG is already downloaded via Step 1 above regardless, so this
-      // was never a dead end, but it used to just toast and stop. Reactivates the real
-      // #easyShareFallbackModal (the spec's "#socialShareModal" — this file has no
-      // element by that literal name) instead: it already has real X/Twitter intent,
-      // WhatsApp intent, and clipboard-copy buttons wired up (Patch 14, below), and has
-      // been sitting unreachable since Patch 25 removed its last two openers. This is
-      // its first real opener again.
-      toast('Receipt saved to downloads.');
+      // No Web Share API at all (most desktop browsers). Opens the real
+      // #easyShareFallbackModal (the spec's "#socialShareModal" — this file
+      // has no element by that literal name): real X/Twitter intent,
+      // WhatsApp intent, and clipboard-copy buttons, wired since Patch 14.
       document.getElementById('easyShareFallbackModal').classList.add('open');
     }
   } catch (err) {
     // AbortError = the citizen closed the native share sheet themselves —
-    // not a failure, nothing to report. Any other error still leaves the
-    // citizen with a real downloaded file from Step 1, so this stays a
-    // quiet no-op rather than an alarming error toast for something that
-    // already partially succeeded.
+    // not a failure, nothing to report.
     if (err && err.name !== 'AbortError') {
       console.warn('[CITIXEN] navigator.share failed:', err);
     }
   }
+}
+document.getElementById('btnExportShareSocial').addEventListener('click', () => {
+  document.getElementById('receiptExportSheet').classList.remove('open');
+  doReceiptShareToSocial();
 });
 // CANONICAL SHARE PAYLOAD (Patch 14-10/03/26) — the exact title/text/url
 // every share channel below uses, so the native share sheet, the X/
