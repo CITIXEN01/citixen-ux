@@ -414,6 +414,21 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
   border-radius:10px;font-size:.8rem;margin-bottom:10px;outline:none;transition:border-color .15s}
 .input:focus{border-color:var(--mint2)}
 textarea.input{resize:none;line-height:1.4}
+/* Patch 148-10/04/26: #repDesc only (the hazard description textarea under
+   "3. Location & details" — real element behind the spec's
+   #hazardDescription; that section, including this field, is already
+   hidden until a photo is attached, via #reportStep2Locked/
+   hasAttachedPhoto(), so it only ever renders in the already-"post-capture"
+   state). Scoped to this one id, not the shared .input/.input:focus rules
+   above, so every other field using .input (location input, ledger search,
+   etc.) keeps its existing mint focus-only border. Matches #photoImg's own
+   border:1px solid var(--mint2) accent, but in the exact #00FF87 brand
+   green per spec rather than var(--mint2) (#00E699) — background and font
+   are left untouched (still var(--surface-input-bg), which renders as the
+   same near-black #0A0D14-range obsidian the rest of the form uses). The ID
+   selector already outranks .input:focus, so this one rule covers both the
+   resting and focused state without a separate :focus override. */
+#repDesc{border:1px solid #00FF87;box-shadow:0 0 12px rgba(0,255,135,.25)}
 
 /* ADDRESS AUTOCOMPLETE (Patch 5.4) — live Photon (OpenStreetMap) suggestions
    as the citizen types a manual street address, so the typed-then-geocoded
