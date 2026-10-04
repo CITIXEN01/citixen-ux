@@ -1168,9 +1168,13 @@ textarea.input{resize:none;line-height:1.4}
    layout is untouched and keeps its own left-aligned classes below. */
 .onboarding-slide.onboarding-centered.active{display:flex;flex-direction:column;align-items:center;
   text-align:center;gap:12px}
+/* Recolored #00E699 (var(--mint2)) -> #00FF87 so this pill, the "UX™"
+   wordmark (.onboarding-ux-accent), and "All feedback is welcome."
+   (.onboarding-centered .onboarding-body) are all the exact same green —
+   resolves the mismatch flagged in that other rule's own comment below. */
 .onboarding-badge-pill{display:inline-block;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-  font-size:.62rem;font-weight:800;letter-spacing:.08em;color:var(--mint2);text-transform:uppercase;
-  background:rgba(0,230,153,.1);border:1px solid rgba(0,230,153,.35);border-radius:9999px;padding:5px 14px}
+  font-size:.62rem;font-weight:800;letter-spacing:.08em;color:#00FF87;text-transform:uppercase;
+  background:rgba(0,255,135,.1);border:1px solid rgba(0,255,135,.3);border-radius:9999px;padding:5px 14px}
 @keyframes onboardingFadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 .onboarding-eyebrow{font-size:.64rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;
   color:var(--mint2);margin-bottom:10px}
@@ -1191,12 +1195,11 @@ textarea.input{resize:none;line-height:1.4}
 .onboarding-body{font-size:.84rem;line-height:1.55;color:var(--muted)}
 /* "All feedback is welcome." recolored to the brand accent green to match
    the "UX™" in the header wordmark (.onboarding-ux-accent, #00FF87) — was
-   #cbd5e1 (near-white). Note: the "CONFIDENTIAL • PATENTS PENDING" pill
-   above it is actually a different, slightly more teal green
-   (.onboarding-badge-pill uses var(--mint2), which resolves to #00E699,
-   not #00FF87) — the two weren't the same color to begin with. This now
-   matches the logo exactly; it's a close but not pixel-identical match to
-   the pill. */
+   #cbd5e1 (near-white). The "CONFIDENTIAL • PATENTS PENDING" pill above it
+   was a different, more teal #00E699 (var(--mint2)) at the time this rule
+   was written; it was brought up to this same #00FF87 in a follow-up pass
+   (see .onboarding-badge-pill above), so all 3 — pill, logo, subtitle —
+   are now the exact same green. */
 .onboarding-centered .onboarding-body{margin-bottom:0;font-size:.875rem;color:#00FF87;line-height:1.6}
 .onboarding-warning{display:flex;gap:10px;align-items:flex-start;background:rgba(15,23,42,.9);
   border:1px solid rgba(16,185,129,.3);border-radius:12px;padding:12px 14px;margin-bottom:14px}
