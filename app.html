@@ -1546,12 +1546,14 @@ textarea.input{resize:none;line-height:1.4}
    #00E699 ambient glow (opacity .75/.1/.16) — the "static/subtle green state"
    this patch's objective calls out. Now that the sequence below actually lights
    each node/path up in turn, the resting state is dim instead, so the sequence
-   reads as something happening rather than a diagram that always looks half-lit. */
-.civic-triad-spoke{stroke:#2A364F;stroke-width:1.6;opacity:.3;stroke-dasharray:6,6;
+   reads as something happening rather than a diagram that always looks half-lit.
+   Patch 145-10/04/26: resting opacity tightened .35/.3 -> .25 exactly, per this
+   round's explicit "opacity: 0.25" spec (was already dim; just a touch dimmer). */
+.civic-triad-spoke{stroke:#2A364F;stroke-width:1.6;opacity:.25;stroke-dasharray:6,6;
   transition:stroke .3s ease,opacity .3s ease}
-.civic-triad-node-circle{fill:#0D1117;stroke:#2A364F;stroke-width:1.5;opacity:.35;
+.civic-triad-node-circle{fill:#0D1117;stroke:#2A364F;stroke-width:1.5;opacity:.25;
   transition:stroke .3s ease,fill .3s ease,opacity .3s ease,filter .3s ease}
-.civic-triad-root-circle{fill:#0D1117;stroke:#2A364F;stroke-width:1.8;opacity:.35;
+.civic-triad-root-circle{fill:#0D1117;stroke:#2A364F;stroke-width:1.8;opacity:.25;
   transition:stroke .3s ease,fill .3s ease,opacity .3s ease,filter .3s ease}
 .civic-triad-outer-ring{fill:none;stroke:#00E699;stroke-width:1.2;opacity:.55}
 .civic-triad-root-label-center{fill:#00E699;font-size:6.2px;font-weight:800;text-anchor:middle;letter-spacing:.02em}
@@ -1570,39 +1572,55 @@ textarea.input{resize:none;line-height:1.4}
 .civic-triad-ux-text{fill:#00FF87}
 .civic-triad-nucleus-icon{stroke:#00E699}
 
-/* ===== "HOW YOUR REPORT MOVES" SEQUENTIAL FLOW (Patch 143(v150)-10/03/26) =====
-   Full replacement of the Patch 18 data-phase system above (4 phases, 6000ms
-   loop, Ledger+Municipal broadcasting simultaneously) with 5 sequential stages
-   over a 6800ms loop, Ledger sealing strictly before Municipal dispatches, and
-   real SVG icon overlays (camera/receipt/shield/lock/dispatch-truck) injected
-   as <text> glyphs instead of a plain color-only transition. Classes (not the
-   old [data-phase="..."] attribute selectors) are added/removed directly by
-   runTriadFlowSequence() in the script below, since this version needs several
-   elements lit independently and holding at once (stage 5's "all lit" hold)
-   rather than one mutually-exclusive phase name at a time. */
+/* ===== "HOW YOUR REPORT MOVES" SEQUENTIAL FLOW (Patch 145-10/04/26) =====
+   Patch 143(v150) replaced the original Patch 18 data-phase system with 5
+   sequential stages where Ledger sealed strictly before Municipal dispatched.
+   This round reverts that one piece — Ledger and Municipal now broadcast
+   SIMULTANEOUSLY again, as explicitly specified — while keeping everything
+   else Patch 143 built: the dim resting state, the .svg-node-active/
+   .svg-node-dim/.svg-path-active class-based lighting (not the original
+   Patch 18 [data-phase="..."] attribute selectors), and per-element icon
+   injection. The one other real change here: injected icons are now real
+   SVG line-icon glyphs (TRIAD_ICON_SVG below, in the script) instead of OS
+   emoji characters (📷🧾🛡🔒🚛) — .icon-boom now styles <path>/<rect>/<circle>
+   children with a stroke, not a <text> glyph's fill. */
 @keyframes svg-icon-boom{
   0%{transform:scale(0);opacity:0}
   60%{transform:scale(1.3);opacity:1}
   100%{transform:scale(1.0);opacity:1}
 }
+/* Icon position (.icon-boom-pos, a plain SVG transform="translate(...)"
+   attribute set once in JS) and the boom-in scale animation (.icon-boom,
+   a CSS transform) are deliberately two nested <g> elements rather than
+   one: a CSS animation's `transform` property fully replaces an element's
+   own SVG transform attribute rather than composing with it, so animating
+   scale directly on the positioned group would silently snap it back to
+   the SVG's local (0,0) origin — nesting keeps the position attribute on
+   the untouched outer group and the animated scale on the inner one. */
+.icon-boom-pos{pointer-events:none}
 .icon-boom{transform-box:fill-box;transform-origin:center;
   animation:svg-icon-boom .35s cubic-bezier(.175,.885,.32,1.275) forwards}
-.icon-boom text{fill:#00FF9D;text-anchor:middle;font-weight:700}
+.icon-boom path,.icon-boom rect,.icon-boom circle{fill:none;stroke:#00FF87;
+  stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 
 @keyframes svg-path-pulse{to{stroke-dashoffset:-20}}
-.svg-path-active{stroke:#00FF9D !important;stroke-dasharray:8 4 !important;
+.svg-path-active{stroke:#00FF87 !important;stroke-dasharray:8 4 !important;
   animation:svg-path-pulse .8s linear infinite !important;opacity:1 !important}
 /* Reduced-motion equivalent of .svg-path-active with no running dash
    animation — used only by applyTriadStaticLitState() below, so a
    prefers-reduced-motion visitor still sees the paths as "connected/lit"
    rather than losing that information outright. */
-.svg-path-static-lit{stroke:#00FF9D !important;stroke-dasharray:none !important;opacity:1 !important}
+.svg-path-static-lit{stroke:#00FF87 !important;stroke-dasharray:none !important;opacity:1 !important}
 
-.svg-node-active{stroke:#00FF9D !important;fill:rgba(0,255,157,.18) !important;
-  filter:drop-shadow(0 0 10px rgba(0,255,157,.85)) !important;opacity:1 !important;
+/* Patch 145-10/04/26: active-state green changed #00FF9D -> #00FF87 (this
+   round's explicit color), matching the brand green used everywhere else
+   in this file (the UX™ wordmark, the onboarding pill, etc.) rather than
+   Patch 143's close-but-different #00FF9D. */
+.svg-node-active{stroke:#00FF87 !important;fill:rgba(0,255,135,.18) !important;
+  filter:drop-shadow(0 0 10px rgba(0,255,135,.85)) !important;opacity:1 !important;
   transition:all .3s ease}
 .svg-node-dim{stroke:#2A364F !important;fill:#0D1117 !important;filter:none !important;
-  opacity:.35 !important;transition:all .4s ease}
+  opacity:.25 !important;transition:all .4s ease}
 
 @media (prefers-reduced-motion: reduce){
   /* The sequence's own timers are never started under reduced motion (see
@@ -3515,12 +3533,10 @@ function switchTab(id,btn){
     initCoverageGrid().then(updateAppTelemetryScorecard);
     // Force Leaflet to recalculate container dimensions once unhidden
     setTimeout(()=>{ if(map) map.invalidateSize(); },200);
-    // Patch 18-10/03/26: was an immediate maybeShowFeedIntroModal() call
-    // right here — see scheduleFeedIntroModal()'s own comment for why
-    // that's now a 12s deferred timer instead.
-    scheduleFeedIntroModal();
-  } else {
-    cancelFeedIntroModalTimer();
+    // Patch 145-10/04/26: the auto-opening "first visit to Map & Feed"
+    // Quick Help pop-up that used to be armed here (scheduleFeedIntroModal())
+    // was removed outright per spec — Quick Help now opens only from a
+    // manual click (#appHelpBtn / #btnMapHowItWorks).
   }
   if(id==='tab-analytics'){
     initAnalytics();
@@ -5252,17 +5268,43 @@ function triadNodeCircle(svg, key){
 function triadPath(svg, key){
   return svg.querySelector('.civic-triad-spoke-' + key);
 }
-function triadInjectIcon(svg, key, glyph){
+// Patch 145-10/04/26: real outline SVG glyphs, centered at local (0,0),
+// replacing the old OS emoji characters (📷🧾🛡🔒🚛). Each is a small set of
+// path/rect/circle children; .icon-boom (CSS, above) supplies the shared
+// stroke/fill/width so none of these repeat it themselves.
+const TRIAD_ICON_SVG = {
+  camera: '<rect x="-9" y="-5" width="18" height="12" rx="2"/><path d="M-4,-5 L-2,-8 L2,-8 L4,-5"/><circle cx="0" cy="1" r="3.4"/>',
+  ticket: '<rect x="-8" y="-6" width="16" height="12" rx="1.5"/><path d="M-8,-1 h16 M-4,-6 v12 M4,-6 v12"/>',
+  shield: '<path d="M0,-9 L7,-6 V1 C7,6 3,9 0,10.5 C-3,9 -7,6 -7,1 V-6 Z"/><path d="M-3,0.5 L-0.8,3 L3.5,-2.5"/>',
+  lock: '<rect x="-6" y="-1" width="12" height="9" rx="2"/><path d="M-4,-1 v-3 a4,4 0 0 1 8,0 v3"/>',
+  truck: '<rect x="-9" y="-3" width="11" height="7" rx="1"/><path d="M2,-3 h4 l3,3 v4 h-7 Z"/><circle cx="-5" cy="5" r="2"/><circle cx="5.5" cy="5" r="2"/>',
+};
+function triadInjectIcon(svg, key, iconKey){
   const circle = triadNodeCircle(svg, key);
-  if (!circle) return;
-  const cx = circle.getAttribute('cx'), cy = circle.getAttribute('cy');
-  const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-  g.setAttribute('class', 'icon-boom');
-  g.innerHTML = '<text x="' + cx + '" y="' + (parseFloat(cy) - 34) + '" font-size="16">' + glyph + '</text>';
-  circle.parentNode.appendChild(g);
+  if (!circle || !TRIAD_ICON_SVG[iconKey]) return;
+  const cx = parseFloat(circle.getAttribute('cx')), cy = parseFloat(circle.getAttribute('cy'));
+  const pos = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  pos.setAttribute('class', 'icon-boom-pos');
+  pos.setAttribute('transform', 'translate(' + cx + ',' + (cy - 34) + ')');
+  const boom = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  boom.setAttribute('class', 'icon-boom');
+  boom.innerHTML = TRIAD_ICON_SVG[iconKey];
+  pos.appendChild(boom);
+  circle.parentNode.appendChild(pos);
+}
+function triadClearIcons(svg){
+  svg.querySelectorAll('.icon-boom-pos').forEach(el => el.remove());
+}
+function triadSetActive(svg, key){
+  const el = triadNodeCircle(svg, key);
+  if (el) { el.classList.remove('svg-node-dim'); el.classList.add('svg-node-active'); }
+}
+function triadSetPathActive(svg, key){
+  const el = triadPath(svg, key);
+  if (el) el.classList.add('svg-path-active');
 }
 function triadResetSvg(svg){
-  svg.querySelectorAll('.icon-boom').forEach(el => el.remove());
+  triadClearIcons(svg);
   ['resident', 'nucleus', 'ledger', 'municipal'].forEach(key => {
     const el = triadNodeCircle(svg, key);
     if (el) { el.classList.remove('svg-node-active'); el.classList.add('svg-node-dim'); }
@@ -5272,21 +5314,21 @@ function triadResetSvg(svg){
     if (el) el.classList.remove('svg-path-active', 'svg-path-static-lit');
   });
 }
-// {at: ms-into-the-6800ms-loop, run: (svg) => ...} — exact timings from the
-// approved spec (Phase 1: 500ms; Phase 2: 1300ms + 2100ms; Phase 3: 2900ms +
-// 3600ms; Phase 4: 4000ms + 4700ms; Phase 5 is simply "nothing scheduled
-// between 4700ms and the 6800ms loop repeat," which holds everything lit for
-// that 2.1s span for free).
+// {at: ms-into-the-6000ms-loop, run: (svg) => ...} — 3 stages this round
+// (was 5 in Patch 143): Resident snap -> receipt travels to the CITIXEN UX
+// nucleus -> the nucleus splits the pulse down BOTH bottom vectors at once,
+// lighting Public Ledger and Municipal Portal together (was sequential).
 const TRIAD_FLOW_STEPS = [
-  { at: 500,  run: (svg) => { const el = triadNodeCircle(svg, 'resident'); if (el) { el.classList.remove('svg-node-dim'); el.classList.add('svg-node-active'); } triadInjectIcon(svg, 'resident', '📷'); } },
-  { at: 1300, run: (svg) => { svg.querySelectorAll('.icon-boom').forEach(el => el.remove()); triadInjectIcon(svg, 'resident', '🧾'); const el = triadPath(svg, 'resident'); if (el) el.classList.add('svg-path-active'); } },
-  { at: 2100, run: (svg) => { const el = triadNodeCircle(svg, 'nucleus'); if (el) { el.classList.remove('svg-node-dim'); el.classList.add('svg-node-active'); } triadInjectIcon(svg, 'nucleus', '🛡'); } },
-  { at: 2900, run: (svg) => { const el = triadPath(svg, 'ledger'); if (el) el.classList.add('svg-path-active'); } },
-  { at: 3600, run: (svg) => { const el = triadNodeCircle(svg, 'ledger'); if (el) { el.classList.remove('svg-node-dim'); el.classList.add('svg-node-active'); } triadInjectIcon(svg, 'ledger', '🔒'); } },
-  { at: 4000, run: (svg) => { const el = triadPath(svg, 'municipal'); if (el) el.classList.add('svg-path-active'); } },
-  { at: 4700, run: (svg) => { const el = triadNodeCircle(svg, 'municipal'); if (el) { el.classList.remove('svg-node-dim'); el.classList.add('svg-node-active'); } triadInjectIcon(svg, 'municipal', '🚛'); } },
+  { at: 500,  run: (svg) => { triadSetActive(svg, 'resident'); triadInjectIcon(svg, 'resident', 'camera'); } },
+  { at: 1300, run: (svg) => { triadClearIcons(svg); triadInjectIcon(svg, 'resident', 'ticket'); triadSetPathActive(svg, 'resident'); } },
+  { at: 2100, run: (svg) => { triadSetActive(svg, 'nucleus'); triadInjectIcon(svg, 'nucleus', 'shield'); } },
+  { at: 2900, run: (svg) => { triadSetPathActive(svg, 'ledger'); triadSetPathActive(svg, 'municipal'); } },
+  { at: 3600, run: (svg) => {
+      triadSetActive(svg, 'ledger'); triadSetActive(svg, 'municipal');
+      triadInjectIcon(svg, 'ledger', 'lock'); triadInjectIcon(svg, 'municipal', 'truck');
+    } },
 ];
-const TRIAD_LOOP_MS = 6800;
+const TRIAD_LOOP_MS = 6000;
 let triadFlowTimeoutIds = [];
 function runTriadFlowSequence(){
   stopTriadFlowSequence();
@@ -5316,7 +5358,7 @@ function stopTriadFlowSequence(){
 // diagram still reads as complete rather than empty.
 function applyTriadStaticLitState(){
   document.querySelectorAll('.civic-triad-svg').forEach((svg) => {
-    svg.querySelectorAll('.icon-boom').forEach((el) => el.remove());
+    triadClearIcons(svg);
     ['resident', 'nucleus', 'ledger', 'municipal'].forEach((key) => {
       const el = triadNodeCircle(svg, key);
       if (el) { el.classList.remove('svg-node-dim'); el.classList.add('svg-node-active'); }
@@ -5410,13 +5452,12 @@ const APP_MODAL_DATA = {
       '<h4 style="color:#00E699">2. Automated Dispatch</h4><p><span class="brand-white">CITIXEN</span> <span class="brand-lime">UX</span><sup class="tm-symbol">™</sup> routes it to municipal teams and logs it to the Public Ledger.</p>' +
       '<h4 style="color:#00E699">3. Track Impact</h4><p>Monitor resolution speed and active capital project timelines in real time.</p>' +
     '</div>' +
-    // FIRST-TIME MAP & FEED POP-UP (Patch 9-10/03/26) — this exact button
-    // also appears when Quick Help is opened manually via the header "?"
-    // icon; closing it always goes to (or stays on) the Map & Feed tab and
-    // scrolls the Live Dispatch Feed card into view, same one-time
-    // highlight-pulse convention as focusReportCategoryFromQueryString()/
-    // headToFeed() elsewhere in this file. See maybeShowFeedIntroModal()/
-    // the delegated click handler on #appInfoModalBody.
+    // "Got It — View Live Feed" CTA inside Quick Help's body — appears every
+    // time Quick Help is opened (manually only, as of Patch 145); closing it
+    // always goes to (or stays on) the Map & Feed tab and scrolls the Live
+    // Dispatch Feed card into view, same one-time highlight-pulse convention
+    // as focusReportCategoryFromQueryString()/headToFeed() elsewhere in this
+    // file. See the delegated click handler on #appInfoModalBody.
     '<button type="button" id="btnQuickHelpViewFeed" class="btn-onboarding-cta" style="margin-top:18px;">Got It — View Live Feed</button>' +
     // Footer — verbatim reuse of the app shell's own persistent footer
     // (same brand shield + "Privacy Engine: Verified" seal, centered
@@ -5454,47 +5495,18 @@ function closeAppInfoModal(){
   stopTriadFlowSequence();
 }
 // FIRST-TIME MAP & FEED "QUICK HELP" POP-UP (Patch 9-10/03/26; retimed
-// Patch 18-10/03/26) — auto-opens the exact same Quick Help modal the
-// header "?" icon opens manually, the first time a citizen lands on the
-// Map & Feed tab on this device. A real, persisted localStorage flag (not
-// a session var) means it only interrupts once ever per device, exactly
-// like every other "show once" flag in this file (e.g. citizen_preview) —
-// a disabled/unavailable localStorage (private browsing, etc.) just means
-// it shows every time rather than throwing, same fail-open posture as the
-// rest of this file's localStorage reads. The "?" icon
-// (openAppInfoModal('quickHelp') via #appHelpBtn) is untouched and stays
-// reachable at any time regardless of this flag.
-//
-// Patch 18-10/03/26 RETIMING: this used to fire the instant switchTab()
-// landed on tab-map — an immediate pop-up the moment the Map & Feed tab
-// became visible. scheduleFeedIntroModal() now waits 12s from that same
-// entry point before checking citixen_feed_intro_seen and opening it,
-// giving the citizen a few seconds to actually see the feed first.
-// cancelFeedIntroModalTimer() (called from switchTab() whenever the
-// citizen navigates to any tab OTHER than tab-map) cancels a still-pending
-// timer so this never pops open on top of an unrelated tab they've since
-// moved to — switchTab() re-arms a fresh 12s timer each time they come
-// back to tab-map, until the flag is actually set.
-let feedIntroTimeoutId = null;
-function scheduleFeedIntroModal(){
-  let seen = false;
-  try { seen = localStorage.getItem('citixen_feed_intro_seen') === 'true'; } catch (e) { seen = false; }
-  if (seen || feedIntroTimeoutId) return;
-  feedIntroTimeoutId = setTimeout(() => {
-    feedIntroTimeoutId = null;
-    maybeShowFeedIntroModal();
-  }, 12000);
-}
-function cancelFeedIntroModalTimer(){
-  if (feedIntroTimeoutId) { clearTimeout(feedIntroTimeoutId); feedIntroTimeoutId = null; }
-}
-function maybeShowFeedIntroModal(){
-  let seen = false;
-  try { seen = localStorage.getItem('citixen_feed_intro_seen') === 'true'; } catch (e) { seen = false; }
-  if (seen) return;
-  try { localStorage.setItem('citixen_feed_intro_seen', 'true'); } catch (e) { /* can't persist — still show it this once */ }
-  openAppInfoModal('quickHelp');
-}
+// Patch 18-10/03/26) — REMOVED (Patch 145-10/04/26) per spec: Quick Help
+// (and its "How Your Report Moves" diagram) now opens ONLY from a manual
+// click — the header "?" icon (#appHelpBtn) or the Map & Feed "How It
+// Works" button (#btnMapHowItWorks) — never automatically. This used to
+// auto-open the first time a citizen landed on the Map & Feed tab (e.g.
+// via headToFeed() after publishing a report), gated by a one-time
+// citixen_feed_intro_seen localStorage flag with a 12s delay from
+// switchTab('tab-map', ...). scheduleFeedIntroModal()/
+// cancelFeedIntroModalTimer()/maybeShowFeedIntroModal() and their call
+// sites in switchTab() are removed outright rather than left disabled,
+// per this round's explicit "lock this... so it ONLY opens when manually
+// clicked."
 // toggleAppFeatureAccordion() was removed along with the Features/Safety/
 // Security tile grid — that same copy (ciFeatures/ciSafety/ciSecurity,
 // folded together) now opens as one modal via APP_MODAL_DATA.
