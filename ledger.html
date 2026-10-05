@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en" data-shield-entry>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Citizen UX Nexus — Master Search (Living Ledger Explorer)</title>
+<meta name="description" content="Search the Citizen UX public ledger and check record fingerprints with SHA-256.">
+<meta name="theme-color" content="#0A0D14">
+<link rel="icon" type="image/x-icon" href="/favicon.ico?v=5">
+<script src="/shared/nexus-transition.js"></script>
+<!-- MASTER SEARCH ENGINE — SHA-256 Living Ledger Explorer (/ledger).
+     Searches the real public ledger API (/api/coverage/tickets) and links each
+     record to its shareable page (/report/:id).
+     What the SHA-256 here is, exactly: a "record fingerprint" computed IN THE
+     BROWSER (crypto.subtle) over the record's public fields as canonical JSON
+     (sorted keys), plus a ledger digest over all fingerprints in reportId
+     order. The server does not store or sign these. They let you save a
+     fingerprint today and check later that a record hasn't changed — they are
+     not a server-side tamper-proof log, and this page doesn't claim to be one.
+     Resident GPS is NOT displayed or hashed (the store keeps full-precision
+     device GPS; a public page must not echo it).
+     Mapped at /ledger. Making this the site root would mean replacing the
+     permanent "/" -> "/app" redirect in vercel.json; that is a product call,
+     so it is left as is (see the note in the Nexus Matrix). -->
+<style>
+:root{--bg:#0A0D14;--surface:#111625;--surface-2:#161c2e;--line:rgba(255,255,255,.08);--line-2:rgba(255,255,255,.14);
+  --text:#f1f5f9;--muted:#8e9fa8;--green:#00FF87;--green-dim:rgba(0,255,135,.12);--red:#ef4444;--yellow:#facc15;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:14px;line-height:1.5}
+a{color:var(--green)}button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.topbar{display:flex;align-items:center;gap:14px;padding:10px 20px;background:var(--surface);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.brand{display:flex;align-items:center;text-decoration:none}.brand img{height:28px;width:auto;display:block}
+.topbar h1{margin:0;font-size:.95rem;font-weight:800}.topbar h1 span{color:var(--green)}
+.sp{flex:1}.topbar a.nav{font-size:.8rem;font-weight:700;text-decoration:none;color:var(--muted)}.topbar a.nav:hover{color:var(--green)}
+main{max-width:1100px;margin:0 auto;padding:28px 20px 64px}
+.eyebrow{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin:0 0 6px}
+h2{margin:0 0 6px;font-size:clamp(1.7rem,4vw,2.6rem);font-weight:900;letter-spacing:-.02em;line-height:1.1}
+.lead{margin:0 0 20px;color:#cbd5e1;max-width:70ch}
+.bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.bar input[type=search]{flex:1 1 280px;background:var(--surface);border:1px solid var(--line-2);border-radius:12px;padding:12px 14px;font-size:.95rem}
+.bar select{background:var(--surface);border:1px solid var(--line-2);border-radius:12px;padding:12px}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 14px;font-size:.78rem;color:var(--muted)}
+.stat b{color:var(--text);font-family:var(--mono);font-size:.95rem;margin-right:6px}
+.digest{background:var(--surface);border:1px solid var(--line-2);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:.78rem;color:var(--muted)}
+.digest code{font-family:var(--mono);color:var(--green);word-break:break-all}
+.table-wrap{border:1px solid var(--line);border-radius:14px;overflow:auto;background:var(--surface)}
+table{width:100%;border-collapse:collapse;font-size:.82rem;min-width:640px}
+th{text-align:left;font-size:.64rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);padding:10px 14px;background:var(--surface-2)}
+td{padding:11px 14px;border-top:1px solid var(--line);vertical-align:top}
+.mono{font-family:var(--mono)}
+.pill{display:inline-block;padding:2px 10px;border-radius:9999px;font-size:.7rem;font-weight:800;border:1px solid var(--line-2);color:var(--muted)}
+.pill.submitted{color:#fca5a5;border-color:rgba(239,68,68,.5)}.pill.dispatched{color:var(--yellow);border-color:rgba(250,204,21,.5)}.pill.resolved{color:var(--green);border-color:rgba(0,255,135,.45)}
+.link-btn{background:none;border:none;color:var(--green);font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:0}
+.empty{padding:34px 20px;text-align:center;color:var(--muted)}
+.panel{margin-top:18px;background:var(--surface);border:1px solid var(--line-2);border-radius:14px;padding:18px}
+.panel h3{margin:0 0 8px;font-size:1rem}
+.panel dl{display:grid;grid-template-columns:140px 1fr;gap:6px 14px;margin:0 0 12px;font-size:.82rem}
+.panel dt{color:var(--muted)}.panel dd{margin:0;word-break:break-word}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row input{flex:1 1 260px;background:var(--bg);border:1px solid var(--line-2);border-radius:10px;padding:9px 12px;font-family:var(--mono);font-size:.78rem}
+.btn{background:var(--surface-2);border:1px solid var(--line-2);border-radius:10px;padding:9px 14px;font-weight:700;cursor:pointer}.btn:hover{border-color:var(--green);color:var(--green)}
+.ok{color:var(--green)}.bad{color:#fca5a5}
+.note{border:1px solid rgba(250,204,21,.4);background:rgba(250,204,21,.07);color:#fde68a;border-radius:10px;padding:10px 14px;font-size:.78rem;margin-top:16px}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="/muni" aria-label="Citizen UX Nexus"><img src="/logo.svg" alt="CITIXEN UX" width="159" height="30"></a>
+  <h1>Citizen UX <span>Nexus</span></h1>
+  <span class="sp"></span>
+  <a class="nav" href="/app" data-shield>Civilian app</a>
+  <a class="nav" href="/muni" data-shield>Municipal</a>
+</header>
+
+<main>
+  <p class="eyebrow">Master Search Engine</p>
+  <h2>SHA-256 Living Ledger Explorer</h2>
+  <p class="lead">Search every public ledger record by report ID, hazard, place or status, and fingerprint any record with SHA-256.</p>
+
+  <form class="bar" id="searchForm" role="search">
+    <label class="sr" for="q" style="position:absolute;left:-9999px">Search the ledger</label>
+    <input type="search" id="q" placeholder="Search report ID, hazard, street, city…" autocomplete="off">
+    <label class="sr" for="stage" style="position:absolute;left:-9999px">Filter by status</label>
+    <select id="stage"><option value="">All statuses</option><option value="submitted">Submitted</option><option value="dispatched">Dispatched</option><option value="resolved">Resolved</option></select>
+    <label class="sr" for="city" style="position:absolute;left:-9999px">Filter by city</label>
+    <select id="city"><option value="">All cities</option></select>
+  </form>
+
+  <div class="stats" id="stats" aria-live="polite"></div>
+  <div class="digest" id="digestBox" hidden>Ledger digest (SHA-256 over the <span id="digestN">0</span> fingerprints below, in report-ID order): <code id="digest">…</code></div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Report</th><th>Hazard</th><th>Place</th><th>Status</th><th>Filed</th><th><span style="position:absolute;left:-9999px">Actions</span></th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="empty" id="empty" hidden></div>
+  </div>
+
+  <section class="panel" id="detail" hidden aria-labelledby="dTitle">
+    <h3 id="dTitle">Record</h3>
+    <dl id="dFields"></dl>
+    <p style="margin:0 0 6px;color:var(--muted);font-size:.78rem">Record fingerprint (SHA-256 of the public fields, canonical JSON)</p>
+    <p class="mono" id="dHash" style="margin:0 0 12px;word-break:break-all;color:var(--green);font-size:.8rem"></p>
+    <div class="row">
+      <input id="dCheck" placeholder="Paste a fingerprint you saved earlier to check this record is unchanged" aria-label="Previously saved fingerprint">
+      <button class="btn" type="button" id="dCheckBtn">Check</button>
+      <button class="btn" type="button" id="dCopyBtn">Copy fingerprint</button>
+      <a class="btn" id="dOpen" href="#" style="text-decoration:none;color:inherit">Open report page</a>
+    </div>
+    <p id="dResult" role="status" style="margin:10px 0 0;font-size:.82rem"></p>
+  </section>
+
+  <div class="note" role="note">Fingerprints and the digest are computed in your browser from what the API returns right now. The server doesn't store or sign them: they let you detect a later change to a record you've saved a fingerprint for. Resident GPS is never shown or hashed.</div>
+</main>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var hasCrypto = !!(window.crypto && window.crypto.subtle);
+  var records = [];   // {t, fp}
+  var selected = null;
+
+  function el(tag, text, cls) { var n = document.createElement(tag); if (text != null) n.textContent = text; if (cls) n.className = cls; return n; }
+
+  async function sha256Hex(s) {
+    var b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+    return Array.from(new Uint8Array(b)).map(function (x) { return x.toString(16).padStart(2, '0'); }).join('');
+  }
+  var FIELDS = ['reportId', 'category', 'hazardOverride', 'title', 'loc', 'stage', 'verified', 'resolutionHours', 'submittedAgo', 'wardName', 'cityName', 'stateName'];
+  function canonical(t) {
+    var o = {};
+    FIELDS.slice().sort().forEach(function (k) { o[k] = t[k] === undefined ? null : t[k]; });
+    return JSON.stringify(o);
+  }
+
+  function placeOf(t) { return [t.loc, t.wardName, t.cityName, (t.state || '').toUpperCase()].filter(Boolean).join(', '); }
+  // hazardOverride is a routing CODE (e.g. PTH), not a label, so it is searchable via the report ID but never shown as the hazard.
+  function hazardOf(t) { return t.category || ''; }
+
+  function render() {
+    var q = $('q').value.trim().toLowerCase(), st = $('stage').value, ct = $('city').value;
+    var shown = records.filter(function (r) {
+      var t = r.t;
+      if (st && t.stage !== st) return false;
+      if (ct && t.city !== ct) return false;
+      if (!q) return true;
+      return (t.reportId + ' ' + hazardOf(t) + ' ' + t.title + ' ' + placeOf(t) + ' ' + t.stage).toLowerCase().indexOf(q) !== -1;
+    });
+    var body = $('rows'); body.textContent = '';
+    shown.forEach(function (r) {
+      var t = r.t, tr = document.createElement('tr');
+      var open = el('button', 'Fingerprint', 'link-btn'); open.type = 'button';
+      open.addEventListener('click', function () { select(r); });
+      var idTd = el('td'); idTd.appendChild(el('span', t.reportId, 'mono'));
+      var stTd = el('td'); stTd.appendChild(el('span', t.stage, 'pill ' + t.stage));
+      var act = el('td'); act.appendChild(open);
+      tr.appendChild(idTd); tr.appendChild(el('td', hazardOf(t))); tr.appendChild(el('td', placeOf(t)));
+      tr.appendChild(stTd); tr.appendChild(el('td', t.submittedAgo || '')); tr.appendChild(act);
+      body.appendChild(tr);
+    });
+    var empty = $('empty');
+    if (!records.length) { empty.hidden = false; empty.textContent = 'The public ledger has no records yet. Entries appear here as residents file reports.'; }
+    else if (!shown.length) { empty.hidden = false; empty.textContent = 'No records match your search.'; }
+    else empty.hidden = true;
+    var by = {submitted: 0, dispatched: 0, resolved: 0};
+    shown.forEach(function (r) { if (by[r.t.stage] !== undefined) by[r.t.stage]++; });
+    var s = $('stats'); s.textContent = '';
+    [['Records', shown.length], ['Submitted', by.submitted], ['Dispatched', by.dispatched], ['Resolved', by.resolved]].forEach(function (p) {
+      var d = el('div', null, 'stat'); d.appendChild(el('b', String(p[1]))); d.appendChild(document.createTextNode(p[0])); s.appendChild(d);
+    });
+  }
+
+  async function digestAll() {
+    if (!hasCrypto || !records.length) { $('digestBox').hidden = true; return; }
+    var all = records.slice().sort(function (a, b) { return a.t.reportId < b.t.reportId ? -1 : 1; }).map(function (r) { return r.fp; }).join('\n');
+    $('digest').textContent = await sha256Hex(all);
+    $('digestN').textContent = String(records.length);
+    $('digestBox').hidden = false;
+  }
+
+  function select(r) {
+    selected = r; var t = r.t;
+    $('detail').hidden = false; $('dTitle').textContent = 'Record ' + t.reportId;
+    var dl = $('dFields'); dl.textContent = '';
+    [['Hazard', hazardOf(t)], ['Description', t.title], ['Place', placeOf(t)], ['Status', t.stage],
+     ['Verified', t.verified === true ? 'Yes' : t.verified === false ? 'No' : 'Not yet'], ['Filed', t.submittedAgo || '']]
+      .forEach(function (p) { dl.appendChild(el('dt', p[0])); dl.appendChild(el('dd', p[1])); });
+    $('dHash').textContent = r.fp || 'SHA-256 unavailable on this origin (needs HTTPS)';
+    $('dOpen').href = '/report/' + encodeURIComponent(t.reportId);
+    $('dCheck').value = ''; $('dResult').textContent = ''; $('dResult').className = '';
+    $('detail').scrollIntoView({behavior: 'smooth', block: 'nearest'});
+  }
+
+  $('dCheckBtn').addEventListener('click', function () {
+    var v = $('dCheck').value.trim().toLowerCase(), out = $('dResult');
+    if (!selected || !selected.fp) return;
+    if (!v) { out.className = 'bad'; out.textContent = 'Paste a fingerprint first.'; return; }
+    if (v === selected.fp) { out.className = 'ok'; out.textContent = '✓ Match — this record is unchanged since that fingerprint was taken.'; }
+    else { out.className = 'bad'; out.textContent = '✗ No match — the record differs from the one that fingerprint was taken from (or the fingerprint is for another record).'; }
+  });
+  $('dCopyBtn').addEventListener('click', function () {
+    var out = $('dResult');
+    if (!selected || !selected.fp) return;
+    (navigator.clipboard ? navigator.clipboard.writeText(selected.fp) : Promise.reject()).then(
+      function () { out.className = 'ok'; out.textContent = 'Fingerprint copied.'; },
+      function () { out.className = 'bad'; out.textContent = 'Copy isn\'t available here — select the fingerprint above instead.'; });
+  });
+  // q re-renders on input only: a 'change' on blur would rebuild the rows between mousedown and
+  // mouseup of a click on a result and swallow that click.
+  $('q').addEventListener('input', render);
+  ['stage', 'city'].forEach(function (id) { $(id).addEventListener('change', render); });
+  $('searchForm').addEventListener('submit', function (e) { e.preventDefault(); });
+
+  fetch('/api/coverage/tickets', {cache: 'no-store', headers: {accept: 'application/json'}})
+    .then(function (r) { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
+    .then(async function (data) {
+      var tickets = data.tickets || [];
+      for (var i = 0; i < tickets.length; i++) {
+        records.push({t: tickets[i], fp: hasCrypto ? await sha256Hex(canonical(tickets[i])) : ''});
+      }
+      var seen = {};
+      tickets.forEach(function (t) {
+        if (t.city && !seen[t.city]) { seen[t.city] = 1; var o = el('option', t.cityName + ', ' + (t.state || '').toUpperCase()); o.value = t.city; $('city').appendChild(o); }
+      });
+      render(); digestAll();
+    })
+    .catch(function () {
+      $('empty').hidden = false; $('empty').textContent = 'Couldn\'t load the ledger right now. Try again shortly.';
+    });
+})();
+</script>
+</body>
+</html>

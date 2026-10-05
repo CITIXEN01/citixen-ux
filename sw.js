@@ -44,6 +44,14 @@ self.addEventListener('fetch', event => {
   if (url.pathname.startsWith('/admin')) return;      // legacy alias — never cached on device
   if (url.pathname.startsWith('/dispatch')) return;   // staff console is never cached on device
   if (url.pathname.startsWith('/rep')) return;        // rep tools gate is never cached on device
+  // Nexus hub, public municipal gateway / city hubs and the ledger explorer:
+  // always live from the network (no offline fallback to /app, nothing cached on device).
+  if (url.pathname === '/nexus' || url.pathname === '/nexus.html') return;
+  if (url.pathname === '/muni' || url.pathname.startsWith('/muni/') || url.pathname === '/muni.html' || url.pathname === '/muni-city.html') return;
+  if (url.pathname === '/ledger' || url.pathname === '/ledger.html') return;
+  // An explicit cache:'no-store' request (e.g. the ledger explorer's reads) must hit the
+  // network, not the stale-while-revalidate copy below.
+  if (req.cache === 'no-store') return;
 
   // Pages and the shared Dashboard modules (/shared/*.js, *.css) are
   // network-first, so a new deploy shows up on the very next load; the

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" data-shield-entry>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Citizen UX Nexus — Municipal Gateway</title>
+<meta name="description" content="Municipal gateway: product demo, activation request and city hub access.">
+<meta name="theme-color" content="#0A0D14">
+<link rel="icon" type="image/x-icon" href="/favicon.ico?v=5">
+<script src="/shared/nexus-transition.js"></script>
+<!-- PUBLIC MUNICIPAL GATEWAY (/muni).
+     Three things, all real or honestly stubbed:
+       1. Demo video  — the real /citizen_infra_final.mp4 asset (metadata-only preload).
+       2. $9,500 PO grant activation — there is no ordering/payment backend in
+          this repo, and no terms for it anywhere in the codebase, so the form
+          opens a pre-filled email draft (partners@citixenux.com, the address
+          already published in deck.html). Nothing is submitted from this page
+          and no terms are stated here.
+       3. Client login prompt — there is no authentication yet. The prompt
+          resolves a city to its hub in shared/tenants.js and says plainly that
+          hubs are not password-protected.
+     Absolute asset URLs: this file is also reachable as /muni (cleanUrls). -->
+<style>
+:root{--bg:#0A0D14;--surface:#111625;--surface-2:#161c2e;--line:rgba(255,255,255,.08);--line-2:rgba(255,255,255,.14);
+  --text:#f1f5f9;--muted:#8e9fa8;--green:#00FF87;--green-dim:rgba(0,255,135,.12);--yellow:#facc15;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:15px;line-height:1.5}
+a{color:var(--green)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.topbar{display:flex;align-items:center;gap:14px;padding:10px 20px;background:var(--surface);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.brand{display:flex;align-items:center;text-decoration:none}.brand img{height:28px;width:auto;display:block}
+.topbar h1{margin:0;font-size:.95rem;font-weight:800;color:var(--text)}.topbar h1 span{color:var(--green)}
+.topbar .sp{flex:1}
+.topbar a.nav{font-size:.8rem;font-weight:700;text-decoration:none;color:var(--muted)}.topbar a.nav:hover{color:var(--green)}
+main{max-width:1080px;margin:0 auto;padding:32px 20px 64px}
+.eyebrow{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin:0 0 8px}
+h2.hero{margin:0 0 10px;font-size:clamp(2rem,5vw,3.4rem);font-weight:900;line-height:1.05;letter-spacing:-.02em}
+.lead{margin:0 0 26px;max-width:62ch;color:#cbd5e1}
+.card{background:var(--surface);border:1px solid var(--line-2);border-radius:16px;padding:22px;margin-bottom:20px}
+.card h3{margin:0 0 6px;font-size:1.1rem}
+.card p{margin:0 0 12px;color:var(--muted);font-size:.9rem}
+video{width:100%;max-height:520px;border-radius:12px;background:#000;display:block;border:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media (max-width:820px){.grid{grid-template-columns:1fr}}
+label{display:block;font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:12px 0 5px}
+input,textarea{width:100%;background:var(--bg);border:1px solid var(--line-2);border-radius:10px;padding:10px 12px}
+textarea{min-height:76px;resize:vertical}
+.btn{display:inline-flex;align-items:center;gap:8px;margin-top:14px;background:var(--green);color:var(--bg);border:none;border-radius:12px;padding:11px 18px;font-weight:800;cursor:pointer;text-decoration:none}
+.btn:hover{box-shadow:0 0 16px rgba(0,255,135,.4)}
+.btn.ghost{background:var(--surface-2);color:var(--text);border:1px solid var(--line-2)}
+.price{font-size:2.2rem;font-weight:900;color:var(--green);margin:4px 0 8px;letter-spacing:-.02em}
+.note{border:1px solid rgba(250,204,21,.4);background:rgba(250,204,21,.07);color:#fde68a;border-radius:10px;padding:10px 14px;font-size:.8rem;margin-top:14px}
+.msg{margin-top:12px;font-size:.85rem;min-height:1.2em}
+.msg.err{color:#fca5a5}.msg.ok{color:var(--green)}
+.hubs{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.hubs a{display:flex;justify-content:space-between;gap:10px;text-decoration:none;color:var(--text);background:var(--surface-2);border:1px solid var(--line-2);border-radius:10px;padding:10px 14px;font-weight:700;font-size:.88rem}
+.hubs a:hover{border-color:var(--green);color:var(--green)}
+.hubs small{color:var(--muted);font-weight:600}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="/muni" aria-label="Citizen UX Nexus — Municipal Gateway"><img src="/logo.svg" alt="CITIXEN UX" width="159" height="30"></a>
+  <h1>Citizen UX <span>Nexus</span></h1>
+  <span class="sp"></span>
+  <a class="nav" href="/app" data-shield>Civilian app</a>
+  <a class="nav" href="/ledger" data-shield>Master Search</a>
+</header>
+
+<main>
+  <p class="eyebrow">Public Municipal Gateway</p>
+  <h2 class="hero">Municipal clients &amp; public sector</h2>
+  <p class="lead">See how Citizen UX turns resident reports into an auditable record, activate your city, or open your city hub.</p>
+
+  <section class="card" aria-labelledby="demoH">
+    <h3 id="demoH">Product demo</h3>
+    <p>How a resident report becomes a verified, auditable ledger entry.</p>
+    <video id="demoVideo" controls preload="metadata" playsinline aria-label="Citizen UX product demo video">
+      <source src="/citizen_infra_final.mp4" type="video/mp4">
+      Your browser can't play this video. <a href="/citizen_infra_final.mp4">Download it</a>.
+    </video>
+  </section>
+
+  <div class="grid">
+    <section class="card" aria-labelledby="poH" id="activation">
+      <h3 id="poH">PO grant activation</h3>
+      <div class="price" aria-label="9,500 dollars">$9,500</div>
+      <p>Tell us about your city and we'll start activation. This opens an email draft to our team; nothing is submitted from this page.</p>
+      <form id="poForm" novalidate>
+        <label for="poCity">City / agency</label>
+        <input id="poCity" name="city" autocomplete="organization" required>
+        <label for="poState">State</label>
+        <input id="poState" name="state" autocomplete="address-level1" maxlength="2" placeholder="WI">
+        <label for="poNotes">Anything we should know (optional)</label>
+        <textarea id="poNotes" name="notes"></textarea>
+        <button class="btn" type="submit" id="poSubmit">Request activation by email</button>
+        <div class="msg" id="poMsg" role="status"></div>
+      </form>
+      <div class="note" role="note">Pricing terms and purchase-order details aren't published on this page yet; they're confirmed with you by email.</div>
+    </section>
+
+    <section class="card" aria-labelledby="loginH" id="login">
+      <h3 id="loginH">Client login</h3>
+      <p>Enter your city to open its hub.</p>
+      <form id="loginForm" novalidate>
+        <label for="loginCity">City hub address</label>
+        <input id="loginCity" name="slug" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="e.g. lacrosse">
+        <button class="btn" type="submit">Open city hub</button>
+        <div class="msg" id="loginMsg" role="status"></div>
+      </form>
+      <div class="note" role="note">Sign-in isn't live yet: hubs are not password-protected, so they only show demo data or data the public ledger already exposes.</div>
+      <p style="margin-top:16px;margin-bottom:0;font-size:.74rem;text-transform:uppercase;letter-spacing:.07em">Available hubs</p>
+      <ul class="hubs" id="hubList"></ul>
+    </section>
+  </div>
+</main>
+
+<script src="/shared/tenants.js"></script>
+<script>
+(function () {
+  'use strict';
+  var T = window.NEXUS_TENANTS || {};
+  var $ = function (id) { return document.getElementById(id); };
+
+  var list = $('hubList');
+  Object.keys(T).forEach(function (k) {
+    var li = document.createElement('li'), a = document.createElement('a'), s = document.createElement('small');
+    a.href = '/muni/' + k; a.setAttribute('data-shield', '');
+    a.appendChild(document.createTextNode(T[k].name));
+    s.textContent = T[k].source === 'demo' ? 'Demo data' : 'Live ledger';
+    a.appendChild(s); li.appendChild(a); list.appendChild(li);
+  });
+
+  $('loginForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var raw = $('loginCity').value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '');
+    var msg = $('loginMsg'); msg.className = 'msg';
+    // Accept "la crosse", "La-Crosse" etc. by comparing letters/digits only.
+    var hit = Object.keys(T).filter(function (k) { return k.replace(/[^a-z0-9]+/g, '') === raw; })[0];
+    if (!raw) { msg.className = 'msg err'; msg.textContent = 'Enter your city hub address.'; return; }
+    if (!hit) { msg.className = 'msg err'; msg.textContent = 'No city hub exists for that address yet. Request activation to get one.'; return; }
+    msg.className = 'msg ok'; msg.textContent = 'Opening ' + T[hit].name + '…';
+    if (window.NexusTransition) window.NexusTransition.go('/muni/' + hit); else location.assign('/muni/' + hit);
+  });
+
+  $('poForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var city = $('poCity').value.trim(), msg = $('poMsg');
+    if (!city) { msg.className = 'msg err'; msg.textContent = 'Enter your city or agency name.'; $('poCity').focus(); return; }
+    var body = 'City / agency: ' + city + '\nState: ' + ($('poState').value.trim() || '—') +
+      '\n\nNotes: ' + ($('poNotes').value.trim() || '—') + '\n\nI would like to start the $9,500 PO grant activation.';
+    msg.className = 'msg ok'; msg.textContent = 'Opening your email app…';
+    location.href = 'mailto:partners@citixenux.com?subject=' + encodeURIComponent('PO grant activation — ' + city) + '&body=' + encodeURIComponent(body);
+  });
+})();
+</script>
+</body>
+</html>

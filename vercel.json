@@ -34,6 +34,18 @@
       "destination": "/nexus.html"
     },
     {
+      "source": "/muni",
+      "destination": "/muni.html"
+    },
+    {
+      "source": "/muni/:city_slug",
+      "destination": "/muni-city.html?city=:city_slug"
+    },
+    {
+      "source": "/ledger",
+      "destination": "/ledger.html"
+    },
+    {
       "source": "/api/pass",
       "destination": "/api/passbook?mode=site"
     },
@@ -62,7 +74,7 @@
       "destination": "/operator.html"
     },
     {
-      "source": "/((?!api/|app$|dispatch$|admin$|rep$|operator$|operator/feedback$|icons/|shared/|manifest.json|sw.js|favicon.ico|apple-touch-icon\\.png|og-preview-large\\.png|citizen_infra_final\\.mp4|CITIXEN_UX_Executive_Deck\\.pptx).*)",
+      "source": "/((?!api/|app$|dispatch$|admin$|rep$|nexus$|muni$|muni/|ledger$|operator$|operator/feedback$|icons/|shared/|manifest.json|sw.js|favicon.ico|apple-touch-icon\\.png|og-preview-large\\.png|citizen_infra_final\\.mp4|CITIXEN_UX_Executive_Deck\\.pptx).*)",
       "destination": "/index.html"
     }
   ],

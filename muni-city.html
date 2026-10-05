@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en" data-shield-entry>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Citizen UX Nexus — City Hub</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0A0D14">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" type="image/x-icon" href="/favicon.ico?v=5">
+<script src="/shared/nexus-transition.js"></script>
+<!-- MULTI-TENANT CITY HUB — served for /muni/{city_slug} (vercel.json rewrites
+     it to /muni-city.html?city={slug}; ?city= also works when opened directly).
+     The tenant comes from shared/tenants.js. This is the dispatcher GIS +
+     Audit Vault that used to live inside nexus.html (c26ae56), now driven by
+     a tenant record instead of hard-coded Austin data:
+       source "demo"   -> mock reports, in-memory status changes, real SHA-256 chain
+       source "ledger" -> real /api/coverage/tickets rows for that city, READ-ONLY
+     SECURITY NOTE: this is a public URL and there is no authentication yet,
+     so the role switcher is UI-only and live-ledger hubs cannot write. Real
+     per-city access control needs a server (e.g. Supabase auth + RLS).
+     Map tiles: CARTO Dark Matter (OSM's own tiles reject Referer-less requests
+     and this page sends referrer: no-referrer). Absolute asset URLs are
+     required because /muni/{slug} is a nested path. -->
+<style>
+:root{
+  --bg:#0A0D14; --surface:#111625; --surface-2:#161c2e; --line:rgba(255,255,255,.08); --line-2:rgba(255,255,255,.14);
+  --text:#f1f5f9; --muted:#8e9fa8; --green:#00FF87; --green-dim:rgba(0,255,135,.12);
+  --red:#ef4444; --yellow:#facc15; --header-h:56px; --side-w:236px; --drawer-w:380px;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:14px}
+button,select{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+.app{display:grid;grid-template-rows:auto 1fr;height:100vh;height:100dvh}
+.stage{position:relative;min-height:0}
+.spoke{position:absolute;inset:0}
+.spoke:focus{outline:none}
+
+/* ---------- Header ---------- */
+.topbar{display:flex;align-items:center;gap:14px;padding:0 16px;min-height:var(--header-h);background:var(--surface);
+  border-bottom:1px solid var(--line);min-width:0}
+.brand{display:flex;align-items:center;gap:10px;min-width:0;text-decoration:none}
+.brand img{height:28px;width:auto;display:block}
+.logo{margin:0;font-weight:800;font-size:.95rem;letter-spacing:.01em;white-space:nowrap;color:var(--text)}
+.logo .nx{color:var(--green)}
+.tenant-missing{max-width:560px;margin:12vh auto;padding:0 20px;text-align:center}
+.tenant-missing[hidden]{display:none}
+#spoke-municipal[hidden]{display:none}
+.tenant-missing h2{margin:0 0 8px;font-size:1.6rem}
+.tenant-missing p{color:var(--muted);line-height:1.5}
+.tenant-missing a{color:var(--green);font-weight:700}
+.empty-banner{position:absolute;left:50%;top:64px;transform:translateX(-50%);z-index:500;background:rgba(17,22,37,.94);border:1px solid var(--line-2);border-radius:10px;padding:8px 14px;font-size:.78rem;color:var(--muted);display:none;max-width:90%;text-align:center}
+.btn-back{display:inline-flex;align-items:center;gap:8px;white-space:nowrap;text-decoration:none;font-weight:800;font-size:.8rem;
+  background:var(--green);color:var(--bg);border-radius:10px;padding:8px 14px}
+.btn-back:hover{box-shadow:0 0 16px rgba(0,255,135,.4)}
+.muni-badge{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border:1px solid var(--line-2);border-radius:9999px;
+  background:var(--surface-2);font-size:.78rem;font-weight:600;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.muni-badge svg{flex-shrink:0;color:var(--green)}
+.spacer{flex:1}
+.chip-demo{font-family:var(--mono);font-size:.64rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--yellow);border:1px solid rgba(250,204,21,.4);background:rgba(250,204,21,.08);padding:4px 9px;border-radius:6px;white-space:nowrap}
+.pii-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:9999px;white-space:nowrap;
+  background:var(--green-dim);border:1px solid rgba(0,255,135,.35);color:var(--green);font-size:.74rem;font-weight:800;letter-spacing:.02em}
+.pii-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+.role-switch{display:flex;align-items:center;gap:8px}
+.role-switch label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.role-switch select{background:var(--surface-2);border:1px solid var(--line-2);border-radius:8px;padding:6px 8px;font-size:.78rem}
+.profile{display:flex;align-items:center;gap:9px;background:none;border:1px solid transparent;border-radius:10px;padding:4px 8px}
+.profile:hover{border-color:var(--line-2)}
+.avatar{width:30px;height:30px;border-radius:50%;background:var(--green-dim);border:1px solid rgba(0,255,135,.4);
+  color:var(--green);display:grid;place-items:center;font-weight:800;font-size:.72rem}
+.profile-text{display:flex;flex-direction:column;text-align:left;line-height:1.2}
+.profile-name{font-size:.78rem;font-weight:700}
+.profile-role{font-size:.66rem;color:var(--muted)}
+
+/* ---------- Municipal workspace ---------- */
+#spoke-municipal{display:grid;grid-template-columns:var(--side-w) 1fr}
+.sidebar{background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:14px 10px;gap:4px;min-height:0;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:11px;width:100%;text-align:left;background:none;border:1px solid transparent;
+  border-radius:10px;padding:10px 12px;color:var(--muted);font-weight:600;font-size:.84rem}
+.nav-item:hover{background:var(--surface-2);color:var(--text)}
+.nav-item[aria-current="page"]{background:var(--green-dim);border-color:rgba(0,255,135,.3);color:var(--green)}
+.nav-item svg{flex-shrink:0}
+.nav-count{margin-left:auto;font-family:var(--mono);font-size:.68rem;background:rgba(239,68,68,.16);color:#fca5a5;border-radius:9999px;padding:1px 7px}
+.side-foot{margin-top:auto;padding-top:14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:9px}
+.chain-head{font-family:var(--mono);font-size:.64rem;color:var(--muted);word-break:break-all;line-height:1.4}
+.chain-head b{color:var(--text);font-weight:600}
+.btn-export{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:var(--green);color:var(--bg);
+  border:none;border-radius:12px;padding:11px 12px;font-weight:700;font-size:.78rem;line-height:1.2;text-align:center}
+.btn-export:hover:not(:disabled){box-shadow:0 0 16px rgba(0,255,135,.4)}
+.btn-export:disabled{opacity:.4;cursor:not-allowed}
+
+.main{position:relative;min-width:0;min-height:0;overflow:hidden}
+.view{position:absolute;inset:0;display:none}
+.view.active{display:block}
+.view-scroll{overflow-y:auto;padding:22px 24px}
+.view-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+.view-title{font-size:1.15rem;font-weight:800;margin:0}
+.view-sub{color:var(--muted);font-size:.78rem;margin:3px 0 0}
+
+#mapWrap{position:absolute;inset:0;background:#0d1220;
+  background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+  background-size:40px 40px}
+#map{position:absolute;inset:0;background:transparent}
+.leaflet-container{background:transparent;font-family:inherit}
+.map-msg{position:absolute;inset:0;display:none;place-items:center;text-align:center;color:var(--muted);padding:24px;z-index:400}
+.map-legend{position:absolute;left:14px;bottom:14px;z-index:500;background:rgba(17,22,37,.92);border:1px solid var(--line-2);
+  border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;gap:7px;font-size:.74rem;backdrop-filter:blur(6px)}
+.map-legend h2{margin:0 0 2px;font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.lg-row{display:flex;align-items:center;gap:9px}
+.lg-count{margin-left:auto;font-family:var(--mono);color:var(--muted);padding-left:14px}
+.pin{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:.7rem;font-weight:900;color:#0A0D14;
+  border:2px solid rgba(10,13,20,.85);box-shadow:0 0 0 1px rgba(255,255,255,.35),0 2px 8px rgba(0,0,0,.6)}
+.pin.new{background:var(--red)} .pin.dispatched{background:var(--yellow)} .pin.resolved{background:var(--green)}
+.pin.selected{transform:scale(1.35);box-shadow:0 0 0 3px #fff,0 0 18px currentColor}
+.leaflet-marker-icon.pin-wrap{background:none;border:none}
+.map-toolbar{position:absolute;top:14px;left:62px;z-index:500;display:flex;gap:8px;flex-wrap:wrap}
+.tb-stat{background:rgba(17,22,37,.92);border:1px solid var(--line-2);border-radius:10px;padding:7px 12px;font-size:.72rem;color:var(--muted);backdrop-filter:blur(6px)}
+.tb-stat b{color:var(--text);font-family:var(--mono);font-size:.8rem;margin-right:4px}
+
+.drawer{position:absolute;top:0;right:0;bottom:0;width:var(--drawer-w);max-width:100%;z-index:600;background:var(--surface);
+  border-left:1px solid var(--line-2);box-shadow:-12px 0 32px rgba(0,0,0,.45);display:flex;flex-direction:column;
+  transform:translateX(102%);transition:transform .22s ease;visibility:hidden}
+.drawer.open{transform:none;visibility:visible}
+@media (prefers-reduced-motion:reduce){.drawer{transition:none}}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.drawer-title{font-family:var(--mono);font-weight:800;font-size:.95rem;margin:0}
+.icon-btn{background:none;border:1px solid var(--line-2);border-radius:8px;width:30px;height:30px;display:grid;place-items:center;color:var(--muted)}
+.icon-btn:hover{color:var(--text);border-color:var(--muted)}
+.drawer-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:16px}
+.photo{position:relative;aspect-ratio:16/10;border-radius:12px;overflow:hidden;border:1px solid var(--line-2);
+  background:repeating-linear-gradient(135deg,#131a2c 0 12px,#10172a 12px 24px);display:grid;place-items:center;color:var(--muted)}
+.photo-inner{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:.72rem;text-align:center;padding:10px}
+.photo-tag{position:absolute;left:8px;top:8px;font-family:var(--mono);font-size:.6rem;font-weight:800;letter-spacing:.06em;
+  background:rgba(10,13,20,.85);border:1px solid rgba(250,204,21,.4);color:var(--yellow);border-radius:5px;padding:2px 6px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px;margin:0}
+.fields div{min-width:0}
+.fields .wide{grid-column:1 / -1}
+.fields dt{font-size:.64rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:3px}
+.fields dd{margin:0;font-size:.82rem;font-weight:600;word-break:break-word}
+.mono{font-family:var(--mono)}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:9999px;font-size:.72rem;font-weight:800;border:1px solid}
+.badge.new{color:#fca5a5;border-color:rgba(239,68,68,.5);background:rgba(239,68,68,.12)}
+.badge.dispatched{color:var(--yellow);border-color:rgba(250,204,21,.5);background:rgba(250,204,21,.1)}
+.badge.resolved{color:var(--green);border-color:rgba(0,255,135,.45);background:var(--green-dim)}
+.badge.planned{color:var(--muted);border-color:var(--line-2);background:var(--surface-2)}
+.ctrl-label{font-size:.64rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:0 0 8px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.seg button{background:var(--surface-2);border:1px solid var(--line-2);border-radius:10px;padding:9px 4px;font-size:.74rem;font-weight:700;color:var(--muted)}
+.seg button:hover:not(:disabled){color:var(--text);border-color:var(--muted)}
+.seg button[aria-pressed="true"]{color:var(--bg);border-color:transparent}
+.seg button[data-status="new"][aria-pressed="true"]{background:var(--red)}
+.seg button[data-status="dispatched"][aria-pressed="true"]{background:var(--yellow)}
+.seg button[data-status="resolved"][aria-pressed="true"]{background:var(--green)}
+.seg button:disabled{opacity:.45;cursor:not-allowed}
+.hint{font-size:.7rem;color:var(--muted);line-height:1.45;margin:8px 0 0}
+
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:var(--surface-2);border:1px solid var(--line-2);border-radius:9999px;padding:5px 12px;font-size:.74rem;font-weight:700;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--green-dim);border-color:rgba(0,255,135,.4);color:var(--green)}
+.table-wrap{border:1px solid var(--line);border-radius:14px;overflow:auto;background:var(--surface)}
+table{width:100%;border-collapse:collapse;font-size:.8rem;min-width:560px}
+th{position:sticky;top:0;background:var(--surface-2);text-align:left;font-size:.64rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);padding:10px 14px;font-weight:700}
+td{padding:11px 14px;border-top:1px solid var(--line);vertical-align:middle}
+tr:hover td{background:rgba(255,255,255,.02)}
+.link-btn{background:none;border:none;color:var(--green);font-weight:700;font-size:.76rem;text-decoration:underline;text-underline-offset:3px;padding:0}
+.btn-ghost{background:var(--surface-2);border:1px solid var(--line-2);border-radius:10px;padding:8px 14px;font-weight:700;font-size:.76rem}
+.btn-ghost:hover{border-color:var(--green);color:var(--green)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}
+.card h2{margin:0 0 4px;font-size:.92rem}
+.card .view-sub{margin-bottom:12px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.row-main{min-width:0}
+.row-title{font-weight:700;font-size:.82rem}
+.row-sub{font-size:.7rem;color:var(--muted)}
+.switch{position:relative;width:38px;height:22px;flex-shrink:0}
+.switch input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer;z-index:1}
+.switch input:disabled{cursor:not-allowed}
+.switch span{position:absolute;inset:0;background:var(--surface-2);border:1px solid var(--line-2);border-radius:9999px;transition:background .15s}
+.switch span::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--muted);transition:transform .15s,background .15s}
+.switch input:checked + span{background:var(--green-dim);border-color:rgba(0,255,135,.5)}
+.switch input:checked + span::after{transform:translateX(16px);background:var(--green)}
+.switch input:focus-visible + span{outline:2px solid var(--green);outline-offset:2px}
+.switch input:disabled + span{opacity:.45}
+.verify-ok{color:var(--green)} .verify-bad{color:#fca5a5}
+.hash{font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:9999;background:var(--surface-2);border:1px solid rgba(0,255,135,.4);
+  color:var(--text);padding:10px 16px;border-radius:12px;font-size:.78rem;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:90vw;display:none}
+.toast.show{display:block}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1100px){.role-switch label,.profile-text,.chip-demo{display:none}}
+@media (max-width:900px){
+  :root{--side-w:64px}
+  .nav-item span.nav-label,.side-foot .chain-head,.btn-export .btn-label{display:none}
+  .nav-item{justify-content:center;padding:11px 0;position:relative}
+  .nav-count{position:absolute;margin:0;transform:translate(12px,-12px)}
+  .drawer{width:100%}
+  .muni-badge{max-width:44vw}
+}
+/* Narrow screens: the header wraps into rows instead of overflowing:
+   [logo ........ back] / [municipality badge] / [Zero-PII ..... role, profile]. */
+@media (max-width:760px){
+  .topbar{flex-wrap:wrap;gap:8px 10px;padding:8px 12px}
+  .topbar .spacer{display:none}
+  .brand{order:1}.logo{font-size:.85rem}
+  .btn-back{order:2;margin-left:auto}
+  .muni-badge{order:3;flex:1 1 100%;max-width:100%}
+  .pii-badge{order:4}
+  .role-switch{order:5;margin-left:auto}
+  .profile{order:6}
+  .role-switch select{max-width:150px}
+}
+@media (max-width:560px){.view-scroll{padding:16px}#view-gateway{padding:14px}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <a class="brand" href="/muni" aria-label="Citizen UX Nexus — Municipal Gateway"><img src="/logo.svg" alt="CITIXEN UX" width="159" height="30"></a>
+    <h1 class="logo">Citizen UX <span class="nx">Nexus</span></h1>
+    <a class="btn-back" id="btnBack" href="/muni">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      Municipal Gateway
+    </a>
+    <div class="muni-badge" id="muniBadge" title="Active municipality">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+      <span id="muniText">Loading…</span>
+    </div>
+    <div class="spacer"></div>
+    <span class="chip-demo" id="chipDemo">Demo data</span>
+    <div class="pii-badge" id="piiBadge" role="status" title="This view contains no reporter-identifying fields">
+      <span class="pii-dot" aria-hidden="true"></span>
+      <span>Zero-PII Active</span>
+    </div>
+    <div class="role-switch" id="roleWrap">
+      <label for="roleSelect">Role</label>
+      <select id="roleSelect" aria-label="Switch role (UI only)">
+        <option value="dispatcher">Dispatcher</option>
+        <option value="supervisor">Supervisor</option>
+        <option value="auditor">Auditor (read-only)</option>
+        <option value="admin">Administrator</option>
+      </select>
+    </div>
+    <button type="button" class="profile" id="profileBtn" aria-label="User profile">
+      <span class="avatar" aria-hidden="true">OP</span>
+      <span class="profile-text"><span class="profile-name">Operator 04</span><span class="profile-role" id="profileRole">Dispatcher</span></span>
+    </button>
+  </header>
+
+  <div class="stage">
+    <section class="tenant-missing" id="tenantMissing" hidden>
+      <h2>City hub not found</h2>
+      <p>There is no city hub at this address. Known hubs:</p>
+      <ul id="tenantLinks" style="list-style:none;padding:0;margin:0 0 14px"></ul>
+      <p><a href="/muni">← Back to the Municipal Gateway</a></p>
+    </section>
+
+    <section class="spoke" id="spoke-municipal" aria-label="City dispatcher command view">
+
+      <nav class="sidebar" aria-label="Municipal">
+        <button type="button" class="nav-item" data-view="map" aria-current="page">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z"/><path d="M8 2v16M16 6v16"/></svg>
+          <span class="nav-label">Command Map (GIS View)</span>
+        </button>
+        <button type="button" class="nav-item" data-view="triage">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <span class="nav-label">Triage Queue (Work Orders)</span>
+          <span class="nav-count" id="navNewCount" aria-label="New reports">0</span>
+        </button>
+        <button type="button" class="nav-item" data-view="audit">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span class="nav-label">Audit Vault (SHA-256 Logs)</span>
+        </button>
+        <button type="button" class="nav-item" data-view="settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+          <span class="nav-label">Geo-Fence &amp; Team Settings</span>
+        </button>
+
+        <div class="side-foot">
+          <div class="chain-head" id="chainHead">Chain head: <b>computing…</b></div>
+          <button type="button" class="btn-export" id="btnExport" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+            <span class="btn-label">Export Cryptographic Audit Packet</span>
+          </button>
+        </div>
+      </nav>
+
+      <main class="main" id="main">
+
+        <!-- Command Map -->
+        <section class="view active" id="view-map" aria-label="Command Map">
+          <div id="mapWrap">
+            <div id="map"></div>
+            <div class="empty-banner" id="emptyBanner" role="status"></div>
+            <div class="map-msg" id="mapMsg"><div>The map library couldn't load (offline or blocked).<br>Reports are still reachable from the Triage Queue.</div></div>
+            <div class="map-toolbar" aria-label="Report totals">
+              <div class="tb-stat"><b id="tbNew">0</b>New</div>
+              <div class="tb-stat"><b id="tbDisp">0</b>Dispatched</div>
+              <div class="tb-stat"><b id="tbRes">0</b>Resolved</div>
+            </div>
+            <div class="map-legend" aria-label="Legend">
+              <h2>Hazard status</h2>
+              <div class="lg-row"><span class="pin new" aria-hidden="true">!</span>New<span class="lg-count" id="lgNew">0</span></div>
+              <div class="lg-row"><span class="pin dispatched" aria-hidden="true">›</span>Dispatched<span class="lg-count" id="lgDisp">0</span></div>
+              <div class="lg-row"><span class="pin resolved" aria-hidden="true">✓</span>Resolved<span class="lg-count" id="lgRes">0</span></div>
+            </div>
+          </div>
+
+          <aside class="drawer" id="drawer" aria-label="Selected hazard report" aria-hidden="true">
+            <div class="drawer-head">
+              <h2 class="drawer-title" id="dwTicket">—</h2>
+              <button type="button" class="icon-btn" id="dwClose" aria-label="Close report details">✕</button>
+            </div>
+            <div class="drawer-body">
+              <div class="photo" role="img" aria-label="Placeholder for the report photo">
+                <span class="photo-tag" id="photoTag">MOCK PHOTO</span>
+                <div class="photo-inner">
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  Resident photo appears here<br>(EXIF-scrubbed before upload)
+                </div>
+              </div>
+              <dl class="fields">
+                <div><dt>Hazard category</dt><dd id="dwCategory">—</dd></div>
+                <div><dt>Status</dt><dd><span class="badge" id="dwStatusBadge">—</span></dd></div>
+                <div class="wide"><dt>GPS coordinates</dt><dd class="mono" id="dwGps">—</dd></div>
+                <div class="wide"><dt>Reported</dt><dd id="dwTime">—</dd></div>
+                <div class="wide"><dt>Reporter</dt><dd>Anonymous — no account, no identifiers</dd></div>
+              </dl>
+              <div>
+                <p class="ctrl-label" id="dwCtrlLabel">Change status</p>
+                <div class="seg" role="group" aria-labelledby="dwCtrlLabel" id="dwSeg">
+                  <button type="button" data-status="new" aria-pressed="false">New</button>
+                  <button type="button" data-status="dispatched" aria-pressed="false">Dispatched</button>
+                  <button type="button" data-status="resolved" aria-pressed="false">Resolved</button>
+                </div>
+                <p class="hint" id="dwHint">Every status change is appended to the Audit Vault as a SHA-256-chained entry.</p>
+              </div>
+            </div>
+          </aside>
+        </section>
+
+        <!-- Triage Queue -->
+        <section class="view view-scroll" id="view-triage" aria-label="Triage Queue">
+          <div class="view-head">
+            <div><h2 class="view-title">Triage Queue</h2><p class="view-sub" id="triageSub">Work orders, urgent first.</p></div>
+            <div class="chips" role="group" aria-label="Filter by status" id="triageFilters">
+              <button type="button" class="chip" data-filter="all" aria-pressed="true">All</button>
+              <button type="button" class="chip" data-filter="new" aria-pressed="false">New</button>
+              <button type="button" class="chip" data-filter="dispatched" aria-pressed="false">Dispatched</button>
+              <button type="button" class="chip" data-filter="resolved" aria-pressed="false">Resolved</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Ticket</th><th>Category</th><th>Status</th><th>Reported</th><th><span class="sr-only">Actions</span></th></tr></thead>
+              <tbody id="triageBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Audit Vault -->
+        <section class="view view-scroll" id="view-audit" aria-label="Audit Vault">
+          <div class="view-head">
+            <div><h2 class="view-title">Audit Vault</h2><p class="view-sub" id="auditSub"></p></div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <span id="verifyResult" class="hash" role="status"></span>
+              <button type="button" class="btn-ghost" id="btnVerify">Verify chain</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Time (UTC)</th><th>Ticket</th><th>Event</th><th>Actor</th><th>Hash</th></tr></thead>
+              <tbody id="auditBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Geo-Fence & Team Settings -->
+        <section class="view view-scroll" id="view-settings" aria-label="Geo-Fence and Team Settings">
+          <div class="view-head">
+            <div><h2 class="view-title">Geo-Fence &amp; Team Settings</h2><p class="view-sub" id="settingsNote"></p></div>
+          </div>
+          <div class="cards">
+            <div class="card">
+              <h2>Geo-fence zones</h2>
+              <p class="view-sub">Enabled zones draw a dashed boundary on the Command Map.</p>
+              <div id="zoneList"></div><p class="hint" id="zoneEmpty" hidden>No geo-fence zones are configured for this city yet.</p>
+            </div>
+            <div class="card">
+              <h2>Response crews</h2>
+              <p class="view-sub">Crew availability, not individual staff.</p>
+              <div id="crewList"></div><p class="hint" id="crewEmpty" hidden>No response crews are configured for this city yet.</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </section>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="/shared/tenants.js"></script>
+<script>
+(function(){
+'use strict';
+const LEAFLET_CSS = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
+const LEAFLET_JS  = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+const TILE_URL = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+const TILE_ATTR = '© OpenStreetMap contributors © CARTO';
+
+/* ===================== DEMO DATA (hard-coded mocks) ===================== */
+const CATEGORIES = ['Pothole','Streetlight Out','Sidewalk Hazard','Water Main Leak','Downed Signage','Illegal Dumping','Storm Drain Blockage'];
+const MIN = 60 * 1000;
+let ZONES = [], CREWS = [];
+const ROLES = {
+  dispatcher:{label:'Dispatcher',write:true,admin:false},
+  supervisor:{label:'Supervisor',write:true,admin:false},
+  auditor:{label:'Auditor',write:false,admin:false},
+  admin:{label:'Administrator',write:true,admin:true},
+};
+const STATUS_LABEL = {new:'New',dispatched:'Dispatched',resolved:'Resolved'};
+const STATUS_GLYPH = {new:'!',dispatched:'›',resolved:'✓'};
+
+/* ===================== STATE (built on first Municipal entry) ===================== */
+let reports = [];
+let role = 'dispatcher';
+let selectedId = null;
+let triageFilter = 'all';
+let log = [];            // audit entries, oldest first
+let map = null, markers = {}, zoneLayers = {};
+let ready = false;
+let MUNICIPALITY = '';
+const TENANTS = window.NEXUS_TENANTS || {};
+function tenantSlug(){
+  const m = /^\/muni\/([^\/?#]+)/.exec(location.pathname);
+  if (m) return decodeURIComponent(m[1]).toLowerCase();
+  return (new URLSearchParams(location.search).get('city') || '').toLowerCase();
+}
+const TENANT = Object.prototype.hasOwnProperty.call(TENANTS, tenantSlug()) ? TENANTS[tenantSlug()] : null;
+const IS_DEMO = !!(TENANT && TENANT.source === 'demo');
+
+const $ = (id) => document.getElementById(id);
+function el(tag, attrs, children){
+  const n = document.createElement(tag);
+  Object.keys(attrs || {}).forEach(k => {
+    if (k === 'class') n.className = attrs[k]; else if (k === 'text') n.textContent = attrs[k]; else n.setAttribute(k, attrs[k]);
+  });
+  (children || []).forEach(c => n.appendChild(c));
+  return n;
+}
+function toast(msg){
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 3200);
+}
+function ago(ts){
+  const m = Math.max(1, Math.round((Date.now() - ts) / MIN));
+  if (m < 60) return m + ' min ago';
+  const h = Math.round(m / 60); if (h < 48) return h + ' h ago';
+  return Math.round(h / 24) + ' d ago';
+}
+function badge(status){ return el('span',{class:'badge ' + status,text:STATUS_LABEL[status]}); }
+const canWrite = () => ROLES[role].write && IS_DEMO;
+
+/* ===================== SHA-256 AUDIT CHAIN (real) ===================== */
+const GENESIS = '0'.repeat(64);
+const hasCrypto = !!(window.crypto && window.crypto.subtle);
+async function sha256Hex(str){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+function entryPayload(e){ return [e.seq, e.ts, e.ticket, e.action, e.actor, e.prevHash].join('|'); }
+async function appendEntry(ticket, action, actor, ts){
+  const prev = log.length ? log[log.length-1].hash : GENESIS;
+  const e = {seq:log.length + 1, ts:ts || Date.now(), ticket, action, actor, prevHash:prev, hash:''};
+  e.hash = hasCrypto ? await sha256Hex(entryPayload(e)) : '(unavailable)';
+  log.push(e);
+  return e;
+}
+async function seedLog(){
+  const events = [];
+  reports.forEach(r => {
+    events.push({ts:r.createdAt, ticket:r.id, action:'REPORT_RECEIVED', actor:'system'});
+    if (r.status !== 'new') events.push({ts:r.createdAt + 25*MIN, ticket:r.id, action:'STATUS new → dispatched', actor:'Dispatcher'});
+    if (r.status === 'resolved') events.push({ts:r.createdAt + 6*60*MIN, ticket:r.id, action:'STATUS dispatched → resolved', actor:'Supervisor'});
+  });
+  events.sort((a,b) => a.ts - b.ts);
+  for (const ev of events) await appendEntry(ev.ticket, ev.action, ev.actor, ev.ts);
+}
+async function verifyChain(){
+  let prev = GENESIS;
+  for (const e of log){
+    if (e.prevHash !== prev) return {ok:false, at:e.seq};
+    if (await sha256Hex(entryPayload(e)) !== e.hash) return {ok:false, at:e.seq};
+    prev = e.hash;
+  }
+  return {ok:true, count:log.length};
+}
+function chainHead(){ return log.length ? log[log.length-1].hash : GENESIS; }
+
+/* ===================== RENDER ===================== */
+function counts(){
+  const c = {new:0,dispatched:0,resolved:0};
+  reports.forEach(r => c[r.status]++);
+  return c;
+}
+function renderCounts(){
+  const c = counts();
+  $('tbNew').textContent = $('lgNew').textContent = $('navNewCount').textContent = c.new;
+  $('tbDisp').textContent = $('lgDisp').textContent = c.dispatched;
+  $('tbRes').textContent = $('lgRes').textContent = c.resolved;
+}
+function pinIcon(r, selected){
+  return L.divIcon({
+    className:'pin-wrap', iconSize:[22,22], iconAnchor:[11,11],
+    html:'<div class="pin ' + r.status + (selected ? ' selected' : '') + '" aria-hidden="true">' + STATUS_GLYPH[r.status] + '</div>'
+  });
+}
+function refreshMarker(r){
+  if (markers[r.id]) markers[r.id].setIcon(pinIcon(r, r.id === selectedId));
+}
+function renderTriage(){
+  const body = $('triageBody'); body.textContent = '';
+  const order = {new:0,dispatched:1,resolved:2};
+  reports.filter(r => triageFilter === 'all' || r.status === triageFilter)
+    .sort((a,b) => order[a.status] - order[b.status] || b.createdAt - a.createdAt)
+    .forEach(r => {
+      const open = el('button',{type:'button',class:'link-btn',text:r.lat == null ? 'No GPS' : 'View on map'});
+      if (r.lat == null) open.disabled = true;
+      else open.addEventListener('click', () => { showView('map'); selectReport(r.id, true); });
+      body.appendChild(el('tr',{},[
+        el('td',{class:'mono',text:r.id}), el('td',{text:r.category}),
+        el('td',{},[badge(r.status)]), el('td',{text:ago(r.createdAt)}), el('td',{},[open])
+      ]));
+    });
+  if (!body.children.length){
+    const td = el('td',{colspan:'5',text:'No work orders match this filter.'}); td.style.color = 'var(--muted)';
+    body.appendChild(el('tr',{},[td]));
+  }
+}
+function short(h){ return h.length > 20 ? h.slice(0,12) + '…' + h.slice(-6) : h; }
+function renderAudit(){
+  const body = $('auditBody'); body.textContent = '';
+  log.slice().reverse().forEach(e => {
+    const h = el('td',{class:'hash',text:short(e.hash),title:e.hash});
+    body.appendChild(el('tr',{},[
+      el('td',{class:'mono',text:String(e.seq)}),
+      el('td',{class:'mono',text:new Date(e.ts).toISOString().replace('T',' ').slice(0,19)}),
+      el('td',{class:'mono',text:e.ticket}), el('td',{text:e.action}), el('td',{text:e.actor}), h
+    ]));
+  });
+  $('chainHead').textContent = '';
+  $('chainHead').appendChild(document.createTextNode('Chain head: '));
+  $('chainHead').appendChild(el('b',{text:hasCrypto ? short(chainHead()) : 'unavailable (needs HTTPS)',title:chainHead()}));
+  $('btnExport').disabled = !hasCrypto || !log.length;
+}
+function renderToggles(){
+  const admin = ROLES[role].admin;
+  const build = (listId, items, onChange) => {
+    const root = $(listId); root.textContent = '';
+    items.forEach(it => {
+      const input = el('input',{type:'checkbox','aria-label':it.name});
+      input.checked = it.on; input.disabled = !admin || !IS_DEMO;
+      input.addEventListener('change', () => { it.on = input.checked; onChange(it); });
+      root.appendChild(el('div',{class:'row'},[
+        el('div',{class:'row-main'},[el('div',{class:'row-title',text:it.name}),el('div',{class:'row-sub',text:it.sub})]),
+        el('label',{class:'switch'},[input, el('span',{})])
+      ]));
+    });
+  };
+  build('zoneList', ZONES, syncZone);
+  build('crewList', CREWS, () => {});
+}
+
+/* ===================== DRAWER ===================== */
+function renderDrawer(){
+  const r = reports.find(x => x.id === selectedId);
+  const dw = $('drawer');
+  if (!r){ dw.classList.remove('open'); dw.setAttribute('aria-hidden','true'); return; }
+  $('dwTicket').textContent = r.id;
+  $('dwCategory').textContent = r.category;
+  const b = $('dwStatusBadge'); b.className = 'badge ' + r.status; b.textContent = STATUS_LABEL[r.status];
+  $('dwGps').textContent = r.lat == null ? 'No GPS on this report' : (IS_DEMO ? r.lat.toFixed(5) + ', ' + r.lng.toFixed(5) : r.lat.toFixed(3) + ', ' + r.lng.toFixed(3) + ' (rounded ~110 m)');
+  $('dwTime').textContent = new Date(r.createdAt).toLocaleString() + ' · ' + ago(r.createdAt);
+  $('dwSeg').querySelectorAll('button').forEach(btn => {
+    btn.setAttribute('aria-pressed', String(btn.dataset.status === r.status));
+    btn.disabled = !canWrite();
+  });
+  $('dwHint').textContent = !IS_DEMO
+    ? 'Read-only: this hub reads the live ledger, and status changes need authenticated access that is not available yet.'
+    : canWrite()
+      ? 'Every status change is appended to the Audit Vault as a SHA-256-chained entry.'
+      : 'Read-only role: switch role to change status.';
+  dw.classList.add('open'); dw.setAttribute('aria-hidden','false');
+}
+function selectReport(id, pan){
+  const prev = selectedId; selectedId = id;
+  const p = reports.find(x => x.id === prev); if (p) refreshMarker(p);
+  const r = reports.find(x => x.id === id); if (r) refreshMarker(r);
+  renderDrawer();
+  if (pan && map && r) map.setView([r.lat, r.lng], Math.max(map.getZoom(), 14), {animate:true});
+}
+function closeDrawer(){
+  const prev = reports.find(x => x.id === selectedId); selectedId = null;
+  if (prev) refreshMarker(prev);
+  renderDrawer();
+}
+async function changeStatus(next){
+  const r = reports.find(x => x.id === selectedId);
+  if (!r || r.status === next || !canWrite()) return;
+  const from = r.status; r.status = next;
+  refreshMarker(r); renderCounts(); renderDrawer(); renderTriage();
+  await appendEntry(r.id, 'STATUS ' + from + ' → ' + next, ROLES[role].label);
+  renderAudit();
+  toast(r.id + ' marked ' + STATUS_LABEL[next] + ' · logged to Audit Vault');
+}
+
+/* ===================== MAP (Leaflet is injected on first Municipal entry) ===================== */
+function loadLeaflet(){
+  return new Promise(resolve => {
+    if (window.L) return resolve(true);
+    const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = LEAFLET_CSS; document.head.appendChild(css);
+    const s = document.createElement('script'); s.src = LEAFLET_JS;
+    s.onload = () => resolve(true); s.onerror = () => resolve(false);
+    document.head.appendChild(s);
+  });
+}
+function syncZone(z){
+  if (!map) return;
+  if (zoneLayers[z.id]){ map.removeLayer(zoneLayers[z.id]); delete zoneLayers[z.id]; }
+  if (z.on){
+    zoneLayers[z.id] = L.circle([z.lat, z.lng], {radius:z.r,color:'#00FF87',weight:1.5,dashArray:'6 6',fillColor:'#00FF87',fillOpacity:.05,interactive:false}).addTo(map);
+  }
+}
+function initMap(){
+  if (typeof L === 'undefined'){ $('mapMsg').style.display = 'grid'; return; }
+  map = L.map('map',{zoomControl:true,attributionControl:true}).setView(TENANT.center, TENANT.zoom);
+  L.tileLayer(TILE_URL,{subdomains:'abcd',maxZoom:20,attribution:TILE_ATTR}).addTo(map);
+  reports.forEach(r => {
+    if (r.lat == null || r.lng == null) return;
+    const m = L.marker([r.lat, r.lng],{icon:pinIcon(r,false),keyboard:true,title:r.id + ' · ' + r.category + ' · ' + STATUS_LABEL[r.status],riseOnHover:true}).addTo(map);
+    m.on('click', () => selectReport(r.id, false));
+    markers[r.id] = m;
+  });
+  ZONES.forEach(syncZone);
+  map.on('click', closeDrawer);
+}
+function agoToMs(s){
+  const m = /(\d+)\s*(m|h|d)/i.exec(String(s || ''));
+  if (!m) return 0;
+  return Number(m[1]) * ({m:MIN,h:60*MIN,d:1440*MIN}[m[2].toLowerCase()]);
+}
+const STAGE_TO_STATUS = {submitted:'new',dispatched:'dispatched',resolved:'resolved'};
+// Public ledger coordinates are shown rounded to 3 decimals (~110 m): the
+// store keeps full-precision device GPS, which a no-auth page must not echo.
+const round3 = (n) => typeof n === 'number' ? Math.round(n * 1000) / 1000 : null;
+async function loadLedgerReports(){
+  const res = await fetch('/api/coverage/tickets',{cache:'no-store',headers:{accept:'application/json'}});
+  if (!res.ok) throw new Error('ledger API ' + res.status);
+  const data = await res.json();
+  const now = Date.now();
+  return (data.tickets || []).filter(t => t.city === TENANT.cityKey).map(t => ({
+    id:t.reportId, category:t.category || 'Report',
+    lat:round3(t.lat), lng:round3(t.lng),
+    status:STAGE_TO_STATUS[t.stage] || 'new', createdAt:now - agoToMs(t.submittedAgo)
+  }));
+}
+function showBanner(msg){ const b = $('emptyBanner'); if (msg){ b.textContent = msg; b.style.display = 'block'; } else b.style.display = 'none'; }
+function showMissingTenant(){
+  document.title = 'City hub not found — Citizen UX Nexus';
+  $('spoke-municipal').hidden = true;
+  $('tenantMissing').hidden = false;
+  const list = $('tenantLinks');
+  Object.keys(TENANTS).forEach(k => {
+    const a = el('a',{href:'/muni/' + k,text:TENANTS[k].label}); const li = el('li'); li.appendChild(a); list.appendChild(li);
+  });
+  ['muniBadge','chipDemo','piiBadge','roleWrap','profileBtn'].forEach(id => { $(id).hidden = true; });
+}
+async function boot(){
+  if (!TENANT){ showMissingTenant(); return; }
+  MUNICIPALITY = TENANT.name;
+  document.title = MUNICIPALITY + ' — Citizen UX Nexus';
+  $('muniText').textContent = MUNICIPALITY;
+  ZONES = (TENANT.zones || []).map(z => Object.assign({}, z));
+  CREWS = (TENANT.crews || []).map(c => Object.assign({}, c));
+  const chip = $('chipDemo');
+  chip.textContent = IS_DEMO ? 'Demo data' : 'Live ledger · read-only';
+  chip.title = IS_DEMO ? 'All reports, crews and zones on this screen are hard-coded mock data' : 'Reports come from the public ledger API; editing is disabled until authenticated access exists';
+  $('triageSub').textContent = IS_DEMO ? 'Work orders, urgent first. Demo data.' : 'Work orders from the live ledger, urgent first. Read-only.';
+  $('photoTag').textContent = IS_DEMO ? 'MOCK PHOTO' : 'NO PHOTO';
+  $('auditSub').textContent = IS_DEMO
+    ? "Append-only log. Each entry's SHA-256 covers the previous entry's hash, so any edit breaks every hash after it."
+    : "SHA-256 chain computed in your browser from the current ledger state (REPORT_RECEIVED plus status steps). It shows the list below is internally consistent; it is not the server's own log.";
+  if (IS_DEMO){
+    const now = Date.now();
+    reports = TENANT.seed.map(([id,cat,lat,lng,status,agoMin]) => ({id,category:CATEGORIES[cat],lat,lng,status,createdAt:now - agoMin*MIN}));
+  } else {
+    try {
+      reports = await loadLedgerReports();
+      if (!reports.length) showBanner('No reports in the ledger for this city yet. Reports appear here as residents file them.');
+    } catch (err) { reports = []; showBanner('Could not load the ledger right now. Try again shortly.'); }
+  }
+  ready = true;
+  renderCounts(); applyRole();
+  seedLog().then(renderAudit);
+  loadLeaflet().then(initMap);
+}
+
+/* ===================== MUNICIPAL VIEWS / ROLE ===================== */
+function showView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.dataset.view === name) n.setAttribute('aria-current','page'); else n.removeAttribute('aria-current');
+  });
+  if (name === 'map' && map) setTimeout(() => map.invalidateSize(), 50);
+  if (name === 'triage') renderTriage();
+}
+function applyRole(){
+  $('profileRole').textContent = ROLES[role].label;
+  renderDrawer(); renderToggles();
+  $('settingsNote').textContent = !IS_DEMO
+    ? 'Read-only on live ledger hubs: zones and crews are shown as configured and cannot be edited until authenticated access exists.'
+    : ROLES[role].admin
+      ? 'Layout stub: toggles update the map but are not persisted.'
+      : 'Layout stub: toggles update the map but are not persisted. Editing requires the Administrator role.';
+  $('zoneEmpty').hidden = ZONES.length > 0; $('crewEmpty').hidden = CREWS.length > 0;
+}
+
+/* ===================== EXPORT ===================== */
+async function exportPacket(){
+  if (!hasCrypto) return;
+  const verified = await verifyChain();
+  const body = {
+    packet_version:1, demo:IS_DEMO, source:TENANT.source, tenant:TENANT.slug,
+    municipality:MUNICIPALITY, generated_at:new Date().toISOString(),
+    algorithm:'SHA-256', chain_verified:verified.ok, chain_head:chainHead(), entry_count:log.length,
+    pii_fields_present:false, gps_precision:IS_DEMO ? 'full (mock)' : 'rounded to 3 decimals',
+    reports:reports.map(r => ({id:r.id,category:r.category,status:r.status,lat:r.lat,lng:r.lng,reported_at:new Date(r.createdAt).toISOString()})),
+    entries:log.map(e => ({seq:e.seq,ts:new Date(e.ts).toISOString(),ticket:e.ticket,action:e.action,actor:e.actor,prev_hash:e.prevHash,hash:e.hash})),
+  };
+  const packetHash = await sha256Hex(JSON.stringify(body));
+  const out = Object.assign({}, body, {packet_sha256:packetHash});
+  const blob = new Blob([JSON.stringify(out,null,2)],{type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = el('a',{href:url,download:'nexus-audit-packet-' + TENANT.slug + '-' + Date.now() + '.json'});
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast('Audit packet exported · SHA-256 ' + packetHash.slice(0,12) + '…');
+}
+
+/* ===================== WIRING ===================== */
+document.querySelectorAll('.nav-item').forEach(n => n.addEventListener('click', () => showView(n.dataset.view)));
+$('dwClose').addEventListener('click', closeDrawer);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && selectedId) closeDrawer(); });
+$('dwSeg').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-status]'); if (b) changeStatus(b.dataset.status);
+});
+$('triageFilters').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-filter]'); if (!b) return;
+  triageFilter = b.dataset.filter;
+  $('triageFilters').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  renderTriage();
+});
+$('roleSelect').addEventListener('change', (e) => { role = e.target.value; applyRole(); toast('Role: ' + ROLES[role].label); });
+$('profileBtn').addEventListener('click', () => toast('Profile menu is a layout stub — no account system yet.'));
+$('btnExport').addEventListener('click', exportPacket);
+$('btnVerify').addEventListener('click', async () => {
+  const out = $('verifyResult'); out.className = 'hash'; out.textContent = 'Verifying…';
+  const v = hasCrypto ? await verifyChain() : {ok:false,at:0};
+  if (v.ok){ out.className = 'hash verify-ok'; out.textContent = '✓ Chain intact · ' + v.count + ' entries'; }
+  else { out.className = 'hash verify-bad'; out.textContent = hasCrypto ? '✗ Chain broken at entry #' + v.at : 'SHA-256 unavailable on this origin (needs HTTPS)'; }
+});
+
+
+boot();
+})();
+</script>
+</body>
+</html>
