@@ -30,6 +30,10 @@
       "destination": "/rep.html"
     },
     {
+      "source": "/nexus",
+      "destination": "/nexus.html"
+    },
+    {
       "source": "/api/pass",
       "destination": "/api/passbook?mode=site"
     },
