@@ -3,24 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>CITIXEN Nexus — Municipal Dispatcher Dashboard</title>
+<title>CITIXEN Nexus — Gateway</title>
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#0A0D14">
 <meta name="referrer" content="no-referrer">
 <link rel="icon" type="image/x-icon" href="/favicon.ico?v=5">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<!-- CITIXEN Nexus — Municipal Dispatcher Dashboard, UI LAYOUT PASS.
-     Everything on this page runs on clearly-labeled DEMO data (see the
-     "Demo data" chip in the header): the 12 hazard reports, crews and
-     geo-fence zones below are hard-coded mocks, not read from /api. What is
-     real: the SHA-256 hash chain in the Audit Vault is computed in-browser
-     with crypto.subtle over those records (status changes append real
-     chained entries, "Verify chain" really recomputes it), and "Export
-     Cryptographic Audit Packet" downloads a real JSON file with its own
-     SHA-256. Wire loadReports() to the live API when this graduates from
-     layout to product. Separate from dispatch.html (the live command
-     center) on purpose; neither file touches the other. -->
+<!-- CITIXEN Nexus — GRAND CENTRAL GATEWAY.
+     /nexus now lands on a 2x2 gateway (MUNICIPAL / CIVILIAN / SALES /
+     CORPORATE) and nothing else: Leaflet is NOT in this <head> any more — it
+     is injected the first time the Municipal door is opened (loadLeaflet()),
+     so the landing view requests no map library, no tiles and builds no
+     dispatch data. Routing is hash-based (#municipal, #sales, #corporate;
+     no hash = gateway) so the browser back button and deep links work.
+       MUNICIPAL -> in-page spoke: the dispatcher GIS/command UI from c26ae56.
+       CIVILIAN  -> /app (the real zero-account intake form + community feed).
+       SALES, CORPORATE -> placeholder spokes. Their modules do not exist yet
+                           in this repo, so those pages say so instead of
+                           showing invented pipeline/commission/telemetry.
+     Municipal data (reports, crews, zones) is still hard-coded DEMO data;
+     the SHA-256 audit chain and the exported packet are real (crypto.subtle).
+     Map tiles: CARTO Dark Matter. The old OpenStreetMap tiles returned
+     "Access blocked" because this page sends <meta name="referrer"
+     content="no-referrer">, and OSM's tile policy rejects requests that
+     carry no Referer; CARTO's basemap doesn't require one. -->
 <style>
 :root{
   --bg:#0A0D14; --surface:#111625; --surface-2:#161c2e; --line:rgba(255,255,255,.08); --line-2:rgba(255,255,255,.14);
@@ -33,16 +38,29 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:14px}
 button,select{font:inherit;color:inherit}
 button{cursor:pointer}
+a{color:inherit}
 :focus-visible{outline:2px solid var(--green);outline-offset:2px}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
-.app{display:grid;grid-template-columns:var(--side-w) 1fr;grid-template-rows:var(--header-h) 1fr;height:100vh;height:100dvh}
+.app{display:grid;grid-template-rows:auto 1fr;height:100vh;height:100dvh}
+.stage{position:relative;min-height:0}
+.spoke{position:absolute;inset:0;display:none}
+.spoke:focus{outline:none}
+body[data-spoke="gateway"] #view-gateway{display:block}
+body[data-spoke="municipal"] #spoke-municipal{display:grid}
+body[data-spoke="sales"] #spoke-sales{display:block}
+body[data-spoke="corporate"] #spoke-corporate{display:block}
 
 /* ---------- Header ---------- */
-.topbar{grid-column:1 / -1;display:flex;align-items:center;gap:14px;padding:0 16px;background:var(--surface);
+.topbar{display:flex;align-items:center;gap:14px;padding:0 16px;min-height:var(--header-h);background:var(--surface);
   border-bottom:1px solid var(--line);min-width:0}
-.logo{font-weight:900;font-size:1.05rem;letter-spacing:.01em;white-space:nowrap}
+.logo{margin:0;font-weight:900;font-size:1.05rem;letter-spacing:.01em;white-space:nowrap}
+.logo a{text-decoration:none}
 .logo .nx{color:var(--green)}
+.btn-back{display:inline-flex;align-items:center;gap:8px;white-space:nowrap;text-decoration:none;font-weight:800;font-size:.8rem;
+  background:var(--green);color:var(--bg);border-radius:10px;padding:8px 14px}
+.btn-back:hover{box-shadow:0 0 16px rgba(0,255,135,.4)}
+body[data-spoke="gateway"] .btn-back{display:none}
 .muni-badge{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border:1px solid var(--line-2);border-radius:9999px;
   background:var(--surface-2);font-size:.78rem;font-weight:600;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .muni-badge svg{flex-shrink:0;color:var(--green)}
@@ -62,8 +80,53 @@ button{cursor:pointer}
 .profile-text{display:flex;flex-direction:column;text-align:left;line-height:1.2}
 .profile-name{font-size:.78rem;font-weight:700}
 .profile-role{font-size:.66rem;color:var(--muted)}
+/* Municipal-only header controls stay out of the gateway and the other spokes. */
+body:not([data-spoke="municipal"]) .only-municipal{display:none}
 
-/* ---------- Sidebar ---------- */
+/* ---------- Gateway (2x2) ---------- */
+#view-gateway{overflow-y:auto;padding:24px;
+  background:radial-gradient(1100px 520px at 50% -8%,rgba(0,255,135,.08),transparent 62%),var(--bg)}
+.gate-grid{max-width:1240px;min-height:100%;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1.25fr 1fr;gap:20px}
+.door{position:relative;display:flex;flex-direction:column;gap:14px;min-width:0;text-decoration:none;color:inherit;
+  background:var(--surface);border:1px solid var(--line-2);border-radius:20px;padding:26px 30px;
+  transition:border-color .18s,box-shadow .18s,transform .18s}
+.door:hover,.door:focus-visible{border-color:rgba(0,255,135,.65);box-shadow:0 0 28px rgba(0,255,135,.14);transform:translateY(-2px)}
+@media (prefers-reduced-motion:reduce){.door{transition:none}.door:hover,.door:focus-visible{transform:none}}
+.door--customer{padding:34px 36px;border-color:rgba(0,255,135,.32);
+  background:linear-gradient(160deg,rgba(0,255,135,.07),transparent 55%),var(--surface)}
+.door-tag{position:absolute;top:16px;right:18px;font-family:var(--mono);font-size:.62rem;font-weight:800;letter-spacing:.08em;
+  text-transform:uppercase;padding:3px 8px;border-radius:6px;border:1px solid var(--line-2);color:var(--muted)}
+.door-tag.live{color:var(--green);border-color:rgba(0,255,135,.4);background:var(--green-dim)}
+.door-tag.demo{color:var(--yellow);border-color:rgba(250,204,21,.4);background:rgba(250,204,21,.08)}
+.door-sub{margin:0;padding-right:96px;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green)}
+.door:not(.door--customer) .door-sub{color:var(--muted)}
+.door-title{margin:0;font-weight:900;text-transform:uppercase;line-height:1;letter-spacing:-.02em;overflow-wrap:anywhere}
+.door-title--hero{font-size:clamp(2.25rem,5.6vw,4.75rem)}
+.door-title--std{font-size:clamp(1.5rem,2.4vw,2rem);letter-spacing:0}
+.door-points{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;font-size:.92rem;line-height:1.4;color:#cbd5e1}
+.door:not(.door--customer) .door-points{font-size:.84rem;color:var(--muted)}
+.door-points li{position:relative;padding-left:20px}
+.door-points li::before{content:'';position:absolute;left:2px;top:.55em;width:7px;height:7px;border-radius:50%;background:var(--green);opacity:.85}
+.door:not(.door--customer) .door-points li::before{background:var(--muted);opacity:.6}
+.door-cta{margin-top:auto;display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:.84rem;color:var(--green)}
+.door:not(.door--customer) .door-cta{color:var(--text)}
+
+/* ---------- Placeholder spokes (Sales / Corporate) ---------- */
+.spoke-scroll{overflow-y:auto;padding:28px 24px}
+.spoke-inner{max-width:980px;margin:0 auto}
+.spoke-inner h2{margin:0;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;text-transform:uppercase;letter-spacing:-.01em}
+.spoke-inner .lead{margin:6px 0 18px;color:var(--muted);font-size:.9rem}
+.notice{border:1px solid rgba(250,204,21,.4);background:rgba(250,204,21,.07);color:#fde68a;border-radius:12px;padding:12px 16px;font-size:.82rem;line-height:1.5;margin-bottom:18px}
+.mod-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.mod{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}
+.mod h3{margin:0 0 6px;font-size:.95rem}
+.mod p{margin:0 0 12px;color:var(--muted);font-size:.78rem;line-height:1.45}
+.related{margin-top:22px}
+.related h3{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 8px}
+.related a{display:inline-block;margin:0 14px 8px 0;color:var(--green);font-weight:700;font-size:.82rem}
+
+/* ---------- Municipal workspace ---------- */
+#spoke-municipal{grid-template-columns:var(--side-w) 1fr}
 .sidebar{background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:14px 10px;gap:4px;min-height:0;overflow-y:auto}
 .nav-item{display:flex;align-items:center;gap:11px;width:100%;text-align:left;background:none;border:1px solid transparent;
   border-radius:10px;padding:10px 12px;color:var(--muted);font-weight:600;font-size:.84rem}
@@ -79,7 +142,6 @@ button{cursor:pointer}
 .btn-export:hover:not(:disabled){box-shadow:0 0 16px rgba(0,255,135,.4)}
 .btn-export:disabled{opacity:.4;cursor:not-allowed}
 
-/* ---------- Main ---------- */
 .main{position:relative;min-width:0;min-height:0;overflow:hidden}
 .view{position:absolute;inset:0;display:none}
 .view.active{display:block}
@@ -88,13 +150,11 @@ button{cursor:pointer}
 .view-title{font-size:1.15rem;font-weight:800;margin:0}
 .view-sub{color:var(--muted);font-size:.78rem;margin:3px 0 0}
 
-/* Command Map */
 #mapWrap{position:absolute;inset:0;background:#0d1220;
   background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
   background-size:40px 40px}
 #map{position:absolute;inset:0;background:transparent}
 .leaflet-container{background:transparent;font-family:inherit}
-.leaflet-tile-pane{filter:grayscale(100%) invert(92%) brightness(88%) contrast(105%)}
 .map-msg{position:absolute;inset:0;display:none;place-items:center;text-align:center;color:var(--muted);padding:24px;z-index:400}
 .map-legend{position:absolute;left:14px;bottom:14px;z-index:500;background:rgba(17,22,37,.92);border:1px solid var(--line-2);
   border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;gap:7px;font-size:.74rem;backdrop-filter:blur(6px)}
@@ -110,7 +170,6 @@ button{cursor:pointer}
 .tb-stat{background:rgba(17,22,37,.92);border:1px solid var(--line-2);border-radius:10px;padding:7px 12px;font-size:.72rem;color:var(--muted);backdrop-filter:blur(6px)}
 .tb-stat b{color:var(--text);font-family:var(--mono);font-size:.8rem;margin-right:4px}
 
-/* Drawer */
 .drawer{position:absolute;top:0;right:0;bottom:0;width:var(--drawer-w);max-width:100%;z-index:600;background:var(--surface);
   border-left:1px solid var(--line-2);box-shadow:-12px 0 32px rgba(0,0,0,.45);display:flex;flex-direction:column;
   transform:translateX(102%);transition:transform .22s ease;visibility:hidden}
@@ -136,6 +195,7 @@ button{cursor:pointer}
 .badge.new{color:#fca5a5;border-color:rgba(239,68,68,.5);background:rgba(239,68,68,.12)}
 .badge.dispatched{color:var(--yellow);border-color:rgba(250,204,21,.5);background:rgba(250,204,21,.1)}
 .badge.resolved{color:var(--green);border-color:rgba(0,255,135,.45);background:var(--green-dim)}
+.badge.planned{color:var(--muted);border-color:var(--line-2);background:var(--surface-2)}
 .ctrl-label{font-size:.64rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:0 0 8px}
 .seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .seg button{background:var(--surface-2);border:1px solid var(--line-2);border-radius:10px;padding:9px 4px;font-size:.74rem;font-weight:700;color:var(--muted)}
@@ -147,7 +207,6 @@ button{cursor:pointer}
 .seg button:disabled{opacity:.45;cursor:not-allowed}
 .hint{font-size:.7rem;color:var(--muted);line-height:1.45;margin:8px 0 0}
 
-/* Tables / cards */
 .chips{display:flex;gap:6px;flex-wrap:wrap}
 .chip{background:var(--surface-2);border:1px solid var(--line-2);border-radius:9999px;padding:5px 12px;font-size:.74rem;font-weight:700;color:var(--muted)}
 .chip[aria-pressed="true"]{background:var(--green-dim);border-color:rgba(0,255,135,.4);color:var(--green)}
@@ -188,47 +247,52 @@ tr:hover td{background:rgba(255,255,255,.02)}
 @media (max-width:900px){
   :root{--side-w:64px}
   .nav-item span.nav-label,.side-foot .chain-head,.btn-export .btn-label{display:none}
-  .nav-item{justify-content:center;padding:11px 0}
+  .nav-item{justify-content:center;padding:11px 0;position:relative}
   .nav-count{position:absolute;margin:0;transform:translate(12px,-12px)}
-  .nav-item{position:relative}
-  .pii-badge .pii-text-long{display:none}
   .drawer{width:100%}
   .muni-badge{max-width:44vw}
 }
-/* Narrow screens: the header wraps into rows instead of overflowing (and
-   instead of dropping the municipality badge or the Zero-PII status):
-   [logo ......... profile] / [municipality badge] / [Zero-PII ..... role]. */
+@media (max-width:820px){
+  .gate-grid{grid-template-columns:1fr;grid-template-rows:none;min-height:0}
+  .door,.door--customer{padding:24px 22px}
+}
+/* Narrow screens: the header wraps into rows instead of overflowing:
+   [logo ........ back] / [municipality badge] / [Zero-PII ..... role, profile]. */
 @media (max-width:760px){
-  .app{grid-template-rows:auto 1fr}
   .topbar{flex-wrap:wrap;gap:8px 10px;padding:8px 12px}
   .topbar .spacer{display:none}
   .logo{order:1;font-size:.95rem}
-  .profile{order:2;margin-left:auto}
+  .btn-back{order:2;margin-left:auto}
   .muni-badge{order:3;flex:1 1 100%;max-width:100%}
   .pii-badge{order:4}
   .role-switch{order:5;margin-left:auto}
+  .profile{order:6}
   .role-switch select{max-width:150px}
 }
-@media (max-width:560px){.view-scroll{padding:16px}}
+@media (max-width:560px){.view-scroll{padding:16px}#view-gateway{padding:14px}}
 </style>
 </head>
-<body>
+<body data-spoke="gateway">
 <div class="app">
 
   <!-- ===== HEADER BAR ===== -->
   <header class="topbar">
-    <div class="logo" aria-label="CITIXEN Nexus">CITIXEN <span class="nx">Nexus</span></div>
-    <div class="muni-badge" id="muniBadge" title="Active municipality and department">
+    <h1 class="logo"><a href="#gateway" aria-label="CITIXEN Nexus — back to the gateway">CITIXEN <span class="nx">Nexus</span></a></h1>
+    <a class="btn-back" id="btnBack" href="#gateway">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      Back to Nexus Gateway
+    </a>
+    <div class="muni-badge only-municipal" id="muniBadge" title="Active municipality and department">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
       <span id="muniText">City of Austin — Public Works</span>
     </div>
     <div class="spacer"></div>
-    <span class="chip-demo" title="All reports, crews and zones on this screen are hard-coded mock data">Demo data</span>
-    <div class="pii-badge" id="piiBadge" role="status" title="This view contains no reporter-identifying fields">
+    <span class="chip-demo only-municipal" title="All reports, crews and zones on this screen are hard-coded mock data">Demo data</span>
+    <div class="pii-badge only-municipal" id="piiBadge" role="status" title="This view contains no reporter-identifying fields">
       <span class="pii-dot" aria-hidden="true"></span>
       <span>Zero-PII Active</span>
     </div>
-    <div class="role-switch">
+    <div class="role-switch only-municipal">
       <label for="roleSelect">Role</label>
       <select id="roleSelect" aria-label="Switch role">
         <option value="dispatcher">Dispatcher</option>
@@ -237,150 +301,244 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <option value="admin">Administrator</option>
       </select>
     </div>
-    <button type="button" class="profile" id="profileBtn" aria-label="User profile">
+    <button type="button" class="profile only-municipal" id="profileBtn" aria-label="User profile">
       <span class="avatar" aria-hidden="true">OP</span>
       <span class="profile-text"><span class="profile-name">Operator 04</span><span class="profile-role" id="profileRole">Dispatcher</span></span>
     </button>
   </header>
 
-  <!-- ===== LEFT SIDEBAR ===== -->
-  <nav class="sidebar" aria-label="Primary">
-    <button type="button" class="nav-item" data-view="map" aria-current="page">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z"/><path d="M8 2v16M16 6v16"/></svg>
-      <span class="nav-label">Command Map (GIS View)</span>
-    </button>
-    <button type="button" class="nav-item" data-view="triage">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-      <span class="nav-label">Triage Queue (Work Orders)</span>
-      <span class="nav-count" id="navNewCount" aria-label="New reports">0</span>
-    </button>
-    <button type="button" class="nav-item" data-view="audit">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      <span class="nav-label">Audit Vault (SHA-256 Logs)</span>
-    </button>
-    <button type="button" class="nav-item" data-view="settings">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
-      <span class="nav-label">Geo-Fence &amp; Team Settings</span>
-    </button>
+  <div class="stage">
 
-    <div class="side-foot">
-      <div class="chain-head" id="chainHead">Chain head: <b>computing…</b></div>
-      <button type="button" class="btn-export" id="btnExport" disabled>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
-        <span class="btn-label">Export Cryptographic Audit Packet</span>
-      </button>
-    </div>
-  </nav>
+    <!-- ================= GATEWAY: 2x2 DOORS ================= -->
+    <section class="spoke" id="view-gateway" tabindex="-1" aria-label="Nexus gateway">
+      <div class="gate-grid">
 
-  <!-- ===== MAIN ===== -->
-  <main class="main" id="main">
+        <a class="door door--customer" id="doorMunicipal" href="#municipal">
+          <span class="door-tag demo">Demo</span>
+          <p class="door-sub">Municipal Clients &amp; Public Sector</p>
+          <h2 class="door-title door-title--hero">MUNICIPAL</h2>
+          <ul class="door-points">
+            <li>Constant Dispatcher GIS Map</li>
+            <li>SHA-256 Living Audit Vault</li>
+            <li>$9,500–$24,500 SLA Micro-Purchase Portal</li>
+          </ul>
+          <span class="door-cta">Open the dispatcher command view <span aria-hidden="true">→</span></span>
+        </a>
 
-    <!-- Command Map -->
-    <section class="view active" id="view-map" aria-label="Command Map">
-      <div id="mapWrap">
-        <div id="map"></div>
-        <div class="map-msg" id="mapMsg"><div>The map library couldn't load (offline or blocked).<br>Reports are still reachable from the Triage Queue.</div></div>
-        <div class="map-toolbar" aria-label="Report totals">
-          <div class="tb-stat"><b id="tbNew">0</b>New</div>
-          <div class="tb-stat"><b id="tbDisp">0</b>Dispatched</div>
-          <div class="tb-stat"><b id="tbRes">0</b>Resolved</div>
-        </div>
-        <div class="map-legend" aria-label="Legend">
-          <h2>Hazard status</h2>
-          <div class="lg-row"><span class="pin new" aria-hidden="true">!</span>New<span class="lg-count" id="lgNew">0</span></div>
-          <div class="lg-row"><span class="pin dispatched" aria-hidden="true">›</span>Dispatched<span class="lg-count" id="lgDisp">0</span></div>
-          <div class="lg-row"><span class="pin resolved" aria-hidden="true">✓</span>Resolved<span class="lg-count" id="lgRes">0</span></div>
-        </div>
+        <a class="door door--customer" id="doorCivilian" href="/app">
+          <span class="door-tag live">Live</span>
+          <p class="door-sub">Public Access &amp; Community Transparency</p>
+          <h2 class="door-title door-title--hero">CIVILIAN</h2>
+          <ul class="door-points">
+            <li>Zero-PII Public Hazard Intake Form</li>
+            <li>Real-Time Community Status Feed</li>
+            <li>Resolution Audit Lookup</li>
+          </ul>
+          <span class="door-cta">Open intake &amp; transparency feed <span aria-hidden="true">→</span></span>
+        </a>
+
+        <a class="door" id="doorSales" href="#sales">
+          <span class="door-tag">Coming soon</span>
+          <p class="door-sub">National Field &amp; Sales Representatives</p>
+          <h2 class="door-title door-title--std">SALES</h2>
+          <ul class="door-points">
+            <li>National Deal Pipeline</li>
+            <li>Commission &amp; Override Ledger</li>
+            <li>B2G Training &amp; 15 Sales Entry Points</li>
+          </ul>
+          <span class="door-cta">Enter <span aria-hidden="true">→</span></span>
+        </a>
+
+        <a class="door" id="doorCorporate" href="#corporate">
+          <span class="door-tag">Coming soon</span>
+          <p class="door-sub">Internal Operations &amp; Platform Engineering</p>
+          <h2 class="door-title door-title--std">CORPORATE</h2>
+          <ul class="door-points">
+            <li>Executive Operational Controls</li>
+            <li>System Health &amp; API Telemetry</li>
+            <li>Core Architecture &amp; Patch Logs</li>
+          </ul>
+          <span class="door-cta">Enter <span aria-hidden="true">→</span></span>
+        </a>
+
       </div>
+    </section>
 
-      <aside class="drawer" id="drawer" aria-label="Selected hazard report" aria-hidden="true">
-        <div class="drawer-head">
-          <h2 class="drawer-title" id="dwTicket">—</h2>
-          <button type="button" class="icon-btn" id="dwClose" aria-label="Close report details">✕</button>
+    <!-- ================= SPOKE: MUNICIPAL (dispatcher command view) ================= -->
+    <section class="spoke" id="spoke-municipal" tabindex="-1" aria-label="Municipal dispatcher command view">
+
+      <nav class="sidebar" aria-label="Municipal">
+        <button type="button" class="nav-item" data-view="map" aria-current="page">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z"/><path d="M8 2v16M16 6v16"/></svg>
+          <span class="nav-label">Command Map (GIS View)</span>
+        </button>
+        <button type="button" class="nav-item" data-view="triage">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <span class="nav-label">Triage Queue (Work Orders)</span>
+          <span class="nav-count" id="navNewCount" aria-label="New reports">0</span>
+        </button>
+        <button type="button" class="nav-item" data-view="audit">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span class="nav-label">Audit Vault (SHA-256 Logs)</span>
+        </button>
+        <button type="button" class="nav-item" data-view="settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+          <span class="nav-label">Geo-Fence &amp; Team Settings</span>
+        </button>
+
+        <div class="side-foot">
+          <div class="chain-head" id="chainHead">Chain head: <b>computing…</b></div>
+          <button type="button" class="btn-export" id="btnExport" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+            <span class="btn-label">Export Cryptographic Audit Packet</span>
+          </button>
         </div>
-        <div class="drawer-body">
-          <div class="photo" role="img" aria-label="Placeholder for the report photo">
-            <span class="photo-tag">MOCK PHOTO</span>
-            <div class="photo-inner">
-              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-              Resident photo appears here<br>(EXIF-scrubbed before upload)
+      </nav>
+
+      <main class="main" id="main">
+
+        <!-- Command Map -->
+        <section class="view active" id="view-map" aria-label="Command Map">
+          <div id="mapWrap">
+            <div id="map"></div>
+            <div class="map-msg" id="mapMsg"><div>The map library couldn't load (offline or blocked).<br>Reports are still reachable from the Triage Queue.</div></div>
+            <div class="map-toolbar" aria-label="Report totals">
+              <div class="tb-stat"><b id="tbNew">0</b>New</div>
+              <div class="tb-stat"><b id="tbDisp">0</b>Dispatched</div>
+              <div class="tb-stat"><b id="tbRes">0</b>Resolved</div>
+            </div>
+            <div class="map-legend" aria-label="Legend">
+              <h2>Hazard status</h2>
+              <div class="lg-row"><span class="pin new" aria-hidden="true">!</span>New<span class="lg-count" id="lgNew">0</span></div>
+              <div class="lg-row"><span class="pin dispatched" aria-hidden="true">›</span>Dispatched<span class="lg-count" id="lgDisp">0</span></div>
+              <div class="lg-row"><span class="pin resolved" aria-hidden="true">✓</span>Resolved<span class="lg-count" id="lgRes">0</span></div>
             </div>
           </div>
-          <dl class="fields">
-            <div><dt>Hazard category</dt><dd id="dwCategory">—</dd></div>
-            <div><dt>Status</dt><dd><span class="badge" id="dwStatusBadge">—</span></dd></div>
-            <div class="wide"><dt>GPS coordinates</dt><dd class="mono" id="dwGps">—</dd></div>
-            <div class="wide"><dt>Reported</dt><dd id="dwTime">—</dd></div>
-            <div class="wide"><dt>Reporter</dt><dd>Anonymous — no account, no identifiers</dd></div>
-          </dl>
-          <div>
-            <p class="ctrl-label" id="dwCtrlLabel">Change status</p>
-            <div class="seg" role="group" aria-labelledby="dwCtrlLabel" id="dwSeg">
-              <button type="button" data-status="new" aria-pressed="false">New</button>
-              <button type="button" data-status="dispatched" aria-pressed="false">Dispatched</button>
-              <button type="button" data-status="resolved" aria-pressed="false">Resolved</button>
+
+          <aside class="drawer" id="drawer" aria-label="Selected hazard report" aria-hidden="true">
+            <div class="drawer-head">
+              <h2 class="drawer-title" id="dwTicket">—</h2>
+              <button type="button" class="icon-btn" id="dwClose" aria-label="Close report details">✕</button>
             </div>
-            <p class="hint" id="dwHint">Every status change is appended to the Audit Vault as a SHA-256-chained entry.</p>
+            <div class="drawer-body">
+              <div class="photo" role="img" aria-label="Placeholder for the report photo">
+                <span class="photo-tag">MOCK PHOTO</span>
+                <div class="photo-inner">
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  Resident photo appears here<br>(EXIF-scrubbed before upload)
+                </div>
+              </div>
+              <dl class="fields">
+                <div><dt>Hazard category</dt><dd id="dwCategory">—</dd></div>
+                <div><dt>Status</dt><dd><span class="badge" id="dwStatusBadge">—</span></dd></div>
+                <div class="wide"><dt>GPS coordinates</dt><dd class="mono" id="dwGps">—</dd></div>
+                <div class="wide"><dt>Reported</dt><dd id="dwTime">—</dd></div>
+                <div class="wide"><dt>Reporter</dt><dd>Anonymous — no account, no identifiers</dd></div>
+              </dl>
+              <div>
+                <p class="ctrl-label" id="dwCtrlLabel">Change status</p>
+                <div class="seg" role="group" aria-labelledby="dwCtrlLabel" id="dwSeg">
+                  <button type="button" data-status="new" aria-pressed="false">New</button>
+                  <button type="button" data-status="dispatched" aria-pressed="false">Dispatched</button>
+                  <button type="button" data-status="resolved" aria-pressed="false">Resolved</button>
+                </div>
+                <p class="hint" id="dwHint">Every status change is appended to the Audit Vault as a SHA-256-chained entry.</p>
+              </div>
+            </div>
+          </aside>
+        </section>
+
+        <!-- Triage Queue -->
+        <section class="view view-scroll" id="view-triage" aria-label="Triage Queue">
+          <div class="view-head">
+            <div><h2 class="view-title">Triage Queue</h2><p class="view-sub">Work orders, urgent first. Demo data.</p></div>
+            <div class="chips" role="group" aria-label="Filter by status" id="triageFilters">
+              <button type="button" class="chip" data-filter="all" aria-pressed="true">All</button>
+              <button type="button" class="chip" data-filter="new" aria-pressed="false">New</button>
+              <button type="button" class="chip" data-filter="dispatched" aria-pressed="false">Dispatched</button>
+              <button type="button" class="chip" data-filter="resolved" aria-pressed="false">Resolved</button>
+            </div>
           </div>
-        </div>
-      </aside>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Ticket</th><th>Category</th><th>Status</th><th>Reported</th><th><span class="sr-only">Actions</span></th></tr></thead>
+              <tbody id="triageBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Audit Vault -->
+        <section class="view view-scroll" id="view-audit" aria-label="Audit Vault">
+          <div class="view-head">
+            <div><h2 class="view-title">Audit Vault</h2><p class="view-sub">Append-only log. Each entry's SHA-256 covers the previous entry's hash, so any edit breaks every hash after it.</p></div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <span id="verifyResult" class="hash" role="status"></span>
+              <button type="button" class="btn-ghost" id="btnVerify">Verify chain</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Time (UTC)</th><th>Ticket</th><th>Event</th><th>Actor</th><th>Hash</th></tr></thead>
+              <tbody id="auditBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Geo-Fence & Team Settings -->
+        <section class="view view-scroll" id="view-settings" aria-label="Geo-Fence and Team Settings">
+          <div class="view-head">
+            <div><h2 class="view-title">Geo-Fence &amp; Team Settings</h2><p class="view-sub" id="settingsNote">Layout stub: toggles update the map but are not persisted. Editing requires the Administrator role.</p></div>
+          </div>
+          <div class="cards">
+            <div class="card">
+              <h2>Geo-fence zones</h2>
+              <p class="view-sub">Enabled zones draw a dashed boundary on the Command Map.</p>
+              <div id="zoneList"></div>
+            </div>
+            <div class="card">
+              <h2>Response crews</h2>
+              <p class="view-sub">Crew availability, not individual staff.</p>
+              <div id="crewList"></div>
+            </div>
+          </div>
+        </section>
+      </main>
     </section>
 
-    <!-- Triage Queue -->
-    <section class="view view-scroll" id="view-triage" aria-label="Triage Queue">
-      <div class="view-head">
-        <div><h1 class="view-title">Triage Queue</h1><p class="view-sub">Work orders, urgent first. Demo data.</p></div>
-        <div class="chips" role="group" aria-label="Filter by status" id="triageFilters">
-          <button type="button" class="chip" data-filter="all" aria-pressed="true">All</button>
-          <button type="button" class="chip" data-filter="new" aria-pressed="false">New</button>
-          <button type="button" class="chip" data-filter="dispatched" aria-pressed="false">Dispatched</button>
-          <button type="button" class="chip" data-filter="resolved" aria-pressed="false">Resolved</button>
+    <!-- ================= SPOKE: SALES (placeholder) ================= -->
+    <section class="spoke spoke-scroll" id="spoke-sales" tabindex="-1" aria-label="Sales">
+      <div class="spoke-inner">
+        <h2>Sales</h2>
+        <p class="lead">National Field &amp; Sales Representatives</p>
+        <div class="notice" role="note">This door is a placeholder. None of the modules below are built yet, so this page shows no pipeline, commission or training figures rather than invented ones.</div>
+        <div class="mod-grid">
+          <div class="mod"><h3>National Deal Pipeline</h3><p>Deals by stage and jurisdiction across the national field team.</p><span class="badge planned">Planned</span></div>
+          <div class="mod"><h3>Commission &amp; Override Ledger</h3><p>Commission and override accounting for field representatives.</p><span class="badge planned">Planned</span></div>
+          <div class="mod"><h3>B2G Training &amp; 15 Sales Entry Points</h3><p>Government-sales training and the 15 sales entry points.</p><span class="badge planned">Planned</span></div>
         </div>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Ticket</th><th>Category</th><th>Status</th><th>Reported</th><th><span class="sr-only">Actions</span></th></tr></thead>
-          <tbody id="triageBody"></tbody>
-        </table>
       </div>
     </section>
 
-    <!-- Audit Vault -->
-    <section class="view view-scroll" id="view-audit" aria-label="Audit Vault">
-      <div class="view-head">
-        <div><h1 class="view-title">Audit Vault</h1><p class="view-sub">Append-only log. Each entry's SHA-256 covers the previous entry's hash, so any edit breaks every hash after it.</p></div>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <span id="verifyResult" class="hash" role="status"></span>
-          <button type="button" class="btn-ghost" id="btnVerify">Verify chain</button>
+    <!-- ================= SPOKE: CORPORATE (placeholder) ================= -->
+    <section class="spoke spoke-scroll" id="spoke-corporate" tabindex="-1" aria-label="Corporate">
+      <div class="spoke-inner">
+        <h2>Corporate</h2>
+        <p class="lead">Internal Operations &amp; Platform Engineering</p>
+        <div class="notice" role="note">This door is a placeholder. None of the modules below are built yet, so this page shows no health, telemetry or controls rather than invented ones.</div>
+        <div class="mod-grid">
+          <div class="mod"><h3>Executive Operational Controls</h3><p>Top-level operational controls for leadership.</p><span class="badge planned">Planned</span></div>
+          <div class="mod"><h3>System Health &amp; API Telemetry</h3><p>Uptime and API telemetry for the platform.</p><span class="badge planned">Planned</span></div>
+          <div class="mod"><h3>Core Architecture &amp; Patch Logs</h3><p>Architecture notes and the patch history.</p><span class="badge planned">Planned</span></div>
         </div>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>#</th><th>Time (UTC)</th><th>Ticket</th><th>Event</th><th>Actor</th><th>Hash</th></tr></thead>
-          <tbody id="auditBody"></tbody>
-        </table>
+        <div class="related">
+          <h3>Related pages that already exist</h3>
+          <a href="/operator">Network Operator Control</a>
+          <a href="/operator/feedback">Feedback Ingestion Queue</a>
+        </div>
       </div>
     </section>
 
-    <!-- Geo-Fence & Team Settings -->
-    <section class="view view-scroll" id="view-settings" aria-label="Geo-Fence and Team Settings">
-      <div class="view-head">
-        <div><h1 class="view-title">Geo-Fence &amp; Team Settings</h1><p class="view-sub" id="settingsNote">Layout stub: toggles update the map but are not persisted. Editing requires the Administrator role.</p></div>
-      </div>
-      <div class="cards">
-        <div class="card">
-          <h2>Geo-fence zones</h2>
-          <p class="view-sub">Enabled zones draw a dashed boundary on the Command Map.</p>
-          <div id="zoneList"></div>
-        </div>
-        <div class="card">
-          <h2>Response crews</h2>
-          <p class="view-sub">Crew availability, not individual staff.</p>
-          <div id="crewList"></div>
-        </div>
-      </div>
-    </section>
-  </main>
+  </div>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -388,6 +546,38 @@ tr:hover td{background:rgba(255,255,255,.02)}
 <script>
 (function(){
 'use strict';
+
+/* ===================== ROUTER (hash-based) ===================== */
+const SPOKES = ['gateway','municipal','sales','corporate'];
+const TITLES = {
+  gateway:'CITIXEN Nexus — Gateway', municipal:'CITIXEN Nexus — Municipal',
+  sales:'CITIXEN Nexus — Sales', corporate:'CITIXEN Nexus — Corporate'
+};
+const LEAFLET_CSS = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
+const LEAFLET_JS  = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+// CARTO Dark Matter: already a dark basemap (no CSS invert filter needed) and,
+// unlike OpenStreetMap's own tile servers, doesn't reject Referer-less requests.
+const TILE_URL = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+const TILE_ATTR = '© OpenStreetMap contributors © CARTO';
+
+function currentSpoke(){
+  const h = location.hash.replace(/^#/, '');
+  return SPOKES.indexOf(h) !== -1 ? h : 'gateway';
+}
+let firstRoute = true;
+function route(){
+  const s = currentSpoke();
+  document.body.setAttribute('data-spoke', s);
+  document.title = TITLES[s];
+  if (s === 'municipal') enterMunicipal();
+  const target = document.getElementById(s === 'gateway' ? 'view-gateway' : 'spoke-' + s);
+  if (target){
+    if (target.scrollTo) target.scrollTo(0, 0);
+    if (!firstRoute) target.focus({preventScroll:true});
+  }
+  firstRoute = false;
+}
+window.addEventListener('hashchange', route);
 
 /* ===================== DEMO DATA (hard-coded mocks) ===================== */
 const MUNICIPALITY = 'City of Austin — Public Works';
@@ -421,14 +611,14 @@ const ROLES = {
 const STATUS_LABEL = {new:'New',dispatched:'Dispatched',resolved:'Resolved'};
 const STATUS_GLYPH = {new:'!',dispatched:'›',resolved:'✓'};
 
-/* ===================== STATE ===================== */
-const now = Date.now();
-const reports = SEED.map(([id,cat,lat,lng,status,ago]) => ({id,category:CATEGORIES[cat],lat,lng,status,createdAt:now - ago*MIN}));
+/* ===================== STATE (built on first Municipal entry) ===================== */
+let reports = [];
 let role = 'dispatcher';
 let selectedId = null;
 let triageFilter = 'all';
 let log = [];            // audit entries, oldest first
 let map = null, markers = {}, zoneLayers = {};
+let municipalReady = false;
 
 const $ = (id) => document.getElementById(id);
 function el(tag, attrs, children){
@@ -602,7 +792,16 @@ async function changeStatus(next){
   toast(r.id + ' marked ' + STATUS_LABEL[next] + ' · logged to Audit Vault');
 }
 
-/* ===================== MAP ===================== */
+/* ===================== MAP (Leaflet is injected on first Municipal entry) ===================== */
+function loadLeaflet(){
+  return new Promise(resolve => {
+    if (window.L) return resolve(true);
+    const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = LEAFLET_CSS; document.head.appendChild(css);
+    const s = document.createElement('script'); s.src = LEAFLET_JS;
+    s.onload = () => resolve(true); s.onerror = () => resolve(false);
+    document.head.appendChild(s);
+  });
+}
 function syncZone(z){
   if (!map) return;
   if (zoneLayers[z.id]){ map.removeLayer(zoneLayers[z.id]); delete zoneLayers[z.id]; }
@@ -613,7 +812,7 @@ function syncZone(z){
 function initMap(){
   if (typeof L === 'undefined'){ $('mapMsg').style.display = 'grid'; return; }
   map = L.map('map',{zoomControl:true,attributionControl:true}).setView([30.2672,-97.7431], 13);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(map);
+  L.tileLayer(TILE_URL,{subdomains:'abcd',maxZoom:20,attribution:TILE_ATTR}).addTo(map);
   reports.forEach(r => {
     const m = L.marker([r.lat, r.lng],{icon:pinIcon(r,false),keyboard:true,title:r.id + ' · ' + r.category + ' · ' + STATUS_LABEL[r.status],riseOnHover:true}).addTo(map);
     m.on('click', () => selectReport(r.id, false));
@@ -622,8 +821,18 @@ function initMap(){
   ZONES.forEach(syncZone);
   map.on('click', closeDrawer);
 }
+function enterMunicipal(){
+  if (municipalReady){ if (map) setTimeout(() => map.invalidateSize(), 50); return; }
+  municipalReady = true;
+  const now = Date.now();
+  reports = SEED.map(([id,cat,lat,lng,status,agoMin]) => ({id,category:CATEGORIES[cat],lat,lng,status,createdAt:now - agoMin*MIN}));
+  $('muniText').textContent = MUNICIPALITY;
+  renderCounts(); renderToggles();
+  seedLog().then(renderAudit);
+  loadLeaflet().then(initMap);
+}
 
-/* ===================== VIEWS / ROLE ===================== */
+/* ===================== MUNICIPAL VIEWS / ROLE ===================== */
 function showView(name){
   document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
   document.querySelectorAll('.nav-item').forEach(n => {
@@ -685,9 +894,7 @@ $('btnVerify').addEventListener('click', async () => {
   else { out.className = 'hash verify-bad'; out.textContent = hasCrypto ? '✗ Chain broken at entry #' + v.at : 'SHA-256 unavailable on this origin (needs HTTPS)'; }
 });
 
-$('muniText').textContent = MUNICIPALITY;
-renderCounts(); renderToggles(); initMap();
-seedLog().then(renderAudit);
+route();
 })();
 </script>
 </body>
