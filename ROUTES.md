@@ -42,3 +42,14 @@ The old slugs (`holmen`, `lacrosse`, `austin`, `holmen-public-works`, `holmen-pa
 A slug only routes if it is in the pattern (`austin-tx|la-crosse-wi|holmen-wi` for intake, hubs and `/sites`; the intake route slugs
 from `tenant.portals` are also allowed under `/sites`; `holmen-wi` only for onboarding and gateway). Anything else is a 404. When you add a tenant: add it to `shared/tenants.js` **and**
 to those patterns.
+
+
+## Public exemption (testing)
+
+`/muni/holmen-wi/gateway` is the only `/muni/*` path that is public. It is a
+preview build (nothing is sent or filed). Everything else under `/muni/*`,
+plus `/nexus`, `/sites`, `/deck`, `/ledger` etc., still redirects to `/app`.
+The `/muni*` lockdown is a set of explicit redirects placed before the
+generic lockdown regex in `vercel.json`. To re-lock the gateway, delete the
+rule `/muni/holmen-wi/gateway/:rest+` and add `gateway` to the
+`/muni/holmen-wi/:sub(...)` rule.

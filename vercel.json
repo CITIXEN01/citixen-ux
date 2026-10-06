@@ -61,8 +61,14 @@
       "destination": "/sites/holmen-wi-parks",
       "permanent": true
     },
+    { "source": "/muni", "destination": "/app", "permanent": false },
+    { "source": "/muni.html", "destination": "/app", "permanent": false },
+    { "source": "/muni/:slug(austin-tx|la-crosse-wi|holmen-wi)", "destination": "/app", "permanent": false },
+    { "source": "/muni/:slug(austin-tx|la-crosse-wi)/:rest+", "destination": "/app", "permanent": false },
+    { "source": "/muni/holmen-wi/:sub(admin|dispatch|onboard)(/.*)?", "destination": "/app", "permanent": false },
+    { "source": "/muni/holmen-wi/gateway/:rest+", "destination": "/app", "permanent": false },
     {
-      "source": "/(deck|nexus|muni|muni-city|ledger|dispatch|admin|careers|careers-dispatch|join|operator|operator-feedback|endcard|statcard|index|sites|onboard|muni-command|muni-gateway)(\\.html)?(/.*)?",
+      "source": "/(deck|nexus|muni-city|ledger|dispatch|admin|careers|careers-dispatch|join|operator|operator-feedback|endcard|statcard|index|sites|onboard|muni-command|muni-gateway)(\\.html)?(/.*)?",
       "destination": "/app",
       "permanent": false
     },
