@@ -77,18 +77,22 @@ html{background:#05070C}
 @keyframes rise2{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 .slogan{margin:clamp(20px,3.6vmin,34px) 0 0;font:600 clamp(1.5rem,3.6vw,2.6rem)/1.15 var(--sans);letter-spacing:-.02em;color:#fff;text-wrap:balance;animation:rise2 .9s .22s cubic-bezier(.2,.7,.2,1) both}
 .sub{margin:clamp(20px,3.4vmin,30px) 0 0;font:500 clamp(1rem,1.8vw,1.2rem)/1.4 var(--sans);letter-spacing:.01em;color:#fff;animation:rise2 .9s .34s cubic-bezier(.2,.7,.2,1) both}
-.begin{margin-top:clamp(30px,5.5vmin,50px);background:transparent;border:1px solid rgba(16,185,129,.6);color:#10B981;padding:10px 32px;border-radius:9999px;font:600 .78rem var(--sans);letter-spacing:.26em;text-transform:uppercase;cursor:pointer;transition:background .25s,box-shadow .25s,color .25s,border-color .25s;animation:rise2 .9s .46s cubic-bezier(.2,.7,.2,1) both}
-.begin:hover,.begin:focus-visible{background:rgba(16,185,129,.12);color:#fff;border-color:#10B981;box-shadow:0 0 24px rgba(16,185,129,.35);outline:none}
+.begin,.tile .go{display:inline-block;background:transparent;border:1px solid rgba(16,185,129,.6);color:#34D399;padding:10px 32px;border-radius:9999px;font:600 12px/1.5 var(--sans);letter-spacing:.1em;text-transform:uppercase;cursor:pointer;box-shadow:none;filter:none;transition:all .2s}
+.begin:hover,.begin:focus-visible,.tile .go:hover,.tile .go:focus-visible{background:rgba(2,44,34,.4);box-shadow:0 0 15px rgba(16,185,129,.25);outline:none;transform:none;filter:none}
+.begin:focus-visible,.tile .go:focus-visible{border-color:#10B981}
+.begin{margin-top:clamp(30px,5.5vmin,50px);animation:rise2 .9s .46s cubic-bezier(.2,.7,.2,1) both}
+.tile .go{margin-top:0}
 .s2wrap{min-height:inherit;display:grid;place-items:center;padding:var(--m)}
 #s2{--m:16px}
 @media (min-width:640px){#s2{--m:56px}}
 @media (min-width:900px) and (min-height:700px){#s2{--m:1.5in}}
-.tile{width:100%;max-width:576px;margin:0 auto;padding:32px;text-align:center;border-radius:16px;
+.tile{width:100%;max-width:576px;margin:0 auto;padding:48px;text-align:center;border-radius:16px;
   background:rgba(15,23,42,.6);border:1px solid rgba(6,78,59,.4);
   box-shadow:0 25px 50px -12px rgba(0,0,0,.25);
   -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.tile h1:focus{outline:none}
 .tile h1{margin:0;font:600 30px/1.2 var(--sans);letter-spacing:-.025em;color:#fff}
-.tile p.lead{margin:8px 0 0;font:400 14px/1.5 var(--sans);color:#CBD5E1}
+.tile p.lead{margin:16px 0 0;font:400 14px/1.5 var(--sans);color:#CBD5E1}
 .tile p.lead strong{font-weight:700;color:#fff}
 .tl{list-style:none;display:flex;align-items:center;justify-content:space-between;margin:24px 0 0;padding:0 16px 40px}
 .tl .st{position:relative;flex:none;display:block;border-radius:9999px;box-sizing:border-box}
@@ -99,17 +103,13 @@ html{background:#05070C}
 .tl .lt{width:10px;height:10px;background:#020617;border:1px solid #334155}
 .tl .ln{flex:1;height:1px;margin:0 8px;background:rgba(16,185,129,.4);list-style:none}
 .tl .ln.m{background:#1E293B}
-.tile .go{display:inline-block;margin-top:4px;border:0;border-radius:9999px;padding:10px 32px;font:700 16px/1.5 var(--sans);letter-spacing:.02em;text-transform:uppercase;color:#020617;cursor:pointer;
-  background:#10B981;box-shadow:0 0 15px rgba(16,185,129,.3);transition:background .2s,box-shadow .25s,transform .2s}
-.tile .go:hover{background:#34D399;transform:translateY(-1px);box-shadow:0 0 0 4px rgba(16,185,129,.14),0 0 28px rgba(52,211,153,.6)}
-.tile .go:active{transform:none}
-.tile .go:focus-visible{outline:2px solid #6EE7B7;outline-offset:3px}
 .go{border:0;border-radius:14px;padding:16px 46px;font:700 1.05rem var(--sans);letter-spacing:-.01em;color:#04120C;
   background:linear-gradient(180deg,#6EE7B7 0%,#34D399 45%,#10B981 100%);
   box-shadow:0 0 0 1px rgba(255,255,255,.28) inset,0 10px 30px -10px rgba(16,185,129,.7);transition:box-shadow .25s,transform .2s,filter .2s}
 .go:hover{transform:translateY(-2px);filter:brightness(1.06);box-shadow:0 0 0 1px rgba(255,255,255,.35) inset,0 0 0 6px rgba(16,185,129,.16),0 18px 50px -8px rgba(16,185,129,.95),0 0 90px -6px rgba(52,211,153,.7)}
 .go:active{transform:translateY(0)}
 .go:focus-visible{outline:2px solid #6EE7B7;outline-offset:4px}
+@media (max-width:480px){.tile{padding:32px 18px}}
 @media (max-width:640px){.splash{padding-top:84px}}
 
 /* preview bar + header */
@@ -634,7 +634,7 @@ function fromHash(){ return location.hash === '#review' ? 3 : location.hash === 
 function showScreen(n){
   if (n === curScr) return;
   var first = curScr === 0, prev = scr[curScr], next = scr[n];
-  var focusIt = function () { var f = n === 1 ? $('beginBtn') : n === 2 ? $('goBtn') : $('nm'); if (!first && f) f.focus({preventScroll: true}); };
+  var focusIt = function () { var f = n === 1 ? $('beginBtn') : n === 2 ? $('wTitle') : $('nm'); if (!first && f) f.focus({preventScroll: true}); };
   var swap = function () {
     if (prev){ prev.classList.remove('on', 'leaving'); }
     next.classList.add('on'); curScr = n; window.scrollTo(0, 0);
