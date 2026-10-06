@@ -83,12 +83,27 @@ html{background:#05070C}
 #s2{--m:16px}
 @media (min-width:640px){#s2{--m:56px}}
 @media (min-width:900px) and (min-height:700px){#s2{--m:1.5in}}
-.tile{width:100%;max-width:720px;padding:clamp(34px,6vw,72px) clamp(22px,5vw,64px);text-align:center;border-radius:28px;
-  background:linear-gradient(180deg,rgba(30,41,59,.62),rgba(15,23,42,.5));border:1px solid rgba(148,163,184,.18);
-  box-shadow:0 1px 0 rgba(255,255,255,.08) inset,0 0 0 1px rgba(16,185,129,.05),0 50px 100px -30px rgba(0,0,0,.85),0 0 120px -40px rgba(16,185,129,.35);
-  -webkit-backdrop-filter:blur(22px) saturate(150%);backdrop-filter:blur(22px) saturate(150%)}
-.tile h1{margin:0 0 14px;font:700 clamp(2.2rem,5.4vw,3.6rem)/1.05 var(--sans);letter-spacing:-.035em;color:#fff}
-.tile p{margin:0 auto clamp(28px,5vw,44px);max-width:34ch;font:400 clamp(1rem,2vw,1.2rem)/1.5 var(--sans);color:#aab6c8;letter-spacing:-.005em}
+.tile{width:100%;max-width:576px;margin:0 auto;padding:32px;text-align:center;border-radius:16px;
+  background:rgba(15,23,42,.6);border:1px solid rgba(6,78,59,.4);
+  box-shadow:0 25px 50px -12px rgba(0,0,0,.25);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.tile h1{margin:0;font:600 30px/1.2 var(--sans);letter-spacing:-.025em;color:#fff}
+.tile p.lead{margin:8px 0 0;font:400 14px/1.5 var(--sans);color:#CBD5E1}
+.tile p.lead strong{font-weight:700;color:#fff}
+.tl{list-style:none;display:flex;align-items:center;justify-content:space-between;margin:24px 0 0;padding:0 16px 40px}
+.tl .st{position:relative;flex:none;display:block;border-radius:9999px;box-sizing:border-box}
+.tl .st i{position:absolute;top:50%;left:50%;transform:translateX(-50%);margin-top:14px;white-space:nowrap;font:500 11px/1 var(--sans);font-style:normal;color:#94A3B8}
+.tl .on{width:12px;height:12px;background:#34D399;box-shadow:0 0 0 4px rgba(6,78,59,.5),0 0 12px rgba(52,211,153,.55)}
+.tl .on i{color:#34D399}
+.tl .nx{width:10px;height:10px;background:#020617;border:1px solid rgba(16,185,129,.5)}
+.tl .lt{width:10px;height:10px;background:#020617;border:1px solid #334155}
+.tl .ln{flex:1;height:1px;margin:0 8px;background:rgba(16,185,129,.4);list-style:none}
+.tl .ln.m{background:#1E293B}
+.tile .go{display:inline-block;margin-top:4px;border:0;border-radius:9999px;padding:10px 32px;font:700 16px/1.5 var(--sans);letter-spacing:.02em;text-transform:uppercase;color:#020617;cursor:pointer;
+  background:#10B981;box-shadow:0 0 15px rgba(16,185,129,.3);transition:background .2s,box-shadow .25s,transform .2s}
+.tile .go:hover{background:#34D399;transform:translateY(-1px);box-shadow:0 0 0 4px rgba(16,185,129,.14),0 0 28px rgba(52,211,153,.6)}
+.tile .go:active{transform:none}
+.tile .go:focus-visible{outline:2px solid #6EE7B7;outline-offset:3px}
 .go{border:0;border-radius:14px;padding:16px 46px;font:700 1.05rem var(--sans);letter-spacing:-.01em;color:#04120C;
   background:linear-gradient(180deg,#6EE7B7 0%,#34D399 45%,#10B981 100%);
   box-shadow:0 0 0 1px rgba(255,255,255,.28) inset,0 10px 30px -10px rgba(16,185,129,.7);transition:box-shadow .25s,transform .2s,filter .2s}
@@ -261,8 +276,15 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
   <div class="obsidian" aria-hidden="true"></div><div class="backlight" aria-hidden="true"></div>
   <div class="s2wrap">
     <div class="tile" role="group" aria-labelledby="wTitle">
-      <h1 id="wTitle" tabindex="-1">Welcome</h1>
-      <p>Complete your easy CITIXEN UX onboarding in less than 5 minutes.</p>
+      <h1 id="wTitle" tabindex="-1">Welcome!</h1>
+      <p class="lead">Complete your easy <strong>CITIXEN UX</strong> onboarding in less than 5 minutes.</p>
+      <ol class="tl" id="tl" aria-label="Onboarding steps">
+        <li class="st on" aria-current="step"><i>1. Verification</i></li>
+        <li class="ln" aria-hidden="true"></li>
+        <li class="st nx"><i>2. § 893.80 Brief</i></li>
+        <li class="ln m" aria-hidden="true"></li>
+        <li class="st lt"><i>3. E-Signature</i></li>
+      </ol>
       <button type="button" class="go" id="goBtn">Let&rsquo;s Go</button>
     </div>
   </div>
@@ -573,7 +595,7 @@ function boot(){
     $('badge').hidden = true; return;
   }
   document.title = 'Onboarding — ' + T.name + ' · Citixen UX';
-  $('wTitle').textContent = OB.welcomeName ? 'Welcome, ' + OB.welcomeName : 'Welcome';
+  $('wTitle').textContent = OB.welcomeName ? 'Welcome, ' + OB.welcomeName + '!' : 'Welcome!';
   var b = $('badge'); b.textContent = ''; b.appendChild(document.createTextNode('Anchor Town #' + OB.anchor + ' Onboarding | ')); b.appendChild(el('b', {text: OB.entity + ', ' + OB.state}));
   renderStepper();
   var pages = $('pages'); pageNodes().forEach(function (p) { pages.appendChild(p); });
