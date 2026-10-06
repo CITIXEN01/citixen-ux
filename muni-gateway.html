@@ -55,10 +55,11 @@ html{background:#05070C}
 .screen.leaving{display:block;animation:scrOut .42s ease-in both;pointer-events:none}
 @keyframes scrIn{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:none}}
 @keyframes scrOut{to{opacity:0;transform:scale(1.015)}}
-.lg{position:fixed;top:clamp(14px,3vw,28px);left:clamp(16px,3.2vw,32px);z-index:20;display:flex;align-items:center;gap:10px;text-decoration:none;transition:opacity .4s}
-.lg svg{display:block;flex:none}
-.lgt{font:700 .9rem/1 var(--sans);letter-spacing:.06em;color:#fff;white-space:nowrap}
-.lgt b{font-weight:700}.lgt .ux{color:#10B981}.lgt sup{font-size:.55em;font-weight:600;letter-spacing:0;vertical-align:top;position:relative;top:-.15em;margin-left:.1em;color:#10B981}
+.lg{position:fixed;top:clamp(14px,3vw,28px);left:clamp(16px,3.2vw,32px);z-index:20;display:flex;align-items:center;gap:8px;text-decoration:none;user-select:none;-webkit-user-select:none;transition:opacity .4s}
+.lgi{width:20px;height:20px;flex:none;display:block;color:#34D399;filter:drop-shadow(0 0 6px rgba(16,185,129,.4))}
+.lgt{display:flex;align-items:baseline;font:700 16px/1 var(--sans);letter-spacing:-.025em}
+.lgw{color:#fff}.lgx{color:#34D399;margin-left:4px}
+.lgm{font-size:10px;font-weight:600;line-height:1;color:#34D399;margin-left:2px;position:relative;top:-.5em;vertical-align:baseline;letter-spacing:0}
 .lg.off{opacity:0;pointer-events:none}
 #s1,#s2{position:relative;isolation:isolate;min-height:100vh;min-height:100svh;overflow:hidden}
 .obsidian{position:absolute;inset:0;background:#0B0F12;z-index:-2}
@@ -241,7 +242,7 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
 </head>
 <body>
 <div class="aurora" aria-hidden="true"></div>
-<a class="lg" id="lg" href="/app" aria-label="CITIXEN UX"><svg viewBox="0 0 44 48" width="20" height="22" fill="none" aria-hidden="true"><path d="M22 44s16-8 16-20V10L22 4 6 10v14c0 12 16 20 16 20z" stroke="#10B981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.5 24.5l5 5 9-10" stroke="#10B981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="lgt"><b>CITIXEN</b> <b class="ux">UX</b><sup>™</sup></span></a>
+<a class="lg" id="lg" href="/app" aria-label="CITIXEN UX"><svg class="lgi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="lgt" aria-hidden="true"><span class="lgw">CITIXEN</span><span class="lgx">UX</span><sup class="lgm">TM</sup></span></a>
 
 <section class="screen" id="s1" aria-label="Welcome">
   <div class="obsidian" aria-hidden="true"></div><div class="backlight" aria-hidden="true"></div>
