@@ -47,6 +47,52 @@ a{color:inherit}[hidden]{display:none !important}
 .glass{background:var(--glass);border:1px solid var(--edge);border-radius:20px;box-shadow:0 1px 0 rgba(255,255,255,.07) inset,0 30px 60px -30px rgba(0,0,0,.75);
   -webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%)}
 
+
+/* ---------- welcome sequence (screens 1 and 2) ---------- */
+html{background:#05070C}
+.screen{display:none}
+.screen.on{display:block;animation:scrIn .7s cubic-bezier(.2,.7,.2,1) both}
+.screen.leaving{display:block;animation:scrOut .42s ease-in both;pointer-events:none}
+@keyframes scrIn{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:none}}
+@keyframes scrOut{to{opacity:0;transform:scale(1.015)}}
+.lg{position:fixed;top:clamp(14px,3vw,28px);left:clamp(16px,3.2vw,32px);z-index:20;display:block;transition:opacity .4s}
+.lg img{height:28px;display:block}
+.lg.off{opacity:0;pointer-events:none}
+#s1,#s2{position:relative;isolation:isolate;min-height:100vh;min-height:100svh;overflow:hidden}
+.obsidian{position:absolute;inset:0;background:#05070C;z-index:-2}
+.backlight{position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(52vmax 52vmax at 50% 46%,rgba(16,185,129,.30),rgba(16,185,129,.09) 38%,transparent 66%),
+             radial-gradient(90vmax 60vmax at 50% 120%,rgba(16,185,129,.08),transparent 60%);
+  animation:breathe 7s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.82;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}
+.splash{min-height:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:90px 24px 70px;cursor:pointer}
+.shield{width:clamp(110px,16vmin,168px);height:auto;margin-bottom:clamp(24px,5vmin,44px);overflow:visible;
+  filter:drop-shadow(0 0 14px rgba(52,211,153,.75)) drop-shadow(0 0 46px rgba(16,185,129,.55));animation:glow 4.5s ease-in-out infinite}
+@keyframes glow{0%,100%{filter:drop-shadow(0 0 12px rgba(52,211,153,.65)) drop-shadow(0 0 38px rgba(16,185,129,.45))}50%{filter:drop-shadow(0 0 20px rgba(110,231,183,.95)) drop-shadow(0 0 64px rgba(16,185,129,.7))}}
+.splash h1{margin:0;font:700 clamp(2.1rem,6.2vw,4.4rem)/1.04 var(--sans);letter-spacing:-.035em;max-width:14ch;
+  background:linear-gradient(180deg,#fff 30%,#bfeedd);-webkit-background-clip:text;background-clip:text;color:transparent;animation:rise2 1s .15s cubic-bezier(.2,.7,.2,1) both}
+@keyframes rise2{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.begin{margin-top:clamp(28px,6vmin,56px);background:none;border:0;color:#7ee0bb;font:600 .85rem var(--sans);letter-spacing:.14em;text-transform:uppercase;padding:10px 18px;border-radius:999px;animation:pulseHint 2.8s 1.2s ease-in-out infinite both}
+.begin:hover{color:#d6fbec}
+@keyframes pulseHint{0%,100%{opacity:.45}50%{opacity:1}}
+.s2wrap{min-height:inherit;display:grid;place-items:center;padding:var(--m)}
+#s2{--m:16px}
+@media (min-width:640px){#s2{--m:56px}}
+@media (min-width:900px) and (min-height:700px){#s2{--m:1.5in}}
+.tile{width:100%;max-width:720px;padding:clamp(34px,6vw,72px) clamp(22px,5vw,64px);text-align:center;border-radius:28px;
+  background:linear-gradient(180deg,rgba(30,41,59,.62),rgba(15,23,42,.5));border:1px solid rgba(148,163,184,.18);
+  box-shadow:0 1px 0 rgba(255,255,255,.08) inset,0 0 0 1px rgba(16,185,129,.05),0 50px 100px -30px rgba(0,0,0,.85),0 0 120px -40px rgba(16,185,129,.35);
+  -webkit-backdrop-filter:blur(22px) saturate(150%);backdrop-filter:blur(22px) saturate(150%)}
+.tile h1{margin:0 0 14px;font:700 clamp(2.2rem,5.4vw,3.6rem)/1.05 var(--sans);letter-spacing:-.035em;color:#fff}
+.tile p{margin:0 auto clamp(28px,5vw,44px);max-width:34ch;font:400 clamp(1rem,2vw,1.2rem)/1.5 var(--sans);color:#aab6c8;letter-spacing:-.005em}
+.go{border:0;border-radius:14px;padding:16px 46px;font:700 1.05rem var(--sans);letter-spacing:-.01em;color:#04120C;
+  background:linear-gradient(180deg,#6EE7B7 0%,#34D399 45%,#10B981 100%);
+  box-shadow:0 0 0 1px rgba(255,255,255,.28) inset,0 10px 30px -10px rgba(16,185,129,.7);transition:box-shadow .25s,transform .2s,filter .2s}
+.go:hover{transform:translateY(-2px);filter:brightness(1.06);box-shadow:0 0 0 1px rgba(255,255,255,.35) inset,0 0 0 6px rgba(16,185,129,.16),0 18px 50px -8px rgba(16,185,129,.95),0 0 90px -6px rgba(52,211,153,.7)}
+.go:active{transform:translateY(0)}
+.go:focus-visible{outline:2px solid #6EE7B7;outline-offset:4px}
+@media (max-width:640px){.lg img{height:24px}.splash{padding-top:84px}}
+
 /* preview bar + header */
 .preview{background:rgba(255,194,75,.09);border-bottom:1px solid rgba(255,194,75,.3);color:#FFD98A;font-size:.78rem;text-align:center;padding:6px 14px}
 header.top{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:14px clamp(14px,3vw,32px);max-width:1440px;margin:0 auto}
@@ -194,6 +240,29 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
 </head>
 <body>
 <div class="aurora" aria-hidden="true"></div>
+<a class="lg" id="lg" href="/muni" aria-label="CITIXEN UX"><img src="/logo.svg" alt="CITIXEN UX" width="159" height="30"></a>
+
+<section class="screen" id="s1" aria-label="Welcome">
+  <div class="obsidian" aria-hidden="true"></div><div class="backlight" aria-hidden="true"></div>
+  <div class="splash" id="splash">
+    <svg class="shield" viewBox="0 0 44 48" fill="none" aria-hidden="true"><defs><linearGradient id="sg" x1="22" y1="4" x2="22" y2="44" gradientUnits="userSpaceOnUse"><stop stop-color="#6EE7B7"/><stop offset="1" stop-color="#10B981"/></linearGradient></defs><path d="M22 44s16-8 16-20V10L22 4 6 10v14c0 12 16 20 16 20z" fill="rgba(16,185,129,.10)" stroke="url(#sg)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.5 24.5l5 5 9-10" stroke="url(#sg)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <h1 id="splashH">Upgrade Your Civic Experience.</h1>
+    <button type="button" class="begin" id="beginBtn">Tap to begin</button>
+  </div>
+</section>
+
+<section class="screen" id="s2" aria-label="Personalized welcome">
+  <div class="obsidian" aria-hidden="true"></div><div class="backlight" aria-hidden="true"></div>
+  <div class="s2wrap">
+    <div class="tile" role="group" aria-labelledby="wTitle">
+      <h1 id="wTitle" tabindex="-1">Welcome</h1>
+      <p>Complete your easy CITIXEN UX onboarding in less than 5 minutes.</p>
+      <button type="button" class="go" id="goBtn">Let&rsquo;s Go</button>
+    </div>
+  </div>
+</section>
+
+<div class="screen" id="s3" aria-label="Review and sign">
 <div id="shell">
 <div class="preview" role="note"><b>Preview build.</b> Sample data. Nothing on this page sends email, files with LWMMI, reserves a namespace or verifies your identity yet.</div>
 <header class="top">
@@ -257,6 +326,7 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
     </section>
   </aside>
 </main>
+</div>
 </div>
 
 <div id="printRoot"></div>
@@ -492,11 +562,12 @@ function showDone(){
 /* ---------- boot ---------- */
 function boot(){
   if (!T || !OB){
-    $('main').hidden = true; $('stepper').hidden = true; $('missing').hidden = false; document.title = 'Onboarding not found — Citixen UX';
+    $('main').hidden = true; $('stepper').hidden = true; $('missing').hidden = false; $('s1').hidden = true; $('s2').hidden = true; $('s3').classList.add('on'); document.title = 'Onboarding not found — Citixen UX';
     Object.keys(TENANTS).forEach(function (k) { if (TENANTS[k].onboarding) $('known').appendChild(el('li', {}, [el('a', {href: '/muni/' + k + '/gateway', text: TENANTS[k].name})])); });
     $('badge').hidden = true; return;
   }
   document.title = 'Onboarding — ' + T.name + ' · Citixen UX';
+  $('wTitle').textContent = OB.welcomeName ? 'Welcome, ' + OB.welcomeName : 'Welcome';
   var b = $('badge'); b.textContent = ''; b.appendChild(document.createTextNode('Anchor Town #' + OB.anchor + ' Onboarding | ')); b.appendChild(el('b', {text: OB.entity + ', ' + OB.state}));
   renderStepper();
   var pages = $('pages'); pageNodes().forEach(function (p) { pages.appendChild(p); });
@@ -527,7 +598,38 @@ $('btnPdf').addEventListener('click', printDoc);
 $('dlPacket').addEventListener('click', function () { download('signed-packet-' + T.slug + '-preview.html', 'text/html', packetHtml()); });
 $('stay').addEventListener('click', function () { clearInterval(timer); $('cd').classList.remove('run'); $('cd').style.display = 'none'; $('cdT').textContent = 'Staying here. Use "Go to command center now" when you are ready.'; $('stay').hidden = true; });
 document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && $('ov').classList.contains('on') && !$('stay').hidden) $('stay').click(); });
+
+/* ---------- screens: 1 splash -> 2 welcome -> 3 review & sign ---------- */
+var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var scr = {1: $('s1'), 2: $('s2'), 3: $('s3')}, curScr = 0;
+function fromHash(){ return location.hash === '#review' ? 3 : location.hash === '#welcome' ? 2 : 1; }
+function showScreen(n){
+  if (n === curScr) return;
+  var prev = scr[curScr], next = scr[n];
+  var focusIt = function () { var f = n === 1 ? $('beginBtn') : n === 2 ? $('goBtn') : $('nm'); if (curScr !== 0 && f) f.focus({preventScroll: true}); };
+  var swap = function () {
+    if (prev){ prev.classList.remove('on', 'leaving'); }
+    next.classList.add('on'); curScr = n; window.scrollTo(0, 0);
+    $('lg').classList.toggle('off', n === 3);
+    document.title = (n === 3 ? 'Review & sign' : 'Welcome') + ' — Citixen UX';
+    focusIt();
+  };
+  if (prev && !reduced){ prev.classList.add('leaving'); curScr = -1; setTimeout(swap, 420); } else swap();
+}
+function nav(n){
+  var h = n === 3 ? '#review' : n === 2 ? '#welcome' : '';
+  if (h !== location.hash){ try { history.pushState(null, '', location.pathname + location.search + h); } catch (e) { location.hash = h; } }
+  showScreen(n);
+}
+window.addEventListener('popstate', function () { showScreen(fromHash()); });
+window.addEventListener('hashchange', function () { showScreen(fromHash()); });
+$('splash').addEventListener('click', function () { nav(2); });
+$('beginBtn').addEventListener('click', function (e) { e.stopPropagation(); nav(2); });
+document.addEventListener('keydown', function (e) { if (curScr === 1 && (e.key === 'Enter' || e.key === ' ') && !e.defaultPrevented){ e.preventDefault(); nav(2); } });
+$('goBtn').addEventListener('click', function () { nav(3); });
+
 boot();
+showScreen(fromHash());
 })();
 </script>
 </body>
