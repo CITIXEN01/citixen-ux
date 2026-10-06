@@ -77,39 +77,118 @@ html{background:#05070C}
 @keyframes rise2{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 .slogan{margin:clamp(20px,3.6vmin,34px) 0 0;font:600 clamp(1.5rem,3.6vw,2.6rem)/1.15 var(--sans);letter-spacing:-.02em;color:#fff;text-wrap:balance;animation:rise2 .9s .22s cubic-bezier(.2,.7,.2,1) both}
 .sub{margin:clamp(20px,3.4vmin,30px) 0 0;font:500 clamp(1rem,1.8vw,1.2rem)/1.4 var(--sans);letter-spacing:.01em;color:#fff;animation:rise2 .9s .34s cubic-bezier(.2,.7,.2,1) both}
-.begin,.tile .go{display:inline-block;background:transparent;border:1px solid rgba(16,185,129,.6);color:#34D399;padding:10px 32px;border-radius:9999px;font:600 12px/1.5 var(--sans);letter-spacing:.1em;text-transform:uppercase;cursor:pointer;box-shadow:none;filter:none;transition:all .2s}
-.begin:hover,.begin:focus-visible,.tile .go:hover,.tile .go:focus-visible{background:rgba(2,44,34,.4);box-shadow:0 0 15px rgba(16,185,129,.25);outline:none;transform:none;filter:none}
-.begin:focus-visible,.tile .go:focus-visible{border-color:#10B981}
+.begin,.pillbtn{display:inline-block;background:transparent;border:1px solid rgba(16,185,129,.6);color:#34D399;padding:10px 32px;border-radius:9999px;font:600 12px/1.5 var(--sans);letter-spacing:.1em;text-transform:uppercase;cursor:pointer;box-shadow:none;filter:none;transition:all .2s}
+.begin:hover,.begin:focus-visible,.pillbtn:hover:not(:disabled),.pillbtn:focus-visible{background:rgba(2,44,34,.4);box-shadow:0 0 15px rgba(16,185,129,.25);outline:none;transform:none;filter:none}
+.begin:focus-visible,.pillbtn:focus-visible{border-color:#10B981}
 .begin{margin-top:clamp(30px,5.5vmin,50px);animation:rise2 .9s .46s cubic-bezier(.2,.7,.2,1) both}
-.tile .go{margin-top:0}
-.s2wrap{min-height:inherit;display:grid;place-items:center;padding:var(--m)}
-#s2{--m:16px}
-@media (min-width:640px){#s2{--m:56px}}
-@media (min-width:900px) and (min-height:700px){#s2{--m:1.5in}}
-.tile{width:100%;max-width:576px;margin:0 auto;padding:48px;text-align:center;border-radius:16px;
-  background:rgba(15,23,42,.6);border:1px solid rgba(6,78,59,.4);
-  box-shadow:0 25px 50px -12px rgba(0,0,0,.25);
-  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
-.tile h1:focus{outline:none}
-.tile h1{margin:0;font:600 30px/1.2 var(--sans);letter-spacing:-.025em;color:#fff}
-.tile p.lead{margin:16px 0 0;font:400 14px/1.5 var(--sans);color:#CBD5E1}
-.tile p.lead strong{font-weight:700;color:#fff}
-.tl{list-style:none;display:flex;align-items:center;justify-content:space-between;margin:24px 0 0;padding:0 16px 40px}
-.tl .st{position:relative;flex:none;display:block;border-radius:9999px;box-sizing:border-box}
-.tl .st i{position:absolute;top:50%;left:50%;transform:translateX(-50%);margin-top:14px;white-space:nowrap;font:500 11px/1 var(--sans);font-style:normal;color:#94A3B8}
-.tl .on{width:12px;height:12px;background:#34D399;box-shadow:0 0 0 4px rgba(6,78,59,.5),0 0 12px rgba(52,211,153,.55)}
-.tl .on i{color:#34D399}
-.tl .nx{width:10px;height:10px;background:#020617;border:1px solid rgba(16,185,129,.5)}
-.tl .lt{width:10px;height:10px;background:#020617;border:1px solid #334155}
-.tl .ln{flex:1;height:1px;margin:0 8px;background:rgba(16,185,129,.4);list-style:none}
-.tl .ln.m{background:#1E293B}
+
+/* ---------- onboarding portal (screen 2) ---------- */
+.pillbtn{padding:8px 24px;cursor:pointer}
+.pillbtn:disabled{opacity:.38;cursor:not-allowed}
+.pillbtn.sec{text-transform:none;letter-spacing:.02em;font-size:13px;border-color:rgba(16,185,129,.4);color:#CBD5E1}
+.portal{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:32px;max-width:1160px;margin:0 auto;padding:104px 32px 64px;align-items:start;min-height:100vh;min-height:100svh;box-sizing:border-box}
+.gl{background:rgba(15,23,42,.6);border:1px solid rgba(30,41,59,.8);border-radius:16px;box-shadow:0 25px 50px -12px rgba(0,0,0,.35);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.stage{padding:40px;min-height:480px;box-sizing:border-box}
+.pane{display:none}.pane.on{display:block;animation:paneIn .3s ease both}
+@keyframes paneIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.pane h1{margin:0;font:600 30px/1.2 var(--sans);letter-spacing:-.025em;color:#fff}
+.pane h1.h2{font-size:26px}
+.pane h1:focus{outline:none}
+.pane p.lead{margin:12px 0 0;font:400 14px/1.55 var(--sans);color:#CBD5E1}
+.pane p.lead strong{font-weight:700;color:#fff}
+.cardx{margin-top:24px;padding:20px 22px;background:rgba(2,6,23,.45);border:1px solid rgba(6,78,59,.4);border-radius:12px}
+.cx-h{font:600 11px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:#34D399;margin-bottom:6px}
+.ln2{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:12px 0;border-bottom:1px solid rgba(30,41,59,.8);font:400 14px/1.4 var(--sans);color:#CBD5E1}
+.ln2 small{display:block;margin-top:2px;font-size:12px;color:#64748B}
+.ln2 b{color:#fff;font-weight:600;white-space:nowrap}.ln2 b.em{color:#34D399}
+.net{margin-top:16px;padding:14px 16px;border:1px solid rgba(16,185,129,.45);border-radius:10px;background:rgba(16,185,129,.07);font:500 15px/1.3 var(--sans);color:#E2E8F0}
+.net strong{color:#34D399;font-weight:700;font-size:20px;margin-left:4px;letter-spacing:-.01em}
+.fine{margin:12px 0 0;font:400 12px/1.55 var(--sans);color:#64748B}
+.acts2{margin-top:28px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.bul{margin:0;padding:0;list-style:none}
+.bul li{position:relative;padding:8px 0 8px 22px;font:400 14px/1.55 var(--sans);color:#CBD5E1}
+.bul li::before{content:"";position:absolute;left:2px;top:15px;width:7px;height:7px;border-radius:50%;background:#10B981;box-shadow:0 0 8px rgba(16,185,129,.6)}
+.chain{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:14px 0 4px;font:500 11.5px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#94A3B8}
+.chain span{padding:5px 9px;border:1px solid rgba(6,78,59,.7);border-radius:8px;background:rgba(2,44,34,.35);color:#34D399}
+.chain i{font-style:normal;color:#475569}
+.chain em{font-style:normal;margin-right:4px}
+.chip{display:inline-block;padding:6px 12px;border-radius:9999px;border:1px solid rgba(16,185,129,.4);background:rgba(16,185,129,.08);color:#34D399;font:500 12px/1.2 var(--sans)}
+.chip.warn{border-color:rgba(255,194,75,.45);background:rgba(255,194,75,.08);color:#FFD98A}
+.pv{margin:28px 0 0;font:400 12px/1.5 var(--sans);color:#64748B}
+.panel{padding:28px 24px;position:sticky;top:96px}
+.panel h3{margin:0 0 22px;font:600 11px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:#64748B}
+.ps{list-style:none;margin:0;padding:0}
+.ps li{position:relative;padding-bottom:30px}
+.ps li:last-child{padding-bottom:0}
+.ps li:not(:last-child)::after{content:"";position:absolute;left:17px;top:40px;bottom:4px;width:2px;border-radius:2px;background:#1E293B;transition:background .4s,box-shadow .4s}
+.ps li.done:not(:last-child)::after{background:#10B981;box-shadow:0 0 8px rgba(16,185,129,.6)}
+.pb{display:grid;grid-template-columns:36px 1fr;gap:14px;width:100%;text-align:left;background:none;border:0;padding:0;margin:0;color:inherit;font:inherit;cursor:default}
+.pb:not(:disabled){cursor:pointer}
+.bd{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;box-sizing:border-box;font:600 14px var(--sans);transition:background .3s,border-color .3s,color .3s}
+.bd svg{width:16px;height:16px}
+.ps .todo .bd{border:2px solid #334155;color:#64748B}
+.ps .cur .bd{background:rgba(16,185,129,.2);border:2px solid #10B981;color:#34D399;filter:drop-shadow(0 0 8px rgba(16,185,129,.55));animation:pls 2s ease-in-out infinite}
+@keyframes pls{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.35)}50%{box-shadow:0 0 0 7px rgba(16,185,129,0)}}
+.ps .done .bd{background:#10B981;border:2px solid #10B981;color:#04120D}
+.tx b{display:block;font:600 15px/1.3 var(--sans);color:#fff;padding-top:7px}
+.ps .todo .tx b{color:#94A3B8}
+.tx small{display:block;margin-top:5px;font:400 12.5px/1.5 var(--sans);color:#94A3B8}
+.ps .view .tx b{color:#34D399}
+.pb:focus-visible{outline:2px solid #34D399;outline-offset:4px;border-radius:8px}
+.sgrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.pane label.f{display:block;font:600 11px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:#94A3B8;margin:0 0 6px}
+.pane input.t{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:10px;border:1px solid #334155;background:rgba(2,6,23,.6);color:#fff;font:400 15px var(--sans)}
+.pane input.t:focus{outline:none;border-color:#10B981;box-shadow:0 0 0 3px rgba(16,185,129,.15)}
+.seg2{display:inline-flex;margin-top:16px;border:1px solid #334155;border-radius:9999px;padding:3px}
+.seg2 button{border:0;background:none;color:#94A3B8;padding:6px 16px;border-radius:9999px;font:600 12px var(--sans);letter-spacing:.06em;cursor:pointer}
+.seg2 button[aria-pressed=true]{background:rgba(16,185,129,.18);color:#34D399}
+.sgbox{margin-top:10px;height:132px;border:1px dashed #334155;border-radius:10px;background:rgba(2,6,23,.5);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.sgty{font:400 38px/1.1 'Snell Roundhand','Segoe Script','Brush Script MT','Apple Chancery',cursive;color:#fff;padding:0 16px;text-align:center;word-break:break-word}
+.sgty.ph{color:#475569;font-size:26px}
+#sgCv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
+.sgclr{position:absolute;right:8px;top:8px;z-index:2;font:600 11px var(--sans);color:#94A3B8;background:rgba(15,23,42,.8);border:1px solid #334155;border-radius:9999px;padding:4px 10px;cursor:pointer}
+.attest2{display:flex;gap:10px;align-items:flex-start;margin-top:16px;font:400 13px/1.5 var(--sans);color:#CBD5E1;cursor:pointer}
+.attest2 input{margin-top:3px;accent-color:#10B981}
+.errl{margin:10px 0 0;font:500 13px var(--sans);color:#FCA5A5;min-height:0}
+.errl:empty{display:none}
+.nm-note{margin:8px 0 0;font:400 12px/1.5 var(--sans);color:#FFD98A}
+.nm-note[hidden]{display:none}
+.signed{margin-top:24px;padding:16px 18px;border:1px solid rgba(16,185,129,.45);border-radius:12px;background:rgba(16,185,129,.07);color:#E2E8F0;font:400 14px/1.5 var(--sans)}
+.signed b{color:#34D399}
+.sh-ov,.ov2{position:fixed;inset:0;z-index:70;background:rgba(2,6,12,.6);display:none}
+.sh-ov.on{display:block}.ov2.on{display:grid;place-items:center;padding:16px}
+.sheet{position:absolute;right:0;top:0;bottom:0;width:min(460px,100%);box-sizing:border-box;padding:28px;overflow:auto;border-radius:16px 0 0 16px;background:rgba(11,15,18,.94);animation:slideIn .28s ease both}
+@keyframes slideIn{from{transform:translateX(32px);opacity:0}to{transform:none;opacity:1}}
+.sh-h{display:flex;justify-content:space-between;align-items:center}
+.sh-h h2{margin:0;font:600 20px var(--sans);letter-spacing:-.02em;color:#fff}
+.sh-h .x{background:none;border:1px solid #334155;color:#CBD5E1;width:32px;height:32px;border-radius:50%;font-size:18px;line-height:1;cursor:pointer}
+.draft{margin:14px 0 0;padding:14px;border:1px solid #1E293B;border-radius:10px;background:rgba(2,6,23,.6);font:400 12px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#94A3B8;white-space:pre-wrap}
+.note{margin-top:14px;padding:10px 12px;border-radius:10px;background:rgba(255,194,75,.09);border:1px solid rgba(255,194,75,.3);color:#FFD98A;font:400 12.5px/1.5 var(--sans)}
+.status{margin-top:14px;min-height:20px;font:500 13.5px/1.5 var(--sans);color:#34D399}
+.status.pz{color:#FFD98A}
+.done2{width:min(560px,100%);max-height:calc(100vh - 32px);overflow:auto;box-sizing:border-box;padding:32px;text-align:center;animation:paneIn .3s ease both}
+.done2 .ring{width:64px;height:64px;margin:0 auto 12px;display:block}
+.done2 .ring circle{fill:rgba(16,185,129,.12);stroke:#10B981;stroke-width:3}
+.done2 .ring path{fill:none;stroke:#34D399;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+.done2 h2{margin:0;font:600 28px var(--sans);letter-spacing:-.025em;color:#fff}
+.done2 .pk{margin:20px 0 0;text-align:left;padding:16px 18px;border:1px solid rgba(6,78,59,.6);border-radius:12px;background:rgba(2,6,23,.55)}
+.done2 .pk .ln2{padding:8px 0;font-size:13.5px}.done2 .ln2 b{white-space:normal;text-align:right}
+.done2 .fp{margin-top:10px;font:400 11px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#64748B;word-break:break-all;text-align:left}
+.done2 .row{margin-top:22px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+a.pillbtn{text-decoration:none}
+@media (max-width:900px){
+  .portal{grid-template-columns:1fr;padding:84px 16px 40px;gap:16px}
+  .panel{position:static;order:-1;padding:18px 16px}
+  .ps li{padding-bottom:22px}.ps li:not(.view) .tx small{display:none}
+  .stage{padding:24px 18px;min-height:0}
+  .sgrow{grid-template-columns:1fr}
+}
 .go{border:0;border-radius:14px;padding:16px 46px;font:700 1.05rem var(--sans);letter-spacing:-.01em;color:#04120C;
   background:linear-gradient(180deg,#6EE7B7 0%,#34D399 45%,#10B981 100%);
   box-shadow:0 0 0 1px rgba(255,255,255,.28) inset,0 10px 30px -10px rgba(16,185,129,.7);transition:box-shadow .25s,transform .2s,filter .2s}
 .go:hover{transform:translateY(-2px);filter:brightness(1.06);box-shadow:0 0 0 1px rgba(255,255,255,.35) inset,0 0 0 6px rgba(16,185,129,.16),0 18px 50px -8px rgba(16,185,129,.95),0 0 90px -6px rgba(52,211,153,.7)}
 .go:active{transform:translateY(0)}
 .go:focus-visible{outline:2px solid #6EE7B7;outline-offset:4px}
-@media (max-width:480px){.tile{padding:32px 18px}}
 @media (max-width:640px){.splash{padding-top:84px}}
 
 /* preview bar + header */
@@ -272,30 +351,108 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
   </div>
 </section>
 
-<section class="screen" id="s2" aria-label="Personalized welcome">
+<section class="screen" id="s2" aria-label="Municipal onboarding">
   <div class="obsidian" aria-hidden="true"></div><div class="backlight" aria-hidden="true"></div>
-  <div class="s2wrap">
-    <div class="tile" role="group" aria-labelledby="wTitle">
-      <h1 id="wTitle" tabindex="-1">Welcome!</h1>
-      <p class="lead">Complete your easy <strong>CITIXEN UX</strong> onboarding in less than 5 minutes.</p>
-      <ol class="tl" id="tl" aria-label="Onboarding steps">
-        <li class="st on" aria-current="step"><i>1. Verification</i></li>
-        <li class="ln" aria-hidden="true"></li>
-        <li class="st nx"><i>2. § 893.80 Brief</i></li>
-        <li class="ln m" aria-hidden="true"></li>
-        <li class="st lt"><i>3. E-Signature</i></li>
+  <div class="portal">
+    <section class="gl stage" id="stage" aria-label="Onboarding step">
+      <div class="pane" id="p1">
+        <h1 id="wTitle" tabindex="-1">Welcome!</h1>
+        <p class="lead">Complete your easy <strong>CITIXEN UX</strong> onboarding in less than 5 minutes.</p>
+        <div class="cardx">
+          <div class="cx-h">LWMMI Loss Control Grant · pre-filled credit offset</div>
+          <div class="ln2"><span>Total platform value (annual)</span><b id="v1">$9,500</b></div>
+          <div class="ln2"><span>LWMMI Loss Control Grant credit offset<small>Pre-filled · pending LWMMI approval</small></span><b class="em" id="v2">−$9,500</b></div>
+          <div class="net" id="netLine">Net Out-of-Pocket Municipal Cost: <strong>$0.00</strong></div>
+          <p class="fine">$0.00 applies when the grant funds the platform. If grant funds are not disbursed to the Village within 60 days, the agreement ends and the Village owes nothing. Sample figures in this preview.</p>
+        </div>
+        <div class="acts2"><button type="button" class="pillbtn" id="c1">Verify &amp; Continue →</button></div>
+        <p class="pv">Preview build · sample data · nothing on this page is sent or filed.</p>
+      </div>
+
+      <div class="pane" id="p2">
+        <h1 class="h2" tabindex="-1">Wis. Stat. § 893.80 Statutory Defense Framework</h1>
+        <div class="cardx">
+          <ul class="bul">
+            <li>Each notice the Village receives is recorded in a <strong style="color:#fff">SHA-256 hash-chained log</strong>: every entry’s hash includes the one before it, so a later edit to any entry is detectable (tamper-evident).</li>
+            <li>The log lets the Village show when a notice arrived and what was done about it.</li>
+          </ul>
+          <div class="chain" id="chain" aria-label="Sample hash chain"></div>
+          <p class="fine">A record-keeping tool, not legal advice. It does not by itself confer immunity or establish a statutory defense. Village Attorney review is recommended.</p>
+        </div>
+        <div class="acts2"><button type="button" class="pillbtn sec" id="openSheet">Dispatch FYI Notice to Village Attorney</button><span class="chip" id="brChip" hidden></span></div>
+        <div class="acts2"><button type="button" class="pillbtn" id="c2">Acknowledge &amp; Proceed to E-Signature →</button></div>
+      </div>
+
+      <div class="pane" id="p3">
+        <h1 class="h2" tabindex="-1">Master Services Agreement &amp; Grant Application</h1>
+        <div class="cardx">
+          <div class="cx-h">Pre-filled agreement summary</div>
+          <div class="ln2"><span>Parties</span><b id="m1">Citixen UX · Village of Holmen, WI</b></div>
+          <div class="ln2"><span>Platform value</span><b id="m2">$9,500/yr</b></div>
+          <div class="ln2"><span>Funding<small>LWMMI Loss Control Grant credit · pending approval</small></span><b class="em" id="m3">−$9,500</b></div>
+          <div class="net" style="margin-top:14px"><b style="color:#fff">60-Day Grant Contingency Addendum.</b> If grant funds are not disbursed to the Village within 60 days, the agreement ends and the Village owes nothing.</div>
+          <p class="fine">Citixen UX draft · counsel review required · not an official LWMMI form. <a href="#review" id="fullDoc" style="color:#34D399">Read the full draft (3 pages) →</a></p>
+        </div>
+        <div id="signForm">
+          <p class="lead" id="sgWho" style="margin-top:22px"></p>
+          <div class="sgrow">
+            <div><label class="f" for="pnm">Full legal name</label><input class="t" id="pnm" type="text" maxlength="80" autocomplete="off" placeholder="Type your full legal name"></div>
+            <div><label class="f" for="pti">Title</label><input class="t" id="pti" type="text" maxlength="80" autocomplete="off" placeholder="e.g. Village Administrator"></div>
+          </div>
+          <p class="nm-note" id="nmNote" hidden></p>
+          <div class="seg2" role="group" aria-label="Signature method"><button type="button" id="pType" aria-pressed="true">Type</button><button type="button" id="pDraw" aria-pressed="false">Draw</button></div>
+          <div class="sgbox" id="sgBox"><div class="sgty ph" id="sgTy">Your signature</div><canvas id="sgCv" width="720" height="264" hidden aria-label="Draw your signature"></canvas><button type="button" class="sgclr" id="sgClr" hidden>Clear</button></div>
+          <label class="attest2"><input type="checkbox" id="patt"><span id="pattT"></span></label>
+          <p class="errl" id="perr" role="alert"></p>
+          <div class="acts2"><button type="button" class="pillbtn" id="c3" disabled>Sign &amp; Submit</button></div>
+        </div>
+        <div class="signed" id="signedBox" hidden></div>
+        <p class="pv">Preview build · sample data · signing here does not send anything, file with LWMMI, or verify identity.</p>
+      </div>
+    </section>
+
+    <aside class="gl panel" aria-label="Onboarding progress">
+      <h3>Onboarding progress</h3>
+      <ol class="ps" id="ps">
+        <li><button type="button" class="pb" data-step="1"><span class="bd"></span><span class="tx"><b>Verification</b><small>Pre-filled $9,500 grant credit offset validation ($0 net out-of-pocket).</small></span></button></li>
+        <li><button type="button" class="pb" data-step="2"><span class="bd"></span><span class="tx"><b>§ 893.80 Brief</b><small>1-click legal brief review &amp; attorney dispatch modal (FYI Notice or Magic Link Pause State).</small></span></button></li>
+        <li><button type="button" class="pb" data-step="3"><span class="bd"></span><span class="tx"><b>E-Signature</b><small>Digital execution of MSA and automatic generation of the $9,500 LWMMI grant application.</small></span></button></li>
       </ol>
-      <button type="button" class="go" id="goBtn">Let&rsquo;s Go</button>
-    </div>
+    </aside>
   </div>
 </section>
+
+<div class="sh-ov" id="shOv">
+  <div class="gl sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="shT">
+    <div class="sh-h"><h2 id="shT">Attorney review</h2><button type="button" class="x" id="shX" aria-label="Close">×</button></div>
+    <p class="lead" id="shWho" style="color:#94A3B8"></p>
+    <div class="seg2" role="group" aria-label="Dispatch option"><button type="button" id="oA" aria-pressed="true">Option A · FYI Notice</button><button type="button" id="oB" aria-pressed="false">Option B · Magic Link Pause</button></div>
+    <p class="lead" id="optDesc"></p>
+    <pre class="draft" id="draft"></pre>
+    <div class="note">Preview build: no email is sent and no magic link is created. This shows the states the real flow will have.</div>
+    <div class="status" id="shStatus" role="status" aria-live="polite"></div>
+    <div class="acts2"><button type="button" class="pillbtn" id="shGo">Dispatch (preview)</button><button type="button" class="pillbtn sec" id="shAck" hidden>Simulate attorney acknowledgement</button></div>
+  </div>
+</div>
+
+<div class="ov2" id="ov2">
+  <div class="gl done2" role="dialog" aria-modal="true" aria-labelledby="d2T" id="d2">
+    <svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46"/><path d="M30 52l14 14 27-30"/></svg>
+    <h2 id="d2T" tabindex="-1">Onboarding Complete!</h2>
+    <p class="lead" id="d2P"></p>
+    <div class="pk" id="d2Pk"></div>
+    <div class="note" id="d2W" style="text-align:left"></div>
+    <div class="fp" id="d2Fp"></div>
+    <div class="row"><button type="button" class="pillbtn" id="d2Dl">Download packet</button><a class="pillbtn sec" id="d2Go" href="/muni">Go to command center</a><button type="button" class="pillbtn sec" id="d2X">Close</button></div>
+  </div>
+</div>
 
 <div class="screen" id="s3" aria-label="Review and sign">
 <div id="shell">
 <div class="preview" role="note"><b>Preview build.</b> Sample data. Nothing on this page sends email, files with LWMMI, reserves a namespace or verifies your identity yet.</div>
 <header class="top">
   <a class="brand" href="/muni" aria-label="Citixen UX municipal gateway"><img src="/logo.svg" alt="CITIXEN UX" width="159" height="30"></a>
-  <div class="badge" id="badge">Onboarding</div>
+  <a href="#sign" id="rvBack" style="color:#34D399;font-size:.85rem;font-weight:600;text-decoration:none">← Back to onboarding</a><div class="badge" id="badge">Onboarding</div>
 </header>
 <ol class="stepper" id="stepper" aria-label="Onboarding progress"></ol>
 
@@ -595,7 +752,7 @@ function boot(){
     $('badge').hidden = true; return;
   }
   document.title = 'Onboarding — ' + T.name + ' · Citixen UX';
-  $('wTitle').textContent = OB.welcomeName ? 'Welcome, ' + OB.welcomeName + '!' : 'Welcome!';
+  fillPortal();
   var b = $('badge'); b.textContent = ''; b.appendChild(document.createTextNode('Anchor Town #' + OB.anchor + ' Onboarding | ')); b.appendChild(el('b', {text: OB.entity + ', ' + OB.state}));
   renderStepper();
   var pages = $('pages'); pageNodes().forEach(function (p) { pages.appendChild(p); });
@@ -627,34 +784,247 @@ $('dlPacket').addEventListener('click', function () { download('signed-packet-' 
 $('stay').addEventListener('click', function () { clearInterval(timer); $('cd').classList.remove('run'); $('cd').style.display = 'none'; $('cdT').textContent = 'Staying here. Use "Go to command center now" when you are ready.'; $('stay').hidden = true; });
 document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && $('ov').classList.contains('on') && !$('stay').hidden) $('stay').click(); });
 
-/* ---------- screens: 1 splash -> 2 welcome -> 3 review & sign ---------- */
+/* ---------- onboarding portal (screen 2) ---------- */
+var P = {done: [false, false, false], step: 1, br: {mode: 'fyi', status: 'none'}, sig: {mode: 'type', drawn: false}, signed: null};
+var HASHES = ['#welcome', '#brief', '#sign'];
+var CHECK = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 10.5l3.6 3.6 7.4-8"/></svg>';
+function stepFromHash(){ var i = HASHES.indexOf(location.hash); return i < 0 ? 1 : i + 1; }
+function allowedMax(){ return P.done[0] ? (P.done[1] ? 3 : 2) : 1; }
+function signatory(){ return (OB && OB.signatory) || {name: '', title: ''}; }
+function attorney(){ return (OB && OB.attorney) || {name: '', title: 'Village Attorney'}; }
+function fillPortal(){
+  var nm = OB.welcomeName; $('wTitle').textContent = nm ? 'Welcome, ' + nm + '!' : 'Welcome!';
+  $('v1').textContent = money(OB.platformValue).replace('.00', '');
+  $('v2').textContent = '−' + money(OB.grantCredit).replace('.00', '');
+  $('netLine').lastChild.textContent = money(Math.max(0, OB.platformValue - OB.grantCredit));
+  $('m1').textContent = 'Citixen UX · ' + OB.entity + ', ' + OB.state;
+  $('m2').textContent = money(OB.platformValue).replace('.00', '') + '/yr';
+  $('m3').textContent = '−' + money(OB.grantCredit).replace('.00', '');
+  var at = attorney(); $('openSheet').textContent = 'Dispatch FYI Notice to ' + (at.title || 'Village Attorney') + (at.name ? ' ' + at.name : '');
+  var sg = signatory();
+  $('sgWho').textContent = sg.name ? 'Authorized signatory on file: ' + sg.name + (sg.title ? ', ' + sg.title : '') + '.' : 'Sign as an authorized official of the ' + OB.entity + '.';
+  $('pattT').textContent = 'I am authorized to sign for the ' + OB.entity + ', and I have read the agreement summary and the 60-day grant contingency clause.';
+  $('shWho').textContent = (at.name ? at.name + ' · ' : '') + (at.title || 'Village Attorney') + ' · ' + OB.entity + ', ' + OB.state;
+  buildChain(); setOption('fyi');
+}
+async function buildChain(){
+  var box = $('chain'); box.textContent = ''; var prev = 'GENESIS', labels = ['Notice 1', 'Notice 2', 'Notice 3'];
+  for (var i = 0; i < 3; i++){
+    var h = await sha256Hex(prev + '|' + labels[i] + ' (sample)');
+    if (i) box.appendChild(el('i', {text: '→'}));
+    box.appendChild(el('span', {title: h}, [el('em', {text: labels[i]}), '#' + h.slice(0, 8)]));
+    prev = h;
+  }
+}
+function renderPanel(k){
+  var fr = P.done.indexOf(false), mx = allowedMax();
+  Array.prototype.forEach.call($('ps').children, function (li, i){
+    var st = P.done[i] ? 'done' : (i === fr ? 'cur' : 'todo');
+    li.className = st + (i + 1 === k ? ' view' : '');
+    var b = li.firstChild; b.disabled = (i + 1) > mx;
+    if (i + 1 === k) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+    li.querySelector('.bd').innerHTML = st === 'done' ? CHECK : String(i + 1);
+  });
+}
+function renderPortal(k, focus){
+  P.step = k;
+  ['p1', 'p2', 'p3'].forEach(function (id, i){ $(id).classList.toggle('on', i + 1 === k); });
+  renderPanel(k); syncBrief(); syncSign();
+  document.title = ['Welcome', '§ 893.80 brief', 'E-signature'][k - 1] + ' — Citixen UX';
+  window.scrollTo(0, 0);
+  if (focus){ var h = $('p' + k).querySelector('h1'); if (h) h.focus({preventScroll: true}); }
+}
+function portalGo(k){
+  k = Math.min(k, allowedMax());
+  var h = HASHES[k - 1];
+  if (h !== location.hash){ try { history.pushState(null, '', location.pathname + location.search + h); } catch (e) { location.hash = h; } }
+  renderPortal(k, true);
+}
+function clampedStep(){
+  var k = stepFromHash(), mx = allowedMax();
+  if (k > mx){ k = mx; try { history.replaceState(null, '', location.pathname + location.search + HASHES[k - 1]); } catch (e) {} }
+  return k;
+}
+$('c1').addEventListener('click', function () { P.done[0] = true; portalGo(2); });
+$('c2').addEventListener('click', function () { P.done[1] = true; portalGo(3); });
+Array.prototype.forEach.call($('ps').querySelectorAll('.pb'), function (b){ b.addEventListener('click', function () { portalGo(+b.getAttribute('data-step')); }); });
+$('fullDoc').addEventListener('click', function (e) { e.preventDefault(); nav(3); });
+$('rvBack').addEventListener('click', function (e) { e.preventDefault(); nav(2); });
+
+/* --- step 2: attorney dispatch sheet --- */
+var lastFocus = null;
+function draftText(mode){
+  var at = attorney(), sg = signatory();
+  var who = at.name ? at.name : 'Counsel';
+  return 'To: ' + (at.name ? at.name + ', ' : '') + (at.title || 'Village Attorney') + ', ' + OB.entity + ', ' + OB.state + '\n' +
+    'Subject: ' + (mode === 'fyi' ? 'FYI: ' : 'Review requested: ') + 'Citixen UX § 893.80 notice-log brief\n\n' +
+    'Hello ' + who + ',\n\n' +
+    (mode === 'fyi'
+      ? 'For your information: ' + (sg.name || 'the Village') + ' is onboarding the Village to the Citixen UX notice platform. The § 893.80 notice-log brief is attached for your records. No action is required for onboarding to continue.'
+      : (sg.name || 'The Village') + ' is onboarding the Village to the Citixen UX notice platform. Onboarding is paused until you open the one-time link below and acknowledge the § 893.80 notice-log brief.\n\n[one-time review link: created when the live flow is enabled]') +
+    '\n\nThis is a record-keeping brief, not legal advice.';
+}
+function setOption(m){
+  P.br.optMode = m;
+  $('oA').setAttribute('aria-pressed', m === 'fyi'); $('oB').setAttribute('aria-pressed', m === 'pause');
+  $('optDesc').textContent = m === 'fyi'
+    ? 'FYI Notice: sends a courtesy copy of the brief to the attorney. Onboarding continues while they review.'
+    : 'Magic Link Pause: onboarding pauses on this step until the attorney opens a one-time link and acknowledges the brief.';
+  $('draft').textContent = draftText(m);
+}
+function stamp(){ return new Date().toLocaleString('en-US', {dateStyle: 'medium', timeStyle: 'short'}); }
+function syncBrief(){
+  var st = P.br.status, chip = $('brChip');
+  chip.hidden = st === 'none'; chip.className = 'chip' + (st === 'paused' ? ' warn' : '');
+  chip.textContent = st === 'fyi' ? 'FYI Notice dispatched (preview) · ' + P.br.at : st === 'paused' ? 'Paused: awaiting attorney acknowledgement (preview)' : st === 'ack' ? 'Attorney acknowledged (simulated) · ' + P.br.at : '';
+  $('c2').disabled = st === 'paused';
+  var s2 = $('shStatus'); s2.className = 'status' + (st === 'paused' ? ' pz' : '');
+  s2.textContent = st === 'fyi' ? '✓ FYI Notice marked as dispatched (preview only; no email was sent). ' + P.br.at : st === 'paused' ? '⏸ Onboarding paused. Waiting for the attorney’s magic-link acknowledgement (preview only; no link was created).' : st === 'ack' ? '✓ Acknowledged (simulated). Onboarding can continue. ' + P.br.at : '';
+  $('shAck').hidden = st !== 'paused';
+  $('shGo').textContent = st === 'none' ? 'Dispatch (preview)' : 'Dispatch again (preview)';
+  $('shGo').hidden = st === 'paused';
+}
+function openSheet(){ lastFocus = document.activeElement; $('shOv').classList.add('on'); syncBrief(); $('oA').focus(); }
+function closeSheet(){ $('shOv').classList.remove('on'); if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('openSheet').addEventListener('click', openSheet);
+$('shX').addEventListener('click', closeSheet);
+$('shOv').addEventListener('click', function (e) { if (e.target === $('shOv')) closeSheet(); });
+$('oA').addEventListener('click', function () { setOption('fyi'); });
+$('oB').addEventListener('click', function () { setOption('pause'); });
+$('shGo').addEventListener('click', function () { P.br.at = stamp(); P.br.status = P.br.optMode === 'fyi' ? 'fyi' : 'paused'; P.br.mode = P.br.optMode; syncBrief(); });
+$('shAck').addEventListener('click', function () { P.br.at = stamp(); P.br.status = 'ack'; syncBrief(); });
+
+/* --- step 3: sign & submit --- */
+var cv = $('sgCv'), cx = cv.getContext('2d'), drawing = false;
+cx.lineWidth = 4; cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.strokeStyle = '#E2E8F0';
+function cpos(e){ var r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * cv.width / r.width, (e.clientY - r.top) * cv.height / r.height]; }
+cv.addEventListener('pointerdown', function (e) { drawing = true; cv.setPointerCapture(e.pointerId); var q = cpos(e); cx.beginPath(); cx.moveTo(q[0], q[1]); cx.lineTo(q[0] + .1, q[1] + .1); cx.stroke(); P.sig.drawn = true; syncSign(); });
+cv.addEventListener('pointermove', function (e) { if (!drawing) return; var q = cpos(e); cx.lineTo(q[0], q[1]); cx.stroke(); });
+['pointerup', 'pointercancel'].forEach(function (n) { cv.addEventListener(n, function () { drawing = false; }); });
+$('sgClr').addEventListener('click', function () { cx.clearRect(0, 0, cv.width, cv.height); P.sig.drawn = false; syncSign(); });
+function setSigMode(m){
+  P.sig.mode = m; $('pType').setAttribute('aria-pressed', m === 'type'); $('pDraw').setAttribute('aria-pressed', m === 'draw');
+  $('sgTy').hidden = m !== 'type'; cv.hidden = m !== 'draw'; $('sgClr').hidden = m !== 'draw'; syncSign();
+}
+$('pType').addEventListener('click', function () { setSigMode('type'); });
+$('pDraw').addEventListener('click', function () { setSigMode('draw'); });
+['pnm', 'pti'].forEach(function (id) { $(id).addEventListener('input', syncSign); });
+$('patt').addEventListener('change', syncSign);
+function sigValid(){
+  var nm = $('pnm').value.trim();
+  if (nm.split(/\s+/).filter(Boolean).length < 2) return 'Enter your full legal name.';
+  if (!$('pti').value.trim()) return 'Enter your title.';
+  if (P.sig.mode === 'draw' && !P.sig.drawn) return 'Draw your signature.';
+  if (!$('patt').checked) return 'Confirm your authority to sign.';
+  return '';
+}
+function syncSign(){
+  var nm = $('pnm').value.trim(), ty = $('sgTy');
+  ty.textContent = nm || 'Your signature'; ty.classList.toggle('ph', !nm);
+  var sg = signatory(), note = $('nmNote');
+  var differs = !!(sg.name && nm && nm.toLowerCase() !== sg.name.toLowerCase());
+  note.hidden = !differs;
+  if (differs) note.textContent = 'This name differs from the authorized signatory on file (' + sg.name + '). You can continue in this preview; a live execution would require identity verification.';
+  $('c3').disabled = !!sigValid() || !!P.signed || !!P.busy;
+  $('signForm').hidden = !!P.signed; $('signedBox').hidden = !P.signed;
+  if (P.signed){ $('signedBox').textContent = ''; $('signedBox').appendChild(el('b', {text: 'Signed in this preview. '})); $('signedBox').appendChild(document.createTextNode(P.signed.record.signer.name + ' · ' + P.signed.record.signer.signed_at.replace('T', ' ').slice(0, 16) + ' UTC. ')); var d = el('button', {type: 'button', class: 'pillbtn', style: 'margin-top:14px;display:block'}); d.textContent = 'Download packet'; d.addEventListener('click', downloadPacket); $('signedBox').appendChild(d); }
+}
+function agreementText(){
+  return ['MASTER SERVICES AGREEMENT SUMMARY (Citixen UX draft, counsel review required)',
+    'Parties: Citixen UX and ' + OB.entity + ', ' + OB.state,
+    'Platform value: ' + money(OB.platformValue) + ' per year',
+    'Funding: LWMMI Loss Control Grant credit of ' + money(OB.grantCredit) + ' (pending LWMMI approval)',
+    '60-Day Grant Contingency Addendum: if grant funds are not disbursed to the Village within 60 days, the agreement ends and the Village owes nothing.',
+    'Net out-of-pocket if funded: $0.00'].join('\n');
+}
+async function signSubmit(){
+  var why = sigValid(); if (why){ $('perr').textContent = why; return; }
+  P.busy = true; $('perr').textContent = ''; $('c3').disabled = true; $('c3').textContent = 'Signing…';
+  var now = new Date().toISOString(), sg = signatory();
+  var rec = {
+    packet_version: 2, preview: !CONFIG.live, municipality: OB.entity + ', ' + OB.state, namespace: '/muni/' + T.slug, policy_id_sample: OB.policy,
+    grant: {program: 'LWMMI Loss Control Grant', requested: OB.grantCredit, status: 'packet generated, not filed'},
+    platform_value_per_year: OB.platformValue, net_out_of_pocket_if_funded: Math.max(0, OB.platformValue - OB.grantCredit),
+    attorney_review: {recipient: attorney().name || null, mode: P.br.status === 'none' ? 'not dispatched' : P.br.mode, status: P.br.status, preview_only: true},
+    signer: {name: $('pnm').value.trim(), title: $('pti').value.trim(), method: P.sig.mode, signed_at: now, signatory_on_file: sg.name || null,
+             name_matches_signatory_on_file: sg.name ? $('pnm').value.trim().toLowerCase() === sg.name.toLowerCase() : null,
+             drawn_signature_png: P.sig.mode === 'draw' ? cv.toDataURL('image/png') : null, authority_confirmed: true, identity_verified: false},
+    agreement_summary_sha256: await sha256Hex(agreementText())
+  };
+  await new Promise(function (r) { setTimeout(r, 700); });
+  var fp = await sha256Hex(JSON.stringify(rec));
+  P.signed = {record: rec, fingerprint: fp}; P.busy = false; P.done[2] = true;
+  $('c3').textContent = 'Sign & Submit';
+  renderPanel(3); syncSign(); showComplete();
+}
+$('c3').addEventListener('click', signSubmit);
+function portalPacketHtml(){
+  var r = P.signed.record, fp = P.signed.fingerprint;
+  return '<!doctype html><html lang="en"><meta charset="utf-8"><title>LWMMI Loss Control Grant packet (draft) — ' + esc(r.municipality) + '</title>' +
+    '<body style="font:15px/1.55 Georgia,serif;max-width:760px;margin:30px auto;padding:0 16px;color:#111">' +
+    '<p style="background:#fff4d6;border:1px solid #ebcb6b;padding:10px 12px"><b>PREVIEW PACKET.</b> Sample data. Generated by Citixen UX; not sent to anyone, not filed with LWMMI, and signer identity is not verified. Citixen UX drafts require counsel review and are not an official LWMMI form.</p>' +
+    '<h1 style="font-size:1.4rem">LWMMI Loss Control Grant packet (draft): ' + esc(r.municipality) + '</h1>' +
+    '<table style="border-collapse:collapse;font-size:14px"><tr><td style="padding:3px 14px 3px 0"><b>Applicant</b></td><td>' + esc(r.municipality) + '</td></tr>' +
+    '<tr><td style="padding:3px 14px 3px 0"><b>Program</b></td><td>' + esc(r.grant.program) + '</td></tr>' +
+    '<tr><td style="padding:3px 14px 3px 0"><b>Amount requested</b></td><td>$' + r.grant.requested.toLocaleString() + '</td></tr>' +
+    '<tr><td style="padding:3px 14px 3px 0"><b>Policy ID</b></td><td>' + esc(r.policy_id_sample) + ' (sample)</td></tr>' +
+    '<tr><td style="padding:3px 14px 3px 0"><b>Status</b></td><td>' + esc(r.grant.status) + '; ready for Underwriting Desk review</td></tr>' +
+    '<tr><td style="padding:3px 14px 3px 0"><b>Signed by</b></td><td>' + esc(r.signer.name) + ', ' + esc(r.signer.title) + ' (' + esc(r.signer.method) + ' signature) at ' + esc(r.signer.signed_at) + '</td></tr></table>' +
+    (r.signer.drawn_signature_png ? '<p><img alt="Drawn signature" src="' + r.signer.drawn_signature_png + '" style="max-width:320px;background:#16202e;border-radius:6px"></p>' : '') +
+    '<h2 style="font-size:1.05rem">Agreement summary</h2><pre style="white-space:pre-wrap;font:13px/1.5 Georgia,serif">' + esc(agreementText()) + '</pre>' +
+    '<p>Agreement summary SHA-256: <code style="word-break:break-all">' + esc(r.agreement_summary_sha256) + '</code><br>Execution fingerprint SHA-256 of the record below: <code style="word-break:break-all">' + esc(fp) + '</code></p>' +
+    '<h2 style="font-size:1.05rem">Record</h2><pre style="white-space:pre-wrap;word-break:break-all;font-size:11px">' + esc(JSON.stringify(r)) + '</pre></body></html>';
+}
+function downloadPacket(){ download('lwmma-grant-packet-' + T.slug + '-preview.html', 'text/html', portalPacketHtml()); }
+function showComplete(){
+  var r = P.signed.record;
+  $('d2P').textContent = r.municipality + ' is signed in this preview.';
+  var pk = $('d2Pk'); pk.textContent = '';
+  pk.appendChild(el('div', {class: 'cx-h', text: 'Auto-generated LWMMI Loss Control Grant packet'}));
+  [['Applicant', r.municipality], ['Amount requested', '$' + r.grant.requested.toLocaleString()], ['Policy ID', r.policy_id_sample + ' (sample)'], ['Status', 'Ready for LWMMI Underwriting Desk submission · not submitted']].forEach(function (x) {
+    pk.appendChild(el('div', {class: 'ln2'}, [el('span', {text: x[0]}), el('b', {text: x[1]})]));
+  });
+  $('d2W').textContent = 'Preview: nothing was sent, no grant was filed with LWMMI, and the namespace was not reserved. The packet is a draft you can download and review.';
+  $('d2Fp').textContent = 'Execution fingerprint (SHA-256): ' + P.signed.fingerprint;
+  $('d2Go').href = '/muni/' + T.slug + '/admin';
+  lastFocus = $('c3'); $('ov2').classList.add('on'); $('d2T').focus();
+}
+function closeComplete(){ $('ov2').classList.remove('on'); var b = $('signedBox').querySelector('button'); if (b) b.focus(); }
+$('d2X').addEventListener('click', closeComplete);
+$('d2Dl').addEventListener('click', downloadPacket);
+$('ov2').addEventListener('click', function (e) { if (e.target === $('ov2')) closeComplete(); });
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Escape') return;
+  if ($('ov2').classList.contains('on')) closeComplete(); else if ($('shOv').classList.contains('on')) closeSheet();
+});
+
+/* ---------- screens: 1 splash -> 2 portal (#welcome #brief #sign) -> 3 full document review (#review) ---------- */
 var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 var scr = {1: $('s1'), 2: $('s2'), 3: $('s3')}, curScr = 0;
-function fromHash(){ return location.hash === '#review' ? 3 : location.hash === '#welcome' ? 2 : 1; }
+function fromHash(){ return location.hash === '#review' ? 3 : HASHES.indexOf(location.hash) >= 0 ? 2 : 1; }
 function showScreen(n){
   if (n === curScr) return;
   var first = curScr === 0, prev = scr[curScr], next = scr[n];
-  var focusIt = function () { var f = n === 1 ? $('beginBtn') : n === 2 ? $('wTitle') : $('nm'); if (!first && f) f.focus({preventScroll: true}); };
   var swap = function () {
     if (prev){ prev.classList.remove('on', 'leaving'); }
     next.classList.add('on'); curScr = n; window.scrollTo(0, 0);
     $('lg').classList.toggle('off', n === 3);
-    document.title = (n === 3 ? 'Review & sign' : 'Welcome') + ' — Citixen UX';
-    focusIt();
+    if (n === 2) renderPortal(clampedStep(), !first);
+    else { document.title = (n === 3 ? 'Review & sign' : 'Welcome') + ' — Citixen UX'; var f = n === 1 ? $('beginBtn') : $('nm'); if (!first && f) f.focus({preventScroll: true}); }
   };
   if (prev && !reduced){ prev.classList.add('leaving'); curScr = -1; setTimeout(swap, 420); } else swap();
 }
 function nav(n){
-  var h = n === 3 ? '#review' : n === 2 ? '#welcome' : '';
+  var h = n === 3 ? '#review' : n === 2 ? HASHES[Math.min(P.step, allowedMax()) - 1] : '';
   if (h !== location.hash){ try { history.pushState(null, '', location.pathname + location.search + h); } catch (e) { location.hash = h; } }
   showScreen(n);
 }
-window.addEventListener('popstate', function () { showScreen(fromHash()); });
-window.addEventListener('hashchange', function () { showScreen(fromHash()); });
+function onHash(){ var n = fromHash(); if (n === 2 && curScr === 2) renderPortal(clampedStep(), true); else showScreen(n); }
+window.addEventListener('popstate', onHash);
+window.addEventListener('hashchange', onHash);
 $('splash').addEventListener('click', function () { nav(2); });
 $('beginBtn').addEventListener('click', function (e) { e.stopPropagation(); nav(2); });
 document.addEventListener('keydown', function (e) { if (curScr === 1 && (e.key === 'Enter' || e.key === ' ') && !e.defaultPrevented){ e.preventDefault(); nav(2); } });
-$('goBtn').addEventListener('click', function () { nav(3); });
 
 boot();
 showScreen(fromHash());

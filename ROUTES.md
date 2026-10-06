@@ -58,3 +58,10 @@ Note: `muni/holmen-wi/gateway.html` is a byte-identical copy of `muni-gateway.ht
 served by the filesystem step (cleanUrls) so the public test URL does not depend
 on a rewrite. After editing `muni-gateway.html`, re-copy it:
 `cp muni-gateway.html muni/holmen-wi/gateway.html`.
+
+## Gateway flow (`/muni/holmen-wi/gateway`)
+
+`#welcome` (step 1 Verification), `#brief` (step 2 § 893.80 Brief) and `#sign` (step 3 E-Signature) are one
+portal screen with a persistent progress panel; steps unlock in order (a deep link ahead of progress bounces back).
+`#review` is the full 3-page agreement viewer, linked from step 3. Everything is a preview build: nothing is sent,
+filed with LWMMI, or identity-verified. The signatory and attorney names come from `onboarding` in `shared/tenants.js`.
