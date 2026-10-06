@@ -195,6 +195,47 @@ table.t td{padding:10px 12px;border-top:1px solid var(--line);vertical-align:mid
   .menu{right:-6px}
 }
 @media (max-width:480px){.title{font-size:.82rem}main{padding:16px 12px 56px}.col{padding:14px}}
+
+/* ---------- Systems: site registry monitor ---------- */
+.sx-head{background:linear-gradient(135deg,#0D2C54,#16425B);border:1px solid var(--line-2);border-radius:16px;padding:20px 20px 18px;margin-bottom:14px}
+.sx-head .eyebrow{color:#9fe8c8}
+.sx-head h2{margin:0 0 6px;font-size:clamp(1.05rem,2.4vw,1.45rem);font-weight:900;letter-spacing:.01em;line-height:1.25}
+.sx-head p{margin:0;color:#c3d3e0;max-width:78ch;font-size:.84rem}
+.sx-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}
+.sx-metric{background:var(--surface);border:1px solid var(--line-2);border-radius:14px;padding:12px 14px}
+.sx-metric b{display:block;font-size:1.9rem;line-height:1.1;font-weight:900}
+.sx-metric span{font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:700}
+.sx-metric.live b{color:var(--green)}.sx-metric.draft b{color:var(--yellow)}.sx-metric.off b{color:var(--red)}
+.sx-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.sx-pills{display:flex;flex-wrap:wrap;gap:6px}
+.sx-pill{background:var(--surface-2);border:1px solid var(--line-2);border-radius:9999px;padding:6px 13px;font-size:.78rem;font-weight:700;color:var(--muted)}
+.sx-pill[aria-pressed="true"]{color:var(--bg);background:var(--green);border-color:var(--green)}
+.sx-search{flex:1 1 260px;min-width:200px;background:var(--bg);border:1px solid var(--line-2);border-radius:10px;padding:8px 12px}
+.sx-note{font-size:.76rem;color:var(--muted);margin:0 0 12px}
+.sx-feed{display:grid;gap:12px}
+.sx-card{background:var(--surface);border:1px solid var(--line-2);border-radius:14px;padding:14px 16px}
+.sx-row{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.sx-badge{font-family:var(--mono);font-size:.68rem;font-weight:800;letter-spacing:.05em;padding:3px 10px;border-radius:9999px;border:1px solid;white-space:nowrap}
+.sx-badge.live{color:var(--green);border-color:rgba(0,255,135,.45);background:var(--green-dim)}
+.sx-badge.draft{color:var(--yellow);border-color:rgba(250,204,21,.45);background:rgba(250,204,21,.08)}
+.sx-badge.off{color:var(--red);border-color:rgba(239,68,68,.5);background:rgba(239,68,68,.08)}
+.sx-badge.unk{color:var(--muted);border-color:var(--line-2)}
+.sx-url{font-family:var(--mono);font-size:.9rem;font-weight:700;word-break:break-all;flex:1 1 220px}
+.sx-links{display:flex;gap:6px;flex-wrap:wrap}
+.sx-links a,.sx-links button{background:none;border:1px solid var(--line-2);border-radius:8px;padding:4px 10px;font-size:.74rem;font-weight:700;color:var(--green);text-decoration:none}
+.sx-links a:hover,.sx-links button:hover{border-color:var(--green)}
+.sx-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px 18px;margin:12px 0 0}
+.sx-grid dt{font-size:.62rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:0}
+.sx-grid dd{margin:2px 0 0;font-size:.82rem;word-break:break-word}
+.sx-panel{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+.sx-panel h4{margin:0 0 6px;font-size:.8rem}
+.sx-log{list-style:none;margin:0;padding:0;font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+.sx-log li{padding:3px 0;border-bottom:1px dashed var(--line)}
+.sx-log li b{color:var(--text);font-weight:600}
+.sx-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;align-items:end}
+.sx-form label{display:block;font-size:.64rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:4px}
+.sx-form input,.sx-form select{width:100%;background:var(--bg);border:1px solid var(--line-2);border-radius:10px;padding:8px 10px}
+.sx-err{color:var(--red);font-size:.78rem;min-height:1.2em;margin:6px 0 0}
 </style>
 </head>
 <body data-view="home">
@@ -613,9 +654,12 @@ const DEPTS = {
 
 function renderDept(key){
   const d = DEPTS[key], root = $('view-' + key); root.textContent = '';
-  root.appendChild(el('p',{class:'eyebrow',text:'Workspace'}));
-  root.appendChild(el('h2',{class:'page',text:d.title}));
-  root.appendChild(el('p',{class:'page-sub',text:d.sub}));
+  if (key === 'systems'){ buildSites(root); }
+  else {
+    root.appendChild(el('p',{class:'eyebrow',text:'Workspace'}));
+    root.appendChild(el('h2',{class:'page',text:d.title}));
+    root.appendChild(el('p',{class:'page-sub',text:d.sub}));
+  }
   const grid = el('div',{class:'mod-grid'});
   d.modules.forEach(m => {
     const card = el('div',{class:'mod'});
@@ -775,6 +819,192 @@ function buildFoia(){
   $('foCopy').addEventListener('click', () => {
     (navigator.clipboard ? navigator.clipboard.writeText($('foOut').value) : Promise.reject()).then(() => toast('Copied'), () => { $('foOut').select(); toast('Press Ctrl/Cmd+C to copy'); });
   });
+}
+
+
+/* ---- Systems: citixenux.com site registry & live deployment monitor ----
+   Real data only:
+   - Seed entries are the routes that exist in this repo (SITE + the Austin demo hub).
+   - "Live" is measured: a GET from this browser that returns 200 and is NOT redirected
+     and is NOT the host's fallback page. Redirected / 4xx / 5xx / unreachable = Offline.
+   - Staging/Draft is a status a person sets (Manage). Nothing here deploys anything.
+   - Registry edits and the audit trail are saved in THIS browser only (like the renewal tracker).
+   - Not available without a server-side monitor: uptime %, certificate expiry. Shown as such. */
+const SX_KEY = 'nx_sites_v1', SX_LOG_KEY = 'nx_sites_log_v1';
+const SX_SEED = [
+  {id:'app', path:'/app', entity:'Public (all residents)', module:'Civilian PWA intake web app', ledger:'Writes reports to the shared ledger'},
+  {id:'ledger', path:'/ledger', entity:'Public', module:'Master Search: SHA-256 Living Ledger Explorer', ledger:'Reads the public ledger'},
+  {id:'muni', path:'/muni', entity:'Municipal gateway (public)', module:'Gateway and grant activation request', ledger:'n/a'},
+  {id:'muni-lacrosse', path:'/muni/lacrosse', entity:'City of La Crosse', module:'Multi-tenant city hub (read-only)', ledger:'Reads the public ledger'},
+  {id:'muni-austin', path:'/muni/austin', entity:'City of Austin (demo tenant)', module:'City hub with demo data', ledger:'In-page demo chain (not persisted)'},
+  {id:'nexus', path:'/nexus', entity:'Internal', module:'Citizen UX Nexus', ledger:'n/a'}
+];
+let sxStore = {custom:[], over:{}};
+try { const j = JSON.parse(lsGet(SX_KEY) || 'null'); if (j && Array.isArray(j.custom) && j.over && typeof j.over === 'object') sxStore = j; } catch(e){}
+let sxLog = {}; try { const j = JSON.parse(lsGet(SX_LOG_KEY) || '{}'); if (j && typeof j === 'object') sxLog = j; } catch(e){}
+let sxProbe = {}, sxFilter = 'all', sxQuery = '', sxOpen = {}, sxFallback = null;
+const SX_LABEL = {live:'🟢 LIVE PUBLISHED', draft:'🟡 STAGING / DRAFT', off:'🔴 OFFLINE / ARCHIVED', unk:'CHECKING…'};
+function sxSave(){ lsSet(SX_KEY, JSON.stringify(sxStore)); lsSet(SX_LOG_KEY, JSON.stringify(sxLog)); }
+function sxAddLog(id, msg){ (sxLog[id] = sxLog[id] || []).unshift({t:Date.now(), m:msg}); sxLog[id] = sxLog[id].slice(0, 25); sxSave(); }
+function sxSites(){
+  const seeds = SX_SEED.map(x => Object.assign({source:'repo'}, x, sxStore.over[x.id] || {}));
+  const custom = sxStore.custom.map(x => Object.assign({source:'manual', ledger:'Not checked'}, x, sxStore.over[x.id] || {}));
+  return seeds.concat(custom);
+}
+function sxState(site){
+  if (site.state) return site.state;           // set by a person via Manage
+  const p = sxProbe[site.id];
+  if (!p) return 'unk';
+  return p.live ? 'live' : 'off';
+}
+async function sxRunProbe(){
+  if (!sxFallback){
+    try { const r = await fetch('/__nx_probe_' + Math.random().toString(36).slice(2), {cache:'no-store'}); sxFallback = {status:r.status, text: r.ok ? await r.text() : null}; }
+    catch(e){ sxFallback = {status:0, text:null}; }
+  }
+  await Promise.all(sxSites().map(async site => {
+    const t0 = performance.now(); let res;
+    try {
+      const r = await fetch(site.path, {cache:'no-store', headers:{accept:'text/html,*/*'}});
+      const ms = Math.round(performance.now() - t0), lm = r.headers.get('last-modified');
+      let fallback = false;
+      if (r.ok && sxFallback.text != null){ try { fallback = (await r.text()) === sxFallback.text; } catch(e){} }
+      const redirected = r.redirected && new URL(r.url).pathname !== site.path;
+      const lmd = lm ? new Date(lm) : null;
+      res = {status:r.status, ms, redirected, to: redirected ? new URL(r.url).pathname : '', fallback,
+        live: r.ok && !redirected && !fallback, lm: lmd && !isNaN(lmd) && lmd.getFullYear() > 2020 ? lmd : null, at:Date.now()};
+    } catch(e){ res = {status:0, ms:Math.round(performance.now() - t0), live:false, error:true, at:Date.now()}; }
+    sxProbe[site.id] = res;
+    sxAddLog(site.id, 'Probe: ' + (res.error ? 'unreachable' : 'HTTP ' + res.status + (res.redirected ? ' (redirected to ' + res.to + ')' : '') + (res.fallback ? ' (fallback page, no site here)' : '')) + ' · ' + res.ms + ' ms');
+  }));
+  sxRender();
+}
+function sxHealth(site){
+  const p = sxProbe[site.id]; if (!p) return 'Checking…';
+  if (p.error) return '✗ Unreachable';
+  const tls = location.protocol === 'https:' ? 'served over HTTPS' : 'not HTTPS here';
+  return (p.live ? '✓ ' : '✗ ') + 'HTTP ' + p.status + (p.redirected ? ' → ' + p.to : '') + (p.fallback ? ' (fallback page)' : '') + ' · ' + p.ms + ' ms · ' + tls;
+}
+function sxCounts(list){
+  const c = {total:list.length, live:0, draft:0, off:0, unk:0};
+  list.forEach(s => { c[sxState(s)]++; });
+  return c;
+}
+function sxRender(){
+  const host = $('sxHost'); if (!host) return;
+  const all = sxSites(), c = sxCounts(all);
+  $('sxTotal').textContent = c.total; $('sxLive').textContent = c.live; $('sxDraft').textContent = c.draft; $('sxOff').textContent = c.off;
+  $('sxUnk').textContent = c.unk ? c.unk + ' site(s) still being checked.' : '';
+  const q = sxQuery.trim().toLowerCase();
+  const list = all.filter(s => (sxFilter === 'all' || sxState(s) === sxFilter) &&
+    (!q || (s.path + ' ' + s.entity + ' ' + s.module).toLowerCase().includes(q)));
+  host.textContent = '';
+  if (!list.length){ host.appendChild(el('div',{class:'empty',text:'No sites match this filter.'})); return; }
+  list.forEach(s => {
+    const st = sxState(s), p = sxProbe[s.id], card = el('div',{class:'sx-card','data-site':s.id});
+    const links = el('div',{class:'sx-links'});
+    links.appendChild(el('a',{href:s.path,target:'_blank',rel:'noopener',text:'Open Site ↗'}));
+    const bLog = el('button',{type:'button',text:'Audit Logs','aria-expanded':String(sxOpen[s.id] === 'log')});
+    const bMan = el('button',{type:'button',text:'Manage','aria-expanded':String(sxOpen[s.id] === 'manage')});
+    bLog.addEventListener('click', () => { sxOpen[s.id] = sxOpen[s.id] === 'log' ? '' : 'log'; sxRender(); });
+    bMan.addEventListener('click', () => { sxOpen[s.id] = sxOpen[s.id] === 'manage' ? '' : 'manage'; sxRender(); });
+    links.appendChild(bLog); links.appendChild(bMan);
+    card.appendChild(el('div',{class:'sx-row'},[el('span',{class:'sx-badge ' + st,text:SX_LABEL[st]}), el('span',{class:'sx-url',text:location.host + s.path}), links]));
+    const dd = (k, v) => [el('div',{},[el('dt',{text:k}), el('dd',{text:v})])];
+    const grid = el('dl',{class:'sx-grid'});
+    [['Target entity / municipality', s.entity], ['Active module', s.module],
+     ['Last deployment', p && p.lm ? p.lm.toLocaleString(undefined,{dateStyle:'medium',timeStyle:'short'}) : 'Not reported by the host'],
+     ['SHA-256 ledger', s.ledger],
+     ['Health check (measured from this browser)', sxHealth(s)],
+     ['Status source', s.state ? 'Set by a person (Manage)' : 'Measured by probe']
+    ].forEach(([k, v]) => dd(k, v).forEach(n => grid.appendChild(n)));
+    card.appendChild(grid);
+    if (sxOpen[s.id] === 'log'){
+      const pan = el('div',{class:'sx-panel'},[el('h4',{text:'Activity in this browser (probes and registry changes)'})]);
+      const ul = el('ul',{class:'sx-log'});
+      (sxLog[s.id] || []).forEach(e => ul.appendChild(el('li',{},[el('b',{text:new Date(e.t).toLocaleString() + ' '}), e.m])));
+      if (!ul.children.length) ul.appendChild(el('li',{text:'No activity recorded yet.'}));
+      pan.appendChild(ul);
+      pan.appendChild(el('p',{class:'sx-note',style:'margin-top:8px',text:'Commits and deploys are in the repo and Vercel history; they are not read into this page.'}));
+      card.appendChild(pan);
+    }
+    if (sxOpen[s.id] === 'manage'){
+      const pan = el('div',{class:'sx-panel'},[el('h4',{text:'Manage (saved in this browser only)'})]);
+      const form = el('div',{class:'sx-form'});
+      const sel = el('select',{id:'sxS-' + s.id,'aria-label':'Status'}); 
+      [['','Auto (measured by probe)'],['live','Live Published'],['draft','Staging / Draft'],['off','Offline / Archived']].forEach(([v,t]) => { const o = el('option',{value:v,text:t}); if ((s.state || '') === v) o.selected = true; sel.appendChild(o); });
+      const ent = el('input',{type:'text',id:'sxE-' + s.id,value:s.entity,maxlength:'80','aria-label':'Entity'});
+      const mod = el('input',{type:'text',id:'sxM-' + s.id,value:s.module,maxlength:'80','aria-label':'Module'});
+      form.appendChild(el('div',{},[el('label',{text:'Status'}), sel]));
+      form.appendChild(el('div',{},[el('label',{text:'Entity / municipality'}), ent]));
+      form.appendChild(el('div',{},[el('label',{text:'Active module'}), mod]));
+      const save = el('button',{type:'button',class:'btn',text:'Save'});
+      save.addEventListener('click', () => {
+        const o = {entity: ent.value.trim() || s.entity, module: mod.value.trim() || s.module};
+        if (sel.value) o.state = sel.value;
+        if (s.source === 'manual'){ const i = sxStore.custom.findIndex(x => x.id === s.id); if (i > -1){ delete sxStore.custom[i].state; Object.assign(sxStore.custom[i], o); } }
+        else sxStore.over[s.id] = o;
+        sxAddLog(s.id, 'Registry edited by you: status ' + (sel.value || 'auto'));
+        sxOpen[s.id] = ''; sxSave(); sxRender(); toast('Saved in this browser');
+      });
+      const acts = el('div',{style:'display:flex;gap:8px'},[save]);
+      if (s.source === 'manual'){
+        const rm = el('button',{type:'button',class:'btn ghost',text:'Remove entry'});
+        rm.addEventListener('click', () => { sxStore.custom = sxStore.custom.filter(x => x.id !== s.id); delete sxStore.over[s.id]; sxSave(); sxRender(); toast('Entry removed'); });
+        acts.appendChild(rm);
+      }
+      form.appendChild(acts); pan.appendChild(form); card.appendChild(pan);
+    }
+    host.appendChild(card);
+  });
+}
+function buildSites(root){
+  const head = el('div',{class:'sx-head'},[
+    el('p',{class:'eyebrow',text:'Systems Engineering'}),
+    el('h2',{text:'CITIXENUX.COM/SITES — LIVE DEPLOYMENT & PUBLICATION MONITOR'}),
+    el('p',{text:'Real-time registry, SSL status, and publication status for all municipal, client, and internal sites provisioned under citixenux.com. Status is measured from this browser; see the note below the filters.'})]);
+  root.appendChild(head);
+  const m = (id, cls, label) => el('div',{class:'sx-metric ' + cls},[el('b',{id,text:'…'}), el('span',{text:label})]);
+  root.appendChild(el('div',{class:'sx-metrics'},[m('sxTotal','','Total provisioned sites'), m('sxLive','live','🟢 Live published'), m('sxDraft','draft','🟡 Staging / draft'), m('sxOff','off','🔴 Offline / retired')]));
+  const bar = el('div',{class:'sx-bar'});
+  const pills = el('div',{class:'sx-pills',role:'group','aria-label':'Filter by publication state'});
+  [['all','All Sites'],['live','🟢 Live Published'],['draft','🟡 Staging / Draft'],['off','🔴 Offline / Archived']].forEach(([k,t]) => {
+    const b = el('button',{type:'button',class:'sx-pill','aria-pressed':String(k === sxFilter),text:t});
+    b.addEventListener('click', () => { sxFilter = k; pills.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed','false')); b.setAttribute('aria-pressed','true'); sxRender(); });
+    pills.appendChild(b);
+  });
+  const search = el('input',{type:'search',class:'sx-search',placeholder:'Filter sites by slug, municipality, or module type...','aria-label':'Filter sites'});
+  search.addEventListener('input', () => { sxQuery = search.value; sxRender(); });
+  const add = el('button',{type:'button',class:'btn',text:'+ Provision New Site Slug'});
+  bar.appendChild(pills); bar.appendChild(search); bar.appendChild(add); root.appendChild(bar);
+  const addPanel = el('div',{class:'tool',hidden:''});
+  addPanel.appendChild(el('p',{class:'hint',text:'This adds a record to the registry in this browser. It does not create, deploy or publish a site; the site itself has to exist in the repo.'}));
+  const f = el('div',{class:'sx-form'});
+  const slug = el('input',{type:'text',id:'sxNewSlug',maxlength:'41',placeholder:'e.g. holmen-wi'});
+  const ent = el('input',{type:'text',id:'sxNewEnt',maxlength:'80',placeholder:'e.g. Village of Holmen, WI'});
+  const mod = el('input',{type:'text',id:'sxNewMod',maxlength:'80',placeholder:'e.g. Digital Onboarding Hub'});
+  const st = el('select',{id:'sxNewState'}); [['draft','Staging / Draft'],['live','Live Published'],['off','Offline / Archived']].forEach(([v,t]) => st.appendChild(el('option',{value:v,text:t})));
+  const go = el('button',{type:'button',class:'btn',text:'Add to registry'});
+  [['Slug (citixenux.com/sites/{slug})',slug],['Entity / municipality',ent],['Active module',mod],['Status',st]].forEach(([l,n]) => f.appendChild(el('div',{},[el('label',{text:l}), n])));
+  f.appendChild(go); addPanel.appendChild(f);
+  const err = el('p',{class:'sx-err',role:'alert'}); addPanel.appendChild(err); root.appendChild(addPanel);
+  add.addEventListener('click', () => { addPanel.hidden = !addPanel.hidden; if (!addPanel.hidden) slug.focus(); });
+  go.addEventListener('click', () => {
+    const v = slug.value.trim().toLowerCase();
+    if (!/^[a-z0-9][a-z0-9-]{1,40}$/.test(v)){ err.textContent = 'Slug: 2–41 characters, lowercase letters, numbers and hyphens.'; slug.focus(); return; }
+    const id = 'site-' + v;
+    if (sxSites().some(x => x.id === id)){ err.textContent = 'That slug is already in the registry.'; return; }
+    err.textContent = '';
+    sxStore.custom.push({id, path:'/sites/' + v, entity: ent.value.trim() || 'Not set', module: mod.value.trim() || 'Not set', state: st.value});
+    sxAddLog(id, 'Added to registry by you as ' + st.value); sxSave();
+    slug.value = ent.value = mod.value = ''; addPanel.hidden = true;
+    sxRender(); sxRunProbe(); toast('Added to registry (record only, nothing deployed)');
+  });
+  root.appendChild(el('p',{class:'sx-note',id:'sxUnk'}));
+  root.appendChild(el('p',{class:'sx-note',text:'How status is decided: 🟢 only when a request from this browser returns 200, is not redirected and is not the host\'s fallback page. Redirects, errors and unreachable sites count as 🔴. 🟡 is set by a person under Manage. Uptime percentage and certificate expiry need a server-side monitor and are not shown.'}));
+  root.appendChild(el('div',{class:'sx-feed',id:'sxHost'}));
+  root.appendChild(el('h3',{text:'Infrastructure and APIs',style:'margin:24px 0 10px'}));
+  sxRender(); sxRunProbe();
 }
 
 /* ===================== CORPORATE LAYER ===================== */
