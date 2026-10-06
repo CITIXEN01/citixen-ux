@@ -105,7 +105,7 @@ textarea{min-height:76px;resize:vertical}
       <p>Enter your city to open its hub.</p>
       <form id="loginForm" novalidate>
         <label for="loginCity">City hub address</label>
-        <input id="loginCity" name="slug" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="e.g. lacrosse">
+        <input id="loginCity" name="slug" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="e.g. la-crosse-wi">
         <button class="btn" type="submit">Open city hub</button>
         <div class="msg" id="loginMsg" role="status"></div>
       </form>
@@ -137,7 +137,7 @@ textarea{min-height:76px;resize:vertical}
     var raw = $('loginCity').value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '');
     var msg = $('loginMsg'); msg.className = 'msg';
     // Accept "la crosse", "La-Crosse" etc. by comparing letters/digits only.
-    var hit = Object.keys(T).filter(function (k) { return k.replace(/[^a-z0-9]+/g, '') === raw; })[0];
+    var hit = Object.keys(T).filter(function (k) { var full = k.replace(/[^a-z0-9]+/g, ''), city = k.replace(/-[a-z]{2}$/, '').replace(/[^a-z0-9]+/g, ''); return full === raw || city === raw; })[0];
     if (!raw) { msg.className = 'msg err'; msg.textContent = 'Enter your city hub address.'; return; }
     if (!hit) { msg.className = 'msg err'; msg.textContent = 'No city hub exists for that address yet. Request activation to get one.'; return; }
     msg.className = 'msg ok'; msg.textContent = 'Opening ' + T[hit].name + '…';

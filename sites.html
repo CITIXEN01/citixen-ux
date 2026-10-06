@@ -50,7 +50,7 @@ a.back{color:var(--green)}
   'use strict';
   var T = window.NEXUS_TENANTS || {};
   // Instances that are onboarding and have no hub tenant yet.
-  var ONBOARDING = { holmen: { name: 'Village of Holmen, WI', note: 'Onboarding (preview)', hub: false } };
+  var ONBOARDING = { 'holmen-wi': { name: 'Village of Holmen, WI', note: 'Onboarding (preview)', hub: false } };
   var PORTALS = {};
   var all = {};
   Object.keys(T).forEach(function (k) { all[k] = { name: T[k].name, note: T[k].source === 'demo' ? 'Demo data' : 'Live ledger, read-only', hub: true }; });

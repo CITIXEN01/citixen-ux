@@ -590,7 +590,7 @@ const SITE = [
   {path:'/ledger', note:'citixenux.com root currently redirects to /app; Master Search lives here until the root is switched.', what:'Master Search Engine — SHA-256 Living Ledger Explorer', pill:['beta','Beta'], href:'/ledger', label:'citixenux.com → /ledger'},
   {path:'/app', what:'Civilian PWA intake web app', pill:['live','Live'], href:'/app'},
   {path:'/muni', what:'Public Municipal Gateway: demo video, $9,500 PO grant activation request, city hub access', pill:['beta','Beta'], href:'/muni'},
-  {path:'/muni/lacrosse/admin', what:'Multi-tenant city hub (example): Audit Vault and Executive Cadence', pill:['beta','Read-only'], href:'/muni/lacrosse/admin'},
+  {path:'/muni/la-crosse-wi/admin', what:'Multi-tenant city hub (example): Audit Vault and Executive Cadence', pill:['beta','Read-only'], href:'/muni/la-crosse-wi/admin'},
   {path:'/nexus', what:'Citixen UX Nexus (this page)', pill:['live','Live'], href:'/nexus', here:true}
 ];
 function renderMatrix(){
@@ -634,7 +634,7 @@ const DEPTS = {
     modules:[
       {t:'Municipal onboarding', d:'Moving a city from request to live hub. Cities start from the activation request on the public gateway.', pill:['beta','Entry point live'], href:'/muni#activation', cta:'Open activation request'},
       {t:'Risk pool grant catalog inclusions', d:'Tracking which risk pool grant catalogs list Citixen UX. Nothing is recorded yet.', pill:['planned','Planned']},
-      {t:'City geofencing', d:'Zones are configured per city in each hub\'s Geo-Fence settings (Austin demo shows the layout; La Crosse has none configured).', pill:['beta','Per-hub'], href:'/muni/austin/admin', cta:'See the demo hub'}
+      {t:'City geofencing', d:'Zones are configured per city in each hub\'s Geo-Fence settings (Austin demo shows the layout; La Crosse has none configured).', pill:['beta','Per-hub'], href:'/muni/austin-tx/admin', cta:'See the demo hub'}
     ], tool:'renewals' },
   systems:{ title:'Systems Engineering', sub:'Uptime, ledger integrity, APIs, infrastructure and patch history.',
     resp:['Uptime telemetry','SHA-256 ledger integrity','API endpoints','Infrastructure performance','Operational patch logs'],
@@ -835,9 +835,9 @@ const SX_SEED = [
   {id:'app', path:'/app', entity:'Public (all residents)', module:'Civilian PWA intake web app', ledger:'Writes reports to the shared ledger'},
   {id:'ledger', path:'/ledger', entity:'Public', module:'Master Search: SHA-256 Living Ledger Explorer', ledger:'Reads the public ledger'},
   {id:'muni', path:'/muni', entity:'Municipal gateway (public)', module:'Gateway and grant activation request', ledger:'n/a'},
-  {id:'muni-lacrosse', path:'/muni/lacrosse/admin', entity:'City of La Crosse', module:'City hub: Audit Vault and Executive Cadence (read-only)', ledger:'Reads the public ledger'},
-  {id:'muni-austin', path:'/muni/austin/admin', entity:'City of Austin (demo tenant)', module:'City hub with demo data', ledger:'In-page demo chain (not persisted)'},
-  {id:'muni-holmen-onboard', path:'/muni/holmen/onboard', entity:'Village of Holmen, WI', module:'Digital Onboarding Hub (preview)', ledger:'n/a'},
+  {id:'muni-lacrosse', path:'/muni/la-crosse-wi/admin', entity:'City of La Crosse', module:'City hub: Audit Vault and Executive Cadence (read-only)', ledger:'Reads the public ledger'},
+  {id:'muni-austin', path:'/muni/austin-tx/admin', entity:'City of Austin (demo tenant)', module:'City hub with demo data', ledger:'In-page demo chain (not persisted)'},
+  {id:'muni-holmen-onboard', path:'/muni/holmen-wi/onboard', entity:'Village of Holmen, WI', module:'Digital Onboarding Hub (preview)', ledger:'n/a'},
   {id:'sites', path:'/sites', entity:'Internal', module:'Multi-tenant site directory', ledger:'n/a'},
   {id:'nexus', path:'/nexus', entity:'Internal', module:'Citixen UX Nexus', ledger:'n/a'}
 ];
@@ -982,7 +982,7 @@ function buildSites(root){
   const addPanel = el('div',{class:'tool',hidden:''});
   addPanel.appendChild(el('p',{class:'hint',text:'This adds a record to the registry in this browser. It does not create, deploy or publish a site; the site itself has to exist in the repo.'}));
   const f = el('div',{class:'sx-form'});
-  const slug = el('input',{type:'text',id:'sxNewSlug',maxlength:'41',placeholder:'e.g. holmen-wi'});
+  const slug = el('input',{type:'text',id:'sxNewSlug',maxlength:'61',placeholder:'city-state, e.g. holmen-wi'});
   const ent = el('input',{type:'text',id:'sxNewEnt',maxlength:'80',placeholder:'e.g. Village of Holmen, WI'});
   const mod = el('input',{type:'text',id:'sxNewMod',maxlength:'80',placeholder:'e.g. Digital Onboarding Hub'});
   const st = el('select',{id:'sxNewState'}); [['draft','Staging / Draft'],['live','Live Published'],['off','Offline / Archived']].forEach(([v,t]) => st.appendChild(el('option',{value:v,text:t})));
@@ -993,7 +993,10 @@ function buildSites(root){
   add.addEventListener('click', () => { addPanel.hidden = !addPanel.hidden; if (!addPanel.hidden) slug.focus(); });
   go.addEventListener('click', () => {
     const v = slug.value.trim().toLowerCase();
-    if (!/^[a-z0-9][a-z0-9-]{1,40}$/.test(v)){ err.textContent = 'Slug: 2–41 characters, lowercase letters, numbers and hyphens.'; slug.focus(); return; }
+    if (!/^[a-z0-9][a-z0-9-]{1,60}$/.test(v)){ err.textContent = 'Slug: lowercase letters, numbers and hyphens.'; slug.focus(); return; }
+    const US = 'al ak az ar ca co ct de dc fl ga hi id il in ia ks ky la me md ma mi mn ms mo mt ne nv nh nj nm ny nc nd oh ok or pa ri sc sd tn tx ut vt va wa wv wi wy'.split(' ');
+    const parts = v.split('-');
+    if (!parts.some((p, i) => i > 0 && US.indexOf(p) > -1)){ err.textContent = 'Use the city-state standard, e.g. holmen-wi or la-crosse-wi (add a department after the state: holmen-wi-parks).'; slug.focus(); return; }
     const id = 'site-' + v;
     if (sxSites().some(x => x.id === id)){ err.textContent = 'That slug is already in the registry.'; return; }
     err.textContent = '';

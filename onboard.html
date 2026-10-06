@@ -174,7 +174,7 @@ canvas { width: 100%; height: 100%; touch-action: none; display: block; cursor: 
     submitEndpoint: null    // POST {record} -> 200 when the package was received
   };
   var MUNIS = {
-    holmen: { slug: "holmen", name: "Village of Holmen", state: "WI", policy: "LWMMI-WI-42091-HOL",
+    "holmen-wi": { slug: "holmen-wi", name: "Village of Holmen", state: "WI", policy: "LWMMI-WI-42091-HOL",
               admin: "administrator@holmenwi.gov", dispatch: "publicworks@holmenwi.gov", title: "Village Administrator" }
   };
   var $ = function (s, r) { return (r || document).querySelector(s); };
@@ -189,7 +189,7 @@ canvas { width: 100%; height: 100%; touch-action: none; display: block; cursor: 
   }
   function slugFromUrl() {
     var q = location.search.match(/[?&]muni=([^&]+)/); if (q) return decodeURIComponent(q[1]).toLowerCase();
-    var m = location.pathname.match(/\/muni\/([^\/?#.]+)\/onboard\/?$/); return m ? m[1].toLowerCase() : "holmen";
+    var m = location.pathname.match(/\/muni\/([^\/?#.]+)\/onboard\/?$/); return m ? m[1].toLowerCase() : "holmen-wi";
   }
   var muni = Object.prototype.hasOwnProperty.call(MUNIS, slugFromUrl()) ? MUNIS[slugFromUrl()] : null;
   var EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;

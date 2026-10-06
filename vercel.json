@@ -7,6 +7,61 @@
       "permanent": true
     },
     {
+      "source": "/muni/austin",
+      "destination": "/muni/austin-tx",
+      "permanent": true
+    },
+    {
+      "source": "/muni/austin/:rest*",
+      "destination": "/muni/austin-tx/:rest*",
+      "permanent": true
+    },
+    {
+      "source": "/sites/austin",
+      "destination": "/sites/austin-tx",
+      "permanent": true
+    },
+    {
+      "source": "/muni/lacrosse",
+      "destination": "/muni/la-crosse-wi",
+      "permanent": true
+    },
+    {
+      "source": "/muni/lacrosse/:rest*",
+      "destination": "/muni/la-crosse-wi/:rest*",
+      "permanent": true
+    },
+    {
+      "source": "/sites/lacrosse",
+      "destination": "/sites/la-crosse-wi",
+      "permanent": true
+    },
+    {
+      "source": "/muni/holmen",
+      "destination": "/muni/holmen-wi",
+      "permanent": true
+    },
+    {
+      "source": "/muni/holmen/:rest*",
+      "destination": "/muni/holmen-wi/:rest*",
+      "permanent": true
+    },
+    {
+      "source": "/sites/holmen",
+      "destination": "/sites/holmen-wi",
+      "permanent": true
+    },
+    {
+      "source": "/sites/holmen-public-works",
+      "destination": "/sites/holmen-wi-public-works",
+      "permanent": true
+    },
+    {
+      "source": "/sites/holmen-parks",
+      "destination": "/sites/holmen-wi-parks",
+      "permanent": true
+    },
+    {
       "source": "/(deck|nexus|muni|muni-city|ledger|dispatch|admin|careers|careers-dispatch|join|operator|operator-feedback|endcard|statcard|index|sites|onboard|muni-command)(\\.html)?(/.*)?",
       "destination": "/app",
       "permanent": false
@@ -65,23 +120,23 @@
       "destination": "/muni.html"
     },
     {
-      "source": "/muni/:slug(austin|lacrosse|holmen)",
+      "source": "/muni/:slug(austin-tx|la-crosse-wi|holmen-wi)",
       "destination": "/app.html?muni=:slug"
     },
     {
-      "source": "/muni/:slug(lacrosse)/dispatch/crew-queue",
+      "source": "/muni/:slug(la-crosse-wi)/dispatch/crew-queue",
       "destination": "/dispatch.html"
     },
     {
-      "source": "/muni/:slug(austin|lacrosse|holmen)/dispatch",
+      "source": "/muni/:slug(austin-tx|la-crosse-wi|holmen-wi)/dispatch",
       "destination": "/muni-city.html?city=:slug&view=dispatch"
     },
     {
-      "source": "/muni/:slug(austin|lacrosse|holmen)/admin",
+      "source": "/muni/:slug(austin-tx|la-crosse-wi|holmen-wi)/admin",
       "destination": "/muni-command.html?city=:slug"
     },
     {
-      "source": "/muni/:slug(holmen)/onboard",
+      "source": "/muni/:slug(holmen-wi)/onboard",
       "destination": "/onboard.html?muni=:slug"
     },
     {
@@ -93,7 +148,7 @@
       "destination": "/sites.html"
     },
     {
-      "source": "/sites/:slug(austin|lacrosse|holmen|holmen-public-works|holmen-parks)",
+      "source": "/sites/:slug(austin-tx|la-crosse-wi|holmen-wi|holmen-wi-public-works|holmen-wi-parks)",
       "destination": "/sites.html?slug=:slug"
     },
     {

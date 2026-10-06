@@ -646,7 +646,7 @@ async function simulate(){
   simCount++;
   var ports = TENANT.portals || [], p = ports.length ? ports[simCount % ports.length].slug : null;
   var n = reports.length + 1 + 100;
-  var r = {id: (TENANT.slug === 'holmen' ? 'HW-' : 'SIM-') + String(n).padStart(4, '0'), category: CATEGORIES[(simCount * 3) % CATEGORIES.length], lat: TENANT.center[0] + (Math.random() - .5) * .01, lng: TENANT.center[1] + (Math.random() - .5) * .01, status: 'new', createdAt: Date.now(), route: p};
+  var r = {id: (TENANT.slug === 'holmen-wi' ? 'HW-' : 'SIM-') + String(n).padStart(4, '0'), category: CATEGORIES[(simCount * 3) % CATEGORIES.length], lat: TENANT.center[0] + (Math.random() - .5) * .01, lng: TENANT.center[1] + (Math.random() - .5) * .01, status: 'new', createdAt: Date.now(), route: p};
   reports.push(r); await append(r.id, 'REPORT_RECEIVED', 'system (simulated)', r.createdAt);
   renderAll(true); toast('Simulated sample report ' + r.id + ' logged and hashed');
 }
