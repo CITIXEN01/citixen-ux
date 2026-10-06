@@ -2,6 +2,21 @@
   "cleanUrls": true,
   "redirects": [
     {
+      "source": "/(deck|nexus|muni|muni-city|ledger|dispatch|admin|rep|careers|careers-dispatch|join|operator|operator-feedback|endcard|statcard|index)(\\.html)?(/.*)?",
+      "destination": "/app",
+      "permanent": false
+    },
+    {
+      "source": "/CITIXEN_UX_Executive_Deck.pptx",
+      "destination": "/app",
+      "permanent": false
+    },
+    {
+      "source": "/board_assets/:path*",
+      "destination": "/app",
+      "permanent": false
+    },
+    {
       "source": "/",
       "destination": "/app",
       "permanent": true
