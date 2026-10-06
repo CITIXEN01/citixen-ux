@@ -59,22 +59,24 @@ html{background:#05070C}
 .lg img{height:28px;display:block}
 .lg.off{opacity:0;pointer-events:none}
 #s1,#s2{position:relative;isolation:isolate;min-height:100vh;min-height:100svh;overflow:hidden}
-.obsidian{position:absolute;inset:0;background:#05070C;z-index:-2}
+.obsidian{position:absolute;inset:0;background:#0B0F12;z-index:-2}
 .backlight{position:absolute;inset:0;z-index:-1;pointer-events:none;
-  background:radial-gradient(52vmax 52vmax at 50% 46%,rgba(16,185,129,.30),rgba(16,185,129,.09) 38%,transparent 66%),
+  background:radial-gradient(52vmax 52vmax at 50% 46%,rgba(16,185,129,.16),rgba(16,185,129,.05) 38%,transparent 66%),
              radial-gradient(90vmax 60vmax at 50% 120%,rgba(16,185,129,.08),transparent 60%);
   animation:breathe 7s ease-in-out infinite}
 @keyframes breathe{0%,100%{opacity:.82;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}
 .splash{min-height:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:90px 24px 70px;cursor:pointer}
-.shield{width:clamp(110px,16vmin,168px);height:auto;margin-bottom:clamp(24px,5vmin,44px);overflow:visible;
-  filter:drop-shadow(0 0 14px rgba(52,211,153,.75)) drop-shadow(0 0 46px rgba(16,185,129,.55));animation:glow 4.5s ease-in-out infinite}
-@keyframes glow{0%,100%{filter:drop-shadow(0 0 12px rgba(52,211,153,.65)) drop-shadow(0 0 38px rgba(16,185,129,.45))}50%{filter:drop-shadow(0 0 20px rgba(110,231,183,.95)) drop-shadow(0 0 64px rgba(16,185,129,.7))}}
-.splash h1{margin:0;font:700 clamp(2.1rem,6.2vw,4.4rem)/1.04 var(--sans);letter-spacing:-.035em;max-width:14ch;
-  background:linear-gradient(180deg,#fff 30%,#bfeedd);-webkit-background-clip:text;background-clip:text;color:transparent;animation:rise2 1s .15s cubic-bezier(.2,.7,.2,1) both}
+.shield{width:clamp(96px,14vmin,148px);height:auto;margin-bottom:clamp(18px,3.4vmin,30px);overflow:visible;
+  filter:drop-shadow(0 0 20px rgba(16,185,129,.35))}
+.wm{margin:0;font:700 clamp(2.1rem,6vw,3.5rem)/1 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:#fff;white-space:nowrap;animation:rise2 .9s .1s cubic-bezier(.2,.7,.2,1) both}
+.wm .ux{color:#10B981}
+.wm sup{font-size:.3em;font-weight:600;letter-spacing:0;vertical-align:top;position:relative;top:.35em;margin-left:.12em;color:#10B981}
 @keyframes rise2{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-.begin{margin-top:clamp(28px,6vmin,56px);background:none;border:0;color:#7ee0bb;font:600 .85rem var(--sans);letter-spacing:.14em;text-transform:uppercase;padding:10px 18px;border-radius:999px;animation:pulseHint 2.8s 1.2s ease-in-out infinite both}
-.begin:hover{color:#d6fbec}
-@keyframes pulseHint{0%,100%{opacity:.45}50%{opacity:1}}
+.slogan{margin:clamp(14px,2.4vmin,22px) 0 0;font:400 clamp(1.05rem,2.5vw,1.45rem)/1.35 var(--sans);letter-spacing:-.005em;color:#F1F5F9;animation:rise2 .9s .25s cubic-bezier(.2,.7,.2,1) both}
+.pill{margin-top:clamp(22px,4vmin,34px);display:inline-block;border:1px solid rgba(6,78,59,.6);background:rgba(2,44,34,.3);padding:8px 24px;border-radius:9999px;color:#10B981;font:500 .9rem ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.02em;animation:rise2 .9s .4s cubic-bezier(.2,.7,.2,1) both}
+.hint{position:absolute;left:0;right:0;bottom:clamp(18px,4vh,34px);text-align:center;font:500 .7rem var(--sans);letter-spacing:.16em;text-transform:uppercase;color:#10B981;opacity:.45;pointer-events:none;animation:pulseHint 2.8s 1.4s ease-in-out infinite both}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@keyframes pulseHint{0%,100%{opacity:.25}50%{opacity:.6}}
 .s2wrap{min-height:inherit;display:grid;place-items:center;padding:var(--m)}
 #s2{--m:16px}
 @media (min-width:640px){#s2{--m:56px}}
@@ -245,9 +247,12 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
 <section class="screen" id="s1" aria-label="Welcome">
   <div class="obsidian" aria-hidden="true"></div><div class="backlight" aria-hidden="true"></div>
   <div class="splash" id="splash">
-    <svg class="shield" viewBox="0 0 44 48" fill="none" aria-hidden="true"><defs><linearGradient id="sg" x1="22" y1="4" x2="22" y2="44" gradientUnits="userSpaceOnUse"><stop stop-color="#6EE7B7"/><stop offset="1" stop-color="#10B981"/></linearGradient></defs><path d="M22 44s16-8 16-20V10L22 4 6 10v14c0 12 16 20 16 20z" fill="rgba(16,185,129,.10)" stroke="url(#sg)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.5 24.5l5 5 9-10" stroke="url(#sg)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <h1 id="splashH">Upgrade Your Civic Experience.</h1>
-    <button type="button" class="begin" id="beginBtn">Tap to begin</button>
+    <svg class="shield" viewBox="0 0 44 48" fill="none" aria-hidden="true"><path d="M22 44s16-8 16-20V10L22 4 6 10v14c0 12 16 20 16 20z" stroke="#10B981" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.5 24.5l5 5 9-10" stroke="#10B981" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <h1 class="wm" id="wordmark" aria-label="CITIXEN UX"><span aria-hidden="true">CITIXEN <span class="ux">UX</span><sup>™</sup></span></h1>
+    <p class="slogan" id="splashH">Upgrade Your Civic Experience</p>
+    <span class="pill" id="urlPill">citixenux.com</span>
+    <button type="button" class="sr" id="beginBtn">Continue</button>
+    <div class="hint" aria-hidden="true">Tap anywhere to continue</div>
   </div>
 </section>
 
