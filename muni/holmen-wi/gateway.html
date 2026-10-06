@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Onboarding Gateway — Citixen UX</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#06080F">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" type="image/x-icon" href="/favicon.ico?v=5">
+<script src="/shared/tenants.js"></script>
+<!-- ONBOARDING GATEWAY — served for /muni/{slug}/gateway (vercel.json rewrites it to
+     /muni-gateway.html?city={slug}; ?city= also works when opened directly).
+
+     Purpose: review the grant packet, see the financial offset, e-sign. Nothing operational.
+
+     PREVIEW BUILD (CONFIG.live = false). Nothing here sends email, files with LWMMI, reserves a
+     namespace or verifies the signer's identity: there is no backend for any of that yet.
+     "Execute" produces a signed packet file in the browser with a real SHA-256 fingerprint and
+     says so on screen. Flip CONFIG.live only after an endpoint exists AND counsel has approved
+     the agreement text.
+
+     Honest-copy rules:
+       - The documents are Citixen UX drafts, not official LWMMI forms. Page 3 is a § 893.80
+         notice-log rider (the statute is the notice-of-claim law; there is no "Form 893.80").
+       - "$0 out-of-pocket" is conditional: the draft agreement ends with $0 owed if grant funds
+         are not disbursed to the Village within 60 days. The grant credit is pending approval.
+       - No claim of legal protection, admissibility, immutability or compliance certifications.
+       - The signer's name is never pre-filled. -->
+<style>
+:root{
+  --bg:#06080F; --ink:#EEF2F8; --muted:#8C9AB0; --faint:#5B6A82;
+  --em:#10F59B; --em-2:#00D677; --em-dk:#06C56E; --amber:#FFC24B; --red:#FF5C6C; --blue:#6EA8FF;
+  --glass:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.022));
+  --edge:rgba(255,255,255,.095); --edge-2:rgba(255,255,255,.17);
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:Inter,"SF Pro Text","SF Pro Display",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+button,input{font:inherit;color:inherit}button{cursor:pointer}
+a{color:inherit}[hidden]{display:none !important}
+:focus-visible{outline:2px solid var(--em);outline-offset:2px;border-radius:6px}
+.aurora{position:fixed;inset:0;z-index:-1;pointer-events:none;background:
+  radial-gradient(900px 520px at 10% -10%,rgba(16,245,155,.12),transparent 60%),
+  radial-gradient(760px 520px at 95% 0%,rgba(110,168,255,.10),transparent 60%),var(--bg)}
+.glass{background:var(--glass);border:1px solid var(--edge);border-radius:20px;box-shadow:0 1px 0 rgba(255,255,255,.07) inset,0 30px 60px -30px rgba(0,0,0,.75);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%)}
+
+
+/* ---------- welcome sequence (screens 1 and 2) ---------- */
+html{background:#05070C}
+.screen{display:none}
+.screen.on{display:block;animation:scrIn .7s cubic-bezier(.2,.7,.2,1) both}
+.screen.leaving{display:block;animation:scrOut .42s ease-in both;pointer-events:none}
+@keyframes scrIn{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:none}}
+@keyframes scrOut{to{opacity:0;transform:scale(1.015)}}
+.lg{position:fixed;top:clamp(14px,3vw,28px);left:clamp(16px,3.2vw,32px);z-index:20;display:block;transition:opacity .4s}
+.lg img{height:28px;display:block}
+.lg.off{opacity:0;pointer-events:none}
+#s1,#s2{position:relative;isolation:isolate;min-height:100vh;min-height:100svh;overflow:hidden}
+.obsidian{position:absolute;inset:0;background:#05070C;z-index:-2}
+.backlight{position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(52vmax 52vmax at 50% 46%,rgba(16,185,129,.30),rgba(16,185,129,.09) 38%,transparent 66%),
+             radial-gradient(90vmax 60vmax at 50% 120%,rgba(16,185,129,.08),transparent 60%);
+  animation:breathe 7s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.82;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}
+.splash{min-height:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:90px 24px 70px;cursor:pointer}
+.shield{width:clamp(110px,16vmin,168px);height:auto;margin-bottom:clamp(24px,5vmin,44px);overflow:visible;
+  filter:drop-shadow(0 0 14px rgba(52,211,153,.75)) drop-shadow(0 0 46px rgba(16,185,129,.55));animation:glow 4.5s ease-in-out infinite}
+@keyframes glow{0%,100%{filter:drop-shadow(0 0 12px rgba(52,211,153,.65)) drop-shadow(0 0 38px rgba(16,185,129,.45))}50%{filter:drop-shadow(0 0 20px rgba(110,231,183,.95)) drop-shadow(0 0 64px rgba(16,185,129,.7))}}
+.splash h1{margin:0;font:700 clamp(2.1rem,6.2vw,4.4rem)/1.04 var(--sans);letter-spacing:-.035em;max-width:14ch;
+  background:linear-gradient(180deg,#fff 30%,#bfeedd);-webkit-background-clip:text;background-clip:text;color:transparent;animation:rise2 1s .15s cubic-bezier(.2,.7,.2,1) both}
+@keyframes rise2{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.begin{margin-top:clamp(28px,6vmin,56px);background:none;border:0;color:#7ee0bb;font:600 .85rem var(--sans);letter-spacing:.14em;text-transform:uppercase;padding:10px 18px;border-radius:999px;animation:pulseHint 2.8s 1.2s ease-in-out infinite both}
+.begin:hover{color:#d6fbec}
+@keyframes pulseHint{0%,100%{opacity:.45}50%{opacity:1}}
+.s2wrap{min-height:inherit;display:grid;place-items:center;padding:var(--m)}
+#s2{--m:16px}
+@media (min-width:640px){#s2{--m:56px}}
+@media (min-width:900px) and (min-height:700px){#s2{--m:1.5in}}
+.tile{width:100%;max-width:720px;padding:clamp(34px,6vw,72px) clamp(22px,5vw,64px);text-align:center;border-radius:28px;
+  background:linear-gradient(180deg,rgba(30,41,59,.62),rgba(15,23,42,.5));border:1px solid rgba(148,163,184,.18);
+  box-shadow:0 1px 0 rgba(255,255,255,.08) inset,0 0 0 1px rgba(16,185,129,.05),0 50px 100px -30px rgba(0,0,0,.85),0 0 120px -40px rgba(16,185,129,.35);
+  -webkit-backdrop-filter:blur(22px) saturate(150%);backdrop-filter:blur(22px) saturate(150%)}
+.tile h1{margin:0 0 14px;font:700 clamp(2.2rem,5.4vw,3.6rem)/1.05 var(--sans);letter-spacing:-.035em;color:#fff}
+.tile p{margin:0 auto clamp(28px,5vw,44px);max-width:34ch;font:400 clamp(1rem,2vw,1.2rem)/1.5 var(--sans);color:#aab6c8;letter-spacing:-.005em}
+.go{border:0;border-radius:14px;padding:16px 46px;font:700 1.05rem var(--sans);letter-spacing:-.01em;color:#04120C;
+  background:linear-gradient(180deg,#6EE7B7 0%,#34D399 45%,#10B981 100%);
+  box-shadow:0 0 0 1px rgba(255,255,255,.28) inset,0 10px 30px -10px rgba(16,185,129,.7);transition:box-shadow .25s,transform .2s,filter .2s}
+.go:hover{transform:translateY(-2px);filter:brightness(1.06);box-shadow:0 0 0 1px rgba(255,255,255,.35) inset,0 0 0 6px rgba(16,185,129,.16),0 18px 50px -8px rgba(16,185,129,.95),0 0 90px -6px rgba(52,211,153,.7)}
+.go:active{transform:translateY(0)}
+.go:focus-visible{outline:2px solid #6EE7B7;outline-offset:4px}
+@media (max-width:640px){.lg img{height:24px}.splash{padding-top:84px}}
+
+/* preview bar + header */
+.preview{background:rgba(255,194,75,.09);border-bottom:1px solid rgba(255,194,75,.3);color:#FFD98A;font-size:.78rem;text-align:center;padding:6px 14px}
+header.top{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:14px clamp(14px,3vw,32px);max-width:1440px;margin:0 auto}
+.brand img{height:26px;display:block}
+.badge{margin-left:auto;font-size:.8rem;font-weight:600;padding:7px 13px;border-radius:10px;border:1px solid var(--edge-2);background:rgba(255,255,255,.04);color:var(--muted)}
+.badge b{color:var(--ink);font-weight:700}
+.badge i{font-style:normal;color:var(--em);font-weight:700}
+
+/* stepper */
+.stepper{display:flex;align-items:center;gap:0;list-style:none;margin:0 auto;padding:0 clamp(14px,3vw,32px) 18px;max-width:1440px}
+.stepper li{display:flex;align-items:center;gap:10px;font-weight:600;font-size:.88rem;color:var(--faint);white-space:nowrap}
+.stepper li .n{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:.78rem;border:1.5px solid var(--edge-2);background:rgba(255,255,255,.03);transition:.3s}
+.stepper li.done{color:var(--ink)}
+.stepper li.done .n{background:var(--em);border-color:var(--em);color:#04140C}
+.stepper li.cur{color:var(--ink)}
+.stepper li.cur .n{border-color:var(--em);color:var(--em);box-shadow:0 0 0 4px rgba(16,245,155,.14);background:rgba(16,245,155,.08)}
+.stepper .bar{flex:1;height:2px;min-width:18px;margin:0 12px;background:var(--edge);border-radius:2px;position:relative;overflow:hidden}
+.stepper .bar::after{content:"";position:absolute;inset:0;background:var(--em);transform:scaleX(0);transform-origin:left;transition:transform .6s}
+.stepper .bar.on::after{transform:scaleX(1)}
+
+/* split */
+main{max-width:1440px;margin:0 auto;padding:0 clamp(14px,3vw,32px) 60px;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(340px,.85fr);gap:20px;align-items:start}
+.docwrap{overflow:hidden;display:flex;flex-direction:column;height:calc(100vh - 200px);min-height:560px}
+.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--edge)}
+.toolbar h2{margin:0;font-size:.9rem;flex:1 1 220px;min-width:0;letter-spacing:-.01em}
+.toolbar h2 small{display:block;font-weight:500;color:var(--faint);font-size:.72rem;margin-top:1px}
+.tb{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.04);border:1px solid var(--edge);border-radius:10px;padding:2px}
+.tb button{background:none;border:0;border-radius:8px;min-width:30px;height:30px;color:var(--muted);font-weight:700;transition:.15s}
+.tb button:hover:not(:disabled){background:rgba(255,255,255,.08);color:var(--ink)}
+.tb button:disabled{opacity:.35;cursor:not-allowed}
+.tb span{font:600 .74rem var(--mono);color:var(--muted);padding:0 6px;min-width:64px;text-align:center}
+.pdfbtn{border:1px solid var(--edge-2);background:rgba(255,255,255,.05);border-radius:10px;padding:7px 12px;font-weight:600;font-size:.78rem;transition:.15s}
+.pdfbtn:hover{border-color:rgba(16,245,155,.55);background:rgba(16,245,155,.08)}
+.viewer{flex:1;overflow:auto;padding:22px 16px 40px;background:radial-gradient(600px 300px at 50% 0%,rgba(255,255,255,.035),transparent),rgba(0,0,0,.28);scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.2) transparent;scroll-behavior:smooth}
+.pages{--z:1;display:flex;flex-direction:column;align-items:center;gap:22px}
+.page{font-size:calc(var(--z) * 13px);width:44em;max-width:none;min-height:56.8em;background:#FCFCFA;color:#16202E;border-radius:4px;padding:3.4em 3.6em 3em;position:relative;
+  box-shadow:0 30px 60px -20px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.04);font-family:Georgia,"Times New Roman",serif;line-height:1.55;transition:font-size .2s}
+.page h3{font-size:1.35em;margin:0 0 .15em;letter-spacing:.01em}
+.page .sub{font:600 .7em var(--sans);text-transform:uppercase;letter-spacing:.09em;color:#5A6678;margin:0 0 1.2em}
+.page h4{font-size:1em;margin:1.2em 0 .25em}
+.page p{margin:0 0 .7em;font-size:.95em}
+.page dl{display:grid;grid-template-columns:11em 1fr;gap:.45em 1em;margin:.8em 0 1em;font-size:.92em}
+.page dt{color:#5A6678;font-family:var(--sans);font-size:.78em;text-transform:uppercase;letter-spacing:.06em;padding-top:.2em}
+.page dd{margin:0}
+.page .draft{font:700 .68em var(--sans);letter-spacing:.07em;text-transform:uppercase;color:#8A5A00;background:#FFF4D6;border:1px solid #EBCB6B;padding:.5em .8em;border-radius:4px;margin-bottom:1.1em}
+.page .money{font-family:var(--sans);font-weight:800}
+.page .num{position:absolute;bottom:1.6em;left:0;right:0;text-align:center;font:600 .68em var(--sans);color:#8A96A8}
+.sigline{margin-top:2.4em;display:grid;grid-template-columns:1fr 1fr;gap:2em;font-size:.9em}
+.sigline .sl{border-bottom:1.5px solid #1b2433;height:3.4em;display:flex;align-items:flex-end;padding-bottom:.2em;font:italic 1.7em "Snell Roundhand","Apple Chancery","Segoe Script","Brush Script MT",cursive;color:#0b2a6f;overflow:hidden;position:relative}
+.sigline .sl img{max-height:3.2em;max-width:100%}
+.sigline .sl.todo::before{content:"Sign here →";position:absolute;left:0;bottom:.35em;font:700 .5em var(--sans);letter-spacing:.06em;text-transform:uppercase;color:#a56a00;background:#FFF1C9;border:1px dashed #D9A93B;padding:.25em .6em;border-radius:3px}
+.sigline small{display:block;color:#5A6678;font:600 .72em var(--sans);margin-top:.35em}
+
+/* right rail */
+.rail{display:grid;gap:16px;position:sticky;top:16px}
+.card{padding:18px}
+.card h3{margin:0 0 12px;font-size:.95rem;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
+.line{display:flex;justify-content:space-between;gap:12px;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--edge)}
+.line .l{color:var(--muted);font-size:.86rem}
+.line .l small{display:block;color:var(--faint);font-size:.72rem}
+.line .v{font:700 1rem var(--mono);letter-spacing:-.02em;white-space:nowrap}
+.line .v.credit{color:var(--em)}
+.pct{font:700 .64rem var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--em);border:1px solid rgba(16,245,155,.4);background:rgba(16,245,155,.09);padding:2px 8px;border-radius:9999px;margin-left:6px;vertical-align:middle;white-space:nowrap}
+.net{margin-top:14px;padding:16px;border-radius:16px;text-align:center;border:1px solid rgba(16,245,155,.5);
+  background:radial-gradient(260px 120px at 50% 0%,rgba(16,245,155,.22),rgba(16,245,155,.04));box-shadow:0 0 0 4px rgba(16,245,155,.06),0 20px 50px -20px rgba(16,245,155,.5)}
+.net .k{font:700 .68rem var(--sans);letter-spacing:.1em;text-transform:uppercase;color:#9CF5CE}
+.net .amt{font:800 clamp(2.4rem,5vw,3.2rem)/1.05 var(--sans);letter-spacing:-.04em;color:var(--em);text-shadow:0 0 30px rgba(16,245,155,.55);margin:2px 0 4px}
+.net .why{font-size:.76rem;color:#B8E8D2;max-width:34ch;margin:0 auto}
+label.f{display:block;font:700 .66rem var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0 0 5px}
+input.t{width:100%;background:rgba(0,0,0,.35);border:1px solid var(--edge-2);border-radius:11px;padding:11px 12px;font-size:.95rem;transition:.15s}
+input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,245,155,.15)}
+.row2{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:14px}
+.seg{display:inline-flex;border:1px solid var(--edge-2);border-radius:10px;padding:3px;background:rgba(255,255,255,.03);margin-bottom:8px}
+.seg button{background:none;border:0;padding:6px 14px;border-radius:8px;font-weight:600;font-size:.8rem;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:rgba(255,255,255,.11);color:var(--ink)}
+.sig{position:relative;height:110px;border:1px dashed var(--edge-2);border-radius:12px;background:rgba(0,0,0,.3);overflow:hidden;margin-bottom:12px}
+.sig canvas{width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+.sig .typed{height:100%;display:flex;align-items:center;padding:0 16px;font:italic 2rem "Snell Roundhand","Apple Chancery","Segoe Script","Brush Script MT",cursive;color:#cfe3ff;overflow:hidden;white-space:nowrap}
+.sig .typed.empty{color:var(--faint);font:italic .9rem var(--sans)}
+.sig .clear{position:absolute;right:8px;top:8px;background:rgba(255,255,255,.07);border:1px solid var(--edge);border-radius:8px;padding:3px 10px;font-size:.72rem;font-weight:600}
+.attest{display:flex;gap:10px;align-items:flex-start;font-size:.8rem;color:var(--muted);margin-bottom:14px;cursor:pointer}
+.attest input{margin-top:3px;accent-color:var(--em);width:16px;height:16px;flex:none}
+.cta{width:100%;border:0;border-radius:14px;padding:16px 18px;font-weight:800;font-size:1rem;letter-spacing:-.01em;color:#031208;
+  background:linear-gradient(180deg,#34FFB0,#10F59B 45%,#00D677);box-shadow:0 0 0 1px rgba(255,255,255,.25) inset,0 14px 44px -8px rgba(16,245,155,.75),0 0 60px -10px rgba(16,245,155,.6);transition:.18s;position:relative;overflow:hidden}
+.cta:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 0 0 1px rgba(255,255,255,.3) inset,0 20px 56px -8px rgba(16,245,155,.9),0 0 80px -8px rgba(16,245,155,.75)}
+.cta:active:not(:disabled){transform:translateY(0)}
+.cta:disabled{filter:grayscale(.85) brightness(.55);box-shadow:none;cursor:not-allowed}
+.cta::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.45) 50%,transparent 70%);transform:translateX(-120%);animation:sheen 3.2s ease-in-out infinite}
+.cta:disabled::after{display:none}
+@keyframes sheen{0%,55%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
+.err{color:var(--red);font-size:.78rem;min-height:1.1em;margin:6px 0 0}
+.need{font-size:.74rem;color:var(--faint);margin:8px 0 0;text-align:center}
+.micro{font-size:.76rem;color:var(--muted);margin:12px 0 0;line-height:1.55}
+.micro b{color:var(--ink)}
+.profile{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:.8rem}
+.profile dt{color:var(--faint)}.profile dd{margin:0}
+
+/* success */
+.done-ov{position:fixed;inset:0;z-index:50;display:none;place-items:center;padding:20px;background:rgba(2,4,10,.78);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.done-ov.on{display:grid;animation:fade .3s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.done{width:min(520px,100%);padding:30px 28px;text-align:center;animation:rise .55s cubic-bezier(.2,.8,.2,1)}
+@keyframes rise{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
+.ring{width:96px;height:96px;margin:0 auto 14px}
+.ring circle{fill:rgba(16,245,155,.08);stroke:var(--em);stroke-width:3;stroke-dasharray:289;stroke-dashoffset:289;animation:draw .8s .1s ease-out forwards}
+.ring path{fill:none;stroke:var(--em);stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;animation:draw .5s .75s ease-out forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.done h2{margin:0 0 6px;font-size:1.45rem;letter-spacing:-.02em}
+.done p{color:var(--muted);margin:0 0 10px;font-size:.88rem}
+.done .warn{font-size:.8rem;color:#FFD98A;background:rgba(255,194,75,.09);border:1px solid rgba(255,194,75,.3);border-radius:10px;padding:8px 12px;margin:10px 0 14px}
+.done .fp{font:600 .7rem var(--mono);color:var(--muted);word-break:break-all;margin-bottom:14px}
+.done .acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.done .acts button,.done .acts a{border:1px solid var(--edge-2);background:rgba(255,255,255,.06);border-radius:11px;padding:9px 14px;font-weight:700;font-size:.82rem;text-decoration:none}
+.done .acts .go{background:var(--em);color:#04140C;border-color:transparent}
+.countdown{height:4px;border-radius:4px;background:var(--edge);overflow:hidden;margin:16px 0 8px}
+.countdown i{display:block;height:100%;width:100%;background:var(--em);transform-origin:left;transform:scaleX(1)}
+.countdown.run i{animation:cd var(--ms,9000ms) linear forwards}
+@keyframes cd{to{transform:scaleX(0)}}
+.missing{max-width:520px;margin:12vh auto;padding:26px;text-align:center}.missing a{color:var(--em)}
+
+@media (max-width:1060px){
+  main{grid-template-columns:1fr}.rail{position:static}
+  .docwrap{height:70vh}
+  .badge{margin-left:0}
+}
+@media (max-width:640px){
+  .stepper li span.t{display:none}.stepper li.cur span.t{display:inline}
+  .stepper .bar{margin:0 6px;min-width:6px}
+  .stepper li{gap:8px;font-size:.8rem}
+  .stepper li.cur span.t{white-space:normal;line-height:1.2;max-width:150px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important;scroll-behavior:auto !important}
+  .ring circle,.ring path{stroke-dashoffset:0}
+}
+#printRoot{display:none}
+@media print{
+  body.printing > *:not(#printRoot){display:none !important}
+  body.printing{background:#fff}
+  body.printing #printRoot{display:block !important}
+  body.printing .page{box-shadow:none;break-after:page;width:auto;min-height:0;font-size:12px;border-radius:0}
+  body.printing .sigline .sl.todo::before{display:none}
+}
+</style>
+</head>
+<body>
+<div class="aurora" aria-hidden="true"></div>
+<a class="lg" id="lg" href="/muni" aria-label="CITIXEN UX"><img src="/logo.svg" alt="CITIXEN UX" width="159" height="30"></a>
+
+<section class="screen" id="s1" aria-label="Welcome">
+  <div class="obsidian" aria-hidden="true"></div><div class="backlight" aria-hidden="true"></div>
+  <div class="splash" id="splash">
+    <svg class="shield" viewBox="0 0 44 48" fill="none" aria-hidden="true"><defs><linearGradient id="sg" x1="22" y1="4" x2="22" y2="44" gradientUnits="userSpaceOnUse"><stop stop-color="#6EE7B7"/><stop offset="1" stop-color="#10B981"/></linearGradient></defs><path d="M22 44s16-8 16-20V10L22 4 6 10v14c0 12 16 20 16 20z" fill="rgba(16,185,129,.10)" stroke="url(#sg)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.5 24.5l5 5 9-10" stroke="url(#sg)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <h1 id="splashH">Upgrade Your Civic Experience.</h1>
+    <button type="button" class="begin" id="beginBtn">Tap to begin</button>
+  </div>
+</section>
+
+<section class="screen" id="s2" aria-label="Personalized welcome">
+  <div class="obsidian" aria-hidden="true"></div><div class="backlight" aria-hidden="true"></div>
+  <div class="s2wrap">
+    <div class="tile" role="group" aria-labelledby="wTitle">
+      <h1 id="wTitle" tabindex="-1">Welcome</h1>
+      <p>Complete your easy CITIXEN UX onboarding in less than 5 minutes.</p>
+      <button type="button" class="go" id="goBtn">Let&rsquo;s Go</button>
+    </div>
+  </div>
+</section>
+
+<div class="screen" id="s3" aria-label="Review and sign">
+<div id="shell">
+<div class="preview" role="note"><b>Preview build.</b> Sample data. Nothing on this page sends email, files with LWMMI, reserves a namespace or verifies your identity yet.</div>
+<header class="top">
+  <a class="brand" href="/muni" aria-label="Citixen UX municipal gateway"><img src="/logo.svg" alt="CITIXEN UX" width="159" height="30"></a>
+  <div class="badge" id="badge">Onboarding</div>
+</header>
+<ol class="stepper" id="stepper" aria-label="Onboarding progress"></ol>
+
+<section class="glass missing" id="missing" hidden>
+  <h2>No onboarding packet for this city</h2>
+  <p>This address has no onboarding packet configured. Known cities:</p>
+  <ul id="known" style="list-style:none;padding:0"></ul>
+  <a href="/muni">← Municipal gateway</a>
+</section>
+
+<main id="main">
+  <section class="glass docwrap" aria-labelledby="docT">
+    <div class="toolbar">
+      <h2 id="docT">LWMMI Loss Control Grant Application &amp; § 893.80 Notice-Log Rider<small>Citixen UX draft · counsel review required · not an official LWMMI form</small></h2>
+      <div class="tb" role="group" aria-label="Page">
+        <button type="button" id="pPrev" aria-label="Previous page">‹</button><span id="pInfo" aria-live="polite">Page 1 of 3</span><button type="button" id="pNext" aria-label="Next page">›</button>
+      </div>
+      <div class="tb" role="group" aria-label="Zoom">
+        <button type="button" id="zOut" aria-label="Zoom out">−</button><span id="zInfo">100%</span><button type="button" id="zIn" aria-label="Zoom in">+</button>
+      </div>
+      <button type="button" class="pdfbtn" id="btnPdf" title="Opens your browser's print dialog; choose Save as PDF">Download Draft PDF</button>
+    </div>
+    <div class="viewer" id="viewer" tabindex="0" role="region" aria-label="Document preview, 3 pages"><div class="pages" id="pages"></div></div>
+  </section>
+
+  <aside class="rail" aria-label="Financial summary and signature">
+    <section class="glass card" aria-labelledby="finH">
+      <h3 id="finH">Financial summary</h3>
+      <div class="line"><span class="l">Total platform value<small>Annual, Citixen UX statutory notice platform</small></span><span class="v" id="fVal">$9,500/yr</span></div>
+      <div class="line"><span class="l">LWMMI Loss Control Grant credit<small>Pending LWMMI approval</small></span><span class="v credit"><span id="fCred">−$9,500</span><span class="pct">100% covered</span></span></div>
+      <div class="net" role="group" aria-label="Net municipal out-of-pocket">
+        <div class="k">Net municipal out-of-pocket</div>
+        <div class="amt" id="fNet">$0.00</div>
+        <p class="why">If grant funds are not disbursed to the Village within 60 days, the agreement ends and the Village owes nothing (draft Section 1).</p>
+      </div>
+    </section>
+
+    <section class="glass card" aria-labelledby="sigH">
+      <h3 id="sigH">Sign &amp; execute</h3>
+      <div class="row2">
+        <div><label class="f" for="nm">Authorized official name</label><input class="t" id="nm" type="text" maxlength="80" autocomplete="off" placeholder="Full legal name"></div>
+        <div><label class="f" for="ti">Title</label><input class="t" id="ti" type="text" maxlength="80" autocomplete="off" placeholder="e.g. Village Administrator"></div>
+      </div>
+      <div class="seg" role="group" aria-label="Signature method"><button type="button" id="mType" aria-pressed="true">Type</button><button type="button" id="mDraw" aria-pressed="false">Draw</button></div>
+      <div class="sig" id="sig" aria-label="Signature"></div>
+      <label class="attest"><input type="checkbox" id="att"><span id="attT"></span></label>
+      <button type="button" class="cta" id="cta" disabled>Execute Agreement &amp; File LWMMI Grant</button>
+      <p class="err" id="err" role="alert"></p>
+      <p class="need" id="need"></p>
+      <p class="micro" id="micro"></p>
+    </section>
+
+    <section class="glass card" aria-labelledby="prH">
+      <h3 id="prH">Village profile on file</h3>
+      <dl class="profile" id="profile"></dl>
+    </section>
+  </aside>
+</main>
+</div>
+</div>
+
+<div id="printRoot"></div>
+
+<div class="done-ov" id="ov" role="dialog" aria-modal="true" aria-labelledby="doneH">
+  <div class="glass done">
+    <svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46"/><path d="M30 52l14 14 27-30"/></svg>
+    <h2 id="doneH">Agreement executed</h2>
+    <p id="doneP"></p>
+    <div class="warn" id="doneW"></div>
+    <div class="fp" id="doneFp"></div>
+    <div class="countdown" id="cd" aria-hidden="true"><i></i></div>
+    <p id="cdT" aria-live="polite"></p>
+    <div class="acts"><button type="button" id="dlPacket">Download signed packet</button><button type="button" id="stay">Stay here</button><a class="go" id="goNow" href="/muni">Go to command center now</a></div>
+  </div>
+</div>
+
+<script>
+(function () {
+'use strict';
+var CONFIG = {
+  live: false,            // true only once submitEndpoint exists and counsel has approved the agreement text
+  submitEndpoint: null,   // POST {record} -> 200 when the packet was received
+  redirectMs: 9000
+};
+var TENANTS = window.NEXUS_TENANTS || {};
+var $ = function (id) { return document.getElementById(id); };
+function el(tag, attrs, kids){
+  var n = document.createElement(tag);
+  Object.keys(attrs || {}).forEach(function (k) { if (k === 'class') n.className = attrs[k]; else if (k === 'text') n.textContent = attrs[k]; else n.setAttribute(k, attrs[k]); });
+  (kids || []).forEach(function (c) { n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+  return n;
+}
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function money(n){ return '$' + n.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
+
+function slugFromUrl(){
+  var q = location.search.match(/[?&]city=([^&]+)/); if (q) return decodeURIComponent(q[1]).toLowerCase();
+  var m = /^\/muni\/([^\/?#]+)/.exec(location.pathname); return m ? decodeURIComponent(m[1]).toLowerCase() : '';
+}
+var SLUG = slugFromUrl();
+var T = Object.prototype.hasOwnProperty.call(TENANTS, SLUG) ? TENANTS[SLUG] : null;
+var OB = T && T.onboarding || null;
+
+var S = {name: '', title: '', mode: 'type', drawn: false, att: false, step: 2, done: false};
+var sigData = null, record = null, fingerprint = '', timer = null;
+
+/* ---------- stepper ---------- */
+function renderStepper(){
+  var labels = ['Village Profile', 'Review & Sign Grant Packet', 'Namespace Activation'];
+  var st = S.done ? ['done', 'done', 'cur'] : ['done', 'cur', ''];
+  var ol = $('stepper'); ol.textContent = '';
+  labels.forEach(function (l, i) {
+    var li = el('li', {class: st[i]}, [el('span', {class: 'n', 'aria-hidden': 'true', text: st[i] === 'done' ? '✓' : st[i] === 'cur' ? '●' : String(i + 1)}), el('span', {class: 't', text: (i + 1) + '. ' + l})]);
+    if (st[i] === 'cur') li.setAttribute('aria-current', 'step');
+    li.setAttribute('aria-label', (i + 1) + '. ' + l + (st[i] === 'done' ? ', complete' : st[i] === 'cur' ? ', current step' : ', not started'));
+    ol.appendChild(li);
+    if (i < 2) ol.appendChild(el('span', {class: 'bar' + (st[i] === 'done' ? ' on' : ''), 'aria-hidden': 'true'}));
+  });
+}
+
+/* ---------- document ---------- */
+function pageNodes(){
+  var entity = OB.entity + ', ' + OB.state, today = new Date().toLocaleDateString(undefined, {year: 'numeric', month: 'long', day: 'numeric'});
+  var p1 = el('article', {class: 'page', 'data-page': '1', 'aria-label': 'Page 1 of 3'}, [
+    el('h3', {text: 'LWMMI Loss Control Grant Application'}), el('div', {class: 'sub', text: 'Application summary · Prepared by Citixen UX'}),
+    el('div', {class: 'draft', text: 'Draft: counsel review required. Not an official LWMMI form.'}),
+    el('dl', {}, [
+      el('dt', {text: 'Applicant'}), el('dd', {text: entity}),
+      el('dt', {text: 'Policy ID'}), el('dd', {text: OB.policy + ' (sample value)'}),
+      el('dt', {text: 'Requested grant'}), el('dd', {class: 'money', text: money(OB.grantCredit)}),
+      el('dt', {text: 'Vendor'}), el('dd', {text: 'Citixen UX · ' + money(OB.platformValue) + ' per year'}),
+      el('dt', {text: 'Funding share'}), el('dd', {text: '100% of the annual fee, requested from the grant'})]),
+    el('h4', {text: 'Project description'}),
+    el('p', {text: 'Deployment of the Citixen UX statutory notice ledger: a public web intake for resident reports of hazards such as potholes and sidewalk defects, a SHA-256 hash-chained record of each report with its time of receipt, and email delivery of each new report to the Public Works address.'}),
+    el('h4', {text: 'Loss-control rationale'}),
+    el('p', {text: 'The Village aims to be able to show when it was notified of a hazard, which matters when a claim is filed under Wis. Stat. § 893.80. The log records when reports arrive and when staff act on them. It does not prevent or decide claims.'}),
+    el('div', {class: 'num', text: '1 / 3'})]);
+  var p2 = el('article', {class: 'page', 'data-page': '2', 'aria-label': 'Page 2 of 3'}, [
+    el('h3', {text: 'Conditional Master Services Agreement'}), el('div', {class: 'sub', text: entity + ' · Citixen UX'}),
+    el('div', {class: 'draft', text: 'Draft text: counsel review required before use'}),
+    el('h4', {text: 'Section 1. Grant contingency'}),
+    el('p', {text: 'This Agreement is contingent on funding from the LWMMI Loss Control Grant. If grant funds are not disbursed to the Village within 60 days of the Effective Date, this Agreement terminates and the Village owes Citixen UX nothing.'}),
+    el('h4', {text: 'Section 2. Platform scope'}),
+    el('p', {text: 'Citixen UX provides a web intake for resident reports, a SHA-256 ledger recording each report, and email delivery of new reports to the Public Works address the Village designates.'}),
+    el('h4', {text: 'Section 3. Annual fee'}),
+    el('p', {text: 'The annual fee is ' + money(OB.platformValue) + ', intended to be paid from the grant described in Section 1.'}),
+    el('h4', {text: 'Section 4. Effective Date'}),
+    el('p', {text: 'The Effective Date is the date the Village\'s authorized official signs this packet: ' + today + ' if signed today.'}),
+    el('div', {class: 'num', text: '2 / 3'})]);
+  var sl = el('div', {class: 'sl todo', id: 'docSig'});
+  var p3 = el('article', {class: 'page', 'data-page': '3', 'aria-label': 'Page 3 of 3'}, [
+    el('h3', {text: 'Wis. Stat. § 893.80 Notice-Log Rider'}), el('div', {class: 'sub', text: 'Rider to the Agreement · Citixen UX draft'}),
+    el('div', {class: 'draft', text: 'Draft text: counsel review required before use'}),
+    el('h4', {text: 'What the platform provides'}),
+    el('p', {text: 'A time-stamped, hash-chained log of resident reports received through the Village\'s intake, and the times status changes were recorded. Each entry\'s SHA-256 covers the previous entry, so a later edit to any entry breaks the hashes after it.'}),
+    el('h4', {text: 'What it does not provide'}),
+    el('p', {text: 'Citixen UX does not give legal advice and does not promise any result in any claim. Whether a log or export may be used in a claim is a question for the Village\'s own counsel.'}),
+    el('h4', {text: 'Execution'}),
+    el('p', {text: 'By signing, the authorized official confirms authority to bind the Village to this Agreement and to authorize preparation of the grant application described on page 1.'}),
+    el('div', {class: 'sigline'}, [el('div', {}, [sl, el('small', {id: 'docSigName', text: 'Authorized official'})]), el('div', {}, [el('div', {class: 'sl', id: 'docDate', text: ''}), el('small', {text: 'Date signed'})])]),
+    el('div', {class: 'num', text: '3 / 3'})]);
+  return [p1, p2, p3];
+}
+function renderDocSig(){
+  var sl = $('docSig'); if (!sl) return; sl.textContent = '';
+  var has = S.mode === 'type' ? S.name.trim().length > 1 : S.drawn && sigData;
+  sl.className = 'sl' + (has ? '' : ' todo');
+  if (has){ if (S.mode === 'type') sl.textContent = S.name.trim(); else sl.appendChild(el('img', {src: sigData, alt: 'Drawn signature'})); }
+  $('docSigName').textContent = (S.name.trim() ? S.name.trim() + (S.title.trim() ? ', ' + S.title.trim() : '') : 'Authorized official');
+  $('docDate').textContent = has ? new Date().toLocaleDateString() : '';
+}
+
+/* viewer controls */
+var zoom = 1, curPage = 1;
+function setZoom(z){ zoom = Math.max(.6, Math.min(1.6, Math.round(z * 10) / 10)); $('pages').style.setProperty('--z', zoom); $('zInfo').textContent = Math.round(zoom * 100) + '%'; $('zOut').disabled = zoom <= .6; $('zIn').disabled = zoom >= 1.6; }
+function goPage(n){ n = Math.max(1, Math.min(3, n)); var pg = document.querySelector('.page[data-page="' + n + '"]'); if (pg) $('viewer').scrollTo({top: pg.offsetTop - $('viewer').offsetTop - 16, behavior: 'smooth'}); setCur(n); }
+function setCur(n){ curPage = n; $('pInfo').textContent = 'Page ' + n + ' of 3'; $('pPrev').disabled = n <= 1; $('pNext').disabled = n >= 3; }
+function onScroll(){
+  var v = $('viewer'), mid = v.scrollTop + v.clientHeight * .35, best = 1;
+  document.querySelectorAll('.page').forEach(function (p) { if (p.offsetTop - v.offsetTop <= mid) best = Number(p.dataset.page); });
+  if (best !== curPage) setCur(best);
+}
+function printDoc(){
+  var root = $('printRoot'); root.textContent = ''; document.querySelectorAll('#pages .page').forEach(function (p) { var c = p.cloneNode(true); c.removeAttribute('id'); root.appendChild(c); });
+  document.body.classList.add('printing');
+  var clean = function () { document.body.classList.remove('printing'); root.textContent = ''; window.removeEventListener('afterprint', clean); };
+  window.addEventListener('afterprint', clean);
+  window.print();
+  setTimeout(function () { if (document.body.classList.contains('printing') && !window.matchMedia('print').matches) clean(); }, 1500);
+}
+
+/* ---------- signature ---------- */
+var cvs = null, cx = null, drawing = false;
+function paintSig(){
+  var box = $('sig'); box.textContent = '';
+  if (S.mode === 'type'){
+    var v = S.name.trim();
+    box.appendChild(el('div', {class: 'typed' + (v ? '' : ' empty'), text: v || 'Your typed signature appears here'}));
+  } else {
+    cvs = el('canvas', {'aria-label': 'Draw your signature with a mouse, finger or stylus'});
+    var clear = el('button', {type: 'button', class: 'clear', text: 'Clear'});
+    box.appendChild(cvs); box.appendChild(clear);
+    var r = box.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    cvs.width = Math.max(260, r.width) * dpr; cvs.height = 110 * dpr; cx = cvs.getContext('2d'); cx.scale(dpr, dpr);
+    cx.lineWidth = 2.4; cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.strokeStyle = '#cfe3ff';
+    if (sigData){ var im = new Image(); im.onload = function () { cx.drawImage(im, 0, 0, cvs.width / dpr, 110); }; im.src = sigData; }
+    var pos = function (e) { var b = cvs.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; };
+    cvs.addEventListener('pointerdown', function (e) { drawing = true; cvs.setPointerCapture(e.pointerId); var p = pos(e); cx.beginPath(); cx.moveTo(p[0], p[1]); cx.lineTo(p[0] + .1, p[1] + .1); cx.stroke(); });
+    cvs.addEventListener('pointermove', function (e) { if (!drawing) return; var p = pos(e); cx.lineTo(p[0], p[1]); cx.stroke(); });
+    var end = function () { if (!drawing) return; drawing = false; S.drawn = true; sigData = cvs.toDataURL('image/png'); sync(); };
+    cvs.addEventListener('pointerup', end); cvs.addEventListener('pointercancel', end);
+    clear.addEventListener('click', function () { cx.clearRect(0, 0, cvs.width, cvs.height); S.drawn = false; sigData = null; sync(); });
+  }
+}
+function valid(){
+  var why = [];
+  if (S.name.trim().length < 2) why.push('your full name');
+  if (S.title.trim().length < 2) why.push('your title');
+  if (S.mode === 'type' ? S.name.trim().length < 2 : !S.drawn) { if (S.mode === 'draw') why.push('a drawn signature'); }
+  if (!S.att) why.push('the authority confirmation');
+  return why;
+}
+function sync(){
+  var why = valid();
+  $('cta').disabled = why.length > 0 || S.busy;
+  $('need').textContent = why.length ? 'To continue, add ' + why.join(', ') + '.' : '';
+  var tp = $('sig').querySelector('.typed'); if (tp){ var v = S.name.trim(); tp.textContent = v || 'Your typed signature appears here'; tp.className = 'typed' + (v ? '' : ' empty'); }
+  renderDocSig();
+  try { sessionStorage.setItem('gw.' + SLUG, JSON.stringify({name: S.name, title: S.title})); } catch (e) {}
+}
+
+/* ---------- execute ---------- */
+async function sha256Hex(str){
+  var b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.prototype.map.call(new Uint8Array(b), function (x) { return ('0' + x.toString(16)).slice(-2); }).join('');
+}
+function docText(){ return pageNodes().map(function (p) { return p.innerText || p.textContent; }).join('\n\n'); }
+async function execute(){
+  var why = valid(); if (why.length) return;
+  S.busy = true; sync(); $('cta').textContent = 'Executing…'; $('err').textContent = '';
+  var now = new Date().toISOString();
+  record = {
+    packet_version: 1, preview: !CONFIG.live, municipality: OB.entity + ', ' + OB.state, namespace: '/muni/' + T.slug, policy_id_sample: OB.policy,
+    grant: {program: 'LWMMI Loss Control Grant', requested: OB.grantCredit, status: 'prepared, not filed'},
+    platform_value_per_year: OB.platformValue, net_out_of_pocket_if_funded: 0,
+    signer: {name: S.name.trim(), title: S.title.trim(), method: S.mode, signed_at: now, drawn_signature_png: S.mode === 'draw' ? sigData : null,
+             authority_confirmed: true, identity_verified: false},
+    document_sha256: await sha256Hex(docText())
+  };
+  try {
+    if (CONFIG.live && CONFIG.submitEndpoint){
+      var r = await fetch(CONFIG.submitEndpoint, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(record)});
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+    } else await new Promise(function (res) { setTimeout(res, 900); });
+  } catch (e) {
+    S.busy = false; $('cta').textContent = 'Execute Agreement & File LWMMI Grant'; sync();
+    $('err').textContent = 'The packet could not be submitted. Nothing was filed. Please try again.'; return;
+  }
+  fingerprint = await sha256Hex(JSON.stringify(record));
+  S.busy = false; S.done = true; renderStepper(); showDone();
+}
+function packetHtml(){
+  var r = record;
+  return '<!doctype html><html lang="en"><meta charset="utf-8"><title>Signed packet (preview) — ' + esc(r.municipality) + '</title>' +
+    '<body style="font:15px/1.55 Georgia,serif;max-width:760px;margin:30px auto;padding:0 16px;color:#111">' +
+    (r.preview ? '<p style="background:#fff4d6;border:1px solid #ebcb6b;padding:10px 12px"><b>PREVIEW PACKET.</b> Sample data. Not sent to anyone, not filed with LWMMI, signer identity not verified. Citixen UX drafts require counsel review before use.</p>' : '') +
+    '<h1 style="font-size:1.4rem">Signed packet: ' + esc(r.municipality) + '</h1>' +
+    '<p>Namespace requested: <code>' + esc(r.namespace) + '</code><br>Signed by: ' + esc(r.signer.name) + ', ' + esc(r.signer.title) + ' (' + esc(r.signer.method) + ' signature) at ' + esc(r.signer.signed_at) + '</p>' +
+    (r.signer.drawn_signature_png ? '<p><img alt="Drawn signature" src="' + r.signer.drawn_signature_png + '" style="max-width:320px;background:#16202e;border-radius:6px"></p>' : '') +
+    '<p>Platform value: $' + r.platform_value_per_year.toLocaleString() + '/yr · Grant credit requested: $' + r.grant.requested.toLocaleString() + ' (' + esc(r.grant.status) + ') · Net out-of-pocket if the grant is funded: $0.00. If grant funds are not disbursed within 60 days the agreement ends and the Village owes nothing (draft Section 1).</p>' +
+    '<p>Document text SHA-256: <code style="word-break:break-all">' + esc(r.document_sha256) + '</code><br>Execution fingerprint SHA-256 of the record below: <code style="word-break:break-all">' + esc(fingerprint) + '</code></p>' +
+    '<h2 style="font-size:1.05rem">Record</h2><pre id="record" style="white-space:pre-wrap;word-break:break-all;font-size:11px">' + esc(JSON.stringify(r)) + '</pre>' +
+    '<h2 style="font-size:1.05rem">Document text</h2><pre style="white-space:pre-wrap;font:13px/1.5 Georgia,serif">' + esc(docText()) + '</pre></body></html>';
+}
+function download(name, type, text){
+  var url = URL.createObjectURL(new Blob([text], {type: type})), a = el('a', {href: url, download: name});
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+}
+function showDone(){
+  var dest = '/muni/' + T.slug + '/admin';
+  $('doneP').textContent = CONFIG.live ? OB.entity + ' is signed. Activating ' + '/muni/' + T.slug + '…' : OB.entity + ', ' + OB.state + ': your packet is signed in this preview.';
+  $('doneW').textContent = CONFIG.live ? 'Submitted.' : 'Preview: nothing was sent, no grant was filed with LWMMI, and the namespace was not reserved. Your signed packet is available to download below.';
+  $('doneFp').textContent = 'Execution fingerprint (SHA-256): ' + fingerprint;
+  $('goNow').href = dest;
+  $('ov').classList.add('on'); $('goNow').focus();
+  var cd = $('cd'); cd.style.setProperty('--ms', CONFIG.redirectMs + 'ms'); void cd.offsetWidth; cd.classList.add('run');
+  var left = Math.round(CONFIG.redirectMs / 1000); $('cdT').textContent = 'Opening your command center in ' + left + 's…';
+  clearInterval(timer);
+  timer = setInterval(function () { left--; if (left <= 0){ clearInterval(timer); location.assign(dest); } else $('cdT').textContent = 'Opening your command center in ' + left + 's…'; }, 1000);
+}
+
+/* ---------- boot ---------- */
+function boot(){
+  if (!T || !OB){
+    $('main').hidden = true; $('stepper').hidden = true; $('missing').hidden = false; $('s1').hidden = true; $('s2').hidden = true; $('s3').classList.add('on'); document.title = 'Onboarding not found — Citixen UX';
+    Object.keys(TENANTS).forEach(function (k) { if (TENANTS[k].onboarding) $('known').appendChild(el('li', {}, [el('a', {href: '/muni/' + k + '/gateway', text: TENANTS[k].name})])); });
+    $('badge').hidden = true; return;
+  }
+  document.title = 'Onboarding — ' + T.name + ' · Citixen UX';
+  $('wTitle').textContent = OB.welcomeName ? 'Welcome, ' + OB.welcomeName : 'Welcome';
+  var b = $('badge'); b.textContent = ''; b.appendChild(document.createTextNode('Anchor Town #' + OB.anchor + ' Onboarding | ')); b.appendChild(el('b', {text: OB.entity + ', ' + OB.state}));
+  renderStepper();
+  var pages = $('pages'); pageNodes().forEach(function (p) { pages.appendChild(p); });
+  $('fVal').textContent = money(OB.platformValue).replace('.00', '') + '/yr';
+  $('fCred').textContent = '−' + money(OB.grantCredit).replace('.00', '');
+  $('fNet').textContent = money(Math.max(0, OB.platformValue - OB.grantCredit));
+  $('attT').textContent = 'I am an authorized official of the ' + OB.entity + ' with authority to execute this conditional agreement.';
+  $('micro').appendChild(document.createTextNode('Executing locks in your '));
+  $('micro').appendChild(el('b', {text: '/muni/' + T.slug}));
+  $('micro').appendChild(document.createTextNode(' namespace request and authorizes Citixen UX to prepare your ' + money(OB.grantCredit).replace('.00', '') + ' LWMMI grant application. You owe $0 unless grant funds are disbursed to the Village. In this preview nothing is sent or filed.'));
+  var pf = $('profile');
+  [['Municipality', OB.entity + ', ' + OB.state], ['Policy ID', OB.policy + ' (sample)'], ['Namespace', '/muni/' + T.slug], ['Plan', 'Anchor Town #' + OB.anchor]].forEach(function (p) { pf.appendChild(el('dt', {text: p[0]})); pf.appendChild(el('dd', {text: p[1]})); });
+  try { var sv = JSON.parse(sessionStorage.getItem('gw.' + SLUG) || 'null'); if (sv){ S.name = sv.name || ''; S.title = sv.title || ''; $('nm').value = S.name; $('ti').value = S.title; } } catch (e) {}
+  setZoom(1); setCur(1); paintSig(); sync();
+}
+$('nm').addEventListener('input', function (e) { S.name = e.target.value; sync(); });
+$('ti').addEventListener('input', function (e) { S.title = e.target.value; sync(); });
+$('att').addEventListener('change', function (e) { S.att = e.target.checked; sync(); });
+$('mType').addEventListener('click', function () { S.mode = 'type'; $('mType').setAttribute('aria-pressed', 'true'); $('mDraw').setAttribute('aria-pressed', 'false'); paintSig(); sync(); });
+$('mDraw').addEventListener('click', function () { S.mode = 'draw'; $('mDraw').setAttribute('aria-pressed', 'true'); $('mType').setAttribute('aria-pressed', 'false'); paintSig(); sync(); });
+$('cta').addEventListener('click', execute);
+$('pPrev').addEventListener('click', function () { goPage(curPage - 1); });
+$('pNext').addEventListener('click', function () { goPage(curPage + 1); });
+$('zIn').addEventListener('click', function () { setZoom(zoom + .1); });
+$('zOut').addEventListener('click', function () { setZoom(zoom - .1); });
+$('viewer').addEventListener('scroll', onScroll);
+$('btnPdf').addEventListener('click', printDoc);
+$('dlPacket').addEventListener('click', function () { download('signed-packet-' + T.slug + '-preview.html', 'text/html', packetHtml()); });
+$('stay').addEventListener('click', function () { clearInterval(timer); $('cd').classList.remove('run'); $('cd').style.display = 'none'; $('cdT').textContent = 'Staying here. Use "Go to command center now" when you are ready.'; $('stay').hidden = true; });
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && $('ov').classList.contains('on') && !$('stay').hidden) $('stay').click(); });
+
+/* ---------- screens: 1 splash -> 2 welcome -> 3 review & sign ---------- */
+var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var scr = {1: $('s1'), 2: $('s2'), 3: $('s3')}, curScr = 0;
+function fromHash(){ return location.hash === '#review' ? 3 : location.hash === '#welcome' ? 2 : 1; }
+function showScreen(n){
+  if (n === curScr) return;
+  var prev = scr[curScr], next = scr[n];
+  var focusIt = function () { var f = n === 1 ? $('beginBtn') : n === 2 ? $('goBtn') : $('nm'); if (curScr !== 0 && f) f.focus({preventScroll: true}); };
+  var swap = function () {
+    if (prev){ prev.classList.remove('on', 'leaving'); }
+    next.classList.add('on'); curScr = n; window.scrollTo(0, 0);
+    $('lg').classList.toggle('off', n === 3);
+    document.title = (n === 3 ? 'Review & sign' : 'Welcome') + ' — Citixen UX';
+    focusIt();
+  };
+  if (prev && !reduced){ prev.classList.add('leaving'); curScr = -1; setTimeout(swap, 420); } else swap();
+}
+function nav(n){
+  var h = n === 3 ? '#review' : n === 2 ? '#welcome' : '';
+  if (h !== location.hash){ try { history.pushState(null, '', location.pathname + location.search + h); } catch (e) { location.hash = h; } }
+  showScreen(n);
+}
+window.addEventListener('popstate', function () { showScreen(fromHash()); });
+window.addEventListener('hashchange', function () { showScreen(fromHash()); });
+$('splash').addEventListener('click', function () { nav(2); });
+$('beginBtn').addEventListener('click', function (e) { e.stopPropagation(); nav(2); });
+document.addEventListener('keydown', function (e) { if (curScr === 1 && (e.key === 'Enter' || e.key === ' ') && !e.defaultPrevented){ e.preventDefault(); nav(2); } });
+$('goBtn').addEventListener('click', function () { nav(3); });
+
+boot();
+showScreen(fromHash());
+})();
+</script>
+</body>
+</html>

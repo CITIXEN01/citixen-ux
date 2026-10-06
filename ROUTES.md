@@ -53,3 +53,8 @@ The `/muni*` lockdown is a set of explicit redirects placed before the
 generic lockdown regex in `vercel.json`. To re-lock the gateway, delete the
 rule `/muni/holmen-wi/gateway/:rest+` and add `gateway` to the
 `/muni/holmen-wi/:sub(...)` rule.
+
+Note: `muni/holmen-wi/gateway.html` is a byte-identical copy of `muni-gateway.html`,
+served by the filesystem step (cleanUrls) so the public test URL does not depend
+on a rewrite. After editing `muni-gateway.html`, re-copy it:
+`cp muni-gateway.html muni/holmen-wi/gateway.html`.
