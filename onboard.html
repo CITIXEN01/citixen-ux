@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CITIXEN UX™ Municipal Onboarding Hub</title>
+<style>
+:root {
+  --bg: #EEF4FA; --card: #FFFFFF; --card2: #F3F7FB; --line: #D5E0EC; --line2: #B8C7D9;
+  --text: #0B1B33; --muted: #5B6B7F; --navy: #0D2C54; --mint: #00E699; --mint-dk: #076B4B; --mint-dim: #E6FBF3;
+  --amber-bg: #FFF6DB; --amber-line: #EBCB6B; --amber-text: #6B4E00; --red: #C0392B; --paper: #FFFFFF; --ink: #0b1220;
+  --shadow: 0 4px 6px -1px rgba(13,44,84,.08);
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 15px; line-height: 1.5; }
+button, input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--navy); outline-offset: 2px; }
+
+.top { background: var(--navy); }
+.top .in { max-width: 980px; margin: 0 auto; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.brand svg.logo { height: 34px; width: auto; display: block; }
+.brand .hub { color: #B9CCE3; font-size: 14px; font-weight: 600; letter-spacing: .02em; border-left: 1px solid rgba(255,255,255,.28); padding-left: 16px; }
+.badge { font-size: 13px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.28); border-radius: 8px; padding: 6px 12px; color: #C9D8EA; }
+.badge b { font-weight: 600; color: #fff; }
+.preview { background: var(--amber-bg); border-bottom: 1px solid var(--amber-line); color: var(--amber-text); font-size: 13.5px; }
+.preview .in { max-width: 980px; margin: 0 auto; padding: 8px 20px; }
+
+main { max-width: 980px; margin: 0 auto; padding: 28px 20px 64px; display: grid; gap: 22px; }
+.stepper { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; list-style: none; margin: 0; padding: 0; }
+.stepper li { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; gap: 12px; align-items: center; min-width: 0; box-shadow: var(--shadow); }
+.stepper .n { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 14px; background: #E3EBF4; color: var(--muted); flex: none; }
+.stepper .t { font-size: 13px; line-height: 1.3; color: var(--muted); min-width: 0; }
+.stepper .t b { display: block; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+.stepper li.active { border-color: var(--navy); box-shadow: 0 0 0 1px var(--navy), var(--shadow); }
+.stepper li.active .n { background: var(--navy); color: #fff; }
+.stepper li.active .t, .stepper li.active .t b { color: var(--navy); }
+.stepper li.done .n { background: var(--mint); color: var(--navy); }
+
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
+.card > h2 { margin: 0; padding: 16px 22px; font-size: 17px; color: var(--navy); border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.card > h2 small { font-size: 13px; font-weight: 500; color: var(--muted); }
+.body { padding: 22px; display: grid; gap: 20px; }
+.goal { color: var(--muted); margin: 0; font-size: 14px; }
+
+.ctx { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; background: var(--card2); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.ctx div { min-width: 0; }
+.ctx dt { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.ctx dd { margin: 2px 0 0; font-weight: 600; overflow-wrap: anywhere; color: var(--navy); }
+
+label.f { display: grid; gap: 6px; font-weight: 600; font-size: 14px; color: var(--navy); }
+label.f span.opt { font-weight: 400; color: var(--muted); }
+input[type=text], input[type=email] { width: 100%; padding: 10px 12px; border: 1px solid var(--line2); border-radius: 8px; background: #fff; color: var(--text); }
+input::placeholder { color: #8A99AB; }
+input.bad { border-color: var(--red); }
+.err { color: var(--red); font-size: 13px; font-weight: 500; min-height: 1.2em; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
+
+.tog { display: flex; align-items: center; gap: 12px; position: relative; flex-wrap: wrap; }
+.sw { position: relative; width: 46px; height: 26px; border-radius: 99px; background: #AEBBCB; border: 0; cursor: pointer; padding: 0; flex: none; transition: background .15s; }
+.sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform .15s; box-shadow: 0 1px 2px rgba(0,0,0,.25); }
+.sw[aria-checked="true"] { background: var(--mint); }
+.sw[aria-checked="true"]::after { transform: translateX(20px); background: var(--navy); }
+.info { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid #8A9BB0; background: #fff; color: var(--muted); font-weight: 700; font-size: 13px; line-height: 1; cursor: pointer; padding: 0; display: inline-grid; place-items: center; }
+.info:hover, .info[aria-expanded="true"] { border-color: var(--navy); color: var(--navy); background: var(--mint-dim); }
+.pop { position: absolute; top: calc(100% + 10px); left: 0; z-index: 10; width: min(380px, calc(100vw - 72px)); background: #fff; border: 1px solid var(--navy); border-radius: 10px; padding: 14px 16px; box-shadow: 0 12px 28px rgba(13,44,84,.22); font-size: 14px; }
+.pop h3 { margin: 0 0 6px; font-size: 14px; color: var(--navy); }
+.pop p { margin: 0 0 8px; color: var(--text); }
+.pop p:last-of-type { margin-bottom: 10px; color: var(--muted); }
+.pop .close { background: #fff; border: 1px solid var(--line2); border-radius: 6px; padding: 4px 12px; cursor: pointer; font-size: 13px; color: var(--navy); }
+
+.btn { border: 1px solid var(--mint); background: var(--mint); color: var(--navy); border-radius: 8px; padding: 11px 18px; font-weight: 700; cursor: pointer; }
+.btn:hover:not(:disabled) { filter: brightness(.94); }
+.btn.sec { background: #fff; color: var(--navy); border-color: var(--line2); font-weight: 600; }
+.btn.sec:hover:not(:disabled) { background: var(--card2); }
+.btn.lg { padding: 15px 22px; font-size: 16px; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.nav { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.nav.end { justify-content: flex-end; }
+
+.verify { border: 1px dashed var(--line2); border-radius: 10px; padding: 16px; display: grid; gap: 12px; background: var(--card2); }
+.verify .row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.stamp { font-size: 13px; color: var(--muted); }
+.spin { width: 20px; height: 20px; border-radius: 50%; border: 3px solid var(--line); border-top-color: var(--navy); animation: sp .8s linear infinite; }
+@keyframes sp { to { transform: rotate(360deg); } }
+.res { border-radius: 8px; padding: 10px 14px; font-weight: 600; font-size: 14px; }
+.res.ok { background: var(--mint-dim); border: 1px solid #7BE3BC; color: var(--mint-dk); }
+.res.note { background: #fff; border: 1px solid var(--line2); color: #33475F; }
+.res.bad { background: #FEECEC; border: 1px solid #F3A3A3; color: #A12222; }
+
+.alert { background: var(--mint-dim); border: 1px solid #7BE3BC; border-radius: 10px; padding: 14px 16px; color: var(--navy); }
+.alert b { color: var(--mint-dk); }
+.alert .emph { color: var(--navy); font-weight: 800; }
+.contract { border: 1px solid var(--line2); border-radius: 10px; max-height: 260px; overflow: auto; padding: 18px 20px; background: var(--paper); color: var(--ink); font-family: Georgia, "Times New Roman", serif; font-size: 14.5px; }
+.contract h3 { font-size: 15px; letter-spacing: .06em; margin: 0 0 4px; text-align: center; }
+.contract .draft { text-align: center; font: 700 12px var(--font); color: #8a5a00; margin-bottom: 14px; }
+.contract h4 { margin: 14px 0 4px; font-size: 14.5px; }
+.contract p { margin: 0; }
+
+.seg { display: inline-flex; border: 1px solid var(--line2); border-radius: 8px; overflow: hidden; background: #fff; }
+.seg button { border: 0; background: transparent; padding: 8px 16px; cursor: pointer; font-weight: 600; font-size: 14px; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--navy); color: #fff; }
+.sigbox { border: 1px solid var(--line2); border-radius: 10px; background: var(--paper); height: 120px; display: grid; place-items: center; overflow: hidden; position: relative; }
+.sigtxt { font-family: "Snell Roundhand", "Brush Script MT", "Segoe Script", cursive; font-size: 40px; color: var(--ink); padding: 0 16px; overflow: hidden; white-space: nowrap; max-width: 100%; }
+.sigtxt.empty { font: 14px var(--font); color: #7C8CA0; }
+canvas { width: 100%; height: 100%; touch-action: none; display: block; cursor: crosshair; }
+.clr { position: absolute; right: 8px; top: 8px; }
+.chk { display: flex; gap: 12px; align-items: flex-start; font-size: 14.5px; }
+.chk input { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--navy); flex: none; }
+
+.kv { display: grid; grid-template-columns: 170px minmax(0,1fr); gap: 10px 16px; margin: 0; }
+.kv dt { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: .05em; padding-top: 2px; }
+.kv dd { margin: 0; font-weight: 500; overflow-wrap: anywhere; }
+.kv dd.big { font-size: 26px; font-weight: 800; color: var(--navy); }
+
+.success { text-align: center; padding: 44px 22px; display: grid; gap: 18px; justify-items: center; }
+.tick { width: 84px; height: 84px; border-radius: 50%; background: var(--mint); display: grid; place-items: center; animation: pop .45s ease-out both; }
+.tick svg { width: 44px; height: 44px; stroke: var(--navy); stroke-width: 5; fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 60; stroke-dashoffset: 60; animation: draw .5s .25s ease-out forwards; }
+.tick.preview { background: var(--mint-dim); border: 3px solid var(--mint); }
+@keyframes pop { from { transform: scale(.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.success h2 { margin: 0; color: var(--navy); font-size: 26px; text-wrap: balance; }
+.success ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; text-align: left; max-width: 620px; }
+.success li { display: flex; gap: 10px; }
+.success li i { font-style: normal; color: var(--mint-dk); font-weight: 700; flex: none; }
+.success li.off i { color: var(--muted); }
+.acts { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+[hidden] { display: none !important; }
+@media (max-width: 720px) {
+  .stepper { grid-template-columns: 1fr; }
+  .ctx, .grid2 { grid-template-columns: 1fr; }
+  .kv { grid-template-columns: 1fr; gap: 2px; }
+  .kv dd { margin-bottom: 10px; }
+  .brand .hub { border-left: 0; padding-left: 0; width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { .spin, .tick, .tick svg { animation: none; } .tick svg { stroke-dashoffset: 0; } }
+</style>
+</head>
+<body>
+<header class="top"><div class="in">
+  <div class="brand">
+    <svg class="logo" viewBox="0 0 340 64" role="img" aria-label="CITIXEN UX">
+  
+  
+  <g transform="translate(2,10)">
+    <path d="M22 44s16-8 16-20V10L22 4 6 10v14c0 12 16 20 16 20z"
+          fill="none" stroke="#00ff88" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="58" y="40" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif"
+        font-size="30" font-weight="800" letter-spacing="0.3" fill="#ffffff">CITIXEN</text>
+  <text x="204" y="40" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif"
+        font-size="30" font-weight="800" letter-spacing="0.3" fill="#00ff88">UX</text>
+  <text x="256" y="22" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif"
+        font-size="13" font-weight="800" fill="#00ff88" opacity="0.55">™</text>
+</svg>
+    <span class="hub">Municipal Onboarding Hub</span>
+  </div>
+  <div class="badge" id="muniBadge"></div>
+</div></header>
+<div class="preview" id="previewBar" role="note"><div class="in"><b>Preview build.</b> Sample data. Nothing on this page sends email, signs a contract or files a grant application yet.</div></div>
+
+<main id="app"></main>
+
+<script>
+(function () {
+  "use strict";
+  /* ---- configuration -------------------------------------------------- */
+  var CONFIG = {
+    live: false,            // true only once real endpoints below exist and counsel has approved the agreement text
+    pingEndpoint: null,     // POST {to} -> 200 when a real test email was accepted
+    submitEndpoint: null    // POST {record} -> 200 when the package was received
+  };
+  var MUNIS = {
+    holmen: { slug: "holmen", name: "Village of Holmen", state: "WI", policy: "LWMMI-WI-42091-HOL",
+              admin: "administrator@holmenwi.gov", dispatch: "publicworks@holmenwi.gov", title: "Village Administrator" }
+  };
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  function h(tag, attrs, kids) {
+    var e = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (k) {
+      if (k === "class") e.className = attrs[k]; else if (k === "text") e.textContent = attrs[k];
+      else if (k.slice(0, 2) === "on") e.addEventListener(k.slice(2), attrs[k]); else if (attrs[k] !== false && attrs[k] != null) e.setAttribute(k, attrs[k]);
+    });
+    (kids || []).forEach(function (c) { if (c != null) e.appendChild(typeof c === "string" ? document.createTextNode(c) : c); });
+    return e;
+  }
+  function slugFromUrl() {
+    var q = location.search.match(/[?&]muni=([^&]+)/); if (q) return decodeURIComponent(q[1]).toLowerCase();
+    var m = location.pathname.match(/\/muni\/([^\/?#.]+)\/onboard\/?$/); return m ? m[1].toLowerCase() : "holmen";
+  }
+  var muni = Object.prototype.hasOwnProperty.call(MUNIS, slugFromUrl()) ? MUNIS[slugFromUrl()] : null;
+  var EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+  var S = { step: 1, dispatch: "", secondary: "", notify: true, ping: "idle", pingMsg: "",
+            sigMode: "type", name: "", title: "", drawn: false, authorized: false, signedAt: null,
+            grantAuth: false, submitting: false, submitErr: "", finished: false };
+  try { var saved = JSON.parse(sessionStorage.getItem("onb." + (muni && muni.slug)) || "null"); if (saved && !saved.finished) { S.dispatch = saved.dispatch || ""; S.secondary = saved.secondary || ""; S.notify = saved.notify !== false; } } catch (e) {}
+  function persist() { try { sessionStorage.setItem("onb." + muni.slug, JSON.stringify({ dispatch: S.dispatch, secondary: S.secondary, notify: S.notify })); } catch (e) {} }
+  if (muni) S.dispatch = S.dispatch || muni.dispatch;
+  if (muni) S.title = muni.title;
+
+  var canvasData = null;  // data URL of drawn signature
+
+  /* ---- views --------------------------------------------------------- */
+  var root = $("#app");
+  function stepper() {
+    var names = [["Step 1", "Technical Verification & IT Routing"], ["Step 2", "Conditional MSA & Statutory Terms"], ["Step 3", "LWMMI Grant Authorization"]];
+    return h("ol", { class: "stepper", "aria-label": "Progress" }, names.map(function (n, i) {
+      var st = S.finished || S.step > i + 1 ? "done" : (S.step === i + 1 ? "active" : "");
+      return h("li", { class: st, "aria-current": st === "active" ? "step" : false }, [
+        h("span", { class: "n", text: st === "done" ? "✓" : String(i + 1) }),
+        h("span", { class: "t" }, [h("b", { text: n[0] }), n[1]])
+      ]);
+    }));
+  }
+  function ctxCard() {
+    return h("dl", { class: "ctx" }, [
+      h("div", {}, [h("dt", { text: "Municipality" }), h("dd", { text: muni.name + ", " + muni.state })]),
+      h("div", {}, [h("dt", { text: "Primary administrator contact" }), h("dd", { text: muni.admin })]),
+      h("div", {}, [h("dt", { text: "Policy ID" }), h("dd", { text: muni.policy })])
+    ]);
+  }
+  function render() {
+    root.textContent = "";
+    if (!muni) { root.appendChild(h("div", { class: "card" }, [h("div", { class: "body" }, [h("h2", { text: "Onboarding link not found" }), h("p", { class: "goal", text: "This link does not match a municipality. Check the address you were sent, or contact CITIXEN UX." })])])); $("#muniBadge").textContent = "Municipality not found"; return; }
+    $("#muniBadge").innerHTML = ""; $("#muniBadge").appendChild(h("span", {}, [h("b", { text: muni.name + ", " + muni.state }), " | Policy: " + muni.policy]));
+    $("#previewBar").hidden = CONFIG.live;
+    root.appendChild(stepper());
+    if (S.finished) root.appendChild(viewDone());
+    else if (S.step === 1) root.appendChild(view1());
+    else if (S.step === 2) root.appendChild(view2());
+    else root.appendChild(view3());
+    window.scrollTo({ top: 0 });
+  }
+
+  /* ---- step 1 -------------------------------------------------------- */
+  function view1() {
+    var disp = h("input", { type: "email", id: "dispatch", value: S.dispatch, placeholder: "publicworks@holmenwi.gov", autocomplete: "off", "aria-describedby": "dispErr" });
+    var sec = h("input", { type: "email", id: "secondary", value: S.secondary, placeholder: "name@holmenwi.gov", autocomplete: "off", "aria-describedby": "secErr" });
+    var dispErr = h("div", { class: "err", id: "dispErr" }), secErr = h("div", { class: "err", id: "secErr" });
+    var next = h("button", { class: "btn", type: "button", text: "Save & Continue to Step 2 →" });
+    var pingBtn = h("button", { class: "btn sec", type: "button", text: "Send Instant System Test Ping" });
+    var resBox = h("div", { "aria-live": "polite" });
+    function validDisp() { return EMAIL.test(disp.value.trim()); }
+    function validSec() { return !sec.value.trim() || EMAIL.test(sec.value.trim()); }
+    function sync() {
+      S.dispatch = disp.value.trim(); S.secondary = sec.value.trim(); persist();
+      next.disabled = !(validDisp() && validSec() && S.ping !== "busy");
+      pingBtn.disabled = !validDisp() || S.ping === "busy";
+    }
+    function showRes() {
+      resBox.textContent = "";
+      if (S.ping === "busy") resBox.appendChild(h("div", { class: "row" }, [h("div", { class: "spin", role: "status", "aria-label": "Sending test" }), h("span", { text: "Sending test to " + S.dispatch + "…" })]));
+      else if (S.ping === "ok") resBox.appendChild(h("div", { class: "res ok", text: S.pingMsg }));
+      else if (S.ping === "note") resBox.appendChild(h("div", { class: "res note", text: S.pingMsg }));
+      else if (S.ping === "bad") resBox.appendChild(h("div", { class: "res bad", text: S.pingMsg }));
+    }
+    disp.addEventListener("input", function () { S.ping = "idle"; showRes(); dispErr.textContent = ""; disp.classList.remove("bad"); sync(); });
+    disp.addEventListener("blur", function () { if (disp.value && !validDisp()) { dispErr.textContent = "Enter a valid email address."; disp.classList.add("bad"); } });
+    sec.addEventListener("input", function () { secErr.textContent = ""; sec.classList.remove("bad"); sync(); });
+    sec.addEventListener("blur", function () { if (!validSec()) { secErr.textContent = "Enter a valid email address or leave this blank."; sec.classList.add("bad"); } });
+    pingBtn.onclick = function () {
+      S.ping = "busy"; showRes(); sync();
+      var done = function (kind, msg) { S.ping = kind; S.pingMsg = msg; showRes(); sync(); };
+      if (CONFIG.live && CONFIG.pingEndpoint) {
+        fetch(CONFIG.pingEndpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ to: S.dispatch }) })
+          .then(function (r) { if (!r.ok) throw new Error(r.status); done("ok", "✓ Test email accepted for " + S.dispatch + ". Ask Public Works to confirm it arrived."); })
+          .catch(function () { done("bad", "The test email could not be sent. Check the address and try again."); });
+      } else {
+        setTimeout(function () { done("note", "✓ Address format is valid. Preview mode: no email was sent, so delivery and whitelisting are not verified."); }, 1300);
+      }
+    };
+    var tog = h("button", { class: "sw", type: "button", role: "switch", "aria-checked": String(S.notify), "aria-labelledby": "togLbl" });
+    tog.onclick = function () { S.notify = !S.notify; tog.setAttribute("aria-checked", String(S.notify)); persist(); };
+    var info = h("button", { class: "info", type: "button", "aria-label": "What is this?", "aria-expanded": "false", "aria-controls": "notifPop", text: "?" });
+    var pop = h("div", { class: "pop", id: "notifPop", role: "dialog", "aria-label": "About intake log notifications" }, [
+      h("h3", { text: "Automated Statutory Intake Log Notifications" }),
+      h("p", { text: "When this is on, CITIXEN UX emails your Public Works address each time a resident report is logged. The email shows what was reported, where, and when it was logged, so staff see it right away and the log shows when the Village was told." }),
+      h("p", { text: "A record of when a municipality was notified of a hazard can matter if a claim is filed. Your attorney can advise on how." }),
+      h("p", { text: CONFIG.live ? "Reports are recorded in the ledger whether this is on or off." : "Preview: no emails are sent yet. Reports would still be recorded in the ledger whether this is on or off." }),
+      h("button", { class: "close", type: "button", text: "Got it" })
+    ]);
+    pop.hidden = true;
+    function setPop(open) { pop.hidden = !open; info.setAttribute("aria-expanded", String(open)); }
+    info.onclick = function (e) { e.stopPropagation(); setPop(pop.hidden); };
+    pop.addEventListener("click", function (e) { e.stopPropagation(); });
+    $(".close", pop).onclick = function () { setPop(false); info.focus(); };
+    var togRow = h("div", { class: "tog" }, [tog, h("span", { id: "togLbl", text: "Enable Automated Statutory Intake Log Notifications" }), info, pop]);
+    document.addEventListener("click", function () { if (document.body.contains(pop)) setPop(false); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && document.body.contains(pop) && !pop.hidden) { setPop(false); info.focus(); } });
+    next.onclick = function () { S.step = 2; render(); };
+    var card = h("section", { class: "card" }, [
+      h("h2", {}, ["Technical Verification & IT Routing", h("small", { text: "Est. time: 3 min" })]),
+      h("div", { class: "body" }, [
+        h("p", { class: "goal", text: "Set where reports are emailed. Nothing is installed on Village servers." }),
+        ctxCard(),
+        h("div", { class: "grid2" }, [
+          h("label", { class: "f", for: "dispatch" }, ["Public Works Dispatch Email", disp, dispErr]),
+          h("label", { class: "f", for: "secondary" }, [h("span", {}, ["Secondary Notification Email ", h("span", { class: "opt", text: "(optional)" })]), sec, secErr])
+        ]),
+        togRow,
+        h("div", { class: "verify" }, [h("div", { class: "row" }, [pingBtn, h("span", { class: "stamp", text: "Sends one test message to the dispatch address." })]), resBox]),
+        h("div", { class: "nav end" }, [next])
+      ])
+    ]);
+    sync(); showRes();
+    return card;
+  }
+
+  /* ---- step 2 -------------------------------------------------------- */
+  function contractNode() {
+    return h("div", { class: "contract", tabindex: "0", role: "region", "aria-label": "Conditional Master Services Agreement" }, [
+      h("h3", { text: "CONDITIONAL MASTER SERVICES AGREEMENT" }),
+      h("div", { class: "draft", text: "DRAFT TEXT: COUNSEL REVIEW REQUIRED BEFORE USE" }),
+      h("h4", { text: "Section 1: Zero-Risk Grant Contingency Clause (Wis. Stat. § 893.80 Defense)" }),
+      h("p", { text: "This Agreement is contingent on funding from the LWMMI Loss Control Grant. If grant funds are not disbursed to the Village within 60 days of the Effective Date, this Agreement terminates and the Village owes CITIXEN UX nothing." }),
+      h("h4", { text: "Section 2: Platform Scope: SHA-256 Intake Ledger & Public Works Email Relay" }),
+      h("p", { text: "CITIXEN UX will provide a web intake for resident reports, a SHA-256 ledger recording each report, and email delivery of new reports to the Public Works address set in Step 1." }),
+      h("h4", { text: "Section 3: Annual Fee: $9,500 (100% Grant Reimbursable)" }),
+      h("p", { text: "The annual fee is $9,500, intended to be paid from the grant described in Section 1." })
+    ]);
+  }
+  function view2() {
+    var nameI = h("input", { type: "text", id: "legalName", value: S.name, autocomplete: "name", placeholder: "Full legal name" });
+    var titleI = h("input", { type: "text", id: "offTitle", value: S.title, placeholder: "Village Administrator" });
+    var auth = h("input", { type: "checkbox", id: "authz" }); auth.checked = S.authorized;
+    var exec = h("button", { class: "btn", type: "button", text: "Execute Agreement & Proceed to Grant Filing →" });
+    var sigWrap = h("div", { class: "sigbox" });
+    var segT = h("button", { type: "button", text: "Type Signature", "aria-pressed": String(S.sigMode === "type") });
+    var segD = h("button", { type: "button", text: "Draw Signature", "aria-pressed": String(S.sigMode === "draw") });
+    var canvas = null, ctx2 = null, drawing = false;
+    function ready() {
+      var sig = S.sigMode === "type" ? nameI.value.trim().length > 1 : S.drawn;
+      return sig && titleI.value.trim() && nameI.value.trim() && auth.checked;
+    }
+    function sync() { S.name = nameI.value; S.title = titleI.value; S.authorized = auth.checked; exec.disabled = !ready(); }
+    function paintSig() {
+      sigWrap.textContent = "";
+      if (S.sigMode === "type") {
+        var v = nameI.value.trim();
+        sigWrap.appendChild(h("div", { class: "sigtxt" + (v ? "" : " empty"), text: v || "Your typed signature appears here" }));
+      } else {
+        canvas = h("canvas", { "aria-label": "Draw your signature" });
+        var clear = h("button", { class: "btn sec clr", type: "button", text: "Clear", style: "padding:4px 10px;font-size:13px" });
+        sigWrap.appendChild(canvas); sigWrap.appendChild(clear);
+        var r = sigWrap.getBoundingClientRect(); var dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.max(300, r.width) * dpr; canvas.height = 120 * dpr;
+        ctx2 = canvas.getContext("2d"); ctx2.scale(dpr, dpr); ctx2.lineWidth = 2.4; ctx2.lineCap = "round"; ctx2.lineJoin = "round"; ctx2.strokeStyle = "#0b1220";
+        if (canvasData) { var img = new Image(); img.onload = function () { ctx2.drawImage(img, 0, 0, canvas.width / dpr, 120); }; img.src = canvasData; }
+        function pos(e) { var b = canvas.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; }
+        canvas.addEventListener("pointerdown", function (e) { drawing = true; canvas.setPointerCapture(e.pointerId); var p = pos(e); ctx2.beginPath(); ctx2.moveTo(p[0], p[1]); });
+        canvas.addEventListener("pointermove", function (e) { if (!drawing) return; var p = pos(e); ctx2.lineTo(p[0], p[1]); ctx2.stroke(); });
+        function end() { if (!drawing) return; drawing = false; S.drawn = true; canvasData = canvas.toDataURL("image/png"); sync(); }
+        canvas.addEventListener("pointerup", end); canvas.addEventListener("pointercancel", end);
+        clear.onclick = function () { ctx2.clearRect(0, 0, canvas.width, canvas.height); S.drawn = false; canvasData = null; sync(); };
+      }
+    }
+    segT.onclick = function () { S.sigMode = "type"; segT.setAttribute("aria-pressed", "true"); segD.setAttribute("aria-pressed", "false"); paintSig(); sync(); };
+    segD.onclick = function () { S.sigMode = "draw"; segD.setAttribute("aria-pressed", "true"); segT.setAttribute("aria-pressed", "false"); paintSig(); sync(); };
+    nameI.addEventListener("input", function () { if (S.sigMode === "type") paintSig(); sync(); });
+    titleI.addEventListener("input", sync); auth.addEventListener("change", sync);
+    exec.onclick = function () { S.signedAt = new Date().toISOString(); S.step = 3; render(); };
+    var card = h("section", { class: "card" }, [
+      h("h2", {}, ["Conditional MSA Review & E-Sign", h("small", { text: "Est. time: 2 min" })]),
+      h("div", { class: "body" }, [
+        h("div", { class: "alert", role: "note" }, [h("b", { text: "Notice: " }), "This Agreement is strictly contingent upon 100% funding via the LWMMI Loss Control Grant. If grant funds are not disbursed within 60 days, this agreement automatically terminates with ", h("strong", { class: "emph", text: "$0 liability" }), " to the Village General Fund."]),
+        contractNode(),
+        h("div", { class: "grid2" }, [
+          h("label", { class: "f", for: "legalName" }, ["Full Legal Name", nameI]),
+          h("label", { class: "f", for: "offTitle" }, ["Official Title", titleI])
+        ]),
+        h("div", {}, [h("div", { class: "seg", role: "group", "aria-label": "Signature method" }, [segT, segD])]),
+        sigWrap,
+        h("label", { class: "chk", for: "authz" }, [auth, h("span", { text: "I am an authorized official of the " + muni.name + " with authority to execute this conditional agreement." })]),
+        h("div", { class: "nav" }, [h("button", { class: "btn sec", type: "button", text: "← Back", onclick: function () { S.step = 1; render(); } }), exec])
+      ])
+    ]);
+    paintSig(); sync();
+    return card;
+  }
+
+  /* ---- step 3 -------------------------------------------------------- */
+  function view3() {
+    var auth = h("input", { type: "checkbox", id: "gauth" }); auth.checked = S.grantAuth;
+    var go = h("button", { class: "btn lg", type: "button", text: "Authorize & Submit $9,500 Grant Application" });
+    var err = h("div", { class: "err", "aria-live": "polite", text: S.submitErr });
+    function sync() { S.grantAuth = auth.checked; go.disabled = !auth.checked || S.submitting; go.textContent = S.submitting ? "Submitting…" : "Authorize & Submit $9,500 Grant Application"; }
+    auth.addEventListener("change", sync);
+    go.onclick = function () {
+      S.submitting = true; S.submitErr = ""; err.textContent = ""; sync();
+      var finish = function () { S.submitting = false; S.finished = true; try { sessionStorage.removeItem("onb." + muni.slug); } catch (e) {} render(); };
+      if (CONFIG.live && CONFIG.submitEndpoint) {
+        fetch(CONFIG.submitEndpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(record()) })
+          .then(function (r) { if (!r.ok) throw new Error(r.status); finish(); })
+          .catch(function () { S.submitting = false; S.submitErr = "The application could not be submitted. Nothing was filed. Try again."; err.textContent = S.submitErr; sync(); });
+      } else setTimeout(finish, 1100);
+    };
+    var card = h("section", { class: "card" }, [
+      h("h2", {}, ["One-Click LWMMI Grant Authorization", h("small", { text: "Est. time: 1 min" })]),
+      h("div", { class: "body" }, [
+        h("p", { class: "goal", text: "Review the pre-filled application, then authorize it." }),
+        h("dl", { class: "kv" }, [
+          h("dt", { text: "Applicant" }), h("dd", { text: muni.name + ", " + muni.state }),
+          h("dt", { text: "Requested grant" }), h("dd", { class: "big", text: "$9,500.00" }),
+          h("dt", { text: "Grant rationale" }), h("dd", { text: "Deployment of CITIXEN UX SHA-256 Statutory Notice Ledger for pothole and sidewalk liability claim mitigation under Wis. Stat. § 893.80." }),
+          h("dt", { text: "Itemized vendor" }), h("dd", { text: "CITIXEN UX LLC — $9,500.00 (100% covered)" })
+        ]),
+        h("label", { class: "chk", for: "gauth" }, [auth, h("span", { text: "Authorize CITIXEN UX Chief of Staff to submit this pre-filled application directly to the LWMMI Claims Committee on behalf of the " + muni.name + "." })]),
+        err,
+        h("div", { class: "nav" }, [h("button", { class: "btn sec", type: "button", text: "← Back", onclick: function () { S.step = 2; render(); } }), go])
+      ])
+    ]);
+    sync();
+    return card;
+  }
+
+  /* ---- done ---------------------------------------------------------- */
+  function record() {
+    return { municipality: muni.name + ", " + muni.state, policyId: muni.policy, dispatchEmail: S.dispatch, secondaryEmail: S.secondary || null,
+             intakeNotifications: S.notify, signer: { name: S.name, title: S.title, method: S.sigMode, signedAt: S.signedAt, drawnSignature: S.sigMode === "draw" ? canvasData : null },
+             grant: { amount: 9500, authorizedAt: new Date().toISOString(), submittedBy: "CITIXEN UX Chief of Staff" }, preview: !CONFIG.live };
+  }
+  function packetHtml() {
+    var r = record(); var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+    return "<!doctype html><meta charset=utf-8><title>Onboarding packet</title><body style='font:15px Georgia,serif;max-width:720px;margin:32px auto;padding:0 16px'>" +
+      (r.preview ? "<p style='background:#fff7e0;padding:8px 12px'><b>PREVIEW PACKET.</b> Sample data. This was not sent, signed with a verified identity or filed.</p>" : "") +
+      "<h1>Onboarding packet: " + esc(r.municipality) + "</h1><p>Policy: " + esc(r.policyId) + "</p>" +
+      "<h2>Routing</h2><p>Dispatch: " + esc(r.dispatchEmail) + "<br>Secondary: " + esc(r.secondaryEmail || "none") + "<br>Intake notifications: " + (r.intakeNotifications ? "on" : "off") + "</p>" +
+      "<h2>Conditional Master Services Agreement (draft text)</h2><p>1. Grant contingency: terminates at no cost if grant funds are not disbursed within 60 days.<br>2. Scope: SHA-256 intake ledger and Public Works email relay.<br>3. Annual fee: $9,500, intended to be paid from the grant.</p>" +
+      "<p>Signed by " + esc(r.signer.name) + ", " + esc(r.signer.title) + " (" + esc(r.signer.method) + " signature) at " + esc(r.signer.signedAt) + "</p>" +
+      (r.signer.drawnSignature ? "<img alt='Drawn signature' src='" + r.signer.drawnSignature + "' style='max-width:320px;border-bottom:1px solid #000'>" : "") +
+      "<h2>Grant authorization</h2><p>$9,500.00 requested from LWMMI; vendor CITIXEN UX LLC. Authorized " + esc(r.grant.authorizedAt) + ".</p></body>";
+  }
+  function viewDone() {
+    var live = CONFIG.live;
+    var li = function (t, off) { return h("li", { class: off ? "off" : "" }, [h("i", { text: off ? "•" : "✓" }), h("span", { text: t })]); };
+    return h("section", { class: "card" }, [h("div", { class: "success" }, [
+      h("div", { class: "tick" + (live ? "" : " preview"), "aria-hidden": "true" }, [(function () { var s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("viewBox", "0 0 44 44"); var p = document.createElementNS("http://www.w3.org/2000/svg", "path"); p.setAttribute("d", "M10 23l8 8 16-17"); s.appendChild(p); return s; })()]),
+      h("h2", { role: "status", text: live ? "Onboarding Complete & Grant Application Filed!" : "Preview complete. Nothing was sent or filed." }),
+      h("ul", {}, live ? [
+        li("Executed Conditional MSA sent to " + muni.admin),
+        li("Grant Application submitted to LWMMI Claims Committee"),
+        li("Your Public Works portal is provisioning at citixenux.com/muni/" + muni.slug)
+      ] : [
+        li("In live mode the executed agreement would be sent to " + muni.admin, true),
+        li("In live mode the grant application would go to the LWMMI Claims Committee", true),
+        li("The Public Works portal at citixenux.com/muni/" + muni.slug + " is not provisioned yet", true)
+      ]),
+      h("div", { class: "acts" }, [
+        h("button", { class: "btn", type: "button", text: "Download Completed Packet", onclick: function () {
+          var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([packetHtml()], { type: "text/html" })); a.download = "onboarding-packet-" + muni.slug + ".html"; document.body.appendChild(a); a.click(); a.remove(); } }),
+        h("button", { class: "btn sec", type: "button", disabled: !live, text: live ? "View Live Public Works Intake Portal" : "Intake portal not provisioned yet" }),
+        h("button", { class: "btn sec", type: "button", text: "Start over", onclick: function () { S.finished = false; S.step = 1; S.ping = "idle"; S.authorized = false; S.grantAuth = false; S.drawn = false; canvasData = null; S.name = ""; render(); } })
+      ])
+    ])]);
+  }
+  render();
+})();
+</script>
+</body>
+</html>

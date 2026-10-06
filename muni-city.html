@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Citizen UX Nexus — City Hub</title>
+<title>Citixen UX Nexus — City Hub</title>
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#0A0D14">
 <meta name="referrer" content="no-referrer">
 <link rel="icon" type="image/x-icon" href="/favicon.ico?v=5">
 <script src="/shared/nexus-transition.js"></script>
-<!-- MULTI-TENANT CITY HUB — served for /muni/{city_slug} (vercel.json rewrites
+<!-- MULTI-TENANT CITY HUB — served for /muni/{city_slug}/admin and /dispatch (austin) (vercel.json rewrites
      it to /muni-city.html?city={slug}; ?city= also works when opened directly).
      The tenant comes from shared/tenants.js. This is the dispatcher GIS +
      Audit Vault that used to live inside nexus.html (c26ae56), now driven by
@@ -221,14 +221,23 @@ tr:hover td{background:rgba(255,255,255,.02)}
   .role-switch select{max-width:150px}
 }
 @media (max-width:560px){.view-scroll{padding:16px}#view-gateway{padding:14px}}
+
+.chip-ent{display:inline-block;margin-left:8px;padding:2px 9px;border-radius:9999px;font-size:.62rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#7dd3fc;border:1px solid rgba(125,211,252,.45);background:rgba(125,211,252,.08);vertical-align:middle}
+.cad-form{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
+.cad-form input,.cad-form select{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 9px;color:var(--text);min-width:0}
+.cad-form button{width:auto;padding:8px 14px;justify-self:start}
+.cad-digest{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}
+.cad-digest h3{margin:0 0 6px;font-size:.88rem}
+.cad-digest pre{margin:0 0 8px;white-space:pre-wrap;font:12px/1.5 ui-monospace,Menlo,monospace;color:var(--muted)}
+.cad-digest a{color:var(--green);font-weight:700;font-size:.8rem}
 </style>
 </head>
 <body>
 <div class="app">
 
   <header class="topbar">
-    <a class="brand" href="/muni" aria-label="Citizen UX Nexus — Municipal Gateway"><img src="/logo.svg" alt="CITIXEN UX" width="159" height="30"></a>
-    <h1 class="logo">Citizen UX <span class="nx">Nexus</span></h1>
+    <a class="brand" href="/muni" aria-label="Citixen UX Nexus — Municipal Gateway"><img src="/logo.svg" alt="CITIXEN UX" width="159" height="30"></a>
+    <h1 class="logo">Citixen UX <span class="nx">Nexus</span></h1>
     <a class="btn-back" id="btnBack" href="/muni">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       Municipal Gateway
@@ -285,6 +294,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <button type="button" class="nav-item" data-view="settings">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
           <span class="nav-label">Geo-Fence &amp; Team Settings</span>
+        </button>
+        <button type="button" class="nav-item" data-view="cadence">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          <span class="nav-label">Executive Cadence (Enterprise)</span>
         </button>
 
         <div class="side-foot">
@@ -404,6 +417,43 @@ tr:hover td{background:rgba(255,255,255,.02)}
             </div>
           </div>
         </section>
+
+        <!-- Executive Cadence (Enterprise): weekly ward/district digests for elected officials -->
+        <section class="view view-scroll" id="view-cadence" aria-label="Executive Cadence">
+          <div class="view-head">
+            <div><h2 class="view-title">Weekly Executive Cadence <span class="chip-ent">Enterprise tier</span></h2>
+              <p class="view-sub">Ward-filtered summary digests for Alderpersons, Council Members and Trustees, scheduled for every Monday at 6:00 AM.</p></div>
+          </div>
+          <div class="cards">
+            <div class="card">
+              <h2>Schedule</h2>
+              <div class="row"><div class="row-main"><div class="row-title">Cadence</div><div class="row-sub">Every Monday, 6:00 AM (city local time). Covers the previous 7 days.</div></div></div>
+              <div class="row"><div class="row-main"><div class="row-title">Automatic sending</div><div class="row-sub" id="cadAutoNote">Not active. Sending on a schedule needs a server-side scheduler and an email service, neither of which exists yet. Until then, generate the digests here and send them from your email app.</div></div><span class="badge new" id="cadAutoBadge">Off</span></div>
+              <div class="row"><div class="row-main"><div class="row-title">Enterprise tier</div><div class="row-sub">Tier is not enforced: there is no sign-in or billing yet, so this view is open on every hub.</div></div></div>
+            </div>
+            <div class="card">
+              <h2>Recipients</h2>
+              <p class="view-sub">Saved in this browser only. These are people's names and email addresses, so do not rely on this page as a system of record.</p>
+              <form id="cadForm" class="cad-form" novalidate>
+                <input type="text" id="cadName" maxlength="80" placeholder="Full name" aria-label="Full name">
+                <select id="cadTitle" aria-label="Title"><option>Alderperson</option><option>Council Member</option><option>Trustee</option></select>
+                <select id="cadWard" aria-label="Ward or district"></select>
+                <input type="text" id="cadEmail" maxlength="120" placeholder="email@city.gov" aria-label="Email">
+                <button type="submit" class="btn-export" id="cadAdd">Add</button>
+              </form>
+              <p class="hint" id="cadMsg" role="alert" style="min-height:1.2em"></p>
+              <div id="cadList"></div>
+            </div>
+          </div>
+          <div class="card" style="margin-top:14px">
+            <h2>This week's digests</h2>
+            <p class="view-sub" id="cadSource"></p>
+            <button type="button" class="btn-export" id="cadGen" style="width:auto;padding:9px 16px">Generate digests now</button>
+            <button type="button" class="btn-export" id="cadDl" style="width:auto;padding:9px 16px;margin-left:8px" disabled>Download all (.txt)</button>
+            <div id="cadOut" style="margin-top:12px"></div>
+          </div>
+        </section>
+
       </main>
     </section>
   </div>
@@ -672,25 +722,25 @@ async function loadLedgerReports(){
   const now = Date.now();
   return (data.tickets || []).filter(t => t.city === TENANT.cityKey).map(t => ({
     id:t.reportId, category:t.category || 'Report',
-    lat:round3(t.lat), lng:round3(t.lng),
+    lat:round3(t.lat), lng:round3(t.lng), ward:t.ward || null, wardName:t.wardName || null,
     status:STAGE_TO_STATUS[t.stage] || 'new', createdAt:now - agoToMs(t.submittedAgo)
   }));
 }
 function showBanner(msg){ const b = $('emptyBanner'); if (msg){ b.textContent = msg; b.style.display = 'block'; } else b.style.display = 'none'; }
 function showMissingTenant(){
-  document.title = 'City hub not found — Citizen UX Nexus';
+  document.title = 'City hub not found — Citixen UX Nexus';
   $('spoke-municipal').hidden = true;
   $('tenantMissing').hidden = false;
   const list = $('tenantLinks');
   Object.keys(TENANTS).forEach(k => {
-    const a = el('a',{href:'/muni/' + k,text:TENANTS[k].label}); const li = el('li'); li.appendChild(a); list.appendChild(li);
+    const a = el('a',{href:'/muni/' + k + '/admin',text:TENANTS[k].label}); const li = el('li'); li.appendChild(a); list.appendChild(li);
   });
   ['muniBadge','chipDemo','piiBadge','roleWrap','profileBtn'].forEach(id => { $(id).hidden = true; });
 }
 async function boot(){
   if (!TENANT){ showMissingTenant(); return; }
   MUNICIPALITY = TENANT.name;
-  document.title = MUNICIPALITY + ' — Citizen UX Nexus';
+  document.title = MUNICIPALITY + ' — Citixen UX Nexus';
   $('muniText').textContent = MUNICIPALITY;
   ZONES = (TENANT.zones || []).map(z => Object.assign({}, z));
   CREWS = (TENANT.crews || []).map(c => Object.assign({}, c));
@@ -713,6 +763,9 @@ async function boot(){
   }
   ready = true;
   renderCounts(); applyRole();
+  buildCadence();
+  // /muni/{slug}/admin opens on the Audit Vault; /muni/{slug}/dispatch (and the bare hub) on the map.
+  if (new URLSearchParams(location.search).get('view') === 'admin' || /\/admin\/?$/.test(location.pathname)) showView('audit');
   seedLog().then(renderAudit);
   loadLeaflet().then(initMap);
 }
@@ -735,6 +788,102 @@ function applyRole(){
       ? 'Layout stub: toggles update the map but are not persisted.'
       : 'Layout stub: toggles update the map but are not persisted. Editing requires the Administrator role.';
   $('zoneEmpty').hidden = ZONES.length > 0; $('crewEmpty').hidden = CREWS.length > 0;
+  if (ready && $('cadList')) cadRenderList();
+}
+
+
+/* ===================== EXECUTIVE CADENCE (Enterprise) ===================== */
+/* Real parts: recipient list (saved in this browser), digest built from this hub's reports
+   for the last 7 days, filtered by ward when reports carry one (live-ledger hubs do; the
+   Austin demo has no wards, so it is city-wide), per-recipient mailto link, .txt download.
+   Not real: automatic Monday 6:00 AM sending. That needs a server scheduler and an email
+   service; the Schedule card says so. */
+let cadRecipients = [], cadDigests = [];
+const CAD_DAYS = 7;
+function cadKey(){ return 'nx_cadence_' + TENANT.slug; }
+function cadLoad(){ try { const j = JSON.parse(localStorage.getItem(cadKey()) || '[]'); cadRecipients = Array.isArray(j) ? j : []; } catch(e){ cadRecipients = []; } }
+function cadSave(){ try { localStorage.setItem(cadKey(), JSON.stringify(cadRecipients)); } catch(e){} }
+function cadWards(){
+  const m = {}; reports.forEach(r => { if (r.ward) m[r.ward] = r.wardName || r.ward; });
+  return Object.keys(m).sort().map(k => ({slug:k, name:m[k]}));
+}
+function cadFillWards(){
+  const sel = $('cadWard'); sel.textContent = '';
+  const wards = cadWards();
+  sel.appendChild(el('option',{value:'',text:wards.length ? 'All wards' : 'City-wide (no wards on this hub)'}));
+  wards.forEach(w => sel.appendChild(el('option',{value:w.slug,text:w.name})));
+}
+function cadWardLabel(slug){ const w = cadWards().find(x => x.slug === slug); return slug ? (w ? w.name : slug) : 'All wards'; }
+function cadRenderList(){
+  const root = $('cadList'); root.textContent = '';
+  const admin = ROLES[role].admin;
+  $('cadAdd').disabled = !admin; ['cadName','cadTitle','cadWard','cadEmail'].forEach(id => { $(id).disabled = !admin; });
+  if (!admin) $('cadMsg').textContent = 'Editing recipients requires the Administrator role (UI switch).'; else if ($('cadMsg').dataset.err !== '1') $('cadMsg').textContent = '';
+  if (!cadRecipients.length){ root.appendChild(el('p',{class:'hint',text:'No recipients yet.'})); return; }
+  cadRecipients.forEach(r => {
+    const rm = el('button',{type:'button',class:'link-btn',text:'Remove','aria-label':'Remove ' + r.name}); rm.disabled = !admin;
+    rm.addEventListener('click', () => { cadRecipients = cadRecipients.filter(x => x.id !== r.id); cadSave(); cadRenderList(); });
+    root.appendChild(el('div',{class:'row'},[el('div',{class:'row-main'},[el('div',{class:'row-title',text:r.name + ' · ' + r.title}), el('div',{class:'row-sub',text:cadWardLabel(r.ward) + ' · ' + r.email})]), rm]));
+  });
+}
+function cadBuild(r){
+  const since = Date.now() - CAD_DAYS * 86400000;
+  const list = reports.filter(x => x.createdAt >= since && (!r.ward || x.ward === r.ward));
+  const c = {new:0,dispatched:0,resolved:0}; list.forEach(x => c[x.status]++);
+  const byCat = {}; list.forEach(x => { byCat[x.category] = (byCat[x.category] || 0) + 1; });
+  const d0 = new Date(since).toLocaleDateString(), d1 = new Date().toLocaleDateString();
+  const scope = r.ward ? cadWardLabel(r.ward) : (cadWards().length ? 'All wards' : 'City-wide');
+  const lines = [
+    'Weekly Executive Report: ' + MUNICIPALITY,
+    'To: ' + r.name + ', ' + r.title + ' (' + scope + ')',
+    'Period: ' + d0 + ' to ' + d1 + ' (last ' + CAD_DAYS + ' days)', '',
+    'Reports received: ' + list.length,
+    '  New (awaiting dispatch): ' + c.new, '  Dispatched: ' + c.dispatched, '  Resolved: ' + c.resolved, ''
+  ];
+  const cats = Object.keys(byCat).sort((a,b) => byCat[b] - byCat[a]);
+  if (cats.length){ lines.push('By category:'); cats.forEach(k => lines.push('  ' + k + ': ' + byCat[k])); lines.push(''); }
+  const open = list.filter(x => x.status !== 'resolved').sort((a,b) => a.createdAt - b.createdAt).slice(0, 10);
+  if (open.length){ lines.push('Oldest open items:'); open.forEach(x => lines.push('  ' + x.id + ' · ' + x.category + ' · ' + STATUS_LABEL[x.status] + ' · ' + ago(x.createdAt))); lines.push(''); }
+  if (!list.length) lines.push('No reports in this period.', '');
+  lines.push('Source: ' + (IS_DEMO ? 'demo data (not real reports)' : 'public ledger API (illustrative seed data, not a live database)') + '.');
+  lines.push('Audit chain head (SHA-256, computed in the browser): ' + (log.length ? chainHead() : 'n/a') + '.');
+  lines.push('Generated ' + new Date().toLocaleString() + ' by Citixen UX. This digest is a summary, not a legal record.');
+  return {to:r.email, subject:'Weekly Executive Report: ' + scope + ' · ' + MUNICIPALITY, body:lines.join('\n'), name:r.name};
+}
+function cadGenerate(){
+  const out = $('cadOut'); out.textContent = '';
+  cadDigests = cadRecipients.map(cadBuild);
+  $('cadDl').disabled = !cadDigests.length;
+  if (!cadDigests.length){ out.appendChild(el('p',{class:'hint',text:'Add at least one recipient first.'})); return; }
+  cadDigests.forEach(d => {
+    const mail = 'mailto:' + encodeURIComponent(d.to) + '?subject=' + encodeURIComponent(d.subject) + '&body=' + encodeURIComponent(d.body.slice(0, 1600));
+    out.appendChild(el('div',{class:'cad-digest'},[el('h3',{text:d.name + ' · ' + d.to}), el('pre',{text:d.body}), el('a',{href:mail,text:'Open in email app →'})]));
+  });
+  toast(cadDigests.length + ' digest(s) generated (nothing was sent)');
+}
+function buildCadence(){
+  cadLoad(); cadFillWards(); cadRenderList();
+  $('cadSource').textContent = IS_DEMO ? 'Built from this hub\'s demo reports for the last 7 days.' : 'Built from the live ledger for the last 7 days. Ward filtering uses each report\'s ward.';
+  $('cadForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const msg = $('cadMsg'), name = $('cadName').value.trim(), email = $('cadEmail').value.trim();
+    msg.dataset.err = '1';
+    if (!ROLES[role].admin){ msg.textContent = 'Editing recipients requires the Administrator role.'; return; }
+    if (!name){ msg.textContent = 'Enter a name.'; $('cadName').focus(); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ msg.textContent = 'Enter a valid email address.'; $('cadEmail').focus(); return; }
+    if (cadRecipients.some(x => x.email.toLowerCase() === email.toLowerCase() && x.ward === $('cadWard').value)){ msg.textContent = 'That recipient is already listed for this ward.'; return; }
+    msg.dataset.err = ''; msg.textContent = '';
+    cadRecipients.push({id:Math.random().toString(36).slice(2), name, title:$('cadTitle').value, ward:$('cadWard').value, email});
+    cadSave(); $('cadName').value = ''; $('cadEmail').value = ''; cadRenderList();
+  });
+  $('cadGen').addEventListener('click', cadGenerate);
+  $('cadDl').addEventListener('click', () => {
+    if (!cadDigests.length) return;
+    const txt = cadDigests.map(d => 'To: ' + d.to + '\nSubject: ' + d.subject + '\n\n' + d.body).join('\n\n==========\n\n');
+    const url = URL.createObjectURL(new Blob([txt],{type:'text/plain'}));
+    const a = el('a',{href:url,download:'weekly-executive-digests-' + TENANT.slug + '.txt'}); document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
 }
 
 /* ===================== EXPORT ===================== */

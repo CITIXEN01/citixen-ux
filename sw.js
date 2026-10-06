@@ -43,7 +43,6 @@ self.addEventListener('fetch', event => {
   if (url.origin !== self.location.origin) return;   // tiles, CDNs, QR: network only
   if (url.pathname.startsWith('/admin')) return;      // legacy alias — never cached on device
   if (url.pathname.startsWith('/dispatch')) return;   // staff console is never cached on device
-  if (url.pathname.startsWith('/rep')) return;        // rep tools gate is never cached on device
   // Nexus hub, public municipal gateway / city hubs and the ledger explorer:
   // always live from the network (no offline fallback to /app, nothing cached on device).
   if (url.pathname === '/nexus' || url.pathname === '/nexus.html') return;

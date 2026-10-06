@@ -7,7 +7,7 @@ sandbox can produce one, because that requires your own developer accounts,
 signing identities, and native build tools. This file is the honest gap list.
 
 ## What's included and ready
-- `index.html`, `app.html`, `rep.html`, `dispatch.html`, `deck.html`, `report.html`
+- `index.html`, `app.html`, `dispatch.html`, `deck.html`, `report.html`
   — the full web app.
 - `api/` — Vercel serverless functions (only relevant if you keep the hosted
   backend; the native wrapper loads the live site, see below).

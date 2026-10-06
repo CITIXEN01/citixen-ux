@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Citizen UX Nexus — Municipal Gateway</title>
+<title>Citixen UX Nexus — Municipal Gateway</title>
 <meta name="description" content="Municipal gateway: product demo, activation request and city hub access.">
 <meta name="theme-color" content="#0A0D14">
 <link rel="icon" type="image/x-icon" href="/favicon.ico?v=5">
 <script src="/shared/nexus-transition.js"></script>
 <!-- PUBLIC MUNICIPAL GATEWAY (/muni).
      Three things, all real or honestly stubbed:
-       1. Demo video  — the real /citizen_infra_final.mp4 asset (metadata-only preload).
+       1. Demo video  — the real /citixen_infra_final.mp4 asset (metadata-only preload).
        2. $9,500 PO grant activation — there is no ordering/payment backend in
           this repo, and no terms for it anywhere in the codebase, so the form
           opens a pre-filled email draft (partners@citixenux.com, the address
@@ -61,8 +61,8 @@ textarea{min-height:76px;resize:vertical}
 </head>
 <body>
 <header class="topbar">
-  <a class="brand" href="/muni" aria-label="Citizen UX Nexus — Municipal Gateway"><img src="/logo.svg" alt="CITIXEN UX" width="159" height="30"></a>
-  <h1>Citizen UX <span>Nexus</span></h1>
+  <a class="brand" href="/muni" aria-label="Citixen UX Nexus — Municipal Gateway"><img src="/logo.svg" alt="CITIXEN UX" width="159" height="30"></a>
+  <h1>Citixen UX <span>Nexus</span></h1>
   <span class="sp"></span>
   <a class="nav" href="/app" data-shield>Civilian app</a>
   <a class="nav" href="/ledger" data-shield>Master Search</a>
@@ -71,14 +71,14 @@ textarea{min-height:76px;resize:vertical}
 <main>
   <p class="eyebrow">Public Municipal Gateway</p>
   <h2 class="hero">Municipal clients &amp; public sector</h2>
-  <p class="lead">See how Citizen UX turns resident reports into an auditable record, activate your city, or open your city hub.</p>
+  <p class="lead">See how Citixen UX turns resident reports into an auditable record, activate your city, or open your city hub.</p>
 
   <section class="card" aria-labelledby="demoH">
     <h3 id="demoH">Product demo</h3>
     <p>How a resident report becomes a verified, auditable ledger entry.</p>
-    <video id="demoVideo" controls preload="metadata" playsinline aria-label="Citizen UX product demo video">
-      <source src="/citizen_infra_final.mp4" type="video/mp4">
-      Your browser can't play this video. <a href="/citizen_infra_final.mp4">Download it</a>.
+    <video id="demoVideo" controls preload="metadata" playsinline aria-label="Citixen UX product demo video">
+      <source src="/citixen_infra_final.mp4" type="video/mp4">
+      Your browser can't play this video. <a href="/citixen_infra_final.mp4">Download it</a>.
     </video>
   </section>
 
@@ -126,7 +126,7 @@ textarea{min-height:76px;resize:vertical}
   var list = $('hubList');
   Object.keys(T).forEach(function (k) {
     var li = document.createElement('li'), a = document.createElement('a'), s = document.createElement('small');
-    a.href = '/muni/' + k; a.setAttribute('data-shield', '');
+    a.href = '/muni/' + k + '/admin'; a.setAttribute('data-shield', '');
     a.appendChild(document.createTextNode(T[k].name));
     s.textContent = T[k].source === 'demo' ? 'Demo data' : 'Live ledger';
     a.appendChild(s); li.appendChild(a); list.appendChild(li);
@@ -141,7 +141,7 @@ textarea{min-height:76px;resize:vertical}
     if (!raw) { msg.className = 'msg err'; msg.textContent = 'Enter your city hub address.'; return; }
     if (!hit) { msg.className = 'msg err'; msg.textContent = 'No city hub exists for that address yet. Request activation to get one.'; return; }
     msg.className = 'msg ok'; msg.textContent = 'Opening ' + T[hit].name + '…';
-    if (window.NexusTransition) window.NexusTransition.go('/muni/' + hit); else location.assign('/muni/' + hit);
+    if (window.NexusTransition) window.NexusTransition.go('/muni/' + hit + '/admin'); else location.assign('/muni/' + hit + '/admin');
   });
 
   $('poForm').addEventListener('submit', function (e) {

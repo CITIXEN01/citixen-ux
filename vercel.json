@@ -2,7 +2,12 @@
   "cleanUrls": true,
   "redirects": [
     {
-      "source": "/(deck|nexus|muni|muni-city|ledger|dispatch|admin|rep|careers|careers-dispatch|join|operator|operator-feedback|endcard|statcard|index)(\\.html)?(/.*)?",
+      "source": "/onboard/:slug",
+      "destination": "/muni/:slug/onboard",
+      "permanent": true
+    },
+    {
+      "source": "/(deck|nexus|muni|muni-city|ledger|dispatch|admin|careers|careers-dispatch|join|operator|operator-feedback|endcard|statcard|index|sites|onboard)(\\.html)?(/.*)?",
       "destination": "/app",
       "permanent": false
     },
@@ -19,11 +24,26 @@
     {
       "source": "/",
       "destination": "/app",
-      "permanent": true
+      "permanent": false
     },
     {
       "source": "/beta",
       "destination": "/app?beta_cohort=alpha_10&ref=direct",
+      "permanent": false
+    },
+    {
+      "source": "/dispatch",
+      "destination": "/muni",
+      "permanent": false
+    },
+    {
+      "source": "/admin",
+      "destination": "/muni",
+      "permanent": false
+    },
+    {
+      "source": "/(muni-city|onboard)",
+      "destination": "/muni",
       "permanent": false
     }
   ],
@@ -33,40 +53,60 @@
       "destination": "/app.html"
     },
     {
-      "source": "/dispatch",
-      "destination": "/dispatch.html"
-    },
-    {
-      "source": "/admin",
-      "destination": "/dispatch.html"
-    },
-    {
-      "source": "/rep",
-      "destination": "/rep.html"
-    },
-    {
-      "source": "/nexus",
-      "destination": "/nexus.html"
-    },
-    {
-      "source": "/muni",
-      "destination": "/muni.html"
-    },
-    {
-      "source": "/muni/:city_slug",
-      "destination": "/muni-city.html?city=:city_slug"
-    },
-    {
-      "source": "/ledger",
-      "destination": "/ledger.html"
-    },
-    {
       "source": "/api/pass",
       "destination": "/api/passbook?mode=site"
     },
     {
       "source": "/report/:id",
       "destination": "/report.html?id=:id"
+    },
+    {
+      "source": "/muni",
+      "destination": "/muni.html"
+    },
+    {
+      "source": "/muni/:slug(austin|lacrosse|holmen)",
+      "destination": "/app.html?muni=:slug"
+    },
+    {
+      "source": "/muni/:slug(lacrosse)/dispatch",
+      "destination": "/dispatch.html"
+    },
+    {
+      "source": "/muni/:slug(austin)/dispatch",
+      "destination": "/muni-city.html?city=:slug&view=dispatch"
+    },
+    {
+      "source": "/muni/:slug(austin|lacrosse)/admin",
+      "destination": "/muni-city.html?city=:slug&view=admin"
+    },
+    {
+      "source": "/muni/:slug(holmen)/onboard",
+      "destination": "/onboard.html?muni=:slug"
+    },
+    {
+      "source": "/nexus",
+      "destination": "/nexus.html"
+    },
+    {
+      "source": "/sites",
+      "destination": "/sites.html"
+    },
+    {
+      "source": "/sites/:slug(austin|lacrosse|holmen)",
+      "destination": "/sites.html?slug=:slug"
+    },
+    {
+      "source": "/ledger",
+      "destination": "/ledger.html"
+    },
+    {
+      "source": "/operator/feedback",
+      "destination": "/operator-feedback.html"
+    },
+    {
+      "source": "/operator",
+      "destination": "/operator.html"
     },
     {
       "source": "/careers",
@@ -79,18 +119,6 @@
     {
       "source": "/join/:id",
       "destination": "/careers-dispatch.html?id=:id"
-    },
-    {
-      "source": "/operator/feedback",
-      "destination": "/operator-feedback.html"
-    },
-    {
-      "source": "/operator",
-      "destination": "/operator.html"
-    },
-    {
-      "source": "/((?!api/|app$|dispatch$|admin$|rep$|nexus$|muni$|muni/|ledger$|operator$|operator/feedback$|icons/|shared/|manifest.json|sw.js|favicon.ico|apple-touch-icon\\.png|og-preview-large\\.png|citizen_infra_final\\.mp4|CITIXEN_UX_Executive_Deck\\.pptx).*)",
-      "destination": "/index.html"
     }
   ],
   "headers": [

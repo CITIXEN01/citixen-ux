@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Citixen UX — Site Directory</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0A0D14">
+<link rel="icon" type="image/x-icon" href="/favicon.ico?v=5">
+<script src="/shared/tenants.js"></script>
+<!-- MULTI-TENANT DEPLOYMENT DIRECTORY (/sites and /sites/{slug}).
+     Lists the municipal instances that exist in this repo (shared/tenants.js) plus
+     instances that are onboarding, and links to each instance's surfaces under
+     /muni/{slug}. It does NOT claim Live / Staging status: that is measured and managed
+     in Nexus (Systems Engineering, internal). vercel.json only routes /sites/{slug} for
+     known slugs, so unknown slugs return a real 404 instead of this page. -->
+<style>
+:root{--bg:#0A0D14;--surface:#111625;--line:rgba(255,255,255,.14);--text:#f1f5f9;--muted:#8e9fa8;--green:#00FF87}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+header{display:flex;align-items:center;gap:14px;padding:10px 18px;background:var(--surface);border-bottom:1px solid var(--line)}
+header img{height:28px}
+header h1{font-size:.95rem;margin:0}
+main{max-width:980px;margin:0 auto;padding:24px 18px 60px}
+h2{margin:0 0 4px;font-size:1.6rem}
+p.sub{color:var(--muted);margin:0 0 18px;max-width:70ch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+.card h3{margin:0 0 2px;font-size:1.05rem}
+.meta{color:var(--muted);font-size:.78rem;margin:0 0 10px;font-family:ui-monospace,Menlo,monospace}
+.links{display:flex;flex-wrap:wrap;gap:8px}
+.links a{color:var(--green);text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:5px 11px;font-weight:700;font-size:.8rem}
+.links a:hover{border-color:var(--green)}
+.note{color:var(--muted);font-size:.78rem;margin-top:16px}
+a.back{color:var(--green)}
+</style>
+</head>
+<body>
+<header>
+  <a href="/sites" aria-label="Citixen UX site directory"><img src="/logo.svg" alt="CITIXEN UX" width="159" height="30"></a>
+  <h1>Site Directory</h1>
+</header>
+<main>
+  <h2 id="title">Site Directory</h2>
+  <p class="sub" id="sub">Municipal instances provisioned under citixenux.com. Each instance has its own civilian intake, dispatch, admin and onboarding surfaces.</p>
+  <div id="list"></div>
+  <p class="note">Publication status (Live / Staging) is tracked in the internal Nexus registry, not on this public page.</p>
+</main>
+<script>
+(function () {
+  'use strict';
+  var T = window.NEXUS_TENANTS || {};
+  // Instances that are onboarding and have no hub tenant yet.
+  var ONBOARDING = { holmen: { name: 'Village of Holmen, WI', note: 'Onboarding (preview)', hub: false } };
+  var all = {};
+  Object.keys(T).forEach(function (k) { all[k] = { name: T[k].name, note: T[k].source === 'demo' ? 'Demo data' : 'Live ledger, read-only', hub: true }; });
+  Object.keys(ONBOARDING).forEach(function (k) { if (!all[k]) all[k] = ONBOARDING[k]; });
+
+  var q = location.search.match(/[?&]slug=([^&]+)/);
+  var m = /^\/sites\/([^\/?#]+)/.exec(location.pathname);
+  var slug = (q ? decodeURIComponent(q[1]) : m ? decodeURIComponent(m[1]) : '').toLowerCase();
+  var keys = slug ? (all[slug] ? [slug] : []) : Object.keys(all);
+
+  function link(href, text) { var a = document.createElement('a'); a.href = href; a.textContent = text; return a; }
+  var root = document.getElementById('list');
+  if (slug && !keys.length) {
+    document.getElementById('title').textContent = 'Site not found';
+    document.getElementById('sub').textContent = 'There is no site at /sites/' + slug + '.';
+    var back = link('/sites', '← All sites'); back.className = 'back'; root.appendChild(back);
+    return;
+  }
+  if (slug) document.getElementById('title').textContent = all[slug].name;
+  keys.forEach(function (k) {
+    var c = document.createElement('div'); c.className = 'card';
+    var h = document.createElement('h3'); h.textContent = all[k].name; c.appendChild(h);
+    var meta = document.createElement('p'); meta.className = 'meta'; meta.textContent = 'citixenux.com/sites/' + k + ' · ' + all[k].note; c.appendChild(meta);
+    var l = document.createElement('div'); l.className = 'links';
+    l.appendChild(link('/muni/' + k, 'Civilian intake'));
+    if (all[k].hub) { l.appendChild(link('/muni/' + k + '/dispatch', 'Dispatch')); l.appendChild(link('/muni/' + k + '/admin', 'Admin & audit')); }
+    l.appendChild(link('/muni/' + k + '/onboard', 'Onboarding'));
+    c.appendChild(l); root.appendChild(c);
+  });
+})();
+</script>
+</body>
+</html>

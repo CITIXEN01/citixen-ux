@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Citizen UX Nexus</title>
+<title>Citixen UX Nexus</title>
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#0A0D14">
 <link rel="icon" type="image/x-icon" href="/favicon.ico?v=5">
@@ -13,7 +13,7 @@
      Workspaces: Growth & Development, Civic Alignment, Systems Engineering,
      PR & Communications. Corporate Layer lives in the header profile menu.
      Routing is hash-based: #home (default) #growth #civic #systems #comms #corporate.
-     The dispatcher/municipal UI that used to live here moved to /muni/{city_slug}
+     The dispatcher/municipal UI that used to live here moved to /muni/{city_slug}/dispatch and /admin
      (muni-city.html); the public gateway is /muni; Master Search is /ledger.
 
      HONESTY / SECURITY NOTES (read before extending):
@@ -30,7 +30,7 @@
         implementing the same five methods; the UI is unchanged.
       - No metrics, headcounts, revenue or pipeline numbers appear on any page:
         none exist in the repo. Modules that aren't built say "Planned".
-      - Brand: the page title / header read "Citizen UX Nexus" as specified; the
+      - Brand: the page title / header read "Citixen UX Nexus" as specified; the
         logo lockup itself reads CITIXEN UX. -->
 <style>
 :root{
@@ -241,8 +241,8 @@ table.t td{padding:10px 12px;border-top:1px solid var(--line);vertical-align:mid
 <body data-view="home">
 
 <header class="topbar">
-  <a class="brand" href="#home" aria-label="Citizen UX Nexus home"><img src="/logo.svg" alt="CITIXEN UX" width="159" height="30"></a>
-  <h1 class="title">Citizen UX <span>Nexus</span></h1>
+  <a class="brand" href="#home" aria-label="Citixen UX Nexus home"><img src="/logo.svg" alt="CITIXEN UX" width="159" height="30"></a>
+  <h1 class="title">Citixen UX <span>Nexus</span></h1>
   <nav class="dept-nav" aria-label="Nexus sections">
     <a href="#home" data-nav="home">Home</a>
     <a href="#growth" data-nav="growth">Growth &amp; Development</a>
@@ -277,7 +277,7 @@ table.t td{padding:10px 12px;border-top:1px solid var(--line);vertical-align:mid
 
   <!-- ================= HOME ================= -->
   <section class="view" id="view-home" tabindex="-1" aria-label="Nexus home">
-    <p class="eyebrow">Citizen UX Nexus</p>
+    <p class="eyebrow">Citixen UX Nexus</p>
     <h2 class="page">Home</h2>
     <p class="page-sub">Founder updates on the left, what we're building and running on the right.</p>
 
@@ -429,8 +429,8 @@ function renderIdentity(){
 
 /* ===================== ROUTER ===================== */
 const VIEWS = ['home','growth','civic','systems','comms','corporate'];
-const TITLES = {home:'Citizen UX Nexus', growth:'Growth & Development — Citizen UX Nexus', civic:'Civic Alignment — Citizen UX Nexus',
-  systems:'Systems Engineering — Citizen UX Nexus', comms:'PR & Communications — Citizen UX Nexus', corporate:'Corporate Layer — Citizen UX Nexus'};
+const TITLES = {home:'Citixen UX Nexus', growth:'Growth & Development — Citixen UX Nexus', civic:'Civic Alignment — Citixen UX Nexus',
+  systems:'Systems Engineering — Citixen UX Nexus', comms:'PR & Communications — Citixen UX Nexus', corporate:'Corporate Layer — Citixen UX Nexus'};
 let firstRoute = true, probed = false;
 function currentView(){ const h = location.hash.replace(/^#/, ''); return VIEWS.indexOf(h) !== -1 ? h : 'home'; }
 function route(){
@@ -575,7 +575,7 @@ FeedStore.subscribe(renderFeed);
 const MATRIX = [
   {key:'current', label:'Current Projects', cls:'g-current', items:[
     {name:'Master Search Engine', pill:['beta','Beta'], text:'SHA-256 Living Ledger Explorer: search every public ledger record and fingerprint it in the browser.', href:'/ledger', cta:'Open Master Search'},
-    {name:'/muni/{city_slug} multi-tenant dispatchers', pill:['beta','Demo tenants'], text:'Dispatcher GIS map and Audit Vault per city. Today: austin (mock data) and lacrosse (live ledger, read-only).', href:'/muni', cta:'Open Municipal Gateway'}
+    {name:'/muni/{city_slug}/dispatch and /admin multi-tenant hubs', pill:['beta','Demo tenants'], text:'Dispatcher GIS map and Audit Vault per city. Today: austin (mock data) and lacrosse (live ledger, read-only).', href:'/muni', cta:'Open Municipal Gateway'}
   ]},
   {key:'staged', label:'Staged Projects', cls:'g-staged', items:[
     {name:'Esri ArcGIS webhook connector', pill:['staged','Queued'], text:'Middleware that pushes ledger events to a city\'s Esri/ArcGIS environment. Not started: no connector code exists yet.'},
@@ -590,8 +590,8 @@ const SITE = [
   {path:'/ledger', note:'citixenux.com root currently redirects to /app; Master Search lives here until the root is switched.', what:'Master Search Engine — SHA-256 Living Ledger Explorer', pill:['beta','Beta'], href:'/ledger', label:'citixenux.com → /ledger'},
   {path:'/app', what:'Civilian PWA intake web app', pill:['live','Live'], href:'/app'},
   {path:'/muni', what:'Public Municipal Gateway: demo video, $9,500 PO grant activation request, city hub access', pill:['beta','Beta'], href:'/muni'},
-  {path:'/muni/lacrosse', what:'Multi-tenant city hub (example): Dispatcher GIS & Audit Vault', pill:['beta','Read-only'], href:'/muni/lacrosse'},
-  {path:'/nexus', what:'Citizen UX Nexus (this page)', pill:['live','Live'], href:'/nexus', here:true}
+  {path:'/muni/lacrosse/admin', what:'Multi-tenant city hub (example): Audit Vault and Executive Cadence', pill:['beta','Read-only'], href:'/muni/lacrosse/admin'},
+  {path:'/nexus', what:'Citixen UX Nexus (this page)', pill:['live','Live'], href:'/nexus', here:true}
 ];
 function renderMatrix(){
   const root = $('matrixBody'); root.textContent = '';
@@ -626,15 +626,15 @@ const DEPTS = {
       {t:'CrowdSave America campaign execution', d:'Run and track the CrowdSave America campaign. The campaign itself is visible in the app today; campaign tooling is not built.', pill:['planned','Planned'], href:'/app', cta:'See it in the app'},
       {t:'Marketing', d:'Content calendar and channel planning.', pill:['planned','Planned']},
       {t:'Sales pipelines: Track A / B / C / D', d:'Deals by track and stage. No pipeline data source exists yet, so no figures are shown.', pill:['planned','Planned']},
-      {t:'Rep touch benchmarks', d:'Target touches per rep per period, once the tracks are defined and a data source exists.', pill:['planned','Planned'], href:'/rep', cta:'Related: rep page'},
+      {t:'Rep touch benchmarks', d:'Target touches per rep per period, once the tracks are defined and a data source exists.', pill:['planned','Planned']},
       {t:'Revenue targets', d:'Targets by track and period. Set by leadership; none are recorded in this repo, so none are shown.', pill:['planned','Planned']}
     ]},
   civic:{ title:'Civic Alignment', sub:'Municipal onboarding, grants, geofencing and renewals.',
     resp:['Municipal onboarding','Risk pool grant catalog inclusions','City geofencing','60-day auto-renewal tracking'],
     modules:[
       {t:'Municipal onboarding', d:'Moving a city from request to live hub. Cities start from the activation request on the public gateway.', pill:['beta','Entry point live'], href:'/muni#activation', cta:'Open activation request'},
-      {t:'Risk pool grant catalog inclusions', d:'Tracking which risk pool grant catalogs list Citizen UX. Nothing is recorded yet.', pill:['planned','Planned']},
-      {t:'City geofencing', d:'Zones are configured per city in each hub\'s Geo-Fence settings (Austin demo shows the layout; La Crosse has none configured).', pill:['beta','Per-hub'], href:'/muni/austin', cta:'See the demo hub'}
+      {t:'Risk pool grant catalog inclusions', d:'Tracking which risk pool grant catalogs list Citixen UX. Nothing is recorded yet.', pill:['planned','Planned']},
+      {t:'City geofencing', d:'Zones are configured per city in each hub\'s Geo-Fence settings (Austin demo shows the layout; La Crosse has none configured).', pill:['beta','Per-hub'], href:'/muni/austin/admin', cta:'See the demo hub'}
     ], tool:'renewals' },
   systems:{ title:'Systems Engineering', sub:'Uptime, ledger integrity, APIs, infrastructure and patch history.',
     resp:['Uptime telemetry','SHA-256 ledger integrity','API endpoints','Infrastructure performance','Operational patch logs'],
@@ -808,7 +808,7 @@ function buildFoia(){
       'I am requesting electronic copies of the following records ' + range + ':\n\n' +
       (items.length ? items.map((x,i) => (i+1) + '. ' + x).join('\n') : '1. [records requested]') + '\n\n' +
       'Please provide the records in their native electronic format. If any portion is withheld, please identify the exemption relied upon for each withheld portion and release the remainder. If fees apply, please tell me the estimate before processing.\n\n' +
-      'Thank you,\n[Name]\n[Contact]\n\n[Template generated by Citizen UX Nexus. Not legal advice; review before sending.]';
+      'Thank you,\n[Name]\n[Contact]\n\n[Template generated by Citixen UX Nexus. Not legal advice; review before sending.]';
   }
   box.addEventListener('input', gen); box.addEventListener('change', gen); gen();
   $('foDownload').addEventListener('click', () => {
@@ -835,9 +835,11 @@ const SX_SEED = [
   {id:'app', path:'/app', entity:'Public (all residents)', module:'Civilian PWA intake web app', ledger:'Writes reports to the shared ledger'},
   {id:'ledger', path:'/ledger', entity:'Public', module:'Master Search: SHA-256 Living Ledger Explorer', ledger:'Reads the public ledger'},
   {id:'muni', path:'/muni', entity:'Municipal gateway (public)', module:'Gateway and grant activation request', ledger:'n/a'},
-  {id:'muni-lacrosse', path:'/muni/lacrosse', entity:'City of La Crosse', module:'Multi-tenant city hub (read-only)', ledger:'Reads the public ledger'},
-  {id:'muni-austin', path:'/muni/austin', entity:'City of Austin (demo tenant)', module:'City hub with demo data', ledger:'In-page demo chain (not persisted)'},
-  {id:'nexus', path:'/nexus', entity:'Internal', module:'Citizen UX Nexus', ledger:'n/a'}
+  {id:'muni-lacrosse', path:'/muni/lacrosse/admin', entity:'City of La Crosse', module:'City hub: Audit Vault and Executive Cadence (read-only)', ledger:'Reads the public ledger'},
+  {id:'muni-austin', path:'/muni/austin/admin', entity:'City of Austin (demo tenant)', module:'City hub with demo data', ledger:'In-page demo chain (not persisted)'},
+  {id:'muni-holmen-onboard', path:'/muni/holmen/onboard', entity:'Village of Holmen, WI', module:'Digital Onboarding Hub (preview)', ledger:'n/a'},
+  {id:'sites', path:'/sites', entity:'Internal', module:'Multi-tenant site directory', ledger:'n/a'},
+  {id:'nexus', path:'/nexus', entity:'Internal', module:'Citixen UX Nexus', ledger:'n/a'}
 ];
 let sxStore = {custom:[], over:{}};
 try { const j = JSON.parse(lsGet(SX_KEY) || 'null'); if (j && Array.isArray(j.custom) && j.over && typeof j.over === 'object') sxStore = j; } catch(e){}
