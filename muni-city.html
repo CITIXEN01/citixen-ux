@@ -242,6 +242,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       Municipal Gateway
     </a>
+    <a class="btn-back" id="btnCmd" href="/muni" hidden>Command Dashboard</a>
     <div class="muni-badge" id="muniBadge" title="Active municipality">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
       <span id="muniText">Loading…</span>
@@ -765,7 +766,9 @@ async function boot(){
   renderCounts(); applyRole();
   buildCadence();
   // /muni/{slug}/admin opens on the Audit Vault; /muni/{slug}/dispatch (and the bare hub) on the map.
-  if (new URLSearchParams(location.search).get('view') === 'admin' || /\/admin\/?$/.test(location.pathname)) showView('audit');
+  var qv = new URLSearchParams(location.search).get('view');
+  if (['audit','cadence','settings','triage'].indexOf(qv) > -1) showView(qv);
+  var cmd = $('btnCmd'); if (cmd){ cmd.href = '/muni/' + TENANT.slug + '/admin'; cmd.hidden = false; }
   seedLog().then(renderAudit);
   loadLeaflet().then(initMap);
 }

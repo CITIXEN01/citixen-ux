@@ -7,7 +7,7 @@
       "permanent": true
     },
     {
-      "source": "/(deck|nexus|muni|muni-city|ledger|dispatch|admin|careers|careers-dispatch|join|operator|operator-feedback|endcard|statcard|index|sites|onboard)(\\.html)?(/.*)?",
+      "source": "/(deck|nexus|muni|muni-city|ledger|dispatch|admin|careers|careers-dispatch|join|operator|operator-feedback|endcard|statcard|index|sites|onboard|muni-command)(\\.html)?(/.*)?",
       "destination": "/app",
       "permanent": false
     },
@@ -42,7 +42,7 @@
       "permanent": false
     },
     {
-      "source": "/(muni-city|onboard)",
+      "source": "/(muni-city|muni-command|onboard)",
       "destination": "/muni",
       "permanent": false
     }
@@ -69,16 +69,16 @@
       "destination": "/app.html?muni=:slug"
     },
     {
-      "source": "/muni/:slug(lacrosse)/dispatch",
+      "source": "/muni/:slug(lacrosse)/dispatch/crew-queue",
       "destination": "/dispatch.html"
     },
     {
-      "source": "/muni/:slug(austin)/dispatch",
+      "source": "/muni/:slug(austin|lacrosse|holmen)/dispatch",
       "destination": "/muni-city.html?city=:slug&view=dispatch"
     },
     {
-      "source": "/muni/:slug(austin|lacrosse)/admin",
-      "destination": "/muni-city.html?city=:slug&view=admin"
+      "source": "/muni/:slug(austin|lacrosse|holmen)/admin",
+      "destination": "/muni-command.html?city=:slug"
     },
     {
       "source": "/muni/:slug(holmen)/onboard",
@@ -93,7 +93,7 @@
       "destination": "/sites.html"
     },
     {
-      "source": "/sites/:slug(austin|lacrosse|holmen)",
+      "source": "/sites/:slug(austin|lacrosse|holmen|holmen-public-works|holmen-parks)",
       "destination": "/sites.html?slug=:slug"
     },
     {

@@ -51,17 +51,28 @@ a.back{color:var(--green)}
   var T = window.NEXUS_TENANTS || {};
   // Instances that are onboarding and have no hub tenant yet.
   var ONBOARDING = { holmen: { name: 'Village of Holmen, WI', note: 'Onboarding (preview)', hub: false } };
+  var PORTALS = {};
   var all = {};
   Object.keys(T).forEach(function (k) { all[k] = { name: T[k].name, note: T[k].source === 'demo' ? 'Demo data' : 'Live ledger, read-only', hub: true }; });
+  Object.keys(T).forEach(function (k) { (T[k].portals || []).forEach(function (p) { PORTALS[p.slug] = { name: p.label, tenant: k, tname: T[k].name }; }); });
   Object.keys(ONBOARDING).forEach(function (k) { if (!all[k]) all[k] = ONBOARDING[k]; });
 
   var q = location.search.match(/[?&]slug=([^&]+)/);
   var m = /^\/sites\/([^\/?#]+)/.exec(location.pathname);
   var slug = (q ? decodeURIComponent(q[1]) : m ? decodeURIComponent(m[1]) : '').toLowerCase();
-  var keys = slug ? (all[slug] ? [slug] : []) : Object.keys(all);
+  var portal = slug && PORTALS[slug];
+  var keys = portal ? [] : slug ? (all[slug] ? [slug] : []) : Object.keys(all);
 
   function link(href, text) { var a = document.createElement('a'); a.href = href; a.textContent = text; return a; }
   var root = document.getElementById('list');
+  if (portal) {
+    document.getElementById('title').textContent = portal.name;
+    document.getElementById('sub').textContent = 'Intake route for ' + portal.tname + '. Residents file reports through the Citixen UX app; this route is registered so the municipality can track and share it. A dedicated resident page for this route is not built yet.';
+    var c0 = document.createElement('div'); c0.className = 'card';
+    var m0 = document.createElement('p'); m0.className = 'meta'; m0.textContent = 'citixenux.com/sites/' + slug; c0.appendChild(m0);
+    var l0 = document.createElement('div'); l0.className = 'links'; l0.appendChild(link('/muni/' + portal.tenant, 'File a report')); l0.appendChild(link('/muni/' + portal.tenant + '/admin', 'Command dashboard')); c0.appendChild(l0); root.appendChild(c0);
+    return;
+  }
   if (slug && !keys.length) {
     document.getElementById('title').textContent = 'Site not found';
     document.getElementById('sub').textContent = 'There is no site at /sites/' + slug + '.';

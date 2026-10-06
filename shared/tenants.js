@@ -14,6 +14,30 @@
 (function () {
   var MIN = 60 * 1000;
   window.NEXUS_TENANTS = {
+    holmen: {
+      slug: 'holmen',
+      name: 'Village of Holmen, WI',
+      label: 'Holmen (sample data)',
+      source: 'demo',
+      center: [43.9647, -91.2585], zoom: 14,
+      // SAMPLE DATA ONLY: invented reports so the command dashboard can be reviewed.
+      // [id, category index, lat, lng, status, minutes ago reported, intake route slug]
+      seed: [
+        ['HW-0114',0,43.9661,-91.2571,'new',9,'holmen-public-works'],        ['HW-0113',1,43.9632,-91.2610,'new',34,'holmen-public-works'],
+        ['HW-0112',2,43.9689,-91.2549,'new',51,'holmen-parks'],               ['HW-0111',5,43.9618,-91.2597,'new',88,'holmen-parks'],
+        ['HW-0110',0,43.9644,-91.2533,'dispatched',150,'holmen-public-works'],['HW-0109',3,43.9602,-91.2574,'dispatched',260,'holmen-public-works'],
+        ['HW-0108',6,43.9671,-91.2622,'dispatched',410,'holmen-public-works'],['HW-0107',2,43.9655,-91.2588,'dispatched',620,'holmen-parks'],
+        ['HW-0106',4,43.9627,-91.2559,'resolved',1100,'holmen-public-works'],['HW-0105',1,43.9640,-91.2606,'resolved',1600,'holmen-public-works'],
+        ['HW-0104',5,43.9678,-91.2540,'resolved',2300,'holmen-parks'],        ['HW-0103',0,43.9609,-91.2582,'resolved',3000,'holmen-public-works']
+      ],
+      portals: [
+        { slug: 'holmen-public-works', label: 'Public Works intake' },
+        { slug: 'holmen-parks', label: 'Parks intake' }
+      ],
+      // Grant status is configuration, not a payment feed. Update it by hand when it changes.
+      grant: { program: 'LWMMI Loss Control Grant', amount: 9500, status: 'pending' },
+      zones: [], crews: []
+    },
     austin: {
       slug: 'austin',
       name: 'City of Austin — Public Works',

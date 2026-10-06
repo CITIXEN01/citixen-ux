@@ -17,12 +17,13 @@ non-public page to `/app`. While it is there, only `/app`, `/report/{id}`, `/api
 | `/report/{id}` | `report.html` | public receipt permalink |
 | `/muni` | `muni.html` | municipal gateway |
 | `/muni/{slug}` | `app.html?muni={slug}` | civilian intake. **Not localized yet**: the PWA ignores `muni`. |
-| `/muni/{slug}/dispatch` | `dispatch.html` (lacrosse), `muni-city.html?view=dispatch` (austin) | `dispatch.html` is hard-coded to La Crosse |
-| `/muni/{slug}/admin` | `muni-city.html?view=admin` | Audit Vault, settings, Executive Cadence (Enterprise) |
+| `/muni/{slug}/admin` | `muni-command.html` | Command dashboard: Living Ledger, § 893.80 packet export, intake portal routes, Cmd+K |
+| `/muni/{slug}/dispatch` | `muni-city.html` | Dispatch hub: map, triage, Audit Vault, geo-fence settings, Executive Cadence (Enterprise). Open a tab with `?view=audit\|cadence\|settings\|triage` |
+| `/muni/lacrosse/dispatch/crew-queue` | `dispatch.html` | La Crosse crew queue (hard-coded to La Crosse) |
 | `/muni/{slug}/onboard` | `onboard.html?muni={slug}` | preview build, sends nothing |
 | `/onboard/{slug}` | 308 to `/muni/{slug}/onboard` | |
 | `/nexus` | `nexus.html` | internal hub; Systems Engineering feed is the site registry |
-| `/sites`, `/sites/{slug}` | `sites.html` | multi-tenant directory |
+| `/sites`, `/sites/{slug}` | `sites.html` | multi-tenant directory; also registered intake routes (`holmen-public-works`, `holmen-parks`) |
 | `/dispatch`, `/admin` | redirect to `/muni` (tenant picker) | legacy roots |
 | `/ledger`, `/operator`, `/careers`, `/join/{id}` | unchanged | not in the architecture brief; kept |
 | anything else | `404.html` (real 404) | the old catch-all that returned 200 is gone |
@@ -31,6 +32,6 @@ non-public page to `/app`. While it is there, only `/app`, `/report/{id}`, `/api
 
 ## Slugs are allow-listed in `vercel.json`
 
-A slug only routes if it is in the pattern (`austin|lacrosse|holmen` for intake and `/sites`, `austin|lacrosse` for hubs,
-`holmen` for onboarding). Anything else is a 404. When you add a tenant: add it to `shared/tenants.js` **and**
+A slug only routes if it is in the pattern (`austin|lacrosse|holmen` for intake, hubs and `/sites`; the intake route slugs
+from `tenant.portals` are also allowed under `/sites`; `holmen` only for onboarding). Anything else is a 404. When you add a tenant: add it to `shared/tenants.js` **and**
 to those patterns.
