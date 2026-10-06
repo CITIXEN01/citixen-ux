@@ -62,7 +62,7 @@
       "permanent": true
     },
     {
-      "source": "/(deck|nexus|muni|muni-city|ledger|dispatch|admin|careers|careers-dispatch|join|operator|operator-feedback|endcard|statcard|index|sites|onboard|muni-command)(\\.html)?(/.*)?",
+      "source": "/(deck|nexus|muni|muni-city|ledger|dispatch|admin|careers|careers-dispatch|join|operator|operator-feedback|endcard|statcard|index|sites|onboard|muni-command|muni-gateway)(\\.html)?(/.*)?",
       "destination": "/app",
       "permanent": false
     },
@@ -97,7 +97,7 @@
       "permanent": false
     },
     {
-      "source": "/(muni-city|muni-command|onboard)",
+      "source": "/(muni-city|muni-command|muni-gateway|onboard)",
       "destination": "/muni",
       "permanent": false
     }
@@ -138,6 +138,10 @@
     {
       "source": "/muni/:slug(holmen-wi)/onboard",
       "destination": "/onboard.html?muni=:slug"
+    },
+    {
+      "source": "/muni/:slug(holmen-wi)/gateway",
+      "destination": "/muni-gateway.html?city=:slug"
     },
     {
       "source": "/nexus",

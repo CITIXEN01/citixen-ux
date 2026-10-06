@@ -20,6 +20,7 @@ non-public page to `/app`. While it is there, only `/app`, `/report/{id}`, `/api
 | `/muni/{slug}/admin` | `muni-command.html` | Command dashboard: Living Ledger, § 893.80 packet export, intake portal routes, Cmd+K |
 | `/muni/{slug}/dispatch` | `muni-city.html` | Dispatch hub: map, triage, Audit Vault, geo-fence settings, Executive Cadence (Enterprise). Open a tab with `?view=audit\|cadence\|settings\|triage` |
 | `/muni/la-crosse-wi/dispatch/crew-queue` | `dispatch.html` | La Crosse crew queue (hard-coded to La Crosse) |
+| `/muni/{slug}/gateway` | `muni-gateway.html?city={slug}` | Onboarding gateway: review grant packet, financial offset, e-sign. Preview build, sends nothing. Needs `tenant.onboarding` |
 | `/muni/{slug}/onboard` | `onboard.html?muni={slug}` | preview build, sends nothing |
 | `/onboard/{slug}` | 308 to `/muni/{slug}/onboard` | |
 | `/nexus` | `nexus.html` | internal hub; Systems Engineering feed is the site registry |
@@ -39,5 +40,5 @@ The old slugs (`holmen`, `lacrosse`, `austin`, `holmen-public-works`, `holmen-pa
 ## Slugs are allow-listed in `vercel.json`
 
 A slug only routes if it is in the pattern (`austin-tx|la-crosse-wi|holmen-wi` for intake, hubs and `/sites`; the intake route slugs
-from `tenant.portals` are also allowed under `/sites`; `holmen-wi` only for onboarding). Anything else is a 404. When you add a tenant: add it to `shared/tenants.js` **and**
+from `tenant.portals` are also allowed under `/sites`; `holmen-wi` only for onboarding and gateway). Anything else is a 404. When you add a tenant: add it to `shared/tenants.js` **and**
 to those patterns.

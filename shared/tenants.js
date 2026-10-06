@@ -40,6 +40,8 @@
       ],
       // Grant status is configuration, not a payment feed. Update it by hand when it changes.
       grant: { program: 'LWMMI Loss Control Grant', amount: 9500, status: 'pending' },
+      // Drives /muni/holmen-wi/gateway. Policy ID is a SAMPLE value until the real one is confirmed.
+      onboarding: { entity: 'Village of Holmen', state: 'WI', policy: 'LWMMI-WI-42091-HOL', anchor: 1, platformValue: 9500, grantCredit: 9500 },
       zones: [], crews: []
     },
     'austin-tx': {
