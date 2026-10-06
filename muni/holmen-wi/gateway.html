@@ -173,6 +173,16 @@ html{background:#05070C}
 .brief p,.brief li{font:400 13.5px/1.6 var(--sans);color:#CBD5E1}
 .brief p{margin:6px 0}.brief ul{margin:6px 0;padding-left:20px}
 .brief .src{margin-top:20px;padding-top:14px;border-top:1px solid rgba(30,41,59,.8);font-size:12px;color:#64748B}
+.expl{margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border:1px solid #1E293B;border-radius:10px;background:rgba(2,6,23,.5)}
+.expl .ei{color:#22D3EE;display:flex;flex:none}.expl .et{flex:1 1 220px;min-width:0;font:400 13px/1.5 var(--sans);color:#94A3B8}
+.elink{flex:none;background:transparent;border:1px solid rgba(34,211,238,.55);color:#22D3EE;border-radius:9999px;padding:5px 14px;font:600 12.5px/1.4 var(--sans);cursor:pointer;transition:.2s}
+.elink:hover,.elink:focus-visible{background:rgba(34,211,238,.1);box-shadow:0 0 14px rgba(34,211,238,.25);outline:none}
+.grantm{width:min(580px,100%)}.grantm h2{display:flex;align-items:center;gap:10px}.grantm h2 svg{color:#34D399;flex:none}
+.grantm h3{color:#22D3EE}
+.callout{margin-top:18px;padding:14px 16px;border:1px solid rgba(16,185,129,.45);background:rgba(16,185,129,.08);border-radius:12px;font:400 14px/1.6 var(--sans);color:#E2E8F0}
+.callout b{color:#34D399}.callout small{display:block;margin-top:6px;font-size:12px;color:#94A3B8}
+.bigbtn{display:block;width:100%;margin-top:20px;padding:12px 20px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.6);color:#34D399;border-radius:12px;font:600 14px/1.4 var(--sans);cursor:pointer;transition:.2s}
+.bigbtn:hover,.bigbtn:focus-visible{background:rgba(16,185,129,.2);box-shadow:0 0 16px rgba(16,185,129,.3);outline:none}
 .sh-ov,.ov2{position:fixed;inset:0;z-index:70;background:rgba(2,6,12,.6);display:none}
 .sh-ov.on{display:block}.ov2.on{display:grid;place-items:center;padding:16px}
 .sheet{position:absolute;right:0;top:0;bottom:0;width:min(460px,100%);box-sizing:border-box;padding:28px;overflow:auto;border-radius:16px 0 0 16px;background:rgba(11,15,18,.94);animation:slideIn .28s ease both}
@@ -381,6 +391,11 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
           <div class="ln2"><span>Total platform value (annual)</span><b id="v1">$9,500</b></div>
           <div class="ln2"><span>LWMMI Loss Control Grant credit offset<small>Pre-filled · pending LWMMI approval</small></span><b class="em" id="v2">−$9,500</b></div>
           <div class="net" id="netLine">Net Out-of-Pocket Municipal Cost: <strong>$0.00</strong></div>
+          <div class="expl">
+            <span class="ei"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span>
+            <span class="et">Funded via the pre-filled LWMMI Loss Control Grant application (pending approval).</span>
+            <button type="button" class="elink" id="openGrant">How is this $0?</button>
+          </div>
           <p class="fine">$0.00 applies when the grant funds the platform. If grant funds are not disbursed to the Village within 60 days, the agreement ends and the Village owes nothing. Sample figures in this preview.</p>
         </div>
         <div class="acts2"><button type="button" class="pillbtn" id="c1">Verify &amp; Continue →</button></div>
@@ -435,13 +450,25 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
     <aside class="gl panel" aria-label="Onboarding progress">
       <h3>Onboarding progress</h3>
       <ol class="ps" id="ps">
-        <li><button type="button" class="pb" data-step="1"><span class="bd"></span><span class="tx"><b>Verification</b><small>Pre-filled $9,500 grant credit offset validation ($0 net out-of-pocket).</small></span></button></li>
+        <li><button type="button" class="pb" data-step="1"><span class="bd"></span><span class="tx"><b>Verification</b><small>Grant Offset Validation — Verify pre-filled $9,500 LWMMI Loss Control Grant for $0 net village cost, pending approval.</small></span></button></li>
         <li><button type="button" class="pb" data-step="2"><span class="bd"></span><span class="tx"><b>§ 893.80 Brief</b><small>1-click legal brief review &amp; attorney dispatch modal (FYI Notice or Magic Link Pause State).</small></span></button></li>
         <li><button type="button" class="pb" data-step="3"><span class="bd"></span><span class="tx"><b>E-Signature</b><small>Digital execution of MSA and automatic generation of the $9,500 LWMMI grant application.</small></span></button></li>
       </ol>
     </aside>
   </div>
 </section>
+
+<div class="ov2" id="grOv">
+  <div class="gl brief grantm" role="dialog" aria-modal="true" aria-labelledby="grT">
+    <div class="sh-h"><h2 id="grT" tabindex="-1"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>How the $0.00 Net Cost Works</h2><button type="button" class="x" id="grX" aria-label="Close">✕</button></div>
+    <h3>1. LWMMI Loss Control Grant</h3>
+    <p>Your insurer, LWMMI, offers a Loss Control Grant toward loss-mitigation tools that help a municipality manage its liability exposure, including notice-of-claim exposure under Wis. Stat. § 893.80. This preview uses a sample figure of up to $9,500 per year. Actual grant terms are LWMMI’s.</p>
+    <h3>2. Pre-Filled Grant Credit</h3>
+    <p>CITIXEN UX™ pre-fills the grant application during onboarding. If LWMMI approves it, the credit offsets the annual software fee 1:1.</p>
+    <div class="callout"><b>Zero-Risk Guarantee:</b> If grant funds are not disbursed to the village within 60 days, the agreement automatically terminates and the Village owes $0.00.<small>As written in the draft agreement. Counsel review required.</small></div>
+    <button type="button" class="bigbtn" id="grDone">Got it, back to onboarding</button>
+  </div>
+</div>
 
 <div class="ov2" id="brOv">
   <div class="gl brief" role="dialog" aria-modal="true" aria-labelledby="brT">
@@ -1049,6 +1076,13 @@ function closeComplete(){ $('ov2').classList.remove('on'); var b = $('signedBox'
 $('d2X').addEventListener('click', closeComplete);
 $('d2Dl').addEventListener('click', downloadPacket);
 $('ov2').addEventListener('click', function (e) { if (e.target === $('ov2')) closeComplete(); });
+/* ---------- Step 1: "How is this $0?" explainer ---------- */
+function openGrant(){ lastFocus = document.activeElement; $('grOv').classList.add('on'); $('grDone').focus(); }
+function closeGrant(){ $('grOv').classList.remove('on'); if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('openGrant').addEventListener('click', openGrant);
+$('grX').addEventListener('click', closeGrant);
+$('grDone').addEventListener('click', closeGrant);
+$('grOv').addEventListener('click', function (e) { if (e.target === $('grOv')) closeGrant(); });
 /* ---------- Step 2: brief pop-up + SHA-256 tooltip ---------- */
 function openBrief(){ lastFocus = document.activeElement; $('brOv').classList.add('on'); $('brX').focus(); }
 function closeBrief(){ $('brOv').classList.remove('on'); if (lastFocus && lastFocus.focus) lastFocus.focus(); }
@@ -1063,6 +1097,7 @@ document.addEventListener('click', function (e) { if (!$('tipW').contains(e.targ
 document.addEventListener('keydown', function (e) {
   if (e.key !== 'Escape') return;
   $('tipW').classList.remove('on'); $('tipW').classList.add('off'); $('tipB').blur();
+  if ($('grOv').classList.contains('on')) { closeGrant(); return; }
   if ($('brOv').classList.contains('on')) { closeBrief(); return; }
   if ($('ov2').classList.contains('on')) closeComplete(); else if ($('shOv').classList.contains('on')) closeSheet();
 });
