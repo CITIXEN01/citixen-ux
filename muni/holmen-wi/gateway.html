@@ -155,6 +155,24 @@ html{background:#05070C}
 .nm-note[hidden]{display:none}
 .signed{margin-top:24px;padding:16px 18px;border:1px solid rgba(16,185,129,.45);border-radius:12px;background:rgba(16,185,129,.07);color:#E2E8F0;font:400 14px/1.5 var(--sans)}
 .signed b{color:#34D399}
+.h2,.pane h1.h2{text-align:center}
+.acts2.ctr{justify-content:center}
+.cardbr{position:relative;padding-bottom:56px}
+.tipw{display:inline;margin-left:6px;vertical-align:middle}
+.tipb{display:inline-flex;align-items:center;justify-content:center;background:none;border:0;padding:0;margin:0;color:#34D399;cursor:help;vertical-align:-3px;border-radius:50%}
+.tipb:hover,.tipb:focus-visible{color:#6EE7B7;outline:none;filter:drop-shadow(0 0 6px rgba(16,185,129,.6))}
+.tip{display:none;position:absolute;left:22px;right:0;top:calc(100% - 2px);z-index:40;padding:12px 14px;border-radius:10px;border:1px solid rgba(16,185,129,.4);background:rgba(2,6,12,.97);box-shadow:0 12px 30px rgba(0,0,0,.5);font:400 12.5px/1.55 var(--sans);color:#CBD5E1}
+.tip b{color:#fff;font-weight:600}
+.tipw:hover .tip,.tipb:focus-visible + .tip,.tipw.on .tip{display:block}
+.tipw.off .tip{display:none!important}
+.vreview{position:absolute;right:14px;bottom:12px;padding:5px 11px;border-radius:9999px;border:1px solid rgba(16,185,129,.55);background:rgba(16,185,129,.1);color:#34D399;font:600 10.5px/1.3 var(--sans);letter-spacing:.08em;text-transform:uppercase;box-shadow:0 0 8px rgba(16,185,129,.3);animation:vpulse 2.4s ease-in-out infinite}
+@keyframes vpulse{0%,100%{box-shadow:0 0 6px rgba(16,185,129,.25);border-color:rgba(16,185,129,.4)}50%{box-shadow:0 0 20px rgba(16,185,129,.7);border-color:rgba(52,211,153,.95)}}
+@media (prefers-reduced-motion:reduce){.vreview{animation:none}}
+.brief{width:min(700px,100%);max-height:calc(100vh - 32px);overflow:auto;box-sizing:border-box;padding:28px 32px;text-align:left;animation:paneIn .3s ease both}
+.brief h3{margin:22px 0 6px;font:600 11px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:#34D399}
+.brief p,.brief li{font:400 13.5px/1.6 var(--sans);color:#CBD5E1}
+.brief p{margin:6px 0}.brief ul{margin:6px 0;padding-left:20px}
+.brief .src{margin-top:20px;padding-top:14px;border-top:1px solid rgba(30,41,59,.8);font-size:12px;color:#64748B}
 .sh-ov,.ov2{position:fixed;inset:0;z-index:70;background:rgba(2,6,12,.6);display:none}
 .sh-ov.on{display:block}.ov2.on{display:grid;place-items:center;padding:16px}
 .sheet{position:absolute;right:0;top:0;bottom:0;width:min(460px,100%);box-sizing:border-box;padding:28px;overflow:auto;border-radius:16px 0 0 16px;background:rgba(11,15,18,.94);animation:slideIn .28s ease both}
@@ -371,16 +389,19 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
 
       <div class="pane" id="p2">
         <h1 class="h2" tabindex="-1">Wis. Stat. § 893.80 Statutory Defense Framework</h1>
-        <div class="cardx">
+        <div class="acts2 ctr"><button type="button" class="pillbtn sec" id="openBrief">View § 893.80 Brief</button></div>
+        <div class="cardx cardbr">
           <ul class="bul">
-            <li>Each notice the Village receives is recorded in a <strong style="color:#fff">SHA-256 hash-chained log</strong>: every entry’s hash includes the one before it, so a later edit to any entry is detectable (tamper-evident).</li>
-            <li>The log lets the Village show when a notice arrived and what was done about it.</li>
+            <li>Each notice the Village receives is recorded in a <strong style="color:#fff">SHA-256 hash-chained log</strong>.<span class="tipw" id="tipW"><button type="button" class="tipb" id="tipB" aria-label="What is SHA-256?" aria-describedby="tipT"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.82 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></button><span class="tip" id="tipT" role="tooltip"><b>SHA-256</b> is a standard cryptographic hash function (NIST FIPS 180-4). It turns any record into a fixed 64-character fingerprint; change a single character and the fingerprint changes completely.<br><br>In a hash chain, each entry’s fingerprint includes the one before it, so editing an old entry breaks every entry after it. That makes changes <b>detectable (tamper-evident)</b>, not impossible, and it does not show who made them.</span></span></li>
+            <li>The log shows the Village when a report was submitted and when it was resolved.</li>
+            <li>CITIXEN UX is a record keeping tool, not legal advice. It does not itself confer immunity or establish a statutory defense.</li>
           </ul>
           <div class="chain" id="chain" aria-label="Sample hash chain"></div>
-          <p class="fine">A record-keeping tool, not legal advice. It does not by itself confer immunity or establish a statutory defense. Village Attorney review is recommended.</p>
+          <span class="vreview">Village Attorney Review Recommended</span>
         </div>
-        <div class="acts2"><button type="button" class="pillbtn sec" id="openSheet">Dispatch FYI Notice to Village Attorney</button><span class="chip" id="brChip" hidden></span></div>
-        <div class="acts2"><button type="button" class="pillbtn" id="c2">Acknowledge &amp; Proceed to E-Signature →</button></div>
+        <div class="acts2 ctr"><button type="button" class="pillbtn sec" id="openSheet">Dispatch to Village Attorney</button></div>
+        <div class="acts2 ctr" style="margin-top:12px"><span class="chip" id="brChip" hidden></span></div>
+        <div class="acts2 ctr"><button type="button" class="pillbtn" id="c2">Acknowledge &amp; Proceed to E-Sign</button></div>
       </div>
 
       <div class="pane" id="p3">
@@ -421,6 +442,41 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
     </aside>
   </div>
 </section>
+
+<div class="ov2" id="brOv">
+  <div class="gl brief" role="dialog" aria-modal="true" aria-labelledby="brT">
+    <div class="sh-h"><h2 id="brT" tabindex="-1">Wis. Stat. § 893.80 Brief</h2><button type="button" class="x" id="brX" aria-label="Close">×</button></div>
+    <p class="lead" style="color:#94A3B8">Notice-of-claim rules for claims against Wisconsin towns, villages, cities and counties, and what CITIXEN UX does and does not do about them.</p>
+    <h3>1 · The notice-of-claim rule</h3>
+    <ul>
+      <li>Before suing a village, a person generally must serve <b style="color:#fff">written notice of the circumstances of the claim within 120 days</b> of the event, signed by the claimant, agent or attorney.</li>
+      <li>The statute also lets a claim proceed when the Village had actual notice of the claim and was not prejudiced by the lack of written notice.</li>
+      <li>The claimant must also present the claim, with an address and an itemized statement of the relief sought, to the Village for it to allow or disallow.</li>
+    </ul>
+    <h3>2 · After a claim is presented</h3>
+    <ul>
+      <li>A disallowance is served by registered or certified mail. A suit must be brought within <b style="color:#fff">6 months</b> of that notice.</li>
+      <li>If the Village does not act within 120 days of presentation, that counts as a disallowance.</li>
+    </ul>
+    <h3>3 · Limits on recovery</h3>
+    <ul>
+      <li>Damages against a political subdivision and its officials are capped (generally <b style="color:#fff">$50,000</b>), and punitive damages are not recoverable.</li>
+      <li>The statute bars suits for intentional torts of officers and employees, and for legislative, quasi-legislative, judicial or quasi-judicial acts.</li>
+    </ul>
+    <h3>4 · What CITIXEN UX adds</h3>
+    <ul>
+      <li>Each notice is recorded in a SHA-256 hash-chained log, so the Village can show when a report was submitted and when it was resolved.</li>
+      <li>Because each entry’s fingerprint includes the one before it, a later edit to any entry is detectable (tamper-evident).</li>
+    </ul>
+    <h3>5 · What it does not do</h3>
+    <ul>
+      <li>It is a record-keeping tool, not legal advice. It does not itself confer immunity or establish a statutory defense.</li>
+      <li>It does not serve or receive statutory notices for the Village, decide whether a claim is valid, or show who made an edit.</li>
+    </ul>
+    <p class="src">Plain-language summary for orientation only; the statute as currently in force controls. Village Attorney review is recommended. Preview build: sample data.</p>
+    <div class="acts2 ctr"><button type="button" class="pillbtn" id="brClose">Close</button></div>
+  </div>
+</div>
 
 <div class="sh-ov" id="shOv">
   <div class="gl sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="shT">
@@ -800,7 +856,7 @@ function fillPortal(){
   $('m1').textContent = 'Citixen UX · ' + OB.entity + ', ' + OB.state;
   $('m2').textContent = money(OB.platformValue).replace('.00', '') + '/yr';
   $('m3').textContent = '−' + money(OB.grantCredit).replace('.00', '');
-  var at = attorney(); $('openSheet').textContent = 'Dispatch FYI Notice to ' + (at.title || 'Village Attorney') + (at.name ? ' ' + at.name : '');
+  var at = attorney();
   var sg = signatory();
   $('sgWho').textContent = sg.name ? 'Authorized signatory on file: ' + sg.name + (sg.title ? ', ' + sg.title : '') + '.' : 'Sign as an authorized official of the ' + OB.entity + '.';
   $('pattT').textContent = 'I am authorized to sign for the ' + OB.entity + ', and I have read the agreement summary and the 60-day grant contingency clause.';
@@ -993,8 +1049,21 @@ function closeComplete(){ $('ov2').classList.remove('on'); var b = $('signedBox'
 $('d2X').addEventListener('click', closeComplete);
 $('d2Dl').addEventListener('click', downloadPacket);
 $('ov2').addEventListener('click', function (e) { if (e.target === $('ov2')) closeComplete(); });
+/* ---------- Step 2: brief pop-up + SHA-256 tooltip ---------- */
+function openBrief(){ lastFocus = document.activeElement; $('brOv').classList.add('on'); $('brX').focus(); }
+function closeBrief(){ $('brOv').classList.remove('on'); if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('openBrief').addEventListener('click', openBrief);
+$('brX').addEventListener('click', closeBrief);
+$('brClose').addEventListener('click', closeBrief);
+$('brOv').addEventListener('click', function (e) { if (e.target === $('brOv')) closeBrief(); });
+$('tipB').addEventListener('click', function (e) { e.stopPropagation(); $('tipW').classList.toggle('on'); });
+$('tipW').addEventListener('mouseleave', function () { $('tipW').classList.remove('off'); });
+$('tipB').addEventListener('mouseenter', function () { $('tipW').classList.remove('off'); });
+document.addEventListener('click', function (e) { if (!$('tipW').contains(e.target)) $('tipW').classList.remove('on'); });
 document.addEventListener('keydown', function (e) {
   if (e.key !== 'Escape') return;
+  $('tipW').classList.remove('on'); $('tipW').classList.add('off'); $('tipB').blur();
+  if ($('brOv').classList.contains('on')) { closeBrief(); return; }
   if ($('ov2').classList.contains('on')) closeComplete(); else if ($('shOv').classList.contains('on')) closeSheet();
 });
 
