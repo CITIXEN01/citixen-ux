@@ -502,16 +502,17 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
             <li>CITIXEN UX is a record keeping tool, not legal advice. It does not itself confer immunity or establish a statutory defense.</li>
           </ul>
           <div class="chain" id="chain" aria-label="Sample hash chain"></div>
-          <span class="vreview">Village Attorney Review Recommended</span>
+          <span class="vreview">VILLAGE ATTORNEY REVIEW RECOMMENDED (OPTIONAL)</span>
         </div>
-        <div class="acts2 ctr"><button type="button" class="pillbtn sec" id="openSheet">Dispatch to Village Attorney</button></div>
+        <div class="acts2 ctr"><button type="button" class="pillbtn sec" id="openSheet">Preview attorney email</button></div>
         <div class="acts2 ctr" style="margin-top:12px"><span class="chip" id="brChip" hidden></span></div>
-        <div class="acts2 ctr"><button type="button" class="pillbtn" id="c2">Acknowledge &amp; Proceed to E-Sign</button></div>
+        <div class="acts2 ctr"><button type="button" class="pillbtn" id="c2">Dispatch to Counsel (Optional) →</button></div>
       </div>
 
       <div class="pane" id="p3">
         <h1 class="h2" tabindex="-1">Master Services Agreement &amp; Grant Application</h1>
         <div class="acts2 ctr"><a class="pillbtn sec" href="#review" id="fullDoc">Read the Full Draft (3 pages)</a></div>
+        <div class="acts2 ctr" style="margin-top:12px"><span class="chip" id="dispNote" hidden></span></div>
         <div class="cardx cardbr">
           <div class="cx-h">Pre-filled agreement summary</div>
           <div class="ln2"><span>Parties</span><b id="m1">Citixen UX · Village of Holmen, WI</b></div>
@@ -519,7 +520,6 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
           <div class="ln2"><span>Funding<small>LWMMI Loss Control Grant credit · pending approval</small></span><b class="em" id="m3">−$9,500</b></div>
           <div class="net" style="margin-top:14px"><b style="color:#fff">60-Day Grant Contingency Addendum.</b> If grant funds are not disbursed to the Village within 60 days, the agreement ends and the Village owes nothing.</div>
           <p class="fine">Citixen UX draft · not an official LWMMI form.</p>
-          <span class="vreview">Counsel Review Required</span>
         </div>
         <div id="signForm">
           <p class="lead" id="sgWho" style="margin-top:22px;text-align:center"></p>
@@ -553,7 +553,7 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
 <div class="ov2" id="vgOv">
   <div class="gl brief vgm" role="dialog" aria-modal="true" aria-labelledby="vgT">
     <div class="sh-h"><h2 id="vgT" tabindex="-1">LWMMI Loss Control Grant Application</h2><button type="button" class="x" id="vgX" aria-label="Close">✕</button></div>
-    <p class="fine" style="margin:6px 0 10px">Pre-filled by CITIXEN UX · draft · not an official LWMMI form · counsel review required</p>
+    <p class="fine" style="margin:6px 0 10px">Pre-filled by CITIXEN UX · draft · not an official LWMMI form · attorney review recommended (optional)</p>
     <div class="ln2"><span>Applicant</span><b id="vgA">—</b></div>
     <div class="ln2"><span>Program</span><b>LWMMI Loss Control Grant</b></div>
     <div class="ln2"><span>Amount requested<small>Sample figure</small></span><b id="vgAmt">—</b></div>
@@ -572,7 +572,7 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
     <p>Your insurer, LWMMI, offers a Loss Control Grant toward loss-mitigation tools that help a municipality manage its liability exposure, including notice-of-claim exposure under Wis. Stat. § 893.80. This preview uses a sample figure of up to $9,500 per year. Actual grant terms are LWMMI’s.</p>
     <h3>2. Pre-Filled Grant Credit</h3>
     <p>CITIXEN UX™ pre-fills the grant application during onboarding. If LWMMI approves it, the credit offsets the annual software fee 1:1.</p>
-    <div class="callout"><b>Zero-Risk Guarantee:</b> If grant funds are not disbursed to the village within 60 days, the agreement automatically terminates and the Village owes $0.00.<small>As written in the draft agreement. Counsel review required.</small></div>
+    <div class="callout"><b>Zero-Risk Guarantee:</b> If grant funds are not disbursed to the village within 60 days, the agreement automatically terminates and the Village owes $0.00.<small>As written in the draft agreement. attorney review recommended (optional).</small></div>
     <button type="button" class="bigbtn" id="grDone">Got it, back to onboarding</button>
   </div>
 </div>
@@ -616,7 +616,7 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
   <div class="gl sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="shT">
     <div class="sh-h"><h2 id="shT">Attorney review</h2><button type="button" class="x" id="shX" aria-label="Close">×</button></div>
     <p class="lead" id="shWho" style="color:#94A3B8"></p>
-    <div class="seg2" role="group" aria-label="Dispatch option"><button type="button" id="oA" aria-pressed="true">Option A · FYI Notice</button><button type="button" id="oB" aria-pressed="false">Option B · Magic Link Pause</button></div>
+    <div class="seg2" role="group" aria-label="Dispatch option"><button type="button" id="oA" aria-pressed="true">FYI Notice · non-blocking</button></div>
     <p class="lead" id="optDesc"></p>
     <pre class="draft" id="draft"></pre>
     <div class="note">Preview build: no email is sent and no magic link is created. This shows the states the real flow will have.</div>
@@ -656,7 +656,7 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
 <main id="main">
   <section class="glass docwrap" aria-labelledby="docT">
     <div class="toolbar">
-      <h2 id="docT">LWMMI Loss Control Grant Application &amp; § 893.80 Notice-Log Rider<small>Citixen UX draft · counsel review required · not an official LWMMI form</small></h2>
+      <h2 id="docT">LWMMI Loss Control Grant Application &amp; § 893.80 Notice-Log Rider<small>Citixen UX draft · attorney review recommended (optional) · not an official LWMMI form</small></h2>
       <div class="tb" role="group" aria-label="Page">
         <button type="button" id="pPrev" aria-label="Previous page">‹</button><span id="pInfo" aria-live="polite">Page 1 of 3</span><button type="button" id="pNext" aria-label="Next page">›</button>
       </div>
@@ -768,7 +768,7 @@ function pageNodes(){
   var entity = OB.entity + ', ' + OB.state, today = new Date().toLocaleDateString(undefined, {year: 'numeric', month: 'long', day: 'numeric'});
   var p1 = el('article', {class: 'page', 'data-page': '1', 'aria-label': 'Page 1 of 3'}, [
     el('h3', {text: 'LWMMI Loss Control Grant Application'}), el('div', {class: 'sub', text: 'Application summary · Prepared by Citixen UX'}),
-    el('div', {class: 'draft', text: 'Draft: counsel review required. Not an official LWMMI form.'}),
+    el('div', {class: 'draft', text: 'Draft: attorney review recommended (optional). Not an official LWMMI form.'}),
     el('dl', {}, [
       el('dt', {text: 'Applicant'}), el('dd', {text: entity}),
       el('dt', {text: 'Policy ID'}), el('dd', {text: OB.policy + ' (sample value)'}),
@@ -782,7 +782,7 @@ function pageNodes(){
     el('div', {class: 'num', text: '1 / 3'})]);
   var p2 = el('article', {class: 'page', 'data-page': '2', 'aria-label': 'Page 2 of 3'}, [
     el('h3', {text: 'Conditional Master Services Agreement'}), el('div', {class: 'sub', text: entity + ' · Citixen UX'}),
-    el('div', {class: 'draft', text: 'Draft text: counsel review required before use'}),
+    el('div', {class: 'draft', text: 'Draft text: attorney review recommended (optional)'}),
     el('h4', {text: 'Section 1. Grant contingency'}),
     el('p', {text: 'This Agreement is contingent on funding from the LWMMI Loss Control Grant. If grant funds are not disbursed to the Village within 60 days of the Effective Date, this Agreement terminates and the Village owes Citixen UX nothing.'}),
     el('h4', {text: 'Section 2. Platform scope'}),
@@ -795,7 +795,7 @@ function pageNodes(){
   var sl = el('div', {class: 'sl todo', id: 'docSig'});
   var p3 = el('article', {class: 'page', 'data-page': '3', 'aria-label': 'Page 3 of 3'}, [
     el('h3', {text: 'Wis. Stat. § 893.80 Notice-Log Rider'}), el('div', {class: 'sub', text: 'Rider to the Agreement · Citixen UX draft'}),
-    el('div', {class: 'draft', text: 'Draft text: counsel review required before use'}),
+    el('div', {class: 'draft', text: 'Draft text: attorney review recommended (optional)'}),
     el('h4', {text: 'What the platform provides'}),
     el('p', {text: 'A time-stamped, hash-chained log of resident reports received through the Village\'s intake, and the times status changes were recorded. Each entry\'s SHA-256 covers the previous entry, so a later edit to any entry breaks the hashes after it.'}),
     el('h4', {text: 'What it does not provide'}),
@@ -1039,7 +1039,12 @@ function clampedStep(){
   return k;
 }
 $('c1').addEventListener('click', function () { P.done[0] = true; portalGo(2); });
-$('c2').addEventListener('click', function () { P.done[1] = true; portalGo(3); });
+$('c2').addEventListener('click', function () {
+  /* non-blocking: record a simulated dispatch, then advance immediately (no waiting on counsel) */
+  P.br.at = stamp(); P.br.status = 'fyi'; P.br.mode = 'fyi';
+  var n = $('dispNote'); n.hidden = false; n.textContent = 'Magic link to counsel queued in background (preview: no email was sent) · ' + P.br.at;
+  P.done[1] = true; portalGo(3);
+});
 Array.prototype.forEach.call($('ps').querySelectorAll('.pb'), function (b){ b.addEventListener('click', function () { portalGo(+b.getAttribute('data-step')); }); });
 $('fullDoc').addEventListener('click', function (e) { e.preventDefault(); nav(3); });
 $('rvBack').addEventListener('click', function (e) { e.preventDefault(); nav(2); });
@@ -1059,7 +1064,7 @@ function draftText(mode){
 }
 function setOption(m){
   P.br.optMode = m;
-  $('oA').setAttribute('aria-pressed', m === 'fyi'); $('oB').setAttribute('aria-pressed', m === 'pause');
+  $('oA').setAttribute('aria-pressed', m === 'fyi');
   $('optDesc').textContent = m === 'fyi'
     ? 'FYI Notice: sends a courtesy copy of the brief to the attorney. Onboarding continues while they review.'
     : 'Magic Link Pause: onboarding pauses on this step until the attorney opens a one-time link and acknowledges the brief.';
@@ -1070,7 +1075,6 @@ function syncBrief(){
   var st = P.br.status, chip = $('brChip');
   chip.hidden = st === 'none'; chip.className = 'chip' + (st === 'paused' ? ' warn' : '');
   chip.textContent = st === 'fyi' ? 'FYI Notice dispatched (preview) · ' + P.br.at : st === 'paused' ? 'Paused: awaiting attorney acknowledgement (preview)' : st === 'ack' ? 'Attorney acknowledged (simulated) · ' + P.br.at : '';
-  $('c2').disabled = st === 'paused';
   var s2 = $('shStatus'); s2.className = 'status' + (st === 'paused' ? ' pz' : '');
   s2.textContent = st === 'fyi' ? '✓ FYI Notice marked as dispatched (preview only; no email was sent). ' + P.br.at : st === 'paused' ? '⏸ Onboarding paused. Waiting for the attorney’s magic-link acknowledgement (preview only; no link was created).' : st === 'ack' ? '✓ Acknowledged (simulated). Onboarding can continue. ' + P.br.at : '';
   $('shAck').hidden = st !== 'paused';
@@ -1083,7 +1087,6 @@ $('openSheet').addEventListener('click', openSheet);
 $('shX').addEventListener('click', closeSheet);
 $('shOv').addEventListener('click', function (e) { if (e.target === $('shOv')) closeSheet(); });
 $('oA').addEventListener('click', function () { setOption('fyi'); });
-$('oB').addEventListener('click', function () { setOption('pause'); });
 $('shGo').addEventListener('click', function () { P.br.at = stamp(); P.br.status = P.br.optMode === 'fyi' ? 'fyi' : 'paused'; P.br.mode = P.br.optMode; syncBrief(); });
 $('shAck').addEventListener('click', function () { P.br.at = stamp(); P.br.status = 'ack'; syncBrief(); });
 
@@ -1123,7 +1126,7 @@ function syncSign(){
   if (P.signed){ $('signedBox').textContent = ''; $('signedBox').appendChild(el('b', {text: 'Signed in this preview. '})); $('signedBox').appendChild(document.createTextNode(P.signed.record.signer.name + ' · ' + P.signed.record.signer.signed_at.replace('T', ' ').slice(0, 16) + ' UTC. ')); var d = el('button', {type: 'button', class: 'pillbtn', style: 'margin-top:14px;display:block'}); d.textContent = 'Download packet'; d.addEventListener('click', downloadPacket); $('signedBox').appendChild(d); }
 }
 function agreementText(){
-  return ['MASTER SERVICES AGREEMENT SUMMARY (Citixen UX draft, counsel review required)',
+  return ['MASTER SERVICES AGREEMENT SUMMARY (Citixen UX draft, attorney review recommended (optional))',
     'Parties: Citixen UX and ' + OB.entity + ', ' + OB.state,
     'Platform value: ' + money(OB.platformValue) + ' per year',
     'Funding: LWMMI Loss Control Grant credit of ' + money(OB.grantCredit) + ' (pending LWMMI approval)',
