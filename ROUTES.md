@@ -24,6 +24,7 @@ non-public page to `/app`. While it is there, only `/app`, `/report/{id}`, `/api
 | `/muni/{slug}/onboard` | `onboard.html?muni={slug}` | preview build, sends nothing |
 | `/onboard/{slug}` | 308 to `/muni/{slug}/onboard` | |
 | `/nexus` | `nexus.html` | internal hub; Systems Engineering feed is the site registry |
+| `/nexuslive` | `nexuslive.html` | internal sales workspace. Behind HTTP Basic Auth via `middleware.js` (see `NEXUSLIVE.md`); not part of the public routes and not affected by the lockdown redirect |
 | `/sites`, `/sites/{slug}` | `sites.html` | multi-tenant directory; also registered intake routes (`holmen-wi-public-works`, `holmen-wi-parks`) |
 | `/dispatch`, `/admin` | redirect to `/muni` (tenant picker) | legacy roots |
 | `/ledger`, `/operator`, `/careers`, `/join/{id}` | unchanged | not in the architecture brief; kept |
