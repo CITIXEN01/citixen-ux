@@ -536,6 +536,21 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
 @media (max-width:640px){#p2 .gcall.abn{flex-direction:column;text-align:center}#p2 .abn .gct{text-align:center}}
 /* ---- v15: attorney modal ---- */
 .fynb{display:inline-block;margin-top:14px;padding:4px 12px;border-radius:9999px;border:1px solid rgba(56,189,248,.6);background:rgba(56,189,248,.1);color:#38BDF8;font:700 11px ui-monospace,"JetBrains Mono",Menlo,monospace;letter-spacing:.12em}
+/* ---- v16: in-page full-draft modal + document branding ---- */
+.docm{width:min(940px,100%);height:calc(100vh - 32px);display:flex;flex-direction:column;overflow:hidden;padding:0;text-align:left;animation:paneIn .3s ease both}
+.docm-h{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid rgba(56,189,248,.3);font:600 12px var(--sans);letter-spacing:.06em;color:#94A3B8;text-transform:uppercase}
+.docm-h .x{background:none;border:1px solid #334155;color:#CBD5E1;width:32px;height:32px;border-radius:50%;font-size:16px;line-height:1;cursor:pointer;flex:none}
+#docSlot{flex:1;min-height:0;display:flex;flex-direction:column}
+.docm .docwrap{height:auto;min-height:0;flex:1;border:0;border-radius:0;box-shadow:none;background:transparent}
+.page .dochd{display:flex;justify-content:space-between;align-items:center;gap:1em;padding-bottom:.9em;margin-bottom:1.1em;border-bottom:2px solid #16202E}
+.page .brandw{font:800 1.2em var(--sans);letter-spacing:.02em;color:#16202E}
+.page .brandw .ux{color:#047857}.page .brandw sup{font-size:.55em;margin-left:.1em}
+.page .lwph{display:flex;align-items:center;gap:.65em;border:1.5px dashed #8A96A8;border-radius:4px;padding:.45em .75em;color:#16202E}
+.page .lwph b{font:800 1.05em var(--sans);letter-spacing:.06em;padding:.25em .5em;border:1.5px solid #16202E;border-radius:3px}
+.page .lwph span{display:flex;flex-direction:column;max-width:15em;font-family:var(--sans)}
+.page .lwph i{font-style:normal;font-weight:600;font-size:.62em;line-height:1.3;letter-spacing:.02em}
+.page .lwph em{font-style:normal;font-size:.55em;letter-spacing:.1em;text-transform:uppercase;color:#8A96A8;margin-top:.2em}
+.page .draft.adv{text-align:center;font-size:.66em;letter-spacing:.08em;line-height:1.5;border-width:1.5px}
 #printRoot{display:none}
 @media print{
   body.printing > *:not(#printRoot){display:none !important}
@@ -610,7 +625,7 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
 
       <div class="pane" id="p3">
         <h1 class="h2" tabindex="-1">Master Services Agreement &amp; Grant Application</h1>
-        <div class="acts2 ctr"><a class="pillbtn sec" href="#review" id="fullDoc">Read the Full Draft (3 pages)</a></div>
+        <div class="acts2 ctr"><button type="button" class="pillbtn sec" id="fullDoc" aria-haspopup="dialog">Read the Full Draft (3 pages)</button></div>
         <div class="acts2 ctr" style="margin-top:12px"><span class="chip" id="dispNote" hidden></span></div>
         <div class="cardx cardbr">
           <div class="cx-h">Pre-filled agreement summary</div>
@@ -698,6 +713,13 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
     </ul>
     <p class="src">Plain-language summary for orientation only; the statute as currently in force controls. Village Attorney review is recommended. Preview build: sample data.</p>
     <div class="acts2 ctr"><button type="button" class="pillbtn" id="brClose">Close</button></div>
+  </div>
+</div>
+
+<div class="ov2" id="docOv">
+  <div class="gl docm" role="dialog" aria-modal="true" aria-label="Full draft: LWMMI Loss Control Grant Application">
+    <div class="docm-h"><span>Draft preview · in-page · nothing is sent or filed</span><button type="button" class="x" id="docX" aria-label="Close draft">✕</button></div>
+    <div id="docSlot"></div>
   </div>
 </div>
 
@@ -855,14 +877,20 @@ function renderStepper(){
 /* ---------- document ---------- */
 function pageNodes(){
   var entity = OB.entity + ', ' + OB.state, today = new Date().toLocaleDateString(undefined, {year: 'numeric', month: 'long', day: 'numeric'});
+  var sg = signatory();
   var p1 = el('article', {class: 'page', 'data-page': '1', 'aria-label': 'Page 1 of 3'}, [
-    el('h3', {text: 'LWMMI Loss Control Grant Application'}), el('div', {class: 'sub', text: 'Application summary · Prepared by Citixen UX'}),
-    el('div', {class: 'draft', text: 'Draft: attorney review recommended (optional). Not an official LWMMI form.'}),
+    el('div', {class: 'dochd'}, [
+      el('div', {class: 'brandw'}, ['CITIXEN ', el('span', {class: 'ux', text: 'UX'}), el('sup', {text: '™'})]),
+      el('div', {class: 'lwph', role: 'img', 'aria-label': 'LWMMI logo placeholder'}, [el('b', {text: 'LWMMI'}), el('span', {}, [el('i', {text: 'League of Wisconsin Municipalities Mutual Insurance'}), el('em', {text: 'Logo placeholder'})])])]),
+    el('h3', {text: 'LWMMI Loss Control Grant Application'}), el('div', {class: 'sub', text: 'Application summary · Prepared by Citixen UX · not an official LWMMI form'}),
+    el('div', {class: 'draft adv', role: 'note', text: 'Pre-filled LWMMI Loss Control Grant Application — Draft for Municipal Execution'}),
     el('dl', {}, [
       el('dt', {text: 'Applicant'}), el('dd', {text: entity}),
+      el('dt', {text: 'Applicant Contact'}), el('dd', {text: (sg.name ? sg.name + (sg.title ? ', ' + sg.title : '') + ' | ' : '') + entity}),
+      el('dt', {text: 'Vendor Contact'}), el('dd', {text: 'Citixen UX Municipal Operations (support@citixenux.com)'}),
       el('dt', {text: 'Policy ID'}), el('dd', {text: OB.policy + ' (sample value)'}),
       el('dt', {text: 'Requested grant'}), el('dd', {class: 'money', text: money(OB.grantCredit)}),
-      el('dt', {text: 'Vendor'}), el('dd', {text: 'Citixen UX · ' + money(OB.platformValue) + ' per year'}),
+      el('dt', {text: 'Annual fee'}), el('dd', {text: 'Citixen UX · ' + money(OB.platformValue) + ' per year'}),
       el('dt', {text: 'Funding share'}), el('dd', {text: '100% of the annual fee, requested from the grant'})]),
     el('h4', {text: 'Project description'}),
     el('p', {text: 'Deployment of the Citixen UX statutory notice ledger: a public web intake for resident reports of hazards such as potholes and sidewalk defects, a SHA-256 hash-chained record of each report with its time of receipt, and email delivery of each new report to the Public Works address.'}),
@@ -871,7 +899,7 @@ function pageNodes(){
     el('div', {class: 'num', text: '1 / 3'})]);
   var p2 = el('article', {class: 'page', 'data-page': '2', 'aria-label': 'Page 2 of 3'}, [
     el('h3', {text: 'Conditional Master Services Agreement'}), el('div', {class: 'sub', text: entity + ' · Citixen UX'}),
-    el('div', {class: 'draft', text: 'Draft text: attorney review recommended (optional)'}),
+    el('div', {class: 'draft adv', role: 'note', text: 'Conditional Master Services Agreement \u2014 Draft for Municipal Execution'}),
     el('h4', {text: 'Section 1. Grant contingency'}),
     el('p', {text: 'This Agreement is contingent on funding from the LWMMI Loss Control Grant. If grant funds are not disbursed to the Village within 60 days of the Effective Date, this Agreement terminates and the Village owes Citixen UX nothing.'}),
     el('h4', {text: 'Section 2. Platform scope'}),
@@ -884,7 +912,7 @@ function pageNodes(){
   var sl = el('div', {class: 'sl todo', id: 'docSig'});
   var p3 = el('article', {class: 'page', 'data-page': '3', 'aria-label': 'Page 3 of 3'}, [
     el('h3', {text: 'Wis. Stat. § 893.80 Notice-Log Rider'}), el('div', {class: 'sub', text: 'Rider to the Agreement · Citixen UX draft'}),
-    el('div', {class: 'draft', text: 'Draft text: attorney review recommended (optional)'}),
+    el('div', {class: 'draft adv', role: 'note', text: 'Wis. Stat. \u00a7 893.80 Notice-Log Rider \u2014 Draft for Municipal Execution'}),
     el('h4', {text: 'What the platform provides'}),
     el('p', {text: 'A time-stamped, hash-chained log of resident reports received through the Village\'s intake, and the times status changes were recorded. Each entry\'s SHA-256 covers the previous entry, so a later edit to any entry breaks the hashes after it.'}),
     el('h4', {text: 'What it does not provide'}),
@@ -1126,7 +1154,12 @@ $('c2').addEventListener('click', function () {
   P.done[1] = true; portalGo(3);
 });
 Array.prototype.forEach.call($('ps').querySelectorAll('.pb'), function (b){ b.addEventListener('click', function () { portalGo(+b.getAttribute('data-step')); }); });
-$('fullDoc').addEventListener('click', function (e) { e.preventDefault(); nav(3); });
+/* in-page full-draft overlay: the same viewer (zoom, paging, PDF) is moved into a modal; no navigation, no hash change */
+function openDoc(){ lastFocus = document.activeElement; var d = document.querySelector('.docwrap'); $('docSlot').appendChild(d); $('docOv').classList.add('on'); goPage(1); $('docX').focus(); }
+function closeDoc(){ var d = document.querySelector('.docwrap'); $('main').insertBefore(d, $('main').firstChild); $('docOv').classList.remove('on'); if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('fullDoc').addEventListener('click', openDoc);
+$('docX').addEventListener('click', closeDoc);
+$('docOv').addEventListener('click', function (e) { if (e.target === $('docOv')) closeDoc(); });
 $('rvBack').addEventListener('click', function (e) { e.preventDefault(); nav(2); });
 
 /* --- step 2: attorney dispatch sheet --- */
@@ -1284,6 +1317,7 @@ document.addEventListener('click', function (e) { if (!$('tipW').contains(e.targ
 document.addEventListener('keydown', function (e) {
   if (e.key !== 'Escape') return;
   $('tipW').classList.remove('on'); $('tipW').classList.add('off'); $('tipB').blur();
+  if ($('docOv').classList.contains('on')) { closeDoc(); return; }
   if ($('vgOv').classList.contains('on')) { closeVG(); return; }
   if ($('brOv').classList.contains('on')) { closeBrief(); return; }
   if ($('ov2').classList.contains('on')) closeComplete(); else if ($('shOv').classList.contains('on')) closeSheet();
