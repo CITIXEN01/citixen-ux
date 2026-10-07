@@ -224,6 +224,28 @@ html{background:#05070C}
 .portal .ps .cur .bd{box-shadow:none;border-color:#38BDF8;animation:slowfade 3s ease-in-out infinite}
 @keyframes slowfade{0%,100%{opacity:1}50%{opacity:.4}}
 @media (max-width:640px){.phead{grid-template-columns:1fr;gap:4px;text-align:center}.panel .phead h3,.phead .pmeta{text-align:center}}
+/* ---- v4: sleek timeline card, stage header, status pills ---- */
+.portal .panel{padding:14px 22px 18px}
+.phead{display:block;text-align:center}
+.panel .phead h3{text-align:center}
+.portal .ps{margin-top:12px}
+.shead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.shead .wt{font:600 22px/1.2 var(--sans);letter-spacing:-.02em;color:#F8FAFC}
+.shead .wt:focus{outline:none}
+.vbadge{font:500 12px ui-monospace,"JetBrains Mono",Menlo,monospace;color:#94A3B8;border:1px solid rgba(51,65,85,.9);background:rgba(15,23,42,.6);border-radius:9999px;padding:5px 12px}
+.mtitle{margin:18px 0 20px;text-align:center;font:700 26px/1.2 var(--sans);letter-spacing:-.02em;color:#F8FAFC}
+.vgbox{position:relative}
+.howz{top:12px;right:14px}
+.portal .ps .done .bd{box-shadow:0 0 8px rgba(52,211,153,.4)}
+.portal .ps .cur .bd{box-shadow:0 0 10px rgba(34,211,238,.35)}
+.st{display:inline-block;margin-top:8px;padding:3px 11px;border-radius:9999px;border:1px solid;font:700 10px ui-monospace,"JetBrains Mono",Menlo,monospace;letter-spacing:.12em}
+.st::before{content:"PLANNED"}
+.ps li .st{color:#64748B;border-color:rgba(100,116,139,.55);background:rgba(100,116,139,.1)}
+.ps li.cur .st{color:#38BDF8;border-color:rgba(56,189,248,.6);background:rgba(56,189,248,.1)}
+.ps li.cur .st::before{content:"IN PROGRESS"}
+.ps li.done .st{color:#0B0F17;border-color:#34D399;background:#34D399;box-shadow:0 0 10px rgba(52,211,153,.45)}
+.ps li.done .st::before{content:"✓ COMPLETED"}
+@media (max-width:640px){.shead{justify-content:center;text-align:center}.howz{position:static;display:block;margin:0 auto 10px}}
 .expl{margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border:1px solid rgba(51,65,85,.6);border-radius:10px;background:rgba(15,23,42,.6)}
 .expl .ei{color:#22D3EE;display:flex;flex:none}.expl .et{flex:1 1 220px;min-width:0;font:400 13px/1.5 var(--sans);color:#94A3B8}
 .elink{flex:none;background:transparent;border:1px solid rgba(34,211,238,.55);color:#22D3EE;border-radius:9999px;padding:5px 14px;font:600 12.5px/1.4 var(--sans);cursor:pointer;transition:.2s}
@@ -434,11 +456,15 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
   <div class="obsidian" aria-hidden="true"></div><div class="backlight" aria-hidden="true"></div>
   <div class="portal">
     <section class="gl stage" id="stage" aria-label="Onboarding step">
+      <div class="shead">
+        <div class="wt" id="wTitle" role="heading" aria-level="1" tabindex="-1">Welcome!</div>
+        <span class="vbadge" id="pMeta">Village of Holmen, Wisconsin</span>
+      </div>
+      <h2 class="mtitle">Municipal Onboarding</h2>
       <div class="pane" id="p1">
-        <button type="button" class="elink howz" id="openGrant">How is this $0?</button>
-        <h1 id="wTitle" class="ctr1" tabindex="-1">Welcome!</h1>
         <p class="lead ctr1">Complete your CITIXEN UX onboarding in less than 5 minutes.</p>
         <div class="cardx vgbox">
+          <button type="button" class="elink howz" id="openGrant">How is this $0?</button>
           <h2 class="vgt">VERIFY PRE-FILLED LWMMI LOSS CONTROL GRANT</h2>
           <p class="vgl" id="vgL1">CITIXEN UX™ has pre-filled the grant application for this onboarding. If LWMMI approves it, the credit offsets the annual software fee 1:1.</p>
           <div class="vgrow"><button type="button" class="pillbtn sec" id="openVG">View Grant</button></div>
@@ -498,15 +524,11 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
     </section>
 
     <aside class="gl panel" aria-label="Onboarding progress">
-      <div class="phead">
-        <h3>Easy Onboarding Timeline</h3>
-        <p class="ptitle">Municipal Onboarding</p>
-        <p class="pmeta" id="pMeta">Village of Holmen, Wisconsin</p>
-      </div>
+      <div class="phead"><h3>5 Min Onboarding Timeline</h3></div>
       <ol class="ps" id="ps">
-        <li><button type="button" class="pb" data-step="1"><span class="bd"></span><span class="tx"><b>Grant Validation</b><small>Grant Offset Validation — Verify pre-filled $9,500 LWMMI Loss Control Grant for $0 net village cost, pending approval.</small><i class="st"></i></span></button></li>
-        <li><button type="button" class="pb" data-step="2"><span class="bd"></span><span class="tx"><b>WI State Statute 893</b><small>1-click legal brief review &amp; attorney dispatch modal (FYI Notice or Magic Link Pause State).</small><i class="st"></i></span></button></li>
-        <li><button type="button" class="pb" data-step="3"><span class="bd"></span><span class="tx"><b>e-Signature</b><small>Digital execution of MSA and automatic generation of the $9,500 LWMMI grant application.</small><i class="st"></i></span></button></li>
+        <li><button type="button" class="pb" data-step="1"><span class="bd"></span><span class="tx"><b>Grant Offset Validation</b><small>Verify pre-filled $9,500 LWMMI Loss Control Grant for $0 net village cost.</small><i class="st"></i></span></button></li>
+        <li><button type="button" class="pb" data-step="2"><span class="bd"></span><span class="tx"><b>Wis. Stat. § 893.80 Defense</b><small>1-click legal brief review and attorney dispatch modal.</small><i class="st"></i></span></button></li>
+        <li><button type="button" class="pb" data-step="3"><span class="bd"></span><span class="tx"><b>e-Signature</b><small>Digital execution of MSA and automatic submission of the $9,500 grant.</small><i class="st"></i></span></button></li>
       </ol>
     </aside>
   </div>
@@ -986,7 +1008,7 @@ function renderPortal(k, focus){
   renderPanel(k); syncBrief(); syncSign();
   document.title = ['Welcome', '§ 893.80 brief', 'E-signature'][k - 1] + ' — Citixen UX';
   window.scrollTo(0, 0);
-  if (focus){ var h = $('p' + k).querySelector('h1'); if (h) h.focus({preventScroll: true}); }
+  if (focus){ var h = $('p' + k).querySelector('h1') || $('wTitle'); if (h) h.focus({preventScroll: true}); }
 }
 function portalGo(k){
   k = Math.min(k, allowedMax());
