@@ -465,6 +465,19 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
 .acts2.end{justify-content:flex-end}
 .vgbox #c1{box-shadow:0 0 14px rgba(52,211,153,.35)}
 @media (max-width:640px){.vghead{flex-direction:column}.vghead .pillbtn{align-self:flex-end}.howrow{justify-content:center}}
+/* ---- v8: cyan only for small status tags; View Grant green; no Municipal Onboarding title ---- */
+.panel .phead h3{color:#34D399;text-shadow:0 0 14px rgba(52,211,153,.55)}
+.ps li.cur .st{color:#38BDF8;border-color:rgba(56,189,248,.6);background:rgba(56,189,248,.1)}
+.ps li.cur .st::before{color:#38BDF8}
+.pillbtn.sec{border-color:rgba(16,185,129,.6);color:#34D399}
+.pillbtn.sec:hover:not(:disabled),.pillbtn.sec:focus-visible{background:rgba(16,185,129,.1);box-shadow:0 0 15px rgba(16,185,129,.3);border-color:#34D399}
+.vghead{justify-content:flex-start;align-items:center;flex-wrap:wrap;gap:14px 18px}
+.vghead .pillbtn{box-shadow:0 0 12px rgba(52,211,153,.3)}
+.shead{margin-bottom:22px}
+.vgbox{margin-top:0}
+.vgb b{color:#fff;font-weight:700}
+.vgbox .gcall{border-color:rgba(56,189,248,.55);background:rgba(56,189,248,.08);box-shadow:0 0 12px rgba(56,189,248,.12)}
+@media (max-width:640px){.vghead{flex-direction:row;justify-content:center;text-align:center}.vghead .pillbtn{align-self:auto}}
 #printRoot{display:none}
 @media print{
   body.printing > *:not(#printRoot){display:none !important}
@@ -501,17 +514,15 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
         </div>
         <span class="vbadge" id="pMeta">Village of Holmen, Wisconsin</span>
       </div>
-      <h2 class="mtitle">Municipal Onboarding</h2>
       <div class="pane" id="p1">
-        <div class="howrow"><button type="button" class="elink" id="openGrant">How is this $0?</button></div>
         <div class="cardx vgbox">
           <div class="vghead">
             <h2 class="vgt">VERIFY PRE-FILLED LWMMI LOSS CONTROL GRANT</h2>
             <button type="button" class="pillbtn sec" id="openVG">View Grant</button>
           </div>
           <ul class="vgb">
-            <li id="vgL1">CITIXEN UX™ has pre-filled the application for this onboarding workflow.</li>
-            <li id="vgL2">Upon approval, LWMMI grant funds offset the annual software fee 1:1 at $0 net municipal cost.</li>
+            <li id="vgL1"><b>Automated Grant Claim Processing:</b> Pre-fills application fields and routes the request directly to LWMMI for 1:1 software offset.</li>
+            <li id="vgL2"><b>Guaranteed $0 Net Municipal Cost:</b> Fully covered under the LWMMI Loss Control Grant with zero out-of-pocket budget impact.</li>
           </ul>
           <hr class="vgsep">
           <h2 class="vgt vgeq" id="vgEq">$9,500 Platform Value - $9,500 Grant = $0 Net Out-of-Pocket Municipal Costs</h2>
@@ -591,18 +602,6 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
     <div class="ln2"><span>Status</span><b style="white-space:normal;text-align:right;color:#FFD98A">Pre-filled · pending LWMMI approval · not submitted</b></div>
     <p class="fine">If LWMMI approves, the credit offsets the annual software fee 1:1. If funds are not disbursed to the Village within 60 days, the agreement ends and the Village owes $0 (as written in the draft agreement).</p>
     <button type="button" class="bigbtn" id="vgDone">Close</button>
-  </div>
-</div>
-
-<div class="ov2" id="grOv">
-  <div class="gl brief grantm" role="dialog" aria-modal="true" aria-labelledby="grT">
-    <div class="sh-h"><h2 id="grT" tabindex="-1"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>How the $0.00 Net Cost Works</h2><button type="button" class="x" id="grX" aria-label="Close">✕</button></div>
-    <h3>1. LWMMI Loss Control Grant</h3>
-    <p>Your insurer, LWMMI, offers a Loss Control Grant toward loss-mitigation tools that help a municipality manage its liability exposure, including notice-of-claim exposure under Wis. Stat. § 893.80. This preview uses a sample figure of up to $9,500 per year. Actual grant terms are LWMMI’s.</p>
-    <h3>2. Pre-Filled Grant Credit</h3>
-    <p>CITIXEN UX™ pre-fills the grant application during onboarding. If LWMMI approves it, the credit offsets the annual software fee 1:1.</p>
-    <div class="callout"><b>Zero-Risk Guarantee:</b> If grant funds are not disbursed to the village within 60 days, the agreement automatically terminates and the Village owes $0.00.<small>As written in the draft agreement. attorney review recommended (optional).</small></div>
-    <button type="button" class="bigbtn" id="grDone">Got it, back to onboarding</button>
   </div>
 </div>
 
@@ -1219,12 +1218,6 @@ $('d2X').addEventListener('click', closeComplete);
 $('d2Dl').addEventListener('click', downloadPacket);
 $('ov2').addEventListener('click', function (e) { if (e.target === $('ov2')) closeComplete(); });
 /* ---------- Step 1: "How is this $0?" explainer ---------- */
-function openGrant(){ lastFocus = document.activeElement; $('grOv').classList.add('on'); $('grDone').focus(); }
-function closeGrant(){ $('grOv').classList.remove('on'); if (lastFocus && lastFocus.focus) lastFocus.focus(); }
-$('openGrant').addEventListener('click', openGrant);
-$('grX').addEventListener('click', closeGrant);
-$('grDone').addEventListener('click', closeGrant);
-$('grOv').addEventListener('click', function (e) { if (e.target === $('grOv')) closeGrant(); });
 function openVG(){ lastFocus = document.activeElement; $('vgOv').classList.add('on'); $('vgDone').focus(); }
 function closeVG(){ $('vgOv').classList.remove('on'); if (lastFocus && lastFocus.focus) lastFocus.focus(); }
 $('openVG').addEventListener('click', openVG);
@@ -1246,7 +1239,6 @@ document.addEventListener('keydown', function (e) {
   if (e.key !== 'Escape') return;
   $('tipW').classList.remove('on'); $('tipW').classList.add('off'); $('tipB').blur();
   if ($('vgOv').classList.contains('on')) { closeVG(); return; }
-  if ($('grOv').classList.contains('on')) { closeGrant(); return; }
   if ($('brOv').classList.contains('on')) { closeBrief(); return; }
   if ($('ov2').classList.contains('on')) closeComplete(); else if ($('shOv').classList.contains('on')) closeSheet();
 });
