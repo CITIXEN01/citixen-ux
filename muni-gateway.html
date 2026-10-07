@@ -529,6 +529,11 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
 .abn [id=brChip]{margin-top:10px}
 .abn>div:last-child:has(#brChip:not([hidden])){margin-top:10px}
 #p2 .gcall.abn{margin-top:14px}
+/* ---- v14: single-row addendum banner ---- */
+#p2 .gcall.abn{display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:14px;padding:12px 16px;text-align:left}
+#p2 .abn .gct{margin:0;text-align:left;font-size:15px}
+#p2 .abn .pillbtn{margin:0;flex:none;padding:7px 20px;box-shadow:0 0 12px rgba(52,211,153,.3)}
+@media (max-width:640px){#p2 .gcall.abn{flex-direction:column;text-align:center}#p2 .abn .gct{text-align:center}}
 #printRoot{display:none}
 @media print{
   body.printing > *:not(#printRoot){display:none !important}
@@ -594,9 +599,9 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
           <div class="gcall abn" role="note">
             <h3 class="gct">Village attorney review is optional but recommended.</h3>
             <button type="button" class="pillbtn sec" id="openSheet">Preview Attorney Email</button>
-            <div><span class="chip" id="brChip" hidden></span></div>
           </div>
-          <div class="acts2 end"><button type="button" class="pillbtn" id="c2">Dispatch to Counsel (Optional) →</button></div>
+          <div class="acts2 ctr" style="margin-top:10px"><span class="chip" id="brChip" hidden></span></div>
+          <div class="acts2 end"><button type="button" class="pillbtn" id="c2">Continue to E-Signature →</button></div>
         </div>
         <p class="pv">CITIXEN UX is a record keeping tool, not legal advice. It does not itself confer immunity or establish a statutory defense.</p>
       </div>
@@ -1115,9 +1120,7 @@ function clampedStep(){
 }
 $('c1').addEventListener('click', function () { P.done[0] = true; portalGo(2); });
 $('c2').addEventListener('click', function () {
-  /* non-blocking: record a simulated dispatch, then advance immediately (no waiting on counsel) */
-  P.br.at = stamp(); P.br.status = 'fyi'; P.br.mode = 'fyi';
-  var n = $('dispNote'); n.hidden = false; n.textContent = 'Magic link to counsel queued in background (preview: no email was sent) · ' + P.br.at;
+  /* never gated on counsel: advance immediately; any attorney dispatch is done (optionally) from the preview sheet */
   P.done[1] = true; portalGo(3);
 });
 Array.prototype.forEach.call($('ps').querySelectorAll('.pb'), function (b){ b.addEventListener('click', function () { portalGo(+b.getAttribute('data-step')); }); });
@@ -1150,6 +1153,7 @@ function syncBrief(){
   var st = P.br.status, chip = $('brChip');
   chip.hidden = st === 'none'; chip.className = 'chip' + (st === 'paused' ? ' warn' : '');
   chip.textContent = st === 'fyi' ? 'FYI Notice dispatched (preview) · ' + P.br.at : st === 'paused' ? 'Paused: awaiting attorney acknowledgement (preview)' : st === 'ack' ? 'Attorney acknowledged (simulated) · ' + P.br.at : '';
+  var dn = $('dispNote'); dn.hidden = st === 'none'; dn.textContent = st === 'none' ? '' : 'Attorney email marked as dispatched (preview: no email was sent) · ' + P.br.at;
   var s2 = $('shStatus'); s2.className = 'status' + (st === 'paused' ? ' pz' : '');
   s2.textContent = st === 'fyi' ? '✓ FYI Notice marked as dispatched (preview only; no email was sent). ' + P.br.at : st === 'paused' ? '⏸ Onboarding paused. Waiting for the attorney’s magic-link acknowledgement (preview only; no link was created).' : st === 'ack' ? '✓ Acknowledged (simulated). Onboarding can continue. ' + P.br.at : '';
   $('shAck').hidden = st !== 'paused';
