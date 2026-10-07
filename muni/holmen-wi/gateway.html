@@ -556,7 +556,7 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
 .subt{padding:16px 18px;border:1px solid rgba(56,189,248,.4);border-radius:12px;background:rgba(15,23,42,.6);min-width:0}
 .subt h3{margin:0 0 10px;font:700 12px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:#38BDF8}
 .kv{padding:8px 0;border-bottom:1px solid rgba(51,65,85,.6)}
-.kv:last-of-type{border-bottom:0}
+.subt .kv:nth-of-type(3){border-bottom:0}
 .kv span{display:block;font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:#64748B}
 .kv b{display:block;margin-top:2px;font:600 14px/1.45 var(--sans);color:#fff;white-space:normal}
 .kv b.em{color:#34D399}
@@ -568,6 +568,23 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
 #p3 .pv{margin-top:16px}
 #p3 .vgbox h1.vgt{font-size:14px;letter-spacing:.06em}
 @media (max-width:760px){.dual{grid-template-columns:1fr}}
+/* ---- v18: attorney follow-up reminders ---- */
+.fuchk{display:flex;align-items:center;gap:10px;margin:14px 0 0;padding:10px 12px;border:1px solid rgba(56,189,248,.4);border-radius:10px;background:rgba(56,189,248,.06);font:500 13px/1.4 var(--sans);color:#E2E8F0;cursor:pointer}
+.fuchk input{width:18px;height:18px;accent-color:#34D399;flex:none}
+.pend{margin:12px 0 4px;padding-top:12px;border-top:1px solid rgba(51,65,85,.6)}
+.pbadge{display:inline-block;padding:4px 10px;border-radius:9999px;border:1px solid rgba(56,189,248,.45);background:rgba(56,189,248,.08);color:#7DD3FC;font:700 10.5px/1.4 ui-monospace,"JetBrains Mono",Menlo,monospace;letter-spacing:.06em}
+.plinks{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px}
+.lnk{background:none;border:0;padding:0;color:#34D399;font:600 12.5px var(--sans);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.lnk:hover,.lnk:focus-visible{color:#6EE7B7;outline:none}
+.fued{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;font:500 12.5px var(--sans);color:#94A3B8}
+.fued input{background:#0B0F17;color:#E2E8F0;border:1px solid #334155;border-radius:8px;padding:5px 8px;font:500 13px var(--sans);color-scheme:dark}
+.pfine{margin:8px 0 0;font:400 11.5px/1.5 var(--sans);color:#64748B}
+.pillbtn.ghost{background:transparent;border-color:rgba(148,163,184,.45);color:#CBD5E1;box-shadow:none;letter-spacing:.06em}
+.pillbtn.ghost:hover:not(:disabled),.pillbtn.ghost:focus-visible{background:rgba(148,163,184,.1);box-shadow:none}
+#p3 .acts2.end{gap:12px}
+.savem{width:min(520px,100%);padding:26px 28px}
+.savem .lead{margin:12px 0}
+@media (max-width:640px){#p3 .acts2.end{justify-content:center}}
 #printRoot{display:none}
 @media print{
   body.printing > *:not(#printRoot){display:none !important}
@@ -652,6 +669,12 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
               <div class="kv"><span>Parties</span><b id="m1">Citixen UX · Village of Holmen, WI</b></div>
               <div class="kv"><span>Platform Value</span><b id="m2">$9,500/yr</b></div>
               <div class="kv"><span>Funding</span><b class="em" id="m3">-$9,500 (LWMMI Loss Control Grant credit - pending execution)</b></div>
+              <div class="pend" id="pend" hidden>
+                <span class="pbadge" id="pbadge"></span>
+                <div class="plinks"><button type="button" class="lnk" id="fuNow">Send Reminder Now</button><button type="button" class="lnk" id="fuEdit">Edit Follow-Up Date</button></div>
+                <div class="fued" id="fuEdBox" hidden><label for="fuDate">Follow-up date</label><input type="date" id="fuDate"><button type="button" class="lnk" id="fuSave">Save</button></div>
+                <p class="pfine" id="fuMsg" role="status" aria-live="polite"></p>
+              </div>
               <p class="fine">Citixen UX draft · not an official LWMMI form.</p>
             </section>
             <section class="subt" aria-labelledby="verT">
@@ -674,7 +697,7 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
           <div class="sgbox" id="sgBox"><div class="sgty ph" id="sgTy">Your signature</div><canvas id="sgCv" width="720" height="264" hidden aria-label="Draw your signature"></canvas><button type="button" class="sgclr" id="sgClr" hidden>Clear</button></div>
           <label class="attest2"><input type="checkbox" id="patt"><span id="pattT"></span></label>
           <p class="errl" id="perr" role="alert"></p>
-          <div class="acts2 end"><button type="button" class="pillbtn" id="c3" disabled>Sign &amp; Execute Agreement →</button></div>
+          <div class="acts2 end"><button type="button" class="pillbtn ghost" id="saveExit">Save &amp; Exit</button><button type="button" class="pillbtn" id="c3" disabled>Sign &amp; Execute Agreement →</button></div>
         </div>
         </div>
         <div class="signed" id="signedBox" hidden></div>
@@ -745,6 +768,15 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
   </div>
 </div>
 
+<div class="ov2" id="saveOv">
+  <div class="gl brief savem" role="dialog" aria-modal="true" aria-labelledby="svT">
+    <div class="sh-h"><h2 id="svT" tabindex="-1">Progress saved</h2><button type="button" class="x" id="svX" aria-label="Close">✕</button></div>
+    <p class="lead" id="svP"></p>
+    <div class="note" id="svN"></div>
+    <div class="acts2 ctr"><button type="button" class="pillbtn" id="svBack">Resume onboarding</button><a class="pillbtn sec" href="/app" id="svExit">Exit to CITIXEN</a></div>
+  </div>
+</div>
+
 <div class="ov2" id="docOv">
   <div class="gl docm" role="dialog" aria-modal="true" aria-label="Full draft: LWMMI Loss Control Grant Application">
     <div class="docm-h"><span>Draft preview · in-page · nothing is sent or filed</span><button type="button" class="x" id="docX" aria-label="Close draft">✕</button></div>
@@ -759,8 +791,9 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
     <span class="fynb" id="oA" tabindex="-1">FYI NOTICE</span>
     <p class="lead" id="optDesc"></p>
     <pre class="draft" id="draft"></pre>
-    <div class="note">Preview build: no email is sent and no magic link is created. This shows the states the real flow will have.</div>
+    <div class="note">Preview build: no email is sent, no magic link is created and no reminder is actually scheduled. This shows the states the real flow will have.</div>
     <div class="status" id="shStatus" role="status" aria-live="polite"></div>
+    <label class="fuchk"><input type="checkbox" id="fuChk" checked><span>Schedule automatic email reminder to attorney if unreviewed in 7 days</span></label>
     <div class="acts2"><button type="button" class="pillbtn" id="shGo">Send Message</button></div>
   </div>
 </div>
@@ -1121,7 +1154,7 @@ $('stay').addEventListener('click', function () { clearInterval(timer); $('cd').
 document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && $('ov').classList.contains('on') && !$('stay').hidden) $('stay').click(); });
 
 /* ---------- onboarding portal (screen 2) ---------- */
-var P = {done: [false, false, false], step: 1, br: {mode: 'fyi', status: 'none'}, sig: {mode: 'type', drawn: false}, signed: null};
+var P = {done: [false, false, false], step: 1, fu: null, br: {mode: 'fyi', status: 'none'}, sig: {mode: 'type', drawn: false}, signed: null};
 var HASHES = ['#welcome', '#brief', '#sign'];
 var CHECK = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 10.5l3.6 3.6 7.4-8"/></svg>';
 function stepFromHash(){ var i = HASHES.indexOf(location.hash); return i < 0 ? 1 : i + 1; }
@@ -1210,20 +1243,68 @@ function setOption(m){
   $('draft').textContent = draftText(m);
 }
 function stamp(){ return new Date().toLocaleString('en-US', {dateStyle: 'medium', timeStyle: 'short'}); }
+function fuLabel(){ return P.fu ? new Date(P.fu.due).toLocaleDateString('en-US', {month: 'short', day: 'numeric'}).toUpperCase() : ''; }
+function fuDays(){ return Math.max(1, Math.round((new Date(P.fu.due) - new Date(P.fu.sent)) / 864e5)); }
 function syncBrief(){
   var st = P.br.status, chip = $('brChip');
-  chip.hidden = st === 'none'; chip.className = 'chip' + (st === 'paused' ? ' warn' : '');
-  chip.textContent = st === 'fyi' ? 'FYI notice marked as sent · ' + P.br.at : st === 'paused' ? 'Paused: awaiting attorney acknowledgement (preview)' : st === 'ack' ? 'Attorney acknowledged (simulated) · ' + P.br.at : '';
-  var s2 = $('shStatus'); s2.className = 'status' + (st === 'paused' ? ' pz' : '');
-  s2.textContent = st === 'fyi' ? '✓ FYI notice marked as sent · ' + P.br.at : st === 'paused' ? '⏸ Onboarding paused. Waiting for the attorney’s magic-link acknowledgement (preview only; no link was created).' : st === 'ack' ? '✓ Acknowledged (simulated). Onboarding can continue. ' + P.br.at : '';
-  $('shGo').hidden = st === 'paused';
+  var sent = 'FYI notice sent' + (P.fu ? ' · Auto-reminder scheduled for ' + fuDays() + ' days' : '');
+  chip.hidden = st === 'none'; chip.className = 'chip';
+  chip.textContent = st === 'fyi' ? sent : '';
+  var s2 = $('shStatus'); s2.className = 'status';
+  s2.textContent = st === 'fyi' ? '✓ ' + sent : '';
+  $('shGo').hidden = false;
+  var pend = $('pend'), show = st === 'fyi' && !!P.fu && !P.signed;
+  pend.hidden = !show;
+  if (show) $('pbadge').textContent = 'ATTORNEY REVIEW PENDING · AUTO-REMINDER SCHEDULED FOR ' + fuLabel();
+  var se = $('saveExit'); if (se) se.textContent = P.fu && st === 'fyi' ? 'Save & Exit (Auto-Reminder Active)' : 'Save & Exit';
 }
 function openSheet(){ lastFocus = document.activeElement; $('shOv').classList.add('on'); syncBrief(); $('oA').focus(); }
 function closeSheet(){ $('shOv').classList.remove('on'); if (lastFocus && lastFocus.focus) lastFocus.focus(); }
 $('openSheet').addEventListener('click', openSheet);
 $('shX').addEventListener('click', closeSheet);
 $('shOv').addEventListener('click', function (e) { if (e.target === $('shOv')) closeSheet(); });
-$('shGo').addEventListener('click', function () { P.br.at = stamp(); P.br.status = P.br.optMode === 'fyi' ? 'fyi' : 'paused'; P.br.mode = P.br.optMode; syncBrief(); });
+$('shGo').addEventListener('click', function () {
+  P.br.at = stamp(); P.br.status = 'fyi'; P.br.mode = 'fyi';
+  var now = new Date(), due = new Date(now.getTime() + 7 * 864e5);
+  P.fu = $('fuChk').checked ? {sent: now.toISOString(), due: due.toISOString()} : null;
+  syncBrief();
+});
+
+/* --- attorney follow-up reminders (preview: nothing is scheduled or sent; state is kept in this browser only) --- */
+function ymd(d){ var z = new Date(d); return z.getFullYear() + '-' + ('0' + (z.getMonth() + 1)).slice(-2) + '-' + ('0' + z.getDate()).slice(-2); }
+$('fuNow').addEventListener('click', function () { $('fuMsg').textContent = 'Reminder re-sent · ' + stamp() + ' (preview: no email was sent)'; });
+$('fuEdit').addEventListener('click', function () {
+  var box = $('fuEdBox'); box.hidden = !box.hidden;
+  if (!box.hidden){ var min = new Date(Date.now() + 864e5); $('fuDate').min = ymd(min); $('fuDate').value = ymd(P.fu.due); $('fuDate').focus(); }
+});
+$('fuSave').addEventListener('click', function () {
+  var v = $('fuDate').value, d = v ? new Date(v + 'T09:00:00') : null;
+  if (!d || isNaN(d) || d <= new Date()){ $('fuMsg').textContent = 'Pick a date after today.'; return; }
+  P.fu.due = d.toISOString(); $('fuEdBox').hidden = true; syncBrief();
+  $('fuMsg').textContent = 'Follow-up date updated to ' + fuLabel() + ' (preview: nothing is scheduled)';
+});
+var SAVE_KEY = function () { return 'citixen_onboarding_' + (T && T.slug); };
+function restoreSaved(){
+  if (!T || !OB) return;
+  try {
+    var raw = localStorage.getItem(SAVE_KEY()); if (!raw) return;
+    var d = JSON.parse(raw); if (!d || !d.done || d.done.length !== 3) return;
+    P.done = [!!d.done[0], !!d.done[1], false]; P.step = Math.min(3, Math.max(1, +d.step || 1));
+    if (d.br && d.br.status === 'fyi'){ P.br.status = 'fyi'; P.br.at = d.br.at || ''; }
+    if (d.fu && d.fu.due && d.fu.sent) P.fu = {due: d.fu.due, sent: d.fu.sent};
+  } catch (e) {}
+}
+function openSave(){
+  lastFocus = document.activeElement;
+  try { localStorage.setItem(SAVE_KEY(), JSON.stringify({done: P.done, step: P.step, br: {status: P.br.status, at: P.br.at}, fu: P.fu || null})); $('svT').textContent = 'Progress saved'; $('svP').textContent = 'Your onboarding is saved on this device and paused at e-signature. The signature itself is not saved. Reopen this page on this device to pick up here.'; }
+  catch (e) { $('svT').textContent = 'Could not save'; $('svP').textContent = 'This browser blocked local storage, so progress was not saved. You can still keep this tab open.'; }
+  $('svN').textContent = P.fu && P.br.status === 'fyi' ? 'Attorney auto-reminder: ' + fuLabel() + '. Preview build: no email was sent and no reminder is actually scheduled.' : 'Preview build: nothing was sent or scheduled.';
+  $('saveOv').classList.add('on'); $('svT').focus();
+}
+function closeSave(){ $('saveOv').classList.remove('on'); if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('saveExit').addEventListener('click', openSave);
+$('svX').addEventListener('click', closeSave); $('svBack').addEventListener('click', closeSave);
+$('saveOv').addEventListener('click', function (e) { if (e.target === $('saveOv')) closeSave(); });
 
 /* --- step 3: sign & submit --- */
 var cv = $('sgCv'), cx = cv.getContext('2d'), drawing = false;
@@ -1345,6 +1426,7 @@ document.addEventListener('click', function (e) { if (!$('tipW').contains(e.targ
 document.addEventListener('keydown', function (e) {
   if (e.key !== 'Escape') return;
   $('tipW').classList.remove('on'); $('tipW').classList.add('off'); $('tipB').blur();
+  if ($('saveOv').classList.contains('on')) { closeSave(); return; }
   if ($('docOv').classList.contains('on')) { closeDoc(); return; }
   if ($('vgOv').classList.contains('on')) { closeVG(); return; }
   if ($('brOv').classList.contains('on')) { closeBrief(); return; }
@@ -1380,6 +1462,7 @@ $('beginBtn').addEventListener('click', function (e) { e.stopPropagation(); nav(
 document.addEventListener('keydown', function (e) { if (curScr === 1 && (e.key === 'Enter' || e.key === ' ') && !e.defaultPrevented){ e.preventDefault(); nav(2); } });
 
 boot();
+restoreSaved();
 showScreen(fromHash());
 })();
 </script>
