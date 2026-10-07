@@ -246,6 +246,14 @@ html{background:#05070C}
 .ps li.done .st{color:#0B0F17;border-color:#34D399;background:#34D399;box-shadow:0 0 10px rgba(52,211,153,.45)}
 .ps li.done .st::before{content:"✓ COMPLETED"}
 @media (max-width:640px){.shead{justify-content:center;text-align:center}.howz{position:static;display:block;margin:0 auto 10px}}
+/* ---- v5 ---- */
+.panel .phead h3{font:700 18px/1.3 ui-monospace,"JetBrains Mono",Menlo,monospace;letter-spacing:.14em;color:#38BDF8}
+.shead{align-items:flex-start}
+.shead .wl{min-width:0;flex:1 1 320px}
+.wsub{margin:6px 0 0;max-width:640px;font:400 14px/1.5 var(--sans);color:#94A3B8}
+.portal .ps .cur .bd{box-shadow:0 0 6px rgba(56,189,248,.25)}
+.portal .tx,.portal .tx b,.portal .tx small{text-align:center}
+@media (max-width:640px){.shead .wl{text-align:center}.wsub{margin-left:auto;margin-right:auto}.panel .phead h3{font-size:14px}}
 .expl{margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border:1px solid rgba(51,65,85,.6);border-radius:10px;background:rgba(15,23,42,.6)}
 .expl .ei{color:#22D3EE;display:flex;flex:none}.expl .et{flex:1 1 220px;min-width:0;font:400 13px/1.5 var(--sans);color:#94A3B8}
 .elink{flex:none;background:transparent;border:1px solid rgba(34,211,238,.55);color:#22D3EE;border-radius:9999px;padding:5px 14px;font:600 12.5px/1.4 var(--sans);cursor:pointer;transition:.2s}
@@ -457,12 +465,14 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
   <div class="portal">
     <section class="gl stage" id="stage" aria-label="Onboarding step">
       <div class="shead">
-        <div class="wt" id="wTitle" role="heading" aria-level="1" tabindex="-1">Welcome!</div>
+        <div class="wl">
+          <div class="wt" id="wTitle" role="heading" aria-level="1" tabindex="-1">Welcome!</div>
+          <p class="wsub" id="wSub">Review and approve the pre-allocated LWMMI Loss Control Grant to activate CITIXEN UX™ for the Village of Holmen at $0 net cost.</p>
+        </div>
         <span class="vbadge" id="pMeta">Village of Holmen, Wisconsin</span>
       </div>
       <h2 class="mtitle">Municipal Onboarding</h2>
       <div class="pane" id="p1">
-        <p class="lead ctr1">Complete your CITIXEN UX onboarding in less than 5 minutes.</p>
         <div class="cardx vgbox">
           <button type="button" class="elink howz" id="openGrant">How is this $0?</button>
           <h2 class="vgt">VERIFY PRE-FILLED LWMMI LOSS CONTROL GRANT</h2>
@@ -524,11 +534,11 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
     </section>
 
     <aside class="gl panel" aria-label="Onboarding progress">
-      <div class="phead"><h3>5 Min Onboarding Timeline</h3></div>
+      <div class="phead"><h3>5 MIN. ONBOARDING TIMELINE</h3></div>
       <ol class="ps" id="ps">
-        <li><button type="button" class="pb" data-step="1"><span class="bd"></span><span class="tx"><b>Grant Offset Validation</b><small>Verify pre-filled $9,500 LWMMI Loss Control Grant for $0 net village cost.</small><i class="st"></i></span></button></li>
-        <li><button type="button" class="pb" data-step="2"><span class="bd"></span><span class="tx"><b>Wis. Stat. § 893.80 Defense</b><small>1-click legal brief review and attorney dispatch modal.</small><i class="st"></i></span></button></li>
-        <li><button type="button" class="pb" data-step="3"><span class="bd"></span><span class="tx"><b>e-Signature</b><small>Digital execution of MSA and automatic submission of the $9,500 grant.</small><i class="st"></i></span></button></li>
+        <li><button type="button" class="pb" data-step="1"><span class="bd"></span><span class="tx"><b>Grant Offset Validation</b><small>Verify LWMMI Loss Control Grant (pre-filled)</small><i class="st"></i></span></button></li>
+        <li><button type="button" class="pb" data-step="2"><span class="bd"></span><span class="tx"><b>Wis. Stat. § 893.80</b><small>1-Click Legal Brief &amp; Attorney Dispatch</small><i class="st"></i></span></button></li>
+        <li><button type="button" class="pb" data-step="3"><span class="bd"></span><span class="tx"><b>e-Signature</b><small>Execution of MSA &amp; Auto-Grant Submission</small><i class="st"></i></span></button></li>
       </ol>
     </aside>
   </div>
@@ -974,6 +984,7 @@ function fillPortal(){
   $('m1').textContent = 'Citixen UX · ' + OB.entity + ', ' + OB.state;
   $('m2').textContent = money(OB.platformValue).replace('.00', '') + '/yr';
   $('m3').textContent = '−' + money(OB.grantCredit).replace('.00', '');
+  $('wSub').textContent = 'Review and approve the pre-allocated LWMMI Loss Control Grant to activate CITIXEN UX™ for the ' + OB.entity + ' at ' + money(Math.max(0, OB.platformValue - OB.grantCredit)).replace('.00', '') + ' net cost.';
   var STN = {WI: 'Wisconsin', TX: 'Texas', MN: 'Minnesota', IA: 'Iowa', IL: 'Illinois'};
   $('pMeta').textContent = OB.entity + ', ' + (STN[OB.state] || OB.state);
   var at = attorney();
