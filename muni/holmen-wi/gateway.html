@@ -556,7 +556,7 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
 .subt{padding:16px 18px;border:1px solid rgba(56,189,248,.4);border-radius:12px;background:rgba(15,23,42,.6);min-width:0}
 .subt h3{margin:0 0 10px;font:700 12px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:#38BDF8}
 .kv{padding:8px 0;border-bottom:1px solid rgba(51,65,85,.6)}
-.subt .kv:nth-of-type(3){border-bottom:0}
+.subt .kv:nth-of-type(4){border-bottom:0}
 .kv span{display:block;font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:#64748B}
 .kv b{display:block;margin-top:2px;font:600 14px/1.45 var(--sans);color:#fff;white-space:normal}
 .kv b.em{color:#34D399}
@@ -585,6 +585,20 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
 .savem{width:min(520px,100%);padding:26px 28px}
 .savem .lead{margin:12px 0}
 @media (max-width:640px){#p3 .acts2.end{justify-content:center}}
+
+/* v19: modal button continuity, Step 2 status chip top-left, Step 3 math rows */
+.ov2 .pillbtn,.sh-ov .pillbtn,.gl .acts2 .pillbtn.sec{padding:8px 24px}
+.pillbtn.sec.cy{border-color:rgba(56,189,248,.55);color:#38BDF8}
+.pillbtn.sec.cy:hover:not(:disabled),.pillbtn.sec.cy:focus-visible{background:rgba(56,189,248,.1);box-shadow:0 0 14px rgba(56,189,248,.25);border-color:#38BDF8}
+.shead.min{justify-content:space-between;align-items:center}
+.shead:not(.min) #brChip{display:none}
+.shead.min #pMeta{margin-left:auto}
+.shead.min{margin-bottom:12px}
+#brChip{order:-1;font:500 12px/1.2 ui-monospace,"JetBrains Mono",Menlo,monospace;padding:4px 12px;border-color:#38BDF8;color:#38BDF8;background:rgba(56,189,248,.1);margin-right:auto}
+#brChip[hidden]{display:none!important}
+.kv.net b{color:#34D399;font-weight:800;font-size:15px;text-shadow:0 0 12px rgba(52,211,153,.55)}
+.kv.net{border-bottom:0}
+@media (max-width:640px){.shead.min{flex-direction:column;gap:8px}#brChip{margin:0}.shead.min #pMeta{margin-left:0}}
 #printRoot{display:none}
 @media print{
   body.printing > *:not(#printRoot){display:none !important}
@@ -615,6 +629,7 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
   <div class="portal">
     <section class="gl stage" id="stage" aria-label="Onboarding step">
       <div class="shead">
+        <span class="chip" id="brChip" role="status" aria-live="polite" hidden></span>
         <div class="wl">
           <div class="wt" id="wTitle" role="heading" aria-level="1" tabindex="-1">Welcome!</div>
           <p class="wsub" id="wSub">Review and approve the pre-allocated LWMMI Loss Control Grant to activate CITIXEN UX™ for the Village of Holmen at $0 net cost.</p>
@@ -651,8 +666,7 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
             <h3 class="gct">Village attorney review is optional but recommended.</h3>
             <button type="button" class="pillbtn sec" id="openSheet">Preview Attorney Email</button>
           </div>
-          <div class="acts2 ctr" style="margin-top:10px"><span class="chip" id="brChip" hidden></span></div>
-          <div class="acts2 end"><button type="button" class="pillbtn" id="c2">Continue to E-Signature →</button></div>
+                    <div class="acts2 end"><button type="button" class="pillbtn" id="c2">Continue to E-Signature →</button></div>
         </div>
         <p class="pv">CITIXEN UX is a record keeping tool, not legal advice. It does not itself confer immunity or establish a statutory defense.</p>
       </div>
@@ -668,7 +682,8 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
               <h3 id="sumT">Pre-filled agreement summary</h3>
               <div class="kv"><span>Parties</span><b id="m1">Citixen UX · Village of Holmen, WI</b></div>
               <div class="kv"><span>Platform Value</span><b id="m2">$9,500/yr</b></div>
-              <div class="kv"><span>Funding</span><b class="em" id="m3">-$9,500 (LWMMI Loss Control Grant credit - pending execution)</b></div>
+              <div class="kv"><span>Grant Credit</span><b class="em" id="m3">-$9,500 (LWMMI Loss Control Grant credit)</b></div>
+              <div class="kv net"><span>Net Municipal Cost</span><b id="m4">$0.00 Net Municipal Out-of-Pocket Cost</b></div>
               <div class="pend" id="pend" hidden>
                 <span class="pbadge" id="pbadge"></span>
                 <div class="plinks"><button type="button" class="lnk" id="fuNow">Send Reminder Now</button><button type="button" class="lnk" id="fuEdit">Edit Follow-Up Date</button></div>
@@ -729,7 +744,7 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
     <div class="ln2"><span>Use of funds</span><b style="white-space:normal;text-align:right">CITIXEN UX statutory notice platform (annual)</b></div>
     <div class="ln2"><span>Status</span><b style="white-space:normal;text-align:right;color:#FFD98A">Pre-filled · pending LWMMI approval · not submitted</b></div>
     <p class="fine">If LWMMI approves, the credit offsets the annual software fee 1:1. If funds are not disbursed to the Village within 60 days, the agreement ends and the Village owes $0 (as written in the draft agreement).</p>
-    <button type="button" class="bigbtn" id="vgDone">Close</button>
+    <div class="acts2 ctr" style="margin-top:20px"><button type="button" class="pillbtn sec" id="vgDone">Close</button></div>
   </div>
 </div>
 
@@ -764,7 +779,7 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
       <li>It does not serve or receive statutory notices for the Village, decide whether a claim is valid, or show who made an edit.</li>
     </ul>
     <p class="src">Plain-language summary for orientation only; the statute as currently in force controls. Village Attorney review is recommended. Preview build: sample data.</p>
-    <div class="acts2 ctr"><button type="button" class="pillbtn" id="brClose">Close</button></div>
+    <div class="acts2 ctr"><button type="button" class="pillbtn sec" id="brClose">Close</button></div>
   </div>
 </div>
 
@@ -773,7 +788,7 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
     <div class="sh-h"><h2 id="svT" tabindex="-1">Progress saved</h2><button type="button" class="x" id="svX" aria-label="Close">✕</button></div>
     <p class="lead" id="svP"></p>
     <div class="note" id="svN"></div>
-    <div class="acts2 ctr"><button type="button" class="pillbtn" id="svBack">Resume onboarding</button><a class="pillbtn sec" href="/app" id="svExit">Exit to CITIXEN</a></div>
+    <div class="acts2 ctr"><button type="button" class="pillbtn sec" id="svBack">Resume onboarding</button><a class="pillbtn sec" href="/app" id="svExit">Exit to CITIXEN</a></div>
   </div>
 </div>
 
@@ -794,7 +809,7 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
     <div class="note">Preview build: no email is sent, no magic link is created and no reminder is actually scheduled. This shows the states the real flow will have.</div>
     <div class="status" id="shStatus" role="status" aria-live="polite"></div>
     <label class="fuchk"><input type="checkbox" id="fuChk" checked><span>Schedule automatic email reminder to attorney if unreviewed in 7 days</span></label>
-    <div class="acts2"><button type="button" class="pillbtn" id="shGo">Send Message</button></div>
+    <div class="acts2"><button type="button" class="pillbtn sec" id="shGo">Send Message</button></div>
   </div>
 </div>
 
@@ -806,7 +821,7 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
     <div class="pk" id="d2Pk"></div>
     <div class="note" id="d2W" style="text-align:left"></div>
     <div class="fp" id="d2Fp"></div>
-    <div class="row"><button type="button" class="pillbtn" id="d2Dl">Download packet</button><a class="pillbtn sec" id="d2Go" href="/muni">Go to command center</a><button type="button" class="pillbtn sec" id="d2X">Close</button></div>
+    <div class="row"><button type="button" class="pillbtn sec" id="d2Dl">Download packet</button><a class="pillbtn sec cy" id="d2Go" href="/muni">Go to command center</a><button type="button" class="pillbtn sec" id="d2X">Close</button></div>
   </div>
 </div>
 
@@ -1169,7 +1184,8 @@ function fillPortal(){
   $('vgA').textContent = OB.entity + ', ' + OB.state; $('vgAmt').textContent = gc0; $('vgP').textContent = OB.policy || '—';
   $('m1').textContent = 'Citixen UX · ' + OB.entity + ', ' + OB.state;
   $('m2').textContent = money(OB.platformValue).replace('.00', '') + '/yr';
-  $('m3').textContent = '-' + money(OB.grantCredit).replace('.00', '') + ' (LWMMI Loss Control Grant credit - pending execution)';
+  $('m3').textContent = '-' + money(OB.grantCredit).replace('.00', '') + ' (LWMMI Loss Control Grant credit)';
+  $('m4').textContent = money(Math.max(0, OB.platformValue - OB.grantCredit)) + ' Net Municipal Out-of-Pocket Cost';
   $('wSub').textContent = 'Review and approve the pre-allocated LWMMI Loss Control Grant to activate CITIXEN UX™ for the ' + OB.entity + ' at ' + money(Math.max(0, OB.platformValue - OB.grantCredit)).replace('.00', '') + ' net cost.';
   var STN = {WI: 'Wisconsin', TX: 'Texas', MN: 'Minnesota', IA: 'Iowa', IL: 'Illinois'};
   $('pMeta').textContent = OB.entity + ', ' + (STN[OB.state] || OB.state);
