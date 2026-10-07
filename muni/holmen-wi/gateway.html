@@ -534,6 +534,8 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
 #p2 .abn .gct{margin:0;text-align:left;font-size:15px}
 #p2 .abn .pillbtn{margin:0;flex:none;padding:7px 20px;box-shadow:0 0 12px rgba(52,211,153,.3)}
 @media (max-width:640px){#p2 .gcall.abn{flex-direction:column;text-align:center}#p2 .abn .gct{text-align:center}}
+/* ---- v15: attorney modal ---- */
+.fynb{display:inline-block;margin-top:14px;padding:4px 12px;border-radius:9999px;border:1px solid rgba(56,189,248,.6);background:rgba(56,189,248,.1);color:#38BDF8;font:700 11px ui-monospace,"JetBrains Mono",Menlo,monospace;letter-spacing:.12em}
 #printRoot{display:none}
 @media print{
   body.printing > *:not(#printRoot){display:none !important}
@@ -703,12 +705,12 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
   <div class="gl sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="shT">
     <div class="sh-h"><h2 id="shT">Attorney review</h2><button type="button" class="x" id="shX" aria-label="Close">×</button></div>
     <p class="lead" id="shWho" style="color:#94A3B8"></p>
-    <div class="seg2" role="group" aria-label="Dispatch option"><button type="button" id="oA" aria-pressed="true">FYI Notice · non-blocking</button></div>
+    <span class="fynb" id="oA" tabindex="-1">FYI NOTICE</span>
     <p class="lead" id="optDesc"></p>
     <pre class="draft" id="draft"></pre>
     <div class="note">Preview build: no email is sent and no magic link is created. This shows the states the real flow will have.</div>
     <div class="status" id="shStatus" role="status" aria-live="polite"></div>
-    <div class="acts2"><button type="button" class="pillbtn" id="shGo">Dispatch (preview)</button><button type="button" class="pillbtn sec" id="shAck" hidden>Simulate attorney acknowledgement</button></div>
+    <div class="acts2"><button type="button" class="pillbtn" id="shGo">Send Message</button></div>
   </div>
 </div>
 
@@ -1133,7 +1135,7 @@ function draftText(mode){
   var at = attorney(), sg = signatory();
   var who = at.name ? at.name : 'Counsel';
   return 'To: ' + (at.name ? at.name + ', ' : '') + (at.title || 'Village Attorney') + ', ' + OB.entity + ', ' + OB.state + '\n' +
-    'Subject: ' + (mode === 'fyi' ? 'FYI: ' : 'Review requested: ') + 'Citixen UX § 893.80 notice-log brief\n\n' +
+    'Subject: FYI: CITIXEN UX § 893.80 Notice-Log Brief\n\n' +
     'Hello ' + who + ',\n\n' +
     (mode === 'fyi'
       ? 'For your information: ' + (sg.name || 'the Village') + ' is onboarding the Village to the Citixen UX notice platform. The § 893.80 notice-log brief is attached for your records. No action is required for onboarding to continue.'
@@ -1142,22 +1144,17 @@ function draftText(mode){
 }
 function setOption(m){
   P.br.optMode = m;
-  $('oA').setAttribute('aria-pressed', m === 'fyi');
-  $('optDesc').textContent = m === 'fyi'
-    ? 'FYI Notice: sends a courtesy copy of the brief to the attorney. Onboarding continues while they review.'
-    : 'Magic Link Pause: onboarding pauses on this step until the attorney opens a one-time link and acknowledges the brief.';
+  $('optDesc').textContent = 'FYI Notice: Sends a courtesy copy of the brief to village counsel. Onboarding continues while they review.';
   $('draft').textContent = draftText(m);
 }
 function stamp(){ return new Date().toLocaleString('en-US', {dateStyle: 'medium', timeStyle: 'short'}); }
 function syncBrief(){
   var st = P.br.status, chip = $('brChip');
   chip.hidden = st === 'none'; chip.className = 'chip' + (st === 'paused' ? ' warn' : '');
-  chip.textContent = st === 'fyi' ? 'FYI Notice dispatched (preview) · ' + P.br.at : st === 'paused' ? 'Paused: awaiting attorney acknowledgement (preview)' : st === 'ack' ? 'Attorney acknowledged (simulated) · ' + P.br.at : '';
-  var dn = $('dispNote'); dn.hidden = st === 'none'; dn.textContent = st === 'none' ? '' : 'Attorney email marked as dispatched (preview: no email was sent) · ' + P.br.at;
+  chip.textContent = st === 'fyi' ? 'FYI notice marked as sent · ' + P.br.at : st === 'paused' ? 'Paused: awaiting attorney acknowledgement (preview)' : st === 'ack' ? 'Attorney acknowledged (simulated) · ' + P.br.at : '';
+  var dn = $('dispNote'); dn.hidden = st === 'none'; dn.textContent = st === 'none' ? '' : 'FYI notice marked as sent (preview: no email was sent) · ' + P.br.at;
   var s2 = $('shStatus'); s2.className = 'status' + (st === 'paused' ? ' pz' : '');
-  s2.textContent = st === 'fyi' ? '✓ FYI Notice marked as dispatched (preview only; no email was sent). ' + P.br.at : st === 'paused' ? '⏸ Onboarding paused. Waiting for the attorney’s magic-link acknowledgement (preview only; no link was created).' : st === 'ack' ? '✓ Acknowledged (simulated). Onboarding can continue. ' + P.br.at : '';
-  $('shAck').hidden = st !== 'paused';
-  $('shGo').textContent = st === 'none' ? 'Dispatch (preview)' : 'Dispatch again (preview)';
+  s2.textContent = st === 'fyi' ? '✓ FYI notice marked as sent · ' + P.br.at : st === 'paused' ? '⏸ Onboarding paused. Waiting for the attorney’s magic-link acknowledgement (preview only; no link was created).' : st === 'ack' ? '✓ Acknowledged (simulated). Onboarding can continue. ' + P.br.at : '';
   $('shGo').hidden = st === 'paused';
 }
 function openSheet(){ lastFocus = document.activeElement; $('shOv').classList.add('on'); syncBrief(); $('oA').focus(); }
@@ -1165,9 +1162,7 @@ function closeSheet(){ $('shOv').classList.remove('on'); if (lastFocus && lastFo
 $('openSheet').addEventListener('click', openSheet);
 $('shX').addEventListener('click', closeSheet);
 $('shOv').addEventListener('click', function (e) { if (e.target === $('shOv')) closeSheet(); });
-$('oA').addEventListener('click', function () { setOption('fyi'); });
 $('shGo').addEventListener('click', function () { P.br.at = stamp(); P.br.status = P.br.optMode === 'fyi' ? 'fyi' : 'paused'; P.br.mode = P.br.optMode; syncBrief(); });
-$('shAck').addEventListener('click', function () { P.br.at = stamp(); P.br.status = 'ack'; syncBrief(); });
 
 /* --- step 3: sign & submit --- */
 var cv = $('sgCv'), cx = cv.getContext('2d'), drawing = false;
