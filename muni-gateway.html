@@ -620,6 +620,15 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
 .sumtile .kv b#m2{font-weight:400;color:#E2E8F0}
 .sumtile .kv b#m3{font-weight:400;color:#34D399}
 .sumtile .kv.netl b{font-weight:700;color:#34D399}
+/* v23: signed banner on one row */
+.signed{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:16px;padding:10px 16px}
+.signed[hidden]{display:none}
+.signed .sgtxt{min-width:0}
+.signed .pillbtn{flex:none;padding:6px 20px}
+.isSigned .dual{grid-template-columns:1fr}
+.isSigned .sigtile{display:none}
+.isSigned .sumtile{aspect-ratio:auto}
+.isSigned .sumtile .fine{margin-top:12px}
 #printRoot{display:none}
 @media print{
   body.printing > *:not(#printRoot){display:none !important}
@@ -707,7 +716,7 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
               <div class="kv netl"><span>Net Municipal Cost</span><b id="m4">$0.00 Net Out-of-Pocket</b></div>
               <p class="fine">Citixen UX draft · not an official LWMMI form.</p>
             </section>
-            <section class="subt" aria-labelledby="verT">
+            <section class="subt sigtile" aria-labelledby="verT">
               <h3 id="verT">Onboarding verification</h3>
               <div id="signForm" class="sgwork">
               <p class="lead" id="sgWho" style="margin-top:22px;text-align:center"></p>
@@ -1371,7 +1380,8 @@ function syncSign(){
   if (differs) note.textContent = 'This name differs from the authorized signatory on file (' + sg.name + '). You can continue in this preview; a live execution would require identity verification.';
   $('c3').disabled = !!sigValid() || !!P.signed || !!P.busy;
   $('signForm').hidden = !!P.signed; $('signedBox').hidden = !P.signed;
-  if (P.signed){ $('signedBox').textContent = ''; $('signedBox').appendChild(el('b', {text: 'Signed in this preview. '})); $('signedBox').appendChild(document.createTextNode(P.signed.record.signer.name + ' · ' + P.signed.record.signer.signed_at.replace('T', ' ').slice(0, 16) + ' UTC. ')); var d = el('button', {type: 'button', class: 'pillbtn', style: 'margin-top:14px;display:block'}); d.textContent = 'Download packet'; d.addEventListener('click', downloadPacket); $('signedBox').appendChild(d); }
+  $('p3').classList.toggle('isSigned', !!P.signed);
+  if (P.signed){ var sb = $('signedBox'); sb.textContent = ''; var tx = el('span', {class: 'sgtxt'}); tx.appendChild(el('b', {text: 'Signed in this preview. '})); tx.appendChild(document.createTextNode(P.signed.record.signer.name + ' · ' + P.signed.record.signer.signed_at.replace('T', ' ').slice(0, 16) + ' UTC.')); sb.appendChild(tx); var d = el('button', {type: 'button', class: 'pillbtn sec'}); d.textContent = 'Download packet'; d.addEventListener('click', downloadPacket); sb.appendChild(d); }
 }
 function agreementText(){
   return ['MASTER SERVICES AGREEMENT SUMMARY (Citixen UX draft, attorney review recommended (optional))',
