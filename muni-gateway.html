@@ -962,6 +962,16 @@ function slugFromUrl(){
   var m = /^\/muni\/([^\/?#]+)/.exec(location.pathname); return m ? decodeURIComponent(m[1]).toLowerCase() : '';
 }
 var SLUG = slugFromUrl();
+/* Test aid: ?reset=1 clears this city's saved portal state (progress, e-sign step, session name/title) so the gateway starts as a first visit, then drops the parameter from the address bar. */
+(function () {
+  try {
+    if (!/(?:^|[?&])reset=1(?:&|$)/.test(location.search)) return;
+    try { localStorage.removeItem('citixen_onboarding_' + SLUG); } catch (e) {}
+    try { sessionStorage.removeItem('gw.' + SLUG); } catch (e) {}
+    var q = location.search.replace(/([?&])reset=1(&|$)/, function (m, p1, p2) { return p2 ? p1 : ''; }).replace(/[?&]$/, '');
+    if (history.replaceState) history.replaceState(null, '', location.pathname + q + location.hash);
+  } catch (e) {}
+})();
 var T = Object.prototype.hasOwnProperty.call(TENANTS, SLUG) ? TENANTS[SLUG] : null;
 var OB = T && T.onboarding || null;
 
