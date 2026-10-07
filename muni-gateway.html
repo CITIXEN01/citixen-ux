@@ -173,6 +173,20 @@ html{background:#05070C}
 .brief p,.brief li{font:400 13.5px/1.6 var(--sans);color:#CBD5E1}
 .brief p{margin:6px 0}.brief ul{margin:6px 0;padding-left:20px}
 .brief .src{margin-top:20px;padding-top:14px;border-top:1px solid rgba(30,41,59,.8);font-size:12px;color:#64748B}
+.stage{position:relative}
+.pane{position:relative}
+.howz{position:absolute;top:-22px;right:-20px;z-index:2}
+.pane h1.ctr1,.pane p.lead.ctr1{text-align:center}
+.pane h1.ctr1{padding:0 150px}
+.vgbox{margin-top:24px;padding:24px 26px;text-align:center}
+.vgt{margin:0;font:700 15px/1.4 var(--sans);letter-spacing:.1em;text-transform:uppercase;color:#34D399;text-align:center}
+.vgt.vgeq{font-size:15px;letter-spacing:.02em;text-transform:none;line-height:1.5}
+.vgl{margin:14px auto 0;max-width:560px;font:400 14px/1.6 var(--sans);color:#CBD5E1;text-align:center}
+.vgl b{font-weight:700;color:#fff}
+.vgrow{display:flex;justify-content:center;margin-top:14px}
+.vgsep{border:0;border-top:1px solid rgba(148,163,184,.3);margin:22px 0 20px}
+.vgm{width:min(580px,100%)}
+@media (max-width:640px){.pane h1.ctr1{padding:34px 0 0}.howz{top:-10px;right:-4px}}
 .expl{margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border:1px solid #1E293B;border-radius:10px;background:rgba(2,6,23,.5)}
 .expl .ei{color:#22D3EE;display:flex;flex:none}.expl .et{flex:1 1 220px;min-width:0;font:400 13px/1.5 var(--sans);color:#94A3B8}
 .elink{flex:none;background:transparent;border:1px solid rgba(34,211,238,.55);color:#22D3EE;border-radius:9999px;padding:5px 14px;font:600 12.5px/1.4 var(--sans);cursor:pointer;transition:.2s}
@@ -384,22 +398,19 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
   <div class="portal">
     <section class="gl stage" id="stage" aria-label="Onboarding step">
       <div class="pane" id="p1">
-        <h1 id="wTitle" tabindex="-1">Welcome!</h1>
-        <p class="lead">Complete your easy <strong>CITIXEN UX</strong> onboarding in less than 5 minutes.</p>
-        <div class="cardx">
-          <div class="cx-h">LWMMI Loss Control Grant · pre-filled credit offset</div>
-          <div class="ln2"><span>Total platform value (annual)</span><b id="v1">$9,500</b></div>
-          <div class="ln2"><span>LWMMI Loss Control Grant credit offset<small>Pre-filled · pending LWMMI approval</small></span><b class="em" id="v2">−$9,500</b></div>
-          <div class="net" id="netLine">Net Out-of-Pocket Municipal Cost: <strong>$0.00</strong></div>
-          <div class="expl">
-            <span class="ei"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span>
-            <span class="et">Funded via the pre-filled LWMMI Loss Control Grant application (pending approval).</span>
-            <button type="button" class="elink" id="openGrant">How is this $0?</button>
-          </div>
-          <p class="fine">$0.00 applies when the grant funds the platform. If grant funds are not disbursed to the Village within 60 days, the agreement ends and the Village owes nothing. Sample figures in this preview.</p>
+        <button type="button" class="elink howz" id="openGrant">How is this $0?</button>
+        <h1 id="wTitle" class="ctr1" tabindex="-1">Welcome!</h1>
+        <p class="lead ctr1">Complete your CITIXEN UX onboarding in less than 5 minutes.</p>
+        <div class="cardx vgbox">
+          <h2 class="vgt">VERIFY PRE-FILLED LWMMI LOSS CONTROL GRANT</h2>
+          <p class="vgl" id="vgL1">CITIXEN UX™ has pre-filled the grant application for this onboarding. If LWMMI approves it, the credit offsets the annual software fee 1:1.</p>
+          <div class="vgrow"><button type="button" class="pillbtn sec" id="openVG">View Grant</button></div>
+          <p class="vgl"><b>Grant applications are zero-risk.</b> If funds are not disbursed to the Village within 60 days, the agreement simply ends and the <b>Village owes $0.</b></p>
+          <hr class="vgsep">
+          <h2 class="vgt vgeq" id="vgEq">$9,500 Platform Value - $9,500 Grant = $0 Net Out-of-Pocket Municipal Costs</h2>
+          <div class="acts2 ctr"><button type="button" class="pillbtn" id="c1">Verify &amp; Continue →</button></div>
         </div>
-        <div class="acts2"><button type="button" class="pillbtn" id="c1">Verify &amp; Continue →</button></div>
-        <p class="pv">Preview build · sample data · nothing on this page is sent or filed.</p>
+        <p class="pv">Preview build · sample data · pending LWMMI approval · nothing on this page is sent or filed.</p>
       </div>
 
       <div class="pane" id="p2">
@@ -457,6 +468,21 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
     </aside>
   </div>
 </section>
+
+<div class="ov2" id="vgOv">
+  <div class="gl brief vgm" role="dialog" aria-modal="true" aria-labelledby="vgT">
+    <div class="sh-h"><h2 id="vgT" tabindex="-1">LWMMI Loss Control Grant Application</h2><button type="button" class="x" id="vgX" aria-label="Close">✕</button></div>
+    <p class="fine" style="margin:6px 0 10px">Pre-filled by CITIXEN UX · draft · not an official LWMMI form · counsel review required</p>
+    <div class="ln2"><span>Applicant</span><b id="vgA">—</b></div>
+    <div class="ln2"><span>Program</span><b>LWMMI Loss Control Grant</b></div>
+    <div class="ln2"><span>Amount requested<small>Sample figure</small></span><b id="vgAmt">—</b></div>
+    <div class="ln2"><span>Policy ID<small>Sample</small></span><b id="vgP">—</b></div>
+    <div class="ln2"><span>Use of funds</span><b style="white-space:normal;text-align:right">CITIXEN UX statutory notice platform (annual)</b></div>
+    <div class="ln2"><span>Status</span><b style="white-space:normal;text-align:right;color:#FFD98A">Pre-filled · pending LWMMI approval · not submitted</b></div>
+    <p class="fine">If LWMMI approves, the credit offsets the annual software fee 1:1. If funds are not disbursed to the Village within 60 days, the agreement ends and the Village owes $0 (as written in the draft agreement).</p>
+    <button type="button" class="bigbtn" id="vgDone">Close</button>
+  </div>
+</div>
 
 <div class="ov2" id="grOv">
   <div class="gl brief grantm" role="dialog" aria-modal="true" aria-labelledby="grT">
@@ -877,9 +903,9 @@ function signatory(){ return (OB && OB.signatory) || {name: '', title: ''}; }
 function attorney(){ return (OB && OB.attorney) || {name: '', title: 'Village Attorney'}; }
 function fillPortal(){
   var nm = OB.welcomeName; $('wTitle').textContent = nm ? 'Welcome, ' + nm + '!' : 'Welcome!';
-  $('v1').textContent = money(OB.platformValue).replace('.00', '');
-  $('v2').textContent = '−' + money(OB.grantCredit).replace('.00', '');
-  $('netLine').lastChild.textContent = money(Math.max(0, OB.platformValue - OB.grantCredit));
+  var pv0 = money(OB.platformValue).replace('.00', ''), gc0 = money(OB.grantCredit).replace('.00', ''), net0 = money(Math.max(0, OB.platformValue - OB.grantCredit)).replace('.00', '');
+  $('vgEq').textContent = pv0 + ' Platform Value - ' + gc0 + ' Grant = ' + net0 + ' Net Out-of-Pocket Municipal Costs';
+  $('vgA').textContent = OB.entity + ', ' + OB.state; $('vgAmt').textContent = gc0; $('vgP').textContent = OB.policy || '—';
   $('m1').textContent = 'Citixen UX · ' + OB.entity + ', ' + OB.state;
   $('m2').textContent = money(OB.platformValue).replace('.00', '') + '/yr';
   $('m3').textContent = '−' + money(OB.grantCredit).replace('.00', '');
@@ -1083,6 +1109,12 @@ $('openGrant').addEventListener('click', openGrant);
 $('grX').addEventListener('click', closeGrant);
 $('grDone').addEventListener('click', closeGrant);
 $('grOv').addEventListener('click', function (e) { if (e.target === $('grOv')) closeGrant(); });
+function openVG(){ lastFocus = document.activeElement; $('vgOv').classList.add('on'); $('vgDone').focus(); }
+function closeVG(){ $('vgOv').classList.remove('on'); if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+$('openVG').addEventListener('click', openVG);
+$('vgX').addEventListener('click', closeVG);
+$('vgDone').addEventListener('click', closeVG);
+$('vgOv').addEventListener('click', function (e) { if (e.target === $('vgOv')) closeVG(); });
 /* ---------- Step 2: brief pop-up + SHA-256 tooltip ---------- */
 function openBrief(){ lastFocus = document.activeElement; $('brOv').classList.add('on'); $('brX').focus(); }
 function closeBrief(){ $('brOv').classList.remove('on'); if (lastFocus && lastFocus.focus) lastFocus.focus(); }
@@ -1097,6 +1129,7 @@ document.addEventListener('click', function (e) { if (!$('tipW').contains(e.targ
 document.addEventListener('keydown', function (e) {
   if (e.key !== 'Escape') return;
   $('tipW').classList.remove('on'); $('tipW').classList.add('off'); $('tipB').blur();
+  if ($('vgOv').classList.contains('on')) { closeVG(); return; }
   if ($('grOv').classList.contains('on')) { closeGrant(); return; }
   if ($('brOv').classList.contains('on')) { closeBrief(); return; }
   if ($('ov2').classList.contains('on')) closeComplete(); else if ($('shOv').classList.contains('on')) closeSheet();
