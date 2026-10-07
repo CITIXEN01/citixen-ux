@@ -521,6 +521,14 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
 .vgbox h1.vgt{margin:0;font:700 15px/1.4 var(--sans);letter-spacing:.1em;text-transform:uppercase;color:#34D399;text-align:left;text-shadow:0 0 12px rgba(52,211,153,.45)}
 .vgbox h1.vgt:focus{outline:none}
 .acts2.start{margin-top:16px}
+/* ---- v13: card gap-6, Step 2 addendum banner ---- */
+.portal{gap:24px}
+.gct{text-transform:uppercase}
+.abn .gct{text-transform:none;font-size:15px;letter-spacing:.02em;margin-bottom:10px}
+.abn .pillbtn{margin:0 auto}
+.abn [id=brChip]{margin-top:10px}
+.abn>div:last-child:has(#brChip:not([hidden])){margin-top:10px}
+#p2 .gcall.abn{margin-top:14px}
 #printRoot{display:none}
 @media print{
   body.printing > *:not(#printRoot){display:none !important}
@@ -583,8 +591,12 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
             <li id="brL1"><b>Automated 120-Day Notice Log:</b> Every submitted report is logged to a SHA-256 hash-chained ledger to preserve tamper-evident timeline evidence under Wis. Stat. § 893.80.<span class="tipw" id="tipW"><button type="button" class="tipb" id="tipB" aria-label="What is SHA-256?" aria-describedby="tipT"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.82 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></button><span class="tip" id="tipT" role="tooltip"><b>SHA-256</b> is a standard cryptographic hash function (NIST FIPS 180-4). It turns any record into a fixed 64-character fingerprint; change a single character and the fingerprint changes completely.<br><br>In a hash chain, each entry’s fingerprint includes the one before it, so editing an old entry breaks every entry after it. That makes changes <b>detectable (tamper-evident)</b>, not impossible, and it does not show who made them.</span></span></li>
             <li id="brL2"><b>Village Attorney Review Optional:</b> CITIXEN UX serves as an automated record-keeping tool. Optional legal dispatch forwards a pre-packaged brief directly to municipal counsel.</li>
           </ul>
-          <div class="acts2 start"><button type="button" class="pillbtn sec" id="openSheet">Preview Attorney Email</button><span class="chip" id="brChip" hidden></span></div>
-          <div class="acts2 between"><span class="vreview inl">VILLAGE ATTORNEY REVIEW RECOMMENDED (OPTIONAL)</span><button type="button" class="pillbtn" id="c2">Dispatch to Counsel (Optional) →</button></div>
+          <div class="gcall abn" role="note">
+            <h3 class="gct">Village attorney review is optional but recommended.</h3>
+            <button type="button" class="pillbtn sec" id="openSheet">Preview Attorney Email</button>
+            <div><span class="chip" id="brChip" hidden></span></div>
+          </div>
+          <div class="acts2 end"><button type="button" class="pillbtn" id="c2">Dispatch to Counsel (Optional) →</button></div>
         </div>
         <p class="pv">CITIXEN UX is a record keeping tool, not legal advice. It does not itself confer immunity or establish a statutory defense.</p>
       </div>
