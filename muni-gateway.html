@@ -508,6 +508,19 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
 .vgbox .gcall{text-align:center}
 .gct{margin:0 0 4px;font:600 14px/1.4 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:#38BDF8;text-align:center}
 .gcb{margin:0;font:400 14px/1.55 var(--sans);color:#CBD5E1;text-align:center}
+/* ---- v12: Step 2 mirrors Step 1 tile ---- */
+.vgb li{position:relative}
+.vgbox .vgb .tipw{margin-left:6px}
+.acts2.start{justify-content:flex-start;margin-top:12px}
+.acts2.between{justify-content:space-between;margin-top:16px}
+.vreview.inl{position:static;display:inline-block;flex:none}
+.vgbox #c2{box-shadow:0 0 14px rgba(52,211,153,.35)}
+#p2 .acts2{margin-top:12px}
+#p2 .acts2.between{margin-top:16px}
+@media (max-width:640px){.acts2.between{justify-content:center}}
+.vgbox h1.vgt{margin:0;font:700 15px/1.4 var(--sans);letter-spacing:.1em;text-transform:uppercase;color:#34D399;text-align:left;text-shadow:0 0 12px rgba(52,211,153,.45)}
+.vgbox h1.vgt:focus{outline:none}
+.acts2.start{margin-top:16px}
 #printRoot{display:none}
 @media print{
   body.printing > *:not(#printRoot){display:none !important}
@@ -561,20 +574,19 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
       </div>
 
       <div class="pane" id="p2">
-        <h1 class="h2" tabindex="-1">Wis. Stat. § 893.80 Statutory Defense Framework</h1>
-        <div class="acts2 ctr"><button type="button" class="pillbtn sec" id="openBrief">View § 893.80 Brief</button></div>
-        <div class="cardx cardbr">
-          <ul class="bul">
-            <li>Each notice the Village receives is recorded in a <strong style="color:#fff">SHA-256 hash-chained log</strong>.<span class="tipw" id="tipW"><button type="button" class="tipb" id="tipB" aria-label="What is SHA-256?" aria-describedby="tipT"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.82 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></button><span class="tip" id="tipT" role="tooltip"><b>SHA-256</b> is a standard cryptographic hash function (NIST FIPS 180-4). It turns any record into a fixed 64-character fingerprint; change a single character and the fingerprint changes completely.<br><br>In a hash chain, each entry’s fingerprint includes the one before it, so editing an old entry breaks every entry after it. That makes changes <b>detectable (tamper-evident)</b>, not impossible, and it does not show who made them.</span></span></li>
-            <li>The log shows the Village when a report was submitted and when it was resolved.</li>
-            <li>CITIXEN UX is a record keeping tool, not legal advice. It does not itself confer immunity or establish a statutory defense.</li>
+        <div class="cardx vgbox">
+          <div class="vghead">
+            <h1 class="vgt" tabindex="-1">Wis. Stat. § 893.80 Statutory Defense</h1>
+            <button type="button" class="pillbtn sec" id="openBrief">View § 893.80 Brief</button>
+          </div>
+          <ul class="vgb">
+            <li id="brL1"><b>Automated 120-Day Notice Log:</b> Every submitted report is logged to a SHA-256 hash-chained ledger to preserve tamper-evident timeline evidence under Wis. Stat. § 893.80.<span class="tipw" id="tipW"><button type="button" class="tipb" id="tipB" aria-label="What is SHA-256?" aria-describedby="tipT"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.82 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></button><span class="tip" id="tipT" role="tooltip"><b>SHA-256</b> is a standard cryptographic hash function (NIST FIPS 180-4). It turns any record into a fixed 64-character fingerprint; change a single character and the fingerprint changes completely.<br><br>In a hash chain, each entry’s fingerprint includes the one before it, so editing an old entry breaks every entry after it. That makes changes <b>detectable (tamper-evident)</b>, not impossible, and it does not show who made them.</span></span></li>
+            <li id="brL2"><b>Village Attorney Review Optional:</b> CITIXEN UX serves as an automated record-keeping tool. Optional legal dispatch forwards a pre-packaged brief directly to municipal counsel.</li>
           </ul>
-          <div class="chain" id="chain" aria-label="Sample hash chain"></div>
-          <span class="vreview">VILLAGE ATTORNEY REVIEW RECOMMENDED (OPTIONAL)</span>
+          <div class="acts2 start"><button type="button" class="pillbtn sec" id="openSheet">Preview Attorney Email</button><span class="chip" id="brChip" hidden></span></div>
+          <div class="acts2 between"><span class="vreview inl">VILLAGE ATTORNEY REVIEW RECOMMENDED (OPTIONAL)</span><button type="button" class="pillbtn" id="c2">Dispatch to Counsel (Optional) →</button></div>
         </div>
-        <div class="acts2 ctr"><button type="button" class="pillbtn sec" id="openSheet">Preview attorney email</button></div>
-        <div class="acts2 ctr" style="margin-top:12px"><span class="chip" id="brChip" hidden></span></div>
-        <div class="acts2 ctr"><button type="button" class="pillbtn" id="c2">Dispatch to Counsel (Optional) →</button></div>
+        <p class="pv">CITIXEN UX is a record keeping tool, not legal advice. It does not itself confer immunity or establish a statutory defense.</p>
       </div>
 
       <div class="pane" id="p3">
@@ -1057,16 +1069,7 @@ function fillPortal(){
   $('sgWho').textContent = sg.name ? 'Authorized signatory on file: ' + sg.name + (sg.title ? ', ' + sg.title : '') + '.' : 'Sign as an authorized official of the ' + OB.entity + '.';
   $('pattT').textContent = 'I am authorized to sign for the ' + OB.entity + ', and I have read the agreement summary and the 60-day grant contingency clause.';
   $('shWho').textContent = (at.name ? at.name + ' · ' : '') + (at.title || 'Village Attorney') + ' · ' + OB.entity + ', ' + OB.state;
-  buildChain(); setOption('fyi');
-}
-async function buildChain(){
-  var box = $('chain'); box.textContent = ''; var prev = 'GENESIS', labels = ['Notice 1', 'Notice 2', 'Notice 3'];
-  for (var i = 0; i < 3; i++){
-    var h = await sha256Hex(prev + '|' + labels[i] + ' (sample)');
-    if (i) box.appendChild(el('i', {text: '→'}));
-    box.appendChild(el('span', {title: h}, [el('em', {text: labels[i]}), '#' + h.slice(0, 8)]));
-    prev = h;
-  }
+  setOption('fyi');
 }
 function renderPanel(k){
   var fr = P.done.indexOf(false), mx = allowedMax();
