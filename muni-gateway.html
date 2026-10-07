@@ -599,6 +599,16 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
 .kv.net b{color:#34D399;font-weight:800;font-size:15px;text-shadow:0 0 12px rgba(52,211,153,.55)}
 .kv.net{border-bottom:0}
 @media (max-width:640px){.shead.min{flex-direction:column;gap:8px}#brChip{margin:0}.shead.min #pMeta{margin-left:0}}
+
+/* v20: Step 3 tiles: left = clean math, right = verification + signature workspace */
+.dual{align-items:start}
+#p3 .sgwork{margin-top:14px;padding-top:4px;border-top:1px solid rgba(51,65,85,.6)}
+#p3 .sgwork .lead{margin-top:12px!important;font-size:13px;text-align:left!important}
+#p3 .sgwork .sgrow{margin-top:8px}
+#p3 .sgwork .acts2.end{flex-direction:column-reverse;align-items:stretch;gap:10px}
+#p3 .sgwork .acts2.end .pillbtn{text-align:center}
+#p3 .subt .chk li b{display:inline}
+.shead.min{margin-bottom:16px;padding:8px 0}
 #printRoot{display:none}
 @media print{
   body.printing > *:not(#printRoot){display:none !important}
@@ -682,38 +692,32 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
               <h3 id="sumT">Pre-filled agreement summary</h3>
               <div class="kv"><span>Parties</span><b id="m1">Citixen UX · Village of Holmen, WI</b></div>
               <div class="kv"><span>Platform Value</span><b id="m2">$9,500/yr</b></div>
-              <div class="kv"><span>Grant Credit</span><b class="em" id="m3">-$9,500 (LWMMI Loss Control Grant credit)</b></div>
-              <div class="kv net"><span>Net Municipal Cost</span><b id="m4">$0.00 Net Municipal Out-of-Pocket Cost</b></div>
-              <div class="pend" id="pend" hidden>
-                <span class="pbadge" id="pbadge"></span>
-                <div class="plinks"><button type="button" class="lnk" id="fuNow">Send Reminder Now</button><button type="button" class="lnk" id="fuEdit">Edit Follow-Up Date</button></div>
-                <div class="fued" id="fuEdBox" hidden><label for="fuDate">Follow-up date</label><input type="date" id="fuDate"><button type="button" class="lnk" id="fuSave">Save</button></div>
-                <p class="pfine" id="fuMsg" role="status" aria-live="polite"></p>
-              </div>
+              <div class="kv"><span>Funding Offset</span><b class="em" id="m3">-$9,500 (LWMMI Loss Control Grant credit)</b></div>
+              <div class="kv net"><span>Net Out-of-Pocket</span><b id="m4">$0.00 Net Municipal Out-of-Pocket Cost</b></div>
               <p class="fine">Citixen UX draft · not an official LWMMI form.</p>
             </section>
             <section class="subt" aria-labelledby="verT">
               <h3 id="verT">Onboarding verification</h3>
               <ol class="chk">
-                <li><b>1. Grant Offset Verified:</b> 1:1 LWMMI Loss Control Grant applied ($0 net municipal cost)</li>
-                <li><b>2. Statutory Shield Briefing:</b> Wis. Stat. § 893.80 notice log brief generated &amp; optional attorney preview provided</li>
-                <li><b>3. Ready for Execution:</b> Authorized village signature required to initiate automated grant submission</li>
+                <li><b>1. Grant Offset Verified</b> ($0 Net)</li>
+                <li><b>2. Statutory Shield Briefing</b> Completed</li>
+                <li><b>3. Ready for Execution</b></li>
               </ol>
+              <div id="signForm" class="sgwork">
+              <p class="lead" id="sgWho" style="margin-top:22px;text-align:center"></p>
+              <div class="sgrow">
+                <div><label class="f" for="pnm">Full legal name</label><input class="t" id="pnm" type="text" maxlength="80" autocomplete="off" placeholder="Type your full legal name"></div>
+                <div><label class="f" for="pti">Title</label><input class="t" id="pti" type="text" maxlength="80" autocomplete="off" placeholder="e.g. Village Administrator"></div>
+              </div>
+              <p class="nm-note" id="nmNote" hidden></p>
+              <div class="seg2" role="group" aria-label="Signature method"><button type="button" id="pType" aria-pressed="true">Type</button><button type="button" id="pDraw" aria-pressed="false">Draw</button></div>
+              <div class="sgbox" id="sgBox"><div class="sgty ph" id="sgTy">Your signature</div><canvas id="sgCv" width="720" height="264" hidden aria-label="Draw your signature"></canvas><button type="button" class="sgclr" id="sgClr" hidden>Clear</button></div>
+              <label class="attest2"><input type="checkbox" id="patt"><span id="pattT"></span></label>
+              <p class="errl" id="perr" role="alert"></p>
+              <div class="acts2 end"><button type="button" class="pillbtn ghost" id="saveExit">Save &amp; Exit</button><button type="button" class="pillbtn" id="c3" disabled>Sign &amp; Execute Agreement →</button></div>
+            </div>
             </section>
           </div>
-          <div id="signForm">
-          <p class="lead" id="sgWho" style="margin-top:22px;text-align:center"></p>
-          <div class="sgrow">
-            <div><label class="f" for="pnm">Full legal name</label><input class="t" id="pnm" type="text" maxlength="80" autocomplete="off" placeholder="Type your full legal name"></div>
-            <div><label class="f" for="pti">Title</label><input class="t" id="pti" type="text" maxlength="80" autocomplete="off" placeholder="e.g. Village Administrator"></div>
-          </div>
-          <p class="nm-note" id="nmNote" hidden></p>
-          <div class="seg2" role="group" aria-label="Signature method"><button type="button" id="pType" aria-pressed="true">Type</button><button type="button" id="pDraw" aria-pressed="false">Draw</button></div>
-          <div class="sgbox" id="sgBox"><div class="sgty ph" id="sgTy">Your signature</div><canvas id="sgCv" width="720" height="264" hidden aria-label="Draw your signature"></canvas><button type="button" class="sgclr" id="sgClr" hidden>Clear</button></div>
-          <label class="attest2"><input type="checkbox" id="patt"><span id="pattT"></span></label>
-          <p class="errl" id="perr" role="alert"></p>
-          <div class="acts2 end"><button type="button" class="pillbtn ghost" id="saveExit">Save &amp; Exit</button><button type="button" class="pillbtn" id="c3" disabled>Sign &amp; Execute Agreement →</button></div>
-        </div>
         </div>
         <div class="signed" id="signedBox" hidden></div>
         <p class="pv">Preview build · sample data · signing here does not send anything, file with LWMMI, or verify identity.</p>
@@ -788,6 +792,12 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
     <div class="sh-h"><h2 id="svT" tabindex="-1">Progress saved</h2><button type="button" class="x" id="svX" aria-label="Close">✕</button></div>
     <p class="lead" id="svP"></p>
     <div class="note" id="svN"></div>
+    <div class="pend" id="pend" hidden>
+      <span class="pbadge" id="pbadge"></span>
+      <div class="plinks"><button type="button" class="lnk" id="fuNow">Send Reminder Now</button><button type="button" class="lnk" id="fuEdit">Edit Follow-Up Date</button></div>
+      <div class="fued" id="fuEdBox" hidden><label for="fuDate">Follow-up date</label><input type="date" id="fuDate"><button type="button" class="lnk" id="fuSave">Save</button></div>
+      <p class="pfine" id="fuMsg" role="status" aria-live="polite"></p>
+    </div>
     <div class="acts2 ctr"><button type="button" class="pillbtn sec" id="svBack">Resume onboarding</button><a class="pillbtn sec" href="/app" id="svExit">Exit to CITIXEN</a></div>
   </div>
 </div>
