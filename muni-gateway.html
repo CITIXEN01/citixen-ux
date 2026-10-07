@@ -440,6 +440,31 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
   *,*::before,*::after{animation:none !important;transition:none !important;scroll-behavior:auto !important}
   .ring circle,.ring path{stroke-dashoffset:0}
 }
+/* ---- v7: border swap + color taxonomy (green = progress/forward, cyan = internal/data/inspection) ---- */
+.portal .panel{border:1px solid #34D399;box-shadow:0 0 18px rgba(52,211,153,.5),0 0 46px rgba(52,211,153,.2)}
+.gl.stage{border:1px solid rgba(56,189,248,.4)}
+.cardx{border-color:rgba(56,189,248,.4)}
+.pillbtn.sec{border-color:rgba(56,189,248,.55);color:#38BDF8;background:transparent}
+.pillbtn.sec:hover:not(:disabled),.pillbtn.sec:focus-visible{background:rgba(56,189,248,.1);box-shadow:0 0 14px rgba(56,189,248,.25);border-color:#38BDF8}
+.elink{border-color:rgba(56,189,248,.55);color:#38BDF8}
+.elink:hover,.elink:focus-visible{background:rgba(56,189,248,.1);box-shadow:0 0 14px rgba(56,189,248,.25)}
+.vbadge{color:#38BDF8;border-color:rgba(56,189,248,.4);background:rgba(56,189,248,.1)}
+.chip{border-color:rgba(56,189,248,.4);background:rgba(56,189,248,.1);color:#38BDF8}
+.ps li.cur .st{color:#34D399;border-color:rgba(52,211,153,.6);background:rgba(52,211,153,.1)}
+.ps li.cur .st::before{color:#34D399}
+.vghead .pillbtn{padding:7px 20px}
+.howrow{display:flex;justify-content:flex-end;margin:0 0 10px}
+.vgbox{text-align:left}
+.vghead{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.vghead .vgt{text-align:left;text-shadow:0 0 12px rgba(52,211,153,.45)}
+.vghead .pillbtn{flex:none}
+.vgb{margin:14px 0 0;padding-left:20px;color:#CBD5E1;font:400 14px/1.6 var(--sans)}
+.vgb li{margin:6px 0}
+.vgbox .vgt.vgeq{text-align:center;text-shadow:none}
+.vgbox .gcall{margin:20px 0 0;text-align:left}
+.acts2.end{justify-content:flex-end}
+.vgbox #c1{box-shadow:0 0 14px rgba(52,211,153,.35)}
+@media (max-width:640px){.vghead{flex-direction:column}.vghead .pillbtn{align-self:flex-end}.howrow{justify-content:center}}
 #printRoot{display:none}
 @media print{
   body.printing > *:not(#printRoot){display:none !important}
@@ -478,16 +503,20 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
       </div>
       <h2 class="mtitle">Municipal Onboarding</h2>
       <div class="pane" id="p1">
-        <div class="gcall" role="note"><b>60-Day Grant Contingency Addendum.</b> If grant funds are not disbursed to the Village within 60 days, the agreement ends and the Village owes nothing.</div>
+        <div class="howrow"><button type="button" class="elink" id="openGrant">How is this $0?</button></div>
         <div class="cardx vgbox">
-          <button type="button" class="elink howz" id="openGrant">How is this $0?</button>
-          <h2 class="vgt">VERIFY PRE-FILLED LWMMI LOSS CONTROL GRANT</h2>
-          <p class="vgl" id="vgL1">CITIXEN UX™ has pre-filled the grant application for this onboarding. If LWMMI approves it, the credit offsets the annual software fee 1:1.</p>
-          <div class="vgrow"><button type="button" class="pillbtn sec" id="openVG">View Grant</button></div>
-          <p class="vgl"><b>Grant applications are zero-risk.</b> If funds are not disbursed to the Village within 60 days, the agreement simply ends and the <b>Village owes $0.</b></p>
+          <div class="vghead">
+            <h2 class="vgt">VERIFY PRE-FILLED LWMMI LOSS CONTROL GRANT</h2>
+            <button type="button" class="pillbtn sec" id="openVG">View Grant</button>
+          </div>
+          <ul class="vgb">
+            <li id="vgL1">CITIXEN UX™ has pre-filled the application for this onboarding workflow.</li>
+            <li id="vgL2">Upon approval, LWMMI grant funds offset the annual software fee 1:1 at $0 net municipal cost.</li>
+          </ul>
           <hr class="vgsep">
           <h2 class="vgt vgeq" id="vgEq">$9,500 Platform Value - $9,500 Grant = $0 Net Out-of-Pocket Municipal Costs</h2>
-          <div class="acts2 ctr"><button type="button" class="pillbtn" id="c1">Verify &amp; Continue →</button></div>
+          <div class="gcall" role="note"><b>60-Day Grant Contingency Addendum.</b> If grant funds are not disbursed to the Village within 60 days, the agreement ends and the Village owes nothing.</div>
+          <div class="acts2 end"><button type="button" class="pillbtn" id="c1">Verify &amp; Continue →</button></div>
         </div>
         <p class="pv">Preview build · sample data · pending LWMMI approval · nothing on this page is sent or filed.</p>
       </div>
