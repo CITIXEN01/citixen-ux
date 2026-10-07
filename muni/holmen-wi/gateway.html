@@ -191,7 +191,7 @@ html{background:#05070C}
 .expl .ei{color:#22D3EE;display:flex;flex:none}.expl .et{flex:1 1 220px;min-width:0;font:400 13px/1.5 var(--sans);color:#94A3B8}
 .elink{flex:none;background:transparent;border:1px solid rgba(34,211,238,.55);color:#22D3EE;border-radius:9999px;padding:5px 14px;font:600 12.5px/1.4 var(--sans);cursor:pointer;transition:.2s}
 .elink:hover,.elink:focus-visible{background:rgba(34,211,238,.1);box-shadow:0 0 14px rgba(34,211,238,.25);outline:none}
-.grantm{width:min(580px,100%)}.grantm h2{display:flex;align-items:center;gap:10px}.grantm h2 svg{color:#34D399;flex:none}
+.grantm{width:min(580px,100%)}.grantm h2{display:flex;align-items:center;justify-content:center;gap:10px}.grantm h2 svg{color:#34D399;flex:none}
 .grantm h3{color:#22D3EE}
 .callout{margin-top:18px;padding:14px 16px;border:1px solid rgba(16,185,129,.45);background:rgba(16,185,129,.08);border-radius:12px;font:400 14px/1.6 var(--sans);color:#E2E8F0}
 .callout b{color:#34D399}.callout small{display:block;margin-top:6px;font-size:12px;color:#94A3B8}
@@ -202,7 +202,7 @@ html{background:#05070C}
 .sheet{position:absolute;right:0;top:0;bottom:0;width:min(460px,100%);box-sizing:border-box;padding:28px;overflow:auto;border-radius:16px 0 0 16px;background:rgba(11,15,18,.94);animation:slideIn .28s ease both}
 @keyframes slideIn{from{transform:translateX(32px);opacity:0}to{transform:none;opacity:1}}
 .sh-h{display:flex;justify-content:space-between;align-items:center}
-.sh-h h2{margin:0;font:600 20px var(--sans);letter-spacing:-.02em;color:#fff}
+.sh-h h2{margin:0;flex:1;text-align:center;padding-left:32px;font:600 20px var(--sans);letter-spacing:-.02em;color:#fff}
 .sh-h .x{background:none;border:1px solid #334155;color:#CBD5E1;width:32px;height:32px;border-radius:50%;font-size:18px;line-height:1;cursor:pointer}
 .draft{margin:14px 0 0;padding:14px;border:1px solid #1E293B;border-radius:10px;background:rgba(2,6,23,.6);font:400 12px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#94A3B8;white-space:pre-wrap}
 .note{margin-top:14px;padding:10px 12px;border-radius:10px;background:rgba(255,194,75,.09);border:1px solid rgba(255,194,75,.3);color:#FFD98A;font:400 12.5px/1.5 var(--sans)}
@@ -432,16 +432,18 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
 
       <div class="pane" id="p3">
         <h1 class="h2" tabindex="-1">Master Services Agreement &amp; Grant Application</h1>
-        <div class="cardx">
+        <div class="acts2 ctr"><a class="pillbtn sec" href="#review" id="fullDoc">Read the Full Draft (3 pages)</a></div>
+        <div class="cardx cardbr">
           <div class="cx-h">Pre-filled agreement summary</div>
           <div class="ln2"><span>Parties</span><b id="m1">Citixen UX · Village of Holmen, WI</b></div>
           <div class="ln2"><span>Platform value</span><b id="m2">$9,500/yr</b></div>
           <div class="ln2"><span>Funding<small>LWMMI Loss Control Grant credit · pending approval</small></span><b class="em" id="m3">−$9,500</b></div>
           <div class="net" style="margin-top:14px"><b style="color:#fff">60-Day Grant Contingency Addendum.</b> If grant funds are not disbursed to the Village within 60 days, the agreement ends and the Village owes nothing.</div>
-          <p class="fine">Citixen UX draft · counsel review required · not an official LWMMI form. <a href="#review" id="fullDoc" style="color:#34D399">Read the full draft (3 pages) →</a></p>
+          <p class="fine">Citixen UX draft · not an official LWMMI form.</p>
+          <span class="vreview">Counsel Review Required</span>
         </div>
         <div id="signForm">
-          <p class="lead" id="sgWho" style="margin-top:22px"></p>
+          <p class="lead" id="sgWho" style="margin-top:22px;text-align:center"></p>
           <div class="sgrow">
             <div><label class="f" for="pnm">Full legal name</label><input class="t" id="pnm" type="text" maxlength="80" autocomplete="off" placeholder="Type your full legal name"></div>
             <div><label class="f" for="pti">Title</label><input class="t" id="pti" type="text" maxlength="80" autocomplete="off" placeholder="e.g. Village Administrator"></div>
@@ -451,7 +453,7 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
           <div class="sgbox" id="sgBox"><div class="sgty ph" id="sgTy">Your signature</div><canvas id="sgCv" width="720" height="264" hidden aria-label="Draw your signature"></canvas><button type="button" class="sgclr" id="sgClr" hidden>Clear</button></div>
           <label class="attest2"><input type="checkbox" id="patt"><span id="pattT"></span></label>
           <p class="errl" id="perr" role="alert"></p>
-          <div class="acts2"><button type="button" class="pillbtn" id="c3" disabled>Sign &amp; Submit</button></div>
+          <div class="acts2 ctr"><button type="button" class="pillbtn" id="c3" disabled>Sign &amp; Submit</button></div>
         </div>
         <div class="signed" id="signedBox" hidden></div>
         <p class="pv">Preview build · sample data · signing here does not send anything, file with LWMMI, or verify identity.</p>
