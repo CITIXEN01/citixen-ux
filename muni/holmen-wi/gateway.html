@@ -478,6 +478,9 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
 .vgb b{color:#fff;font-weight:700}
 .vgbox .gcall{border-color:rgba(56,189,248,.55);background:rgba(56,189,248,.08);box-shadow:0 0 12px rgba(56,189,248,.12)}
 @media (max-width:640px){.vghead{flex-direction:row;justify-content:center;text-align:center}.vghead .pillbtn{align-self:auto}}
+/* ---- v9: greeting Step 1 only; compact tile ---- */
+.shead[hidden]{display:none}
+.vgbox .gcall{margin:18px 0 0}
 #printRoot{display:none}
 @media print{
   body.printing > *:not(#printRoot){display:none !important}
@@ -524,8 +527,6 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
             <li id="vgL1"><b>Automated Grant Claim Processing:</b> Pre-fills application fields and routes the request directly to LWMMI for 1:1 software offset.</li>
             <li id="vgL2"><b>Guaranteed $0 Net Municipal Cost:</b> Fully covered under the LWMMI Loss Control Grant with zero out-of-pocket budget impact.</li>
           </ul>
-          <hr class="vgsep">
-          <h2 class="vgt vgeq" id="vgEq">$9,500 Platform Value - $9,500 Grant = $0 Net Out-of-Pocket Municipal Costs</h2>
           <div class="gcall" role="note"><b>60-Day Grant Contingency Addendum.</b> If grant funds are not disbursed to the Village within 60 days, the agreement ends and the Village owes nothing.</div>
           <div class="acts2 end"><button type="button" class="pillbtn" id="c1">Verify &amp; Continue →</button></div>
         </div>
@@ -595,7 +596,9 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
     <div class="sh-h"><h2 id="vgT" tabindex="-1">LWMMI Loss Control Grant Application</h2><button type="button" class="x" id="vgX" aria-label="Close">✕</button></div>
     <p class="fine" style="margin:6px 0 10px">Pre-filled by CITIXEN UX · draft · not an official LWMMI form · attorney review recommended (optional)</p>
     <div class="ln2"><span>Applicant</span><b id="vgA">—</b></div>
+    <div class="ln2"><span>Authorized signatory</span><b id="vgS" style="white-space:normal;text-align:right">—</b></div>
     <div class="ln2"><span>Program</span><b>LWMMI Loss Control Grant</b></div>
+    <div class="ln2"><span>Annual platform value<small>Sample figure</small></span><b id="vgPV">—</b></div>
     <div class="ln2"><span>Amount requested<small>Sample figure</small></span><b id="vgAmt">—</b></div>
     <div class="ln2"><span>Policy ID<small>Sample</small></span><b id="vgP">—</b></div>
     <div class="ln2"><span>Use of funds</span><b style="white-space:normal;text-align:right">CITIXEN UX statutory notice platform (annual)</b></div>
@@ -1013,7 +1016,8 @@ function attorney(){ return (OB && OB.attorney) || {name: '', title: 'Village At
 function fillPortal(){
   var nm = OB.welcomeName; $('wTitle').textContent = nm ? 'Welcome, ' + nm + '!' : 'Welcome!';
   var pv0 = money(OB.platformValue).replace('.00', ''), gc0 = money(OB.grantCredit).replace('.00', ''), net0 = money(Math.max(0, OB.platformValue - OB.grantCredit)).replace('.00', '');
-  $('vgEq').textContent = pv0 + ' Platform Value - ' + gc0 + ' Grant = ' + net0 + ' Net Out-of-Pocket Municipal Costs';
+  $('vgPV').textContent = pv0 + '/yr';
+  $('vgS').textContent = signatory().name ? signatory().name + (signatory().title ? ', ' + signatory().title : '') : '—';
   $('vgA').textContent = OB.entity + ', ' + OB.state; $('vgAmt').textContent = gc0; $('vgP').textContent = OB.policy || '—';
   $('m1').textContent = 'Citixen UX · ' + OB.entity + ', ' + OB.state;
   $('m2').textContent = money(OB.platformValue).replace('.00', '') + '/yr';
@@ -1051,6 +1055,7 @@ function renderPortal(k, focus){
   P.step = k;
   ['p1', 'p2', 'p3'].forEach(function (id, i){ $(id).classList.toggle('on', i + 1 === k); });
   renderPanel(k); syncBrief(); syncSign();
+  document.querySelector('.shead').hidden = k !== 1;  /* greeting is Step 1 only */
   document.title = ['Welcome', '§ 893.80 brief', 'E-signature'][k - 1] + ' — Citixen UX';
   window.scrollTo(0, 0);
   if (focus){ var h = $('p' + k).querySelector('h1') || $('wTitle'); if (h) h.focus({preventScroll: true}); }
