@@ -596,14 +596,14 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
 .shead.min{margin-bottom:12px}
 #brChip{order:-1;font:500 12px/1.2 ui-monospace,"JetBrains Mono",Menlo,monospace;padding:4px 12px;border-color:#38BDF8;color:#38BDF8;background:rgba(56,189,248,.1);margin-right:auto}
 #brChip[hidden]{display:none!important}
-.kv.net b{color:#34D399;font-weight:800;font-size:15px;text-shadow:0 0 12px rgba(52,211,153,.55)}
-.kv.net{border-bottom:0}
+.kv.netl b{color:#34D399;font-weight:800}
+.kv.netl{border-bottom:0}
 @media (max-width:640px){.shead.min{flex-direction:column;gap:8px}#brChip{margin:0}.shead.min #pMeta{margin-left:0}}
 
 /* v20: Step 3 tiles: left = clean math, right = verification + signature workspace */
 .dual{align-items:start}
-#p3 .sgwork{margin-top:14px;padding-top:4px;border-top:1px solid rgba(51,65,85,.6)}
-#p3 .sgwork .lead{margin-top:12px!important;font-size:13px;text-align:left!important}
+#p3 .sgwork{margin:0;padding:0;border:0}
+#p3 .sgwork .lead{margin:0!important;padding:8px 0 0;font:600 14px/1.45 var(--sans);color:#fff;text-align:left!important}
 #p3 .sgwork .sgrow{margin-top:8px}
 #p3 .sgwork .acts2.end{flex-direction:column-reverse;align-items:stretch;gap:10px}
 #p3 .sgwork .acts2.end .pillbtn{text-align:center}
@@ -693,16 +693,11 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
               <div class="kv"><span>Parties</span><b id="m1">Citixen UX · Village of Holmen, WI</b></div>
               <div class="kv"><span>Platform Value</span><b id="m2">$9,500/yr</b></div>
               <div class="kv"><span>Funding Offset</span><b class="em" id="m3">-$9,500 (LWMMI Loss Control Grant credit)</b></div>
-              <div class="kv net"><span>Net Out-of-Pocket</span><b id="m4">$0.00 Net Municipal Out-of-Pocket Cost</b></div>
+              <div class="kv netl"><span>Net Municipal Cost</span><b id="m4">$0.00 Net Out-of-Pocket</b></div>
               <p class="fine">Citixen UX draft · not an official LWMMI form.</p>
             </section>
             <section class="subt" aria-labelledby="verT">
               <h3 id="verT">Onboarding verification</h3>
-              <ol class="chk">
-                <li><b>1. Grant Offset Verified</b> ($0 Net)</li>
-                <li><b>2. Statutory Shield Briefing</b> Completed</li>
-                <li><b>3. Ready for Execution</b></li>
-              </ol>
               <div id="signForm" class="sgwork">
               <p class="lead" id="sgWho" style="margin-top:22px;text-align:center"></p>
               <div class="sgrow">
@@ -1195,7 +1190,7 @@ function fillPortal(){
   $('m1').textContent = 'Citixen UX · ' + OB.entity + ', ' + OB.state;
   $('m2').textContent = money(OB.platformValue).replace('.00', '') + '/yr';
   $('m3').textContent = '-' + money(OB.grantCredit).replace('.00', '') + ' (LWMMI Loss Control Grant credit)';
-  $('m4').textContent = money(Math.max(0, OB.platformValue - OB.grantCredit)) + ' Net Municipal Out-of-Pocket Cost';
+  $('m4').textContent = money(Math.max(0, OB.platformValue - OB.grantCredit)) + ' Net Out-of-Pocket';
   $('wSub').textContent = 'Review and approve the pre-allocated LWMMI Loss Control Grant to activate CITIXEN UX™ for the ' + OB.entity + ' at ' + money(Math.max(0, OB.platformValue - OB.grantCredit)).replace('.00', '') + ' net cost.';
   var STN = {WI: 'Wisconsin', TX: 'Texas', MN: 'Minnesota', IA: 'Iowa', IL: 'Illinois'};
   $('pMeta').textContent = OB.entity + ', ' + (STN[OB.state] || OB.state);
