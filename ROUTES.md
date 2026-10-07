@@ -27,7 +27,8 @@ non-public page to `/app`. While it is there, only `/app`, `/report/{id}`, `/api
 | `/sites`, `/sites/{slug}` | `sites.html` | multi-tenant directory; also registered intake routes (`holmen-wi-public-works`, `holmen-wi-parks`) |
 | `/dispatch`, `/admin` | redirect to `/muni` (tenant picker) | legacy roots |
 | `/ledger`, `/operator`, `/careers`, `/join/{id}` | unchanged | not in the architecture brief; kept |
-| anything else | `404.html` (real 404) | the old catch-all that returned 200 is gone |
+| `/muni/{anything unknown}` (e.g. `/muni/holmen-wi-gatewa`, `/muni/holmen-wi/invalid`) | `404.html` via the last rewrite | branded "Redirecting to Village of Holmen Gateway..." page, `location.replace` to `/muni/holmen-wi/gateway` after 1 s (meta refresh if JS is off). Served 200 + noindex. Real routes win because rewrites are first-match and this one is last. `/muni/holmen-wi/gateway/{rest}` is a plain 307 to the gateway |
+| anything else | `404.html` (real 404, same redirecting page) | the old catch-all that returned 200 is gone |
 
 `/rep` and `rep.html` are removed (still in git history). Representative visibility is the municipality's call.
 
