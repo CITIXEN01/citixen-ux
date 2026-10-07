@@ -615,6 +615,11 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
 .savem .plinks{justify-content:center;gap:24px}
 .savem .fued{justify-content:center}
 .savem .pfine{text-align:center}
+/* v22: left summary tile: square, regular-weight values, bold net line only */
+@media (min-width:761px){.sumtile{aspect-ratio:1/1;display:flex;flex-direction:column;overflow:hidden}.sumtile .fine{margin-top:auto}}
+.sumtile .kv b#m2{font-weight:400;color:#E2E8F0}
+.sumtile .kv b#m3{font-weight:400;color:#34D399}
+.sumtile .kv.netl b{font-weight:700;color:#34D399}
 #printRoot{display:none}
 @media print{
   body.printing > *:not(#printRoot){display:none !important}
@@ -694,7 +699,7 @@ input.t:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 3px rgba(16,2
             <button type="button" class="pillbtn sec" id="fullDoc" aria-haspopup="dialog">Read the Full Draft (3 pages)</button>
           </div>
           <div class="dual">
-            <section class="subt" aria-labelledby="sumT">
+            <section class="subt sumtile" aria-labelledby="sumT">
               <h3 id="sumT">Pre-filled agreement summary</h3>
               <div class="kv"><span>Parties</span><b id="m1">Citixen UX · Village of Holmen, WI</b></div>
               <div class="kv"><span>Platform Value</span><b id="m2">$9,500/yr</b></div>
